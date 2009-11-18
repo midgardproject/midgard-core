@@ -1,0 +1,182 @@
+NEWS of Midgard library
+History of user-visible changes. March 12 2001
+
+Copyright (C) 1999 Jukka Zitting <jukka.zitting@iki.fi>
+Copyright (C) 2000 The Midgard Project ry
+Copyright (C) 2001 Emiliano Heyns, Aurora SA
+See the end for copying conditions.
+
+Please contact user@midgard-project.org for more information.
+
+Version 1.4.2
+* Repligard
+   Preliminary support for export hooks (non-configurable from the user side yet)
+   Fixes in sitegroup management
+* Midgard library
+   Preliminary support for request parser and mod_midgard2 (experimental)
+   Configuration options are distributed across Midgard components using midgard-config tool
+* PHP3 module
+   PHP3 support rendered obsolete
+* PHP4 module
+   Major fixes in article's handling including sorting and event management
+   Reworked preparser code
+   Better handling of attachments
+* Apache module
+   New Apache module (mod_midgard2) which supports caching of PHP pages (experimental)
+
+Version 1.4.1-dev (Release candidate)
+* Repligard
+   Better sitegroup support
+* PHP4 module
+   Midgard now works with PHP4 and PHP3
+* Object management in portable way
+   Midgard's PHP binding now has support to fetch objects indexed 
+   by Globally Unique IDentifiers insted of local database IDs.
+   It opens era of truly portable applications in Midgard
+* mod_midgard
+   Cleanly closes database connections at exit.
+
+Version 1.4
+* Asgard
+   Asgard is new Administrative interface for Midgard databases
+
+Version 1.4-beta7
+* Repligard
+   Repligard supports BLOBs, attachments, and removal of
+   deleted resources.
+   
+Version 1.4-beta6
+* Repligard
+   Repligard is replication utility for Midgard. It uses XML-based
+   file format to transfer changes between master and slave databases
+   easing server maintainance and development.
+   
+   Repligard isn't completed yet, so far it can export/import almost all
+   Midgard resource types except for BLOBs. It also support transparent
+   charset translation via UNICODE.
+   
+Version 1.4-beta5
+
+* Filetemplates
+   Filetemplates enables the development of file-based Midgard
+   applications. Page & style info is put in XML files. All midgard
+   stuff works but you'll be missing some information like
+   $midgard->page.
+
+   Filetemplates can work in connected or disconnected mode. Connected
+   is if a non-prefixed host record is found for the host you're
+   accessing. A connection to the database will be available and all
+   midgard functions will work. If not all midgard functions can be
+   called but will fail. The template & inline variable expansion
+   syntax does work in disconnected mode.
+
+Version 1.4-beta4
+
+*  Sitegroups logon 'su' support.
+   You can now log in as priviligeduser=otheruser[+!]sitegroupname.
+   This logs you in as otheruser whith priviligedusers' password.
+   root users can change to anyone, SG admins are of course restricted
+   to users withing sitegroups they're admin of
+
+*  Repligard
+
+Version 1.4-beta3
+
+* Moved copyrights to The Midgard Project Ry
+
+* Sitegroups support beta
+
+* Calendering/events in the core libraries.
+
+* Database generalization should make porting to other databases easier
+
+Version 1.2.6
+
+* Maintainer of 1.2 branch is changed to Alexander Bokovoy <bokovoy@minsk.lug.net>
+* Support for selecting records by names instead of IDs added.
+* API for text formating engine changed, --with-midgard-lang compilation
+  option removed in favor of MidgardParser runtime Mod_Midgard's directive.
+* SiteGroups support added (alpha)
+
+Version 1.2.5
+
+* Support for Russian Midgard integrated.
+
+Version 1.2.4
+
+* Bug fixes in access control. Group membership is now handled better.
+
+Version 1.2.3
+
+* Better search for MySQL development environment in the configure script.
+  The configure options --with-mysql-lib and --with-mysql-include are no
+  longer available as they should not be needed.
+
+* The problem with the mysql_fetch_field_direct function is now fixed.
+
+Version 1.2.2
+
+* More verbose error messages of connection failure now available
+
+* New configure options --with-mysql-lib and --with-mysql-include added
+
+* Removed unused code in web.c
+
+Version 1.2.1
+
+* Support for plain text passwords was added.
+
+* Library now uses mysql_real_connect to connect faster to the database.
+
+Version 1.2
+
+* Runtime configuration of the connection parameters now possible.
+
+* The configure script now requires the MySQL client library to be available.
+
+Version 1.1
+
+* Broke up the installation system. The Midgard library now installs as
+  an independent package.
+
+* Upgraded to libtool 1.3. No more problems with inter-library dependencies.
+
+Version 1.0.2
+
+* Midgard library now installs as a part of a more complete Midgard system.
+  The system also contains the Midgard-PHP module.
+
+Version 1.0
+
+* First stable release. The base API should be quite stable at least to
+  version 2.0.
+
+Version 0.5
+
+* Migrated the installation system to use Libtool, Autoconf and Automake.
+  You should now be able to do ./configure; make; make install to install
+  the Midgard library.
+
+* Added files NEWS, AUTHORS and ChangeLog to comply with the GNU coding
+  standards.
+
+----------------------------------------------------------------------
+Copyright information:
+
+Copyright (C) 1999 Jukka Zitting <jukka.zitting@iki.fi>
+Copyright (C) 2000 The Midgard Project ry
+
+   Permission is granted to anyone to make or distribute verbatim copies
+   of this document as received, in any medium, provided that the
+   copyright notice and this permission notice are preserved,
+   thus giving the recipient permission to redistribute in turn.
+
+   Permission is granted to distribute modified versions
+   of this document, or of portions of it,
+   under the above conditions, provided also that they
+   carry prominent notices stating who last changed them.
+
+Local variables:
+version-control: never
+mode: indented-text
+end:

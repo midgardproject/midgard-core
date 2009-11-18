@@ -1,0 +1,95 @@
+# Midgard core 
+# Copyright (C) 2006 Piotr Pokora <piotrek.pokora@gmail.com>
+# This file is distributed under the same license as the midgard-core package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: midgard\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2006-06-02 22:00+0200\n"
+"PO-Revision-Date: 2006-06-02 22:00+200\n"
+"Last-Translator: Piotr Pokora <piotrek.pokora@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/midgard_error.c:35
+msgid "MGD_ERR_OK"
+msgstr "OK"
+
+#: src/midgard_error.c:39
+msgid "Access Denied"
+msgstr "Dost�p zabroniony"
+
+#: src/midgard_error.c:43
+msgid "Resource link crosses sitegroup borders"
+msgstr "Link wykracza poza granicę sitegroup'y"
+
+#: src/midgard_error.c:47
+msgid "Not Midgard Object"
+msgstr "Obiekt nie jest zarejstrowany jako 'Midgard obiekt'"
+
+#: src/midgard_error.c:51
+msgid "Object does not exist"
+msgstr "Obiekt nie istnieje"
+
+#: src/midgard_error.c:55
+msgid "Can't allocate memory"
+msgstr "Nie można przydzielć pamięci"
+
+#: src/midgard_error.c:59
+msgid "Invalid characters in object's name"
+msgstr "Niedozwolone znaki w nazwie"
+
+#: src/midgard_error.c:63
+msgid "Object already exist"
+msgstr "Obiekt już istnieje"
+
+#: src/midgard_error.c:67
+msgid "Object has dependants"
+msgstr "Obiekt ma zależnści"
+
+#: src/midgard_error.c:71
+msgid "Date range error"
+msgstr "Błąd zakresu daty"
+
+#: src/midgard_error.c:75
+msgid "Not connected to the Midgard database"
+msgstr "Brak połączenia z baą Midgard"
+
+#: src/midgard_error.c:79
+msgid "Sitegroup not found"
+msgstr "Sitegroupa nie znaleziona"
+
+#: src/midgard_error.c:83
+msgid "Object not registered as Midgard Object"
+msgstr "Obiekt nie jest zarejstrowany jako 'Midgard obiekt'"
+
+#: src/midgard_error.c:87
+msgid "Quota limit reached"
+msgstr "Limit quoty dyskowej osiągnęty"
+
+#: src/midgard_error.c:91
+msgid "Critical internal error"
+msgstr "Krytyczny błąd wewętrzny"
+
+#: src/midgard_error.c:95
+msgid "Object with such name exists in tree"
+msgstr "Już istnieje obiekt o takiej nazwie"
+
+#: src/midgard_error.c:99
+msgid "Storage table not defined for object"
+msgstr "Tabela bazy danych nie zdefiniowana dla obiektu"
+
+#: src/midgard_error.c:103
+msgid "Parent object in tree not defined"
+msgstr "Nie zdefiniowany nadrzędny typ"
+
+#: src/midgard_error.c:107
+msgid "Invalid property value"
+msgstr "Niewłściwa wartś"
+
+#: src/midgard_error.c:115
+msgid "Undefined error"
+msgstr "Niezidentyfikowany błąd"

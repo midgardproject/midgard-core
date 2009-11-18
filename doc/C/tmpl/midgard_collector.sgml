@@ -1,0 +1,227 @@
+<!-- ##### SECTION Title ##### -->
+midgard_collector
+
+<!-- ##### SECTION Short_Description ##### -->
+Optimized database query that doesn't return objects
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+ The main idea of #MidgardCollector is code, resources and data reusability
+ for all data values which are not objects itself and as part of any object
+ could be retrieved from Midgard database without any need to retrieve full 
+ objects' records. MidgardCollector is special limited resource data handler 
+ and is optimized for performance and data accessibility.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### TYPEDEF midgard_collector ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardCollector ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### TYPEDEF MidgardCollectorClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION midgard_collector_new ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@typename: 
+@domain: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_set_key_property ##### -->
+<para>
+
+</para>
+
+@self: 
+@key: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_add_value_property ##### -->
+<para>
+
+</para>
+
+@self: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_set ##### -->
+<para>
+
+</para>
+
+@self: 
+@key: 
+@subkey: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_get ##### -->
+<para>
+
+</para>
+
+@self: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_get_subkey ##### -->
+<para>
+
+</para>
+
+@self: 
+@key: 
+@subkey: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_list_keys ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_merge ##### -->
+<para>
+
+</para>
+
+@self: 
+@mc: 
+@overwrite: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_remove_key ##### -->
+<para>
+
+</para>
+
+@self: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_add_constraint ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@op: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_add_constraint_with_property ##### -->
+<para>
+
+</para>
+
+@self: 
+@property_a: 
+@op: 
+@property_b: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_begin_group ##### -->
+<para>
+
+</para>
+
+@self: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_end_group ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_add_order ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@dir: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_collector_set_offset ##### -->
+<para>
+
+</para>
+
+@self: 
+@offset: 
+
+
+<!-- ##### FUNCTION midgard_collector_set_limit ##### -->
+<para>
+
+</para>
+
+@self: 
+@limit: 
+
+
+<!-- ##### FUNCTION midgard_collector_count ##### -->
+<para>
+
+</para>
+
+@self: 
+
+
+<!-- ##### FUNCTION midgard_collector_execute ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

@@ -1,0 +1,7 @@
+man/midgard-config.1
+man/midgard-owner.1
+man/midgard-pageresolve.1  
+man/midgard-schema.1  
+man/midgard-snippet.1
+man/midgard-preparse.1
+man/midgard-query.1

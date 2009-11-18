@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Database xmlns="http://www.midgard-project.org/midgard-basic-database">
+
+	<!-- repligard table description -->
+	<table name="repligard">
+		<column name="id"                   dbtype="int"            gtype="integer"     unique="false" />
+		<column name="guid"                 dbtype="varchar(80)"    gtype="string"      index="true" unique="false" />
+		<column name="sitegroup"            dbtype="int"            gtype="integer"     index="true" default="0"/>
+		<column name="typename"             dbtype="varchar(255)"   gtype="string" />
+		<column name="lang"                 dbtype="int"            gtype="integer"     default="0"/>
+		<column name="object_action"        dbtype="varchar(255)"   gtype="string" />
+		<column name="object_action_date"   dbtype="datetime"       gtype="datetime"    default="0001-01-01 00:00:00"/>
+	</table>
+
+</Database>

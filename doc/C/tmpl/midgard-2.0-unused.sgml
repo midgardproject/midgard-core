@@ -1,0 +1,1506 @@
+<!-- ##### SECTION ./tmpl/midgard_request.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_request.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_request.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/midgard_request.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/midgard_request.sgml:Title ##### -->
+midgard_request
+
+
+<!-- ##### SECTION ./tmpl/midgard_request_config.sgml:Long_Description ##### -->
+<para>
+ #MidgardRequestConfig holds variables which are valid for a very short time.
+ Real use case is to store http request's data in #MidgardRequestConfig 
+ configuration. 
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_request_config.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_request_config.sgml:Short_Description ##### -->
+Http request's variables handler.
+
+
+<!-- ##### SECTION ./tmpl/midgard_request_config.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/midgard_request_config.sgml:Title ##### -->
+midgard_request_config
+
+
+<!-- ##### SECTION ./tmpl/midgard_sitegroup.sgml:Long_Description ##### -->
+<para>
+#MidgardSitegroup (midgard_sitegroup) class represents virtual database context.
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_sitegroup.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_sitegroup.sgml:Short_Description ##### -->
+Virtual database context
+
+
+<!-- ##### SECTION ./tmpl/midgard_sitegroup.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/midgard_sitegroup.sgml:Title ##### -->
+midgard_sitegroup
+
+
+<!-- ##### MACRO MGD_TYPE_SITEGROUP ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardCollectorPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardConnectionCache ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardRequestConfig ##### -->
+<para>
+
+</para>
+
+@parent: 
+@host: 
+@page: 
+@style: 
+@pages: 
+@uri: 
+@auth_required: 
+@is_auth: 
+@argv: 
+@argc: 
+
+<!-- ##### STRUCT MidgardRequestConfigClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### STRUCT MidgardRequestConfigPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardSitegroup ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+@priv: 
+@name: 
+@realm: 
+@group: 
+@ispublic: 
+@id: 
+@adminid: 
+@metadata: 
+
+<!-- ##### STRUCT MidgardSitegroupPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardStoragePrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-blob:content ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-blob:parentguid ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:authtype ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:blobdir ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:cachedir ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:database ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:dbpass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:dbtype ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:dbuser ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:defaultlang ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:host ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:logfilename ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:loglevel ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:midgardpassword ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:midgardusername ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:pamfile ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:schema ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:schemadir ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:sharedir ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:tablecreate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:tableupdate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:testunit ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-config:vardir ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL midgard-connection::auth-changed ##### -->
+<para>
+
+</para>
+
+@midgard_connection: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-connection::error ##### -->
+<para>
+
+</para>
+
+@midgard_connection: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-connection::lang-changed ##### -->
+<para>
+
+</para>
+
+@midgard_connection: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-connection::lost-provider ##### -->
+<para>
+
+</para>
+
+@midgard_connection: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-connection::sitegroup-changed ##### -->
+<para>
+
+</para>
+
+@midgard_connection: the object which received the signal.
+
+<!-- ##### ARG midgard-connection:errnum ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-connection:errstr ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-connection:person ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-connection:request-config ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-connection:user ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL midgard-dbus::notified ##### -->
+<para>
+
+</para>
+
+@midgard_dbus: the object which received the signal.
+@arg1: 
+
+<!-- ##### SIGNAL midgard-metadata::set-created ##### -->
+<para>
+
+</para>
+
+@midgard_metadata: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-metadata::set-updated ##### -->
+<para>
+
+</para>
+
+@midgard_metadata: the object which received the signal.
+
+<!-- ##### ARG midgard-metadata:approved ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:approver ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:authors ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:created ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:creator ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:deleted ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:exported ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:hidden ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:imported ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:isapproved ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:islocked ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:locked ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:locker ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:navnoentry ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:owner ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:published ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:revised ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:revision ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:revisor ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:scheduleend ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:schedulestart ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:score ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-metadata:size ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL midgard-object::action-approve ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-approve-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-approved ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-create ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-create-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-created ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-delete ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-delete-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-deleted ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-export ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-export-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-exported ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-import ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-import-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-imported ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-loaded ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-loaded-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-lock ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-lock-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-locked ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-purge ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-purge-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-purged ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-unapprove ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-unapprove-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-unapproved ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-unlock ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-unlock-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-unlocked ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-update ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-update-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard-object::action-updated ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### ARG midgard-object:action ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-object:guid ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-object:metadata ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-object:sitegroup ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-sitegroup:admingroupguid ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-sitegroup:adminid ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-sitegroup:group ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-sitegroup:guid ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-sitegroup:id ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-sitegroup:metadata ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-sitegroup:name ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-sitegroup:public ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-sitegroup:realm ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:active ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:authtype ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:authtypeid ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:guid ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:hashtype ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:login ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:password ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:person ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:sitegroup ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard-user:usertype ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION midgard_collector_destroy ##### -->
+<para>
+
+</para>
+
+@collector: 
+
+<!-- ##### FUNCTION midgard_collector_set_lang ##### -->
+<para>
+
+</para>
+
+@self: 
+@lang: 
+
+<!-- ##### FUNCTION midgard_collector_unset_languages ##### -->
+<para>
+
+</para>
+
+@self: 
+
+<!-- ##### FUNCTION midgard_config_init ##### -->
+<para>
+
+</para>
+
+@fname: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_config_struct2gobject ##### -->
+<para>
+
+</para>
+
+@config: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_config_struct_free ##### -->
+<para>
+
+</para>
+
+@config: 
+
+<!-- ##### FUNCTION midgard_config_struct_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION midgard_config_update_midgard_table ##### -->
+<para>
+
+</para>
+
+@self: 
+@klass: 
+@mgd: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_close ##### -->
+<para>
+
+</para>
+
+@self: 
+
+<!-- ##### FUNCTION midgard_connection_get_default_lang ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_get_lang ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_get_lang_from_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@id: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_get_lang_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@language: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_get_request_config ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_get_sitegroup ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_get_sitegroup_from_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@id: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_get_sitegroup_id ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_list_languages ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_objects: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_set_default_lang ##### -->
+<para>
+
+</para>
+
+@self: 
+@language: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_set_lang ##### -->
+<para>
+
+</para>
+
+@self: 
+@language: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_set_request_config ##### -->
+<para>
+
+</para>
+
+@self: 
+@rcfg: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_set_sitegroup ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_struct2gobject ##### -->
+<para>
+
+</para>
+
+@conn: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_struct_free ##### -->
+<para>
+
+</para>
+
+@self: 
+
+<!-- ##### FUNCTION midgard_connection_struct_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_struct_open_config ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@config: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_workaround_get ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION midgard_connection_workaround_set ##### -->
+<para>
+
+</para>
+
+@mgd: 
+
+<!-- ##### FUNCTION midgard_object_build_path ##### -->
+<para>
+
+</para>
+
+@mobj: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_class_is_multilang ##### -->
+<para>
+
+</para>
+
+@klass: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_get ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_get_languages ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_objects: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_query_builder_free ##### -->
+<para>
+
+</para>
+
+@builder: 
+
+<!-- ##### FUNCTION midgard_query_builder_get_guid ##### -->
+<para>
+
+</para>
+
+@builder: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_query_builder_join ##### -->
+<para>
+
+</para>
+
+@builder: 
+@prop: 
+@jobject: 
+@jprop: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_query_builder_set_lang ##### -->
+<para>
+
+</para>
+
+@builder: 
+@lang: 
+
+<!-- ##### FUNCTION midgard_query_builder_unset_languages ##### -->
+<para>
+
+</para>
+
+@builder: 
+
+<!-- ##### FUNCTION midgard_quota_get_sitegroup_size ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@sg: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_quota_set_sitegroup_size ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@sitegroup: 
+@size: 
+@records: 
+
+<!-- ##### FUNCTION midgard_reflection_property_is_multilang ##### -->
+<para>
+
+</para>
+
+@object: 
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_replicator_new ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_get_argc ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_get_argv ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_get_auth ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_get_host ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_get_page ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_get_pages ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_get_style ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_get_uri ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_new ##### -->
+<para>
+
+</para>
+
+@uri: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_set_argc ##### -->
+<para>
+
+</para>
+
+@self: 
+@argc: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_set_argv ##### -->
+<para>
+
+</para>
+
+@self: 
+@argv: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_set_auth ##### -->
+<para>
+
+</para>
+
+@self: 
+@auth: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_set_host ##### -->
+<para>
+
+</para>
+
+@self: 
+@host: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_set_page ##### -->
+<para>
+
+</para>
+
+@self: 
+@page: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_set_pages ##### -->
+<para>
+
+</para>
+
+@self: 
+@pages: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_request_config_set_style ##### -->
+<para>
+
+</para>
+
+@self: 
+@style: 
+@Returns: 
+
+<!-- ##### TYPEDEF midgard_sitegroup ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION midgard_sitegroup_create ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_sitegroup_delete ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_sitegroup_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION midgard_sitegroup_list ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_sitegroup_new ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@value: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_sitegroup_update ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_timestamp_dup_string ##### -->
+<para>
+
+</para>
+
+@value: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_timestamp_get_time ##### -->
+<para>
+
+</para>
+
+@value: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_timestamp_set_string ##### -->
+<para>
+
+</para>
+
+@value: 
+@time: 
+
+<!-- ##### FUNCTION midgard_timestamp_set_time ##### -->
+<para>
+
+</para>
+
+@value: 
+@time: 
+
+<!-- ##### FUNCTION midgard_user_auth ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@name: 
+@password: 
+@sitegroup: 
+@trusted: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_user_is_root ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_user_legacy_auth ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@login: 
+@password: 
+@sitegroup: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_user_password ##### -->
+<para>
+
+</para>
+
+@self: 
+@login: 
+@password: 
+@hashtype: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_user_root_login ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@login: 
+@password: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_user_set_active ##### -->
+<para>
+
+</para>
+
+@user: 
+@flag: 
+@Returns: 
+
+<!-- ##### FUNCTION set_created ##### -->
+<para>
+
+</para>
+
+@self: 
+
+<!-- ##### FUNCTION set_updated ##### -->
+<para>
+
+</para>
+
+@self: 
+

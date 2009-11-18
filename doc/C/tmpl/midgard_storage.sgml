@@ -1,0 +1,95 @@
+<!-- ##### SECTION Title ##### -->
+MidgardStorage
+
+<!-- ##### SECTION Short_Description ##### -->
+Underlying storage creator
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+#MidgardStorage is reponsible for creating underlying storage.
+It creates storage for every #MidgardDBObjectClass derived one. 
+For example, normal database tables are created for #MidgardObjectClass derived classes, 
+and database views for #MidgardViewClass derived ones.
+</para>
+<para>
+It is very important to understand that #MidgardStorage doesn't have specific implementation 
+which creates storage tables. Instead, it invokes private routines of #MidgardDBObjectClass derived classes.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### TYPEDEF midgard_storage ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardStorage ##### -->
+<para>
+
+</para>
+
+@Since: 9.09
+
+<!-- ##### STRUCT MidgardStorageClass ##### -->
+<para>
+
+</para>
+
+@Since: 9.09
+
+<!-- ##### FUNCTION midgard_storage_create_base_storage ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_storage_create_class_storage ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_storage_update_class_storage ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_storage_class_storage_exists ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_storage_delete_class_storage ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@Returns: 
+
+

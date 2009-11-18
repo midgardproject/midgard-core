@@ -1,0 +1,54 @@
+Source: midgard2-core
+Section: ""libs
+Priority: optional
+Maintainer:  Piotr Pokora <piotrek.pokora@gmail.com>
+Uploaders: 
+Standards-Version: 3.2.1
+Build-Depends: debhelper (>=3), libglib2.0-dev (>=2.8), autotools-dev, libxml2-dev(>=2.6.11), fakeroot
+
+Package: libmidgard2.0
+Section: ""libs
+Architecture: i386
+Depends: libglib2.0-0 (>=2.8), libxml2 (>=2.6.11), libgda3-3
+Conflicts: libmidgard3 , libmidgard5
+Suggests: mysql-server-5.0 (>=5.0), libgda3-mysql
+Description: Midgard Content Management System - Runtime Library
+ .
+ Midgard is a capable open source content management system for running 
+ mid-to-high-end websites. In addition to the built-in content management 
+ features, Midgard also provides a highly object-oriented component 
+ architecture for building interactive web applications that integrate 
+ seamlessly with the website. 
+ .
+ Midgard can run almost any kind of website. From personal blogs to 
+ corporate intranets and multilingual groups of websites. 
+
+Package: libmidgard2.0-dev
+Section: ""devel
+Architecture: i386
+Depends: libmidgard2.0 (>= ${source:Version})
+Conflicts: libmidgard3-dev, libmidgard5-dev
+Description: Midgard Content Management System - Development Files
+ This package is required only if you are a developer and intend to build
+ extensions for Midgard. It contains the header files and static library.
+ .
+ Midgard is a capable open source content management system for running
+ mid-to-high-end websites. In addition to the built-in content management
+ features, Midgard also provides a highly object-oriented component
+ architecture for building interactive web applications that integrate
+ seamlessly with the website.
+
+Package: midgard2.0-common
+Section: ""utils
+Architecture: i386
+Depends: libmidgard2.0 (>= ${source:Version})
+Description: Midgard common files used by different midgard extensions
+ .
+ Midgard is a capable open source content management system for running 
+ mid-to-high-end websites. In addition to the built-in content management 
+ features, Midgard also provides a highly object-oriented component 
+ architecture for building interactive web applications that integrate 
+ seamlessly with the website
+ .
+ This package contains command line tools, manuals, authentication and 
+ configuration files.

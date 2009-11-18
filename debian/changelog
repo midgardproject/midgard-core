@@ -1,0 +1,282 @@
+midgard2-core (1:2.0alpha0) unstable; urgency=low
+
+  * SVN upstream 
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 31 Oct 2007 13:09:22 +0100
+
+midgard2-core (1:1.9alpha1) unstable; urgency=low
+
+  * rules file defines architecture and section
+  * renamed lib files
+  * added usr/share/midgard/midgard_initial_database.xml
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Mon, 16 Jul 2007 15:04:46 +0200
+
+midgard-core (1:1.8.0) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Sat, 14 Oct 2006 14:37:48 +0200
+
+midgard-core (1:1.8beta2) unstable; urgency=low
+
+  * New upstream
+  * rules files updated to generate shlibs
+  * dev package gets version from Source-Version variable
+  * source package renamed to midgard-core
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Thu, 14 Sep 2006 10:11:11 +0200
+
+libmidgard (1:1.8beta1) unstable; urgency=low
+
+  *  New upstream
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Tue,  8 Aug 2006 21:38:47 +0200
+
+libmidgard (1:1.8alpha2) unstable; urgency=low
+
+  * New upstream 
+  * Updated control dependencies 
+
+ -- Piotr Pokora <piotr.pokora@infoglob.pl>  Wed,  3 May 2006 22:11:21 +0200
+
+libmidgard (1:1.8alpha1) unstable; urgency=low
+
+  * New upstream
+  * repligard packaged removed , builded in midgard-data now
+
+ -- Piotr.Pokora <pp@infoglob.pl>  Mon, 12 Dec 2005 21:44:13 +0100
+
+libmidgard (1:1.7.0) unstable; urgency=low
+
+  * New upstream
+  * Epoch added to version due to rc2 version mistake
+
+ -- Piotr Pokora <pp@infoglob.pl>  Fri, 22 Jul 2005 17:49:36 +0200
+
+libmidgard (1.7.rc2) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <pp@infoglob.pl>  Tue, 12 Jul 2005 23:47:46 +0200
+
+libmidgard (1.7rc1) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <piotr.pokora@infoglob.pl>  Mon, 27 Jun 2005 22:16:53 +0200
+
+libmidgard (1.7beta1) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <piotr.pokora@infoglob.pl>  Thu,  2 Jun 2005 00:52:28 +0200
+
+libmidgard (1.7alpha1) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <pp@infoglob.pl>  Wed, 23 Mar 2005 23:10:35 +0100
+
+libmidgard (1.6.3) unstable; urgency=low
+
+  * New release
+  * Updated dependency versions
+  * repligard.conf removed from confiles
+
+ -- Piotr Pokora <pp@infoglob.pl>  Sat, 12 Mar 2005 10:12:09 +0100
+
+libmidgard (1.6.2) unstable; urgency=low
+
+  * New release
+  * Mysql-4.1 added in dependencies
+
+ -- Piotr Pokora <pp@infoglob.pl>  Tue, 18 Jan 2005 00:19:41 +0100
+
+libmidgard (1.6.1) unstable; urgency=low
+
+  * New relese 
+
+ -- Piotr Pokora <pp@infoglob.pl>  Thu,  4 Nov 2004 14:15:17 +0100
+
+libmidgard (1.6.0rc2) unstable; urgency=low
+
+  * New release 
+
+ -- Piotr Pokora <piotr.pokora@infoglob.pl>  Mon, 18 Oct 2004 21:51:02 +0200
+
+libmidgard (1.6.0rc1) unstable; urgency=low
+
+  * New release 
+
+ -- Piotr Pokora <piotr.pokora@infoglob.pl>  Tue, 21 Sep 2004 14:50:11 +0200
+
+libmidgard (1.6.0beta) unstable; urgency=low
+
+  * New beta release 
+
+ -- Piotr Pokora <pp@infoglob.pl>  Wed, 19 May 2004 15:04:31 +0100
+
+libmidgard (1.6alpha2) unstable; urgency=low
+
+  * datagard files removed in favour of data package
+  * New upstream
+
+ -- Piotr Pokora <pp@infoglob.pl>  Sat, 27 Mar 2004 23:24:12 +0100
+
+libmidgard (1.5.0-2a) unstable; urgency=low
+
+  * lib.postinst updated to xml update files
+
+ -- Piotr Pokora <pp@infogob.pl>  Wed, 24 Sep 2003 21:06:20 +0100
+
+libmidgard (1.5.0-2) unstable; urgency=low
+
+  * repligard included in main library now
+  * datagard added as database management tool
+  * libraries compiled with cache fix and multilang feature
+  * Asgard removed from package in favour of new data packages
+  * no default action in config and postinst files according to repligard
+
+ -- Piotr Pokora <pp@infoglob.pl>  Thu, 11 Sep 2003 22:51:45 +0100                
+
+libmidgard (1.5.0-1) unstable; urgency=low
+
+  * New upstream
+  * Database upgrade management added
+
+ -- Piotr Pokora <pp@infoglob.pl>  Tue, 24 Jun 2003 23:35:16 +0200
+
+libmidgard (1.4.4-5) unstable; urgency=low
+
+  * Compiled against Mysql4
+  * Debhelper and flex removed from libmidgard dependancies
+
+ -- Piotr Pokora <pp@infoglob.pl>  Mon, 12 May 2003 16:30:04 +0200
+
+libmidgard (1.4.4-4) unstable; urgency=low
+
+  * Repligard patched thanks to Andrew McMillan.
+  * Libmidgard supports filetemplates now.
+
+ -- Piotr Pokora <pp@infoglob.pl>  Thu,  8 May 2003 11:43:18 +0200
+
+libmidgard (1.4.4-3) unstable; urgency=low
+
+  * Another fixes for mysql prompts
+   (first we get data, than we try to make something)
+
+ -- Piotr Pokora <pp@infoglob.pl>  Fri, 25 Apr 2003 16:04:40 +0200
+
+libmidgard (1.4.4-2d) unstable; urgency=low
+
+  * Asgard has now long php tags.
+  * Postinst script checks if mysql is running.
+   (fixes prompts for passwords)
+  * Short note about default port for example database.
+
+ -- Piotr Pokora <pp@infoglob.pl>  Thu,  3 Apr 2003 00:04:41 +0200                                
+
+libmidgard (1.4.4-2c) unstable; urgency=low
+
+  * Templates file fixed
+
+ -- Piotr Pokora <pp@infoglob.pl>  Fri, 31 Jan 2003 23:57:25 +0100
+
+libmidgard (1.4.4-2b) unstable; urgency=low
+
+  * Small fixes for postinst script
+  * Changed default files permissions for newly created blobs
+
+ -- Piotr Pokora <pp@infoglob.pl>  Tue, 28 Jan 2003 12:04:08 +0100
+
+libmidgard (1.4.4-2a) unstable; urgency=low
+
+  * php4-midgard removed from dependency
+
+ -- Piotr Pokora <pp@infoglob.pl>  Mon, 20 Jan 2003 08:06:43 +0100
+
+libmidgard (1.4.4-2) unstable; urgency=low
+
+  * Dependency fixing (dev packages removed)
+  * Added preinst script
+  * Postinst script checks if mysql-server is installed
+
+ -- Piotr Pokora <pp@infoglob.pl>  Fri, 17 Jan 2003 19:26:46  +0100
+
+libmidgard (1.4.4-1b) unstable; urgency=low
+
+  * Postinst script - neverending story...
+
+ -- Piotr Pokora <pp@infoglob.pl>  Sun, 29 Dec 2002 18:48:02 +0100
+
+libmidgard (1.4.4-1a) unstable; urgency=low
+
+  * Another fixing for debconf postinst script
+
+ -- Piotr Pokora <pp@infoglob.pl>  Fri, 20 Dec 2002 10:14:16 +0100                   
+
+libmidgard (1.4.4) unstable; urgency=low
+
+  * Moved upstream to 1.4.4, see the Release announcement
+    at http://www.midgard-project.org for details.
+
+ -- Torben Nehmer <classic@nathan.net>  Thu, 19 Dec 2002 12:28:38 +0100
+
+libmidgard (1.4.3-2b) unstable; urgency=low
+
+  * Another one fixing for database. The last I hope.
+
+ -- Piotr Pokora <pp@infoglob.pl>  Fri, 13 Dec 2002 10:44:14 +0100
+
+libmidgard (1.4.3-2a) unstable; urgency=low
+
+  * Another fixes for db creation
+
+ -- Piotr Pokora <pp@infoglob.pl>  Mon,  2 Dec 2002 15:01:18 +0100
+
+libmidgard (1.4.3-2) unstable; urgency=low
+
+  * Fixed database building with debconf
+
+ -- Piotr Pokora <pp@infoglob.pl>  Mon,  2 Dec 2002 14:33:32 +0100
+
+libmidgard (1.4.3-1) unstable; urgency=low
+
+  * libmidgard now creates initial preconfigured database
+  * repligard looks for conf file in /etc/midgard
+  * added postint script
+  * Database creation managed with debconf
+
+ -- Piotr Pokora <pp@infoglob.pl>  Tue, 26 Nov 2002 11:57:54  +0100
+
+libmidgard (1.4.3) unstable; urgency=low
+
+  * Changed libmidgard5 to libmidgard
+  * Added copyright info
+  * Updated Debian Files
+
+ -- Torben Nehmer <torben@nehmer.net>  Wed, 12 Jun 2002 17:48:26 +0200
+
+libmidgard (1.4.2) unstable; urgency=low
+
+  * Daily CVS Snapshot
+
+ -- Piotr Pokora <pp@infoglob.pl>  Fri, 24 May 2002 06:31:00 +0200
+
+libmidgard-1.4.3 (1.4.3-cvs-20020328) unstable; urgency=low
+
+  * debian/changelog - Daily CVS snapshot
+  
+
+ -- Emile Heyns <emile@iris-advies.nl>  Thu, 28 Mar 2002 16:55:18 +0100
+
+libmidgard-1.4.3 (1.4.3-cvs-20020322) unstable; urgency=low
+
+  * Initial release.
+
+ -- Emiliano <emile@iris-advies.nl>  Fri,  1 Mar 2002 18:26:52 +0100
+
+
+
+

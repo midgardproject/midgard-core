@@ -1,0 +1,77 @@
+#! /usr/bin/make -f
+
+#export DH_VERBOSE=1
+export DH_COMPAT=4
+export DH_OPTIONS
+
+DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_BUILD_ARCH   ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+
+deb_section=""
+
+CONFIGURE_FLAGS=\
+	--prefix=/usr\
+
+ifeq ("armel",$(DEB_BUILD_ARCH))
+deb_section="user/"
+endif
+
+switch-arch::
+	sed -e 's/@SECTION@/${deb_section}/g' -e 's/@ARCH@/${DEB_BUILD_ARCH}/g' \
+	debian/control.in > debian/control
+
+build: build-stamp
+build-stamp: configure-stamp
+	dh_testdir
+	$(MAKE) pkgdatadir=/usr/share/midgard 
+	touch $@
+
+configure: switch-arch configure-stamp 
+configure-stamp:	
+	dh_testdir
+	cp -f /usr/share/misc/config.guess .
+	cp -f /usr/share/misc/config.sub .
+	./configure ${CONFIGURE_FLAGS}
+	touch $@
+
+clean:
+	dh_testdir
+	-$(MAKE) distclean
+	rm -f build-stamp configure-stamp
+	dh_clean
+
+install: DH_OPTIONS=
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean
+	dh_installdirs
+	$(MAKE) install \
+		INSTALL='/usr/bin/install -c -o root -g root' \
+		DESTDIR=`pwd`/debian/tmp 
+	dh_movefiles	
+	
+binary-indep: DH_OPTIONS=-i
+binary-indep:
+# nothing to do
+
+binary-indep: DH_OPTIONS=-a
+binary-arch:install
+	dh_testdir
+	dh_testroot
+	dh_installdocs 
+	dh_installchangelogs
+	dh_installman
+	dh_installpam --name=midgard
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs -V
+	dh_installdeb	
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary:	switch-arch binary-indep binary-arch
+.PHONY: switch-arch binary binary-arch binary-indep install clean configure build clean

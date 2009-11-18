@@ -1,0 +1,119 @@
+<!-- ##### SECTION Title ##### -->
+midgard_type
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO MGD_TYPE_LONGTEXT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MGD_TYPE_PARAM_LONGTEXT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT MgdParamSpecLongtext ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION midgard_param_longtext_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### MACRO MGD_TYPE_TIMESTAMP ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION midgard_timestamp_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### MACRO MGD_TYPE_GUID ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION midgard_guid_get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### MACRO MGD_TYPE_NONE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MGD_TYPE_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MGD_TYPE_UINT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MGD_TYPE_FLOAT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MGD_TYPE_BOOLEAN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MGD_TYPE_INT ##### -->
+<para>
+
+</para>
+
+
+
