@@ -1,4 +1,4 @@
-libmidgard2.so.2009 libmidgard2.0 #MINVER#
+libmidgard2.so.2009 libmidgard2-2009 #MINVER#
  MIDGARD_MD5_Final@Base 9.09-1
  MIDGARD_MD5_Init@Base 9.09-1
  MIDGARD_MD5_Update@Base 9.09-1
