@@ -1,0 +1,245 @@
+<!-- ##### SECTION Title ##### -->
+midgard_config
+
+<!-- ##### SECTION Short_Description ##### -->
+ Midgard unified config representation.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+ #MidgardConfig class represents Midgard unified configuration file. 
+ Underlying configuration file representation is limited to #GKeyFile. 
+ There are few ways to read configuration data: midgard_config_read_file(), which 
+ encapsulates real file location, midgard_config_read_file_path() if file location
+ is not common or very specific for application or midgard_config_read_data(), which 
+ reads configuration from given buffer.  
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### TYPEDEF midgard_config ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard_config:authtype ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:blobdir ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:cachedir ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:database ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:dbpass ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:dbtype ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:dbuser ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:host ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:logfilename ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:loglevel ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:midgardpassword ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:midgardusername ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:pamfile ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:sharedir ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:tablecreate ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:tableupdate ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:testunit ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_config:vardir ##### -->
+<para>
+
+</para>
+
+<!-- ##### TYPEDEF MidgardConfig ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF MidgardConfigClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardConfigPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM MidgardDBType ##### -->
+<para>
+
+</para>
+
+@MIDGARD_DB_TYPE_MYSQL: 
+@MIDGARD_DB_TYPE_POSTGRES: 
+@MIDGARD_DB_TYPE_FREETDS: 
+@MIDGARD_DB_TYPE_SQLITE: 
+@MIDGARD_DB_TYPE_ODBC: 
+@MIDGARD_DB_TYPE_ORACLE: 
+
+<!-- ##### FUNCTION midgard_config_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_config_read_file ##### -->
+<para>
+
+</para>
+
+@self: 
+@filename: 
+@user: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_config_read_file_at_path ##### -->
+<para>
+
+</para>
+
+@self: 
+@filepath: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_config_read_data ##### -->
+<para>
+
+</para>
+
+@self: 
+@data: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_config_list_files ##### -->
+<para>
+
+</para>
+
+@user: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_config_save_file ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@user: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_config_create_midgard_tables ##### -->
+<para>
+
+</para>
+
+@self: 
+@mgd: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_config_create_class_table ##### -->
+<para>
+
+</para>
+
+@self: 
+@klass: 
+@mgd: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_config_update_class_table ##### -->
+<para>
+
+</para>
+
+@self: 
+@klass: 
+@mgd: 
+@Returns: 
+
+

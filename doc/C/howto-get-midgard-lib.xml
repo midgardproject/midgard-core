@@ -1,0 +1,44 @@
+<!-- Based on GLib documentation -->
+<refentry id="get-midgard-lib" revision="14 May 2009">
+<refmeta>
+<refentrytitle>Getting Midgard</refentrytitle>
+<manvolnum>3</manvolnum>
+<refmiscinfo>Midgard Library</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+<refname>Getting Midgard Library</refname>
+</refnamediv>
+
+<refsect1>
+<title>Getting Midgard</title>
+
+<itemizedlist>
+  <listitem>
+    <para>
+      The easiest way to download Midgard is to use already built binary packages.
+      For Vinland (Midgard2 9.03) you may find some 
+      <ulink url="http://download.opensuse.org/repositories/home:/midgardproject:/vinland/">at OBS repository</ulink>.
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+      You can download release tarballs from 
+      <ulink url="http://www.midgard-project.org/download/9-3/">Midgard website</ulink>.
+    </para>
+  </listitem>
+  <listitem>
+    <para>
+      Also, you can get Midgard from SVN repository.
+      <programlisting>
+      $ mkdir -p svn/midgard/branches
+      $ cd svn/midgard/branches
+      $ svn co https://svn.midgard-project.org/midgard/branches/vinland
+      </programlisting>
+    </para>
+  </listitem>
+</itemizedlist>
+
+</refsect1>
+
+</refentry>

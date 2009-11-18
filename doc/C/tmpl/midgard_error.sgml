@@ -1,0 +1,119 @@
+<!-- ##### SECTION Title ##### -->
+midgard_error
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO MGD_GENERIC_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### ENUM MgdErrorGeneric ##### -->
+<para>
+
+</para>
+
+@MGD_ERR_OK: 
+@MGD_ERR_ERROR: 
+@MGD_ERR_ACCESS_DENIED: 
+@MGD_ERR_NO_METADATA: 
+@MGD_ERR_NOT_OBJECT: 
+@MGD_ERR_NOT_EXISTS: 
+@MGD_ERR_INVALID_NAME: 
+@MGD_ERR_DUPLICATE: 
+@MGD_ERR_HAS_DEPENDANTS: 
+@MGD_ERR_RANGE: 
+@MGD_ERR_NOT_CONNECTED: 
+@MGD_ERR_SG_NOTFOUND: 
+@MGD_ERR_INVALID_OBJECT: 
+@MGD_ERR_QUOTA: 
+@MGD_ERR_INTERNAL: 
+@MGD_ERR_OBJECT_NAME_EXISTS: 
+@MGD_ERR_OBJECT_NO_STORAGE: 
+@MGD_ERR_OBJECT_NO_PARENT: 
+@MGD_ERR_INVALID_PROPERTY_VALUE: 
+@MGD_ERR_INVALID_PROPERTY: 
+@MGD_ERR_USER_DATA: 
+@MGD_ERR_OBJECT_DELETED: 
+@MGD_ERR_OBJECT_PURGED: 
+@MGD_ERR_OBJECT_EXPORTED: 
+@MGD_ERR_OBJECT_IMPORTED: 
+@MGD_ERR_MISSED_DEPENDENCE: 
+@MGD_ERR_TREE_IS_CIRCULAR: 
+@MGD_ERR_OBJECT_IS_LOCKED: 
+
+<!-- ##### FUNCTION midgard_error_generic ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_error_string ##### -->
+<para>
+
+</para>
+
+@domain: 
+@errcode: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_set_error ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@domain: 
+@errcode: 
+@msg: 
+@Varargs: 
+
+
+<!-- ##### FUNCTION midgard_error_default_log ##### -->
+<para>
+
+</para>
+
+@domain: 
+@level: 
+@msg: 
+@ptr: 
+
+
+<!-- ##### FUNCTION midgard_error_parse_loglevel ##### -->
+<para>
+
+</para>
+
+@levelstring: 
+@Returns: 
+
+
+<!-- ##### MACRO MIDGARD_ERRNO_SET ##### -->
+<para>
+
+</para>
+
+@str: 
+@errcode: 
+
+

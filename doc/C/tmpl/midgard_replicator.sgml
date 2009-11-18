@@ -1,0 +1,144 @@
+<!-- ##### SECTION Title ##### -->
+midgard_replicator
+
+<!-- ##### SECTION Short_Description ##### -->
+ Object serialization and replication.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+ #MidgardReplicator lets you serialize and unserialize objects.
+ Once transformed to string, can be sent as custom message through
+ D_Bus services, imported to different database, stored in files, etc.
+</para>
+<itemizedlist>
+<listitem><para>
+http://www.midgard-project.org/development/mrfc/view/0030.html
+</para></listitem>
+<listitem><para>
+http://www.midgard-project.org/development/mrfc/view/0033.html
+</para></listitem>
+</itemizedlist>
+
+<!-- ##### SECTION See_Also ##### -->
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT MidgardReplicatorPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardReplicator ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### TYPEDEF MidgardReplicatorClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION midgard_replicator_serialize ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_replicator_export ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_replicator_export_purged ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@startdate: 
+@enddate: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_replicator_serialize_blob ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_replicator_export_blob ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_replicator_export_by_guid ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@guid: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_replicator_export_media ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_replicator_unserialize ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@xml: 
+@force: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_replicator_import_object ##### -->
+<para>
+
+</para>
+
+@object: 
+@force: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_replicator_import_from_xml ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@xml: 
+@force: 
+
+

@@ -1,0 +1,94 @@
+<!-- ##### SECTION Title ##### -->
+midgard_object_parameter
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION midgard_object_get_parameter ##### -->
+<para>
+
+</para>
+
+@self: 
+@domain: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_set_parameter ##### -->
+<para>
+
+</para>
+
+@self: 
+@domain: 
+@name: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_list_parameters ##### -->
+<para>
+
+</para>
+
+@self: 
+@domain: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_find_parameters ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_params: 
+@parameters: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_has_parameters ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_delete_parameters ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_params: 
+@parameters: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_purge_parameters ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_params: 
+@parameters: 
+@Returns: 
+
+

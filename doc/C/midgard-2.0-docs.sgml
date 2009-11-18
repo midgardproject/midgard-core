@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+               "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+<!ENTITY example-midgardconnection SYSTEM "examples/midgard_connection.xml">
+<!ENTITY example-helloworld SYSTEM "examples/hello_world.xml">
+<!ENTITY howto-get_midgard_lib SYSTEM "howto-get-midgard-lib.xml">
+<!ENTITY howto-compile_midgard_lib SYSTEM "howto-compile-midgard-lib.xml">
+<!ENTITY howto-compile_midgard_app SYSTEM "howto-compile-midgard-app.xml">
+
+]>
+<book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
+  <bookinfo>
+    <title>Midgard2 Reference Manual</title>
+    <releaseinfo>
+      for 9.09 "Mjolnir"
+    </releaseinfo>
+  </bookinfo>
+
+  <part label="I">
+    <title>Build and compile</title>
+
+    &howto-get_midgard_lib;
+    &howto-compile_midgard_lib;
+    &howto-compile_midgard_app;
+  </part>
+
+
+  <part label="II">
+  <title>API reference</title>
+    
+    <chapter id="midgard-Basic">
+      <title>Midgard Basic Types</title>
+      <xi:include href="xml/midgard_config.xml"/>	
+      <xi:include href="xml/midgard_connection.xml"/>
+      <xi:include href="xml/midgard_storage.xml"/>
+      <xi:include href="xml/query_builder.xml"/>
+      <xi:include href="xml/midgard_user.xml"/>
+      <xi:include href="xml/midgard_collector.xml"/> 
+      <xi:include href="xml/midgard_blob.xml"/>
+      <xi:include href="xml/midgard_reflection_property.xml"/>
+      <xi:include href="xml/midgard_replicator.xml"/>
+      <xi:include href="xml/midgard_quota.xml"/>
+      <xi:include href="xml/midgard_error.xml"/>
+      <xi:include href="xml/midgard_object_class.xml"/>
+      <xi:include href="xml/midgard_dbobject.xml"/>    
+      <xi:include href="xml/midgard_schema.xml"/>
+      <xi:include href="xml/midgard_transaction.xml"/>
+      <xi:include href="xml/midgard_dbus.xml"/>
+    </chapter>
+
+    <chapter id="midgard-Midgard-Schema-User-Defined-Types">
+      <title>Midgard Schema User Defined Types</title>
+      <xi:include href="xml/midgard_object.xml"/>
+      <xi:include href="xml/midgard_metadata.xml"/>
+      <xi:include href="xml/midgard_object_attachment.xml"/>
+      <xi:include href="xml/midgard_object_parameter.xml"/>
+      <xi:include href="xml/midgard_view.xml"/>
+    </chapter>
+
+    <chapter id="midgard-Types">
+      <title>Types</title> 
+      <xi:include href="xml/midgard_type.xml"/>
+      <xi:include href="xml/midgard_timestamp.xml"/>
+    </chapter>
+
+    <chapter id="midgard-Misc">
+      <title>Miscelanous</title> 
+      <xi:include href="xml/midgard.xml"/>
+      <xi:include href="xml/uuid.xml"/>
+      <xi:include href="xml/guid.xml"/>
+      <xi:include href="xml/midgard_config_auto.xml"/>
+
+    </chapter>
+  
+  </part>
+ 
+  <part label="III">
+    <title>Examples</title>
+
+    &example-midgardconnection;
+    &example-helloworld;
+  </part>
+
+<index>
+    <title>Index</title>
+  </index>
+  <index role="deprecated">
+    <title>Index of deprecated symbols</title>
+  </index>
+  <index role="9.09">
+    <title>Index of new symbols in 9.09</title>
+  </index>
+
+</book>

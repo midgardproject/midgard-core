@@ -1,0 +1,4 @@
+usr/bin/midgard-*
+usr/share/midgard/MgdObjects.xml
+etc/midgard/conf.d/midgard.conf.example
+usr/share/midgard/schema/README.txt

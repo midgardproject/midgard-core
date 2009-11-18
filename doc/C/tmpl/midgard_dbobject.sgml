@@ -1,0 +1,38 @@
+<!-- ##### SECTION Title ##### -->
+midgard_dbobject
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### TYPEDEF midgard_dbobject ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardDBObjectPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardDBObject ##### -->
+<para>
+
+</para>
+
+@parent: 
+

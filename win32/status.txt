@@ -1,0 +1,40 @@
+Implementation Status of the Win32 Midgard Lib
+Last update: $Date$
+
+Copyright (C) 1999 Jukka Zitting <jukka.zitting@iki.fi>
+Copyright (C) 2000 The Midgard Project ry
+Win32 Parts (w) 2002 Daniel S. Reichenbach <dsr@best-off.org>
+See the end for copying conditions.
+
+This document gives you an overview, which features are missing on
+Win32 or Work in progress and is updated on regular basis.
+
+If someone is working on the section, his or her name is listed behind
+the entry in brackets.
+
+Missing features:
+ o Encrypted passwords: Right now, Midgard only supports plain text
+   passwords, as there is no equivalent to the crypt() function on
+   Win32.
+
+----------------------------------------------------------------------
+Copyright information:
+
+Copyright (C) 1999 Jukka Zitting <jukka.zitting@iki.fi>
+Copyright (C) 2000 The Midgard Project ry
+Win32 Parts (w) 2002 Daniel S. Reichenbach <dsr@best-off.org>
+
+   Permission is granted to anyone to make or distribute verbatim copies
+   of this document as received, in any medium, provided that the
+   copyright notice and this permission notice are preserved,
+   thus giving the recipient permission to redistribute in turn.
+
+   Permission is granted to distribute modified versions
+   of this document, or of portions of it,
+   under the above conditions, provided also that they
+   carry prominent notices stating who last changed them.
+^L
+Local variables:
+version-control: never
+mode: indented-text
+end:

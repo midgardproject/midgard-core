@@ -1,0 +1,9 @@
+iconvxml.c
+.libs
+.dirstamp
+*.la
+tablenames-*.c
+authfailure.c
+.deps
+*.lo
+preparse.c

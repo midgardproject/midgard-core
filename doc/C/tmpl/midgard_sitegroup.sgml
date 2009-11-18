@@ -1,0 +1,128 @@
+<!-- ##### SECTION Title ##### -->
+midgard_sitegroup
+
+<!-- ##### SECTION Short_Description ##### -->
+Virtual database context
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+#MidgardSitegroup (midgard_sitegroup) class represents virtual database context.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT MidgardSitegroupPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF midgard_sitegroup ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard_sitegroup:admingroupguid ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_sitegroup:adminid ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_sitegroup:guid ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_sitegroup:id ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_sitegroup:name ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_sitegroup:public ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_sitegroup:realm ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT MidgardSitegroup ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+@priv: 
+@name: 
+@realm: 
+@group: 
+@ispublic: 
+@id: 
+@adminid: 
+@metadata: 
+
+<!-- ##### FUNCTION midgard_sitegroup_new ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_sitegroup_list ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_sitegroup_create ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_sitegroup_update ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_sitegroup_delete ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+

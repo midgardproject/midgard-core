@@ -1,0 +1,25 @@
+#!/bin/sh
+
+if test "$1" = "" ; then
+   MODE="runtime"
+else
+   if test "$1" = "runtime" || test "$1" = "build" ; then
+      MODE=$1
+   else
+      echo "Please specify 'build' or 'runtime'"
+      exit 1
+   fi
+fi
+
+
+PKGS=""
+
+if test "$MODE" = "build" ; then
+   PKGS="flex libmysqlclient10-dev libexpat1-dev"
+fi
+
+PKGS="$PKGS libmysqlclient10 libexpat1"
+
+COLUMNS=256
+export COLUMNS
+dpkg -l $PKGS | awk '/^[a-z]/ {print $2, $3}'
