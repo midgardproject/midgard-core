@@ -1,0 +1,61 @@
+<!-- ##### SECTION Title ##### -->
+midgard_config_auto
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO MIDGARD_LIB_PREFIX ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MIDGARD_GLOBAL_SCHEMA ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MIDGARD_LSCHEMA_DIR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MIDGARD_SHARE_DIR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MIDGARD_LIB_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MIDGARD_LIB_VERSION_STRING ##### -->
+<para>
+
+</para>
+
+
+

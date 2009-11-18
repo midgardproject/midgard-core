@@ -1,0 +1,201 @@
+<!-- ##### SECTION Title ##### -->
+midgard_user
+
+<!-- ##### SECTION Short_Description ##### -->
+ User account and authentication
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+ #MidgardUser (midgard_user) class is a special class which let's you authenticate any 
+ user into Midgard system. Class itself (and its implementation) doesn't provide any special 
+ security routines. Instead, it provides easy to use interfaces to implement many derived ones. 
+</para>
+<para>
+ Valid user (from Midgard core point of view) is an object which can be stored in underlying storage, 
+ and can be identified by unique guid, unique login name and authentication type. It's very impoprtant 
+ to notice that user's guid is unique per storage, while login name is unique with particular 
+ authentication type. Which means, the same login name can be used with different authentication types.
+</para>
+<para>
+ #MidgardUser class doesn't do any password validation or doesn't support password encryption or decryption.
+ For such, proper implementation should be made for derived class. An exception is legacy and backward 
+ compatible authentication which is supported by unix encrypt utils in the background.
+</para>
+<para>
+ #MidgardUser provides very basic and low level access control system.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### TYPEDEF midgard_user ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ARG midgard_user:active ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_user:authtype ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_user:authtypeid ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_user:guid ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_user:login ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_user:password ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_user:person ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_user:usertype ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT MidgardUserClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+@get_connection: 
+@get_person: 
+@login: 
+@logout: 
+@get: 
+@query: 
+@create: 
+@update: 
+@is_user: 
+@is_admin: 
+
+<!-- ##### STRUCT MidgardUserPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardUser ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+
+<!-- ##### FUNCTION midgard_user_new ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@n_params: 
+@parameters: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_get ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@n_params: 
+@parameters: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_query ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@n_params: 
+@parameters: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_login ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_logout ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_is_user ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_is_admin ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_get_person ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_set_person ##### -->
+<para>
+
+</para>
+
+@self: 
+@person: 
+@Returns: 
+
+

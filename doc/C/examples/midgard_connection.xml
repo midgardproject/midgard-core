@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding="UTF-8"?>
+<chapter id="example-midgard-connection">
+  <title>midgard_connection</title>
+  <programlisting>
+int main (int argc, char *argv[])
+{
+	/* Create user's configuration file if doesn't exist. */
+	MidgardConfig *config = midgard_config_new();
+	g_object_set(config, "dbtype", "SQLite", NULL);
+	g_object_set(config, "loglevel", "debug", NULL);
+
+	GError *error = NULL;
+	/* Try to save configuration file (under ~/.midgard-2.0 ) */
+	if (!midgard_config_save_file(config, "my_config", TRUE, &amp;error)) {
+		
+		if (error)
+			g_warning("Failed to save configuration. %s", error->message);
+		return 1;
+	}
+
+	/* Create new MidgardConnection instance */
+	MidgardConnection *mgd = midgard_connection_new();
+
+	/* Try to connect */
+	if (!midgard_connection_open_config(mgd, config)) {
+		
+		g_warning("Failed to open database connection. %s",
+			midgard_connection_get_error_string(mgd));
+		return 1;
+	}
+
+	g_print("Connection opened!");
+
+        return 0;
+}
+
+</programlisting>
+
+</chapter>

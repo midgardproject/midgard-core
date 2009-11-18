@@ -1,0 +1,190 @@
+<!-- ##### SECTION Title ##### -->
+midgard_metadata
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### TYPEDEF midgard_metadata ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL midgard_metadata::set-created ##### -->
+<para>
+
+</para>
+
+@midgard_metadata: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_metadata::set-updated ##### -->
+<para>
+
+</para>
+
+@midgard_metadata: the object which received the signal.
+
+<!-- ##### ARG midgard_metadata:approved ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:approver ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:authors ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:created ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:creator ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:deleted ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:exported ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:hidden ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:imported ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:isapproved ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:islocked ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:locked ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:locker ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:navnoentry ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:owner ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:published ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:revised ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:revision ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:revisor ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:scheduleend ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:schedulestart ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:score ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_metadata:size ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT MidgardMetadata ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+@priv: 
+
+<!-- ##### STRUCT MidgardMetadataClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+@signal_set_created: 
+@signal_set_updated: 
+@set_created: 
+@set_updated: 
+
+<!-- ##### STRUCT MidgardMetadataPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION midgard_metadata_new ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+

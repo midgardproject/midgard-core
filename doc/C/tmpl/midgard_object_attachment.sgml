@@ -1,0 +1,83 @@
+<!-- ##### SECTION Title ##### -->
+midgard_object_attachment
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### FUNCTION midgard_object_create_attachment ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@title: 
+@mimetype: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_list_attachments ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_find_attachments ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_params: 
+@parameters: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_has_attachments ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_delete_attachments ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_params: 
+@parameters: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_purge_attachments ##### -->
+<para>
+
+</para>
+
+@self: 
+@delete_blob: 
+@n_params: 
+@parameters: 
+@Returns: 
+
+

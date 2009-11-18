@@ -1,0 +1,203 @@
+<!-- ##### SECTION Title ##### -->
+midgard_connection
+
+<!-- ##### SECTION Short_Description ##### -->
+ Connection and environment variables handler.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+ #MidgardConnection represents database connection, and runtime Midgard related 
+ environment variables. Logged in #MidgardUser or #midgard_error for example.</para>
+
+<para>
+ Use midgard_connection_new() to initialize new #MidgardConnection object, and 
+ midgard_connection_open() to open database connection. 
+ There is also midgard_connection_open_config() for cases, if configuration file 
+ is not in common path, and this file could be represented by #MidgardConfig.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO GETTEXT_PACKAGE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### TYPEDEF MidgardConnectionClass ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardConnectionPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF midgard_connection ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL midgard_connection::auth-changed ##### -->
+<para>
+
+</para>
+
+@midgard_connection: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_connection::error ##### -->
+<para>
+
+</para>
+
+@midgard_connection: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_connection::lost-provider ##### -->
+<para>
+
+</para>
+
+@midgard_connection: the object which received the signal.
+
+<!-- ##### FUNCTION midgard_connection_new ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_open ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@error: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_open_config ##### -->
+<para>
+
+</para>
+
+@self: 
+@config: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_set_loglevel ##### -->
+<para>
+
+</para>
+
+@self: 
+@level: 
+@log_func: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_get_loglevel ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_set_loghandler ##### -->
+<para>
+
+</para>
+
+@self: 
+@loghandler: 
+
+
+<!-- ##### FUNCTION midgard_connection_get_loghandler ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_get_error ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_get_error_string ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_set_error ##### -->
+<para>
+
+</para>
+
+@self: 
+@errcode: 
+
+
+<!-- ##### FUNCTION midgard_connection_get_user ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_copy ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_reopen ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_list_auth_types ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_types: 
+@Returns: 
+
+

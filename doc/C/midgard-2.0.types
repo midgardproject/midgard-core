@@ -1,0 +1,15 @@
+#include <midgard/midgard_defs.h>
+
+midgard_object_get_type
+midgard_config_get_type
+midgard_connection_get_type
+midgard_dbobject_get_type
+midgard_query_builder_get_type
+midgard_collector_get_type
+midgard_metadata_get_type
+midgard_user_get_type
+midgard_blob_get_type
+midgard_transaction_get_type
+midgard_view_get_type
+midgard_storage_get_type
+midgard_dbus_get_type

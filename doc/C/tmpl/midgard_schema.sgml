@@ -1,0 +1,85 @@
+<!-- ##### SECTION Title ##### -->
+MidgardSchema
+
+<!-- ##### SECTION Short_Description ##### -->
+ Creates user defined classes.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+ #MidgardSchema reads MgdSchema files and registers user defined classes in GType system.
+ It's not needed to use this part of API in normal application written in C for example.
+ #MidgardConnection API does the magic and initialize #MidgardSchema object for you, if such 
+ is not yet created. However, there might be some use cases where #MidgardSchema must be 
+ initiazlied explicitly before any connection is done.
+</para>
+
+<para>
+ The best example is httpd server with PHP bindings for Midgard. In such case, classes must 
+ be registered when main process starts up and new #MidgardConnection objects are created 
+ for any child process.
+</para>
+
+<para>
+ In other words, in most cases, there's no need to use #MidgardSchema directly.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT MgdSchema ##### -->
+<para>
+
+</para>
+
+@types: 
+
+<!-- ##### STRUCT MidgardSchema ##### -->
+<para>
+
+</para>
+
+@parent: 
+
+<!-- ##### FUNCTION midgard_schema_init ##### -->
+<para>
+
+</para>
+
+@self: 
+@path: 
+
+
+<!-- ##### FUNCTION midgard_schema_read_dir ##### -->
+<para>
+
+</para>
+
+@self: 
+@dirname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_schema_type_exists ##### -->
+<para>
+
+</para>
+
+@self: 
+@classname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_schema_read_file ##### -->
+<para>
+
+</para>
+
+@self: 
+@filename: 
+
+

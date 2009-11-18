@@ -1,0 +1,53 @@
+<!-- ##### SECTION Title ##### -->
+MidgardView
+
+<!-- ##### SECTION Short_Description ##### -->
+Abstract class which represents database view.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+#MidgardViewClass derived objects represent database views.
+</para>
+<para>
+Those are created in xml files, using MgdSchema patterns.
+</para>
+<para>
+See: http://www.midgard-project.org/development/mrfc/0041/
+</para>
+<para>
+Since: 9.09
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### TYPEDEF midgard_view ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardView ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+@Since: 9.09
+
+<!-- ##### STRUCT MidgardViewClass ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+@get_connection: 
+@Since: 9.09
+

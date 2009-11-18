@@ -1,0 +1,125 @@
+dnl $Id$
+dnl
+dnl Process this file with autoconf to produce a configure script.
+dnl
+dnl The Midgard version number is changed from here. First edit
+dnl this file, then write a ChangeLog entry about the new version,
+dnl and finally commit the source tree and give it a tag.
+dnl
+dnl If the version contains user visible changes then you should
+dnl have updated the NEWS file. Remember also to test the release
+dnl before committing.
+dnl
+AC_INIT([midgard2-core],[9.09.99])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_SRCDIR(src/midgard.c)
+
+dnl Automake is needed for the build system.
+dnl
+AM_INIT_AUTOMAKE
+AM_MAINTAINER_MODE
+
+AM_PROG_LEX
+AC_PROG_YACC
+AC_PROG_CC(gcc cc)
+AM_PROG_CC_C_O
+AC_LANG(C)
+
+dnl Checks for programs.
+AM_PROG_LIBTOOL
+
+dnl Checks for libraries.
+AC_MSG_CHECKING([whether to use Libgda4 (libgda3 by default)])
+AC_ARG_WITH(libgda4, [  --with-libgda4], gdamodule="libgda-4.0", gdamodule="libgda-3.0")
+AC_MSG_RESULT($gdamodule)
+
+_MIDGARD_DBUS_SUPPORT=yes
+dbus_libs="dbus-1 dbus-glib-1"
+MIDGARD_DBUS_SUPPORT=1
+AC_MSG_CHECKING([whether to compile dbus support (enabled by default)])
+AC_ARG_WITH(dbus-support,
+	[  --with-dbus-support    compile with dbus support ],
+	_MIDGARD_DBUS_SUPPORT=[$]withval, _MIDGARD_DBUS_SUPPORT="yes")
+AC_MSG_RESULT($_MIDGARD_DBUS_SUPPORT)
+if test "$_MIDGARD_DBUS_SUPPORT" == "no"; then
+	#MIDGARD_DBUS_SUPPORT=0
+	dbus_libs=""
+fi
+
+PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 $gdamodule $dbus_libs)
+if test "$gdamodule" == "libgda-4.0"; then
+    MIDGARD_CFLAGS="${MIDGARD_CFLAGS} -DHAVE_LIBGDA_4"
+fi
+
+DBUS_CONF_DIR="/etc"
+if test "$_MIDGARD_DBUS_SUPPORT" == "yes"; then
+	#MIDGARD_DBUS_SUPPORT=1
+	MIDGARD_CFLAGS=" ${MIDGARD_CFLAGS} -DMGD_HAVE_DBUS "
+	DBUS_CONF_DIR=`pkg-config --variable sysconfdir dbus-1`
+fi
+AM_CONDITIONAL(MIDGARD_DBUS_SUPPORT, test x$_MIDGARD_DBUS_SUPPORT = xyes)
+
+AM_GLIB_GNU_GETTEXT
+LIBS="$INTLLIBS $LIBS"
+
+PATH="${PATH}:${prefix}/bin"
+
+dnl Checks for header files.
+AC_HEADER_STDC
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+
+dnl Checks for library functions.
+AC_SEARCH_LIBS(crypt, crypt,,AC_MSG_ERROR(You need libcrypt))
+dnl AC_CHECK_HEADERS(zlib.h,,AC_MSG_ERROR(You need zlib.h))
+AC_CHECK_HEADERS(crypt.h)
+AC_CHECK_HEADERS(security/pam_appl.h pam/pam_appl.h)
+dnl AC_SEARCH_LIBS(compress, z,,AC_MSG_ERROR(You need libz))
+dnl AC_SEARCH_LIBS(gzopen, z,,AC_MSG_ERROR(You need libz))
+AC_SEARCH_LIBS(floor, m,,AC_MSG_ERROR(You need libmath))
+
+dnl LFLAGS="${LFLAGS} -Pmgdlib -olex.yy.c"
+
+dnl accomodate Solaris
+AC_SEARCH_LIBS(gethostbyname, nsl)
+AC_SEARCH_LIBS(htonl, socket)
+
+dnl search PAM
+AC_CHECK_LIB(pam, pam_start)
+
+AC_MSG_CHECKING([if building for some Win32 platform])
+case "$host" in
+  *-*-mingw*|*-*-cygwin*)
+    platform_win32=yes
+    ;;
+  *)
+    platform_win32=no
+    ;;
+esac
+AC_MSG_RESULT($platform_win32)
+AM_CONDITIONAL(PLATFORM_WIN32, test x$platform_win32 = xyes)
+
+if test "$prefix" = "/usr"; then
+	sysconfdir="/etc/midgard2"
+elif test "$prefix" = "NONE"; then
+	sysconfdir="/usr/local/etc/midgard2"
+else 
+	sysconfdir="$prefix/etc/midgard2"
+fi
+
+LIBS="$LIBS $MIDGARD_LIBS"
+
+AC_SUBST(LIBS)
+AC_SUBST(VERSION)
+AC_SUBST(VERSION_STRING)
+AC_SUBST(LFLAGS)
+AC_SUBST(MIDGARD_DBUS_SUPPORT)
+AC_SUBST(LIBGDA_VERSION, $gdamodule)
+AC_SUBST(MIDGARD_LIBS)
+AC_SUBST(MIDGARD_CFLAGS)
+AC_SUBST(DBUS_CONF_DIR)
+
+AC_CONFIG_FILES([Makefile Doxyfile src/midgard_config_auto.h midgard2.pc])
+AC_OUTPUT

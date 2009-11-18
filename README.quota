@@ -1,0 +1,91 @@
+Copyright (C) 2003 David Schmitter, Dataflow Solutions GmbH <schmitt@dataflow.ch>
+
+Quotas
+******
+
+Overview
+--------
+With Midgard Quotas, you can define per-sitegroup restrictions on 
+a) the number of records for each table 
+b) the maximum content size in each table, where you can define which fields count as content
+c) the maximum size for attachments.
+d) the maximum content size for all objects of a sitegroup.
+If you try to create / update a record, and the quota for the table is reached, error MGD_ERR_QUOTA ("Quota reached") is triggered.
+The same happens if you open an attachment and the maximum attachment size is reached.
+
+Installation
+------------
+./configure --with-quota
+Create the quota table using quota.sql in /data 
+
+Configuration
+-------------
+New apache configuration directive:
+MidgardCheckQuota (On|Off) default: Off
+
+Class + function reference
+--------------------------
+
+New object 
+class Quota {
+	var $id;
+	var $sitegroup; // sitegroup 
+	var $tablename; // table or special name 'blobsdata' for filesystem blobs or special name 'wholesg' for all objects of the SG
+	var $spacefields; // the fields that count as content for this table
+	var $number; // max number of records
+	var $space; // max length of content fields or max disk space for filesystem blobs (both in KB)
+	var $eff_number; // effective number of objects for which this quota is defined
+	var $eff_space; // effective size of objects for which this quota is defined
+}	
+
+New functions:
+mgd_list_quotas();
+mgd_get_quota([int id]);
+mgd_get_quota_by_tablename(string tablename);
+mgd_get_quota_info_by_tablename(string tablename, [int sitegroup]);
+mgd_create_quota(int sitegroup, string tablename, string spacefields, int number, int space);
+mgd_update_quota(int id, int sitegroup, string tablename, string spacefields, int number, int space);
+mgd_delete_quota(int id);
+
+Example
+-------
+/* as $midgard->root: */
+
+/* The total size of all content fields of table page_i may not exceed 1000 KB for sitegroup $sg */
+mgd_create_quota($sg, 'page_i', 'content', 0, 1000); 
+
+/* The total size of all value fields of table pageelement_i may not exceed 1000 KB for sitegroup $sg */
+mgd_create_quota($sg, 'pageelement_i', 'content', 0, 1000);
+
+/* The total size of all content & abstract fields of table article_i may not exceed 1000 KB for sitegroup $sg */
+mgd_create_quota($sg, 'article_i', 'content,abstract', 0, 1000);
+
+/* The total size of all value fields of table element_i may not exceed 1000 KB for sitegroup $sg */
+mgd_create_quota($sg, 'element_i', 'value', 0, 1000);
+
+/* The total size of all code fields of table element_i may not exceed 1000 KB for sitegroup $sg */
+mgd_create_quota($sg, 'snippet_i', 'code', 0, 1000);
+
+/* The total size of all extra & pgpkey fields of table person may not exceed 1000 KB for sitegroup $sg */
+mgd_create_quota($sg, 'person', 'extra,pgpkey', 0, 1000);
+
+/* The total size of all attachments may not exceed 10000 KB for sitegroup $sg */
+mgd_create_quota($sg, 'blobsdata', '', 0, 10000);
+
+/* The total size of all table fields and blobs data defined above may not exceed 10000 KB for sitegroup $sg */
+mgd_create_quota($sg, 'wholesg', '', 0, 12000);
+
+/* The total number of articles may not exceed 1000 for sitegroup $sg */
+mgd_create_quota($sg, 'article', '', 1000, 0);
+
+/* ... */
+/* as normal user: */
+
+$qinfo = mgd_get_quota_info_by_tablename('blobsdata');
+$qinfosg = mgd_get_quota_info_by_tablename('wholesg');
+
+/* Test if file $filename could be written into an attachment according to quota rules */
+if ($qinfo->eff_space + (filesize($filename) / 1024) >= $qinfo->space or $qinfosg->eff_space + (filesize($filename) / 1024) >= $qinfosg->space) {	
+	echo "File too big";
+}
+

@@ -1,0 +1,1 @@
+auth  required /lib/security/pam_winbind.so

@@ -1,0 +1,121 @@
+<!-- ##### SECTION Title ##### -->
+midgard_reflection_property
+
+<!-- ##### SECTION Short_Description ##### -->
+MgdSchema reflection.
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+ #MidgardReflectionProperty class lets developers write "reflected" applications 
+ and provides as many information defined in MgdSchema files as possible.
+</para>
+
+<para>
+ #MidgardReflectionProperty provides information declared in schema files 
+ as attributes of types' properties: multilang, link, type, etc.
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### STRUCT MidgardReflectionProperty ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION midgard_reflection_property_new ##### -->
+<para>
+
+</para>
+
+@klass: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_reflection_property_get_midgard_type ##### -->
+<para>
+
+</para>
+
+@self: 
+@propname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_reflection_property_is_link ##### -->
+<para>
+
+</para>
+
+@self: 
+@propname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_reflection_property_is_linked ##### -->
+<para>
+
+</para>
+
+@self: 
+@propname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_reflection_property_get_link_class ##### -->
+<para>
+
+</para>
+
+@self: 
+@propname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_reflection_property_get_link_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@propname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_reflection_property_get_link_target ##### -->
+<para>
+
+</para>
+
+@self: 
+@propname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_reflection_property_description ##### -->
+<para>
+
+</para>
+
+@self: 
+@propname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_reflection_property_get_user_value ##### -->
+<para>
+
+</para>
+
+@self: 
+@property: 
+@name: 
+@Returns: 
+
+

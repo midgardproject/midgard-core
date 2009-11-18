@@ -1,0 +1,531 @@
+<!-- ##### SECTION Title ##### -->
+midgard_object
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### MACRO MIDGARD_OBJECT_GET_CLASS_BY_NAME ##### -->
+<para>
+
+</para>
+
+@name: 
+
+
+<!-- ##### STRUCT MgdObject ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+@priv: 
+@metadata: 
+
+<!-- ##### TYPEDEF MidgardObject ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF midgard_object ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SIGNAL midgard_object::action-approve ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-approve-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-approved ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-create ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-create-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-created ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-delete ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-delete-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-deleted ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-export ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-export-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-exported ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-import ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-import-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-imported ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-loaded ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-loaded-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-lock ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-lock-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-locked ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-purge ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-purge-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-purged ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-unapprove ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-unapprove-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-unapproved ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-unlock ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-unlock-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-unlocked ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-update ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-update-hook ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### SIGNAL midgard_object::action-updated ##### -->
+<para>
+
+</para>
+
+@midgard_object: the object which received the signal.
+
+<!-- ##### ARG midgard_object:action ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_object:guid ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG midgard_object:metadata ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT MidgardObjectPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardObjectClassPrivate ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION midgard_object_new ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@name: 
+@value: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_get_by_id ##### -->
+<para>
+
+</para>
+
+@object: 
+@id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_update ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_create ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_is_in_parent_tree ##### -->
+<para>
+
+</para>
+
+@self: 
+@rootid: 
+@id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_is_in_tree ##### -->
+<para>
+
+</para>
+
+@self: 
+@rootid: 
+@id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_get_tree ##### -->
+<para>
+
+</para>
+
+@object: 
+@tnodes: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_get_by_guid ##### -->
+<para>
+
+</para>
+
+@object: 
+@guid: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_delete ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_purge ##### -->
+<para>
+
+</para>
+
+@object: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_get_parent ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_list ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_objects: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_list_children ##### -->
+<para>
+
+</para>
+
+@object: 
+@childname: 
+@n_objects: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_get_by_path ##### -->
+<para>
+
+</para>
+
+@self: 
+@path: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_parent ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_undelete ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@guid: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_set_guid ##### -->
+<para>
+
+</para>
+
+@self: 
+@guid: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_set_connection ##### -->
+<para>
+
+</para>
+
+@self: 
+@mgd: 
+
+
+<!-- ##### FUNCTION midgard_object_lock ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_unlock ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_is_locked ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_approve ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_unapprove ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_object_is_approved ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
