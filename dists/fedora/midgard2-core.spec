@@ -1,4 +1,4 @@
-%define major_version 9.03.99
+%define major_version 9.09
 
 %define min_glib2 2.14
 %define min_libxml2 2.6
