@@ -90,7 +90,7 @@ src_libmidgard2_la_CPPFLAGS = \
 AM_CFLAGS = -I$(top_srcdir)/src -Wall @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 
 
-src_libmidgard2_la_LDFLAGS = -version-info 2018:0:9 $(no_undefined)
+src_libmidgard2_la_LDFLAGS = -version-info 2013:0:3 $(no_undefined)
 
 test_midgard_schema_CPPFLAGS = \
 	 -DG_LOG_DOMAIN=\"midgard-core\"
