@@ -917,7 +917,8 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 	return;
 }
 
-GList *midgard_core_qb_set_object_from_query(MidgardQueryBuilder *builder, guint select_type, MgdObject *nobject)
+GList *
+midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint select_type, MgdObject *nobject)
 {
         g_assert(builder != NULL);
 
@@ -1036,10 +1037,6 @@ GList *midgard_core_qb_set_object_from_query(MidgardQueryBuilder *builder, guint
 				
 				if(G_IS_VALUE(gvalue)) {
 
-					guint puint = 0;
-					gint pint = 0;
-					gboolean pbool = 0;
-
 					if (!pspec) {
 						
 						g_warning("Failed to found (unregistered) %s property (%s class)", 
@@ -1047,53 +1044,29 @@ GList *midgard_core_qb_set_object_from_query(MidgardQueryBuilder *builder, guint
 						continue;
 					}
 
-					switch(pspec->value_type) {
+					if (pspec->value_type != G_VALUE_TYPE (gvalue)) {
 
-						case G_TYPE_INT:
-							MIDGARD_GET_INT_FROM_VALUE(pint, gvalue);
-							g_object_set(G_OBJECT(object), coltitle, pint, NULL);
-							break;
+						GValue _convert = {0, };
+						g_value_init (&_convert, pspec->value_type);	
+				
+						if (g_value_transform (gvalue, &_convert)) {
 
-						case G_TYPE_UINT:
-							MIDGARD_GET_UINT_FROM_VALUE(puint, gvalue);
-							g_object_set(G_OBJECT(object), coltitle, puint, NULL);
-							break;
+							g_object_set_property (G_OBJECT (object), coltitle, &_convert);
+					
+						} else {
 
-						case G_TYPE_BOOLEAN:
-							if (G_VALUE_TYPE(gvalue) != G_TYPE_BOOLEAN) {
-								MIDGARD_GET_BOOLEAN_FROM_VALUE(pbool, gvalue);
-								g_object_set(G_OBJECT(object), coltitle, pbool, NULL);
-							} else {
-								g_object_set_property(G_OBJECT(object), coltitle, gvalue);
-							}
-							break;
+							g_warning ("Failed to convert %s to %s for %s property",
+									G_VALUE_TYPE_NAME (gvalue),
+									G_VALUE_TYPE_NAME (&_convert), 
+									coltitle);
+						}
 
-						default:	
-							if (pspec->value_type != G_VALUE_TYPE (gvalue)) {
+						g_value_unset (&_convert);
 
-								GValue _convert = {0, };
-								g_value_init (&_convert, pspec->value_type);
-								
-								if (g_value_transform (gvalue, &_convert)) {
+					} else {
 
-									g_object_set_property (G_OBJECT (object), coltitle, &_convert);
-
-								} else {
-
-									g_warning ("Failed to convert %s to %s for %s property",
-											G_VALUE_TYPE_NAME (gvalue),
-											G_VALUE_TYPE_NAME (&_convert), 
-											coltitle);
-								}
-
-								g_value_unset (&_convert);
-
-							} else {
-							
-								g_object_set_property(G_OBJECT(object), coltitle, gvalue);
-							}
-							break;
-					}
+						g_object_set_property(G_OBJECT(object), coltitle, gvalue);
+					}	
 				
 				} else if (gda_value_is_null(gvalue)) {			
 
