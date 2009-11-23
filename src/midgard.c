@@ -1,6 +1,6 @@
 /* $Id$
  *
- * Copyright (C) 2007 Piotr Pokora <piotrek.pokora@gmail.com>
+ * Copyright (C) 2007, 2009 Piotr Pokora <piotrek.pokora@gmail.com>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -32,7 +32,8 @@
 #include "midgard_view.h"
 #include <libgda/libgda.h>
 
-const char *midgard_version()
+const char *
+midgard_version()
 {
 	return MIDGARD_LIB_VERSION;
 }
@@ -41,15 +42,16 @@ const char *midgard_version()
  * convertion one. GGtype system doesn't support such conversion,
  * and what is more, such convesrion must be done using plain C locale
  * for SQL safety. */
-static void __transform_string_to_float (const GValue *src_val, GValue *dest_val)
+static void 
+__transform_string_to_float (const GValue *src_val, GValue *dest_val)
 {
 	g_assert (src_val != NULL);
 	g_assert (dest_val != NULL);
 
 	g_assert (G_VALUE_HOLDS_FLOAT (dest_val));
 
-	gchar *lstring = setlocale(LC_NUMERIC, "0");
-	setlocale(LC_NUMERIC, "C");
+	gchar *lstring = setlocale (LC_NUMERIC, "0");
+	setlocale (LC_NUMERIC, "C");
 
 	const gchar *string_float = g_value_get_string (src_val);
 
@@ -62,13 +64,14 @@ static void __transform_string_to_float (const GValue *src_val, GValue *dest_val
 		g_value_set_float (dest_val, atof (string_float));
 	}
 
-	setlocale(LC_ALL, lstring);
+	setlocale (LC_ALL, lstring);
 
 	return;
 }
 
  
-void midgard_init() 
+void 
+midgard_init() 
 {	
 	GType type;
 	/* g_type_init_with_debug_flags(G_TYPE_DEBUG_OBJECTS | G_TYPE_DEBUG_NONE); */
@@ -80,82 +83,83 @@ void midgard_init()
 #endif
 
 	type = MIDGARD_TYPE_BLOB;
-	g_assert(type != 0);
-	g_type_class_ref(type);
+	g_assert (type != 0);
+	g_type_class_ref (type);
 
 	type = MIDGARD_TYPE_USER;
-	g_assert(type != 0);
-	g_type_class_ref(type);
+	g_assert (type != 0);
+	g_type_class_ref (type);
 
 	type = MIDGARD_TYPE_CONNECTION;
-	g_assert(type != 0);
-	g_type_class_ref(type);
+	g_assert (type != 0);
+	g_type_class_ref (type);
 
 	type = MIDGARD_TYPE_CONFIG;
-	g_assert(type != 0);
-	g_type_class_ref(type);
+	g_assert (type != 0);
+	g_type_class_ref (type);
 
 	type = MIDGARD_TYPE_COLLECTOR;
-	g_assert(type != 0);
-	g_type_class_ref(type);
+	g_assert (type != 0);
+	g_type_class_ref (type);
 
 	type = MIDGARD_TYPE_QUERY_BUILDER;
-	g_assert(type != 0);
-	g_type_class_ref(type);
+	g_assert (type != 0);
+	g_type_class_ref (type);
 	
 	type = MIDGARD_TYPE_DBOBJECT;
-	g_assert(type != 0);
-	g_type_class_ref(type);
+	g_assert (type != 0);
+	g_type_class_ref (type);
 
 	type = MIDGARD_TYPE_OBJECT;
-	g_assert(type != 0);
-	g_type_class_ref(type);
+	g_assert (type != 0);
+	g_type_class_ref (type);
 
 	type = MIDGARD_TYPE_VIEW;
-	g_assert(type != 0);
-	g_type_class_ref(type);
+	g_assert (type != 0);
+	g_type_class_ref (type);
 
 	/* Register transform function explicitly, we need own routine */
 	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_FLOAT, __transform_string_to_float);
 }
 
-void midgard_close(void)
+void 
+midgard_close(void)
 {
 	GObjectClass *klass;	
 	
-	klass = g_type_class_peek(MIDGARD_TYPE_BLOB);
+	klass = g_type_class_peek (MIDGARD_TYPE_BLOB);
 	if (klass)
-		g_type_class_unref(klass);
+		g_type_class_unref (klass);
 
-	klass = g_type_class_peek(MIDGARD_TYPE_USER);
+	klass = g_type_class_peek (MIDGARD_TYPE_USER);
 	if (klass)
-		g_type_class_unref(klass);
+		g_type_class_unref (klass);
 	
-	klass = g_type_class_peek(MIDGARD_TYPE_CONNECTION);
+	klass = g_type_class_peek (MIDGARD_TYPE_CONNECTION);
 	if (klass)
-		g_type_class_unref(klass);
+		g_type_class_unref (klass);
 
-	klass = g_type_class_peek(MIDGARD_TYPE_CONFIG);
+	klass = g_type_class_peek (MIDGARD_TYPE_CONFIG);
 	if (klass)
-		g_type_class_unref(klass);
+		g_type_class_unref (klass);
 
-	klass = g_type_class_peek(MIDGARD_TYPE_COLLECTOR);
+	klass = g_type_class_peek (MIDGARD_TYPE_COLLECTOR);
 	if (klass)
-		g_type_class_unref(klass);
+		g_type_class_unref (klass);
 
-	klass = g_type_class_peek(MIDGARD_TYPE_QUERY_BUILDER);
+	klass = g_type_class_peek (MIDGARD_TYPE_QUERY_BUILDER);
 	if (klass)
-		g_type_class_unref(klass);
+		g_type_class_unref (klass);
 
-	klass = g_type_class_peek(MIDGARD_TYPE_DBOBJECT);
+	klass = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
 	if (klass)
-		g_type_class_unref(klass);
+		g_type_class_unref (klass);
 
-	klass = g_type_class_peek(MIDGARD_TYPE_OBJECT);
+	klass = g_type_class_peek (MIDGARD_TYPE_OBJECT);
 	if (klass)
-		g_type_class_unref(klass);
+		g_type_class_unref (klass);
 
-	klass = g_type_class_peek(MIDGARD_TYPE_VIEW);
+	klass = g_type_class_peek (MIDGARD_TYPE_VIEW);
 	if (klass)
-		g_type_class_unref(klass);
+		g_type_class_unref (klass);
 }
