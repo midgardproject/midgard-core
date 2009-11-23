@@ -1067,10 +1067,32 @@ GList *midgard_core_qb_set_object_from_query(MidgardQueryBuilder *builder, guint
 								g_object_set_property(G_OBJECT(object), coltitle, gvalue);
 							}
 							break;
+	
+						default:    
+							if (pspec->value_type != G_VALUE_TYPE (gvalue)) {
 
-						default:
-							g_object_set_property(G_OBJECT(object), coltitle, gvalue);
-							break;
+								GValue _convert = {0, };
+								g_value_init (&_convert, pspec->value_type);
+
+								if (g_value_transform (gvalue, &_convert)) {
+
+									g_object_set_property (G_OBJECT (object), coltitle, &_convert);
+								
+								} else {
+		      
+									g_warning ("Failed to convert %s to %s for %s property",
+											G_VALUE_TYPE_NAME (gvalue),
+											G_VALUE_TYPE_NAME (&_convert),
+											coltitle);
+			      					}
+
+								g_value_unset (&_convert);
+	       
+							} else {
+					    
+								g_object_set_property(G_OBJECT(object), coltitle, gvalue);
+							}
+ 							break;
 					}
 				
 				} else if (gda_value_is_null(gvalue)) {			
