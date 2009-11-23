@@ -37,6 +37,37 @@ const char *midgard_version()
 	return MIDGARD_LIB_VERSION;
 }
 
+/* A helper funtion which is registered as string to float 
+ * convertion one. GGtype system doesn't support such conversion,
+ * and what is more, such convesrion must be done using plain C locale
+ * for SQL safety. */
+static void __transform_string_to_float (const GValue *src_val, GValue *dest_val)
+{
+	g_assert (src_val != NULL);
+	g_assert (dest_val != NULL);
+
+	g_assert (G_VALUE_HOLDS_FLOAT (dest_val));
+
+	gchar *lstring = setlocale(LC_NUMERIC, "0");
+	setlocale(LC_NUMERIC, "C");
+
+	const gchar *string_float = g_value_get_string (src_val);
+
+	if (!string_float) {
+
+		g_value_set_float (dest_val, 0.00);
+	
+	} else {
+		
+		g_value_set_float (dest_val, atof (string_float));
+	}
+
+	setlocale(LC_ALL, lstring);
+
+	return;
+}
+
+ 
 void midgard_init() 
 {	
 	GType type;
@@ -83,6 +114,9 @@ void midgard_init()
 	type = MIDGARD_TYPE_VIEW;
 	g_assert(type != 0);
 	g_type_class_ref(type);
+
+	/* Register transform function explicitly, we need own routine */
+	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_FLOAT, __transform_string_to_float);
 }
 
 void midgard_close(void)
