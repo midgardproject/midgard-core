@@ -1690,7 +1690,7 @@ static void _midgard_config_class_init(
 	
 	pspec = g_param_spec_uint ("port",
 			"Port",
-			"Database port.",
+			"Database port ( 0 by default )",
 			0, G_MAXUINT32, 0, G_PARAM_READWRITE);
 	g_object_class_install_property (gobject_class,
 			MIDGARD_CONFIG_DBPORT,
