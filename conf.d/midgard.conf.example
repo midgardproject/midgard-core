@@ -28,6 +28,9 @@ Type=MySQL
 #Database host ( 'localhost' by default )
 Host=
 
+#Database port (0 by default)
+#Port=3306
+
 #Name of the database 
 Name=midgard
 
