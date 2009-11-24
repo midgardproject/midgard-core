@@ -173,7 +173,7 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 	guint port = g_key_file_get_integer (keyfile, "MidgardDatabase", "Port", NULL);
 	if (port > 0)
 		self->dbport = port;
-	else 
+	else if (port < 0) 
 		g_warning ("Invalid, negative value for database port");
 
 	/* Get database name */
