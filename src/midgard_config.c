@@ -48,6 +48,7 @@ static gchar *__get_default_confdir(void);
 enum {
 	MIDGARD_CONFIG_DBTYPE = 1,
 	MIDGARD_CONFIG_DBNAME,
+	MIDGARD_CONFIG_DBPORT,
 	MIDGARD_CONFIG_DBUSER, 
 	MIDGARD_CONFIG_DBPASS, 
 	MIDGARD_CONFIG_HOST,
@@ -168,6 +169,13 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 	self->host = g_strdup(tmpstr);
 	g_free(tmpstr);
 
+	/* Get database port */
+	guint port = g_key_file_get_integer (keyfile, "MidgardDatabase", "Port", NULL);
+	if (port > 0)
+		self->dbport = port;
+	else 
+		g_warning ("Invalid, negative value for database port");
+
 	/* Get database name */
 	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "Name", NULL);
 	if(tmpstr != NULL && *tmpstr != '\0') {
@@ -175,7 +183,6 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 		self->database = g_strdup(tmpstr);
 	}
 	g_free(tmpstr);
-
 
 	/* Get database's username */
 	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "Username", NULL);
@@ -720,6 +727,14 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 						nick, 
 						g_value_get_boolean(&pval));
 				break;
+
+			case G_TYPE_UINT:
+				g_key_file_set_integer (self->priv->keyfile,
+						keygroup, 
+						nick, 
+						g_value_get_uint (&pval));
+				break;
+
 		}
 
 		g_key_file_set_comment(self->priv->keyfile, keygroup, nick,
@@ -993,7 +1008,8 @@ static void __config_struct_new(MidgardConfig *self)
 	self->mgdusername = g_strdup("admin");
 	self->mgdpassword = g_strdup("password");
 	self->host = g_strdup("localhost");
-	self->database = g_strdup("midgard");	
+	self->database = g_strdup("midgard");
+	self->dbport = 0;	
 	self->dbuser = g_strdup("midgard");
 	self->dbpass = g_strdup("midgard");
 	self->logfilename = g_strdup ("");;
@@ -1108,6 +1124,8 @@ __midgard_config_struct_free (MidgardConfig *self)
 	g_free (self->database);	
 	self->database = NULL;
 
+	self->dbport = 0;
+
 	g_free (self->dbuser);
 	self->dbuser = NULL;
 
@@ -1193,7 +1211,7 @@ const gchar *midgard_config_get_database_host(MidgardConfig *self)
 guint midgard_config_get_database_port(MidgardConfig *self)
 {
 	g_assert(self != NULL);
-	return self->port;
+	return self->dbport;
 }
 
 const gchar *midgard_config_get_blobdir(MidgardConfig *self)
@@ -1328,7 +1346,7 @@ void midgard_config_set_database_host(MidgardConfig *self, const gchar *host)
 void midgard_config_set_database_port(MidgardConfig *self, guint port)
 {
 	g_assert(self != NULL);
-	self->port = port;
+	self->dbport = port;
 }
 
 void midgard_config_set_blobdir(MidgardConfig *self, const gchar *blobdir)
@@ -1464,6 +1482,10 @@ _midgard_config_set_property (GObject *object, guint property_id,
 			self->host = g_value_dup_string(value);
 			break;
 
+		case MIDGARD_CONFIG_DBPORT:
+			self->dbport = g_value_get_uint (value);
+			break;
+
 		case MIDGARD_CONFIG_LOGFILENAME:
 			g_free(self->logfilename);
 			self->logfilename = g_value_dup_string(value);
@@ -1558,6 +1580,10 @@ _midgard_config_get_property (GObject *object, guint property_id,
 
 		case MIDGARD_CONFIG_HOST:
 			g_value_set_string (value, self->host);
+			break;
+
+		case MIDGARD_CONFIG_DBPORT:
+			g_value_set_uint (value, self->dbport);
 			break;
 
 		case MIDGARD_CONFIG_LOGFILENAME:
@@ -1662,6 +1688,14 @@ static void _midgard_config_class_init(
 			MIDGARD_CONFIG_HOST,
 			pspec);
 	
+	pspec = g_param_spec_uint ("port",
+			"Port",
+			"Database port.",
+			0, G_MAXUINT32, 0, G_PARAM_READWRITE);
+	g_object_class_install_property (gobject_class,
+			MIDGARD_CONFIG_DBPORT,
+			pspec);	
+
 	pspec = g_param_spec_string ("database",
 			"Name",
 			"Name of the database",

@@ -419,6 +419,7 @@ gboolean __midgard_connection_open(
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
 	gchar *host, *dbname, *dbuser, *dbpass, *loglevel, *tmpstr;
+	guint port = 0;
 #ifdef HAVE_LIBGDA_4
 	gchar *auth = NULL;
 #endif
@@ -428,6 +429,7 @@ gboolean __midgard_connection_open(
 	dbuser = config->dbuser;
 	dbpass = config->dbpass;
 	loglevel = config->loglevel;
+	port = config->dbport;
 	gboolean enable_threads = config->gdathreads;
 
 	/* Get 30% performance boost for non threaded applications */
@@ -506,6 +508,15 @@ gboolean __midgard_connection_open(
 		
 		GString *cnc = g_string_sized_new(100);
 		cnc_add_part(cnc, "HOST", host, MGD_MYSQL_HOST);
+
+		if (port > 0) {
+
+			GString *_strp = g_string_new("");
+			g_string_append_printf (_strp, "%d", port);
+			cnc_add_part (cnc, "PORT", _strp->str, "");
+			g_string_free (_strp, TRUE);
+		}
+
 		cnc_add_part(cnc, "DB_NAME", dbname, MGD_MYSQL_DATABASE);
 #ifdef HAVE_LIBGDA_4
 		tmpstr = g_string_free(cnc, FALSE);
