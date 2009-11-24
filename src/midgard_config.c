@@ -412,12 +412,10 @@ gboolean midgard_config_read_file(MidgardConfig *self, const gchar *filename, gb
 		return FALSE;
 	}
 
-	g_free(fname);
-
 	// checking consistency of config-file
 	// 1) upgrade-advice
 	if (!g_key_file_has_group(keyfile, "MidgardDatabase") && g_key_file_has_group(keyfile, "Database")) {
-		g_warning("Config-file doesn't have [MidgardDatabase] section, but has old [Database] section. You should rename it.");
+		g_warning("Config-file '%s' doesn't have [MidgardDatabase] section, but has old [Database] section. You should rename it.", fname);
 	}
 	// 2) check for unsupported sections
 	{
@@ -426,10 +424,12 @@ gboolean midgard_config_read_file(MidgardConfig *self, const gchar *filename, gb
 
 		for (i = 0; i < sections_len; i++) {
 			if (!g_str_equal(sections[i], "MidgardDatabase") && !g_str_equal(sections[i], "MidgardDir")) {
-				g_warning("Config-file has unsupported section [%s]. It won't be parsed.", sections[i]);
+				g_warning("Config-file '%s' has unsupported section [%s]. It won't be parsed.", fname, sections[i]);
 			}
 		}
 	}
+
+	g_free (fname);
 
 	__set_config_from_keyfile(self, keyfile, filename);
 
