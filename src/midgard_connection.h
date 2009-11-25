@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2006, 2007, 2008 Piotr Pokora <piotrek.pokora@gmail.com>
+ * Copyright (C) 2006, 2007, 2008, 2009 Piotr Pokora <piotrek.pokora@gmail.com>
  * Copyright (C) 2006 Jukka Zitting <jukka.zitting@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -58,11 +58,15 @@ struct MidgardConnectionClass {
 	void	(*error) 		(GObject *object);
 	void	(*auth_changed) 	(GObject *object);
 	void 	(*lost_provider)	(GObject *object);
+	void	(*connected)		(GObject *object);
+	void 	(*disconnected)		(GObject *object);
 
 	/* signals IDs */
 	guint signal_id_error;
 	guint signal_id_auth_changed;
 	guint signal_id_lost_provider;
+	guint signal_id_connected;
+	guint signal_id_disconnected;
 };
 
 struct _MidgardConnection {
@@ -87,6 +91,7 @@ gboolean 		 midgard_connection_open			(MidgardConnection *self, const gchar *nam
 GHashTable 		*midgard_connection_open_all			(gboolean userdir); 
 gboolean 		 midgard_connection_open_config			(MidgardConnection *self, MidgardConfig *config);
 gboolean 		 midgard_connection_open_from_file		(MidgardConnection *self, const gchar *filepath, GError **error);
+gboolean		 midgard_connection_is_connected		(MidgardConnection *self);
 gboolean 		 midgard_connection_set_loglevel		(MidgardConnection *self, const gchar *level, GLogFunc log_func);
 guint 			 midgard_connection_get_loglevel		(MidgardConnection *self);
 void 			 midgard_connection_set_loghandler		(MidgardConnection *self, guint loghandler);

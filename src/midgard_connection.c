@@ -51,6 +51,7 @@ midgard_connection_private_new (void)
 
 	cnc_private->pattern = NULL;	
 	cnc_private->config = NULL;
+	cnc_private->connected = FALSE;
 	cnc_private->free_config = FALSE;
 	cnc_private->loghandler = 0;
 	cnc_private->loglevel = 0;
@@ -164,8 +165,11 @@ static void _midgard_connection_dispose(GObject *object)
 	if (self->priv->error_clbk_connected)
 		midgard_core_connection_disconnect_error_callback(self);
 
-	if (gda_cnc != NULL)
+	if (gda_cnc != NULL) {
+
 		g_object_unref(gda_cnc);
+		g_signal_emit(self, MIDGARD_CONNECTION_GET_CLASS(self)->signal_id_disconnected, 0);
+	}
 }
 
 enum {	
@@ -261,6 +265,40 @@ static void _midgard_connection_class_init(
 			g_cclosure_marshal_VOID__VOID,
 			G_TYPE_NONE,
 			0);
+	
+	klass->signal_id_connected = 
+		g_signal_new("connected",
+			G_TYPE_FROM_CLASS(g_class),
+			G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+			G_STRUCT_OFFSET (MidgardConnectionClass, connected),
+			NULL, /* accumulator */
+			NULL, /* accu_data */
+			g_cclosure_marshal_VOID__VOID,
+			G_TYPE_NONE,
+			0);
+	
+	klass->signal_id_disconnected = 
+		g_signal_new("disconnected",
+			G_TYPE_FROM_CLASS(g_class),
+			G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+			G_STRUCT_OFFSET (MidgardConnectionClass, disconnected),
+			NULL, /* accumulator */
+			NULL, /* accu_data */
+			g_cclosure_marshal_VOID__VOID,
+			G_TYPE_NONE,
+			0);
+}
+
+static void
+__connect_callback (MidgardConnection *self)
+{
+	self->priv->connected = TRUE;
+}
+
+static void
+__disconnect_callback (MidgardConnection *self)
+{
+	self->priv->connected = FALSE;
 }
 
 static void _midgard_connection_instance_init(GTypeInstance *instance, gpointer g_class)
@@ -273,6 +311,9 @@ static void _midgard_connection_instance_init(GTypeInstance *instance, gpointer 
 
 	/* Private members */
 	self->priv = midgard_connection_private_new();
+
+	g_signal_connect (G_OBJECT(self), "connected", G_CALLBACK(__connect_callback), (gpointer) self);
+	g_signal_connect (G_OBJECT(self), "disconnected", G_CALLBACK(__disconnect_callback), (gpointer) self);
 }
 
 /* Registers the type as  a fundamental GType unless already registered. */
@@ -323,31 +364,34 @@ MidgardConnection *midgard_connection_new(void){
 	return self;
 }
 
-static gboolean __mysql_reconnect(MidgardConnection *mgd)
+static gboolean 
+__mysql_reconnect (MidgardConnection *mgd)
 {
-	g_assert(mgd != NULL);
+	g_assert (mgd != NULL);
 
 	guint i = 0;
 	gboolean opened;
 
-	gda_connection_close_no_warning(mgd->priv->connection);
+	gda_connection_close_no_warning (mgd->priv->connection);
+	g_signal_emit (mgd, MIDGARD_CONNECTION_GET_CLASS (mgd)->signal_id_disconnected, 0);
 
 	/* Try to reconnect 3 times */
 	do {
-		g_usleep(5000000); /* 5 seconds interval */
-		g_debug("Trying to reopen connection");
+		g_usleep (5000000); /* 5 seconds interval */
+		g_debug ("Trying to reopen connection");
 
-		opened = gda_connection_open(mgd->priv->connection, NULL);
+		opened = gda_connection_open (mgd->priv->connection, NULL);
 	
 		if (opened) {
-
-			g_debug("Successfully reopened connection");
+		
+			g_signal_emit (mgd, MIDGARD_CONNECTION_GET_CLASS (mgd)->signal_id_connected, 0);
+			g_debug ("Successfully reopened connection");
 			return TRUE;
 		}
 
 		i++;
 
-	} while(i < 3);
+	} while (i < 3);
 
 	return FALSE;
 }
@@ -425,11 +469,11 @@ gboolean __midgard_connection_open(
 #endif
 	MidgardConfig *config = mgd->priv->config;
 	host = config->host;
-	port = config->dbport;
 	dbname = config->database;
 	dbuser = config->dbuser;
 	dbpass = config->dbpass;
 	loglevel = config->loglevel;
+	port = config->dbport;
 	gboolean enable_threads = config->gdathreads;
 
 	/* Get 30% performance boost for non threaded applications */
@@ -508,7 +552,7 @@ gboolean __midgard_connection_open(
 		
 		GString *cnc = g_string_sized_new(100);
 		cnc_add_part(cnc, "HOST", host, MGD_MYSQL_HOST);
-		
+
 		if (port > 0) {
 
 			GString *_strp = g_string_new("");
@@ -585,6 +629,8 @@ gboolean __midgard_connection_open(
 
 	/* Loads available authentication types */
 	midgard_core_connection_initialize_auth_types(mgd);
+
+	g_signal_emit (mgd, MIDGARD_CONNECTION_GET_CLASS (mgd)->signal_id_connected, 0);
 
 	return TRUE;
 }
@@ -1124,6 +1170,20 @@ midgard_connection_list_auth_types (MidgardConnection *self, guint *n_types)
 	types[i] = NULL;
 
 	return types;
+}
+
+/**
+ * midgard_connection_is_connected:
+ * @self: #MidgardConnection instance
+ *
+ * Returns: %TRUE if database connection is established, %FALSE otherwise
+ */
+gboolean 
+midgard_connection_is_connected (MidgardConnection *self)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+
+	return self->priv->connected;
 }
 
 /* !! Undocumented workarounds !! */
