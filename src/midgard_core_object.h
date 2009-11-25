@@ -139,6 +139,7 @@ struct _MidgardConnectionCache {
 struct _MidgardConnectionPrivate {
 	MidgardConnection *pattern; /* a pointer to connection we made copy from */
         MidgardConfig *config;
+	gboolean connected;
 	gboolean free_config;
 	guint loghandler;
 	guint loglevel;
