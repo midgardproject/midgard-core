@@ -12,9 +12,7 @@ midgard_config_read_file_at_path
 midgard_config_read_data
 midgard_config_list_files
 midgard_config_save_file
-midgard_config_create_midgard_tables
-midgard_config_create_class_table
-midgard_config_update_class_table
+midgard_config_create_blobdir
 <SUBSECTION Standard>
 MIDGARD_CONFIG
 MIDGARD_IS_CONFIG

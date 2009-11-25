@@ -101,10 +101,6 @@ gboolean 	midgard_config_read_file_at_path	(MidgardConfig *self, const gchar *fi
 gboolean 	midgard_config_read_data		(MidgardConfig *self, const gchar *data, GError **error);
 gchar 		**midgard_config_list_files		(gboolean user);
 gboolean 	midgard_config_save_file		(MidgardConfig *self, const gchar *name, gboolean user, GError **error);
-gboolean 	midgard_config_create_midgard_tables	(MidgardConfig *self, MidgardConnection *mgd);
-gboolean 	midgard_config_create_class_table	(MidgardConfig *self, MidgardObjectClass *klass, MidgardConnection *mgd);
-gboolean 	midgard_config_update_class_table	(MidgardConfig *self, MidgardObjectClass *klass, MidgardConnection *mgd);
-gboolean 	midgard_config_class_table_exists	(MidgardConfig *self, MidgardObjectClass *klass, MidgardConnection *mgd);
 gboolean 	midgard_config_create_blobdir		(MidgardConfig *self);
 
 /* API helpers, getters */
