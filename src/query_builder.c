@@ -561,16 +561,21 @@ static GList *midgard_query_builder_execute_or_count(MidgardQueryBuilder *builde
 		}
 	}
 
+	g_signal_emit (builder, MIDGARD_QUERY_BUILDER_GET_CLASS (builder)->signal_id_execute, 0);
+
 	GList *list = midgard_core_qb_set_object_from_query(builder, select_type, NULL);
+
 	if (list == NULL) {
+
 		if (holder)
 			holder->elements = 0;
-
-		return NULL;
+	} else {
+		
+		if (holder)
+			holder->elements = g_list_length(list);
 	}
 
-	if (holder)
-		holder->elements = g_list_length(list);
+	g_signal_emit (builder, MIDGARD_QUERY_BUILDER_GET_CLASS (builder)->signal_id_executed, 0);
 
 	return list;
 }
@@ -1183,6 +1188,28 @@ static void _midgard_query_builder_class_init(
 	klass->include_deleted = midgard_query_builder_include_deleted;
 	klass->execute = midgard_query_builder_execute;
 	klass->count = midgard_query_builder_count;
+
+	klass->signal_id_execute =
+		g_signal_new("execute",
+				G_TYPE_FROM_CLASS(g_class),
+				G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+				G_STRUCT_OFFSET (MidgardQueryBuilderClass, execute_signal),
+				NULL, /* accumulator */
+				NULL, /* accu_data */
+				g_cclosure_marshal_VOID__VOID,
+				G_TYPE_NONE,
+				0);
+
+	klass->signal_id_executed =
+		g_signal_new("executed",
+				G_TYPE_FROM_CLASS(g_class),
+				G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+				G_STRUCT_OFFSET (MidgardQueryBuilderClass, executed),
+				NULL, /* accumulator */
+				NULL, /* accu_data */
+				g_cclosure_marshal_VOID__VOID,
+				G_TYPE_NONE,
+				0);
 }
 
 static void _midgard_query_builder_instance_init(
