@@ -454,10 +454,10 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 	midgard_query_builder_include_deleted (builder);
 
 	guint n_objects;
-	GObject **_dbobject = midgard_query_builder_execute (builder, &n_objects);
+	GObject **_dbobjects = midgard_query_builder_execute (builder, &n_objects);
 	MgdObject *dbobject;
 
-	if (!_dbobject){
+	if (!_dbobjects){
 	
 		g_object_unref (G_OBJECT (builder));
 		
@@ -489,7 +489,9 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 	} else {
 
 		gchar *updated, *dbupdated;
-		dbobject = (MgdObject *)_dbobject[0];
+		dbobject = (MgdObject *)_dbobjects[0];
+		g_free (_dbobjects);
+
 		GValue updated_timestamp = {0, };
 		g_value_init (&updated_timestamp, MGD_TYPE_TIMESTAMP);
 		GValue dbupdated_timestamp = {0, };
@@ -506,7 +508,32 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 		/* We can use g_ascii_strcasecmp as it type cast every single 
 		 * pointer to integer and unsigned char returning substract result */		
 		gint datecmp;
-		
+	
+	     	if (updated == NULL) {
+
+			g_warning ("Trying to import ivalid object. metadata.revised property holds NULL (Object: %s)", 
+					MGD_OBJECT_GUID (object));
+
+			if (dbupdated)
+				g_free (dbupdated);
+
+			g_object_unref (dbobject);
+
+			return FALSE;
+		}
+
+		if (dbupdated == NULL) {
+
+			g_warning ("Trying to import object for invalid object stored in database. metadata.revised property holds NULL (Database object:%s)", MGD_OBJECT_GUID (object));
+
+			if (updated)
+				g_free (updated);
+
+			g_object_unref (dbobject);
+
+			return FALSE;
+		}
+
 		if (force) {
 
 			datecmp = -1;
@@ -524,8 +551,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 
 		if (datecmp > 0 || datecmp == 0) {
 			
-			/* Database object is more recent or exactly the same */
-			g_object_unref (builder);
+			/* Database object is more recent or exactly the same */	
 			g_object_unref (dbobject);	
 			MIDGARD_ERRNO_SET (mgd, MGD_ERR_OBJECT_IMPORTED);
 	
@@ -541,7 +567,6 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 			 * * we delete object from database */
 			if (deleted) {
 
-				g_object_unref (builder);
 				ret = midgard_object_delete (dbobject);
 				g_object_unref (dbobject);
 				return ret;
@@ -569,8 +594,6 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 			}
 
 			_update_object:
-			g_object_unref(builder);
-
 			ret = _midgard_object_update (MIDGARD_OBJECT (object), OBJECT_UPDATE_IMPORTED);
 			g_object_unref (dbobject);
 			return ret;
