@@ -33,6 +33,7 @@ MgdObject 		*midgard_object_class_get_object_by_path	(MidgardConnection *mgd, co
 gboolean 		midgard_object_class_undelete	(MidgardConnection *mgd, const gchar *guid);
 gboolean 		midgard_object_class_has_metadata		(MidgardObjectClass *klass);
 GObjectClass		*midgard_object_class_get_metadata_class	(MidgardObjectClass *klass);
+const gchar 		*midgard_object_class_get_schema_value		(MidgardObjectClass *klass, const gchar *name);
 
 #endif /* MIDGARD_OBJECT_CLASS_H */
 

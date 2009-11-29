@@ -538,7 +538,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 			0);
 
 	MgdSchemaPropertyAttr *prop_attr;
-	MgdSchemaTypeAttr *type_attr = _mgd_schema_type_attr_new();
+	MgdSchemaTypeAttr *type_attr = midgard_core_schema_type_attr_new();
 	
 	/* Register properties */        
 
@@ -551,7 +551,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_CREATOR,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_GUID;
 	prop_attr->field = g_strdup("metadata_creator");
 	prop_attr->table = NULL;
@@ -568,7 +568,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_CREATED,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_TIMESTAMP;
 	prop_attr->field = g_strdup("metadata_created");
 	prop_attr->table = NULL;
@@ -585,7 +585,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_REVISOR,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_GUID;
 	prop_attr->field = g_strdup("metadata_revisor");
 	prop_attr->table = NULL;
@@ -602,7 +602,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_REVISED,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_TIMESTAMP;
 	prop_attr->field = g_strdup("metadata_revised");
 	prop_attr->table = NULL;
@@ -618,7 +618,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_REVISION,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_UINT;
 	prop_attr->field = g_strdup("metadata_revision");
 	prop_attr->table = NULL;
@@ -635,7 +635,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_LOCKER,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_GUID;
 	prop_attr->field = g_strdup("metadata_locker");
 	prop_attr->table = NULL;
@@ -652,7 +652,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_LOCKED,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_TIMESTAMP;
 	prop_attr->field = g_strdup("metadata_locked");
 	prop_attr->table = NULL;
@@ -669,7 +669,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_APPROVER,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_GUID;
 	prop_attr->field = g_strdup("metadata_approver");
 	prop_attr->table = NULL;
@@ -686,7 +686,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_APPROVED,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_TIMESTAMP;
 	prop_attr->field = g_strdup("metadata_approved");
 	prop_attr->table = NULL;
@@ -703,7 +703,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_AUTHORS,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_STRING;
 	prop_attr->field = g_strdup("metadata_authors");
 	prop_attr->table = NULL;
@@ -720,7 +720,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_OWNER,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_GUID;
 	prop_attr->field = g_strdup("metadata_owner");
 	prop_attr->table = NULL;
@@ -737,7 +737,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_SCHEDULE_START,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_TIMESTAMP;
 	prop_attr->field = g_strdup("metadata_schedule_start");
 	prop_attr->table = NULL;
@@ -754,7 +754,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_SCHEDULE_END,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_TIMESTAMP;
 	prop_attr->field = g_strdup("metadata_schedule_end");
 	prop_attr->table = NULL;
@@ -771,7 +771,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_HIDDEN,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_BOOLEAN;
 	prop_attr->field = g_strdup("metadata_hidden");
 	prop_attr->table = NULL;
@@ -788,7 +788,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_NAV_NOENTRY,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_BOOLEAN;
 	prop_attr->field = g_strdup("metadata_nav_noentry");
 	prop_attr->table = NULL;
@@ -804,7 +804,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_SIZE,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_UINT;
 	prop_attr->field = g_strdup("metadata_size");
 	prop_attr->table = NULL;
@@ -821,7 +821,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_PUBLISHED,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_TIMESTAMP;
 	prop_attr->field = g_strdup("metadata_published");
 	prop_attr->table = NULL;
@@ -837,7 +837,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,      
 			MIDGARD_METADATA_SCORE,        
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_INT;
 	prop_attr->field = g_strdup("metadata_score");
 	prop_attr->table = NULL;
@@ -854,7 +854,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_EXPORTED,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_TIMESTAMP;
 	prop_attr->field = g_strdup("metadata_exported");
 	prop_attr->table = NULL;
@@ -871,7 +871,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_IMPORTED,
 			pspec);
-    	prop_attr = _mgd_schema_property_attr_new();
+    	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_TIMESTAMP;
 	prop_attr->field = g_strdup("metadata_imported");
 	prop_attr->table = NULL;
@@ -888,7 +888,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_DELETED,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_BOOLEAN;
 	prop_attr->field = g_strdup("metadata_deleted");
 	prop_attr->table = NULL;
@@ -905,7 +905,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_ISAPPROVED,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_BOOLEAN;
 	prop_attr->field = g_strdup("metadata_isapproved");
 	prop_attr->table = NULL;
@@ -922,7 +922,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_METADATA_ISLOCKED,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_BOOLEAN;
 	prop_attr->field = g_strdup("metadata_islocked");
 	prop_attr->table = NULL;

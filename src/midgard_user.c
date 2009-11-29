@@ -1577,7 +1577,7 @@ static void _midgard_user_class_init(
 	klass->is_admin = __midgard_user_is_admin;
 
 	MgdSchemaPropertyAttr *prop_attr;
-	MgdSchemaTypeAttr *type_attr = _mgd_schema_type_attr_new();
+	MgdSchemaTypeAttr *type_attr = midgard_core_schema_type_attr_new();
 
 	GParamSpec *pspec;
 
@@ -1590,7 +1590,7 @@ static void _midgard_user_class_init(
 	g_object_class_install_property (gobject_class,
 			MIDGARD_USER_GUID,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_GUID;
 	prop_attr->field = g_strdup("guid");
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
@@ -1607,7 +1607,7 @@ static void _midgard_user_class_init(
 	g_object_class_install_property (gobject_class,
 			MIDGARD_USER_LOGIN,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_STRING;
 	prop_attr->field = g_strdup("login");
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
@@ -1625,7 +1625,7 @@ static void _midgard_user_class_init(
 	g_object_class_install_property (gobject_class,
 			MIDGARD_USER_PASS,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_STRING;
 	prop_attr->field = g_strdup("password");
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
@@ -1642,7 +1642,7 @@ static void _midgard_user_class_init(
 	g_object_class_install_property (gobject_class,
 			MIDGARD_USER_PERSON_GUID,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_GUID;
 	prop_attr->field = g_strdup("person_guid");
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
@@ -1661,7 +1661,7 @@ static void _midgard_user_class_init(
 	g_object_class_install_property (gobject_class,
 			MIDGARD_USER_ACTIVE,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_BOOLEAN;
 	prop_attr->field = g_strdup("active");
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
@@ -1678,7 +1678,7 @@ static void _midgard_user_class_init(
 	g_object_class_install_property (gobject_class,
 			MIDGARD_USER_AUTH_TYPE,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_STRING;
 	prop_attr->field = g_strdup("auth_type");
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
@@ -1694,7 +1694,7 @@ static void _midgard_user_class_init(
 	g_object_class_install_property (gobject_class,
 			MIDGARD_USER_AUTH_TYPE_ID,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_UINT;
 	prop_attr->field = g_strdup("auth_type_id");
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
@@ -1711,7 +1711,7 @@ static void _midgard_user_class_init(
 	g_object_class_install_property (gobject_class,
 			MIDGARD_USER_TYPE,
 			pspec);
-	prop_attr = _mgd_schema_property_attr_new();
+	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_UINT;
 	prop_attr->field = g_strdup("user_type");
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);

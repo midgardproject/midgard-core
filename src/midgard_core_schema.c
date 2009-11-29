@@ -53,7 +53,7 @@ midgard_core_schema_type_property_attr_new (void)
 	prop->is_link = FALSE;
 	prop->is_linked = FALSE;
 	prop->description = g_strdup("");
-	prop->user_fields = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+	prop->user_values = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 
 	return prop;
 }
@@ -61,8 +61,8 @@ midgard_core_schema_type_property_attr_new (void)
 void
 midgard_core_schema_type_property_copy (MgdSchemaPropertyAttr *src_prop, MgdSchemaTypeAttr *dest_type)
 {
-	g_assert(src_prop != NULL);
-	g_assert(dest_type != NULL);
+	g_assert (src_prop != NULL);
+	g_assert (dest_type != NULL);
 
 	MgdSchemaPropertyAttr *prop = midgard_core_schema_type_property_attr_new ();
 
@@ -94,115 +94,224 @@ midgard_core_schema_type_property_copy (MgdSchemaPropertyAttr *src_prop, MgdSche
 	prop->is_linked = src_prop->is_linked;
 	g_free (prop->description); /* Explicitly free, it's initialized with new empty string by default */
 	prop->description = g_strdup(src_prop->description);
-	g_hash_table_destroy(prop->user_fields);
-	prop->user_fields = __copy_hash_table_with_strings(src_prop->user_fields);
+	g_hash_table_destroy (prop->user_values);
+	prop->user_values = __copy_hash_table_with_strings(src_prop->user_values);
 
 	g_hash_table_insert(dest_type->prophash, g_strdup(prop->name), prop);
-}
-
-MgdSchemaPropertyAttr* 
-_mgd_schema_property_attr_new (void){
-
-	return midgard_core_schema_type_property_attr_new();
 }
 
 void
 midgard_core_schema_type_property_attr_free (MgdSchemaPropertyAttr *prop)
 {
-	g_assert(prop != NULL);
+	g_assert (prop != NULL);
 	
-	g_free((gchar *)prop->type);
+	g_free ((gchar *)prop->type);
 	prop->type = NULL;
 
-	g_free((gchar *)prop->dbtype);
+	g_free ((gchar *)prop->dbtype);
 	prop->dbtype = NULL;
 
-	g_free((gchar *)prop->name);
+	g_free ((gchar *)prop->name);
 	prop->name = NULL;
 
-	g_free((gchar *)prop->field);
+	g_free ((gchar *)prop->field);
 	prop->field = NULL;
 
-	g_free((gchar *)prop->table);
+	g_free ((gchar *)prop->table);
 	prop->table = NULL;
 
-	g_free((gchar *)prop->tablefield);
+	g_free ((gchar *)prop->tablefield);
 	prop->tablefield = NULL;
 
-	g_free((gchar *)prop->upfield);
+	g_free ((gchar *)prop->upfield);
 	prop->upfield = NULL;
 
-	g_free((gchar *)prop->parentfield);
+	g_free ((gchar *)prop->parentfield);
 	prop->parentfield = NULL;
 
-	g_free((gchar *)prop->primaryfield);
+	g_free ((gchar *)prop->primaryfield);
 	prop->primaryfield = NULL;
 
-	g_free((gchar *)prop->link);
+	g_free ((gchar *)prop->link);
 	prop->link = NULL;
 
-	g_free((gchar *)prop->link_target);
+	g_free ((gchar *)prop->link_target);
 	prop->link_target = NULL;
 
-	g_free((gchar *)prop->description);
+	g_free ((gchar *)prop->description);
 	prop->description = NULL;
 
-	g_hash_table_destroy(prop->user_fields);
-	prop->user_fields = NULL;
+	g_hash_table_destroy(prop->user_values);
+	prop->user_values = NULL;
 
-	g_free(prop);
+	g_free (prop);
 
 	prop = NULL;
 }
 
+MgdSchemaTypeAttr *
+midgard_core_schema_type_attr_new (void)
+{
+	MgdSchemaTypeAttr *type = g_new (MgdSchemaTypeAttr, 1);
+	type->name = NULL;
+	type->base_index = 0;
+	type->num_properties = 0;
+	type->class_nprop = 0;
+	type->params = NULL;
+	type->properties = NULL;
+	type->table = NULL;
+	type->parentfield = NULL;
+	type->upfield = NULL;
+	type->primaryfield = NULL;
+	type->parent = NULL;
+	type->primary = NULL;
+	type->property_up = NULL;
+	type->property_parent = NULL;
+	type->tables = NULL;
+	type->tableshash = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+	type->prophash = g_hash_table_new (g_str_hash, g_str_equal);
+	type->_properties_list = NULL;
+	type->children = NULL;
+	type->unique_name = NULL;
+	type->sql_select_full = NULL;
+	type->copy_from = NULL;
+	type->extends = NULL;
+	type->joins = NULL;
+	type->constraints = NULL;
+	type->is_view = FALSE;
+	type->sql_create_view = NULL;
+	type->metadata_class = NULL;
+	type->user_values = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+
+	return type;
+}
+
+void 
+_destroy_property_hash (gpointer key, gpointer value, gpointer userdata)
+{
+	MgdSchemaPropertyAttr *prop = (MgdSchemaPropertyAttr *) value;
+	gchar *name = (gchar *) key;
+
+	if(prop)
+		midgard_core_schema_type_property_attr_free (prop);
+
+	if(name) {
+
+		g_free (name);
+		name = NULL;
+	}
+}
+
+void 
+midgard_core_schema_type_attr_free (MgdSchemaTypeAttr *type)
+{
+	g_assert (type != NULL);
+
+	g_free (type->name);
+	type->name = NULL;
+
+	g_free ((gchar *)type->table);
+	type->table = NULL;
+
+	g_free ((gchar *)type->tables);
+	type->tables = NULL;
+
+	g_free ((gchar *)type->parent);
+	type->parent = NULL;
+
+	g_free ((gchar *)type->primary);
+	type->primary = NULL;
+
+	g_free ((gchar *)type->property_up);
+	type->property_up = NULL;
+
+	g_free ((gchar *)type->property_parent);
+	type->property_parent = NULL;
+
+	g_hash_table_destroy(type->tableshash);
+	type->tableshash = NULL;
+
+	g_hash_table_foreach(type->prophash, _destroy_property_hash, NULL);
+	g_hash_table_destroy(type->prophash);
+	type->prophash = NULL;
+
+	if (type->_properties_list)
+		g_slist_free (type->_properties_list);
+	type->_properties_list = NULL;
+
+       	g_free (type->sql_select_full);
+	g_free (type->parentfield);
+	g_free (type->upfield);
+	g_free (type->primaryfield);
+	g_free (type->params);
+	g_free (type->properties);
+	g_free ((gchar *)type->unique_name);
+
+	if (type->joins != NULL) {
+		g_slist_free(type->joins);
+		type->joins = NULL;
+	}
+
+	if (type->constraints != NULL) {
+		g_slist_free(type->constraints);
+		type->constraints = NULL;
+	}
+
+	g_free (type->sql_create_view);
+	type->sql_create_view = NULL;
+	g_free (type->metadata_class);
+	type->metadata_class = NULL;
+
+	g_hash_table_destroy (type->user_values);
+        type->user_values = NULL;
+
+	g_free (type);
+
+	type = NULL;
+}
+
 static void 
-__copy_hash_table_keys(gpointer key, gpointer value, gpointer userdata)
+__copy_hash_table_keys (gpointer key, gpointer value, gpointer userdata)
 {
 	gchar *k = (gchar *)key;
 	gchar *v = (gchar *)value;
 	GHashTable *table = (GHashTable *)userdata;
 
-	g_hash_table_insert(table, g_strdup(k), g_strdup(v));
+	g_hash_table_insert (table, g_strdup(k), g_strdup(v));
 }
 
 static GHashTable*
-__copy_hash_table_with_strings(GHashTable *src)
+__copy_hash_table_with_strings (GHashTable *src)
 {
-	GHashTable *dest = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
-	g_hash_table_foreach(src, __copy_hash_table_keys, dest);
+	GHashTable *dest = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
+	g_hash_table_foreach (src, __copy_hash_table_keys, dest);
 
 	return dest;
-}
-
-void 
-_mgd_schema_property_attr_free (MgdSchemaPropertyAttr *prop) 
-{
-	midgard_core_schema_type_property_attr_free(prop);
 }
 
 void			
 midgard_core_schema_type_set_table (MgdSchemaTypeAttr *type, const gchar *table)
 {
-	g_assert(type != NULL);
-	g_assert(table != NULL);
+	g_assert (type != NULL);
+	g_assert (table != NULL);
 
 	if (type->table != NULL)
 		return;
 
-	type->table = g_strdup((gchar *)table);
+	type->table = g_strdup ((gchar *)table);
 	midgard_core_schema_type_add_table (type, table);
 }
 
 static void 
-__build_tables_static_string(gpointer key, gpointer val, gpointer userdata)
+__build_tables_static_string (gpointer key, gpointer val, gpointer userdata)
 {
 	_str_cont *_cont  = (_str_cont *) userdata;
 	gchar *table = (gchar *) key;
 
 	if(_cont->elts == 0)
-		g_string_append_printf(_cont->string, "%s", table);
+		g_string_append_printf (_cont->string, "%s", table);
 	else
-		g_string_append_printf(_cont->string, ", %s", table);
+		g_string_append_printf (_cont->string, ", %s", table);
 
 	_cont->elts++;		
 }
@@ -210,30 +319,30 @@ __build_tables_static_string(gpointer key, gpointer val, gpointer userdata)
 void			
 midgard_core_schema_type_add_table (MgdSchemaTypeAttr *type, const gchar *table)
 {
-	g_assert(type != NULL);
-	g_assert(table != NULL);
+	g_assert (type != NULL);
+	g_assert (table != NULL);
 
 	if (type->tableshash == NULL)
 		return;
 
 	g_hash_table_insert (type->tableshash, g_strdup(table), NULL);
 
-	GString *_sql = g_string_new(" ");
-	_str_cont *cont = g_new(_str_cont, 1);
+	GString *_sql = g_string_new (" ");
+	_str_cont *cont = g_new (_str_cont, 1);
 	cont->string = _sql;
 	cont->elts = 0;
 
 	g_hash_table_foreach (type->tableshash, __build_tables_static_string, cont);
 	g_free ((gchar *)type->tables);
-	type->tables = g_strdup(_sql->str);
-	g_string_free(_sql, TRUE);
-	g_free(cont);
+	type->tables = g_strdup (_sql->str);
+	g_string_free (_sql, TRUE);
+	g_free (cont);
 }
 
 void 
 midgard_core_schema_type_initialize_paramspec (MgdSchemaTypeAttr *type)
 {
-	g_assert(type != NULL);
+	g_assert (type != NULL);
 
 	GHashTable *hash = type->prophash;
 
@@ -321,8 +430,8 @@ midgard_core_schema_type_initialize_paramspec (MgdSchemaTypeAttr *type)
 void			
 midgard_core_schema_type_property_set_table (MgdSchemaPropertyAttr *prop, const gchar *table)
 {
-	g_assert(prop != NULL);
-	g_assert(table != NULL);
+	g_assert (prop != NULL);
+	g_assert (table != NULL);
 
 	if (prop->table != NULL)
 		return;
@@ -333,26 +442,26 @@ midgard_core_schema_type_property_set_table (MgdSchemaPropertyAttr *prop, const 
 void 
 midgard_core_schema_type_property_set_tablefield (MgdSchemaPropertyAttr *prop, const gchar *table, const gchar *field)
 {
-	g_assert(prop != NULL);
-	g_assert(table != NULL);
-	g_assert(field != NULL);
+	g_assert (prop != NULL);
+	g_assert (table != NULL);
+	g_assert (field != NULL);
 
 	/* in case there are two attributes of which one takes precedence */
 	/* FIXME, we shouldn't allow this, but it's kept for safety reason */
 	if (prop->tablefield != NULL)
-		g_free((gchar *)prop->tablefield);
+		g_free ((gchar *)prop->tablefield);
 
 	gchar *_table = g_strdup (table);
 	gchar *_field = g_strdup (field);
 
-	if (prop->table) g_free( (gchar *)prop->table);
+	if (prop->table) g_free ( (gchar *)prop->table);
 	prop->table = g_strdup(_table);
 
 	/* Set table implicitly */
 	midgard_core_schema_type_property_set_table(prop, _table);
 
 	/* Set field implicitly */
-	if (prop->field) g_free( (gchar *)prop->field); 
+	if (prop->field) g_free ( (gchar *)prop->field); 
 	prop->field = g_strdup(_field);
 
 	prop->tablefield = g_strjoin(".", _table, _field, NULL);
@@ -407,17 +516,18 @@ midgard_core_schema_gtype_from_string(const gchar *type)
 void
 midgard_core_schema_type_property_set_gtype (MgdSchemaPropertyAttr *prop, const gchar *type)
 {
-	g_assert(prop != NULL);
-	g_assert(type != NULL);
+	g_assert (prop != NULL);
+	g_assert (type != NULL);
 
 	if (prop->type != NULL)
-		g_free((gchar *)prop->type);
+		g_free ((gchar *)prop->type);
 
 	prop->type = g_strdup((gchar *)type);
 	prop->gtype = midgard_core_schema_gtype_from_string(type);
 }
 
-static void __build_static_sql(gpointer key, gpointer val, gpointer userdata)
+static void 
+__build_static_sql(gpointer key, gpointer val, gpointer userdata)
 {
 	_str_cont *_cont  = (_str_cont *) userdata;
 	gchar *property = (gchar *) key;
@@ -449,7 +559,7 @@ static void __build_static_sql(gpointer key, gpointer val, gpointer userdata)
 void                    
 midgard_core_schema_type_build_static_sql (MgdSchemaTypeAttr *type_attr)
 {
-	g_assert(type_attr != NULL);
+	g_assert (type_attr != NULL);
 
 	if (type_attr->prophash == NULL || type_attr->table == NULL)
 		return;
@@ -468,46 +578,48 @@ midgard_core_schema_type_build_static_sql (MgdSchemaTypeAttr *type_attr)
 	type_attr->sql_select_full = g_strdup(_sql->str);
 }
 
-static void __field_is_equal(gpointer key, gpointer val, gpointer userdata)
+static void 
+__field_is_equal(gpointer key, gpointer val, gpointer userdata)
 {
 	MgdSchemaPropertyAttr *prop_attr = (MgdSchemaPropertyAttr *)val;
 	MgdSchemaPropertyAttr *src_prop = (MgdSchemaPropertyAttr *)userdata;
 
-	if (!g_str_equal(prop_attr->name, src_prop->name)) {
+	if (!g_str_equal (prop_attr->name, src_prop->name)) {
 
-		if (g_str_equal(prop_attr->tablefield, src_prop->tablefield)) {
+		if (g_str_equal (prop_attr->tablefield, src_prop->tablefield)) {
 
-			g_warning("Field %s redefined for %s and %s", 
+			g_warning ("Field %s redefined for %s and %s", 
 					prop_attr->tablefield, prop_attr->name, src_prop->name);
-			g_error("Table columns collision");
+			g_error ("Table columns collision");
 		}
 	}
 }
 
-static void __check_field_duplicates(gpointer key, gpointer val, gpointer userdata)
+static void 
+__check_field_duplicates(gpointer key, gpointer val, gpointer userdata)
 {
 	MgdSchemaPropertyAttr *prop_attr = (MgdSchemaPropertyAttr *)val;
 	MgdSchemaTypeAttr *type = (MgdSchemaTypeAttr *)userdata;
 
-	g_hash_table_foreach(type->prophash, __field_is_equal, prop_attr);
+	g_hash_table_foreach (type->prophash, __field_is_equal, prop_attr);
 }
 
 void
 midgard_core_schema_type_validate_fields (MgdSchemaTypeAttr *type)
 {
-	g_assert(type != NULL);
+	g_assert (type != NULL);
 
 	if (type->table == NULL)
 		return;
 
-	g_hash_table_foreach(type->prophash, __check_field_duplicates, type);
+	g_hash_table_foreach (type->prophash, __check_field_duplicates, type);
 }
 
 MgdSchemaPropertyAttr*
-midgard_core_schema_type_property_lookup(MgdSchemaTypeAttr *type, const gchar *name)
+midgard_core_schema_type_property_lookup (MgdSchemaTypeAttr *type, const gchar *name)
 {
-	g_return_val_if_fail(type != NULL, NULL);
-	g_return_val_if_fail(name != NULL, NULL);
+	g_return_val_if_fail (type != NULL, NULL);
+	g_return_val_if_fail (name != NULL, NULL);
 
-	return g_hash_table_lookup(type->prophash, name);
+	return g_hash_table_lookup (type->prophash, name);
 }

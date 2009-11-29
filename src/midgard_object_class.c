@@ -619,3 +619,27 @@ midgard_object_class_get_metadata_class (MidgardObjectClass *klass)
 
 	return g_type_class_peek(g_type_from_name(type_attr->metadata_class));
 }
+
+/**
+ * midgard_object_class_get_schema_value:
+ * @klass: MidgardObjectClass derived class pointer
+ * @name: node's name declared for given @klass
+ *
+ * Returns: value for given node's @name 
+ *
+ * Since: 9.09.1
+ */
+const gchar *
+midgard_object_class_get_schema_value (MidgardObjectClass *klass, const gchar *name)
+{
+	g_return_val_if_fail (klass != NULL, NULL);
+	g_return_val_if_fail (name != NULL, NULL);
+
+	MgdSchemaTypeAttr *type_attr = midgard_core_class_get_type_attr (MIDGARD_DBOBJECT_CLASS (klass));	
+
+	if (!type_attr)
+		return NULL;
+
+	return g_hash_table_lookup (type_attr->user_values, (gpointer) name);
+}
+

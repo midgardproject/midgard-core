@@ -47,121 +47,10 @@ static GSList *schema_trash = NULL;
  * Only for warning purposes */
 static const gchar *parsed_schema = NULL;
 
-void _destroy_property_hash(gpointer key, gpointer value, gpointer userdata)
-{
-	MgdSchemaPropertyAttr *prop = (MgdSchemaPropertyAttr *) value;
-	gchar *name = (gchar *) key;
-	
-	if(prop)
-		_mgd_schema_property_attr_free(prop);
-
-	if(name)
-		g_free(name);
-}
-
 void _destroy_query_hash(gpointer key, gpointer value, gpointer userdata)
 {
 	gchar *name = (gchar *) key;	
 	if(name) g_free(name);
-}
-
-MgdSchemaTypeAttr *_mgd_schema_type_attr_new()
-{
-	MgdSchemaTypeAttr *type = g_new(MgdSchemaTypeAttr, 1);
-	type->name = NULL;
-	type->base_index = 0;
-	type->num_properties = 0;
-	type->class_nprop = 0;
-	type->params = NULL;
-	type->properties = NULL;
-	type->table = NULL;
-	type->parentfield = NULL;
-	type->upfield = NULL;
-	type->primaryfield = NULL;
-	type->parent = NULL;
-	type->primary = NULL;
-	type->property_up = NULL;
-	type->property_parent = NULL;				
-	type->tables = NULL;
-	type->tableshash = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-	type->prophash = g_hash_table_new(g_str_hash, g_str_equal);
-	type->_properties_list = NULL;
-	type->children = NULL;
-	type->unique_name = NULL;
-	type->sql_select_full = NULL;
-	type->copy_from = NULL;
-	type->extends = NULL;
-	type->joins = NULL;
-	type->constraints = NULL;
-	type->is_view = FALSE;
-	type->sql_create_view = NULL;
-	type->metadata_class = NULL;
-	
-	return type;
-}
-
-void _mgd_schema_type_attr_free(MgdSchemaTypeAttr *type)
-{
-	g_assert(type != NULL);
-
-	g_free(type->name);
-	type->name = NULL;
-
-	g_free((gchar *)type->table);
-	type->table = NULL;
-
-	g_free((gchar *)type->tables);
-	type->tables = NULL;
-
-	g_free((gchar *)type->parent);
-	type->parent = NULL;
-
-	g_free((gchar *)type->primary);
-	type->primary = NULL;
-
-	g_free((gchar *)type->property_up);
-	type->property_up = NULL;
-
-	g_free((gchar *)type->property_parent);
-	type->property_parent = NULL;
-
-	g_hash_table_destroy(type->tableshash);	
-	
-	g_hash_table_foreach(type->prophash, _destroy_property_hash, NULL);
-	g_hash_table_destroy(type->prophash);
-
-	if (type->_properties_list)
-		g_slist_free (type->_properties_list);
-	type->_properties_list = NULL;
-
-	g_free(type->sql_select_full);
-	g_free(type->parentfield);
-	g_free(type->upfield);
-	g_free(type->primaryfield);
-
-	g_free(type->params);
-	g_free(type->properties);
-	g_free((gchar *)type->unique_name);
-
-	if (type->joins != NULL) {
-
-		g_slist_free(type->joins);
-		type->joins = NULL;
-	}
-
-	if (type->constraints != NULL) {
-
-		g_slist_free(type->constraints);
-		type->constraints = NULL;
-	}
-
-	g_free(type->sql_create_view);
-	type->sql_create_view = NULL;
-
-	g_free (type->metadata_class);
-	type->metadata_class = NULL;
-
-	g_free(type);
 }
 
 /* return type's struct  or NULL if type is not in schema */
@@ -213,7 +102,18 @@ static void __warn_msg(xmlNode * node, const gchar *msg)
 /* Define which element names should be addedd to schema. 
  * We change them only here , and in xml file itself.
  */
-static const gchar *mgd_complextype[] = { "type", "property", "Schema", "description", "include", "copy", "extends", NULL };
+static const gchar *mgd_complextype[] = { 
+	"type", 
+	"property", 
+	"Schema", 
+	"description", 
+	"include", 
+	"copy", 
+	"extends", 
+	TYPE_RW_USERVALUES,
+	NULL 
+};
+
 static const gchar *mgd_attribute[] = { 
 	TYPE_RW_TYPE,
 	TYPE_RW_NAME, 
@@ -768,7 +668,7 @@ _get_user_fields (xmlNode *node, MgdSchemaPropertyAttr *prop_attr)
 
 			} else {	
 				
-				g_hash_table_insert(prop_attr->user_fields, g_strdup((gchar *)snode->name), g_strdup((gchar *)decoded));
+				g_hash_table_insert(prop_attr->user_values, g_strdup((gchar *)snode->name), g_strdup((gchar *)decoded));
 			}
 
 			g_free(decoded);
@@ -778,7 +678,43 @@ _get_user_fields (xmlNode *node, MgdSchemaPropertyAttr *prop_attr)
 	}
 }
 
-static void __get_properties (xmlNode *curn, MgdSchemaTypeAttr *type_attr, MidgardSchema *schema)
+static void
+__get_type_user_values (xmlNode *node, MgdSchemaTypeAttr *type_attr)
+{
+	xmlNode *snode = NULL;	
+	xmlNode *user_value = NULL;
+
+	for (snode = node; snode != NULL; snode = snode->next) {
+		
+		if (snode->type != XML_ELEMENT_NODE)
+			continue;
+
+		if (g_str_equal (snode->name, TYPE_RW_USERVALUES)) {
+
+			for (user_value = snode->children; user_value != NULL; user_value = user_value->next) {
+
+				if (user_value->type != XML_ELEMENT_NODE)
+					continue;
+	
+				xmlParserCtxtPtr parser = xmlNewParserCtxt();
+				gchar *value = (gchar *)xmlNodeGetContent(user_value);	
+				xmlChar *decoded =
+					xmlStringDecodeEntities (parser,	(const xmlChar *) value,
+							XML_SUBSTITUTE_REF, 0, 0, 0);
+
+				g_hash_table_insert (type_attr->user_values, 
+						g_strdup ((gchar *)user_value->name), g_strdup ((gchar *)decoded));
+
+				g_free (decoded);
+				xmlFreeParserCtxt (parser);
+				g_free (value);
+			}
+		}
+	}
+}
+
+static void 
+__get_properties (xmlNode *curn, MgdSchemaTypeAttr *type_attr, MidgardSchema *schema)
 {
 	xmlNode *node = NULL;
 	xmlChar *nv = NULL;	
@@ -790,30 +726,30 @@ static void __get_properties (xmlNode *curn, MgdSchemaTypeAttr *type_attr, Midga
 		if (node->type != XML_ELEMENT_NODE)
 			continue;
 
-		if (!strv_contains(mgd_complextype, node->name)) {
-			g_warning("Wrong node name '%s' in '%s' on line %ld",
+		if (!strv_contains (mgd_complextype, node->name)) {
+			g_warning ("Wrong node name '%s' in '%s' on line %ld",
 					node->name, parsed_schema, xmlGetLineNo(node));
 		}
 
-		if (g_str_equal(node->name, "property")) {
+		if (g_str_equal (node->name, TYPE_RW_PROPERTY)) {
 				
 			nv = xmlGetProp (node, (const xmlChar *) TYPE_RW_NAME);
-			check_property_name(nv, type_attr->name);
+			check_property_name (nv, type_attr->name);
 			
-			prop_attr = g_hash_table_lookup(type_attr->prophash, (gchar *)nv);
+			prop_attr = g_hash_table_lookup (type_attr->prophash, (gchar *)nv);
 				
 			if (prop_attr != NULL) {
 
-				__warn_msg(node, "Invalid property");
-				g_error("Property '%s' already added to %s", nv, type_attr->name);
+				__warn_msg (node, "Invalid property");
+				g_error ("Property '%s' already added to %s", nv, type_attr->name);
 			}
 
 			prop_attr = midgard_core_schema_type_property_attr_new();
-			midgard_core_schema_get_property_type(node, type_attr, prop_attr);
-			midgard_core_schema_get_default_value(node, type_attr, prop_attr);
-			midgard_core_schema_get_unique_name(node, type_attr, prop_attr);
-			_get_user_fields(node, prop_attr);
-			_get_property_attributes(node, type_attr, prop_attr);
+			midgard_core_schema_get_property_type (node, type_attr, prop_attr);
+			midgard_core_schema_get_default_value (node, type_attr, prop_attr);
+			midgard_core_schema_get_unique_name (node, type_attr, prop_attr);
+			_get_user_fields (node, prop_attr);
+			_get_property_attributes (node, type_attr, prop_attr);
 
 			if(prop_attr->is_primary 
 					&& prop_attr->gtype != MGD_TYPE_UINT) {
@@ -824,16 +760,16 @@ static void __get_properties (xmlNode *curn, MgdSchemaTypeAttr *type_attr, Midga
 				g_free(tmpstr);
 			}
 
-			prop_attr->name = g_strdup((gchar *)nv);
+			prop_attr->name = g_strdup ((gchar *)nv);
 			gchar *property_name = g_strdup ((gchar *)nv);
-			g_hash_table_insert(type_attr->prophash, property_name, prop_attr);
+			g_hash_table_insert (type_attr->prophash, property_name, prop_attr);
 			/* Workaround.
 			 * _properties_list is only properties' holder.
 			 * It just holds properties in the same order we declared them in MgdSchema file */ 
 			type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
 
-			xmlFree(nv);
-		}		
+			xmlFree (nv);
+		}				
 	}
 }
 
@@ -877,13 +813,16 @@ _get_element_names (xmlNode *curn , MgdSchemaTypeAttr *type_attr, MidgardSchema 
 			g_error("%s:%s already added to schema!", obj->name, nv);
 		}
 
-		type_attr = _mgd_schema_type_attr_new();
+		type_attr = midgard_core_schema_type_attr_new();
 		type_attr->name = g_strdup((gchar *)nv);
 		g_hash_table_insert(schema->types, g_strdup((gchar *)nv), type_attr);
 		_get_type_attributes (obj, type_attr, schema);
 
-		if (obj->children != NULL)
+		if (obj->children != NULL) {
+
 			__get_properties(obj->children, type_attr, schema);
+			__get_type_user_values (obj->children, type_attr);
+		}
 
 		xmlFree(nv);
 	}
@@ -1485,7 +1424,7 @@ static void __register_schema_type (gpointer key, gpointer val, gpointer user_da
 	}
 
 	GType new_type;
-	new_type = midgard_type_register(key, type_attr, MIDGARD_TYPE_OBJECT);
+	new_type = midgard_type_register(type_attr, MIDGARD_TYPE_OBJECT);
 
 	if (new_type) {
 
@@ -1646,30 +1585,33 @@ static void _get_schema_trash(gpointer key, gpointer val, gpointer userdata)
 
 /* Create new object instance */
 static void 
-_schema_instance_init(GTypeInstance *instance, gpointer g_class)
+_schema_instance_init 
+(GTypeInstance *instance, gpointer g_class)
 {
 	MidgardSchema *self = (MidgardSchema *) instance;
-	self->types = g_hash_table_new(g_str_hash, g_str_equal);
+	self->types = g_hash_table_new (g_str_hash, g_str_equal);
 }
 
 /* Finalize  */
-static void _midgard_schema_finalize(GObject *object)
+static void 
+_midgard_schema_finalize (GObject *object)
 {
-	g_assert(object != NULL); /* just in case */
+	g_assert (object != NULL); /* just in case */
 	MidgardSchema *self = (MidgardSchema *) object;	
 
-	g_hash_table_foreach(self->types, _get_schema_trash, NULL);
-	g_hash_table_destroy(self->types);
+	g_hash_table_foreach (self->types, _get_schema_trash, NULL);
+	g_hash_table_destroy (self->types);
 	
-	for( ; schema_trash ; schema_trash = schema_trash->next){
-		_mgd_schema_type_attr_free((MgdSchemaTypeAttr *) schema_trash->data);
+	for ( ; schema_trash ; schema_trash = schema_trash->next){
+		midgard_core_schema_type_attr_free ((MgdSchemaTypeAttr *) schema_trash->data);
 	}
-	g_slist_free(schema_trash);					
+
+	g_slist_free (schema_trash);					
 }
 
 /* Initialize class */
-static void _midgard_schema_class_init(
-		gpointer g_class, gpointer g_class_data)
+static void 
+_midgard_schema_class_init (gpointer g_class, gpointer g_class_data)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);
 	MidgardSchemaClass *klass = MIDGARD_SCHEMA_CLASS (g_class);

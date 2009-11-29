@@ -47,7 +47,7 @@ struct _MgdSchemaPropertyAttr{
 	gboolean is_primary;
 	gboolean is_reversed;
 	gchar *description;
-	GHashTable *user_fields;
+	GHashTable *user_values;
 };
 
 struct _MgdSchemaTypeAttr {
@@ -78,23 +78,16 @@ struct _MgdSchemaTypeAttr {
 	GSList *constraints;
 	gboolean is_view;
 	gchar *sql_create_view;
-	gchar *metadata_class;	
+	gchar *metadata_class;
+	GHashTable *user_values;	
 };
 
 /* MgdSchema storage utilities */
-MgdSchemaPropertyAttr 	*_mgd_schema_property_attr_new		(void);
-void			_mgd_schema_property_attr_free		(MgdSchemaPropertyAttr *prop);
-MgdSchemaTypeAttr 	*_mgd_schema_type_attr_new		(void);
-void 			_mgd_schema_type_attr_free		(MgdSchemaTypeAttr *type);
 MgdSchemaTypeAttr 	*midgard_schema_lookup_type		(MidgardSchema *schema, gchar *type);
-GType			midgard_type_register			(const gchar *class_name, MgdSchemaTypeAttr *data, GType parent_type);
+GType			midgard_type_register			(MgdSchemaTypeAttr *data, GType parent_type);
 
-MgdSchemaPropertyAttr	*midgard_core_schema_type_property_attr_new	(void);
-void 			midgard_core_schema_type_property_attr_free	(MgdSchemaPropertyAttr *prop);
-void 			midgard_core_schema_type_property_copy		(MgdSchemaPropertyAttr *src_prop, MgdSchemaTypeAttr *dest_type);
-void			midgard_core_schema_type_property_set_gtype	(MgdSchemaPropertyAttr *prop, const gchar *type);
-void 			midgard_core_schema_type_property_set_tablefield	(MgdSchemaPropertyAttr *prop, const gchar *table, const gchar *field);
-void			midgard_core_schema_type_property_set_table 	(MgdSchemaPropertyAttr *prop, const gchar *table);
+MgdSchemaTypeAttr	*midgard_core_schema_type_attr_new	(void);
+void 			midgard_core_schema_type_attr_free	(MgdSchemaTypeAttr *prop);
 
 void			midgard_core_schema_type_set_table	 	(MgdSchemaTypeAttr *prop, const gchar *table);
 void 			midgard_core_schema_type_add_table 		(MgdSchemaTypeAttr *type, const gchar *table);
@@ -102,7 +95,15 @@ void			midgard_core_schema_type_build_static_sql	(MgdSchemaTypeAttr *type_attr);
 void			midgard_core_schema_type_initialize_paramspec 	(MgdSchemaTypeAttr *type);
 void 			midgard_core_schema_type_validate_fields	(MgdSchemaTypeAttr *type);
 
+MgdSchemaPropertyAttr	*midgard_core_schema_type_property_attr_new	(void);
+void 			midgard_core_schema_type_property_attr_free	(MgdSchemaPropertyAttr *prop);
+void 			midgard_core_schema_type_property_copy		(MgdSchemaPropertyAttr *src_prop, MgdSchemaTypeAttr *dest_type);
+void			midgard_core_schema_type_property_set_gtype	(MgdSchemaPropertyAttr *prop, const gchar *type);
+void 			midgard_core_schema_type_property_set_tablefield	(MgdSchemaPropertyAttr *prop, const gchar *table, const gchar *field);
+void			midgard_core_schema_type_property_set_table 	(MgdSchemaPropertyAttr *prop, const gchar *table);
 MgdSchemaPropertyAttr	*midgard_core_schema_type_property_lookup(MgdSchemaTypeAttr *type, const gchar *name);
+
+
 
 GType 			midgard_core_schema_gtype_from_string		(const gchar *type);
 
@@ -117,5 +118,7 @@ GType 			midgard_core_schema_gtype_from_string		(const gchar *type);
 #define TYPE_RW_COPY		"copy"
 #define TYPE_RW_EXTENDS		"extends"
 #define TYPE_RW_METADATA 	"metadata"
+#define TYPE_RW_USERVALUES	"user_values"
+#define TYPE_RW_PROPERTY	"property"
 
 #endif /* _PRIVATE_SCHEMA_H */
