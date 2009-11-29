@@ -461,13 +461,13 @@ midgard_query_constraint_set_class (MidgardQueryConstraint *self, MidgardDBObjec
 
 /* GOBJECT ROUTINES */
 
-MidgardQueryConstraintPrivate *midgard_query_constraint_private_new(void)
+MidgardQueryConstraintPrivate *
+midgard_query_constraint_private_new (void)
 {
-	MidgardQueryConstraintPrivate *priv = 
-		g_new(MidgardQueryConstraintPrivate, 1);
+	MidgardQueryConstraintPrivate *priv = g_new (MidgardQueryConstraintPrivate, 1);
 	
-	priv->prop_left = _mgd_schema_property_attr_new();
-	priv->prop_right = _mgd_schema_property_attr_new();
+	priv->prop_left = midgard_core_schema_type_property_attr_new();
+	priv->prop_right = midgard_core_schema_type_property_attr_new();
 	priv->condition_operator = NULL;
 	priv->joins = NULL;
 	priv->condition = NULL;

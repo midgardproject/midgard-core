@@ -313,7 +313,7 @@ static void __mgdschematype_from_node(xmlNode *node, GSList **list)
 	if (!viewname) 	
 		__view_error(node, "Empty view name. Can not define any type.", NULL);
 
-	MgdSchemaTypeAttr *type = _mgd_schema_type_attr_new();
+	MgdSchemaTypeAttr *type = midgard_core_schema_type_attr_new();
 	type->name = g_strdup((gchar *)viewname);
 	type->is_view = TRUE;
 

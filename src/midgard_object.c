@@ -1278,19 +1278,16 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 }
 
 static void
-__add_core_properties(MgdSchemaTypeAttr *type_attr)
+__add_core_properties (MgdSchemaTypeAttr *type_attr)
 {
 	/* GUID */
-	MgdSchemaPropertyAttr *prop_attr =
-		_mgd_schema_property_attr_new();
+	MgdSchemaPropertyAttr *prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->name = g_strdup ("guid");
 	prop_attr->gtype = MGD_TYPE_GUID;
-	prop_attr->field = g_strdup("guid");
-	prop_attr->table = g_strdup(type_attr->table);
-	prop_attr->tablefield = 
-		g_strjoin(".", type_attr->table, "guid", NULL);
-	g_hash_table_insert(type_attr->prophash,
-			g_strdup((gchar *)"guid"), prop_attr);
+	prop_attr->field = g_strdup ("guid");
+	prop_attr->table = g_strdup (type_attr->table);
+	prop_attr->tablefield = g_strjoin (".", type_attr->table, "guid", NULL);
+	g_hash_table_insert (type_attr->prophash, g_strdup((gchar *)"guid"), prop_attr);
 	
 	return;
 }
@@ -1336,9 +1333,11 @@ __mgdschema_object_dispose (GObject *object)
 }
 
 GType
-midgard_type_register(const gchar *class_name, MgdSchemaTypeAttr *data, GType parent_type)
+midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
 {
-	GType class_type = g_type_from_name(class_name);
+	gchar *classname = type_data->name;
+
+	GType class_type = g_type_from_name (classname);
 
         if (class_type) {
                 return class_type;
@@ -1346,33 +1345,33 @@ midgard_type_register(const gchar *class_name, MgdSchemaTypeAttr *data, GType pa
 
         {
                 GTypeInfo *midgard_type_info = g_new0 (GTypeInfo, 1);
-		if (data == NULL)
-			data = g_new(MgdSchemaTypeAttr, 1);
+
+		/* FIXME, does it make sense? */
+		if (type_data == NULL)
+			type_data = g_new(MgdSchemaTypeAttr, 1);
 
                 /* our own class size is 0 but it should include space for a parent, therefore add it */
-                midgard_type_info->class_size = sizeof(MidgardObjectClass);
+                midgard_type_info->class_size = sizeof (MidgardObjectClass);
                 midgard_type_info->base_init = NULL;
                 midgard_type_info->base_finalize = NULL;
                 midgard_type_info->class_init  = __mgdschema_class_init;
                 midgard_type_info->class_finalize  = NULL;
-                midgard_type_info->class_data = data;
+                midgard_type_info->class_data = type_data;
                 /* our own instance size is 0 but it should include space for a parent,
                  * therefore add it */
-                midgard_type_info->instance_size = sizeof(MgdObject);
+                midgard_type_info->instance_size = sizeof (MgdObject);
                 midgard_type_info->n_preallocs = 0;
                 midgard_type_info->instance_init = _object_instance_init;
                 midgard_type_info->value_table = NULL;
                 
-		GType type = g_type_register_static(
-                                MIDGARD_TYPE_OBJECT, class_name, midgard_type_info, 0);
+		GType type = g_type_register_static (MIDGARD_TYPE_OBJECT, classname, midgard_type_info, 0);
                 
-		if (g_str_equal(class_name, "midgard_attachment"))
+		if (g_str_equal (classname, "midgard_attachment"))
 			_midgard_attachment_type = type;
 
-                g_free(midgard_type_info);
+                g_free (midgard_type_info);
                 return type;   
         }                      
-
 }
 
 /* Workaround for midgard_attachment created as MgdSchema class and type */

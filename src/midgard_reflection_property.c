@@ -270,15 +270,14 @@ midgard_reflection_property_get_link_class (MidgardReflectionProperty *self, con
 const gchar*
 midgard_reflection_property_get_user_value (MidgardReflectionProperty *self, const gchar *property, const gchar *name)
 {
-	g_assert(self != NULL);
-	g_return_val_if_fail(property != NULL, NULL);	
-	g_return_val_if_fail(name != NULL, NULL);
+	g_assert (self != NULL);
+	g_return_val_if_fail (property != NULL, NULL);	
+	g_return_val_if_fail (name != NULL, NULL);
 
 	MgdSchemaPropertyAttr *prop_attr = 
-		midgard_core_class_get_property_attr(
-				MIDGARD_DBOBJECT_CLASS(self->klass), property);
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
 	if (prop_attr == NULL)
 		return NULL;
 	
-	return (gchar *) g_hash_table_lookup(prop_attr->user_fields, name);
+	return (gchar *) g_hash_table_lookup (prop_attr->user_values, name);
 }
