@@ -2351,20 +2351,13 @@ gboolean midgard_object_delete(MgdObject *object)
 			"%s SET ",
 			table);
 	
-	gchar *person_guid ;
-	MgdObject *person = (MgdObject *)MGD_OBJECT_CNC (object)->person;
-	if (person){
-		if (G_IS_OBJECT(G_OBJECT(person))) {
-			person_guid = (gchar *)MGD_OBJECT_GUID(person);
-		} else {
-			g_warning("Expected person object associated with current connection. Probably found garbage!");
-			person_guid = "";
-		}
-	} else {
-		/* g_info("Anonymous mode"); */
-		person_guid = "";
-	}
+	gchar *person_guid = "";
 
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	MidgardObject *person = MGD_CNC_PERSON (mgd);
+	if (person)
+		person_guid = (gchar *)MGD_OBJECT_GUID(person);
+	
 	GValue tval = {0, };
 	g_value_init (&tval, MGD_TYPE_TIMESTAMP);
 	midgard_timestamp_set_current_time(&tval);
@@ -3199,14 +3192,11 @@ gboolean midgard_object_lock(MgdObject *self)
 	GValue gval = {0, };
 	g_value_init(&gval, G_TYPE_STRING);
 
-	{
-		MgdObject *person = MIDGARD_OBJECT(mgd->priv->person);
-
-		if (person)
-			g_value_set_string (&gval, MGD_OBJECT_GUID(person));
-		else
-			g_value_set_string (&gval, "");
-	}
+	MidgardObject *person = MGD_CNC_PERSON (mgd);
+	if (person)
+		g_value_set_string (&gval, MGD_OBJECT_GUID(person));
+	else
+		g_value_set_string (&gval, "");
 
 	/* approved toggle */
 	GValue aval = {0, };
@@ -3381,14 +3371,11 @@ gboolean midgard_object_unlock(MgdObject *self)
 	GValue gval = {0, };
 	g_value_init(&gval, G_TYPE_STRING);
 
-	{
-		MgdObject *person = MIDGARD_OBJECT(mgd->priv->person);
-
-		if (person)
-			g_value_set_string (&gval, MGD_OBJECT_GUID(person));
-		else
-			g_value_set_string (&gval, "");
-	}
+	MidgardObject *person = MGD_CNC_PERSON (mgd);
+	if (person)
+		g_value_set_string (&gval, MGD_OBJECT_GUID(person));
+	else
+		g_value_set_string (&gval, "");
 
 	/* approved toggle */
 	GValue aval = {0, };

@@ -28,16 +28,11 @@
 
 /* convention macros */
 #define MIDGARD_TYPE_CONNECTION (midgard_connection_get_type())
-#define MIDGARD_CONNECTION(object)  \
-	        (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_CONNECTION, MidgardConnection))
-#define MIDGARD_CONNECTION_CLASS(klass)  \
-	        (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_CONNECTION, MidgardConnectionClass))
-#define MIDGARD_IS_CONNECTION(object)   \
-	        (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_CONNECTION))
-#define MIDGARD_IS_CONNECTION_CLASS(klass) \
-	        (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_CONNECTION))
-#define MIDGARD_CONNECTION_GET_CLASS(obj) \
-	        (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_CONNECTION, MidgardConnectionClass))
+#define MIDGARD_CONNECTION(object) (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_CONNECTION, MidgardConnection))
+#define MIDGARD_CONNECTION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_CONNECTION, MidgardConnectionClass))
+#define MIDGARD_IS_CONNECTION(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_CONNECTION))
+#define MIDGARD_IS_CONNECTION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_CONNECTION))
+#define MIDGARD_CONNECTION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_CONNECTION, MidgardConnectionClass))
 
 typedef struct MidgardConnectionClass MidgardConnectionClass;
 typedef struct _MidgardConnectionPrivate MidgardConnectionPrivate; 
@@ -45,14 +40,6 @@ typedef struct _MidgardConnection midgard_connection;
 
 struct MidgardConnectionClass {
 	GObjectClass parent;
-
-	/* class members */
-	gboolean	(*open)			(MidgardConnection *mgd, const char *name, GError **error);
-	gboolean	(*open_config) 		(MidgardConnection *mgd, MidgardConfig *config);
-	gboolean 	(*set_loglevel) 	(MidgardConnection *mgd, const gchar *levelstring, GLogFunc log_func);
-	guint 		(*get_loglevel) 	(MidgardConnection *mgd);
-	void 		(*set_loghandler) 	(MidgardConnection *mgd, guint loghandler);
-	guint 		(*get_loghandler) 	(MidgardConnection *mgd);
 
 	/* signals */
 	void	(*error) 		(GObject *object);
@@ -70,19 +57,15 @@ struct MidgardConnectionClass {
 };
 
 struct _MidgardConnection {
-
-	/* < public > */
 	GObject parent;
+
+	/* <public> */
 	gint errnum;
 	gchar *errstr;
 	GError *err;
 	
 	/* < private > */
-	MidgardConnectionPrivate *priv;
-	
-	/* Legacy, FIXME, remove */	
-	gpointer person;	
-	gboolean quota;	
+	MidgardConnectionPrivate *priv;	
 };
 
 GType			 midgard_connection_get_type			(void);
@@ -103,18 +86,5 @@ MidgardUser 		*midgard_connection_get_user			(MidgardConnection *self);
 MidgardConnection 	*midgard_connection_copy			(MidgardConnection *self);
 gboolean		midgard_connection_reopen			(MidgardConnection *self);
 gchar 			**midgard_connection_list_auth_types		(MidgardConnection *self, guint *n_types);
-
-/*
- * This is a part of public API , however it shouldn't be used in any
- * application unless you really know what you are doing.
- */
-MidgardConnection *midgard_connection_struct_new(void);
-
-MidgardConnection *midgard_connection_struct2gobject(MidgardConnection *conn);
-
-gboolean midgard_connection_struct_open_config(
-	MidgardConnection *mgd, MidgardConfig *config);
-
-void midgard_connection_struct_free(MidgardConnection *self);
 
 #endif /* MIDGARD_CONNNECTION_H */

@@ -38,12 +38,10 @@
 #define MGD_MYSQL_USERNAME "midgard"
 #define MGD_MYSQL_PASSWORD "midgard"
 
-gboolean __midgard_connection_open(
-		MidgardConnection *mgd,
-		GHashTable **hashtable, gboolean init_schema);
+gboolean 
+__midgard_connection_open (MidgardConnection *mgd, GHashTable **hashtable, gboolean init_schema);
 
-static 
-MidgardConnectionPrivate *
+static MidgardConnectionPrivate *
 midgard_connection_private_new (void)
 {
 	MidgardConnectionPrivate *cnc_private = 
@@ -54,8 +52,7 @@ midgard_connection_private_new (void)
 	cnc_private->connected = FALSE;
 	cnc_private->free_config = FALSE;
 	cnc_private->loghandler = 0;
-	cnc_private->loglevel = 0;
-	cnc_private->person = NULL;
+	cnc_private->loglevel = 0;	
 	cnc_private->user = NULL;
 	cnc_private->inherited = FALSE;
 #ifdef HAVE_LIBGDA_4
@@ -64,7 +61,6 @@ midgard_connection_private_new (void)
 	cnc_private->client = NULL;
 #endif
 	cnc_private->connection = NULL;
-	cnc_private->cache = NULL;
 	cnc_private->configname = NULL;
 
 	cnc_private->error_clbk_connected = FALSE;
@@ -80,8 +76,11 @@ midgard_connection_private_new (void)
 	return cnc_private;
 }
 
-static void __midgard_connection_struct_free(MidgardConnection *self, gboolean object)
+static void _midgard_connection_finalize(GObject *object)
 {
+	g_assert(object != NULL);
+	MidgardConnection *self = (MidgardConnection *) object;
+
 	if (self->err != NULL)
 		g_clear_error(&self->err);
 
@@ -109,14 +108,6 @@ static void __midgard_connection_struct_free(MidgardConnection *self, gboolean o
 	self->priv = NULL;
 }
 
-static void _midgard_connection_finalize(GObject *object)
-{
-	g_assert(object != NULL);
-	MidgardConnection *self = (MidgardConnection *) object;
-
-	__midgard_connection_struct_free(self, TRUE);
-}
-
 static void _midgard_connection_dispose(GObject *object)
 {
 	MidgardConnection *self = (MidgardConnection *) object;
@@ -125,11 +116,6 @@ static void _midgard_connection_dispose(GObject *object)
 #ifndef HAVE_LIBGDA_4
 	GdaClient *gda_client = NULL;
 #endif
-
-	if (self->priv->person != NULL) {
-		g_object_unref(self->priv->person);
-		self->priv->person = NULL;
-	}
 
 	while (self->priv->user != NULL) {
 		// emptying authstack
@@ -172,45 +158,6 @@ static void _midgard_connection_dispose(GObject *object)
 	}
 }
 
-enum {	
-	_MIDGARD_CNC_USER = 1,
-	_MIDGARD_CNC_PERSON,
-	_MIDGARD_CNC_ERRSTR,
-	_MIDGARD_CNC_ERRNUM
-};
-
-static void
-_midgard_connection_get_property (GObject *object, guint property_id,
-		GValue *value, GParamSpec *pspec)
-{
-	MidgardConnection *self = (MidgardConnection *) object;
-	
-	switch (property_id) {
-		
-		case _MIDGARD_CNC_USER:
-			if(self->priv->user != NULL)
-				g_value_set_object(value, MIDGARD_USER(self->priv->user));
-			break;
-
-		case _MIDGARD_CNC_PERSON:
-			if(self->priv->person != NULL)
-				g_value_set_object(value, self->priv->person);
-			break;
-
-		case _MIDGARD_CNC_ERRSTR:
-			g_value_set_string(value, self->errstr);
-			break;
-
-		case _MIDGARD_CNC_ERRNUM:
-			g_value_set_int(value, self->errnum);
-			break;
-
-		default:
-			G_OBJECT_WARN_INVALID_PROPERTY_ID(object,property_id,pspec);
-			break;
-	}
-}
-
 static void _midgard_connection_class_init(
 		gpointer g_class, gpointer g_class_data)
 {
@@ -219,13 +166,6 @@ static void _midgard_connection_class_init(
 
 	gobject_class->finalize = _midgard_connection_finalize;
 	gobject_class->dispose = _midgard_connection_dispose;
-	gobject_class->get_property = _midgard_connection_get_property;
-	klass->open = midgard_connection_open;
-	klass->open_config = midgard_connection_open_config;	
-	klass->set_loglevel = midgard_connection_set_loglevel;
-	klass->get_loglevel = midgard_connection_get_loglevel;
-	klass->set_loghandler = midgard_connection_set_loghandler;
-	klass->get_loghandler = midgard_connection_get_loghandler;
 
 	/* signals */
 	/**
@@ -488,39 +428,6 @@ gboolean __midgard_connection_open(
 	gda_init ("MIDGARD", "1.9", 0, args);
 #endif
 	midgard_connection_set_loglevel(mgd, loglevel, NULL);
-
-	if (hashtable == NULL && mgd->priv->cache != NULL) {
-
-		g_critical("Tried to assign NULL holder for already allocated cache");
-		MIDGARD_ERRNO_SET (mgd, MGD_ERR_INTERNAL);
-		return FALSE;
-	}
-
-	/* Initialize hashtable and holder. It's initialized per MidgardConnection instance */
-	if (hashtable != NULL && *hashtable == NULL) {
-	
-		*hashtable = g_hash_table_new_full(
-				g_str_hash, g_direct_equal,
-				(GDestroyNotify)g_free, NULL);
-	}
-
-	/* Look for cache and reuse it if found */
-	gchar *dbathost = g_strconcat(config->database, "at", config->host, NULL);
-
-	if (hashtable && *hashtable)
-		mgd->priv->cache = g_hash_table_lookup(*hashtable, (gchar *)dbathost);
-	
-	if (hashtable && *hashtable && mgd->priv->cache == NULL) {
-
-		mgd->priv->cache = g_new(MidgardConnectionCache, 1);
-		mgd->priv->cache->sg_ids = NULL;
-		g_datalist_init(&mgd->priv->cache->sg_datalist);
-		g_hash_table_insert(*hashtable,  dbathost, (gpointer) mgd->priv->cache);
-
-	} else {
-
-		g_free(dbathost);
-	}
 
 	if(config->priv->dbtype == MIDGARD_DB_TYPE_SQLITE) {
 
@@ -1185,25 +1092,6 @@ midgard_connection_is_connected (MidgardConnection *self)
 
 	return self->priv->connected;
 }
-
-/* !! Undocumented workarounds !! */
-
-MidgardConnection *midgard_connection_struct_new(void) 
-{
-	MidgardConnection *self = 
-		g_new0(MidgardConnection, 1);
-	self->errstr = g_strdup("MGD_ERR_OK");
-	self->err = NULL;
-	self->priv = midgard_connection_private_new(); 
-	
-	return self;
-}
-
-void midgard_connection_struct_free(MidgardConnection *self)
-{
-	__midgard_connection_struct_free(self, FALSE);
-}
-
 
 /**
  * midgard_connection_copy:

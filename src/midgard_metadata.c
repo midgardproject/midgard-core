@@ -30,23 +30,17 @@
 
 void __set_from_xml_node(MidgardDBObject *object, xmlNode *node);
 
-static void _action_create_callback(MgdObject *object, gpointer ud)
+static void 
+_action_create_callback (MgdObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;
 
 	gchar *person_guid = "";
-	MidgardConnection *mgd = MGD_OBJECT_CNC(object);
-	MidgardUser *user = midgard_connection_get_user(mgd);
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	MidgardObject *person = MGD_CNC_PERSON (mgd);
 
-	if (user) {
-		const MgdObject *person = midgard_user_get_person(user);
-
-		if (person) {
-			if (G_IS_OBJECT(G_OBJECT(person)))
-				person_guid = (gchar *)MGD_OBJECT_GUID(person);			
-		}
-	}
-
+	if (person) 
+		person_guid = (gchar *)MGD_OBJECT_GUID(person);			
 
 	GValue *tval = midgard_timestamp_new_current();
 	
@@ -75,16 +69,10 @@ static void _action_update_callback(MgdObject *object, gpointer ud)
 	
 	gchar *person_guid = "";
 	MidgardConnection *mgd = MGD_OBJECT_CNC(object);
-	MidgardUser *user = midgard_connection_get_user(mgd);
+	MidgardObject *person = MGD_CNC_PERSON (mgd);
 
-	if (user) {
-		const MgdObject *person = midgard_user_get_person(user);
-
-		if (person) {
-			if (G_IS_OBJECT(G_OBJECT(person)))
-				person_guid = (gchar *)MGD_OBJECT_GUID(person);			
-		}
-	}
+	if (person) 
+		person_guid = (gchar *)MGD_OBJECT_GUID(person);			
 
 	GValue *tval = midgard_timestamp_new_current();
 
@@ -466,14 +454,12 @@ _metadata_object_finalize(GObject *object)
 /* Set properties when object is created */
 void midgard_metadata_set_create(MgdObject *object)
 {
-	MgdObject *person = (MgdObject *)object->dbpriv->mgd->person;
-	gchar *person_guid;
-	g_object_get(G_OBJECT(person), "guid", &person_guid, NULL);
-	
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	MidgardObject *person = MGD_CNC_PERSON (mgd);
 	MidgardMetadata *metadata = (MidgardMetadata *) object->metadata;
-	
-	midgard_core_metadata_set_creator(metadata, person_guid);
-	g_free(person_guid);
+
+	if (person) 
+		midgard_core_metadata_set_creator(metadata, MGD_OBJECT_GUID (person));
 
 	GValue *tval = midgard_timestamp_new_current();
 	midgard_core_metadata_set_created(metadata, tval);
@@ -483,14 +469,12 @@ void midgard_metadata_set_create(MgdObject *object)
 /* Set properties when object is updated */
 void midgard_metadata_set_update(MgdObject *object)
 {
-	MgdObject *person = (MgdObject *)object->dbpriv->mgd->person;
-	gchar *person_guid;
-	g_object_get(G_OBJECT(person), "guid", &person_guid, NULL);
-
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	MidgardObject *person = MGD_CNC_PERSON (mgd);
 	MidgardMetadata *metadata = (MidgardMetadata *) object->metadata;
-	
-	midgard_core_metadata_set_revisor(metadata, person_guid);
-	g_free(person_guid);
+
+	if (person)
+		midgard_core_metadata_set_revisor(metadata, MGD_OBJECT_GUID (person));
 
 	GValue *tval = midgard_timestamp_new_current();
 	midgard_core_metadata_set_revised(metadata, tval);

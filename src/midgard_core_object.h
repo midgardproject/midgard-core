@@ -129,13 +129,6 @@ struct _MidgardConfigPrivate{
 	gchar *pamfile;
 };
 
-typedef struct _MidgardConnectionCache MidgardConnectionCache;
-
-struct _MidgardConnectionCache {
-	GData *sg_datalist;
-	gpointer sg_ids;
-};
-
 struct _MidgardConnectionPrivate {
 	MidgardConnection *pattern; /* a pointer to connection we made copy from */
         MidgardConfig *config;
@@ -154,13 +147,11 @@ struct _MidgardConnectionPrivate {
 
 	const gchar *cnc_str;
 	const gchar *auth_str;
-
-	GObject *person;
-	GObject *user;
+	
+	MidgardUser *user;
 	gboolean inherited;
 	GTimeVal app_time;
 	GTimer *timer;
-	MidgardConnectionCache *cache;
 	gchar *configname;
 
 	gboolean error_clbk_connected;
@@ -169,6 +160,8 @@ struct _MidgardConnectionPrivate {
 	GSList *authtypes;
 	GSList *authstack;
 };
+
+#define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL;
 
 struct _MidgardBlobPrivate {
 	MgdObject *attachment;
