@@ -541,14 +541,9 @@ _get_property_attributes(xmlNode * node,
 					prop_attr->dbindex = TRUE;
 			}
 
-			if(g_str_equal(attr->name, "table")){
-				/* Check if table name is reserved one */
-				if (strv_contains(rtables, attrval)) {
-					g_critical("'%s' is reserved table name",
-							attrval);
-				}
-
-				midgard_core_schema_type_property_set_table(prop_attr, (const gchar *)attrval);
+			if(g_str_equal(attr->name, "table")) {
+				/* Disable warning, we can not use debug level */
+				/* __warn_msg (node, "'table' attribute not supported"); */
 			}
 
 			if(g_str_equal(attr->name, "upfield")){
@@ -596,8 +591,10 @@ _get_property_attributes(xmlNode * node,
 				prop_attr->parentfield = g_strdup((gchar *)attrval);
 			}			
 
-			if (g_str_equal(attr->name, "multilang")) 
-				__warn_msg (node, "'multilang' attribute not supported");
+			if (g_str_equal(attr->name, "multilang")) {
+				/* Disable warning, we can not use debug level */
+				/* __warn_msg (node, "'multilang' attribute not supported"); */
+			}
 
 			if(g_str_equal(attr->name, "primaryfield")) {
 				check_metadata_column(attrval);
