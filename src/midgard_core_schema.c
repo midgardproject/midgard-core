@@ -52,6 +52,7 @@ midgard_core_schema_type_property_attr_new (void)
 	prop->is_reversed = FALSE;
 	prop->is_link = FALSE;
 	prop->is_linked = FALSE;
+	prop->is_private = FALSE;
 	prop->description = g_strdup("");
 	prop->user_values = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
 

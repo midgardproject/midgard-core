@@ -46,6 +46,7 @@ struct _MgdSchemaPropertyAttr{
 	gboolean is_linked;
 	gboolean is_primary;
 	gboolean is_reversed;
+	gboolean is_private;
 	gchar *description;
 	GHashTable *user_values;
 };
@@ -120,5 +121,14 @@ GType 			midgard_core_schema_gtype_from_string		(const gchar *type);
 #define TYPE_RW_METADATA 	"metadata"
 #define TYPE_RW_USERVALUES	"user_values"
 #define TYPE_RW_PROPERTY	"property"
+
+#define PROP_RW_PRIVATE		"private"
+#define PROP_RW_FIELD		"field"
+#define PROP_RW_INDEX		"index"
+#define PROP_RW_UPFIELD		"upfield"
+#define PROP_RW_PARENTFIELD	"parentfield"
+#define PROP_RW_PRIMARY		"primaryfield"
+#define PROP_RW_REVERSE		"reverse"
+#define PROP_RW_LINK		"link"
 
 #endif /* _PRIVATE_SCHEMA_H */

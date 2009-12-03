@@ -132,7 +132,8 @@ static const gchar *mgd_attribute[] = {
 	"index", 
 	"default", 
 	"unique",
-	"multilang", 
+	"multilang",
+	PROP_RW_PRIVATE,
 	NULL 
 };
 
@@ -505,140 +506,182 @@ static void
 _get_property_attributes(xmlNode * node, 
 		MgdSchemaTypeAttr *type_attr, MgdSchemaPropertyAttr *prop_attr)
 {
+	g_return_if_fail (node != NULL);
+	g_return_if_fail (type_attr != NULL);
+	g_return_if_fail (prop_attr != NULL);
+
 	xmlAttr *attr;
-	xmlChar *attrval;
+	xmlChar *attrval = NULL;
+	
+	/* Validate attributes. Throw warning if there's invalid one. */
+	attr = node->properties;
+	attr = attr->next;
 
-	if (node != NULL){
-
-		attr = node->properties;
-		attr = attr->next;
-
-		while (attr != NULL){
-
-			attrval = xmlNodeListGetString (node->doc, attr->children, 1);
-		
-			if(!strv_contains(mgd_attribute, attr->name)){
-				g_warning("Wrong attribute '%s' in '%s' on line %ld",
-						attr->name, parsed_schema, xmlGetLineNo(node));
-			}
-			
-			if(g_str_equal(attr->name, "dbtype"))
-				prop_attr->dbtype = g_strdup((gchar *)attrval);
-			
-			if(g_str_equal(attr->name, "field")){
-				/* Check if column name is reserved one */
-				check_metadata_column(attrval);
-				if (strv_contains(rcolumns, attrval)) {
-					g_critical("'%s' is reserved column name",
-							attrval);
-				}								
-				prop_attr->field = g_strdup((gchar *)attrval);
-			}
-		
-			if(g_str_equal(attr->name, "index")) {
-				
-				if(g_str_equal(attrval, "yes"))
-					prop_attr->dbindex = TRUE;
-			}
-
-			if(g_str_equal(attr->name, "table")) {
-				/* Disable warning, we can not use debug level */
-				/* __warn_msg (node, "'table' attribute not supported"); */
-			}
-
-			if(g_str_equal(attr->name, "upfield")){
-				check_metadata_column(attrval);
-				/* Check if column name is reserved one */
-				if (strv_contains(rcolumns, attrval)) {
-					g_critical("'%s' is reserved column name",
-							attrval);
-				}				
-				if(!type_attr->property_up){
-					xmlChar *tmpattr = 
-						xmlGetProp (node, (const xmlChar *)"name");
-					type_attr->property_up = g_strdup((gchar *)tmpattr);
-					type_attr->upfield = g_strdup((gchar *)attrval);
-					if(!midgard_core_object_prop_up_is_valid(prop_attr->gtype)) {
-						__warn_msg(node, "Invalid type for up property.");
-						g_error("Wrong schema attribute");
-					}
-					xmlFree(tmpattr);
-				} else {
-					__warn_msg(node, "Upfield redefined!");
-				}
-				prop_attr->upfield = g_strdup((gchar *)attrval);			
-			}
-
-			if(g_str_equal(attr->name, "parentfield")){
-				check_metadata_column(attrval);
-				/* Check if column name is reserved one */
-				if (strv_contains(rcolumns, attrval)) {
-					g_critical("'%s' is reserved column name",
-							attrval);
-				}
-				if(!type_attr->property_parent){
-					xmlChar *tmpattr = xmlGetProp (node, (const xmlChar *)"name");
-					type_attr->property_parent = g_strdup((gchar *)tmpattr);
-					type_attr->parentfield = g_strdup((gchar *)attrval);
-					if(!midgard_core_object_prop_parent_is_valid(prop_attr->gtype)) {
-						__warn_msg(node, "Invalid type for parent property.");
-						g_error("Wrong schema attribute");
-					}
-					xmlFree(tmpattr);
-				} else {                         
-					__warn_msg(node, "Parentfield redefined!");
-				}
-				prop_attr->parentfield = g_strdup((gchar *)attrval);
-			}			
-
-			if (g_str_equal(attr->name, "multilang")) {
-				/* Disable warning, we can not use debug level */
-				/* __warn_msg (node, "'multilang' attribute not supported"); */
-			}
-
-			if(g_str_equal(attr->name, "primaryfield")) {
-				check_metadata_column(attrval);
-				/* Check if column name is reserved one */
-				if (strv_contains(rcolumns, attrval)) {
-					g_critical("'%s' is reserved column name",
-							attrval);
-				}
-				prop_attr->primaryfield = g_strdup((gchar *)attrval);
-				prop_attr->is_primary = TRUE;
-				xmlChar *tmpattr = xmlGetProp (node, (const xmlChar *)"name");
-				type_attr->primary = g_strdup((gchar *)tmpattr);
-				type_attr->primaryfield = g_strdup((gchar *)attrval);
-				xmlFree(tmpattr);
-			}
-
-			if(g_str_equal(attr->name, "reverse")) {
-				if(g_str_equal(attrval, "yes"))
-					prop_attr->is_reversed = TRUE;	
-			}
-			
-			if(g_str_equal(attr->name, "link")) {
-
-				if(!midgard_core_object_prop_link_is_valid(prop_attr->gtype)) {
-					__warn_msg(node, "Invalid type for link property.");
-					g_error("Wrong schema attribute");
-				}
-
-				gchar **link = g_strsplit((gchar *)attrval, ":", -1);
-				prop_attr->link = g_strdup((gchar *)link[0]);
-				prop_attr->is_link = TRUE;
-				if(link[1])
-					prop_attr->link_target = 
-						g_strdup((gchar *)link[1]);
-				else 
-					prop_attr->link_target =
-						g_strdup("guid");
-
-				g_strfreev(link);
-			}
-
-			xmlFree(attrval);
-			attr = attr->next;								
+	while (attr != NULL) {
+		attrval = xmlNodeListGetString (node->doc, attr->children, 1);
+		if (!strv_contains(mgd_attribute, attr->name)) {
+			g_warning ("Wrong attribute '%s' in '%s' on line %ld",
+					attr->name, parsed_schema, xmlGetLineNo(node));
 		}
+		attr = attr->next;
+	}
+	
+	/* dbtype */	
+	attrval = xmlGetProp (node, (const xmlChar *)"dbtype");
+	if (attrval) {
+		prop_attr->dbtype = g_strdup((gchar *)attrval);
+		xmlFree (attrval);
+	}
+
+	/* field */
+	attrval = xmlGetProp (node, (const xmlChar *)PROP_RW_FIELD);
+	if (attrval) {
+
+		/* Check if column name is reserved one */
+		check_metadata_column (attrval);
+		if (strv_contains (rcolumns, attrval)) {
+			g_critical("'%s' is reserved column name", attrval);
+		} 
+		prop_attr->field = g_strdup ((gchar *)attrval);
+		xmlFree (attrval);
+	}
+		
+	/* index */
+	attrval = xmlGetProp (node, (const xmlChar *)PROP_RW_INDEX);
+	if (attrval) {
+		if (g_str_equal(attrval, "yes") || g_str_equal (attrval, "true"))
+			prop_attr->dbindex = TRUE;
+		xmlFree (attrval);
+	}
+			
+	/* table, backward compatibility */
+	attrval = xmlGetProp (node, (const xmlChar *)TYPE_RW_TABLE);
+	if (attrval) {
+		/* Disable warning, we can not use debug level */
+		/* __warn_msg (node, "'table' attribute not supported"); */
+		xmlFree (attrval);
+	}
+
+	/* upfield */
+	attrval = xmlGetProp (node, (const xmlChar *)PROP_RW_UPFIELD);
+	if (attrval) {
+		check_metadata_column (attrval);
+		/* Check if column name is reserved one */
+		if (strv_contains (rcolumns, attrval)) {
+			g_critical("'%s' is reserved column name", attrval);
+		}				
+
+		if(!type_attr->property_up) {
+			xmlChar *tmpattr = xmlGetProp (node, (const xmlChar *)"name");
+			type_attr->property_up = g_strdup((gchar *)tmpattr);
+			type_attr->upfield = g_strdup((gchar *)attrval);
+			if (!midgard_core_object_prop_up_is_valid(prop_attr->gtype)) {
+				__warn_msg(node, "Invalid type for up property.");
+				g_error("Wrong schema attribute");
+			}
+			xmlFree(tmpattr);
+
+		} else {
+			__warn_msg(node, "Upfield redefined!");
+		}
+
+		prop_attr->upfield = g_strdup((gchar *)attrval);		
+		xmlFree (attrval);
+	}
+
+	/* parentfield */
+	attrval = xmlGetProp (node, (const xmlChar *)PROP_RW_PARENTFIELD);
+	if (attrval) {
+		check_metadata_column (attrval);
+		/* Check if column name is reserved one */
+		if (strv_contains (rcolumns, attrval)) {
+			g_critical ("'%s' is reserved column name", attrval);
+		}
+
+		if (!type_attr->property_parent) {
+			xmlChar *tmpattr = xmlGetProp (node, (const xmlChar *)"name");
+			type_attr->property_parent = g_strdup ((gchar *)tmpattr);
+			type_attr->parentfield = g_strdup ((gchar *)attrval);
+			if (!midgard_core_object_prop_parent_is_valid (prop_attr->gtype)) {
+				__warn_msg (node, "Invalid type for parent property.");
+				g_error ("Wrong schema attribute");
+			}
+			xmlFree(tmpattr);
+		} else {                         
+			__warn_msg(node, "Parentfield redefined!");
+		}
+
+		if (g_str_equal (type_attr->upfield, type_attr->parentfield)) {
+			__warn_msg (node, "Parentfield and upfield is the same property");
+			g_error ("Wrong schema attribute");
+		}
+
+		prop_attr->parentfield = g_strdup ((gchar *)attrval);
+		xmlFree (attrval);
+	}
+
+	/* multilang, backward compatibility */
+	attrval = xmlGetProp (node, (const xmlChar *)"multilang");
+	if (attrval) {
+		/* Disable warning, we can not use debug level */
+		/* __warn_msg (node, "'multilang' attribute not supported"); */
+		xmlFree (attrval);
+	}
+
+	/* primaryfield */
+	attrval = xmlGetProp (node, (const xmlChar *)PROP_RW_PRIMARY);
+	if (attrval) {
+		check_metadata_column (attrval);
+		
+		/* Check if column name is reserved one */
+		if (strv_contains (rcolumns, attrval)) 
+			g_critical ("'%s' is reserved column name",attrval);
+
+		prop_attr->primaryfield = g_strdup ((gchar *)attrval);
+		prop_attr->is_primary = TRUE;
+		xmlChar *tmpattr = xmlGetProp (node, (const xmlChar *)"name");
+		type_attr->primary = g_strdup ((gchar *)tmpattr);
+		type_attr->primaryfield = g_strdup ((gchar *)attrval);
+		xmlFree (tmpattr);
+		xmlFree (attrval);
+	}
+
+	/* reverse */
+	attrval = xmlGetProp (node, (const xmlChar *)PROP_RW_REVERSE);
+	if (attrval ) {
+		if (g_str_equal (attrval, "yes") || g_str_equal (attrval, "true"))
+			prop_attr->is_reversed = TRUE;	
+			
+		xmlFree (attrval);
+	}
+		
+	/* link */	
+	attrval = xmlGetProp (node, (const xmlChar *)PROP_RW_LINK);
+	if (attrval) {
+		if(!midgard_core_object_prop_link_is_valid(prop_attr->gtype)) {
+			__warn_msg(node, "Invalid type for link property.");
+			g_error("Wrong schema attribute");
+		}
+
+		gchar **link = g_strsplit((gchar *)attrval, ":", -1);
+		prop_attr->link = g_strdup((gchar *)link[0]);
+		prop_attr->is_link = TRUE;
+		
+		if(link[1])
+			prop_attr->link_target = g_strdup((gchar *)link[1]);
+		else 
+			prop_attr->link_target = g_strdup("guid");
+		
+		g_strfreev(link);
+		xmlFree (attrval);
+	}
+
+	/* private */
+	attrval = xmlGetProp (node, (const xmlChar *)PROP_RW_PRIVATE);
+	if (attrval) {
+		if (g_str_equal (attrval, "yes") || g_str_equal (attrval, "true"))
+			prop_attr->is_private = TRUE;
+		xmlFree (attrval);
 	}
 }
 
@@ -742,6 +785,7 @@ __get_properties (xmlNode *curn, MgdSchemaTypeAttr *type_attr, MidgardSchema *sc
 			}
 
 			prop_attr = midgard_core_schema_type_property_attr_new();
+			prop_attr->name = g_strdup ((gchar *)nv);
 			midgard_core_schema_get_property_type (node, type_attr, prop_attr);
 			midgard_core_schema_get_default_value (node, type_attr, prop_attr);
 			midgard_core_schema_get_unique_name (node, type_attr, prop_attr);
@@ -757,7 +801,6 @@ __get_properties (xmlNode *curn, MgdSchemaTypeAttr *type_attr, MidgardSchema *sc
 				g_free(tmpstr);
 			}
 
-			prop_attr->name = g_strdup ((gchar *)nv);
 			gchar *property_name = g_strdup ((gchar *)nv);
 			g_hash_table_insert (type_attr->prophash, property_name, prop_attr);
 			/* Workaround.
