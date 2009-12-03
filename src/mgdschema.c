@@ -611,7 +611,7 @@ _get_property_attributes(xmlNode * node,
 			__warn_msg(node, "Parentfield redefined!");
 		}
 
-		if (g_str_equal (type_attr->upfield, type_attr->parentfield)) {
+		if (type_attr->upfield && (g_str_equal (type_attr->upfield, type_attr->parentfield))) {
 			__warn_msg (node, "Parentfield and upfield is the same property");
 			g_error ("Wrong schema attribute");
 		}
