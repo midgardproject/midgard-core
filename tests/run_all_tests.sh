@@ -38,8 +38,8 @@ gtester-report midgard-test.xml > midgard-test.html
 #gtester-report midgard-test-object.xml > run-midgard-test-object.html
 
 echo "Droping database midgard_test"
-sudo mysqladmin -f drop midgard_test
+#sudo mysqladmin -f drop midgard_test
 
 echo "Droping database midgard_test_replicator_import"
-sudo mysqladmin -f drop midgard_test_replicator_import
+#sudo mysqladmin -f drop midgard_test_replicator_import
 

@@ -27,6 +27,8 @@ int main (int argc, char *argv[])
 {
 	g_test_init (&argc, &argv, NULL);
 
+	g_test_bug_base (MIDGARD_TRAC_TICKET_BASE_URL);
+
 	g_test_add_func("/midgard_object/basic", midgard_test_object_basic_run);
 	
 	midgard_init();
@@ -172,7 +174,12 @@ int main (int argc, char *argv[])
 		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
 				midgard_test_object_basic_delete, midgard_test_teardown_foo);
 		g_free(testname);
-		
+
+		testname = g_strconcat("/midgard_object_class/", typename, "/get_object_by_guid_deleted", NULL);
+		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+				midgard_test_object_class_get_object_by_guid_deleted, midgard_test_teardown_foo);
+		g_free(testname);
+	
 		/*testname = g_strconcat("/midgard_replicator/", typename, "/serialize", NULL);
 		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
 				midgard_test_replicator_serialize, midgard_test_teardown_foo);
