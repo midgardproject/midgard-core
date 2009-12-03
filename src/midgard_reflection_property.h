@@ -56,5 +56,6 @@ const gchar			*midgard_reflection_property_get_link_name (MidgardReflectionPrope
 const gchar 			*midgard_reflection_property_get_link_target (MidgardReflectionProperty *self, const gchar *propname);
 const gchar 			*midgard_reflection_property_description (MidgardReflectionProperty *self, const gchar *propname);
 const gchar 			*midgard_reflection_property_get_user_value (MidgardReflectionProperty *self, const gchar *property, const gchar *name);
+gboolean			midgard_reflection_property_is_private (MidgardReflectionProperty *self, const gchar *property);
 
 #endif /* MIDGARD_REFLECTION_PROPERTY_H */

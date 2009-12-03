@@ -281,3 +281,26 @@ midgard_reflection_property_get_user_value (MidgardReflectionProperty *self, con
 	
 	return (gchar *) g_hash_table_lookup (prop_attr->user_values, name);
 }
+
+/**
+ * midgard_reflection_property_is_private:
+ * @self: #MidgardReflectionProperty instance
+ * @property: property name to check 
+ *
+ * Returns: %TRUE, if propery is defined private, %FALSE otherwise
+ *
+ * Since: 10.03
+ */ 
+gboolean
+midgard_reflection_property_is_private (MidgardReflectionProperty *self, const gchar *property)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (property != NULL, FALSE);	
+
+	MgdSchemaPropertyAttr *prop_attr = 
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+	if (prop_attr == NULL)
+		return FALSE;
+	
+	return prop_attr->is_private;
+}
