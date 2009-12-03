@@ -219,6 +219,15 @@ MgdObject *midgard_object_class_get_object_by_guid (	MidgardConnection *mgd,
 	guint aval = 0;
 	MIDGARD_GET_UINT_FROM_VALUE(aval, action_value);
 
+	/* workaround for incorrect repligard.object_action which holds varchar type in mjolnir 9.09.0 */
+	/* TODO: Remove in Ratatoskr+1 */
+	if (G_VALUE_HOLDS_STRING (action_value)) {
+
+		gchar *strval = g_value_get_string (action_value);
+		if (strval)
+			aval = atoi ((const gchar *)strval);
+	}
+
 	switch(aval) {
 		
 		case MGD_OBJECT_ACTION_DELETE:
