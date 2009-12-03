@@ -91,12 +91,12 @@ static GParamSpec **_midgard_object_class_paramspec()
   
 	/* Last value is 'params[n]+1' */
 	GParamSpec **params = g_malloc(sizeof(GParamSpec*)*4);
-	params[0] = g_param_spec_string ("guid", "", "GUID",
+	params[0] = g_param_spec_string ("guid", "", "GUID identifier of the object",
 			" ", G_PARAM_READABLE);
 	params[1] = g_param_spec_object ("metadata", "",
-			"Property which holds MidgardMetadata object",
+			"midgard_metadata for the object",
 			G_TYPE_OBJECT, G_PARAM_READWRITE);
-	params[2] = g_param_spec_string ("action", "", "What was done with object",
+	params[2] = g_param_spec_string ("action", "", "Last action done to the object",
 			"", G_PARAM_READWRITE);    
 	params[3] = NULL;
 	  
