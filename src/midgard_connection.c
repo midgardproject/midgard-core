@@ -672,7 +672,8 @@ gboolean midgard_connection_open_from_file(
 	if(!__midgard_connection_open(mgd, &hash, TRUE)) 
 		rv = FALSE;
 
-	g_hash_table_destroy(hash);
+	if(hash)
+		g_hash_table_destroy(hash);
 	
 	return rv;
 }
