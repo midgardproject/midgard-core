@@ -61,7 +61,7 @@ gboolean _midgard_tree_exists(MidgardConnection *mgd,
 
 /**
  * midgard_object_is_in_parent_tree:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @rootid: guint which identifies parent's type primary property
  * @id: guint which identify object's primary property
  *
@@ -74,7 +74,7 @@ gboolean _midgard_tree_exists(MidgardConnection *mgd,
  *
  * Returns: %TRUE if object exists in parent tree, %FALSE otherwise.
  */ 
-gboolean midgard_object_is_in_parent_tree(MgdObject *self, guint rootid, guint id)
+gboolean midgard_object_is_in_parent_tree(MidgardObject *self, guint rootid, guint id)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 
@@ -138,7 +138,7 @@ gboolean midgard_object_is_in_parent_tree(MgdObject *self, guint rootid, guint i
 
 /**
  * midgard_object_is_in_tree:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @rootid: guint value which identifies type's primary property
  * @id: guint value which identifies object's primary property
  *
@@ -151,7 +151,7 @@ gboolean midgard_object_is_in_parent_tree(MgdObject *self, guint rootid, guint i
  * 
  * Returns: %TRUE if object exists in tree, %FALSE otherwise. 
  */
-gboolean midgard_object_is_in_tree(MgdObject *self, guint rootid, guint id)
+gboolean midgard_object_is_in_tree(MidgardObject *self, guint rootid, guint id)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	

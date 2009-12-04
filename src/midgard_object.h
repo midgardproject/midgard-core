@@ -25,20 +25,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_dbobject.h"
 
 #define MIDGARD_TYPE_OBJECT midgard_object_get_type()
-#define MIDGARD_OBJECT(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object), MIDGARD_TYPE_OBJECT, MgdObject))
+#define MIDGARD_OBJECT(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object), MIDGARD_TYPE_OBJECT, MidgardObject))
 #define MIDGARD_OBJECT_CLASS(klass)       (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_OBJECT, MidgardObjectClass))
 #define MIDGARD_IS_OBJECT(object)   (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_OBJECT))
 #define MIDGARD_IS_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_OBJECT))
 #define MIDGARD_OBJECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_OBJECT, MidgardObjectClass))
 #define MIDGARD_OBJECT_GET_CLASS_BY_NAME(name) ((MidgardObjectClass*) g_type_class_peek(g_type_from_name(name)))
 
-typedef struct _MgdObject MgdObject;
-typedef struct _MgdObject MidgardObject;
-typedef struct _MgdObject midgard_object;
+typedef struct _MidgardObject MidgardObject;
+typedef struct _MidgardObject midgard_object;
 typedef struct _MidgardObjectPrivate MidgardObjectPrivate;
 typedef struct _MidgardObjectClassPrivate MidgardObjectClassPrivate;
 
-struct _MgdObject {
+struct _MidgardObject {
 	GObject parent;
 	MidgardDBObjectPrivate *dbpriv;
 	MidgardObjectPrivate *priv;	
@@ -56,38 +55,38 @@ struct _MidgardObjectClass {
 	const MidgardConnection *(*get_connection) (MidgardDBObject *);	
 
 	/* signals */
-	void (*action_create)		(MgdObject *object);
-	void (*action_create_hook)   	(MgdObject *object);
-	void (*action_created)		(MgdObject *object);
-	void (*action_update)		(MgdObject *object);
-	void (*action_update_hook)   	(MgdObject *object);
-	void (*action_updated)		(MgdObject *object);
-	void (*action_delete)		(MgdObject *object);
-	void (*action_delete_hook)   	(MgdObject *object);
-	void (*action_deleted)		(MgdObject *object);
-	void (*action_purge)		(MgdObject *object);
-	void (*action_purge_hook)   	(MgdObject *object);
-	void (*action_purged)		(MgdObject *object);
-	void (*action_import)   	(MgdObject *object);
-	void (*action_import_hook)   	(MgdObject *object);
-	void (*action_imported) 	(MgdObject *object);
-	void (*action_export)		(MgdObject *object);
-	void (*action_export_hook)   	(MgdObject *object);
-	void (*action_exported) 	(MgdObject *object);
-	void (*action_loaded)		(MgdObject *object);
-	void (*action_loaded_hook)   	(MgdObject *object);
-	void (*action_approve)		(MgdObject *object);
-	void (*action_approve_hook)	(MgdObject *object);
-	void (*action_approved)		(MgdObject *object);
-	void (*action_unapprove)	(MgdObject *object);
-	void (*action_unapprove_hook)	(MgdObject *object);
-	void (*action_unapproved)	(MgdObject *object);
-	void (*action_lock)		(MgdObject *object);
-	void (*action_lock_hook)	(MgdObject *object);
-	void (*action_locked)		(MgdObject *object);
-	void (*action_unlock)		(MgdObject *object);
-	void (*action_unlock_hook)	(MgdObject *object);
-	void (*action_unlocked)		(MgdObject *object);
+	void (*action_create)		(MidgardObject *object);
+	void (*action_create_hook)   	(MidgardObject *object);
+	void (*action_created)		(MidgardObject *object);
+	void (*action_update)		(MidgardObject *object);
+	void (*action_update_hook)   	(MidgardObject *object);
+	void (*action_updated)		(MidgardObject *object);
+	void (*action_delete)		(MidgardObject *object);
+	void (*action_delete_hook)   	(MidgardObject *object);
+	void (*action_deleted)		(MidgardObject *object);
+	void (*action_purge)		(MidgardObject *object);
+	void (*action_purge_hook)   	(MidgardObject *object);
+	void (*action_purged)		(MidgardObject *object);
+	void (*action_import)   	(MidgardObject *object);
+	void (*action_import_hook)   	(MidgardObject *object);
+	void (*action_imported) 	(MidgardObject *object);
+	void (*action_export)		(MidgardObject *object);
+	void (*action_export_hook)   	(MidgardObject *object);
+	void (*action_exported) 	(MidgardObject *object);
+	void (*action_loaded)		(MidgardObject *object);
+	void (*action_loaded_hook)   	(MidgardObject *object);
+	void (*action_approve)		(MidgardObject *object);
+	void (*action_approve_hook)	(MidgardObject *object);
+	void (*action_approved)		(MidgardObject *object);
+	void (*action_unapprove)	(MidgardObject *object);
+	void (*action_unapprove_hook)	(MidgardObject *object);
+	void (*action_unapproved)	(MidgardObject *object);
+	void (*action_lock)		(MidgardObject *object);
+	void (*action_lock_hook)	(MidgardObject *object);
+	void (*action_locked)		(MidgardObject *object);
+	void (*action_unlock)		(MidgardObject *object);
+	void (*action_unlock_hook)	(MidgardObject *object);
+	void (*action_unlocked)		(MidgardObject *object);
 
 	/* signals id */
 	guint signal_action_loaded;
@@ -135,40 +134,40 @@ enum MidgardObjectAction
 	MGD_OBJECT_ACTION_UPDATE /**< Object has been updated >*/
 };
 
-MgdObject *midgard_object_new(MidgardConnection *mgd, const gchar *name, GValue *value);
+MidgardObject *midgard_object_new(MidgardConnection *mgd, const gchar *name, GValue *value);
 
-gboolean midgard_object_get_by_id(MgdObject *object, guint id);
-gboolean midgard_object_get_by_guid(MgdObject *object, const gchar *guid);
-gboolean midgard_object_get_by_path(MgdObject *self, const gchar *path);
+gboolean midgard_object_get_by_id(MidgardObject *object, guint id);
+gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid);
+gboolean midgard_object_get_by_path(MidgardObject *self, const gchar *path);
 
-gboolean midgard_object_update(MgdObject *self);
-gboolean midgard_object_create(MgdObject *object);
-gboolean midgard_object_delete(MgdObject *object);
+gboolean midgard_object_update(MidgardObject *self);
+gboolean midgard_object_create(MidgardObject *object);
+gboolean midgard_object_delete(MidgardObject *object);
 gboolean midgard_object_undelete(MidgardConnection *mgd, const gchar *guid);
-gboolean midgard_object_purge(MgdObject *object);
+gboolean midgard_object_purge(MidgardObject *object);
 
-gchar * midgard_object_build_path(MgdObject *mobj);
+gchar * midgard_object_build_path(MidgardObject *mobj);
 
-gboolean midgard_object_is_in_parent_tree(MgdObject *self, guint rootid, guint id);
-gboolean midgard_object_is_in_tree(MgdObject *self, guint rootid, guint id);
-gchar * midgard_object_get_tree(MgdObject *object, GSList *tnodes);
-const gchar *midgard_object_parent(MgdObject *self);
-MgdObject *midgard_object_get_parent(MgdObject *self);
+gboolean midgard_object_is_in_parent_tree(MidgardObject *self, guint rootid, guint id);
+gboolean midgard_object_is_in_tree(MidgardObject *self, guint rootid, guint id);
+gchar * midgard_object_get_tree(MidgardObject *object, GSList *tnodes);
+const gchar *midgard_object_parent(MidgardObject *self);
+MidgardObject *midgard_object_get_parent(MidgardObject *self);
 
-GObject **midgard_object_list(MgdObject *self, guint *n_objects);
-GObject **midgard_object_list_children(MgdObject *object, const gchar *childname, guint *n_objects);
+GObject **midgard_object_list(MidgardObject *self, guint *n_objects);
+GObject **midgard_object_list_children(MidgardObject *object, const gchar *childname, guint *n_objects);
 
-gboolean midgard_object_has_dependents(MgdObject *self);
-gboolean midgard_object_set_guid(MgdObject *self, const gchar *guid);
-void midgard_object_set_connection(MgdObject *self, MidgardConnection *mgd);
-const MidgardConnection *midgard_object_get_connection(MgdObject *self);
+gboolean midgard_object_has_dependents(MidgardObject *self);
+gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid);
+void midgard_object_set_connection(MidgardObject *self, MidgardConnection *mgd);
+const MidgardConnection *midgard_object_get_connection(MidgardObject *self);
 
-gboolean midgard_object_approve(MgdObject *self);
-gboolean midgard_object_is_approved(MgdObject *self);
-gboolean midgard_object_unapprove(MgdObject *self);
+gboolean midgard_object_approve(MidgardObject *self);
+gboolean midgard_object_is_approved(MidgardObject *self);
+gboolean midgard_object_unapprove(MidgardObject *self);
 
-gboolean midgard_object_lock(MgdObject *self);
-gboolean midgard_object_is_locked(MgdObject *self);
-gboolean midgard_object_unlock(MgdObject *self);
+gboolean midgard_object_lock(MidgardObject *self);
+gboolean midgard_object_is_locked(MidgardObject *self);
+gboolean midgard_object_unlock(MidgardObject *self);
 
 #endif /* MIDGARD_OBJECT_H */

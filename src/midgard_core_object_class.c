@@ -133,7 +133,7 @@ GType midgard_core_object_get_property_up_type(MidgardObjectClass *klass)
 	return pspec->value_type;
 }
 
-gboolean midgard_core_object_prop_parent_is_set(MgdObject *object)
+gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object)
 {
 	g_assert(object != NULL);
 
@@ -169,7 +169,7 @@ gboolean midgard_core_object_prop_parent_is_set(MgdObject *object)
 	return FALSE;
 }
 
-gboolean midgard_core_object_prop_up_is_set(MgdObject *object)
+gboolean midgard_core_object_prop_up_is_set(MidgardObject *object)
 {
 	g_assert(object != NULL);
 
@@ -205,7 +205,7 @@ gboolean midgard_core_object_prop_up_is_set(MgdObject *object)
 	return FALSE;
 }
 
-gboolean midgard_core_object_is_valid(MgdObject *object)
+gboolean midgard_core_object_is_valid(MidgardObject *object)
 {	
 	guint propn, i, size = 0;
 	GType prop_type;
@@ -375,7 +375,7 @@ gboolean midgard_core_object_is_valid(MgdObject *object)
 	return TRUE;
 }
 
-gboolean midgard_core_object_has_dependents(MgdObject *self, const gchar *classname)
+gboolean midgard_core_object_has_dependents(MidgardObject *self, const gchar *classname)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(classname != NULL, FALSE);

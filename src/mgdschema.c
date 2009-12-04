@@ -1167,7 +1167,7 @@ static void parse_schema(gpointer key, gpointer value, gpointer user_data) {
  * @path: full path to a xml file with common classes
  *
  * Reads xml file which defines very basic and common classes.
- * By default it's `/usr/local/share/midgard/MgdObjects.xml` file.
+ * By default it's `/usr/local/share/midgard/MidgardObjects.xml` file.
  */
 void midgard_schema_init(MidgardSchema *self, const gchar *path)
 {	
@@ -1185,13 +1185,13 @@ void midgard_schema_init(MidgardSchema *self, const gchar *path)
 
 	if (g_file_test(lpath, G_FILE_TEST_IS_DIR)) {
 
-		g_warning("Common MgdObjects.xml path is a directory");
+		g_warning("Common MidgardObjects.xml path is a directory");
 		return;
 	}
 	
 	if (!g_file_test(lpath, G_FILE_TEST_EXISTS)) {
 
-		g_warning("Common MgdObjects.xml file (%s) doesn't exist.", lpath);
+		g_warning("Common MidgardObjects.xml file (%s) doesn't exist.", lpath);
 		return;
 	}
 

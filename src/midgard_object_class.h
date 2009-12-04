@@ -27,9 +27,9 @@ const gchar 		*midgard_object_class_get_property_parent	(MidgardObjectClass *kla
 const gchar 		*midgard_object_class_get_property_up		(MidgardObjectClass *klass);
 const gchar 		*midgard_object_class_get_property_unique	(MidgardObjectClass *klass);
 MidgardObjectClass 	**midgard_object_class_list_children		(MidgardObjectClass *klass);
-MgdObject 		*midgard_object_class_factory			(MidgardConnection *mgd, MidgardObjectClass *klass, const GValue *val);
-MgdObject 		*midgard_object_class_get_object_by_guid	(MidgardConnection *mgd, const gchar *guid);
-MgdObject 		*midgard_object_class_get_object_by_path	(MidgardConnection *mgd, const gchar *classname, const gchar *object_path);
+MidgardObject 		*midgard_object_class_factory			(MidgardConnection *mgd, MidgardObjectClass *klass, const GValue *val);
+MidgardObject 		*midgard_object_class_get_object_by_guid	(MidgardConnection *mgd, const gchar *guid);
+MidgardObject 		*midgard_object_class_get_object_by_path	(MidgardConnection *mgd, const gchar *classname, const gchar *object_path);
 gboolean 		midgard_object_class_undelete	(MidgardConnection *mgd, const gchar *guid);
 gboolean 		midgard_object_class_has_metadata		(MidgardObjectClass *klass);
 GObjectClass		*midgard_object_class_get_metadata_class	(MidgardObjectClass *klass);

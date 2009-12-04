@@ -309,7 +309,7 @@ midgard_dbus_send(MidgardConnection *mgd, const gchar *path, const gchar *messag
 }
  
 void 
-midgard_core_dbus_send_serialized_object(MgdObject *object, const gchar *path)
+midgard_core_dbus_send_serialized_object(MidgardObject *object, const gchar *path)
 {
 #ifdef MGD_HAVE_DBUS
 	g_assert(object != NULL);

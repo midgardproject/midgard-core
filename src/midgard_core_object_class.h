@@ -22,7 +22,7 @@
 #include "midgard_object.h"
 #include "schema.h"
 
-gboolean		midgard_core_object_is_valid				(MgdObject *object);
+gboolean		midgard_core_object_is_valid				(MidgardObject *object);
 void 			midgard_core_object_class_set_guid			(GObject *object, const gchar *guid);
 void			midgard_core_object_class_set_midgard			(MidgardConnection *mgd, GObject *object);
 MgdSchemaTypeAttr 	*midgard_core_class_get_type_attr			(MidgardDBObjectClass *klass);

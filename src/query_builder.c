@@ -618,7 +618,7 @@ GObject **midgard_query_builder_execute(
 	}
 
 	*n_objects = holder->elements;
-	MgdObject **objects = g_new(MgdObject *, holder->elements+1);	
+	MidgardObject **objects = g_new(MidgardObject *, holder->elements+1);	
 
 	for( ; list; list = list->next){
 		objects[i] = list->data;
@@ -692,7 +692,7 @@ gchar *midgard_query_builder_get_object_select(
 		return g_string_free(select, FALSE);
 	}
 	
-        /* guid hardcoded ( inherited from MgdObjectClass )
+        /* guid hardcoded ( inherited from MidgardObjectClass )
          * metadata properties hardcoded ( defined in midgard_metadata )
          */ 
 	/* FIXME, move this to particular class implementation, so we can reuse MidgardDBObject derived class data only */
@@ -923,11 +923,11 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 }
 
 GList *
-midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint select_type, MgdObject *nobject)
+midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint select_type, MidgardObject *nobject)
 {
         g_assert(builder != NULL);
 
-        MgdObject *object;
+        MidgardObject *object;
         guint ret_rows, ret_fields;
 	MidgardConnection *mgd = builder->priv->mgd;
       

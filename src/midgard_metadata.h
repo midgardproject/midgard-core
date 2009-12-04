@@ -41,8 +41,8 @@ struct _MidgardMetadataClass {
 	guint signal_set_created;
 	guint signal_set_updated;
 	
-	void (*set_created) (MgdObject *self);
-	void (*set_updated) (MgdObject *self);	
+	void (*set_created) (MidgardObject *self);
+	void (*set_updated) (MidgardObject *self);	
 };
 
 struct _MidgardMetadata {
@@ -53,6 +53,6 @@ struct _MidgardMetadata {
 };
 
 GType 			midgard_metadata_get_type 	(void);
-MidgardMetadata 	*midgard_metadata_new		(MgdObject *object);
+MidgardMetadata 	*midgard_metadata_new		(MidgardObject *object);
 
 #endif /* MIDGARD_METADATA_H */

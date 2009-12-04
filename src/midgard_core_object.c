@@ -47,7 +47,7 @@ static void _write_nodes(GObject *object, xmlNodePtr node)
 	g_assert(node);
 
 	guint prop_n;
-	MgdObject *mgdobject = (MgdObject *)object;
+	MidgardObject *mgdobject = (MidgardObject *)object;
 	MidgardReflectionProperty *mrp = NULL;
 	MidgardObjectClass *klass = NULL;
 	GParamSpec **pspec = g_object_class_list_properties(
@@ -404,8 +404,8 @@ gboolean _nodes2object(GObject *object, xmlNode *node, gboolean force)
 	gchar *nodeprop = NULL;
 	xmlChar *decoded;
 	xmlParserCtxtPtr parser;
-	MgdObject *mobject = NULL;
-	MgdObject *lobject = NULL;
+	MidgardObject *mobject = NULL;
+	MidgardObject *lobject = NULL;
 	MidgardReflectionProperty *mrp = NULL;
 	const gchar *linktype = NULL;
 
@@ -666,7 +666,7 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd,
 	}
 
 	guint _n_nodes = 0;
-	MgdObject **_objects = NULL;
+	MidgardObject **_objects = NULL;
 	GSList *olist = NULL;
 
 	for(; child; child = _get_type_node(child->next)) {
@@ -751,7 +751,7 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd,
 
 	if(_n_nodes > 0) {
 		
-		_objects = g_new(MgdObject *, _n_nodes+1);
+		_objects = g_new(MidgardObject *, _n_nodes+1);
 		_n_nodes = 0;
 		
 		for(; olist ; olist = olist->next){

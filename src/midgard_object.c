@@ -56,7 +56,7 @@ static GObject *__mgdschema_object_constructor (GType type,
 static void __mgdschema_object_dispose (GObject *object);
 
 static void __add_core_properties(MgdSchemaTypeAttr *type_attr);
-static gint __insert_or_update_records(MgdObject *object, const gchar *table, gint query_type, const gchar *where);
+static gint __insert_or_update_records(MidgardObject *object, const gchar *table, gint query_type, const gchar *where);
 
 enum {
 	MIDGARD_PROPERTY_NULL = 0,
@@ -83,7 +83,7 @@ enum {
 
 static GParamSpec **_midgard_object_class_paramspec()
 {
-	/* Hardcode MidgardRepligardClass parameters. Those will be inherited with MgdObject 
+	/* Hardcode MidgardRepligardClass parameters. Those will be inherited with MidgardObject 
 	 * and thus do not bother about Midgard basic and core parameters later.
 	 * We also should hardcode these parameters to keep one real Midgard object
 	 * which has "one logic" properties and methods.
@@ -107,7 +107,7 @@ static GParamSpec **_midgard_object_class_paramspec()
 static void 
 _object_instance_init(GTypeInstance *instance, gpointer g_class)
 {	
-	MgdObject *self = (MgdObject *) instance;
+	MidgardObject *self = (MidgardObject *) instance;
 	
 	/* Midgard Object Private */
 	self->priv = g_new0(MidgardObjectPrivate, 1);
@@ -150,7 +150,7 @@ _object_set_property (GObject *object, guint prop_id,
 	gint prop_id_local = 0;
 	GType current_type = G_TYPE_FROM_INSTANCE(object);
 	MgdSchemaTypeAttr *priv = G_TYPE_INSTANCE_GET_PRIVATE (object, current_type, MgdSchemaTypeAttr);
-	MgdObject *self = (MgdObject *) object;
+	MidgardObject *self = (MidgardObject *) object;
 	MgdSchemaPropertyAttr *prop;
 	MidgardConnection *mgd = MGD_OBJECT_CNC (MIDGARD_DBOBJECT (object));	
 
@@ -193,7 +193,7 @@ _object_get_property (GObject *object, guint prop_id,
 	gint prop_id_local = 0;
 	GType current_type = G_TYPE_FROM_INSTANCE(object);
 	MgdSchemaTypeAttr *priv = G_TYPE_INSTANCE_GET_PRIVATE (object, current_type, MgdSchemaTypeAttr);
-	MgdObject *self = (MgdObject *) object;
+	MidgardObject *self = (MidgardObject *) object;
 	MidgardConnection *mgd = MGD_OBJECT_CNC (MIDGARD_DBOBJECT (object));
 
 	if (midgard_core_object_property_refuse_private (mgd, priv, MIDGARD_DBOBJECT (object), pspec->name))
@@ -245,7 +245,7 @@ static void _object_finalize (GObject *object)
 	if (object == NULL)
 		return;
 
-	MgdObject *self = (MgdObject *)object;
+	MidgardObject *self = (MidgardObject *)object;
 	
 	/* Free private struct members and MidgardTypePrivate */	
 	g_free((gchar *)self->priv->action);
@@ -301,7 +301,7 @@ static void _object_finalize (GObject *object)
 	}
 }
 
-static gboolean _is_circular(MgdObject *object)
+static gboolean _is_circular(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);
 
@@ -375,7 +375,7 @@ _CHECK_IS_UP_CIRCULAR:
 }
 
 /* TODO, replace execute with distinct if needed */  
-guint _object_in_tree(MgdObject *object)
+guint _object_in_tree(MidgardObject *object)
 {
 	GParamSpec *name_prop, *up_prop;
 	GValue pval = {0,};
@@ -470,7 +470,7 @@ guint _object_in_tree(MgdObject *object)
 
 /**
  * midgard_object_set_guid:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @guid: guid to set
  * 
  * Sets object's guid
@@ -490,7 +490,7 @@ guint _object_in_tree(MgdObject *object)
  * 
  * Returns: %TRUE on success, %FALSE otherwise
  */
-gboolean midgard_object_set_guid(MgdObject *self, const gchar *guid)
+gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid)
 {
 	g_assert(self != NULL);
 	g_assert(guid != NULL);
@@ -509,7 +509,7 @@ gboolean midgard_object_set_guid(MgdObject *self, const gchar *guid)
 		return FALSE;
 	}
 
-	MgdObject *dbobject =
+	MidgardObject *dbobject =
 		midgard_object_class_get_object_by_guid(self->dbpriv->mgd, guid);
 	
 	if (dbobject) {
@@ -524,7 +524,7 @@ gboolean midgard_object_set_guid(MgdObject *self, const gchar *guid)
 	return TRUE;
 }
 
-gboolean _midgard_object_update(MgdObject *gobj, 
+gboolean _midgard_object_update(MidgardObject *gobj, 
 		_ObjectActionUpdate replicate)
 {
 	g_assert(gobj != NULL);
@@ -634,7 +634,7 @@ gboolean _midgard_object_update(MgdObject *gobj,
 
 /**
  * midgard_object_update:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Update object's record(s).
  * 
@@ -669,7 +669,7 @@ gboolean _midgard_object_update(MgdObject *gobj,
  * 
  * Returns: %TRUE if object's record(s) is successfully updated, %FALSE otherwise.
  */ 
-gboolean midgard_object_update(MgdObject *self)
+gboolean midgard_object_update(MidgardObject *self)
 {
 	g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_update, 0);
 	gboolean rv =  _midgard_object_update(self, OBJECT_UPDATE_NONE);
@@ -681,7 +681,7 @@ gboolean midgard_object_update(MgdObject *self)
 	return rv;
 }
 
-static GPtrArray *__get_glists(MgdObject *object) 
+static GPtrArray *__get_glists(MidgardObject *object) 
 {
 	GPtrArray *gparray = g_ptr_array_new();
 
@@ -760,7 +760,7 @@ static GPtrArray *__get_glists(MgdObject *object)
 }
 
 gint 
-__insert_or_update_records(MgdObject *object, const gchar *tablename,  
+__insert_or_update_records(MidgardObject *object, const gchar *tablename,  
 				gint query_type, const gchar *where)
 {
 	GPtrArray *gparray;
@@ -791,7 +791,7 @@ __insert_or_update_records(MgdObject *object, const gchar *tablename,
 }
 
 /* Create object's data in storage */
-gboolean _midgard_object_create (	MgdObject *object,	
+gboolean _midgard_object_create (	MidgardObject *object,	
 					const gchar *create_guid,
 					_ObjectActionUpdate replicate)
 {
@@ -951,7 +951,7 @@ gboolean _midgard_object_create (	MgdObject *object,
 
 /**
  * midgard_object_create:
- * @object: #MgdObject instance
+ * @object: #MidgardObject instance
  *
  * Creates new database record(s) for object.
  *
@@ -1005,7 +1005,7 @@ gboolean _midgard_object_create (	MgdObject *object,
  * 
  * Returns: %TRUE on success, %FALSE otherwise
  */
-gboolean midgard_object_create(MgdObject *object)
+gboolean midgard_object_create(MidgardObject *object)
 {
 	g_assert(object != NULL);
 
@@ -1071,7 +1071,7 @@ void _object_copy_properties(GObject *src, GObject *dest)
 
 /**
  * midgard_object_get_by_id:
- * @object: #MgdObject instance
+ * @object: #MidgardObject instance
  * @id: object's integer identifier
  *
  * Fetch object's record(s) from database using 'id' property.
@@ -1080,7 +1080,7 @@ void _object_copy_properties(GObject *src, GObject *dest)
  * id column stores unique, primary key value which identifies object and its record(s).
  * However primary property with integer type is freely defined by user.
  * 
- * MgdObject object instance must be created with midgard_object_new function.
+ * MidgardObject object instance must be created with midgard_object_new function.
  * When midgard connection handler is not associated with object instance, 
  * application is terminated with 'assertion fails' error message being logged. 
  *
@@ -1101,7 +1101,7 @@ void _object_copy_properties(GObject *src, GObject *dest)
  * 
  * Returns: %TRUE if object is successfully fetched from database, %FALSE otherwise. 
  */ 
-gboolean midgard_object_get_by_id(MgdObject *object, guint id)
+gboolean midgard_object_get_by_id(MidgardObject *object, guint id)
 {
 	g_assert(object != NULL);
 	g_assert(MGD_OBJECT_CNC (object) != NULL);
@@ -1367,7 +1367,7 @@ midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
                 midgard_type_info->class_data = type_data;
                 /* our own instance size is 0 but it should include space for a parent,
                  * therefore add it */
-                midgard_type_info->instance_size = sizeof (MgdObject);
+                midgard_type_info->instance_size = sizeof (MidgardObject);
                 midgard_type_info->n_preallocs = 0;
                 midgard_type_info->instance_init = _object_instance_init;
                 midgard_type_info->value_table = NULL;
@@ -1849,7 +1849,7 @@ GType midgard_object_get_type(void)
                         (GClassInitFunc) __midgard_object_class_init,   /* class_init */
                         NULL,                       /* class_finalize */
                         class_data,	                    /* class_data */
-                        sizeof(MgdObject),
+                        sizeof(MidgardObject),
                         0,                          /* n_preallocs */
                         NULL,        /* instance_init */
                 };
@@ -1866,7 +1866,7 @@ GType midgard_object_get_type(void)
  * @name: name of the class 
  * @value: optional value which holds id or guid of an object 
  * 
- * Creates new MgdObject object instance.
+ * Creates new MidgardObject object instance.
  *
  * This function is mandatory one for new midgard object initialization.
  * Unlike g_object_new ( which is typical function to create new GObject 
@@ -1906,9 +1906,9 @@ GType midgard_object_get_type(void)
  * </para></listitem>
  * </itemizedlist> 
  * 
- * Returns: New #MgdObject object or %NULL on failure 
+ * Returns: New #MidgardObject object or %NULL on failure 
  */ 
-MgdObject *
+MidgardObject *
 midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 {
 	g_return_val_if_fail (mgd != NULL, NULL);
@@ -1916,7 +1916,7 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
 	GType type;
-	MgdObject *self;
+	MidgardObject *self;
 	const gchar *field = "id";	
 
 	if ((type = g_type_from_name(name))){
@@ -2037,7 +2037,7 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 
 /**
  * midgard_object_get_parent:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Fetch parent ( in midgard tree ) object.
  *
@@ -2045,14 +2045,14 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
  * object if object's up property holds empty value. 
  * Object is root object in tree when NULL is returned.
  *
- * Returns: new #MgdObject object instance or %NULL 
+ * Returns: new #MidgardObject object instance or %NULL 
  */ 
-MgdObject *midgard_object_get_parent(MgdObject *self)
+MidgardObject *midgard_object_get_parent(MidgardObject *self)
 {
-	MgdObject *mobj = self;
+	MidgardObject *mobj = self;
 	g_assert(mobj != NULL);
 	
-	MgdObject *pobj;
+	MidgardObject *pobj;
 	const gchar *pcstring;
 	guint puint = 0;
 	gint pint = 0;
@@ -2200,12 +2200,12 @@ MgdObject *midgard_object_get_parent(MgdObject *self)
 
 /**
  * midgard_object_get_by_guid:
- * @object: #MgdObject instance
+ * @object: #MidgardObject instance
  * @guid: string value which should identify object 
  * 
  * Fetch object's record(s) from database using 'guid' property constraint.
  *
- * MgdObject object instance must be created with midgard_object_new function.
+ * MidgardObject object instance must be created with midgard_object_new function.
  * When midgard connection handler is not associated with object instance, 
  * application is terminated with 'assertion fails' error message being logged. 
  * 
@@ -2223,7 +2223,7 @@ MgdObject *midgard_object_get_parent(MgdObject *self)
  * 
  * Returns: %TRUE if object is successfully fetched from database, %FALSE otherwise.
  */ 
-gboolean midgard_object_get_by_guid(MgdObject *object, const gchar *guid)
+gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 {
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 	
@@ -2280,7 +2280,7 @@ gboolean midgard_object_get_by_guid(MgdObject *object, const gchar *guid)
 
 /**
  * midgard_object_delete:
- * @object: #MgdObject instance
+ * @object: #MidgardObject instance
  *
  * Delete object's record(s) from database, but object's record is not fully deleted 
  * from database. Instead, it is marked as deleted , thus it is possible to undelete 
@@ -2306,7 +2306,7 @@ gboolean midgard_object_get_by_guid(MgdObject *object, const gchar *guid)
  *  
  * Returns: %TRUE if object is successfully deleted from database, %FALSE otherwise.
  */ 
-gboolean midgard_object_delete(MgdObject *object)
+gboolean midgard_object_delete(MidgardObject *object)
 {
 	g_assert(object);
 
@@ -2426,7 +2426,7 @@ gboolean midgard_object_delete(MgdObject *object)
 
 /**
  * midgard_object_purge:
- * @object: #MgdObject instance
+ * @object: #MidgardObject instance
  *
  * Purge object's record(s) from database.
  * 
@@ -2456,7 +2456,7 @@ gboolean midgard_object_delete(MgdObject *object)
  *
  * Returns: %TRUE if object has been succesfully purged from database, %FALSE otherwise.
  */ 
-gboolean midgard_object_purge(MgdObject *object)
+gboolean midgard_object_purge(MidgardObject *object)
 {
 	gint rv = 0;
 	GString *dsql;
@@ -2555,16 +2555,16 @@ gboolean midgard_object_purge(MgdObject *object)
 
 /**
  * midgard_object_list:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @n_objects: stores the length of returned array of objects
  *
  * Returned array stores object(s) which up property is equal to @self primary property
  * 
- * Returns: newly allocated, %NULL terminated array of #MgdObject objects
+ * Returns: newly allocated, %NULL terminated array of #MidgardObject objects
  */
-GObject **midgard_object_list(MgdObject *self, guint *n_objects)
+GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
 {
-	MgdObject *object = self;
+	MidgardObject *object = self;
 
 	*n_objects = 0;
 
@@ -2618,13 +2618,13 @@ GObject **midgard_object_list(MgdObject *self, guint *n_objects)
 
 /**
  * midgard_object_list_children:
- * @object: #MgdObject instance
+ * @object: #MidgardObject instance
  * @childname: child typename
  * @n_objects: stores the length of returned array of objects
  *
  * Returns: newly allocated, %NULL terminated children objects array 
  */
-GObject **midgard_object_list_children(MgdObject *object, 
+GObject **midgard_object_list_children(MidgardObject *object, 
 		const gchar *childcname, guint *n_objects)
 {
 	*n_objects = 0;
@@ -2658,7 +2658,7 @@ GObject **midgard_object_list_children(MgdObject *object,
 		return NULL;
 	}
 	
-	MgdObject *child = midgard_object_new(MGD_OBJECT_CNC (object), childcname, NULL);
+	MidgardObject *child = midgard_object_new(MGD_OBJECT_CNC (object), childcname, NULL);
 	MidgardObjectClass *child_klass = MIDGARD_OBJECT_GET_CLASS(child);
 
 	if (midgard_object_class_get_property_parent(child_klass) == NULL) {
@@ -2706,7 +2706,7 @@ GObject **midgard_object_list_children(MgdObject *object,
 
 /**
  * midgard_object_has_dependents:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Checks whether object has dependent objects. 
  *
@@ -2727,7 +2727,7 @@ GObject **midgard_object_list_children(MgdObject *object,
  * </para></listitem>
 * </itemizedlist> 
  */
-gboolean midgard_object_has_dependents(MgdObject *self)
+gboolean midgard_object_has_dependents(MidgardObject *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 
@@ -2763,7 +2763,7 @@ gboolean midgard_object_has_dependents(MgdObject *self)
  * 
  * Returns: class name of parent object ( in content tree ).
  */ 
-const gchar *midgard_object_parent(MgdObject *self)
+const gchar *midgard_object_parent(MidgardObject *self)
 {
 	g_assert(self != NULL);	
 
@@ -2775,7 +2775,7 @@ const gchar *midgard_object_parent(MgdObject *self)
 
 /** 
  * midgard_object_get_by_path:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @path: path at which object should be found
  *
  * Fetch object's record by path
@@ -2788,12 +2788,12 @@ const gchar *midgard_object_parent(MgdObject *self)
  * 
  * Returns: %TRUE if object is found, %FALSE otherwise.
  */ 
-gboolean midgard_object_get_by_path(MgdObject *self, const gchar *path)
+gboolean midgard_object_get_by_path(MidgardObject *self, const gchar *path)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(path != NULL, FALSE);
 
-	MgdObject *object = 
+	MidgardObject *object = 
 		midgard_object_class_get_object_by_path(
 				self->dbpriv->mgd, 
 				G_OBJECT_TYPE_NAME(self),
@@ -2826,7 +2826,7 @@ gboolean midgard_object_undelete(MidgardConnection *mgd, const gchar *guid)
 
 /** 
  * midgard_object_set_connection:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @mgd: #MidgardConnection instance
  *
  * Set object's connection.
@@ -2838,7 +2838,7 @@ gboolean midgard_object_undelete(MidgardConnection *mgd, const gchar *guid)
  * 
  * Already associated connection is silently ignored.
  */ 
-void midgard_object_set_connection(MgdObject *self, MidgardConnection *mgd)
+void midgard_object_set_connection(MidgardObject *self, MidgardConnection *mgd)
 {
 	g_assert(self != NULL);
 	g_assert(mgd != NULL);
@@ -2851,13 +2851,13 @@ void midgard_object_set_connection(MgdObject *self, MidgardConnection *mgd)
 
 /**
  * midgard_object_get_connection:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Returned #MidgardConnection is owned by core, and should not be freed.
  *
  * Returns: pointer to #MidgardConnection associated with given object.
  */ 
-const MidgardConnection *midgard_object_get_connection(MgdObject *self)
+const MidgardConnection *midgard_object_get_connection(MidgardObject *self)
 {
 	g_assert(self != NULL);
 
@@ -2866,7 +2866,7 @@ const MidgardConnection *midgard_object_get_connection(MgdObject *self)
 
 /**
  * midgard_object_approve:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Approve object.
  *
@@ -2895,7 +2895,7 @@ const MidgardConnection *midgard_object_get_connection(MgdObject *self)
 
  * Returns: %TRUE if object has been approved, FALSE otherwise
  */ 
-gboolean midgard_object_approve(MgdObject *self)
+gboolean midgard_object_approve(MidgardObject *self)
 {
 	g_assert(self != NULL);
 	g_object_ref(self);
@@ -2906,7 +2906,7 @@ gboolean midgard_object_approve(MgdObject *self)
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
 	MidgardUser *user = midgard_connection_get_user(mgd);
-	const MgdObject *person = midgard_user_get_person(user);
+	const MidgardObject *person = midgard_user_get_person(user);
 
 	if (!user) {
 		
@@ -2982,13 +2982,13 @@ gboolean midgard_object_approve(MgdObject *self)
 
 /**
  * midgard_object_is_approved:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Check whether object is approved.
  *
  * Returns: %TRUE if object is approved, %FALSE otherwise
  */ 
-gboolean midgard_object_is_approved(MgdObject *self)
+gboolean midgard_object_is_approved(MidgardObject *self)
 {
 	g_assert(self != NULL);
 
@@ -3033,7 +3033,7 @@ gboolean midgard_object_is_approved(MgdObject *self)
 
 /**
  * midgard_object_unapprove:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Simply unapprove object. It doesn't affect any core functionality, 
  * like midgard_object_approve().
@@ -3053,7 +3053,7 @@ gboolean midgard_object_is_approved(MgdObject *self)
  *
  * Returns: %TRUE on success, %FALSE otherwise
  */ 
-gboolean midgard_object_unapprove(MgdObject *self)
+gboolean midgard_object_unapprove(MidgardObject *self)
 {
 	g_assert(self != NULL);
 
@@ -3064,7 +3064,7 @@ gboolean midgard_object_unapprove(MgdObject *self)
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
 	MidgardUser *user = midgard_connection_get_user(mgd);
-	const MgdObject *person = midgard_user_get_person(user);
+	const MidgardObject *person = midgard_user_get_person(user);
 
 	if (!user) {
 		
@@ -3142,7 +3142,7 @@ gboolean midgard_object_unapprove(MgdObject *self)
 
 /**
  * midgard_object_lock:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Lock object.
  *
@@ -3168,7 +3168,7 @@ gboolean midgard_object_unapprove(MgdObject *self)
  *
  * Returns: %TRUE on success, %FALSE otherwise
  */ 
-gboolean midgard_object_lock(MgdObject *self)
+gboolean midgard_object_lock(MidgardObject *self)
 {
 	g_assert(self != NULL);
 
@@ -3260,7 +3260,7 @@ gboolean midgard_object_lock(MgdObject *self)
 
 /**
  * midgard_object_is_locked:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Check whether object is locked
  * 
@@ -3273,7 +3273,7 @@ gboolean midgard_object_lock(MgdObject *self)
  *
  * Returns: %TRUE on success, %FALSE otherwise
  */ 
-gboolean midgard_object_is_locked(MgdObject *self)
+gboolean midgard_object_is_locked(MidgardObject *self)
 {
 	g_assert(self != NULL);
 
@@ -3328,7 +3328,7 @@ gboolean midgard_object_is_locked(MgdObject *self)
 
 /**
  * midgard_object_unlock:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Unlock object.
  *
@@ -3347,7 +3347,7 @@ gboolean midgard_object_is_locked(MgdObject *self)
  *
  * Returns: %TRUE on success, %FALSE otherwise
  */ 
-gboolean midgard_object_unlock(MgdObject *self)
+gboolean midgard_object_unlock(MidgardObject *self)
 {
 	g_assert(self != NULL);
 

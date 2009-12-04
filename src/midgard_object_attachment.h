@@ -19,14 +19,16 @@
 #ifndef MIDGARD_OBJECT_ATTACHMENT_H
 #define MIDGARD_OBJECT_ATTACHMENT_H
 
+#include "midgard_object.h"
+
 G_BEGIN_DECLS
 
-MgdObject	**midgard_object_list_attachments	(MgdObject *self);
-MgdObject 	*midgard_object_create_attachment	(MgdObject *self, const gchar *name, const gchar *title, const gchar *mimetype);
-gboolean 	midgard_object_delete_attachments	(MgdObject *self, guint n_params, const GParameter *parameters);
-gboolean 	midgard_object_purge_attachments	(MgdObject *self, gboolean delete_blob, guint n_params, const GParameter *parameters);
-MgdObject 	**midgard_object_find_attachments	(MgdObject *self, guint n_params, const GParameter *parameters);
-gboolean 	midgard_object_has_attachments		(MgdObject *self);
+MidgardObject	**midgard_object_list_attachments	(MidgardObject *self);
+MidgardObject 	*midgard_object_create_attachment	(MidgardObject *self, const gchar *name, const gchar *title, const gchar *mimetype);
+gboolean 	midgard_object_delete_attachments	(MidgardObject *self, guint n_params, const GParameter *parameters);
+gboolean 	midgard_object_purge_attachments	(MidgardObject *self, gboolean delete_blob, guint n_params, const GParameter *parameters);
+MidgardObject 	**midgard_object_find_attachments	(MidgardObject *self, guint n_params, const GParameter *parameters);
+gboolean 	midgard_object_has_attachments		(MidgardObject *self);
 
 G_END_DECLS
 

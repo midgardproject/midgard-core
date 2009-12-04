@@ -51,7 +51,7 @@ struct _MidgardUserClass{
 	const MidgardConnection *(*get_connection) (MidgardDBObject *);
 	
 	/* API methods */
-	MgdObject *(*get_person)		(MidgardUser *self);
+	MidgardObject *(*get_person)		(MidgardUser *self);
 	gboolean        (*login)              	(MidgardUser *self);
 	gboolean        (*logout)             	(MidgardUser *self);
 	MidgardUser     *(*get)               	(MidgardConnection *mgd, guint n_params, const GParameter *parameters);
@@ -94,7 +94,7 @@ gboolean		midgard_user_create		(MidgardUser *self);
 gboolean 		midgard_user_update		(MidgardUser *self);
 gboolean 		midgard_user_is_user		(MidgardUser *self);
 gboolean 		midgard_user_is_admin		(MidgardUser *self);
-MgdObject		*midgard_user_get_person	(MidgardUser *self);
+MidgardObject		*midgard_user_get_person	(MidgardUser *self);
 gboolean 		midgard_user_set_person		(MidgardUser *self, MidgardObject *person);
 gboolean		midgard_user_login 		(MidgardUser *self);
 gboolean 		midgard_user_logout 		(MidgardUser *self);

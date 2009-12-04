@@ -153,9 +153,9 @@ MidgardObjectClass **midgard_object_class_list_children(
  *
  * This is static method.
  *
- * Returns: #MgdObject object identified by given @guid
+ * Returns: #MidgardObject object identified by given @guid
  */
-MgdObject *midgard_object_class_get_object_by_guid (	MidgardConnection *mgd,
+MidgardObject *midgard_object_class_get_object_by_guid (	MidgardConnection *mgd,
 							const gchar *guid)
 {
 	g_assert(mgd != NULL);
@@ -166,7 +166,7 @@ MgdObject *midgard_object_class_get_object_by_guid (	MidgardConnection *mgd,
 		return NULL;
 	}
 
-	MgdObject *object;
+	MidgardObject *object;
 	
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 	GString *sql = g_string_new("SELECT ");
@@ -335,9 +335,9 @@ static gboolean __get_id_from_path_element(MidgardConnection *mgd,
  *  - MGD_ERR_INTERNAL 
  *  - MGD_ERR_NOT_EXISTS
  * 
- * Returns: #MgdObject instance of @classname or %NULL if object is not found
+ * Returns: #MidgardObject instance of @classname or %NULL if object is not found
  */
-MgdObject *midgard_object_class_get_object_by_path(MidgardConnection *mgd,
+MidgardObject *midgard_object_class_get_object_by_path(MidgardConnection *mgd,
 		const gchar *classname, const gchar *object_path)
 {
 	g_assert(mgd != NULL);
@@ -458,7 +458,7 @@ _GET_NEXT_PATH_ELEMENT:
 			g_value_init(&idval, G_TYPE_UINT);
 			g_value_set_uint(&idval, _oid);
 
-			MgdObject *object = midgard_object_new(mgd, _cname, &idval);
+			MidgardObject *object = midgard_object_new(mgd, _cname, &idval);
 			
 			g_value_unset(&idval);
 			g_list_free(plist);
@@ -573,9 +573,9 @@ gboolean midgard_object_class_undelete(MidgardConnection *mgd, const gchar *guid
   * database id or guid value. Empty object (not fecthed from database) is returned
   * if value is explicitly set to NULL.
   *
-  * Returns: newly allocated #MgdObject object, or %NULL on failure.
+  * Returns: newly allocated #MidgardObject object, or %NULL on failure.
   */
-MgdObject *midgard_object_class_factory(
+MidgardObject *midgard_object_class_factory(
 		MidgardConnection *mgd, MidgardObjectClass *klass, const GValue *val)
 {
 	g_assert(mgd != NULL);

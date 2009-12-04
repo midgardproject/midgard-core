@@ -22,12 +22,12 @@
 #include "midgard_object.h"
 #include "midgard_object_class.h"
 
-guint 		midgard_quota_get_object_size	(MgdObject *object);
-gboolean 	midgard_quota_create		(MgdObject *object);
-gboolean 	midgard_quota_update		(MgdObject *object, guint init_size);
-void 		midgard_quota_remove		(MgdObject *object, guint size);
+guint 		midgard_quota_get_object_size	(MidgardObject *object);
+gboolean 	midgard_quota_create		(MidgardObject *object);
+gboolean 	midgard_quota_update		(MidgardObject *object, guint init_size);
+void 		midgard_quota_remove		(MidgardObject *object, guint size);
 void 		midgard_quota_set_type_size	(MidgardConnection *mgd, const gchar *typename,	guint size, guint records);
 guint 		midgard_quota_get_type_size	(MidgardConnection *mgd, const gchar *typename);
-gboolean 	midgard_quota_size_is_reached	(MgdObject *object, gint size);
+gboolean 	midgard_quota_size_is_reached	(MidgardObject *object, gint size);
 
 #endif /* MIDGARD_QUOTA_H */

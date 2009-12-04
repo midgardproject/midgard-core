@@ -21,10 +21,10 @@
 
 G_BEGIN_DECLS
 
-MgdObject **midgard_core_object_parameters_list(
+MidgardObject **midgard_core_object_parameters_list(
 		MidgardConnection *mgd, const gchar *class_name, const gchar *guid);
 
-MgdObject *midgard_core_object_parameters_create(
+MidgardObject *midgard_core_object_parameters_create(
 		MidgardConnection *mgd, const gchar *class_name, 
 		const gchar *guid, guint n_params, const GParameter *parameters);
 
@@ -40,7 +40,7 @@ gboolean midgard_core_object_parameters_purge_with_blob(
 		MidgardConnection *mgd, const gchar *class_name,
 		const gchar *guid, guint n_params, const GParameter *parameters);
 
-MgdObject **midgard_core_object_parameters_find(
+MidgardObject **midgard_core_object_parameters_find(
 		MidgardConnection *mgd, const gchar *class_name,
 		const gchar *guid, guint n_params, const GParameter *parameters);
 

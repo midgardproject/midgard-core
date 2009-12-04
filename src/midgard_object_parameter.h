@@ -19,15 +19,17 @@
 #ifndef MIDGARD_OBJECT_PARAMETER_H
 #define MIDGARD_OBJECT_PARAMETER_H
 
+#include "midgard_object.h"
+
 G_BEGIN_DECLS
 
-const GValue	*midgard_object_get_parameter		(MgdObject *self, const gchar *domain, const gchar *name);
-gboolean 	midgard_object_set_parameter		(MgdObject *self, const gchar *domain, const gchar *name, GValue *value);
-MgdObject 	**midgard_object_list_parameters	(MgdObject *self, const gchar *domain);
-gboolean 	midgard_object_delete_parameters	(MgdObject *self, guint n_params, const GParameter *parameters);
-gboolean 	midgard_object_purge_parameters		(MgdObject *self, guint n_params, const GParameter *parameters);
-MgdObject 	**midgard_object_find_parameters	(MgdObject *self, guint n_params, const GParameter *parameters);
-gboolean 	midgard_object_has_parameters		(MgdObject *self);		
+const GValue	*midgard_object_get_parameter		(MidgardObject *self, const gchar *domain, const gchar *name);
+gboolean 	midgard_object_set_parameter		(MidgardObject *self, const gchar *domain, const gchar *name, GValue *value);
+MidgardObject 	**midgard_object_list_parameters	(MidgardObject *self, const gchar *domain);
+gboolean 	midgard_object_delete_parameters	(MidgardObject *self, guint n_params, const GParameter *parameters);
+gboolean 	midgard_object_purge_parameters		(MidgardObject *self, guint n_params, const GParameter *parameters);
+MidgardObject 	**midgard_object_find_parameters	(MidgardObject *self, guint n_params, const GParameter *parameters);
+gboolean 	midgard_object_has_parameters		(MidgardObject *self);		
 
 G_END_DECLS
 

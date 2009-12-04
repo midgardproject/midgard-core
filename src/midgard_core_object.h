@@ -98,7 +98,7 @@ struct _MidgardMetadataPrivate {
 	gboolean approve_is_set;
 	
 	/* Other sruct members */
-	MgdObject *object;
+	MidgardObject *object;
 };
 
 /* Private structure for Midgard Config object */
@@ -164,7 +164,7 @@ struct _MidgardConnectionPrivate {
 #define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL;
 
 struct _MidgardBlobPrivate {
-	MgdObject *attachment;
+	MidgardObject *attachment;
 	gchar *location;
 	MidgardConnection *mgd;
 	gchar *blobdir;
@@ -198,8 +198,8 @@ xmlNode *_get_type_node(xmlNode *node);
 GObject **midgard_core_object_from_xml(MidgardConnection *mgd, const gchar *xml, gboolean force);
 
 /* Object's routines */
-gboolean _midgard_object_update(MgdObject *object, _ObjectActionUpdate replicate);
-gboolean _midgard_object_create(MgdObject *object, const gchar *create_guid, _ObjectActionUpdate replicate);
+gboolean _midgard_object_update(MidgardObject *object, _ObjectActionUpdate replicate);
+gboolean _midgard_object_create(MidgardObject *object, const gchar *create_guid, _ObjectActionUpdate replicate);
 void _object_copy_properties(GObject *src, GObject *dest);
 
 /* Links */
@@ -211,15 +211,15 @@ gboolean midgard_core_object_prop_parent_is_valid(GType ptype);
 gboolean midgard_core_object_prop_up_is_valid(GType ptype);
 GType midgard_core_object_get_property_parent_type(MidgardObjectClass *klass);
 GType midgard_core_object_get_property_up_type(MidgardObjectClass *klass);
-gboolean midgard_core_object_prop_parent_is_set(MgdObject *object);
-gboolean midgard_core_object_prop_up_is_set(MgdObject *object);
+gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object);
+gboolean midgard_core_object_prop_up_is_set(MidgardObject *object);
 
-gboolean midgard_core_object_has_dependents(MgdObject *self, const gchar *classname);
+gboolean midgard_core_object_has_dependents(MidgardObject *self, const gchar *classname);
 
 /* ACL */
 gboolean midgard_core_object_property_refuse_private (MidgardConnection *self, MgdSchemaTypeAttr *attr, MidgardDBObject *object, const gchar *property);
 
 /* D-Bus */
-void midgard_core_dbus_send_serialized_object(MgdObject *object, const gchar *path);
+void midgard_core_dbus_send_serialized_object(MidgardObject *object, const gchar *path);
 
 #endif /* MIDGARD_CORE_OBJECT_H */

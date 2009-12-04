@@ -23,7 +23,7 @@
 
 /**
  * midgard_object_list_attachments: 
- * @self: a #MgdObject self instance 
+ * @self: a #MidgardObject self instance 
  * 
  * Returned objects are midgard_attachment class. Attachments objects are 
  * fetched from database unconditionally. 
@@ -33,13 +33,13 @@
  * 
  * Returns: Newly allocated and NULL terminated array of midgard_attachment objects. 
  */
-MgdObject **midgard_object_list_attachments(MgdObject *self)
+MidgardObject **midgard_object_list_attachments(MidgardObject *self)
 {
 	g_return_val_if_fail(self != NULL, NULL);
 	g_return_val_if_fail(self->dbpriv->guid != NULL, NULL);
 	g_return_val_if_fail(self->dbpriv->mgd != NULL, NULL);
 
-	MgdObject **objects = NULL;
+	MidgardObject **objects = NULL;
 
 	objects = midgard_core_object_parameters_list(
 			self->dbpriv->mgd, "midgard_attachment", self->dbpriv->guid);
@@ -49,7 +49,7 @@ MgdObject **midgard_object_list_attachments(MgdObject *self)
 
 /**
  * midgard_object_create_attachment:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @name: name for attachment
  * @title: its title
  * @mimetype: and mimetype
@@ -57,9 +57,9 @@ MgdObject **midgard_object_list_attachments(MgdObject *self)
  * Creates object's attachment using given properties.
  * Any property may be explicitly set to NULL.
  *
- * Returns: newly created #MgdObject of midgard_attachment class or %NULL on failure
+ * Returns: newly created #MidgardObject of midgard_attachment class or %NULL on failure
  */
-MgdObject *midgard_object_create_attachment(MgdObject *self, 
+MidgardObject *midgard_object_create_attachment(MidgardObject *self, 
 		const gchar *name, const gchar *title, const gchar *mimetype)
 {
 	g_return_val_if_fail(self != NULL, NULL);
@@ -145,7 +145,7 @@ MgdObject *midgard_object_create_attachment(MgdObject *self,
 		}
 	}
 
-	MgdObject *att = 
+	MidgardObject *att = 
 		midgard_core_object_parameters_create(self->dbpriv->mgd, 
 				"midgard_attachment", self->dbpriv->guid, 
 				n_params, parameters);
@@ -161,7 +161,7 @@ MgdObject *midgard_object_create_attachment(MgdObject *self,
 
 /**
  * midgard_object_delete_attachments:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @n_params: number of properties
  * @parameters: properties list
  *
@@ -171,7 +171,7 @@ MgdObject *midgard_object_create_attachment(MgdObject *self,
  *
  * Returns: %TRUE on success, %FALSE if at least one of the attachment could not be deleted
  */
-gboolean midgard_object_delete_attachments(MgdObject *self, 
+gboolean midgard_object_delete_attachments(MidgardObject *self, 
 		guint n_params, const GParameter *parameters)
 {
 	g_assert(self != NULL);
@@ -189,7 +189,7 @@ gboolean midgard_object_delete_attachments(MgdObject *self,
 
 /**
  * midgard_object_purge_attachments:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @delete_blob: whether blob should be deleted as well
  * @n_params: number of properties
  * @parameters: properties list
@@ -208,7 +208,7 @@ gboolean midgard_object_delete_attachments(MgdObject *self,
  *
  * Returns: %TRUE on success, %FALSE if at least one of the attachment could not be purged
  */
-gboolean midgard_object_purge_attachments(MgdObject *self, gboolean delete_blob,
+gboolean midgard_object_purge_attachments(MidgardObject *self, gboolean delete_blob,
 		guint n_params, const GParameter *parameters)
 {
 	g_assert(self != NULL);
@@ -238,7 +238,7 @@ gboolean midgard_object_purge_attachments(MgdObject *self, gboolean delete_blob,
 
 /**
  * midgard_object_find_attachments:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @n_params: number of properties
  * @parameters: properties list
  *
@@ -246,9 +246,9 @@ gboolean midgard_object_purge_attachments(MgdObject *self, gboolean delete_blob,
  * @parameters argument is optional. All object's attachments are 
  * returned ( if exist ) if @parameters is explicitly set to %NULL.
 *
- * Returns: newly created, NULL terminated array of #MgdObject ( midgard_attachment class ) or %NULL on failure
+ * Returns: newly created, NULL terminated array of #MidgardObject ( midgard_attachment class ) or %NULL on failure
  */
-MgdObject **midgard_object_find_attachments(MgdObject *self, 
+MidgardObject **midgard_object_find_attachments(MidgardObject *self, 
 		guint n_params, const GParameter *parameters)
 {
 	g_assert(self != NULL);
@@ -265,11 +265,11 @@ MgdObject **midgard_object_find_attachments(MgdObject *self,
 
 /**
  * midgard_object_has_attachments:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * 
  * Returns: %TRUE if object has attachments, %FALSE otherwise.
  */
-gboolean midgard_object_has_attachments(MgdObject *self)
+gboolean midgard_object_has_attachments(MidgardObject *self)
 {
 	g_assert(self != NULL);
 	

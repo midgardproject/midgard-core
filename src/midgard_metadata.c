@@ -31,7 +31,7 @@
 void __set_from_xml_node(MidgardDBObject *object, xmlNode *node);
 
 static void 
-_action_create_callback (MgdObject *object, gpointer ud)
+_action_create_callback (MidgardObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;
 
@@ -63,7 +63,7 @@ _action_create_callback (MgdObject *object, gpointer ud)
 	g_free (tval); 
 }
 
-static void _action_update_callback(MgdObject *object, gpointer ud)
+static void _action_update_callback(MidgardObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;
 	
@@ -89,12 +89,12 @@ static void _action_update_callback(MgdObject *object, gpointer ud)
 	g_free (tval);
 }
 
-static void _action_delete_callback(MgdObject *object, gpointer ud)
+static void _action_delete_callback(MidgardObject *object, gpointer ud)
 {
 	return;
 }
 
-static void _action_import_callback(MgdObject *object, gpointer ud)
+static void _action_import_callback(MidgardObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;	
 	GValue *tval = midgard_timestamp_new_current();
@@ -106,7 +106,7 @@ static void _action_import_callback(MgdObject *object, gpointer ud)
 	g_free (tval);
 }
 
-static void _action_export_callback(MgdObject *object, gpointer ud)
+static void _action_export_callback(MidgardObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;	
 	const GValue *tval = (GValue *)midgard_timestamp_new_current();
@@ -137,11 +137,11 @@ static void _action_export_callback(MgdObject *object, gpointer ud)
 
 /**
  * midgard_metadata_new:
- * @object: #MgdObject for which metadata is created
+ * @object: #MidgardObject for which metadata is created
  * 
- * Creates new midgard_metadata instance for the given #MgdObject instance.
+ * Creates new midgard_metadata instance for the given #MidgardObject instance.
  *
- * Do not use g_object_new() as metadata constructor. #MgdObject pointer is internally 
+ * Do not use g_object_new() as metadata constructor. #MidgardObject pointer is internally 
  * assigned as a pointer to midgard object for which particular metadata object 
  * instance was created.
  * 
@@ -151,11 +151,11 @@ static void _action_export_callback(MgdObject *object, gpointer ud)
  * keep value of such property "as is".  
  *
  * Do not free #MidgardMetadata object's memory as it is automatically
- * freed when particular #MgdObject object's instance memory is freed. 
+ * freed when particular #MidgardObject object's instance memory is freed. 
  *
  * Returns: newly allocated midgard_metadata instance
  */ 
-MidgardMetadata *midgard_metadata_new(MgdObject *object)
+MidgardMetadata *midgard_metadata_new(MidgardObject *object)
 {
 	g_assert(object != NULL);
 	
@@ -452,7 +452,7 @@ _metadata_object_finalize(GObject *object)
 }
 
 /* Set properties when object is created */
-void midgard_metadata_set_create(MgdObject *object)
+void midgard_metadata_set_create(MidgardObject *object)
 {
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
@@ -467,7 +467,7 @@ void midgard_metadata_set_create(MgdObject *object)
 }
 
 /* Set properties when object is updated */
-void midgard_metadata_set_update(MgdObject *object)
+void midgard_metadata_set_update(MidgardObject *object)
 {
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
@@ -497,7 +497,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	gobject_class->finalize = _metadata_object_finalize;
 
 	/* Register signals */
-	/* Create signal which should be emitted before MgdObject is created */
+	/* Create signal which should be emitted before MidgardObject is created */
 	klass->set_created = midgard_metadata_set_create;
 	klass->signal_set_created = g_signal_new("set_created",
 			G_TYPE_FROM_CLASS(g_class),
@@ -509,7 +509,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 			G_TYPE_NONE,
 			0);
     
-	/* Create signal which should be emitted before MgdObject is updates */
+	/* Create signal which should be emitted before MidgardObject is updates */
 	klass->set_updated = midgard_metadata_set_update;
 	klass->signal_set_updated = g_signal_new("set_updated",
 			G_TYPE_FROM_CLASS(g_class),
@@ -942,7 +942,7 @@ GType midgard_metadata_get_type (void)
 	return type;
 }
 
-MidgardMetadata *midgard_object_metadata_get(MgdObject *object){
+MidgardMetadata *midgard_object_metadata_get(MidgardObject *object){
 
     MidgardMetadata *mm = midgard_metadata_new(object);
     if(mm)

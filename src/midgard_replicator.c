@@ -314,7 +314,7 @@ midgard_replicator_export_purged (MidgardConnection *mgd, MidgardObjectClass *kl
  * Returns: Newly allocated xml buffer, which holds blob data base64 encoded, or %NULL.
  */    
 gchar *
-midgard_replicator_serialize_blob (MgdObject *object)
+midgard_replicator_serialize_blob (MidgardObject *object)
 {	
 	GType attachment_type = g_type_from_name ("midgard_attachment");
 	g_return_val_if_fail (G_OBJECT_TYPE (object) != attachment_type, NULL);
@@ -366,7 +366,7 @@ midgard_replicator_serialize_blob (MgdObject *object)
  * Alias for midgard_replicator_serialize_blob().
  */ 
 gchar *
-midgard_replicator_export_blob(MgdObject *object)
+midgard_replicator_export_blob(MidgardObject *object)
 {
 	return midgard_replicator_serialize_blob(object);
 }
@@ -455,7 +455,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 
 	guint n_objects;
 	GObject **_dbobjects = midgard_query_builder_execute (builder, &n_objects);
-	MgdObject *dbobject;
+	MidgardObject *dbobject;
 
 	if (!_dbobjects){
 	
@@ -489,7 +489,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 	} else {
 
 		gchar *updated, *dbupdated;
-		dbobject = (MgdObject *)_dbobjects[0];
+		dbobject = (MidgardObject *)_dbobjects[0];
 		g_free (_dbobjects);
 
 		GValue updated_timestamp = {0, };
@@ -628,7 +628,7 @@ static gboolean __import_blob_from_xml(	MidgardConnection *mgd,
 		return FALSE;
 	}
 
-	MgdObject *object = midgard_object_class_get_object_by_guid(mgd, guid);
+	MidgardObject *object = midgard_object_class_get_object_by_guid(mgd, guid);
 
 	/* TODO , Add more error messages to inform about object state. 
 	 * One is already set by midgard_object_class_get_object_by_guid */
@@ -725,7 +725,7 @@ midgard_replicator_import_from_xml (MidgardConnection *mgd,  const gchar *xml, g
 	}
 
 	xmlChar *attr, *guid_attr;
-	MgdObject *dbobject;
+	MidgardObject *dbobject;
 
 	for(; child; child = _get_type_node(child->next)) {
 		
@@ -753,7 +753,7 @@ midgard_replicator_import_from_xml (MidgardConnection *mgd,  const gchar *xml, g
 
 		xmlFree(attr);
 
-		MgdObject *object =
+		MidgardObject *object =
 			midgard_object_new(mgd, (const gchar *)child->name, NULL);
 		if(!object) {
 			g_warning("Can not create %s instance", child->name);

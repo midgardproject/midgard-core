@@ -76,7 +76,7 @@ MIDGARD_DBOBJECT_GET_CLASS
 <FILE>midgard_object</FILE>
 <TITLE>midgard_object</TITLE>
 MIDGARD_OBJECT_GET_CLASS_BY_NAME
-MgdObject
+MidgardObject
 MidgardObject
 midgard_object
 MidgardObjectPrivate

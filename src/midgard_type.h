@@ -43,9 +43,7 @@ typedef struct _MgdParamSpecLongtext MgdParamSpecLongtext;
 GType midgard_param_longtext_get_type(void);
 
 /* Timestamp */
-#define MGD_TYPE_TIMESTAMP (midgard_timestamp_get_type())
-
-GType midgard_timestamp_get_type(void);
+#define MGD_TYPE_TIMESTAMP MIDGARD_TYPE_TIMESTAMP
 
 /* Guid */
 #define MGD_TYPE_GUID (midgard_guid_get_type())

@@ -41,7 +41,7 @@ static void __get_filepath(MidgardBlob *self)
 	gchar *fname = NULL;
 	gchar *location = NULL;
 	gchar *up_a, *up_b;
-	MgdObject *attachment = self->priv->attachment;
+	MidgardObject *attachment = self->priv->attachment;
 
 	GParamSpec *pspec =
 		g_object_class_find_property(
@@ -132,14 +132,14 @@ static void __get_channel(MidgardBlob *self, const gchar *mode)
 
 /**
  * midgard_blob_new: 
- * @attachment: #MgdObject of MIDGARD_TYPE_ATTACHMENT type.
+ * @attachment: #MidgardObject of MIDGARD_TYPE_ATTACHMENT type.
  * @encoding: file encoding
  * 
  * Default encoding is UTF-8. Set NULL @encoding if such is required. 
  *
  * Instatiate new Midgard Blob object for the given midgard_attachment object. 
  * This is almost the same constructor as g_object_new, but unlike that one,
- * midgard_blob_new requires MgdObject (midgard_attachment) object's pointer.
+ * midgard_blob_new requires MidgardObject (midgard_attachment) object's pointer.
  *
  * This constructor defines new relative path for attachment, if midgard_attachment 
  * is associated with midgard_blob and its location is empty. 
@@ -147,7 +147,7 @@ static void __get_channel(MidgardBlob *self, const gchar *mode)
  * 
  * Returns: newly instatiated #MidgardBlob object or %NULL on failure
  */
-MidgardBlob *midgard_blob_new(MgdObject *attachment, const gchar *encoding)
+MidgardBlob *midgard_blob_new(MidgardObject *attachment, const gchar *encoding)
 {
 	g_assert(attachment != NULL);
 	

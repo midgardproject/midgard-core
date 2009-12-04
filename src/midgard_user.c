@@ -57,13 +57,13 @@ gboolean        	__midgard_user_create             (MidgardUser *self);
 gboolean        	__midgard_user_update             (MidgardUser *self);
 gboolean        	__midgard_user_is_user            (MidgardUser *self);
 gboolean        	__midgard_user_is_admin           (MidgardUser *self);
-MgdObject		*__midgard_user_get_person        (MidgardUser *self);
+MidgardObject		*__midgard_user_get_person        (MidgardUser *self);
 gboolean		__midgard_user_set_person         (MidgardUser *self, MidgardObject *person);
 gboolean        	__midgard_user_login              (MidgardUser *self);
 gboolean        	__midgard_user_logout             (MidgardUser *self);
 
 struct _MidgardUserPrivate {
-	MgdObject *person;
+	MidgardObject *person;
 	gchar *person_guid;
 	guint user_type;
 	gchar *login;
@@ -988,7 +988,7 @@ static gboolean __set_legacy_password(MidgardUser *self, const gchar *login,
 	GValue gval = {0, };
 	g_value_init(&gval, G_TYPE_STRING);
 	g_value_set_string(&gval, self->dbpriv->guid);
-	MgdObject *person = 
+	MidgardObject *person = 
 		midgard_object_new(self->dbpriv->mgd, "midgard_person", &gval);
 	g_value_unset(&gval);
 
@@ -1304,16 +1304,16 @@ midgard_user_set_person (MidgardUser *self, MidgardObject *person)
  * midgard_user_get_person:
  * @self: #MidgardUser instance
  *
- * Returns: #MgdObject of "midgard_person" type, of %NULL if none associated.
+ * Returns: #MidgardObject of "midgard_person" type, of %NULL if none associated.
  */
-MgdObject *
+MidgardObject *
 midgard_user_get_person (MidgardUser *self)
 {
 	MidgardUserClass *klass = MIDGARD_USER_GET_CLASS (self);
 	return klass->get_person (self);	
 }
 
-MgdObject *
+MidgardObject *
 __midgard_user_get_person(MidgardUser *self)
 {
 	g_assert(self != NULL);

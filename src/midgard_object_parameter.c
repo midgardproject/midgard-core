@@ -44,7 +44,7 @@ static MidgardCollector *__create_domain_collector(MidgardConnection *mgd, const
 	return mc;
 }
 
-static MidgardCollector *__get_parameters_collector(MgdObject *object, 
+static MidgardCollector *__get_parameters_collector(MidgardObject *object, 
 		const gchar *domain)
 {	
 	if(!object->priv->_params) {
@@ -57,13 +57,13 @@ static MidgardCollector *__get_parameters_collector(MgdObject *object,
 }
 
 static void __register_domain_collector(
-		MgdObject *object, const gchar *domain, MidgardCollector *mc)
+		MidgardObject *object, const gchar *domain, MidgardCollector *mc)
 {		
 	if(object->priv->_params)
 		g_hash_table_insert(object->priv->_params, (gpointer) g_strdup(domain), mc);
 }
 
-static gboolean __is_guid_valid(MgdObject *self)
+static gboolean __is_guid_valid(MidgardObject *self)
 {
 	if(self->dbpriv->guid == NULL) {
 
@@ -94,7 +94,7 @@ static gboolean __is_guid_valid(MgdObject *self)
 
 /**
  * midgard_object_get_paramater:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @domain: parameter's domain string
  * @name: parameter's name string
  *
@@ -103,7 +103,7 @@ static gboolean __is_guid_valid(MgdObject *self)
  *
  * Returns: GValue which holds value for domain&name pair
  */
-const GValue *midgard_object_get_parameter(MgdObject *self,
+const GValue *midgard_object_get_parameter(MidgardObject *self,
 		const gchar *domain, const gchar *name)
 {
 	g_assert(self);
@@ -132,7 +132,7 @@ const GValue *midgard_object_get_parameter(MgdObject *self,
 		midgard_collector_execute(mc);
 		
 		/* prepend collector to object's parameter list 
-		 * we will free it in MgdObject destructor */
+		 * we will free it in MidgardObject destructor */
 		self->priv->parameters = 
 			g_slist_prepend(self->priv->parameters, mc);
 
@@ -156,7 +156,7 @@ const GValue *midgard_object_get_parameter(MgdObject *self,
 
 /**
  * midgard_object_set_parameter:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @domain: parameter's domain string
  * @name: parameter's name string
  * @value: a GValue value which should be set for domain&name pair
@@ -166,14 +166,14 @@ const GValue *midgard_object_get_parameter(MgdObject *self,
  * Returns: %TRUE on success, %FALSE otherwise
  */ 
 gboolean 
-midgard_object_set_parameter (MgdObject *self, const gchar *domain, const gchar *name, GValue *value) 
+midgard_object_set_parameter (MidgardObject *self, const gchar *domain, const gchar *name, GValue *value) 
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 
 	if(!__is_guid_valid(self))
 		return FALSE;
 		
-	MgdObject *param;
+	MidgardObject *param;
 	const gchar *value_string =
 		g_value_get_string(value);
 	gboolean delete_parameter = FALSE;
@@ -305,7 +305,7 @@ midgard_object_set_parameter (MgdObject *self, const gchar *domain, const gchar 
 
 /**
  * midgard_object_list_parameters: 
- * @self: a #MgdObject self instance
+ * @self: a #MidgardObject self instance
  * @domain: optional paramaters' domain
  * 
  * Returned objects are midgard_parameter class. Parameter objects are 
@@ -316,13 +316,13 @@ midgard_object_set_parameter (MgdObject *self, const gchar *domain, const gchar 
  * 
  * Returns: Newly allocated and NULL terminated array of midgard_parameter objects. 
  */
-MgdObject **midgard_object_list_parameters(MgdObject *self, const gchar *domain)
+MidgardObject **midgard_object_list_parameters(MidgardObject *self, const gchar *domain)
 {
 	g_return_val_if_fail(self != NULL, NULL);
 	g_return_val_if_fail(self->dbpriv->guid != NULL, NULL);
 	g_return_val_if_fail(self->dbpriv->mgd != NULL, NULL);
 
-	MgdObject **objects = NULL;
+	MidgardObject **objects = NULL;
 
 	if(domain == NULL) {
 
@@ -352,7 +352,7 @@ MgdObject **midgard_object_list_parameters(MgdObject *self, const gchar *domain)
 
 /**
  * midgard_object_delete_parameters:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @n_params: number of properties
  * @parameters: properties list
  *
@@ -362,7 +362,7 @@ MgdObject **midgard_object_list_parameters(MgdObject *self, const gchar *domain)
  *
  * Returns: %TRUE on success, %FALSE if at least one of the parameters could not be deleted
  */
-gboolean midgard_object_delete_parameters(MgdObject *self, 
+gboolean midgard_object_delete_parameters(MidgardObject *self, 
 		guint n_params, const GParameter *parameters)
 {
 	g_assert(self != NULL);
@@ -379,7 +379,7 @@ gboolean midgard_object_delete_parameters(MgdObject *self,
 
 /**
  * midgard_object_purge_parameters:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @n_params: number of properties
  * @parameters: properties list
  *
@@ -389,7 +389,7 @@ gboolean midgard_object_delete_parameters(MgdObject *self,
  *
  * Returns: %TRUE on success, %FALSE if at least one of the parameters could not be purged
  */
-gboolean midgard_object_purge_parameters(MgdObject *self, 
+gboolean midgard_object_purge_parameters(MidgardObject *self, 
 		guint n_params, const GParameter *parameters)
 {
 	g_assert(self != NULL);
@@ -406,7 +406,7 @@ gboolean midgard_object_purge_parameters(MgdObject *self,
 
 /**
  * midgard_object_find_parameters:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  * @n_params: number of properties
  * @parameters: properties list
  *
@@ -414,9 +414,9 @@ gboolean midgard_object_purge_parameters(MgdObject *self,
  * @parameters argument is optional. All object's parameters are 
  * returned ( if exist ) if @parameters is explicitly set to %NULL.
 *
- * Returns: newly created, NULL terminated array of #MgdObject ( midgard_parameter class ) or %NULL on failure
+ * Returns: newly created, NULL terminated array of #MidgardObject ( midgard_parameter class ) or %NULL on failure
  */
-MgdObject **midgard_object_find_parameters(MgdObject *self, 
+MidgardObject **midgard_object_find_parameters(MidgardObject *self, 
 		guint n_params, const GParameter *parameters)
 {
 	g_assert(self != NULL);
@@ -433,11 +433,11 @@ MgdObject **midgard_object_find_parameters(MgdObject *self,
 
 /**
  * midgard_object_has_parameters:
- * @self: #MgdObject instance
+ * @self: #MidgardObject instance
  *
  * Returns: %TRUE if object has paramateres, %FALSE otherwise.
  */ 
-gboolean midgard_object_has_parameters(MgdObject *self)
+gboolean midgard_object_has_parameters(MidgardObject *self)
 {
 	g_assert(self != NULL);
 
@@ -447,7 +447,7 @@ gboolean midgard_object_has_parameters(MgdObject *self)
 
 /* Internal routines */
 
-MgdObject **midgard_core_object_parameters_list(
+MidgardObject **midgard_core_object_parameters_list(
 		MidgardConnection *mgd, const gchar *class_name, const gchar *guid)
 {
 	g_assert(class_name != NULL);
@@ -472,10 +472,10 @@ MgdObject **midgard_core_object_parameters_list(
 
 	g_object_unref(builder);
 
-	return (MgdObject **)objects;
+	return (MidgardObject **)objects;
 }
 
-MgdObject *midgard_core_object_parameters_create(
+MidgardObject *midgard_core_object_parameters_create(
 		MidgardConnection *mgd, const gchar *class_name,
 		const gchar *guid, guint n_params, const GParameter *parameters)
 {
@@ -492,7 +492,7 @@ MgdObject *midgard_core_object_parameters_create(
 	MidgardObjectClass *klass = 
 		MIDGARD_OBJECT_GET_CLASS_BY_NAME(class_name);
 
-	MgdObject *object = midgard_object_new(mgd, class_name, NULL);
+	MidgardObject *object = midgard_object_new(mgd, class_name, NULL);
 
 	/* Check if properties in parameters are registered for given class */
 	for ( i = 0; i < n_params; i++) {
@@ -716,7 +716,7 @@ MidgardQueryBuilder *midgard_core_object_parameter_query_builder(
 	return builder;
 }
 
-MgdObject **midgard_core_object_parameters_find(
+MidgardObject **midgard_core_object_parameters_find(
 		MidgardConnection *mgd, const gchar *class_name,
 		const gchar *guid, guint n_params, const GParameter *parameters)
 {
@@ -761,7 +761,7 @@ MgdObject **midgard_core_object_parameters_find(
 	GObject **objects = midgard_query_builder_execute(builder, &n_objects);
 	g_object_unref(builder);
 
-	return (MgdObject **)objects;
+	return (MidgardObject **)objects;
 }
 
 gboolean midgard_core_object_has_parameters(

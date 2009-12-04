@@ -26,9 +26,11 @@
 #include "midgard_object_class.h"
 #include "midgard_error.h"
 #include "midgard_core_connection.h"
+#include "midgard_timestamp.h"
 #ifdef HAVE_LIBGDA_4
 #include <sql-parser/gda-sql-parser.h>
 #endif
+
 
 /* Do not use _DB_DEFAULT_DATETIME.
  * Some databases (like MySQL) fails to create datetime column with datetime which included timezone. 

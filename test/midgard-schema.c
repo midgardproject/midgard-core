@@ -28,7 +28,7 @@
 #define G_LOG_DOMAIN "Schema"
 #endif
 
-static void _test_me(MidgardConnection *mgd, MgdObject *object)
+static void _test_me(MidgardConnection *mgd, MidgardObject *object)
 {
 	/* This is anonymous mode now. 
 	 * It should be supported by SG account in config file later.
@@ -101,7 +101,7 @@ static void _test_me(MidgardConnection *mgd, MgdObject *object)
 		gchar *guid;
 		g_object_get(G_OBJECT(object), "guid", &guid, NULL);
 		g_value_set_string(&gval, guid);
-		MgdObject *new = midgard_object_new(mgd, typename, &gval);
+		MidgardObject *new = midgard_object_new(mgd, typename, &gval);
 		g_value_unset(&gval);
 		
 		if (new == NULL) {
@@ -210,14 +210,14 @@ main (int argc, char **argv)
 		typename = g_type_name(all_types[i]);
 
 		if (g_str_equal(typename, "midgard_parameter")) {
-			MgdObject *param = midgard_object_new(mgd, typename, NULL);
+			MidgardObject *param = midgard_object_new(mgd, typename, NULL);
 			g_object_unref(param);
 			g_message("midgard_parameter ignored");
 			continue;
 		}
 
 		g_message("Type %s", typename);
-		MgdObject *object = midgard_object_new(mgd, typename, NULL);
+		MidgardObject *object = midgard_object_new(mgd, typename, NULL);
 
 		MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME(typename);
 

@@ -73,5 +73,5 @@ void 			midgard_core_qb_add_group		(MidgardQueryBuilder *builder, MidgardQueryGr
 void 			midgard_core_qb_add_group_constraint	(MidgardQueryBuilder *builder, MidgardQueryConstraint *constraint);
 gboolean 		midgard_core_qb_is_grouping		(MidgardQueryBuilder *builder);
 GObject			**midgard_core_qb_execute		(MidgardQueryBuilder *builder, guint *n_objects);
-GList 			*midgard_core_qb_set_object_from_query	(MidgardQueryBuilder *builder, guint select_type, MgdObject *object);
+GList 			*midgard_core_qb_set_object_from_query	(MidgardQueryBuilder *builder, guint select_type, MidgardObject *object);
 #endif /* MIDGARD_CORE_QB_H */

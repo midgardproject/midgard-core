@@ -523,7 +523,7 @@ gboolean __midgard_connection_open(
 		if(!g_type_from_name("midgard_language")) {
 			
 			MidgardSchema *schema = g_object_new(MIDGARD_TYPE_SCHEMA, NULL);
-			gchar *path = g_build_path(G_DIR_SEPARATOR_S, config->sharedir, "MgdObjects.xml", NULL);
+			gchar *path = g_build_path(G_DIR_SEPARATOR_S, config->sharedir, "MidgardObjects.xml", NULL);
 			midgard_schema_init(schema, (const gchar *)path);
 			g_free(path);
 			midgard_schema_read_dir(schema, config->sharedir);
@@ -562,7 +562,7 @@ gboolean __midgard_connection_open(
  * error state.
  *
  * It also initializes #MidgardSchema object (which is encapsulated by implementation )
- * and register all MgdSchema, #MgdObjectClass derived classes defined by user.
+ * and register all MgdSchema, #MidgardObjectClass derived classes defined by user.
  * This happens only when basic Midgard classes are not registered in GType system.
  * This is recommended way to initialize MgdSchema types.
  *  

@@ -24,7 +24,7 @@
 #include "midgard_metadata.h"
 #include "midgard_user.h"
 
-gboolean midgard_quota_size_is_reached(MgdObject *object, gint size)
+gboolean midgard_quota_size_is_reached(MidgardObject *object, gint size)
 {
 	GString *query;
 	guint limit_tmp_size = 0, tmp_size = 0;	
@@ -91,7 +91,7 @@ gboolean midgard_quota_size_is_reached(MgdObject *object, gint size)
 /*
  * Returns object's disk usage size 
  */ 
-guint midgard_quota_get_object_size(MgdObject *object)
+guint midgard_quota_get_object_size(MidgardObject *object)
 {
 	g_assert(object != NULL);
 
@@ -127,7 +127,7 @@ guint midgard_quota_get_object_size(MgdObject *object)
  * Updates object's storage setting object's size
  * WARNING, this is MySQL optimized!	
  */
-gboolean midgard_quota_update(MgdObject *object, guint32 init_size)
+gboolean midgard_quota_update(MidgardObject *object, guint32 init_size)
 {
 	g_assert(object != NULL);
 	g_assert(MGD_OBJECT_CNC (object) != NULL);
@@ -173,7 +173,7 @@ gboolean midgard_quota_update(MgdObject *object, guint32 init_size)
 	return TRUE;
 }
 
-gboolean midgard_quota_create(MgdObject *object)
+gboolean midgard_quota_create(MidgardObject *object)
 {
 	g_assert(object != NULL);
 
@@ -204,7 +204,7 @@ gboolean midgard_quota_create(MgdObject *object)
 	return TRUE;
 }
 
-void midgard_quota_remove(MgdObject *object, guint size){
+void midgard_quota_remove(MidgardObject *object, guint size){
 
 	g_assert(object != NULL);
 
