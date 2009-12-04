@@ -82,10 +82,14 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 			if (table == NULL)
 				__view_error (cur, "Can not create proper view. Defined '%s' class has NULL storage", rprop[0]);
 
-			MgdSchemaPropertyAttr *rprop_attr = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, rprop[1]);
+			MgdSchemaPropertyAttr *rprop_attr = midgard_core_class_get_property_attr (klass, rprop[1]);
 			
 			if (!rprop_attr)
-				__view_error(cur, "%s not found. Not registered for %s ?", rprop[1], rprop[0]);
+				__view_error (cur, "%s not found. Not registered for %s ?", rprop[1], rprop[0]);
+
+			if (rprop_attr->is_private)
+				__view_error (cur, "Private property %s.%s can not be added to view.", 
+					       G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (klass)), rprop_attr->name);	
 
 			midgard_core_schema_type_property_copy(rprop_attr, type);
 			

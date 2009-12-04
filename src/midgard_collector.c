@@ -24,6 +24,7 @@
 #include <libgda/libgda.h>
 #include "midgard_core_query.h"
 #include "midgard_core_object_class.h"
+#include "midgard_core_object.h"
 
 struct _MidgardCollectorPrivate{
 	const gchar *typename;
@@ -36,6 +37,7 @@ struct _MidgardCollectorPrivate{
 	MidgardObjectClass *klass;
 	GList *values;
 	GData *datalist;
+	MidgardConnection *mgd;
 };
 
 static const gchar *_collector_find_class_property(
@@ -164,6 +166,7 @@ MidgardCollector *midgard_collector_new(
 	self->priv->domain_value = value;
 	self->priv->keyname = NULL;
 	self->priv->keyname_value = NULL;
+	self->priv->mgd = mgd;
 	
 	g_value_unset(value);
 	g_free(value);
@@ -221,7 +224,16 @@ gboolean midgard_collector_set_key_property(
 		g_object_unref(constraint);
 		return FALSE;
 	}
+
+	/* Check if property is private */
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (constraint->priv->klass);
+	MgdSchemaTypeAttr *type_attr = dbklass->dbpriv->storage_data;
+	if (midgard_core_object_property_refuse_private (self->priv->mgd, type_attr, NULL, constraint->priv->propname)) {
 	
+		g_object_unref(constraint);
+		return FALSE;
+	}
+
 	gchar *sql_field = g_strconcat(constraint->priv->current->table, ".",
 			constraint->priv->current->field, " AS midgard_collector_key", NULL);
 	
@@ -289,6 +301,15 @@ gboolean midgard_collector_add_value_property(
 		return FALSE;
 	}
 	
+	/* Check if property is private */
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (constraint->priv->klass);
+	MgdSchemaTypeAttr *type_attr = dbklass->dbpriv->storage_data;
+	if (midgard_core_object_property_refuse_private (self->priv->mgd, type_attr, NULL, constraint->priv->propname)) {
+	
+		g_object_unref(constraint);
+		return FALSE;
+	}
+
 	gchar *sql_field = g_strconcat(constraint->priv->current->table, ".",
 			constraint->priv->current->field, " AS ",
 			constraint->priv->pspec->name, NULL);

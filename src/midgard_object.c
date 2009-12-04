@@ -148,12 +148,16 @@ _object_set_property (GObject *object, guint prop_id,
     const GValue *value, GParamSpec   *pspec)
 {	
 	gint prop_id_local = 0;
-	MgdSchemaTypeAttr *priv;
 	GType current_type = G_TYPE_FROM_INSTANCE(object);
+	MgdSchemaTypeAttr *priv = G_TYPE_INSTANCE_GET_PRIVATE (object, current_type, MgdSchemaTypeAttr);
 	MgdObject *self = (MgdObject *) object;
-	MgdSchemaPropertyAttr *prop;	
+	MgdSchemaPropertyAttr *prop;
+	MidgardConnection *mgd = MGD_OBJECT_CNC (MIDGARD_DBOBJECT (object));	
 
-	switch(prop_id) {
+	if (midgard_core_object_property_refuse_private (mgd, priv, MIDGARD_DBOBJECT (object), pspec->name))
+		return;
+
+	switch (prop_id) {
 			
 		case MIDGARD_PROPERTY_GUID:
 			g_debug("Setting guid property is not allowed");
@@ -187,11 +191,15 @@ _object_get_property (GObject *object, guint prop_id,
 		GValue *value, GParamSpec   *pspec)
 {
 	gint prop_id_local = 0;
-	MgdSchemaTypeAttr *priv;
 	GType current_type = G_TYPE_FROM_INSTANCE(object);
+	MgdSchemaTypeAttr *priv = G_TYPE_INSTANCE_GET_PRIVATE (object, current_type, MgdSchemaTypeAttr);
 	MgdObject *self = (MgdObject *) object;
+	MidgardConnection *mgd = MGD_OBJECT_CNC (MIDGARD_DBOBJECT (object));
 
-	switch(prop_id) {
+	if (midgard_core_object_property_refuse_private (mgd, priv, MIDGARD_DBOBJECT (object), pspec->name))
+		return;
+
+	switch (prop_id) {
 
 		case MIDGARD_PROPERTY_GUID:	
 			g_value_set_string (value, self->dbpriv->guid);

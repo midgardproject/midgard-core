@@ -37,6 +37,7 @@
 #include "midgard_metadata.h"
 #include "guid.h"
 #include "midgard_core_metadata.h"
+#include "midgard_core_object_class.h"
 
 static const gchar *MIDGARD_OBJECT_HREF = "http://www.midgard-project.org/midgard_object/1.8";
 
@@ -766,4 +767,91 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd,
 	xmlCleanupParser();
 
 	return (GObject **) _objects;
+}
+
+/* Returns TRUE if property is private and caller is not allowed to read/write it. */ 
+gboolean 
+midgard_core_object_property_refuse_private (MidgardConnection *mgd, MgdSchemaTypeAttr *type, 
+		MidgardDBObject *object, const gchar *property)
+{
+	/* Unknown case, no connection  */
+	g_return_val_if_fail (mgd != NULL, TRUE);
+	g_return_val_if_fail (property != NULL, FALSE);
+
+	MgdSchemaTypeAttr *type_attr = type;
+	MidgardDBObjectClass *klass = NULL;
+
+	if (object)
+		klass = MIDGARD_DBOBJECT_GET_CLASS (object);
+
+	g_return_val_if_fail (object != NULL && type_attr != NULL, FALSE);
+
+	if (!type_attr && object)
+		type_attr = klass->dbpriv->storage_data;
+
+	/* Unknown case, no storage_data which means something like no property */
+	g_return_val_if_fail (type_attr != NULL, FALSE);
+
+	MgdSchemaPropertyAttr  *attr = midgard_core_class_get_property_attr (klass, property);
+	if (!attr)
+		return FALSE;
+
+	if (!attr->is_private)
+		return FALSE;
+
+	/* No object, so no chance to check metadata.creator.
+	 * There might be corner case or feature work around, so refuse unconditionally. */
+	if (!object) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_ACCESS_DENIED, "No object. Can not check private property owner");
+		return TRUE;
+	}
+
+	/* Also, no user, and anonymous is not allowed.
+	 * If user exists, and has no person associated, refuse as well. */ 
+	MidgardObject *person = MGD_CNC_PERSON (mgd);
+	if (!mgd->priv->user) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_ACCESS_DENIED, "No user logged in");
+		return TRUE;
+	}
+
+	if (!person) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_ACCESS_DENIED, "Can not check property owner. No person associated with logged in user");
+		return TRUE;
+	}
+
+	/* OK, so we have admin, allow */
+	if (midgard_user_is_admin (mgd->priv->user))
+		return FALSE;
+
+	const gchar *person_guid = MGD_OBJECT_GUID (person);
+
+	/* Something really strange, person has no guid associated */
+	if (!person_guid) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_ACCESS_DENIED, "Midgard person identified by empty guid");
+		return TRUE;
+	}
+
+	gchar *creator_guid = NULL;
+
+	if (MIDGARD_IS_OBJECT (object)) {
+		MidgardMetadata *metadata = MIDGARD_OBJECT (object)->metadata;
+		creator_guid = metadata->priv->creator;
+	}
+
+	/* TODO, sooner or later we will need metadata->owner check */
+
+	/* No creator for this object. Might be very old in db or not set at all.
+	 * Refuse, we do not know this. */
+	if (!creator_guid) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_ACCESS_DENIED, "Object's metadata holds null value instead of creator guid");
+		return TRUE;
+	}
+	
+	/* Finally, user which is logged in is the same person which created 
+	 * object in question. Allow. */
+	if (g_str_equal (person_guid, creator_guid))
+		return FALSE;
+
+	MIDGARD_ERRNO_SET (mgd, MGD_ERR_ACCESS_DENIED);
+	return TRUE;
 }

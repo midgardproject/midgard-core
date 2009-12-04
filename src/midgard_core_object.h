@@ -216,6 +216,9 @@ gboolean midgard_core_object_prop_up_is_set(MgdObject *object);
 
 gboolean midgard_core_object_has_dependents(MgdObject *self, const gchar *classname);
 
+/* ACL */
+gboolean midgard_core_object_property_refuse_private (MidgardConnection *self, MgdSchemaTypeAttr *attr, MidgardDBObject *object, const gchar *property);
+
 /* D-Bus */
 void midgard_core_dbus_send_serialized_object(MgdObject *object, const gchar *path);
 
