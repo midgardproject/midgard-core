@@ -873,7 +873,8 @@ gboolean midgard_connection_open_config(
 	if(!__midgard_connection_open(self, &hash, TRUE))
 		rv = FALSE;
 
-	g_hash_table_destroy(hash);
+	if(hash)
+		g_hash_table_destroy(hash);
 
 	return rv;
 }
