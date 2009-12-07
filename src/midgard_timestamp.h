@@ -42,10 +42,11 @@ typedef struct {
 GType midgard_timestamp_get_type(void);
 
 void			midgard_timestamp_set_current_time	(const GValue *value);
-gchar 			*midgard_timestamp_get_string		(const GValue *value);
+gchar 			*midgard_timestamp_get_string_from_value (const GValue *value);
+gchar 			*midgard_timestamp_get_string		(MidgardTimestamp *mt);
 MidgardTimestamp 	*midgard_timestamp_new			(void);
 GValue 			*midgard_timestamp_new_current		(void);
-GValue 			*midgard_timestamp_new_value_from_iso8601(const gchar *iso_date);
+GValue 			*midgard_timestamp_new_value_from_iso8601 (const gchar *iso_date);
 MidgardTimestamp 	*midgard_timestamp_new_from_iso8601	(const gchar *iso_date);
 void 			midgard_timestamp_free			(MidgardTimestamp *mt);
 

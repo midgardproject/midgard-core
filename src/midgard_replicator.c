@@ -181,7 +181,7 @@ midgard_replicator_export_by_guid (MidgardConnection *mgd, const gchar *guid)
 					table);
 
 			tval = midgard_timestamp_new_current();
-			timeupdated = midgard_timestamp_get_string(tval);
+			timeupdated = midgard_timestamp_get_string_from_value (tval);
 			
 			g_string_append_printf(sql, "metadata_exported='%s' WHERE guid = '%s' ", 
 					timeupdated, guid);
@@ -502,8 +502,8 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 		g_object_get_property (G_OBJECT (MIDGARD_OBJECT (object)->metadata), "revised", &updated_timestamp);
 		g_object_get_property (G_OBJECT (MIDGARD_OBJECT (dbobject)->metadata), "revised", &dbupdated_timestamp);
 
-		updated = midgard_timestamp_get_string ((const GValue *)&updated_timestamp);
-		dbupdated = midgard_timestamp_get_string ((const GValue *)&dbupdated_timestamp);
+		updated = midgard_timestamp_get_string_from_value ((const GValue *)&updated_timestamp);
+		dbupdated = midgard_timestamp_get_string_from_value ((const GValue *)&dbupdated_timestamp);
 
 		/* We can use g_ascii_strcasecmp as it type cast every single 
 		 * pointer to integer and unsigned char returning substract result */		

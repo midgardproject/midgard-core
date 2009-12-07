@@ -488,7 +488,14 @@ GValue *midgard_timestamp_new_current()
 	return tval;
 }
 
-gchar *midgard_timestamp_get_string(const GValue *value)
+gchar *midgard_timestamp_get_string(MidgardTimestamp *mt)
+{
+	g_return_val_if_fail (mt != NULL, NULL);
+
+	return caltime_fmt(mt);
+}
+
+gchar *midgard_timestamp_get_string_from_value (const GValue *value)
 {
 	g_assert(value != NULL);
 	g_return_val_if_fail(G_VALUE_HOLDS(value, MGD_TYPE_TIMESTAMP), NULL);
@@ -497,6 +504,7 @@ gchar *midgard_timestamp_get_string(const GValue *value)
 
 	return caltime_fmt(mt);
 }
+
 
 GValue *midgard_timestamp_new_value_from_iso8601(const gchar *iso_date)
 {

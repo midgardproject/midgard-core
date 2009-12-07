@@ -2363,7 +2363,7 @@ gboolean midgard_object_delete(MidgardObject *object)
 	GValue tval = {0, };
 	g_value_init (&tval, MGD_TYPE_TIMESTAMP);
 	midgard_timestamp_set_current_time(&tval);
-	const gchar *timeupdated = midgard_timestamp_get_string(&tval);
+	const gchar *timeupdated = midgard_timestamp_get_string_from_value (&tval);
 	object->metadata->priv->revision++;
 	g_string_append_printf(sql,
 			"metadata_revisor='%s', metadata_revised='%s',"
@@ -2519,7 +2519,7 @@ gboolean midgard_object_purge(MidgardObject *object)
 	GValue tval = {0, };
 	g_value_init(&tval, MIDGARD_TYPE_TIMESTAMP);
 	midgard_timestamp_set_current_time(&tval);
-	gchar *timedeleted = midgard_timestamp_get_string(&tval);
+	gchar *timedeleted = midgard_timestamp_get_string_from_value (&tval);
 
 	dsql = g_string_new("UPDATE repligard SET ");
 	g_string_append_printf(dsql,
