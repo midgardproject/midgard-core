@@ -224,7 +224,7 @@ MidgardTimestamp *midgard_timestamp_new()
 	return mt;
 }
 
-static void midgard_timestamp_free(MidgardTimestamp *mt)
+void midgard_timestamp_free(MidgardTimestamp *mt)
 {
 	if (mt == NULL)
 		return;
