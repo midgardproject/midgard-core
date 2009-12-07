@@ -39,7 +39,6 @@ G_BEGIN_DECLS
 
 typedef struct _MidgardTransaction MidgardTransaction;
 typedef struct _MidgardTransactionClass MidgardTransactionClass;
-typedef struct _MidgardTransaction midgard_transaction;
 
 struct _MidgardTransactionClass{
 	GObjectClass parent;

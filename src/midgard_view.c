@@ -395,9 +395,7 @@ GType midgard_view_get_type(void)
 			NULL		/* instance_init */
 		};
 
-		type = g_type_register_static (MIDGARD_TYPE_DBOBJECT,
-				"midgard_view", 
-				&info, G_TYPE_FLAG_ABSTRACT);
+		type = g_type_register_static (MIDGARD_TYPE_DBOBJECT, "MidgardView", &info, G_TYPE_FLAG_ABSTRACT);
 	}
 
 	return type;

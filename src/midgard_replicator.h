@@ -37,15 +37,14 @@
 typedef struct _MidgardReplicatorPrivate MidgardReplicatorPrivate;
 
 typedef struct _MidgardReplicator MidgardReplicator;
-typedef struct _MidgardReplicator midgard_replicator;
 
-struct _MidgardReplicator{
+struct _MidgardReplicator {
 	GObject parent;
 };
 
 typedef struct MidgardReplicatorClass MidgardReplicatorClass;
 
-struct MidgardReplicatorClass{
+struct MidgardReplicatorClass {
 	GObjectClass parent;
 	
 	/* API methods */
@@ -61,7 +60,7 @@ struct MidgardReplicatorClass{
 	void		(*import_from_xml)	(MidgardConnection *mgd, const gchar *xml, gboolean force);
 };
 
-GType midgard_replicator_get_type(void);
+GType midgard_replicator_get_type (void);
 
 gchar 			*midgard_replicator_serialize		(GObject *object);
 gboolean 		midgard_replicator_export		(MidgardDBObject *object);

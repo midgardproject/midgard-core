@@ -207,7 +207,7 @@ midgard_user_new (MidgardConnection *mgd, guint n_params, const GParameter *para
  * midgard_user_auth:
  *
  * Deprecated: 9.09
- * See: midgard_user_login() 
+ * See: midgard_user_log_in() 
  */
 MidgardUser *
 midgard_user_auth (MidgardConnection *mgd, 
@@ -736,7 +736,7 @@ __midgard_user_update (MidgardUser *self)
 }
 
 /** 
- * midgard_user_login:
+ * midgard_user_log_in:
  * @self: #MidgardUser instance
  * 
  * Logs in user instance, if given one is valid. 
@@ -756,12 +756,12 @@ __midgard_user_update (MidgardUser *self)
  * Since: 9.09
  */
 gboolean 
-midgard_user_login (MidgardUser *self)
+midgard_user_log_in (MidgardUser *self)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 
 	MidgardUserClass *klass = MIDGARD_USER_GET_CLASS (self);
-	return klass->login (self);
+	return klass->log_in (self);
 }
 
 gboolean
@@ -785,7 +785,7 @@ __midgard_user_login (MidgardUser *self)
 	}
 
 	g_object_ref(self); // storing as priv->user
-	mgd->priv->user = G_OBJECT(self);
+	mgd->priv->user = self;
 
 	g_object_ref(self); // storing in priv->authstack
 	mgd->priv->authstack = g_slist_append(mgd->priv->authstack, self);
@@ -797,7 +797,7 @@ __midgard_user_login (MidgardUser *self)
 }
 
 /**
- * midgard_user_logout:
+ * midgard_user_log_out:
  * @self: #MidgardUser instance
  *
  * Cases to return %FALSE:
@@ -815,12 +815,12 @@ __midgard_user_login (MidgardUser *self)
  * Since: 9.09
  */
 gboolean 
-midgard_user_logout (MidgardUser *self)
+midgard_user_log_out (MidgardUser *self)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 
 	MidgardUserClass *klass = MIDGARD_USER_GET_CLASS(self);
-	return klass->logout(self);
+	return klass->log_out(self);
 }
 
 gboolean 
@@ -1371,7 +1371,7 @@ midgard_user_quick_login (MidgardConnection *mgd, const gchar *login, const gcha
 	if (!user)
 		return NULL;
 
-	midgard_user_login (user);
+	midgard_user_log_in (user);
 
 	return user;
 }
@@ -1385,7 +1385,7 @@ static void _midgard_user_finalize(GObject *object)
 	MidgardUser *self = (MidgardUser *) object;
 	
 	if (self && (self->dbpriv && self->priv->is_logged))
-		(void) midgard_user_logout (self);
+		(void) midgard_user_log_out (self);
 
 	g_free (self->priv->auth_type);
 	self->priv->auth_type = NULL;
@@ -1567,8 +1567,8 @@ static void _midgard_user_class_init(
 
 	/* Virtual methods */
 	klass->get_person = __midgard_user_get_person;
-	klass->login = __midgard_user_login;
-	klass->logout = __midgard_user_logout;
+	klass->log_in = __midgard_user_login;
+	klass->log_out = __midgard_user_logout;
 	klass->get = __midgard_user_get;
 	klass->query = __midgard_user_query;
 	klass->create = __midgard_user_create;
@@ -1759,9 +1759,7 @@ GType midgard_user_get_type(void)
 			0,              /* n_preallocs */
 			(GInstanceInitFunc) _midgard_user_instance_init/* instance_init */
 		};
-		type = g_type_register_static (MIDGARD_TYPE_DBOBJECT,
-				"midgard_user",
-				&info, 0);
+		type = g_type_register_static (MIDGARD_TYPE_DBOBJECT, "MidgardUser", &info, 0);
 	}
 	
 	return type;

@@ -29,7 +29,6 @@
 #define MIDGARD_VIEW_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), MIDGARD_TYPE_VIEW, MidgardViewClass))
 
 typedef struct _MidgardView MidgardView;
-typedef struct _MidgardView midgard_view;
 typedef struct _MidgardViewClass MidgardViewClass;
 
 struct _MidgardView {

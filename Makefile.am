@@ -22,7 +22,7 @@ noinst_PROGRAMS = $(TESTS)
 nobase_dist_sysconf_DATA = \
         conf.d/midgard.conf.example
 
-dist_pkgdata_DATA = MgdObjects.xml \
+dist_pkgdata_DATA = MidgardObjects.xml \
 	midgard_initial_database.xml \
 	midgard_auth_types.xml \
 	midgard_dbus.conf \

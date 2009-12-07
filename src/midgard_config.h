@@ -36,7 +36,6 @@
 	(G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_CONFIG, MidgardConfigClass))
 
 typedef struct MidgardConfig MidgardConfig;
-typedef struct MidgardConfig midgard_config;
 typedef struct MidgardConfigClass MidgardConfigClass;
 typedef struct _MidgardConfigPrivate MidgardConfigPrivate;
 

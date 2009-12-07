@@ -33,12 +33,13 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #define MIDGARD_OBJECT_GET_CLASS_BY_NAME(name) ((MidgardObjectClass*) g_type_class_peek(g_type_from_name(name)))
 
 typedef struct _MidgardObject MidgardObject;
-typedef struct _MidgardObject midgard_object;
 typedef struct _MidgardObjectPrivate MidgardObjectPrivate;
 typedef struct _MidgardObjectClassPrivate MidgardObjectClassPrivate;
 
 struct _MidgardObject {
 	GObject parent;
+
+	/* <private> */
 	MidgardDBObjectPrivate *dbpriv;
 	MidgardObjectPrivate *priv;	
 	MidgardMetadata *metadata;	

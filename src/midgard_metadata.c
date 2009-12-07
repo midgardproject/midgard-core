@@ -935,9 +935,7 @@ GType midgard_metadata_get_type (void)
 			0,      /* n_preallocs */
 			_metadata_instance_init    /* instance_init */
 		};
-		type = g_type_register_static (MIDGARD_TYPE_DBOBJECT,
-				"midgard_metadata",
-				&info, 0);
+		type = g_type_register_static (MIDGARD_TYPE_DBOBJECT, "MidgardMetadata", &info, 0);
 	}
 	return type;
 }

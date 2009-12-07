@@ -21,7 +21,7 @@
 #include "midgard_error.h"
 #include "uuid.h"
 
-struct _MidgardTransaction{
+struct _MidgardTransaction {
 	GObject parent;
 
 	/* < private > */
@@ -277,7 +277,7 @@ midgard_transaction_get_type(void)
 		      (GInstanceInitFunc) __midgard_transaction_instance_init/* instance_init */
 	      };
 
-	      type = g_type_register_static (G_TYPE_OBJECT, "midgard_transaction", &info, 0);
+	      type = g_type_register_static (G_TYPE_OBJECT, "MidgardTransaction", &info, 0);
       }
 
       return type;

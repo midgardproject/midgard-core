@@ -954,7 +954,7 @@ void _copy_schemas(gpointer key, gpointer value, gpointer userdata)
 {
 	gchar *typename = (gchar *)key;
 	MgdSchemaTypeAttr *type = (MgdSchemaTypeAttr *)value;
-	MgdSchema *ts = (MgdSchema *) userdata;
+	MidgardSchema *ts = (MidgardSchema *) userdata;
 
 	if(!g_hash_table_lookup(ts->types, typename)) {
 		
@@ -1658,12 +1658,7 @@ _midgard_schema_class_init (gpointer g_class, gpointer g_class_data)
 	
 	gobject_class->set_property = NULL;
 	gobject_class->get_property = NULL;
-	gobject_class->finalize = _midgard_schema_finalize;
-	
-	klass->init = midgard_schema_init;
-	klass->read_dir = midgard_schema_read_dir;
-	klass->read_file = midgard_schema_read_file;
-	klass->type_exists = midgard_schema_type_exists;
+	gobject_class->finalize = _midgard_schema_finalize;	
 }
 
 /* Register MidgardSchema type */
@@ -1683,9 +1678,7 @@ midgard_schema_get_type (void)
 			0,              /* n_preallocs */
 			_schema_instance_init    /* instance_init */
 		};
-		type = g_type_register_static (G_TYPE_OBJECT,
-				"midgard_schema",
-				&info, 0);
+		type = g_type_register_static (G_TYPE_OBJECT, "MidgardSchema", &info, 0);
 	}
 	return type;
 }

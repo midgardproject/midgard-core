@@ -47,14 +47,6 @@ GType midgard_schema_get_type(void);
 typedef struct _MidgardSchema MidgardSchema;
 typedef struct _MidgardSchemaClass MidgardSchemaClass;
 
-
-typedef struct _MgdSchema MgdSchema; 
-
-/* FIXME , move MgdSchema structure to source file */
-struct _MgdSchema {
-	GHashTable *types;
-};
-
 struct _MidgardSchema {
 	GObject parent;
 
@@ -64,12 +56,6 @@ struct _MidgardSchema {
 
 struct _MidgardSchemaClass{
 	GObjectClass parent;
-
-	/* < public > */
-	void 	  (*init) (MidgardSchema *self, const gchar *path);
-	gboolean  (*read_dir) (MidgardSchema *self, const gchar *dirname);
-	void	  (*read_file) (MidgardSchema *self, const gchar *filename);	
-	gboolean  (*type_exists) (MidgardSchema *self, const gchar *classname);
 };
 
 void 		midgard_schema_init		(MidgardSchema *self, const gchar *path);

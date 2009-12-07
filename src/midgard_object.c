@@ -1853,9 +1853,7 @@ GType midgard_object_get_type(void)
                         0,                          /* n_preallocs */
                         NULL,        /* instance_init */
                 };
-                type = g_type_register_static(
-                        MIDGARD_TYPE_DBOBJECT, "midgard_object", &info,
-                        G_TYPE_FLAG_ABSTRACT);
+                type = g_type_register_static (MIDGARD_TYPE_DBOBJECT, "MidgardObject", &info, G_TYPE_FLAG_ABSTRACT);
         }
         return type;
 }

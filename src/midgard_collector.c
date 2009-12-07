@@ -1039,9 +1039,7 @@ GType midgard_collector_get_type(void)
 			0,              /* n_preallocs */
 			(GInstanceInitFunc) _midgard_collector_instance_init /* instance_init */
 		};	
-		type = g_type_register_static (MIDGARD_TYPE_QUERY_BUILDER,
-				"midgard_collector",
-				&info, 0);
+		type = g_type_register_static (MIDGARD_TYPE_QUERY_BUILDER, "MidgardCollector", &info, 0);
 	}
 	return type;
 }

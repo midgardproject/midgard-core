@@ -85,9 +85,7 @@ gboolean midgard_object_is_in_parent_tree(MidgardObject *self, guint rootid, gui
 
 	MidgardConnection *mgd = self->dbpriv->mgd;
 
-	MidgardObjectClass *parent_class = 
-		MIDGARD_OBJECT_GET_CLASS_BY_NAME(
-				midgard_object_parent(self));
+	MidgardObjectClass *parent_class = MIDGARD_OBJECT_GET_CLASS_BY_NAME (midgard_object_parent(self));
 
 	const gchar *parent_table, *up_field;
 	const gchar *parent_field;

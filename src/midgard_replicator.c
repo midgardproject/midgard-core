@@ -814,7 +814,7 @@ GType midgard_replicator_get_type(void)
 			0,              /* n_preallocs */
 			NULL /* instance_init */
 		};
-		type = g_type_register_static (G_TYPE_OBJECT, "midgard_replicator", &info, 0);
+		type = g_type_register_static (G_TYPE_OBJECT, "MidgardReplicator", &info, 0);
 	}
 
 	return type;

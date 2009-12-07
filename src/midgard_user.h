@@ -38,7 +38,6 @@ G_BEGIN_DECLS
 #define MIDGARD_USER_GET_CLASS(obj) \
 	        (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_USER, MidgardUserClass))
 
-typedef struct _MidgardUser midgard_user;
 typedef struct _MidgardUserClass MidgardUserClass;
 typedef struct _MidgardUserPrivate MidgardUserPrivate; 
 
@@ -52,8 +51,8 @@ struct _MidgardUserClass{
 	
 	/* API methods */
 	MidgardObject *(*get_person)		(MidgardUser *self);
-	gboolean        (*login)              	(MidgardUser *self);
-	gboolean        (*logout)             	(MidgardUser *self);
+	gboolean        (*log_in)              	(MidgardUser *self);
+	gboolean        (*log_out)             	(MidgardUser *self);
 	MidgardUser     *(*get)               	(MidgardConnection *mgd, guint n_params, const GParameter *parameters);
 	MidgardUser     **(*query) 		(MidgardConnection *mgd, guint n_params, const GParameter *parameters);
 	gboolean        (*create)           	(MidgardUser *self);
@@ -96,8 +95,8 @@ gboolean 		midgard_user_is_user		(MidgardUser *self);
 gboolean 		midgard_user_is_admin		(MidgardUser *self);
 MidgardObject		*midgard_user_get_person	(MidgardUser *self);
 gboolean 		midgard_user_set_person		(MidgardUser *self, MidgardObject *person);
-gboolean		midgard_user_login 		(MidgardUser *self);
-gboolean 		midgard_user_logout 		(MidgardUser *self);
+gboolean		midgard_user_log_in 		(MidgardUser *self);
+gboolean 		midgard_user_log_out 		(MidgardUser *self);
 
 /* Deprecated */
 MidgardUser 	*midgard_user_auth	(MidgardConnection *mgd, const gchar *name, const gchar *password, const gchar *sitegroup, gboolean trusted);

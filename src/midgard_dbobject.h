@@ -38,7 +38,6 @@
 	        (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_DBOBJECT, MidgardDBObjectClass))
 
 typedef struct _MidgardDBObject MidgardDBObject;
-typedef struct _MidgardDBObject midgard_dbobject;
 typedef struct _MidgardDBObjectClass MidgardDBObjectClass;
 typedef struct _MidgardDBObjectPrivate MidgardDBObjectPrivate;
 
@@ -47,13 +46,13 @@ GType midgard_dbobject_get_type(void);
 struct _MidgardDBObject{
 	GObject parent;
 
-	/* < private > */
+	/* <private> */
 	MidgardDBObjectPrivate *dbpriv;
 };
 
 struct _MidgardDBObjectClass {
 	GObjectClass parent;
-	/* < private > */
+	/* <private> */
 	MidgardDBObjectPrivate *dbpriv;
 	
 	/* virtual */

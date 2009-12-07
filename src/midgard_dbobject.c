@@ -118,9 +118,7 @@ midgard_dbobject_get_type (void)
 			0,              /* n_preallocs */  
 			NULL
 		};
-		type = g_type_register_static (G_TYPE_OBJECT,
-				"midgard_dbobject",
-				&info, G_TYPE_FLAG_ABSTRACT);
+		type = g_type_register_static (G_TYPE_OBJECT, "MidgardDBObject", &info, G_TYPE_FLAG_ABSTRACT);
 	}
 	return type;
 }

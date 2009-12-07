@@ -37,7 +37,6 @@
 
 typedef struct _MidgardCollectorPrivate MidgardCollectorPrivate;
 typedef struct _MidgardCollector MidgardCollector;
-typedef struct _MidgardCollector midgard_collector;
 typedef struct MidgardCollectorClass MidgardCollectorClass;
 
 struct _MidgardCollector{

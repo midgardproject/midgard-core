@@ -119,7 +119,7 @@ static void _midgard_connection_dispose(GObject *object)
 
 	while (self->priv->user != NULL) {
 		// emptying authstack
-		gboolean res = midgard_user_logout((MidgardUser *)self->priv->user);
+		gboolean res = midgard_user_log_out((MidgardUser *)self->priv->user);
 		g_assert(res == TRUE);
 	}
 
@@ -272,9 +272,7 @@ GType midgard_connection_get_type(void)
 			0,              /* n_preallocs */
 			(GInstanceInitFunc) _midgard_connection_instance_init /* instance_init */
 		};
-		type = g_type_register_static (G_TYPE_OBJECT,
-				"midgard_connection",
-				&info, 0);
+		type = g_type_register_static (G_TYPE_OBJECT, "MidgardConnection", &info, 0);
 	}
 	return type;
 }

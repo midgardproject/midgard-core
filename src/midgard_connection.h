@@ -36,7 +36,6 @@
 
 typedef struct MidgardConnectionClass MidgardConnectionClass;
 typedef struct _MidgardConnectionPrivate MidgardConnectionPrivate; 
-typedef struct _MidgardConnection midgard_connection;
 
 struct MidgardConnectionClass {
 	GObjectClass parent;

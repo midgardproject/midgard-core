@@ -38,7 +38,6 @@ G_BEGIN_DECLS
 	(G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_BLOB, MidgardBlobClass))
 
 typedef struct MidgardBlob MidgardBlob;
-typedef struct MidgardBlob midgard_blob;
 typedef struct MidgardBlobClass MidgardBlobClass;
 typedef struct _MidgardBlobPrivate MidgardBlobPrivate;
 

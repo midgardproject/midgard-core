@@ -36,7 +36,6 @@
 	(G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_QUERY_BUILDER, MidgardQueryBuilderClass))
 
 typedef struct _MidgardQueryBuilder MidgardQueryBuilder;
-typedef struct _MidgardQueryBuilder midgard_query_builder;
 typedef struct _MidgardQueryBuilderPrivate MidgardQueryBuilderPrivate;
 
 struct _MidgardQueryBuilder {

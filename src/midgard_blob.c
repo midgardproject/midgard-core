@@ -627,9 +627,7 @@ GType midgard_blob_get_type(void)
 			0,              /* n_preallocs */
 			(GInstanceInitFunc) _midgard_blob_instance_init /* instance_init */
 		};
-		type = g_type_register_static (G_TYPE_OBJECT,
-				"midgard_blob",
-				&info, 0);
+		type = g_type_register_static (G_TYPE_OBJECT, "MidgardBlob", &info, 0);
 	}
 	return type;
 }

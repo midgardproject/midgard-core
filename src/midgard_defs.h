@@ -11,11 +11,9 @@
 typedef struct MidgardTypeHolder MidgardTypeHolder;
 typedef struct _MidgardConnection MidgardConnection;
 typedef struct _MidgardObjectClass MidgardObjectClass;
-typedef struct _MidgardUser MidgardUser;
+typedef struct _MidgardUser MidgardUser; 
 typedef struct _MidgardMetadata MidgardMetadata;
-typedef struct _MidgardMetadata midgard_metadata;
 typedef struct _MidgardMetadataClass MidgardMetadataClass;
-
 
 typedef enum {
 	MIDGARD_AUTHTYPE_NORMAL = 0,

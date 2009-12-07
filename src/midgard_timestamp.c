@@ -455,7 +455,7 @@ GType midgard_timestamp_get_type(void)
                         &value_table               /* value_table */
                 };
 
-		type = g_type_register_static (G_TYPE_BOXED, "midgard_timestamp", &info, 0);
+		type = g_type_register_static (G_TYPE_BOXED, "MidgardTimestamp", &info, 0);
 
 		/* Register transform functions */
 		g_value_register_transform_func(type, G_TYPE_STRING, midgard_timestamp_transform_to_string);

@@ -1234,9 +1234,7 @@ GType midgard_query_builder_get_type(void)
 			0,              /* n_preallocs */
 			(GInstanceInitFunc) _midgard_query_builder_instance_init /* instance_init */
 		};
-		type = g_type_register_static (G_TYPE_OBJECT,
-				"midgard_query_builder",
-				&info, 0);
+		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryBuilder", &info, 0);
 	}
 	return type;
 }

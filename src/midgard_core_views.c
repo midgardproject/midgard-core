@@ -82,7 +82,7 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 			if (table == NULL)
 				__view_error (cur, "Can not create proper view. Defined '%s' class has NULL storage", rprop[0]);
 
-			MgdSchemaPropertyAttr *rprop_attr = midgard_core_class_get_property_attr (klass, rprop[1]);
+			MgdSchemaPropertyAttr *rprop_attr = midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (klass), rprop[1]);
 			
 			if (!rprop_attr)
 				__view_error (cur, "%s not found. Not registered for %s ?", rprop[1], rprop[0]);
