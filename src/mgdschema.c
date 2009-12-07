@@ -307,7 +307,7 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 		
 		} else {
 
-			type_attr->metadata_class = g_strdup ("midgard_metadata");
+			type_attr->metadata_class = g_strdup ("MidgardMetadata");
 		}
 	}
 }

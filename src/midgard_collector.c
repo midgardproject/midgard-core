@@ -52,7 +52,7 @@ static const gchar *_collector_find_class_property(
 	if(table_field == NULL) {
 		 
 		MidgardMetadataClass *mklass =
-			(MidgardMetadataClass*) g_type_class_peek(g_type_from_name("midgard_metadata"));
+			(MidgardMetadataClass*) g_type_class_peek(g_type_from_name("MidgardMetadata"));
 
 		table_field =
 			midgard_core_class_get_property_tablefield(
