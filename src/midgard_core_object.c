@@ -234,7 +234,7 @@ static void _write_nodes(GObject *object, xmlNodePtr node)
 		}	
 		
 		export_unchecked_property:
-		switch(pspec[i]->value_type) {
+		switch (G_TYPE_FUNDAMENTAL(pspec[i]->value_type)) {
 			
 			case G_TYPE_STRING:				
 				strprop = g_value_dup_string(&pval);
@@ -314,7 +314,6 @@ static void _write_nodes(GObject *object, xmlNodePtr node)
 						BAD_CAST pspec[i]->name,
 						BAD_CAST (xmlChar *)g_value_get_string (&strval));
 					g_value_unset (&strval);
-
 
 				} else {
 					g_warning ("midgard_replicator_serialize: unhandled %s property type (%s)", 
