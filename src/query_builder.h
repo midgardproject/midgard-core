@@ -62,12 +62,12 @@ struct MidgardQueryBuilderClass{
 	guint 		(*count) 		(MidgardQueryBuilder *builder);
 
 	/* signals */
-	void 		(*execute_signal)	(GObject *object);
-	void		(*executed)		(GObject *object);
+	void 		(*execution_start)	(GObject *object);
+	void		(*execution_end)		(GObject *object);
 
 	/* signals IDs */
-	guint 		signal_id_execute;
-	guint		signal_id_executed;
+	guint 		signal_id_execution_start;
+	guint		signal_id_execution_end;
 };
 
 GType			midgard_query_builder_get_type		(void);
