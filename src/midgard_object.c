@@ -101,23 +101,26 @@ static GParamSpec **_midgard_object_class_paramspec()
 
 /* Initialize instance for all types that are not MidgardRepligardClass type. */
 static void 
-_object_instance_init(GTypeInstance *instance, gpointer g_class)
+__midgard_object_instance_init (GTypeInstance *instance, gpointer g_class)
 {	
 	MidgardObject *self = (MidgardObject *) instance;
 	
 	/* Midgard Object Private */
-	self->priv = g_new0(MidgardObjectPrivate, 1);
+	self->priv = g_new0 (MidgardObjectPrivate, 1);
 	self->priv->action = NULL;
 	self->priv->exported = NULL;
 	self->priv->imported = NULL;
 	self->priv->parameters = NULL;
 	self->priv->_params = NULL;
 
-	/* Initialize metadata object, if enabled. */	
-	if (MIDGARD_DBOBJECT_CLASS (g_class)->dbpriv->has_metadata)
-		self->metadata = midgard_metadata_new(self);	
-	else 
+	/* Initialize metadata object, if enabled. */
+	if (MIDGARD_DBOBJECT_CLASS (g_class)->dbpriv->has_metadata) {
+		self->metadata = midgard_metadata_new (self);
+		/* Add weak reference */
+		g_object_add_weak_pointer (G_OBJECT (self), (gpointer) self->metadata);
+	} else {
 		self->metadata = NULL;
+	}
 }
                 
 /* AB: This is shortcut macro for traversing through class hierarchy (from child to ancestor)
@@ -140,7 +143,7 @@ _object_instance_init(GTypeInstance *instance, gpointer g_class)
 
 /* AB: Handle property assignments. Despite its simplicity, this is *very* important function */
 static void
-_object_set_property (GObject *object, guint prop_id, 
+__midgard_object_set_property (GObject *object, guint prop_id, 
     const GValue *value, GParamSpec   *pspec)
 {	
 	gint prop_id_local = 0;
@@ -183,7 +186,7 @@ _object_set_property (GObject *object, guint prop_id,
 
 /* Get object's property */
 static void
-_object_get_property (GObject *object, guint prop_id,
+__midgard_object_get_property (GObject *object, guint prop_id,
 		GValue *value, GParamSpec   *pspec)
 {
 	gint prop_id_local = 0;
@@ -224,16 +227,41 @@ _object_get_property (GObject *object, guint prop_id,
 	}
 }
 
+static void 
+__mgdschema_object_dispose (GObject *object)
+{
+	MidgardObject *self = MIDGARD_OBJECT (object);
+
+	if (self->metadata != NULL && G_IS_OBJECT(self->metadata)) {
+		/* Remove weak reference */
+		g_object_remove_weak_pointer (G_OBJECT (self), (gpointer) self->metadata);
+		/* Call destructor */
+		g_object_unref (self->metadata);
+		self->metadata = NULL;
+	}
+
+	/* Free object's parameters */
+	if (self->priv->parameters != NULL) {
+		GSList *_param = self->priv->parameters;
+		for (; _param; _param = _param->next) {
+			g_object_unref(_param->data);
+		}
+		g_slist_free(_param);
+		self->priv->parameters = NULL;
+	}
+
+	__mgdschema_parent_class->dispose (object);
+}
+
 /* 
- * Finalizer for GMidgardObject instance.
+ * Finalizer for MidgardObject instance.
  * Cleans up all allocated data. As optimization, it handles all data
  * which belongs to its ancestors up to but not inluding GObject.
  * It is really makes no sense to call this function recursively
  * for each ancestor because we already know object's structure.
  * For GObject we call its finalizer directly.
  */
-
-static void _object_finalize (GObject *object) 
+static void __mgdschema_object_finalize (GObject *object) 
 {
 	guint idx;
 	MgdSchemaTypeAttr *priv;
@@ -248,26 +276,11 @@ static void _object_finalize (GObject *object)
 	g_free(self->priv->exported);
 	g_free(self->priv->imported);
 	
-	/* Free object's parameters */
-	if (self->priv->parameters != NULL) {
-		
-		GSList *_param = self->priv->parameters;
-		for (; _param; _param = _param->next) {
-			g_object_unref(_param->data);	
-		}
-		g_slist_free(_param);
-	}
-
 	if (self->priv->_params != NULL)
 		g_hash_table_destroy(self->priv->_params);
 
 	g_free(self->priv);
 	self->priv = NULL;
-
-	if (self->metadata != NULL && G_IS_OBJECT(self->metadata)) {
-		g_object_unref(self->metadata);
-		self->metadata = NULL;
-	}
 	
 	GType current_type = G_TYPE_FROM_INSTANCE(object); 
 
@@ -1220,9 +1233,9 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 
 	__mgdschema_parent_class = g_type_class_peek_parent (g_class);
 
-	gobject_class->set_property = _object_set_property;
-	gobject_class->get_property = _object_get_property;
-	gobject_class->finalize = _object_finalize;
+	gobject_class->set_property = __midgard_object_set_property;
+	gobject_class->get_property = __midgard_object_get_property;
+	gobject_class->finalize = __mgdschema_object_finalize;
 	gobject_class->constructor = __mgdschema_object_constructor;
         gobject_class->dispose = __mgdschema_object_dispose;
 
@@ -1330,12 +1343,6 @@ __mgdschema_object_constructor (GType type,
 	return object;
 }
 
-static void 
-__mgdschema_object_dispose (GObject *object)
-{
-	__mgdschema_parent_class->dispose (object);
-}
-
 GType
 midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
 {
@@ -1343,16 +1350,15 @@ midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
 
 	GType class_type = g_type_from_name (classname);
 
-        if (class_type) {
+        if (class_type) 
                 return class_type;
-        }
 
         {
                 GTypeInfo *midgard_type_info = g_new0 (GTypeInfo, 1);
 
 		/* FIXME, does it make sense? */
 		if (type_data == NULL)
-			type_data = g_new(MgdSchemaTypeAttr, 1);
+			type_data = g_new (MgdSchemaTypeAttr, 1);
 
                 /* our own class size is 0 but it should include space for a parent, therefore add it */
                 midgard_type_info->class_size = sizeof (MidgardObjectClass);
@@ -1365,12 +1371,12 @@ midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
                  * therefore add it */
                 midgard_type_info->instance_size = sizeof (MidgardObject);
                 midgard_type_info->n_preallocs = 0;
-                midgard_type_info->instance_init = _object_instance_init;
+                midgard_type_info->instance_init = __midgard_object_instance_init;
                 midgard_type_info->value_table = NULL;
                 
 		GType type = g_type_register_static (MIDGARD_TYPE_OBJECT, classname, midgard_type_info, 0);
                 
-		if (g_str_equal (classname, "midgard_attachment"))
+		if (g_str_equal (classname, "MidgardAttachment"))
 			_midgard_attachment_type = type;
 
                 g_free (midgard_type_info);
@@ -1430,6 +1436,12 @@ __midgard_object_dispose (GObject *object)
 	__midgard_object_parent_class->dispose (object);
 }
 
+static void 
+__midgard_object_finalize (GObject *object)
+{
+	__midgard_object_parent_class->finalize (object);
+}
+
 static void
 __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 {
@@ -1444,8 +1456,9 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 
 	g_class->constructor = __midgard_object_constructor;
 	g_class->dispose = __midgard_object_dispose;
-	g_class->set_property = _object_set_property;
-	g_class->get_property = _object_get_property;
+	g_class->finalize = __midgard_object_finalize;
+	g_class->set_property = __midgard_object_set_property;
+	g_class->get_property = __midgard_object_get_property;
 
 	MgdSchemaTypeAttr *data = (MgdSchemaTypeAttr *) g_class_data;
 	guint idx;
