@@ -39,10 +39,10 @@ libmidgard2.so.2009 libmidgard2-2009 #MINVER#
  _destroy_property_hash@Base 9.09
  _destroy_query_hash@Base 9.09
  _get_type_node@Base 9.09
- _mgd_schema_property_attr_free@Base 9.09
- _mgd_schema_property_attr_new@Base 9.09
- _mgd_schema_type_attr_free@Base 9.09
- _mgd_schema_type_attr_new@Base 9.09
+#MISSING: 9.09.1# _mgd_schema_property_attr_free@Base 9.09
+#MISSING: 9.09.1# _mgd_schema_property_attr_new@Base 9.09
+#MISSING: 9.09.1# _mgd_schema_type_attr_free@Base 9.09
+#MISSING: 9.09.1# _mgd_schema_type_attr_new@Base 9.09
  _midgard_attachment_type@Base 9.09
  _midgard_object_create@Base 9.09
  _midgard_object_update@Base 9.09
@@ -137,6 +137,7 @@ libmidgard2.so.2009 libmidgard2-2009 #MINVER#
  midgard_connection_get_loglevel@Base 9.09
  midgard_connection_get_type@Base 9.09
  midgard_connection_get_user@Base 9.09
+ midgard_connection_is_connected@Base 9.09.1
  midgard_connection_list_auth_types@Base 9.09
  midgard_connection_new@Base 9.09
  midgard_connection_open@Base 9.09
@@ -243,6 +244,8 @@ libmidgard2.so.2009 libmidgard2-2009 #MINVER#
  midgard_core_query_where_guid@Base 9.09
  midgard_core_schema_gtype_from_string@Base 9.09
  midgard_core_schema_type_add_table@Base 9.09
+ midgard_core_schema_type_attr_free@Base 9.09.1
+ midgard_core_schema_type_attr_new@Base 9.09.1
  midgard_core_schema_type_build_static_sql@Base 9.09
  midgard_core_schema_type_initialize_paramspec@Base 9.09
  midgard_core_schema_type_property_attr_free@Base 9.09
@@ -319,6 +322,7 @@ libmidgard2.so.2009 libmidgard2-2009 #MINVER#
  midgard_object_class_get_property_parent@Base 9.09
  midgard_object_class_get_property_unique@Base 9.09
  midgard_object_class_get_property_up@Base 9.09
+ midgard_object_class_get_schema_value@Base 9.09.1
  midgard_object_class_has_metadata@Base 9.09
  midgard_object_class_list_children@Base 9.09
  midgard_object_class_undelete@Base 9.09
