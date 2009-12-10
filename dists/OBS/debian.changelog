@@ -1,3 +1,9 @@
+midgard2-core (9.09.1-1) unstable; urgency=low
+
+  * New upstream
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Thu, 10 Dec Nov 2009 20:37:30 +0200
+
 midgard2-core (9.09-3) unstable; urgency=low
 
   * Debian revision not included in symbols file
