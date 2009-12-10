@@ -458,7 +458,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 	MgdObject *dbobject;
 
 	if (!_dbobject){
-	
+
 		g_object_unref (G_OBJECT (builder));
 		
 		if ((mgd->errnum == MGD_ERR_OBJECT_PURGED) && force) {
@@ -480,7 +480,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 			return ret_val;
 		}
 
-		if(mgd->errnum == MGD_ERR_NOT_EXISTS) {
+		if (mgd->errnum == MGD_ERR_NOT_EXISTS || mgd->errnum == MGD_ERR_OK) {
 
 			ret_val =  _midgard_object_create (MIDGARD_OBJECT(object), MGD_OBJECT_GUID(object), OBJECT_UPDATE_IMPORTED);
 			return ret_val;
