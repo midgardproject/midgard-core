@@ -250,7 +250,7 @@ _metadata_set_property (GObject *object, guint property_id,
 			break;
 
 		case MIDGARD_METADATA_SCORE:
-			self->priv->score = g_value_get_uint (value);
+			self->priv->score = g_value_get_int (value);
 			break;
 			
 		default:
