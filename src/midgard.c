@@ -67,10 +67,35 @@ static void __transform_string_to_float (const GValue *src_val, GValue *dest_val
 	return;
 }
 
+/* A helper function whch transforms string to boolean */
+static void __transform_string_to_boolean (const GValue *src_val, GValue *dest_val)
+{
+	g_assert (src_val != NULL);
+	g_assert (dest_val != NULL);
+
+	g_assert (G_VALUE_HOLDS_BOOLEAN (dest_val));
+
+	const gchar *_str = g_value_get_string (src_val);
+
+	if (!_str || (_str && *_str == '\0')) {
+		g_value_set_boolean (dest_val, FALSE);
+		return;
+	}
+
+	gint i = atoi (_str);
+
+	if (i > 0)
+		g_value_set_boolean (dest_val, TRUE);
+	else 
+		g_value_set_boolean (dest_val, FALSE);
+
+	return;
+}
+
 void midgard_init() 
 {	
 	GType type;
-	/* g_type_init_with_debug_flags(G_TYPE_DEBUG_OBJECTS | G_TYPE_DEBUG_NONE); */
+	g_type_init_with_debug_flags(G_TYPE_DEBUG_OBJECTS | G_TYPE_DEBUG_MASK); 
 
 #ifdef HAVE_LIBGDA_4
 	gda_init ();
@@ -114,8 +139,9 @@ void midgard_init()
 	g_assert(type != 0);
 	g_type_class_ref(type);
 
-	/* Register transform function explicitly, we need own routine */
+	/* Register transform functions explicitly, we need own routines */
  	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_FLOAT, __transform_string_to_float);
+ 	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_BOOLEAN, __transform_string_to_boolean);
 }
 
 void midgard_close(void)
