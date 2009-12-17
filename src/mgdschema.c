@@ -536,14 +536,16 @@ _get_property_attributes(xmlNode * node,
 	/* field */
 	attrval = xmlGetProp (node, (const xmlChar *)PROP_RW_FIELD);
 	if (attrval) {
-
 		/* Check if column name is reserved one */
 		check_metadata_column (attrval);
 		if (strv_contains (rcolumns, attrval)) {
-			g_critical("'%s' is reserved column name", attrval);
+			__warn_msg(node, "Invalid (reserved) column name defined");
+			g_error ("Invalid column name");
 		} 
 		prop_attr->field = g_strdup ((gchar *)attrval);
 		xmlFree (attrval);
+	} else {
+		prop_attr->field = g_strdup (prop_attr->name);
 	}
 		
 	/* index */
