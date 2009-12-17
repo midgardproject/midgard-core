@@ -1371,6 +1371,12 @@ static void __extend_type_foreach(gpointer key, gpointer val, gpointer userdata)
 	type_attr->table = g_strdup(parent_type_attr->table);
 	type_attr->tables = g_strdup(parent_type_attr->tables);
 
+	GSList *slist = NULL;
+
+	for (slist = parent_type_attr->_properties_list; slist != NULL; slist = slist->next) {
+		type_attr->_properties_list = g_slist_prepend (type_attr->_properties_list, slist->data);
+	}
+
 	g_hash_table_foreach(parent_type_attr->prophash, __extend_type_attr, type_attr);	
 }
 
@@ -1411,6 +1417,11 @@ static void __copy_type_foreach(gpointer key, gpointer val, gpointer userdata)
 	if (!parent_type_attr)
 		g_error("Type information for %s (%s's parent) not found", 
 				copied, type_attr->name);
+	GSList *slist = NULL;
+
+	for (slist = parent_type_attr->_properties_list; slist != NULL; slist = slist->next) {
+		type_attr->_properties_list = g_slist_prepend (type_attr->_properties_list, slist->data);
+	}
 
 	g_hash_table_foreach(parent_type_attr->prophash, __copy_type_attr, type_attr);	
 }
