@@ -531,7 +531,9 @@ _get_property_attributes(xmlNode * node,
 				if (strv_contains(rcolumns, attrval)) {
 					g_critical("'%s' is reserved column name",
 							attrval);
-				}								
+				}							
+				if (prop_attr->field)
+					g_strdup (prop_attr->field);	
 				prop_attr->field = g_strdup((gchar *)attrval);
 			}
 		
@@ -592,6 +594,8 @@ _get_property_attributes(xmlNode * node,
 			}			
 
 			if (g_str_equal(attr->name, "multilang")) {
+				prop_attr->legacy_multilang = TRUE;
+				type_attr->legacy_multilang = TRUE;
 				/* Disable warning, we can not use debug level */
 				/* __warn_msg (node, "'multilang' attribute not supported"); */
 			}
@@ -746,6 +750,9 @@ __get_properties (xmlNode *curn, MgdSchemaTypeAttr *type_attr, MidgardSchema *sc
 			midgard_core_schema_get_default_value (node, type_attr, prop_attr);
 			midgard_core_schema_get_unique_name (node, type_attr, prop_attr);
 			_get_user_fields (node, prop_attr);
+			prop_attr->name = g_strdup ((gchar *)nv);
+			/* "Initialize" field name in case it's not configured in schema */
+			prop_attr->field = g_strdup (prop_attr->name);
 			_get_property_attributes (node, type_attr, prop_attr);
 
 			if(prop_attr->is_primary 
@@ -757,7 +764,6 @@ __get_properties (xmlNode *curn, MgdSchemaTypeAttr *type_attr, MidgardSchema *sc
 				g_free(tmpstr);
 			}
 
-			prop_attr->name = g_strdup ((gchar *)nv);
 			gchar *property_name = g_strdup ((gchar *)nv);
 			g_hash_table_insert (type_attr->prophash, property_name, prop_attr);
 			/* Workaround.
