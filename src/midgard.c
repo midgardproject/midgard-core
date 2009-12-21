@@ -82,6 +82,27 @@ static void __transform_string_to_boolean (const GValue *src_val, GValue *dest_v
 		return;
 	}
 
+	/* Stringified boolean */
+	if (g_str_equal (_str, "TRUE")) {
+		g_value_set_boolean (dest_val, TRUE);
+		return;
+	}
+
+	if (g_str_equal (_str, "true")) {
+		g_value_set_boolean (dest_val, TRUE);
+		return;
+	}
+
+	if (g_str_equal (_str, "FALSE")) {
+		g_value_set_boolean (dest_val, FALSE);
+		return;
+	}
+
+	if (g_str_equal (_str, "false")) {
+		g_value_set_boolean (dest_val, FALSE);
+		return;
+	}
+
 	gint i = atoi (_str);
 
 	if (i > 0)
