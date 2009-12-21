@@ -1422,7 +1422,7 @@ void midgard_config_set_authtype(MidgardConfig *self, const gchar *authtype)
 {
 	g_assert(self != NULL);
 
-	if(authtype == NULL) {
+	if(authtype == NULL || (authtype && *authtype == '0')) {
 
 		self->authtype = MIDGARD_AUTHTYPE_NORMAL;
 		return;
