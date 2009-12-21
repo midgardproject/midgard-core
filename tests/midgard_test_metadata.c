@@ -494,7 +494,7 @@ void midgard_test_metadata_check_update(MgdObject *object)
 	/* revision */
 	guint metadata_revision = 0;
 	g_object_get(metadata, "revision", &metadata_revision, NULL);
-	g_assert_cmpuint(metadata_revision, <, 4); /* FIXME, move it standalone tests with revision argument to check */
+	g_assert_cmpuint(metadata_revision, <, 5); /* FIXME, move it standalone tests with revision argument to check */
 
 	/* locker */
 	gchar *metadata_locker = NULL;
