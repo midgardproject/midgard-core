@@ -1108,88 +1108,31 @@ gboolean midgard_core_query_create_table(MidgardConnection *mgd,
 		return FALSE;
 	}
 	
-	xmlDocPtr parameters;
-	xmlNodePtr root;
-	xmlNodePtr table, op_data, array_data, array_row, array_value;
-
-	parameters = xmlNewDoc ((xmlChar*)"1.0"); 
-	root = xmlNewDocNode (parameters, NULL, (xmlChar*)"serv_op_data", NULL);
-	xmlDocSetRootElement (parameters, root);
-
-	table = xmlNewChild (root, NULL, (xmlChar*)"op_data", (xmlChar*)tablename);
-	xmlSetProp(table, (xmlChar*)"path", (xmlChar*) "/TABLE_DEF_P/TABLE_NAME");	
-
-	/* Default columns */	
-	/* guid column */
-	/*array_row = xmlNewChild (array_data, NULL, (xmlChar*)"gda_array_row", NULL);
-	array_value = xmlNewChild (array_row, NULL, 
-			(xmlChar*)"gda_array_value", (xmlChar*)"guid");
-	xmlSetProp(array_value, (xmlChar*)"colid", (xmlChar*)"COLUMN_NAME");
-	array_value = xmlNewChild(array_row, NULL, 
-			(xmlChar*)"gda_array_value", (xmlChar*)"varchar(80)");
-	xmlSetProp(array_value, (xmlChar*)"colid", (xmlChar*)"COLUMN_TYPE");
-	array_value = xmlNewChild(array_row, NULL,
-			(xmlChar*)"gda_array_value", (xmlChar*)"\'\'");
-	xmlSetProp(array_value, (xmlChar*)"colid", (xmlChar*)"COLUMN_DEFAULT");
-	*/
-	
-	/* Postgresql.
-	 * Probably we could define NOT NULL *only* when MySQL is used. */
-	/*if(mgd->priv->config->priv->dbtype != MIDGARD_DB_TYPE_POSTGRES) {
-		array_value = xmlNewChild(array_row, NULL,
-				(xmlChar*)"gda_array_value", (xmlChar*)"true");
-		xmlSetProp(array_value, (xmlChar*)"colid", (xmlChar*)"COLUMN_NNUL");
-	}*/
+	gda_server_operation_set_value_at(op, tablename, NULL, "/TABLE_DEF_P/TABLE_NAME");
+	gda_server_operation_set_value_at(op, tablename, NULL, "/TABLE_DEF_P/TABLE_IFNOTEXISTS");
 	
 	/* Add primary field if defined */
 	if(primary) {
 
-		op_data = xmlNewChild (root, NULL, (xmlChar*)"op_data", NULL);
-		xmlSetProp(op_data, (xmlChar*)"path", (xmlChar*)"/FIELDS_A");
-		array_data = xmlNewChild (op_data, NULL, (xmlChar*)"gda_array_data", NULL);
-
-		array_row = 
-			xmlNewChild (array_data, NULL, (xmlChar*)"gda_array_row", NULL);
-		array_value = xmlNewChild (array_row, NULL, 
-				(xmlChar*)"gda_array_value", (xmlChar*)primary);
-		xmlSetProp(array_value, (xmlChar*)"colid", (xmlChar*)"COLUMN_NAME");
-
+		gda_server_operation_set_value_at(op, primary, NULL, "/FIELDS_A/@COLUMN_NAME/%d", 0);
+	
 		/* PostgreSQL requires 'SERIAL' identifier... */
 		if(mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_POSTGRES) {
 			
-			array_value = xmlNewChild(array_row, NULL, 
-				(xmlChar*)"gda_array_value", (xmlChar*)"SERIAL");
+			gda_server_operation_set_value_at(op, "SERIAL", NULL, "/FIELDS_A/@COLUMN_TYPE/%d", 0);
+
 		} else {
 
-			array_value = xmlNewChild(array_row, NULL,
-					(xmlChar*)"gda_array_value", (xmlChar*)"INTEGER");
+			gda_server_operation_set_value_at(op, "INTEGER", NULL, "/FIELDS_A/@COLUMN_TYPE/%d", 0);
 		}
 
-		xmlSetProp(array_value, (xmlChar*)"colid", (xmlChar*)"COLUMN_TYPE");
-		array_value = xmlNewChild(array_row, NULL,
-				(xmlChar*)"gda_array_value", (xmlChar*)"true");
-		xmlSetProp(array_value, (xmlChar*)"colid", (xmlChar*)"COLUMN_PKEY");
-
-		array_value = xmlNewChild(array_row, NULL,
-				(xmlChar*)"gda_array_value", (xmlChar*)"true");
-		xmlSetProp(array_value, (xmlChar*)"colid", (xmlChar*)"COLUMN_AUTOINC");
+		gda_server_operation_set_value_at(op, "true", NULL, "/FIELDS_A/@COLUMN_PKEY/%d", 0);
+		gda_server_operation_set_value_at(op, "true", NULL, "/FIELDS_A/@COLUMN_AUTOINC/%d", 0);
+		gda_server_operation_set_value_at(op, "true", NULL, "/FIELDS_A/@COLUMN_UNIQUE/%d", 0);
 	}
-
-	if (!gda_server_operation_load_data_from_xml (op, root, &error)){
-		
-		g_warning("Can not load table data from xml. %s", error->message);
-		xmlFreeDoc(parameters);
-		g_object_unref(op);
-		return FALSE;
-	}
-	
-	gda_server_operation_set_value_at(op, tablename,
-			NULL, "/TABLE_DEF_P/TABLE_IFNOTEXISTS");
 
 	gchar *_sql = gda_server_provider_render_operation(server, cnc, op, NULL);
 	g_debug("Render create table: %s", _sql);
-
-	xmlFreeDoc(parameters);
 
 	gboolean created = 
 		gda_server_provider_perform_operation (server, cnc, op, &error);
@@ -2143,7 +2086,7 @@ gboolean midgard_core_query_create_class_storage(
 		pprop = midgard_object_class_get_primary_property(MIDGARD_OBJECT_CLASS(klass));
 	
 	if(pprop) {
-
+	
 		pfield = midgard_core_class_get_property_colname(
 				MIDGARD_DBOBJECT_CLASS(klass), pprop);
 		GParamSpec *pspec = 
