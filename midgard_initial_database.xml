@@ -6,7 +6,7 @@
 		<column name="id"                   dbtype="int"            gtype="integer"     unique="false" />
 		<column name="guid"                 dbtype="varchar(80)"    gtype="string"      index="true" unique="false" />
 		<column name="typename"             dbtype="varchar(255)"   gtype="string" />
-		<column name="object_action"        dbtype="int"						gtype="integer" />
+		<column name="object_action"        dbtype="int"						gtype="integer" 		default="0"/>
 		<column name="object_action_date"   dbtype="datetime"       gtype="datetime"    default="0001-01-01 00:00:00"/>
 	</table>
 
