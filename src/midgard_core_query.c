@@ -1116,7 +1116,7 @@ gboolean midgard_core_query_create_table(MidgardConnection *mgd,
 
 		gda_server_operation_set_value_at(op, primary, NULL, "/FIELDS_A/@COLUMN_NAME/%d", 0);
 	
-		/* PostgreSQL requires 'SERIAL' identifier... */
+		/* PostgreSQL requires 'SERIAL' identifier...  */
 		if(mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_POSTGRES) {
 			
 			gda_server_operation_set_value_at(op, "SERIAL", NULL, "/FIELDS_A/@COLUMN_TYPE/%d", 0);
@@ -1126,9 +1126,8 @@ gboolean midgard_core_query_create_table(MidgardConnection *mgd,
 			gda_server_operation_set_value_at(op, "INTEGER", NULL, "/FIELDS_A/@COLUMN_TYPE/%d", 0);
 		}
 
-		gda_server_operation_set_value_at(op, "true", NULL, "/FIELDS_A/@COLUMN_PKEY/%d", 0);
-		gda_server_operation_set_value_at(op, "true", NULL, "/FIELDS_A/@COLUMN_AUTOINC/%d", 0);
-		gda_server_operation_set_value_at(op, "true", NULL, "/FIELDS_A/@COLUMN_UNIQUE/%d", 0);
+		gda_server_operation_set_value_at(op, "TRUE", NULL, "/FIELDS_A/@COLUMN_PKEY/%d", 0);
+		gda_server_operation_set_value_at(op, "TRUE", NULL, "/FIELDS_A/@COLUMN_AUTOINC/%d", 0);	
 	}
 
 	gchar *_sql = gda_server_provider_render_operation(server, cnc, op, NULL);
