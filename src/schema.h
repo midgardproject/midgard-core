@@ -48,6 +48,8 @@ struct _MgdSchemaPropertyAttr{
 	gboolean is_reversed;
 	gchar *description;
 	GHashTable *user_values;
+	gboolean legacy_multilang;
+	gchar *legacy_field;
 };
 
 struct _MgdSchemaTypeAttr {
@@ -79,7 +81,8 @@ struct _MgdSchemaTypeAttr {
 	gboolean is_view;
 	gchar *sql_create_view;
 	gchar *metadata_class;
-	GHashTable *user_values;	
+	GHashTable *user_values;
+	gboolean legacy_multilang;	
 };
 
 /* MgdSchema storage utilities */
