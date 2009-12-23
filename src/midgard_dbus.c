@@ -113,7 +113,7 @@ __modify_path(MidgardConnection *mgd, const gchar *path)
 		return NULL;
 	}
 
-	gchar *new_path = g_strconcat(MIDGARD_DBUS_PATH, "/", path, NULL);
+	gchar *new_path = g_strconcat(MIDGARD_DBUS_PATH, path, NULL);
 	/* g_debug("New midgard path for D-Bus: (%s)", new_path); */
 
 	return new_path;
