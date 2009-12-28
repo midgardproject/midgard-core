@@ -34,6 +34,7 @@ struct _MidgardDBObjectPrivate {
 	MgdSchemaTypeAttr *storage_data;
 	MidgardConnection *mgd;
 	gboolean has_metadata;
+	MidgardMetadata *metadata;
 	GdaDataModel *datamodel;
 	gint row;	
 

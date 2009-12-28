@@ -112,7 +112,7 @@ _midgard_view_derived_object_get_property (GObject *object, guint prop_id,
 		return;
 
 	const GValue *dvalue = 
-		gda_data_model_get_value_at_col_name(self->dbpriv->datamodel, pspec->name, self->dbpriv->row);
+		midgard_data_model_get_value_at_col_name(self->dbpriv->datamodel, pspec->name, self->dbpriv->row);
 
 	// Hack to workaround bug in gda-sqlite (returns INVALID for empty strings)
 	if (G_VALUE_HOLDS (dvalue, G_TYPE_INVALID) && G_VALUE_HOLDS_STRING (value)) {
@@ -187,6 +187,8 @@ _midgard_view_derived_storage_exists (MidgardConnection *mgd, MidgardDBObjectCla
 	if (mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_MYSQL)
 		use_mysql = TRUE;
 
+#warning "gda_connection_get_schema replacement"
+/*
 	GdaDataModel *dm_schema =
 		gda_connection_get_schema(mgd->priv->connection, 
 				use_mysql ? GDA_CONNECTION_SCHEMA_TABLES : GDA_CONNECTION_SCHEMA_VIEWS , NULL ,NULL);
@@ -211,7 +213,7 @@ _midgard_view_derived_storage_exists (MidgardConnection *mgd, MidgardDBObjectCla
 	}
 
 	g_object_unref(dm_schema);
-	
+*/	
 	return FALSE;
 }
 

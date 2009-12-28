@@ -511,6 +511,10 @@ gboolean __midgard_connection_open(
 
 #ifndef HAVE_LIBGDA_4
 	mgd->priv->client = client;
+	mgd->priv->parser = gda_connection_create_parser (connection);
+	if !(mgd->priv->parser)
+		mgd->priv->parser = gda_sql_parser_new();
+	g_assert (mgd->priv->parser != NULL);
 #endif
 
 	mgd->priv->connection = connection;

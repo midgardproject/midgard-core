@@ -197,10 +197,10 @@ MidgardObject *midgard_object_class_get_object_by_guid (	MidgardConnection *mgd,
 	}
 
 	const GValue *action_value =
-		gda_data_model_get_value_at_col_name(model, "object_action", 0);
+		midgard_data_model_get_value_at_col_name(model, "object_action", 0);
 	
 	const GValue *type_value =
-		gda_data_model_get_value_at_col_name(model, "typename", 0);
+		midgard_data_model_get_value_at_col_name(model, "typename", 0);
 
 	if (action_value == NULL 
 			|| type_value == NULL ) {

@@ -32,12 +32,13 @@ midgard_dbobject_constructor (GType type,
 				n_construct_properties,
 				construct_properties);
 
-	MIDGARD_DBOBJECT(object)->dbpriv = g_new(MidgardDBObjectPrivate, 1);
-	MIDGARD_DBOBJECT(object)->dbpriv->mgd = NULL; /* read only */
-	MIDGARD_DBOBJECT(object)->dbpriv->guid = NULL;
-	MIDGARD_DBOBJECT(object)->dbpriv->datamodel = NULL;
-	MIDGARD_DBOBJECT(object)->dbpriv->row = -1;	
-	MIDGARD_DBOBJECT(object)->dbpriv->has_metadata = TRUE;
+	MIDGARD_DBOBJECT (object)->dbpriv = g_new(MidgardDBObjectPrivate, 1);
+	MIDGARD_DBOBJECT (object)->dbpriv->mgd = NULL; /* read only */
+	MIDGARD_DBOBJECT (object)->dbpriv->guid = NULL;
+	MIDGARD_DBOBJECT (object)->dbpriv->datamodel = NULL;
+	MIDGARD_DBOBJECT (object)->dbpriv->row = -1;	
+	MIDGARD_DBOBJECT (object)->dbpriv->has_metadata = TRUE;
+	MIDGARD_DBOBJECT (object)->dbpriv->metadata = NULL;
 
 	MIDGARD_DBOBJECT (object)->dbpriv->storage_data =
 		MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->storage_data;
@@ -69,6 +70,10 @@ midgard_dbobject_finalize (GObject *object)
 		g_object_unref(self->dbpriv->datamodel);
 
 	self->dbpriv->row = -1;
+
+	/* Do not nullify metadata object, we might be in the middle of refcount decreasing */
+	if (self->dbpriv->metadata)
+		g_object_unref (self->dbpriv->metadata);
 
 	g_free(self->dbpriv);
 	self->dbpriv = NULL;

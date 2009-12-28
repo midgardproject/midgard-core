@@ -57,7 +57,7 @@ struct MidgardQueryBuilderClass{
 	void 		(*set_offset) 		(MidgardQueryBuilder *builder, guint offset);
 	void 		(*set_limit) 		(MidgardQueryBuilder *builder, guint limit);
 	void 		(*include_deleted) 	(MidgardQueryBuilder *builder);
-	GObject 	**(*execute) 		(MidgardQueryBuilder *builder, guint *n_objects);
+	GObject**	(*execute) 		(MidgardQueryBuilder *builder, guint *n_objects);
 	guint 		(*count) 		(MidgardQueryBuilder *builder);
 
 	/* signals */
@@ -70,7 +70,7 @@ struct MidgardQueryBuilderClass{
 };
 
 GType			midgard_query_builder_get_type		(void);
-MidgardQueryBuilder	*midgard_query_builder_new		(MidgardConnection *mgd, const gchar *classname);
+MidgardQueryBuilder*	midgard_query_builder_new		(MidgardConnection *mgd, const gchar *classname);
 gboolean 		midgard_query_builder_add_constraint	(MidgardQueryBuilder *builder, const gchar *name, const gchar *op, const GValue *value);
 gboolean 		midgard_query_builder_add_constraint_with_property	(MidgardQueryBuilder *builder, const gchar *property_a, const gchar *op, const gchar *property_b);
 gboolean 		midgard_query_builder_begin_group	(MidgardQueryBuilder *builder, const gchar *type);
@@ -78,9 +78,9 @@ gboolean 		midgard_query_builder_end_group		(MidgardQueryBuilder *builder);
 gboolean 		midgard_query_builder_add_order		(MidgardQueryBuilder *builder, const gchar *name, const gchar *dir);
 void 			midgard_query_builder_set_offset	(MidgardQueryBuilder *builder, guint offset);
 void 			midgard_query_builder_set_limit		(MidgardQueryBuilder *builder, guint limit);
-GObject 		**midgard_query_builder_execute		(MidgardQueryBuilder *builder, guint *n_objects);
+GObject**		midgard_query_builder_execute		(MidgardQueryBuilder *builder, guint *n_objects);
 guint 			midgard_query_builder_count		(MidgardQueryBuilder *builder); 
-const gchar 		*midgard_query_builder_get_type_name	(MidgardQueryBuilder *builder);
+const gchar*		midgard_query_builder_get_type_name	(MidgardQueryBuilder *builder);
 void 			midgard_query_builder_include_deleted	(MidgardQueryBuilder *builder);
 
 #endif
