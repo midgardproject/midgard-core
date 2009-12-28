@@ -255,7 +255,7 @@ midgard_test_connection_get_user (void)
 	g_assert (valid_user == still_valid_user);
 
 	/* Now we will remove all refcounts to user */
-	gboolean user_logged_out = midgard_user_logout (still_valid_user);
+	gboolean user_logged_out = midgard_user_log_out (still_valid_user);
 	MIDGARD_TEST_ERROR_OK (mgd);
 	g_assert (user_logged_out == TRUE);
 

@@ -6,12 +6,12 @@
 
 typedef struct {
 	MidgardConnection *mgd;
-	MgdObject *object;
+	MidgardObject *object;
 	guint id;
 	gchar *guid;
 	gchar *created;
 	gchar *creator;
 	gchar *classname;
-}MgdObjectTest;
+}MidgardObjectTest;
 
 #endif /* MIDGARD_TEST_OBJECT */

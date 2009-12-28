@@ -4,15 +4,15 @@
 
 #include "midgard_test.h"
 
-void midgard_test_metadata_check_new(MgdObject *object);
-void midgard_test_metadata_check_create(MgdObject *object);
-void midgard_test_metadata_check_created(MgdObject *object);
-void midgard_test_metadata_check_update(MgdObject *object);
-void midgard_test_metadata_check_updated(MgdObject *object);
-void midgard_test_metadata_check_delete(MgdObject *object);
+void midgard_test_metadata_check_new(MidgardObject *object);
+void midgard_test_metadata_check_create(MidgardObject *object);
+void midgard_test_metadata_check_created(MidgardObject *object);
+void midgard_test_metadata_check_update(MidgardObject *object);
+void midgard_test_metadata_check_updated(MidgardObject *object);
+void midgard_test_metadata_check_delete(MidgardObject *object);
 
-void midgard_test_metadata_check_person_references(MgdObject *object, const gchar *guid, ...);
-void midgard_test_metadata_check_datetime_properties(MgdObject *object, const gchar *datetime, ...);
+void midgard_test_metadata_check_person_references(MidgardObject *object, const gchar *guid, ...);
+void midgard_test_metadata_check_datetime_properties(MidgardObject *object, const gchar *datetime, ...);
 
 #endif /* MIDGARD_TEST_METADATA_H */
 

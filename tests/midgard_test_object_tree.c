@@ -19,10 +19,10 @@
 #include "midgard_test_object_tree.h"
 #include "midgard_test_object_basic.h"
 
-void midgard_test_object_tree_basic(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_tree_basic(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
-	MgdObject *object = MIDGARD_OBJECT(mot->object);
+	MidgardObject *object = MIDGARD_OBJECT(mot->object);
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);
 
 	/* Get parent (in tree) class and check if parent has the same child declared */
@@ -56,10 +56,10 @@ void midgard_test_object_tree_basic(MgdObjectTest *mot, gconstpointer data)
 	g_assert(has_child_class != FALSE);
 }
 
-void midgard_test_object_tree_create(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
-	MgdObject *_object = MIDGARD_OBJECT(mot->object);
+	MidgardObject *_object = MIDGARD_OBJECT(mot->object);
 	MidgardConnection *mgd = MIDGARD_CONNECTION(midgard_object_get_connection(_object));
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(_object);
 
@@ -83,7 +83,7 @@ void midgard_test_object_tree_create(MgdObjectTest *mot, gconstpointer data)
 	g_assert (unique_name_pspec != NULL);
 
 	/* Empty name */
-	MgdObject *object = midgard_object_new(mgd, G_OBJECT_TYPE_NAME(_object), NULL);
+	MidgardObject *object = midgard_object_new(mgd, G_OBJECT_TYPE_NAME(_object), NULL);
 	g_object_set(object, unique_name, "", NULL);
 
 	/* Workaround */
@@ -131,7 +131,7 @@ void midgard_test_object_tree_create(MgdObjectTest *mot, gconstpointer data)
 	MIDGARD_TEST_ERROR_OK(mgd);
 	g_assert(created != FALSE);
 
-	MgdObject *dupobject = midgard_object_new(mgd, G_OBJECT_TYPE_NAME(_object), NULL);
+	MidgardObject *dupobject = midgard_object_new(mgd, G_OBJECT_TYPE_NAME(_object), NULL);
 	g_object_set(dupobject, unique_name, "Unique", NULL);
 	
 	/* Workaround */

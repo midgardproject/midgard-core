@@ -47,7 +47,7 @@ gboolean midgard_test_database_create(MidgardConnection *mgd)
 		class_table_created = midgard_storage_create_class_storage(mgd, MIDGARD_DBOBJECT_CLASS (klass));
 		g_assert(class_table_created == TRUE);
 
-		class_table_exists = midgard_config_class_table_exists(NULL, klass, mgd);
+		class_table_exists = midgard_storage_class_storage_exists(mgd, MIDGARD_DBOBJECT_CLASS (klass));
 		g_assert(class_table_exists == TRUE);		
 	}
 	

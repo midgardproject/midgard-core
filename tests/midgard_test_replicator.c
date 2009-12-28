@@ -100,7 +100,7 @@ _read_object_xml_file (GObject *object)
 }
 
 /* This should be run only when all objects are created and none of them is deleted */
-void midgard_test_replicator_update_object_links(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_update_object_links(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	
@@ -381,7 +381,7 @@ static gboolean __is_unserialized_object_valid(GObject *orig, GObject *copy, con
 }
 
 void 
-midgard_test_replicator_serialize (MgdObjectTest *mot, gconstpointer data)
+midgard_test_replicator_serialize (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	
@@ -396,7 +396,7 @@ midgard_test_replicator_serialize (MgdObjectTest *mot, gconstpointer data)
 }
 
 void 
-midgard_test_replicator_unserialize (MgdObjectTest *mot, gconstpointer data)
+midgard_test_replicator_unserialize (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 
@@ -519,14 +519,14 @@ midgard_test_replicator_unserialize (MgdObjectTest *mot, gconstpointer data)
 }
 
 void 
-midgard_test_replicator_object_delete (MgdObjectTest *mot, gconstpointer data)
+midgard_test_replicator_object_delete (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 
 	return;
 }
 
-void midgard_test_replicator_export_created (MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_export_created (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 
@@ -564,7 +564,7 @@ void midgard_test_replicator_export_created (MgdObjectTest *mot, gconstpointer d
 	g_value_unset (&strval);
 }
 
-void midgard_test_replicator_export_updated (MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_export_updated (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 
@@ -634,7 +634,7 @@ _create_xml_path (const gchar *dir, MidgardObject *object)
 }
 
 void 
-midgard_test_replicator_export_archive (MgdObjectTest *mot, gconstpointer data)
+midgard_test_replicator_export_archive (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT (mot);
 
@@ -661,37 +661,37 @@ midgard_test_replicator_export_archive (MgdObjectTest *mot, gconstpointer data)
 	g_free (filepath);
 }
 
-void midgard_test_replicator_export_purged(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_export_purged(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	/* TODO */
 }
 
-void midgard_test_replicator_serialize_blob(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_serialize_blob(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	/* TODO */
 }
 
-void midgard_test_replicator_export_blob(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_export_blob(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	/* TODO */
 }
 
-void midgard_test_replicator_export_by_guid(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_export_by_guid(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	/* TODO */
 }
 
-void midgard_test_replicator_export_media(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_export_media(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	/* TODO */
 }
 
-void midgard_test_replicator_import_object_already_imported(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_import_object_already_imported(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 
@@ -703,7 +703,7 @@ void midgard_test_replicator_import_object_already_imported(MgdObjectTest *mot, 
 	g_assert (midgard_object_imported == FALSE);
 }
 
-void midgard_test_replicator_import_from_xml(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_replicator_import_from_xml(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	/* TODO */

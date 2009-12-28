@@ -18,7 +18,7 @@
 
 #include "midgard_test_property_reflector.h"
 
-MidgardReflectionProperty *midgard_test_property_reflector_create(MgdObject *object)
+MidgardReflectionProperty *midgard_test_property_reflector_create(MidgardObject *object)
 {
 	g_assert(object != NULL);
 
@@ -35,7 +35,7 @@ MidgardReflectionProperty *midgard_test_property_reflector_create(MgdObject *obj
 	MidgardReflectionProperty *mrp = midgard_test_property_reflector_create(__object); \
 	g_assert(mrp != NULL);
 
-void midgard_test_property_reflector_new(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_property_reflector_new(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	MIDGARD_TEST_MRP_NEW(object);
@@ -43,7 +43,7 @@ void midgard_test_property_reflector_new(MgdObjectTest *mot, gconstpointer data)
 	g_object_unref(mrp);
 }
 
-void midgard_test_property_reflector_check_midgard_type(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_property_reflector_check_midgard_type(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	MIDGARD_TEST_MRP_NEW(object);
@@ -89,7 +89,7 @@ void midgard_test_property_reflector_check_midgard_type(MgdObjectTest *mot, gcon
 	g_object_unref(mrp);
 }
 
-void midgard_test_property_reflector_check_is_link(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_property_reflector_check_is_link(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	MIDGARD_TEST_MRP_NEW(object);
@@ -136,7 +136,7 @@ void midgard_test_property_reflector_check_is_link(MgdObjectTest *mot, gconstpoi
 	g_object_unref(mrp);
 }
 
-void midgard_test_property_reflector_check_is_linked(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_property_reflector_check_is_linked(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	MIDGARD_TEST_MRP_NEW(object);
@@ -161,7 +161,7 @@ void midgard_test_property_reflector_check_is_linked(MgdObjectTest *mot, gconstp
 	g_object_unref(mrp);
 }
 
-void midgard_test_property_reflector_check_link_class(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_property_reflector_check_link_class(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	MIDGARD_TEST_MRP_NEW(object);
@@ -209,7 +209,7 @@ void midgard_test_property_reflector_check_link_class(MgdObjectTest *mot, gconst
 	g_object_unref(mrp);
 }
 
-void midgard_test_property_reflector_check_link_name(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_property_reflector_check_link_name(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	MIDGARD_TEST_MRP_NEW(object);
@@ -256,7 +256,7 @@ void midgard_test_property_reflector_check_link_name(MgdObjectTest *mot, gconstp
 	g_object_unref(mrp);
 }
 
-void midgard_test_property_reflector_check_link_target(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_property_reflector_check_link_target(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	MIDGARD_TEST_MRP_NEW(object);
@@ -304,7 +304,7 @@ void midgard_test_property_reflector_check_link_target(MgdObjectTest *mot, gcons
 	g_object_unref(mrp);
 }
 
-void midgard_test_property_reflector_check_description(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_property_reflector_check_description(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
 	MIDGARD_TEST_MRP_NEW(object);

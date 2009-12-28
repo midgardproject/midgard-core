@@ -61,146 +61,146 @@ int main (int argc, char *argv[])
 				|| g_str_equal(typename, "midgard_parameter"))
 			continue;
 
-		MgdObject *object = midgard_test_object_basic_new(mgd_global, typename, NULL);
+		MidgardObject *object = midgard_test_object_basic_new(mgd_global, typename, NULL);
 		g_assert(object != NULL);
 
 		gchar *testname = g_strconcat("/midgard_reflection_property/new/", typename, NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_property_reflector_new, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_reflection_property/get_midgard_type/", typename, NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_property_reflector_check_midgard_type, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_reflection_property/is_link/", typename, NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_property_reflector_check_is_link, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_reflection_property/is_linked/", typename, NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_property_reflector_check_is_linked, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_reflection_property/get_link_class/", typename, NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_property_reflector_check_link_class, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_reflection_property/get_link_name/", typename, NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_property_reflector_check_link_name, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_reflection_property/get_link_target/", typename, NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_property_reflector_check_link_target, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_reflection_property/description/", typename, NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_property_reflector_check_description, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_object/", typename, "/create", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_basic_create, midgard_test_teardown_foo);
 		g_free(testname);
 
 		//testname = g_strconcat("/midgard_replicator/", typename, "/serialize", NULL);
-		//g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		//g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 		//		midgard_test_replicator_serialize, midgard_test_teardown_foo);
 		//g_free(testname);
 
 		testname = g_strconcat("/midgard_object/", typename, "/get_by_id_created", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_get_by_id_created, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_object/", typename, "/get_by_guid_created", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_get_by_guid_created, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_object/", typename, "/constructor_id_created", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_constructor_id_created, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_object/", typename, "/constructor_guid_created", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_constructor_guid_created, midgard_test_teardown_foo);
 		g_free(testname);
 	
 		testname = g_strconcat("/midgard_object/", typename, "/update", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_basic_update, midgard_test_teardown_foo);
 		g_free(testname);
 
 		/*
 		testname = g_strconcat("/midgard_replicator/", typename, "/serialize", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_replicator_serialize, midgard_test_teardown_foo);
 		g_free(testname); */
 	
 		testname = g_strconcat("/midgard_object/", typename, "/get_by_id_updated", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_get_by_id_updated, midgard_test_teardown_foo);
 		g_free(testname);
 	
 		testname = g_strconcat("/midgard_object/", typename, "/lock", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_basic_lock, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_object/", typename, "/unlock", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_basic_unlock, midgard_test_teardown_foo);
 		g_free(testname); 
 	
 		testname = g_strconcat("/midgard_object/", typename, "/approve", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_basic_approve, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_object/", typename, "/unapprove", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_basic_unapprove, midgard_test_teardown_foo);
 		g_free(testname); 
 
 		testname = g_strconcat("/midgard_object/", typename, "/delete", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_basic_delete, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_object_class/", typename, "/get_object_by_guid_deleted", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_class_get_object_by_guid_deleted, midgard_test_teardown_foo);
 		g_free(testname);
 	
 		/*testname = g_strconcat("/midgard_replicator/", typename, "/serialize", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_replicator_serialize, midgard_test_teardown_foo);
 		g_free(testname);*/
 
 		// unref object 
 		testname = g_strconcat("/midgard_object/", typename, "/get_by_id_deleted", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_get_by_id_deleted, midgard_test_unref_object);
 		g_free(testname);
 
-		MgdObject *undelete_object = midgard_test_object_basic_new(mgd_global, typename, NULL);
+		MidgardObject *undelete_object = midgard_test_object_basic_new(mgd_global, typename, NULL);
 		g_assert(undelete_object != NULL);
 		
 		testname = g_strconcat("/midgard_object_class/", typename, "/undelete", NULL);
-		g_test_add(testname, MgdObjectTest, undelete_object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, undelete_object, midgard_test_setup,  
 				midgard_test_object_class_undelete, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_object_class/", typename, "/purge", NULL);
-		g_test_add(testname, MgdObjectTest, undelete_object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, undelete_object, midgard_test_setup,  
 				midgard_test_object_basic_purge, midgard_test_teardown_foo);
 		g_free(testname); 
 

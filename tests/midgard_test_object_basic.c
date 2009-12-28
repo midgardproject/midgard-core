@@ -20,9 +20,9 @@
 #include "midgard_test_query_builder.h"
 #include <midgard/uuid.h>
 
-MgdObject *midgard_test_object_basic_new(MidgardConnection *mgd, const gchar *name, GValue *value)
+MidgardObject *midgard_test_object_basic_new(MidgardConnection *mgd, const gchar *name, GValue *value)
 {
-	MgdObject *object = midgard_object_new(mgd, name, value);
+	MidgardObject *object = midgard_object_new(mgd, name, value);
 	g_assert(object != NULL);
 	MIDGARD_TEST_ERROR_OK(mgd);
 
@@ -59,7 +59,7 @@ MgdObject *midgard_test_object_basic_new(MidgardConnection *mgd, const gchar *na
 	return object;
 }
 
-MgdObject *midgard_test_object_basic_new_by_guid(MidgardConnection *mgd, const gchar *name, const gchar *guid)
+MidgardObject *midgard_test_object_basic_new_by_guid(MidgardConnection *mgd, const gchar *name, const gchar *guid)
 {
 	g_assert(mgd != NULL);
 	g_assert(name != NULL);
@@ -69,18 +69,18 @@ MgdObject *midgard_test_object_basic_new_by_guid(MidgardConnection *mgd, const g
 	g_value_init(&val, G_TYPE_STRING);
 	g_value_set_string(&val, guid);
 
-	MgdObject *object = midgard_test_object_basic_new(mgd, name, &val);
+	MidgardObject *object = midgard_test_object_basic_new(mgd, name, &val);
 
 	g_value_unset(&val);
 
 	return object;
 }
 
-void midgard_test_object_basic_create(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_basic_create(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
 
-	MgdObject *object = mot->object;	
+	MidgardObject *object = mot->object;	
 	MidgardConnection *mgd = mot->mgd;
 
 	GParamSpec *pspec = 
@@ -134,7 +134,7 @@ void midgard_test_object_basic_create(MgdObjectTest *mot, gconstpointer data)
 	MidgardUser *user = midgard_connection_get_user(mgd);
 	g_assert(user != NULL);
 
-	MgdObject *person = midgard_user_get_person(user);
+	MidgardObject *person = midgard_user_get_person(user);
 	g_assert(person != NULL);
 
 	gchar *pguid = NULL;
@@ -151,11 +151,11 @@ void midgard_test_object_basic_create(MgdObjectTest *mot, gconstpointer data)
 	return;
 }
 
-void midgard_test_object_basic_update(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_basic_update(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
 
-	MgdObject *object = mot->object;	
+	MidgardObject *object = mot->object;	
 	MidgardConnection *mgd = mot->mgd;
 
 	gboolean object_updated = midgard_object_update(object);
@@ -169,7 +169,7 @@ void midgard_test_object_basic_update(MgdObjectTest *mot, gconstpointer data)
 	MidgardUser *user = midgard_connection_get_user(mgd);
 	g_assert(user != NULL);
 
-	MgdObject *person = midgard_user_get_person(user);
+	MidgardObject *person = midgard_user_get_person(user);
 	g_assert(person != NULL);
 
 	gchar *pguid = NULL;
@@ -186,11 +186,11 @@ void midgard_test_object_basic_update(MgdObjectTest *mot, gconstpointer data)
 	return;
 }
 
-void midgard_test_object_basic_delete(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_basic_delete(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
 
-	MgdObject *object = mot->object;	
+	MidgardObject *object = mot->object;	
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
@@ -208,7 +208,7 @@ void midgard_test_object_basic_delete(MgdObjectTest *mot, gconstpointer data)
 	MidgardUser *user = midgard_connection_get_user(mgd);
 	g_assert(user != NULL);
 
-	MgdObject *person = midgard_user_get_person(user);
+	MidgardObject *person = midgard_user_get_person(user);
 	g_assert(person != NULL);
 
 	gchar *pguid = NULL;
@@ -226,7 +226,7 @@ void midgard_test_object_basic_delete(MgdObjectTest *mot, gconstpointer data)
 	return;
 }
 
-void midgard_test_object_basic_purge(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_basic_purge(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
 
@@ -244,14 +244,14 @@ void midgard_test_object_basic_purge(MgdObjectTest *mot, gconstpointer data)
 	guint i = 0;
 	while(objects[i] != NULL) {
 		
-		MgdObject *object = MIDGARD_OBJECT(objects[i]);
+		MidgardObject *object = MIDGARD_OBJECT(objects[i]);
 		gchar *guid;
 		g_object_get(object, "guid", &guid, NULL);
 
 		gboolean purged = midgard_object_purge(object);
 		g_assert(purged == TRUE);
 
-		MgdObject *purged_object = midgard_object_new(mgd, G_OBJECT_TYPE_NAME(mot->object), NULL);
+		MidgardObject *purged_object = midgard_object_new(mgd, G_OBJECT_TYPE_NAME(mot->object), NULL);
 		gboolean get_purged = midgard_object_get_by_guid(purged_object, guid);
 		g_free(guid);
 
@@ -267,7 +267,7 @@ void midgard_test_object_basic_purge(MgdObjectTest *mot, gconstpointer data)
 	g_free(objects);
 }
 
-void midgard_test_object_basic_check_properties(MgdObject *object)
+void midgard_test_object_basic_check_properties(MidgardObject *object)
 {
 	g_assert(object != NULL);
 
@@ -331,7 +331,7 @@ void midgard_test_object_basic_run(void)
 	for(i = 0; i < n_types; i++) {
 		
 		typename = g_type_name(all_types[i]);
-		MgdObject *object = 
+		MidgardObject *object = 
 			midgard_test_object_basic_new(mgd, typename, NULL);
 
 		g_assert(object != NULL);
@@ -367,7 +367,7 @@ void midgard_test_object_basic_create_run(void)
 				|| g_str_equal(typename, "midgard_parameter"))
 			continue;
 
-		MgdObject *object = midgard_test_object_basic_new(mgd, typename, NULL);
+		MidgardObject *object = midgard_test_object_basic_new(mgd, typename, NULL);
 		g_assert(object != NULL);
 		//midgard_test_object_basic_create(object);	
 		//g_test_add_data_func("/midgard_object/basic/create/new", object, midgard_test_object_basic_create);
@@ -409,11 +409,11 @@ void midgard_test_object_basic_update_run(void)
 	return;
 }
 
-void midgard_test_object_basic_lock(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_basic_lock(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
 
-	MgdObject *object = mot->object;
+	MidgardObject *object = mot->object;
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
@@ -441,14 +441,14 @@ void midgard_test_object_basic_lock(MgdObjectTest *mot, gconstpointer data)
 	GValue tval = {0, };
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(object->metadata), "revised", &tval);
-	revised = midgard_timestamp_get_string(&tval);
+	revised = midgard_timestamp_get_string_from_value(&tval);
 	midgard_test_metadata_check_datetime_properties(object,                      
 			revised, "locked", "revised", NULL);
 
 	/* get fresh object */
 	gchar *oguid = NULL;
 	g_object_get(object, "guid", &oguid, NULL);
-	MgdObject *locked_object = 
+	MidgardObject *locked_object = 
 		midgard_test_object_basic_new_by_guid(mgd, G_OBJECT_TYPE_NAME(object), oguid);
 	g_assert(locked_object != NULL);
 	
@@ -468,11 +468,11 @@ void midgard_test_object_basic_lock(MgdObjectTest *mot, gconstpointer data)
 	g_free(pguid);
 }
 
-void midgard_test_object_basic_unlock(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_basic_unlock(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
 
-	MgdObject *object = mot->object;
+	MidgardObject *object = mot->object;
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
@@ -500,14 +500,14 @@ void midgard_test_object_basic_unlock(MgdObjectTest *mot, gconstpointer data)
 	GValue tval = {0, };
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(object->metadata), "revised", &tval);
-	revised = midgard_timestamp_get_string(&tval);
+	revised = midgard_timestamp_get_string_from_value(&tval);
 	midgard_test_metadata_check_datetime_properties(object,                      
 			revised, "locked", "revised", NULL);
 
 	/* get fresh object */
 	gchar *oguid = NULL;
 	g_object_get(object, "guid", &oguid, NULL);
-	MgdObject *locked_object = 
+	MidgardObject *locked_object = 
 		midgard_test_object_basic_new_by_guid(mgd, G_OBJECT_TYPE_NAME(object), oguid);
 	g_assert(locked_object != NULL);
 	
@@ -527,11 +527,11 @@ void midgard_test_object_basic_unlock(MgdObjectTest *mot, gconstpointer data)
 	g_free(pguid);
 }
 
-void midgard_test_object_basic_approve(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_basic_approve(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
 
-	MgdObject *object = mot->object;
+	MidgardObject *object = mot->object;
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
@@ -559,14 +559,14 @@ void midgard_test_object_basic_approve(MgdObjectTest *mot, gconstpointer data)
 	GValue tval = {0, };
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(object->metadata), "revised", &tval);
-	revised = midgard_timestamp_get_string(&tval);
+	revised = midgard_timestamp_get_string_from_value(&tval);
 	midgard_test_metadata_check_datetime_properties(object,                      
 			revised, "approved", "revised", NULL);
 
 	/* get fresh object */
 	gchar *oguid = NULL;
 	g_object_get(object, "guid", &oguid, NULL);
-	MgdObject *approved_object = 
+	MidgardObject *approved_object = 
 		midgard_test_object_basic_new_by_guid(mgd, G_OBJECT_TYPE_NAME(object), oguid);
 	g_assert(approved_object != NULL);
 	
@@ -587,11 +587,11 @@ void midgard_test_object_basic_approve(MgdObjectTest *mot, gconstpointer data)
 
 }
 
-void midgard_test_object_basic_unapprove(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_basic_unapprove(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
 
-	MgdObject *object = mot->object;
+	MidgardObject *object = mot->object;
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
@@ -619,14 +619,14 @@ void midgard_test_object_basic_unapprove(MgdObjectTest *mot, gconstpointer data)
 	GValue tval = {0, };
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(object->metadata), "revised", &tval);
-	revised = midgard_timestamp_get_string(&tval);
+	revised = midgard_timestamp_get_string_from_value(&tval);
 	midgard_test_metadata_check_datetime_properties(object,                      
 			revised, "approved", "revised", NULL);
 
 	/* get fresh object */
 	gchar *oguid = NULL;
 	g_object_get(object, "guid", &oguid, NULL);
-	MgdObject *unapproved_object = 
+	MidgardObject *unapproved_object = 
 		midgard_test_object_basic_new_by_guid(mgd, G_OBJECT_TYPE_NAME(object), oguid);
 	g_assert(unapproved_object != NULL);
 	

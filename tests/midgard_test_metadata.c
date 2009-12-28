@@ -25,7 +25,7 @@ void __metadata_datetime_empty(const gchar *datetime)
 	 * Current way is not efficient as it depends only on MySQL provider and fails with PostgreSQL for example */
 }
 
-void midgard_test_metadata_check_new(MgdObject *object)
+void midgard_test_metadata_check_new(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 	if (!midgard_object_class_has_metadata (klass))
@@ -40,7 +40,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	gchar *metadata_created = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "created", &tval);
-	metadata_created = midgard_timestamp_get_string(&tval);
+	metadata_created = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_created, ==, MIDGARD_DEFAULT_DATETIME); 
 	g_free(metadata_created);
 	g_value_unset(&tval);
@@ -66,7 +66,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	gchar *metadata_revised = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
-	metadata_revised = midgard_timestamp_get_string(&tval);
+	metadata_revised = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_revised, ==, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
 	g_free(metadata_revised);
@@ -81,7 +81,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	gchar *metadata_locked = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "locked", &tval);
-	metadata_locked = midgard_timestamp_get_string(&tval);
+	metadata_locked = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_locked, ==, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
 	g_free(metadata_locked);
@@ -96,7 +96,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	gchar *metadata_approved = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "approved", &tval);
-	metadata_approved = midgard_timestamp_get_string(&tval);
+	metadata_approved = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_approved, ==, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
 	g_free(metadata_approved);
@@ -117,7 +117,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	gchar *metadata_schedulestart = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "schedulestart", &tval);
-	metadata_schedulestart = midgard_timestamp_get_string(&tval);
+	metadata_schedulestart = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_schedulestart, ==, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
 	g_free(metadata_schedulestart);
@@ -126,7 +126,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	gchar *metadata_scheduleend = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "scheduleend", &tval);
-	metadata_scheduleend = midgard_timestamp_get_string(&tval);
+	metadata_scheduleend = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_scheduleend, ==, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
 	g_free(metadata_scheduleend);
@@ -150,7 +150,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	gchar *metadata_published = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "published", &tval);
-	metadata_published = midgard_timestamp_get_string(&tval);
+	metadata_published = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_published, ==, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
 	g_free(metadata_published);
@@ -164,7 +164,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	gchar *metadata_imported = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "imported", &tval);
-	metadata_imported = midgard_timestamp_get_string(&tval);
+	metadata_imported = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_imported, ==, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
 	g_free(metadata_imported);
@@ -173,7 +173,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	gchar *metadata_exported = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "exported", &tval);
-	metadata_exported = midgard_timestamp_get_string(&tval);
+	metadata_exported = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_exported, ==, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
 	g_free(metadata_exported);
@@ -196,7 +196,7 @@ void midgard_test_metadata_check_new(MgdObject *object)
 	return;
 }
 
-void midgard_test_metadata_check_create(MgdObject *object)
+void midgard_test_metadata_check_create(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 	if (!midgard_object_class_has_metadata (klass))
@@ -211,7 +211,7 @@ void midgard_test_metadata_check_create(MgdObject *object)
 	gchar *metadata_created = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "created", &tval);
-	metadata_created = midgard_timestamp_get_string(&tval);
+	metadata_created = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_created, !=, NULL);
 	g_assert_cmpstr(metadata_created, !=, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
@@ -233,7 +233,7 @@ void midgard_test_metadata_check_create(MgdObject *object)
 	gchar *metadata_revised = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
-	metadata_revised = midgard_timestamp_get_string(&tval);
+	metadata_revised = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_revised, !=, NULL);
 	g_value_unset(&tval);
 	g_free(metadata_revised);
@@ -253,7 +253,7 @@ void midgard_test_metadata_check_create(MgdObject *object)
 	gchar *metadata_locked = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "locked", &tval);
-	metadata_locked = midgard_timestamp_get_string(&tval);
+	metadata_locked = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_locked);
 	g_value_unset(&tval);
 	g_free(metadata_locked);	
@@ -268,7 +268,7 @@ void midgard_test_metadata_check_create(MgdObject *object)
 	gchar *metadata_approved = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "approved", &tval);
-	metadata_approved = midgard_timestamp_get_string(&tval);
+	metadata_approved = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_approved);
 	g_value_unset(&tval);
 	g_free(metadata_approved);	
@@ -291,7 +291,7 @@ void midgard_test_metadata_check_create(MgdObject *object)
 	gchar *metadata_imported = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "imported", &tval);
-	metadata_imported = midgard_timestamp_get_string(&tval);
+	metadata_imported = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_imported);
 	g_value_unset(&tval);
 	g_free(metadata_imported);	
@@ -300,7 +300,7 @@ void midgard_test_metadata_check_create(MgdObject *object)
 	gchar *metadata_exported = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "exported", &tval);
-	metadata_exported = midgard_timestamp_get_string(&tval);
+	metadata_exported = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_exported);
 	g_value_unset(&tval);
 	g_free(metadata_exported);	
@@ -323,7 +323,7 @@ void midgard_test_metadata_check_create(MgdObject *object)
 	return;
 }
 
-void midgard_test_metadata_check_created(MgdObject *object)
+void midgard_test_metadata_check_created(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 	if (!midgard_object_class_has_metadata (klass))
@@ -338,7 +338,7 @@ void midgard_test_metadata_check_created(MgdObject *object)
 	gchar *metadata_created = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "created", &tval);
-	metadata_created = midgard_timestamp_get_string(&tval);
+	metadata_created = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_created, !=, NULL);
 	g_assert_cmpstr(metadata_created, !=, MIDGARD_DEFAULT_DATETIME);
 	g_value_unset(&tval);
@@ -360,7 +360,7 @@ void midgard_test_metadata_check_created(MgdObject *object)
 	gchar *metadata_revised = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
-	metadata_revised = midgard_timestamp_get_string(&tval);
+	metadata_revised = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_revised, !=, NULL);
 	g_value_unset(&tval);
 	g_free(metadata_revised);
@@ -380,7 +380,7 @@ void midgard_test_metadata_check_created(MgdObject *object)
 	gchar *metadata_locked = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "locked", &tval);
-	metadata_locked = midgard_timestamp_get_string(&tval);
+	metadata_locked = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_locked);
 	g_value_unset(&tval);
 	g_free(metadata_locked);	
@@ -395,7 +395,7 @@ void midgard_test_metadata_check_created(MgdObject *object)
 	gchar *metadata_approved = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "approved", &tval);
-	metadata_approved = midgard_timestamp_get_string(&tval);
+	metadata_approved = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_approved);
 	g_value_unset(&tval);
 	g_free(metadata_approved);	
@@ -418,7 +418,7 @@ void midgard_test_metadata_check_created(MgdObject *object)
 	gchar *metadata_imported = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "imported", &tval);
-	metadata_imported = midgard_timestamp_get_string(&tval);
+	metadata_imported = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_imported);
 	g_value_unset(&tval);
 	g_free(metadata_imported);	
@@ -427,7 +427,7 @@ void midgard_test_metadata_check_created(MgdObject *object)
 	gchar *metadata_exported = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "exported", &tval);
-	metadata_exported = midgard_timestamp_get_string(&tval);
+	metadata_exported = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_exported);
 	g_value_unset(&tval);
 	g_free(metadata_exported);	
@@ -450,7 +450,7 @@ void midgard_test_metadata_check_created(MgdObject *object)
 	return;
 }
 
-void midgard_test_metadata_check_update(MgdObject *object)
+void midgard_test_metadata_check_update(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 	if (!midgard_object_class_has_metadata (klass))
@@ -465,7 +465,7 @@ void midgard_test_metadata_check_update(MgdObject *object)
 	gchar *metadata_created = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "created", &tval);
-	metadata_created = midgard_timestamp_get_string(&tval);
+	metadata_created = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_created, !=, NULL);
 	g_value_unset(&tval);
 	g_free(metadata_created);
@@ -486,7 +486,7 @@ void midgard_test_metadata_check_update(MgdObject *object)
 	gchar *metadata_revised = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
-	metadata_revised = midgard_timestamp_get_string(&tval);
+	metadata_revised = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_revised, !=, NULL);
 	g_value_unset(&tval);
 	g_free(metadata_revised);
@@ -572,7 +572,7 @@ void midgard_test_metadata_check_update(MgdObject *object)
 	return;
 }
 
-void midgard_test_metadata_check_updated(MgdObject *object)
+void midgard_test_metadata_check_updated(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 	if (!midgard_object_class_has_metadata (klass))
@@ -587,7 +587,7 @@ void midgard_test_metadata_check_updated(MgdObject *object)
 	gchar *metadata_created = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "created", &tval);
-	metadata_created = midgard_timestamp_get_string(&tval);
+	metadata_created = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_created, !=, NULL);
 	g_value_unset(&tval);
 	g_free(metadata_created);
@@ -608,7 +608,7 @@ void midgard_test_metadata_check_updated(MgdObject *object)
 	gchar *metadata_revised = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
-	metadata_revised = midgard_timestamp_get_string(&tval);
+	metadata_revised = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_revised, !=, NULL);
 	g_value_unset(&tval);
 	g_free(metadata_revised);
@@ -694,7 +694,7 @@ void midgard_test_metadata_check_updated(MgdObject *object)
 	return;
 }
 
-void midgard_test_metadata_check_delete(MgdObject *object)
+void midgard_test_metadata_check_delete(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 	if (!midgard_object_class_has_metadata (klass))
@@ -709,7 +709,7 @@ void midgard_test_metadata_check_delete(MgdObject *object)
 	gchar *metadata_created = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "created", &tval);
-	metadata_created = midgard_timestamp_get_string(&tval);
+	metadata_created = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_created, !=, NULL);
 	g_value_unset(&tval);
 	g_free(metadata_created);
@@ -730,7 +730,7 @@ void midgard_test_metadata_check_delete(MgdObject *object)
 	gchar *metadata_revised = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
-	metadata_revised = midgard_timestamp_get_string(&tval);
+	metadata_revised = midgard_timestamp_get_string_from_value(&tval);
 	g_assert_cmpstr(metadata_revised, !=, NULL);
 	g_value_unset(&tval);
 	g_free(metadata_revised);
@@ -748,7 +748,7 @@ void midgard_test_metadata_check_delete(MgdObject *object)
 	gchar *metadata_locked = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "locked", &tval);
-	metadata_locked = midgard_timestamp_get_string(&tval);
+	metadata_locked = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_locked);
 	g_value_unset(&tval);
 	g_free(metadata_locked);	
@@ -760,7 +760,7 @@ void midgard_test_metadata_check_delete(MgdObject *object)
 	gchar *metadata_approved = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "approved", &tval);
-	metadata_approved = midgard_timestamp_get_string(&tval);
+	metadata_approved = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_approved);
 	g_value_unset(&tval);
 	g_free(metadata_approved);	
@@ -783,7 +783,7 @@ void midgard_test_metadata_check_delete(MgdObject *object)
 	gchar *metadata_imported = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "imported", &tval);
-	metadata_imported = midgard_timestamp_get_string(&tval);
+	metadata_imported = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_imported);
 	g_value_unset(&tval);
 	g_free(metadata_imported);	
@@ -792,7 +792,7 @@ void midgard_test_metadata_check_delete(MgdObject *object)
 	gchar *metadata_exported = NULL;
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 	g_object_get_property(G_OBJECT(metadata), "exported", &tval);
-	metadata_exported = midgard_timestamp_get_string(&tval);
+	metadata_exported = midgard_timestamp_get_string_from_value(&tval);
 	__metadata_datetime_empty(metadata_exported);
 	g_value_unset(&tval);
 	g_free(metadata_exported);	
@@ -812,7 +812,7 @@ void midgard_test_metadata_check_delete(MgdObject *object)
 	return;
 }
 
-void midgard_test_metadata_check_person_references(MgdObject *object, const gchar *guid, ...)
+void midgard_test_metadata_check_person_references(MidgardObject *object, const gchar *guid, ...)
 {
 	g_assert (object != NULL);
 
@@ -853,7 +853,7 @@ void midgard_test_metadata_check_person_references(MgdObject *object, const gcha
 	return;
 }
 
-void midgard_test_metadata_check_datetime_properties(MgdObject *object, const gchar *datetime, ...)
+void midgard_test_metadata_check_datetime_properties(MidgardObject *object, const gchar *datetime, ...)
 {
 	g_assert(object != NULL);
 
@@ -873,7 +873,7 @@ void midgard_test_metadata_check_datetime_properties(MgdObject *object, const gc
 		
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 		g_object_get_property(G_OBJECT(metadata), property, &tval);
-		metadata_property = midgard_timestamp_get_string(&tval);
+		metadata_property = midgard_timestamp_get_string_from_value(&tval);
 		g_assert_cmpstr(metadata_property, !=, NULL);
 
 		/* check if value is the same as given one */

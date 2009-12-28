@@ -448,13 +448,13 @@ midgard_test_user_login (MidgardUserTest *mut, gconstpointer data)
 	g_value_unset (&atval);
 	g_free (parameters);
 
-	gboolean logged_in = midgard_user_login (user);
+	gboolean logged_in = midgard_user_log_in (user);
 	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OK);
 	g_assert (logged_in != FALSE);	
 
 	/* Check empty user */
 	MidgardUser *empty = midgard_user_new (mgd, 0, NULL);
-	gboolean empty_logged_in = midgard_user_login (empty);
+	gboolean empty_logged_in = midgard_user_log_in (empty);
 	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_INVALID_PROPERTY_VALUE);
 	g_assert (empty_logged_in == FALSE);
 	g_object_unref (empty);
@@ -469,14 +469,14 @@ midgard_test_user_logout (MidgardUserTest *mut, gconstpointer data)
 	MidgardUser *user = midgard_connection_get_user (mgd);
 	g_assert (user != NULL);
 
-	gboolean user_logout = midgard_user_logout (user);
+	gboolean user_logout = midgard_user_log_out (user);
 	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OK);
 	g_assert (user_logout != FALSE);
 	g_object_unref (user);
 
 	/* Check empty user logout */
 	MidgardUser *empty = midgard_user_new (mgd, 0, NULL);
-	gboolean empty_user_logout = midgard_user_logout (empty);
+	gboolean empty_user_logout = midgard_user_log_out (empty);
 	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_INTERNAL);
 	g_assert (empty_user_logout == FALSE);
 }

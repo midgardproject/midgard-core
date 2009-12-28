@@ -5,15 +5,15 @@
 #include "midgard_test.h"
 #include "midgard_test_object.h"
 
-gboolean midgard_test_object_fetch_by_id_created(MgdObject *object, guint id);
-void midgard_test_object_get_by_id_created(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_get_by_id_updated(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_get_by_id_deleted(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_constructor_id_created(MgdObjectTest *mot, gconstpointer data);
+gboolean midgard_test_object_fetch_by_id_created(MidgardObject *object, guint id);
+void midgard_test_object_get_by_id_created(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_get_by_id_updated(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_get_by_id_deleted(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_constructor_id_created(MidgardObjectTest *mot, gconstpointer data);
 
-gboolean midgard_test_object_fetch_by_guid_created(MgdObject *object, const gchar *guid);
-void midgard_test_object_get_by_guid_created(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_constructor_guid_created(MgdObjectTest *mot, gconstpointer data);
+gboolean midgard_test_object_fetch_by_guid_created(MidgardObject *object, const gchar *guid);
+void midgard_test_object_get_by_guid_created(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_constructor_guid_created(MidgardObjectTest *mot, gconstpointer data);
 
 void midgard_test_object_fetch_run(void);
 

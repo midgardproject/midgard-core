@@ -18,22 +18,22 @@
 
 #include "midgard_test.h"
 
-void midgard_test_setup_foo(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_setup_foo(MidgardObjectTest *mot, gconstpointer data)
 {
 	/* Do nothing */
 }
 
-void midgard_test_teardown_foo(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_teardown_foo(MidgardObjectTest *mot, gconstpointer data)
 {
 	/* Do nothing */
 }
 
-void midgard_test_run_foo(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_run_foo(MidgardObjectTest *mot, gconstpointer data)
 {
 	/* Do nothing */
 }
 
-void midgard_test_unref_object(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_unref_object(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(data != NULL);
 	GObject *object = G_OBJECT(data);
@@ -45,7 +45,7 @@ void midgard_test_lock_root_objects(MidgardConnection *mgd, MidgardUser *user)
 	g_assert(user != NULL);
 	/* Lock root user */
 
-	MgdObject *person = midgard_user_get_person(user);
+	MidgardObject *person = midgard_user_get_person(user);
 	g_assert(person != NULL);
 
 	if(!midgard_object_is_locked((MIDGARD_OBJECT(person)))) {
@@ -63,7 +63,7 @@ gchar *midgard_test_get_current_person_guid(MidgardConnection *mgd)
 	MidgardUser *user = midgard_connection_get_user(mgd);
 	g_assert(user != NULL);
 
-	MgdObject *person = midgard_user_get_person(user);
+	MidgardObject *person = midgard_user_get_person(user);
 	g_assert(person != NULL);
 	
 	gchar *pguid = NULL;

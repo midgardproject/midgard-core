@@ -6,9 +6,9 @@
 #include "midgard_test_object.h"
 
 /* tests */
-void	midgard_test_replicator_import_unserialize		(MgdObjectTest *mot, gconstpointer data);
-void	midgard_test_replicator_import_dependent_objects_fail	(MgdObjectTest *mot, gconstpointer data);
-void	midgard_test_replicator_import_dependent_objects	(MgdObjectTest *mot, gconstpointer data);
-void	midgard_test_replicator_import_independent_objects	(MgdObjectTest *mot, gconstpointer data);
+void	midgard_test_replicator_import_unserialize		(MidgardObjectTest *mot, gconstpointer data);
+void	midgard_test_replicator_import_dependent_objects_fail	(MidgardObjectTest *mot, gconstpointer data);
+void	midgard_test_replicator_import_dependent_objects	(MidgardObjectTest *mot, gconstpointer data);
+void	midgard_test_replicator_import_independent_objects	(MidgardObjectTest *mot, gconstpointer data);
 
 #endif /* MIDGARD_TEST_REPLICATOR_IMPORT_H */

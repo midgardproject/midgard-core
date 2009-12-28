@@ -53,16 +53,16 @@ int main (int argc, char *argv[])
 				|| g_str_equal(typename, "midgard_parameter"))
 			continue;
 
-		MgdObject *object = midgard_test_object_basic_new(mgd_global, typename, NULL);
+		MidgardObject *object = midgard_test_object_basic_new(mgd_global, typename, NULL);
 		g_assert(object != NULL);
 
 		testname = g_strconcat("/midgard_object_tree/", typename, "/basic", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_tree_basic, midgard_test_teardown_foo);
 		g_free(testname);
 
 		testname = g_strconcat("/midgard_object_tree/", typename, "/create", NULL);
-		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
 				midgard_test_object_tree_create, midgard_test_teardown_foo);
 		g_free(testname);	
 

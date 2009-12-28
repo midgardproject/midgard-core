@@ -20,7 +20,7 @@
 #include "midgard_test_object_basic.h"
 #include "midgard_test_query_builder.h"
 
-void midgard_test_object_class_undelete(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_class_undelete(MidgardObjectTest *mot, gconstpointer data)
 {
 	return; /* FIXME! This test fails and blocks others */
 	g_assert(mot != NULL);
@@ -60,7 +60,7 @@ void midgard_test_object_class_undelete(MgdObjectTest *mot, gconstpointer data)
 	g_free(objects);
 }
 
-void midgard_test_object_class_get_object_by_guid_deleted (MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_class_get_object_by_guid_deleted (MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
 	

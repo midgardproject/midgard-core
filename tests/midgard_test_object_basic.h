@@ -6,24 +6,24 @@
 #include "midgard_test_object.h"
 
 /* helpers */
-MgdObject *midgard_test_object_basic_new(MidgardConnection *mgd, const gchar *name, GValue *value);
-MgdObject *midgard_test_object_basic_new_by_guid(MidgardConnection *mgd, const gchar *name, const gchar *guid);
+MidgardObject *midgard_test_object_basic_new(MidgardConnection *mgd, const gchar *name, GValue *value);
+MidgardObject *midgard_test_object_basic_new_by_guid(MidgardConnection *mgd, const gchar *name, const gchar *guid);
 
 /* tests */
-void midgard_test_object_basic_create(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_basic_update(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_basic_delete(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_basic_purge(MgdObjectTest *mot, gconstpointer data);
+void midgard_test_object_basic_create(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_basic_update(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_basic_delete(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_basic_purge(MidgardObjectTest *mot, gconstpointer data);
 
-void midgard_test_object_basic_lock(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_basic_unlock(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_basic_approve(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_object_basic_unapprove(MgdObjectTest *mot, gconstpointer data);
+void midgard_test_object_basic_lock(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_basic_unlock(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_basic_approve(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_object_basic_unapprove(MidgardObjectTest *mot, gconstpointer data);
 
-/* gboolean midgard_test_object_basic_update(MgdObject *object); */
-/* gboolean midgard_test_object_basic_delete(MgdObject *object); */
-/* gboolean midgard_test_object_basic_purge(MgdObject *object); */
-void midgard_test_object_basic_check_properties(MgdObject *object);
+/* gboolean midgard_test_object_basic_update(MidgardObject *object); */
+/* gboolean midgard_test_object_basic_delete(MidgardObject *object); */
+/* gboolean midgard_test_object_basic_purge(MidgardObject *object); */
+void midgard_test_object_basic_check_properties(MidgardObject *object);
 
 void midgard_test_object_basic_run(void);
 void midgard_test_object_basic_create_run(void);

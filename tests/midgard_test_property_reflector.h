@@ -6,14 +6,14 @@
 #include "midgard_test_object.h"
 
 /* tests */
-void midgard_test_property_reflector_new(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_property_reflector_check_midgard_type(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_property_reflector_check_is_link(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_property_reflector_check_is_linked(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_property_reflector_check_link_class(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_property_reflector_check_link_name(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_property_reflector_check_link_target(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_property_reflector_check_description(MgdObjectTest *mot, gconstpointer data);
-void midgard_test_property_reflector_check_is_multilang(MgdObjectTest *mot, gconstpointer data);
+void midgard_test_property_reflector_new(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_property_reflector_check_midgard_type(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_property_reflector_check_is_link(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_property_reflector_check_is_linked(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_property_reflector_check_link_class(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_property_reflector_check_link_name(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_property_reflector_check_link_target(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_property_reflector_check_description(MidgardObjectTest *mot, gconstpointer data);
+void midgard_test_property_reflector_check_is_multilang(MidgardObjectTest *mot, gconstpointer data);
 
 #endif /* MIDGARD_TEST_PROPERTY_REFLECTOR_H */
