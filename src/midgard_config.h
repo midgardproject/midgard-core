@@ -59,7 +59,7 @@ struct MidgardConfig{
 	gchar *mgdpassword;
 	gboolean testunit;
 	guint loghandler;
-	guint authtype;
+	gchar *authtype;
 	gchar *pamfile;
 	gboolean gdathreads;
 

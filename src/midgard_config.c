@@ -38,10 +38,6 @@
 #include "midgard_error.h"
 #include "midgard_core_object_class.h"
 
-#define AUTH_NORMAL_STR		"Normal"
-#define AUTH_PAM_STR		"PAM"
-#define AUTH_TRUSTED_STR	"Trusted"
-
 static gchar *__get_default_confdir(void);
 
 /* Properties */
@@ -113,7 +109,7 @@ void __set_dbtype(MidgardConfig *self, const gchar *tmpstr)
 	} else if(tmpstr == NULL) {
 		self->priv->dbtype = MIDGARD_DB_TYPE_MYSQL;
 	} else {
-		g_warning("'%s' database type is invalid. Setting default MySQL one", tmpstr);
+		g_warning ("'%s' database type is invalid. Setting default MySQL one", tmpstr);
 		self->priv->dbtype = MIDGARD_DB_TYPE_MYSQL;
 		_dbtype = "MySQL";
 	}
@@ -135,39 +131,39 @@ void __create_log_dir(const gchar *path)
 	gint rv = g_mkdir_with_parents((const gchar *)dir_path, 0711);
 	
 	if(rv == -1) {
-		g_warning("Failed to create '%s' directory", dir_path);
-		g_free(dir_path);
+		g_warning ("Failed to create '%s' directory", dir_path);
+		g_free (dir_path);
 		return ;
 	}
 }
 
 static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, const gchar *filename)
 {
-	g_assert(self != NULL);
-	g_assert(keyfile != NULL);
+	g_assert (self != NULL);
+	g_assert (keyfile != NULL);
 
 	gchar  *tmpstr;
 	gboolean tmpbool;
 
 	/* Get database type */
 	self->priv->dbtype = MIDGARD_DB_TYPE_MYSQL;
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "Type", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Type", NULL);
 	if(tmpstr == NULL || *tmpstr == '\0') {
-		g_free(tmpstr);
+		g_free (tmpstr);
 		tmpstr = g_strdup("MySQL");
 	}
 
 	__set_dbtype(self, tmpstr);
-	g_free(tmpstr);
+	g_free (tmpstr);
 		
 	/* Get host name or IP */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "Host", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Host", NULL);
 	if(tmpstr == NULL)
 		tmpstr = g_strdup("localhost");
 	if(self->host)
-		g_free(self->host);
+		g_free (self->host);
 	self->host = g_strdup(tmpstr);
-	g_free(tmpstr);
+	g_free (tmpstr);
 
 	/* Get database port */
 	guint port = g_key_file_get_integer (keyfile, "MidgardDatabase", "Port", NULL);
@@ -177,31 +173,31 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 		g_warning ("Invalid, negative value for database port");
 
 	/* Get database name */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "Name", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Name", NULL);
 	if(tmpstr != NULL && *tmpstr != '\0') {
-		g_free(self->database);
+		g_free (self->database);
 		self->database = g_strdup(tmpstr);
 	}
-	g_free(tmpstr);
+	g_free (tmpstr);
 
 	/* Get database's username */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "Username", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Username", NULL);
 	if(tmpstr != NULL && *tmpstr != '\0') {
-		g_free(self->dbuser);
+		g_free (self->dbuser);
 		self->dbuser = g_strdup(tmpstr);
 	}
-	g_free(tmpstr);
+	g_free (tmpstr);
 
 	/* Get password for database user */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "Password", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Password", NULL);
 	if(tmpstr != NULL && *tmpstr != '\0') {
-		g_free(self->dbpass);
+		g_free (self->dbpass);
 		self->dbpass = g_strdup(tmpstr);
 	}
-	g_free(tmpstr);
+	g_free (tmpstr);
 
 	/* Get log filename */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "Logfile", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Logfile", NULL);
 	GIOChannel *channel = NULL;
 	if(tmpstr != NULL && !g_str_equal(tmpstr, "")) {
 
@@ -214,11 +210,11 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 					tmpstr,
 					"a",
 					&err);
-		g_free(tmpstr);
+		g_free (tmpstr);
 		tmpstr = NULL;
 
 		if(!channel){
-			g_warning("Can not open '%s' logfile. %s", 
+			g_warning ("Can not open '%s' logfile. %s", 
 					self->logfilename,
 					err->message);
 		} else {
@@ -228,16 +224,16 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 	}
 
 	if(tmpstr)
-		g_free(tmpstr);
+		g_free (tmpstr);
 
 	/* Get log level */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "Loglevel", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Loglevel", NULL);
 	if(tmpstr == NULL)
 		tmpstr = g_strdup("warn");
 	if(self->loglevel)
-		g_free(self->loglevel);
+		g_free (self->loglevel);
 	self->loglevel = g_strdup(tmpstr);
-	g_free(tmpstr);
+	g_free (tmpstr);
 	tmpstr = NULL;
 
 	/* Get database creation mode */
@@ -250,21 +246,21 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 	self->tableupdate = tmpbool;
 
 	/* Get SG admin username */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "MidgardUsername", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "MidgardUsername", NULL);
 	if(tmpstr != NULL && *tmpstr != '\0') {
 		if(self->mgdusername)
-			g_free(self->mgdusername);
+			g_free (self->mgdusername);
 		self->mgdusername = g_strdup(tmpstr);		
-		g_free(tmpstr);
+		g_free (tmpstr);
 	}
 
 	/* Get SG admin password */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "MidgardPassword", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "MidgardPassword", NULL);
 	if(tmpstr != NULL && *tmpstr != '\0') {
 		if(self->mgdpassword)
-			g_free(self->mgdpassword);
+			g_free (self->mgdpassword);
 		self->mgdpassword = g_strdup(tmpstr);
-		g_free(tmpstr);
+		g_free (tmpstr);
 	}
 
 	/* Get test mode */
@@ -272,16 +268,16 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 	self->testunit = tmpbool;
 
 	/* Get auth type */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "AuthType", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "AuthType", NULL);
 	midgard_config_set_authtype(self, (const gchar *)tmpstr);
-	g_free(tmpstr);
+	g_free (tmpstr);
 
 	/* Get Pam file */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "PamFile", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "PamFile", NULL);
 	if(tmpstr == NULL)
 		tmpstr = g_strdup("midgard");
 	self->pamfile = g_strdup(tmpstr);
-	g_free(tmpstr);
+	g_free (tmpstr);
 
 	/* Disable threads */
 	tmpbool = g_key_file_get_boolean(keyfile, "MidgardDatabase", "GdaThreads", NULL);
@@ -290,51 +286,51 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 	/* DIRECTORIES */
 
 	/* BlobDir */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDir", "BlobDir", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "BlobDir", NULL);
 	if(tmpstr != NULL && *tmpstr != '\0') {
 
-		g_free(self->blobdir);
+		g_free (self->blobdir);
 		self->blobdir = g_strdup(tmpstr);
-		g_free(tmpstr);
+		g_free (tmpstr);
 	
 	} else {
 
 		gchar *db_blobdir = g_build_path(G_DIR_SEPARATOR_S, 
 				self->blobdir, self->database, NULL);
-		g_free(self->blobdir);
+		g_free (self->blobdir);
 		self->blobdir = db_blobdir;
 	}
 
 	/* ShareDir */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDir", "ShareDir", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "ShareDir", NULL);
 	if(tmpstr != NULL && *tmpstr != '\0') {
 
-		g_free(self->sharedir);
+		g_free (self->sharedir);
 		self->sharedir = tmpstr;
 	}
 
 	/* VarDir */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDir", "VarDir", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "VarDir", NULL);
 	if(tmpstr != NULL || (tmpstr && *tmpstr != '\0')) {
 
-		g_free(self->vardir);
+		g_free (self->vardir);
 		self->vardir = tmpstr;
 	}
 
 	/* CacheDir */
-	tmpstr = g_key_file_get_string(keyfile, "MidgardDir", "ShareDir", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "ShareDir", NULL);
 	if(tmpstr != NULL || (tmpstr && *tmpstr == '\0')) {
 
-		g_free(self->cachedir);
+		g_free (self->cachedir);
 		self->cachedir = tmpstr;
 	} 
 
 	/* SchemaDir */
-	g_free(self->schemadir);
+	g_free (self->schemadir);
 	self->schemadir = g_build_path(G_DIR_SEPARATOR_S, self->sharedir, MIDGARD_CONFIG_RW_SCHEMA, NULL);
 
 	/* ViewsDir */
-	g_free(self->viewsdir);
+	g_free (self->viewsdir);
 	self->viewsdir = g_build_path(G_DIR_SEPARATOR_S, self->sharedir, MIDGARD_CONFIG_RW_VIEW, NULL);
 
 	/* We will free it when config is unref */
@@ -368,7 +364,7 @@ gboolean midgard_config_read_file(MidgardConfig *self, const gchar *filename, gb
 	gchar *fname = NULL;	
 	GKeyFile *keyfile;	
 
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
 	if(filename == NULL || *filename == '\0') {
@@ -384,7 +380,7 @@ gboolean midgard_config_read_file(MidgardConfig *self, const gchar *filename, gb
 		gchar *_umcd = g_strconcat(".", MIDGARD_PACKAGE_NAME, NULL);
 		fname = g_build_path (G_DIR_SEPARATOR_S, 
 				g_get_home_dir(), _umcd, "conf.d", filename, NULL);
-		g_free(_umcd);
+		g_free (_umcd);
 	} else {
 		fname = g_build_path (G_DIR_SEPARATOR_S,
 				self->confdir, "/", filename, NULL);
@@ -408,14 +404,14 @@ gboolean midgard_config_read_file(MidgardConfig *self, const gchar *filename, gb
 			g_clear_error(&kf_error);
 		}
 
-		g_free(fname);
+		g_free (fname);
 		return FALSE;
 	}
 
 	// checking consistency of config-file
 	// 1) upgrade-advice
 	if (!g_key_file_has_group(keyfile, "MidgardDatabase") && g_key_file_has_group(keyfile, "Database")) {
-		g_warning("Config-file '%s' doesn't have [MidgardDatabase] section, but has old [Database] section. You should rename it.", fname);
+		g_warning ("Config-file '%s' doesn't have [MidgardDatabase] section, but has old [Database] section. You should rename it.", fname);
 	}
 	// 2) check for unsupported sections
 	{
@@ -424,7 +420,7 @@ gboolean midgard_config_read_file(MidgardConfig *self, const gchar *filename, gb
 
 		for (i = 0; i < sections_len; i++) {
 			if (!g_str_equal(sections[i], "MidgardDatabase") && !g_str_equal(sections[i], "MidgardDir")) {
-				g_warning("Config-file '%s' has unsupported section [%s]. It won't be parsed.", fname, sections[i]);
+				g_warning ("Config-file '%s' has unsupported section [%s]. It won't be parsed.", fname, sections[i]);
 			}
 		}
 	}
@@ -446,7 +442,7 @@ gboolean midgard_config_read_file(MidgardConfig *self, const gchar *filename, gb
  */
 gboolean midgard_config_read_file_at_path(MidgardConfig *self, const gchar *filepath, GError **error)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
 	GKeyFile *keyfile = NULL;
@@ -484,7 +480,7 @@ gboolean midgard_config_read_file_at_path(MidgardConfig *self, const gchar *file
  */
 gboolean midgard_config_read_data(MidgardConfig *self, const gchar *data, GError **error)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
 	GKeyFile *keyfile = NULL;
@@ -528,11 +524,11 @@ gchar **midgard_config_list_files(gboolean user)
 		gchar *_umcd = g_strconcat(".", MIDGARD_PACKAGE_NAME, NULL);
 		config_dir = g_build_path (G_DIR_SEPARATOR_S,
 				g_get_home_dir(), _umcd, "conf.d", NULL);
-		g_free(_umcd);
+		g_free (_umcd);
 		if (!g_file_test (config_dir, G_FILE_TEST_IS_DIR)){
 			g_error("Config directory '%s' doesn't exist",
 					config_dir);
-			g_free(config_dir);
+			g_free (config_dir);
 			return NULL;
 		} 
 
@@ -572,7 +568,7 @@ gchar **midgard_config_list_files(gboolean user)
 		filenames[i] = NULL;		
 	}
 	
-	g_free(config_dir);
+	g_free (config_dir);
 
 	return filenames;
 }
@@ -606,7 +602,7 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 	gchar *_umcd = NULL;
 
 	if(namel < 1) {
-		g_warning("Can not save configuration file without a name");
+		g_warning ("Can not save configuration file without a name");
 		return FALSE;
 	}
 
@@ -618,12 +614,12 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 	if(user) {
 
 		gchar *_cnf_path = midgard_core_config_build_path(NULL, NULL, TRUE);
-		g_free(_cnf_path);
+		g_free (_cnf_path);
 
 		_umcd = g_strconcat(".", MIDGARD_PACKAGE_NAME, NULL);
 		gchar *path = g_build_path(G_DIR_SEPARATOR_S,
 				g_get_home_dir(), _umcd, NULL);
-		g_free(_umcd);
+		g_free (_umcd);
 
 		/* Check if .midgard directory exists */
 		if(!g_file_test((const gchar *)path, 
@@ -635,16 +631,16 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 		if(!g_file_test((const gchar *)path,
 					G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) {
 
-			g_warning("%s is not a directory!", path);
-			g_free(path);
+			g_warning ("%s is not a directory!", path);
+			g_free (path);
 			return FALSE;
 		}
-		g_free(path);
+		g_free (path);
 
 		_umcd = g_strconcat(".", MIDGARD_PACKAGE_NAME, NULL);
 		path = g_build_path(G_DIR_SEPARATOR_S, 
 				g_get_home_dir(), _umcd, "conf.d", NULL);
-		g_free(_umcd);
+		g_free (_umcd);
 		
 		/* Check if .midgard/conf.d directory exists */
 		if(!g_file_test((const gchar *)path, 
@@ -656,16 +652,16 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 		if(!g_file_test((const gchar *)path,
 					G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) {
 
-			g_warning("%s is not a directory!", path);
-			g_free(path);
+			g_warning ("%s is not a directory!", path);
+			g_free (path);
 			return FALSE;
 		}
-		g_free(path);
+		g_free (path);
 
 		_umcd = g_strconcat(".", MIDGARD_PACKAGE_NAME, NULL);
 		cnfpath = g_build_path (G_DIR_SEPARATOR_S,
 				g_get_home_dir(), _umcd, "conf.d", name, NULL);
-		g_free(_umcd);
+		g_free (_umcd);
 
 	} else {
 		
@@ -673,7 +669,7 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 					G_FILE_TEST_EXISTS)
 				|| (!g_file_test((const gchar *)self->confdir,
 						G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))) {
-			g_warning("%s doesn't exist or is not a directory!", self->confdir);
+			g_warning ("%s doesn't exist or is not a directory!", self->confdir);
 			return FALSE;
 		}
 
@@ -713,10 +709,10 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 		switch(props[i]->value_type){
 	
 			case G_TYPE_STRING:
-				tmpstr = (gchar *)g_value_get_string(&pval);
+				tmpstr = (gchar *)g_value_get_string (&pval);
 				if(!tmpstr)
 					tmpstr = "";
-				g_key_file_set_string(self->priv->keyfile,
+				g_key_file_set_string (self->priv->keyfile,
 						keygroup,
 						nick, tmpstr);
 				break;
@@ -742,7 +738,7 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 		g_value_unset(&pval);
 	}
 
-	g_free(props);
+	g_free (props);
 
 	gsize length;
 	GError *kf_error = NULL;
@@ -797,7 +793,7 @@ gboolean __create_base_blobdir(const gchar *path)
 	gint rv = g_mkdir_with_parents((const gchar *)dir_path, 0711);
 	
 	if (dir_path)
-		g_free(dir_path);
+		g_free (dir_path);
 	
 	if (rv == -1)
 		return FALSE;
@@ -821,13 +817,13 @@ gboolean __recurse_prepare_blobdir(const gchar *parentdir, int max_depth, int de
 		gint rv = g_mkdir_with_parents((const gchar *)dir_path, 0711);
 		if (rv == -1)
 		{
-			g_free(dir_path);
+			g_free (dir_path);
 			return FALSE;
 		}
 		
 		/* create subdirs */
 		gboolean err = __recurse_prepare_blobdir(dir_path, max_depth, depth + 1);
-		if (dir_path) g_free(dir_path);
+		if (dir_path) g_free (dir_path);
 		if (err == FALSE)
 			return FALSE;
 	}
@@ -845,13 +841,13 @@ gboolean __recurse_prepare_blobdir(const gchar *parentdir, int max_depth, int de
  */
 gboolean midgard_config_create_blobdir(MidgardConfig *self)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 
 	gboolean err = FALSE;	
 	
 	if (self->blobdir == NULL || *self->blobdir == '\0')
 	{
-		g_warning("Invalid blobdir (NULL)");
+		g_warning ("Invalid blobdir (NULL)");
 		return FALSE;
 	}
 
@@ -882,7 +878,7 @@ __get_default_confdir (void)
 	confdir = g_strdup (getenv("MIDGARD_ENV_GLOBAL_CONFDIR"));
 
 	if (!confdir || (confdir && g_str_equal (confdir, ""))) {
-		g_free(confdir);
+		g_free (confdir);
 
 		if (g_str_equal(MIDGARD_LIB_PREFIX, "/usr")) {
 			/* Using the standard prefix "/usr", so, choosing "/etc" */
@@ -925,7 +921,7 @@ static void __config_struct_new(MidgardConfig *self)
 
 	if (!self->sharedir 
 			|| (self->sharedir && g_str_equal(self->sharedir, ""))) {
-		g_free(self->sharedir);
+		g_free (self->sharedir);
 		self->sharedir = g_build_path(G_DIR_SEPARATOR_S, 
 				MIDGARD_LIB_PREFIX, "share", MIDGARD_PACKAGE_NAME, NULL);
 	}
@@ -934,21 +930,21 @@ static void __config_struct_new(MidgardConfig *self)
 
 		if (!self->blobdir 
 				|| (self->blobdir && g_str_equal(self->blobdir, ""))) {
-			g_free(self->blobdir);
+			g_free (self->blobdir);
 			self->blobdir = g_build_path(G_DIR_SEPARATOR_S, 
 					G_DIR_SEPARATOR_S, "var", "lib", MIDGARD_PACKAGE_NAME, "blobs", NULL);
 		}
 
 		if (!self->vardir 
 				|| (self->vardir && g_str_equal(self->vardir, ""))) {
-			g_free(self->vardir);
+			g_free (self->vardir);
 			self->vardir = g_build_path(G_DIR_SEPARATOR_S, 
 					G_DIR_SEPARATOR_S, "var", "lib", MIDGARD_PACKAGE_NAME, NULL);
 		}
 
 		if (!self->cachedir 
 				|| (self->cachedir && g_str_equal(self->cachedir, ""))) {
-			g_free(self->cachedir);
+			g_free (self->cachedir);
 			self->cachedir = g_build_path(G_DIR_SEPARATOR_S, 
 					G_DIR_SEPARATOR_S, "var", "cache", MIDGARD_PACKAGE_NAME, NULL);
 		}
@@ -957,21 +953,21 @@ static void __config_struct_new(MidgardConfig *self)
 
 		if (!self->blobdir 
 				|| (self->blobdir && g_str_equal(self->blobdir, ""))) {
-			g_free(self->blobdir);
+			g_free (self->blobdir);
 			self->blobdir = g_build_path(G_DIR_SEPARATOR_S, 
 					G_DIR_SEPARATOR_S, "var", "local", "lib", MIDGARD_PACKAGE_NAME, "blobs", NULL);
 		}
 
 		if (!self->vardir 
 				|| (self->vardir && g_str_equal(self->vardir, ""))) {
-			g_free(self->vardir);
+			g_free (self->vardir);
 			self->vardir = g_build_path(G_DIR_SEPARATOR_S, 
 					G_DIR_SEPARATOR_S, "var", "local", "lib", MIDGARD_PACKAGE_NAME, NULL);
 		}
 
 		if (!self->cachedir 
 				|| (self->cachedir && g_str_equal(self->cachedir, ""))) {
-			g_free(self->cachedir);
+			g_free (self->cachedir);
 			self->cachedir = g_build_path(G_DIR_SEPARATOR_S, 
 					G_DIR_SEPARATOR_S, "var", "local", "cache", MIDGARD_PACKAGE_NAME, NULL);
 		}
@@ -980,21 +976,21 @@ static void __config_struct_new(MidgardConfig *self)
 
 		if (!self->blobdir 
 				|| (self->blobdir && g_str_equal(self->blobdir, ""))) {
-			g_free(self->blobdir);
+			g_free (self->blobdir);
 			self->blobdir = g_build_path(G_DIR_SEPARATOR_S, 
 					MIDGARD_LIB_PREFIX, "var", "lib", MIDGARD_PACKAGE_NAME, "blobs", NULL);
 		}
 
 		if (!self->vardir 
 				|| (self->vardir && g_str_equal(self->vardir, ""))) {
-			g_free(self->vardir);
+			g_free (self->vardir);
 			self->vardir = g_build_path(G_DIR_SEPARATOR_S, 
 					MIDGARD_LIB_PREFIX, "var", "lib", MIDGARD_PACKAGE_NAME, NULL);
 		}
 
 		if (!self->cachedir 
 				|| (self->cachedir && g_str_equal(self->cachedir, ""))) {
-			g_free(self->cachedir);
+			g_free (self->cachedir);
 			self->cachedir = g_build_path(G_DIR_SEPARATOR_S, 
 					MIDGARD_LIB_PREFIX, "var", "cache", MIDGARD_PACKAGE_NAME, NULL);
 		}
@@ -1074,133 +1070,118 @@ __midgard_config_struct_free (MidgardConfig *self)
 /* API helpers, getters */
 const gchar *midgard_config_get_database_name(MidgardConfig *self)
 {
-	g_assert(self != NULL);	
+	g_assert (self != NULL);	
 	return self->database;
 }
 
 const gchar *midgard_config_get_database_type(MidgardConfig *self)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	return self->dbtype;
 }
 
 const gchar *midgard_config_get_database_username(MidgardConfig *self)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	return self->dbuser;
 }
 
 const gchar *midgard_config_get_database_password(MidgardConfig *self)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	return self->dbpass;
 }
 
 const gchar *midgard_config_get_database_host(MidgardConfig *self)
 {
-	g_assert(self != NULL);	
+	g_assert (self != NULL);	
 	return self->host;
 }
 
 guint midgard_config_get_database_port(MidgardConfig *self)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	return self->dbport;
 }
 
 const gchar *midgard_config_get_blobdir(MidgardConfig *self)
 {
-	g_assert(self != NULL);	
+	g_assert (self != NULL);	
 	return self->blobdir;
 }
 
 const gchar *midgard_config_get_logfile(MidgardConfig *self)
 {
-	g_assert(self != NULL);	
+	g_assert (self != NULL);	
 	return self->logfilename;
 }
 
 const gchar *midgard_config_get_loglevel(MidgardConfig *self)
 {
-	g_assert(self != NULL);	
+	g_assert (self != NULL);	
 	return self->loglevel;
 }
 
 gboolean midgard_config_get_table_create(MidgardConfig *self)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	return self->tablecreate;
 }
 
 gboolean midgard_config_get_table_update(MidgardConfig *self)
 {
-	g_assert(self != NULL);	
+	g_assert (self != NULL);	
 	return self->tableupdate;
 }
 
 gboolean midgard_config_get_testunit(MidgardConfig *self)
 {
-	g_assert(self != NULL);	
+	g_assert (self != NULL);	
 	return self->testunit;
 }
 
 const gchar *midgard_config_get_midgard_username(MidgardConfig *self)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	return  self->mgdusername;
 }
 
 const gchar *midgard_config_get_midgard_password(MidgardConfig *self)
 {
-	g_assert(self != NULL);	
+	g_assert (self != NULL);	
 	return self->mgdpassword;
 }
 
 const gchar *midgard_config_get_authtype(MidgardConfig *self)
 {
-	g_assert(self != NULL);	
+	g_assert (self != NULL);	
 
-	switch(self->authtype){
-
-		case MIDGARD_AUTHTYPE_NORMAL:
-			return AUTH_NORMAL_STR;
-			break;
-
-		case MIDGARD_AUTHTYPE_PAM:
-			return AUTH_PAM_STR;
-			break;
-
-		case MIDGARD_AUTHTYPE_TRUST:
-			return AUTH_TRUSTED_STR;
-			break;
-	}
-
-	return NULL;
+	return (const gchar *) self->authtype;
 }
 
 const gchar *midgard_config_get_pamfile(MidgardConfig *self)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	return self->pamfile;
 }
 
 /* setters */
 void midgard_config_set_database_name(MidgardConfig *self, const gchar *name)
 {
-	g_assert(self != NULL && name != NULL);
+	g_assert (self != NULL && name != NULL);
 	
 	if(self->database)
-		g_free(self->database);
+		g_free (self->database);
 	
 	self->database = g_strdup(name);
 }
 
 void midgard_config_set_database_type(MidgardConfig *self, const gchar *type)
 {
-	g_assert(self != NULL && type != NULL);
+	g_assert (self != NULL && type != NULL);
 	
 	if(self->dbtype)
-		g_free(self->dbtype);
+		g_free (self->dbtype);
 
 	self->dbtype = NULL;
 
@@ -1209,135 +1190,122 @@ void midgard_config_set_database_type(MidgardConfig *self, const gchar *type)
 
 void midgard_config_set_database_username(MidgardConfig *self, const gchar *username)
 {
-	g_assert(self != NULL && username != NULL);
+	g_assert (self != NULL && username != NULL);
 
 	if(self->dbuser)
-		g_free(self->dbuser);
+		g_free (self->dbuser);
 
 	self->dbuser = g_strdup(username);
 }
 
 void midgard_config_set_database_password(MidgardConfig *self, const gchar *password)
 {
-	g_assert(self != NULL && password != NULL);
+	g_assert (self != NULL && password != NULL);
 
 	if(self->dbpass)
-		g_free(self->dbpass);
+		g_free (self->dbpass);
 
 	self->dbpass = g_strdup(password);
 }
 
 void midgard_config_set_database_host(MidgardConfig *self, const gchar *host)
 {
-	g_assert(self != NULL && host != NULL);
+	g_assert (self != NULL && host != NULL);
 
 	if(self->host)
-		g_free(self->host);
+		g_free (self->host);
 
 	self->host = g_strdup(host);
 }
 
 void midgard_config_set_database_port(MidgardConfig *self, guint port)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	self->dbport = port;
 }
 
 void midgard_config_set_blobdir(MidgardConfig *self, const gchar *blobdir)
 {
-	g_assert(self != NULL && blobdir != NULL);
+	g_assert (self != NULL && blobdir != NULL);
 
 	if(self->blobdir)
-		g_free(self->blobdir);
+		g_free (self->blobdir);
 
 	self->blobdir = g_strdup(blobdir);
 }
 
 void midgard_config_set_logfile(MidgardConfig *self, const gchar *logfile)
 {
-	g_assert(self != NULL && logfile != NULL);
+	g_assert (self != NULL && logfile != NULL);
 
 	if(self->logfilename)
-		g_free(self->logfilename);
+		g_free (self->logfilename);
 
 	self->logfilename = g_strdup(logfile);
 }
 
 void midgard_config_set_loglevel(MidgardConfig *self, const gchar *loglevel)
 {
-	g_assert(self != NULL && loglevel != NULL);
+	g_assert (self != NULL && loglevel != NULL);
 
 	if(self->loglevel)
-		g_free(self->loglevel);
+		g_free (self->loglevel);
 
 	self->loglevel = g_strdup(loglevel);
 }
 
 void midgard_config_set_table_create(MidgardConfig *self, gboolean toggle)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	self->tablecreate = toggle;
 }
 
 void midgard_config_set_table_update(MidgardConfig *self, gboolean toggle)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	self->tableupdate = toggle;
 }
 
 void midgard_config_set_testunit(MidgardConfig *self, gboolean toggle)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 	self->testunit = toggle;
 }
 
 void midgard_config_set_midgard_username(MidgardConfig *self, const gchar *username)
 {
-	g_assert(self != NULL && username != NULL);
+	g_assert (self != NULL && username != NULL);
 
 	if(self->mgdusername)
-		g_free(self->mgdusername);
+		g_free (self->mgdusername);
 
 	self->mgdusername = g_strdup(username);
 }
 
 void midgard_config_set_midgard_password(MidgardConfig *self, const gchar *password)
 {
-	g_assert(self != NULL && password != NULL);
+	g_assert (self != NULL && password != NULL);
 
 	if(self->mgdpassword)
-		g_free(self->mgdpassword);
+		g_free (self->mgdpassword);
 
 	self->mgdpassword = g_strdup(password);
 }
 
 void midgard_config_set_authtype(MidgardConfig *self, const gchar *authtype)
 {
-	g_assert(self != NULL);
+	g_assert (self != NULL);
 
-	if(authtype == NULL) {
-
-		self->authtype = MIDGARD_AUTHTYPE_NORMAL;
-		return;
-	}
-
-	if(g_str_equal(authtype, AUTH_NORMAL_STR)) {
-		self->authtype = MIDGARD_AUTHTYPE_NORMAL;
-	} else if(g_str_equal(authtype, AUTH_PAM_STR)) {
-		self->authtype = MIDGARD_AUTHTYPE_PAM;
-	} else if(g_str_equal(authtype, AUTH_TRUSTED_STR)) {
-		self->authtype = MIDGARD_AUTHTYPE_TRUST;
-	} else {
-		g_warning("Unknown '%s' auth type. 'Normal', 'PAM' or 'Trusetd' allowed.", authtype);
-	}
+	if(authtype == NULL) 
+		self->authtype = (gchar *) authtype;
 }
 
 void midgard_config_set_pamfile(MidgardConfig *self, const gchar *pamfile)
 {
-	g_assert(self != NULL && pamfile != NULL);
+	g_assert (self != NULL && pamfile != NULL);
 
 	if(self->pamfile)
-		g_free(self->pamfile);
+		g_free (self->pamfile);
 
 	self->pamfile = g_strdup(pamfile);
 }
@@ -1352,28 +1320,28 @@ _midgard_config_set_property (GObject *object, guint property_id,
 	switch (property_id) {
 
 		case MIDGARD_CONFIG_DBTYPE:
-			__set_dbtype(self, (gchar *)g_value_get_string(value));
-			//self->dbtype = g_value_dup_string(value);
+			__set_dbtype(self, (gchar *)g_value_get_string (value));
+			//self->dbtype = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_DBNAME:
-			g_free(self->database);
-			self->database = g_value_dup_string(value);
+			g_free (self->database);
+			self->database = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_DBUSER: 
-			g_free(self->dbuser);
-			self->dbuser = g_value_dup_string(value);
+			g_free (self->dbuser);
+			self->dbuser = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_DBPASS:
-			g_free(self->dbpass);
-			self->dbpass = g_value_dup_string(value);
+			g_free (self->dbpass);
+			self->dbpass = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_HOST:
-			g_free(self->host);
-			self->host = g_value_dup_string(value);
+			g_free (self->host);
+			self->host = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_DBPORT:
@@ -1381,13 +1349,13 @@ _midgard_config_set_property (GObject *object, guint property_id,
 			break;
 
 		case MIDGARD_CONFIG_LOGFILENAME:
-			g_free(self->logfilename);
-			self->logfilename = g_value_dup_string(value);
+			g_free (self->logfilename);
+			self->logfilename = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_LOGLEVEL:
-			g_free(self->loglevel);
-			self->loglevel = g_value_dup_string(value);
+			g_free (self->loglevel);
+			self->loglevel = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_TABLECREATE:
@@ -1403,43 +1371,44 @@ _midgard_config_set_property (GObject *object, guint property_id,
 			break;
 		
 		case MIDGARD_CONFIG_MGDUSERNAME:
-			g_free(self->mgdusername);
-			self->mgdusername = g_value_dup_string(value);
+			g_free (self->mgdusername);
+			self->mgdusername = g_value_dup_string (value);
 			break;
 			
 		case MIDGARD_CONFIG_MGDPASSWORD:
-			g_free(self->mgdpassword);
-			self->mgdpassword = g_value_dup_string(value);
+			g_free (self->mgdpassword);
+			self->mgdpassword = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_AUTHTYPE:
-			self->authtype = g_value_get_uint(value);
+			g_free (self->authtype);
+			self->authtype = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_PAMFILE:
-			g_free(self->pamfile);
-			self->pamfile = g_value_dup_string(value);
+			g_free (self->pamfile);
+			self->pamfile = g_value_dup_string (value);
 			break;
 
 		/* MidgardDir */
 		case MIDGARD_CONFIG_BLOBDIR:
-			g_free(self->blobdir);
-			self->blobdir = g_value_dup_string(value);
+			g_free (self->blobdir);
+			self->blobdir = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_SHAREDIR:
-			g_free(self->sharedir);
-			self->sharedir = g_value_dup_string(value);
+			g_free (self->sharedir);
+			self->sharedir = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_VARDIR:
-			g_free(self->vardir);
-			self->vardir = g_value_dup_string(value);
+			g_free (self->vardir);
+			self->vardir = g_value_dup_string (value);
 			break;
 
 		case MIDGARD_CONFIG_CACHEDIR:
-			g_free(self->cachedir);
-			self->cachedir = g_value_dup_string(value);
+			g_free (self->cachedir);
+			self->cachedir = g_value_dup_string (value);
 			break;
 
 		default:
@@ -1457,7 +1426,7 @@ _midgard_config_get_property (GObject *object, guint property_id,
 	switch (property_id) {
 		
 		case MIDGARD_CONFIG_DBTYPE:
-			g_value_set_string(value, self->dbtype);
+			g_value_set_string (value, self->dbtype);
 			break;
 	
 		case MIDGARD_CONFIG_DBNAME: 
@@ -1485,7 +1454,7 @@ _midgard_config_get_property (GObject *object, guint property_id,
 			break;
 
 		case MIDGARD_CONFIG_LOGLEVEL:
-			g_value_set_string(value, self->loglevel);
+			g_value_set_string (value, self->loglevel);
 			break;
 
 		case MIDGARD_CONFIG_TABLECREATE:
@@ -1501,19 +1470,19 @@ _midgard_config_get_property (GObject *object, guint property_id,
 			break;
 			
 		case MIDGARD_CONFIG_MGDUSERNAME:
-			g_value_set_string(value, self->mgdusername);
+			g_value_set_string (value, self->mgdusername);
 			break;
 		
 		case MIDGARD_CONFIG_MGDPASSWORD:
-			g_value_set_string(value, self->mgdpassword);
+			g_value_set_string (value, self->mgdpassword);
 			break;
 
 		case MIDGARD_CONFIG_AUTHTYPE:
-			g_value_set_uint(value, self->authtype);
+			g_value_set_string (value, self->authtype);
 			break;
 
 		case MIDGARD_CONFIG_PAMFILE:
-			g_value_set_string(value, self->pamfile);
+			g_value_set_string (value, self->pamfile);
 			break;
 		
 		/* MidgardDir */
@@ -1542,15 +1511,15 @@ _midgard_config_get_property (GObject *object, guint property_id,
 static void 
 _midgard_config_finalize(GObject *object)
 {
-	g_assert(object != NULL);
+	g_assert (object != NULL);
 	
 	MidgardConfig *self = (MidgardConfig *) object;
 
-	__midgard_config_struct_free(self);
+	__midgard_config_struct_free (self);
 }
 
-static void _midgard_config_class_init(
-		gpointer g_class, gpointer g_class_data)
+static void 
+_midgard_config_class_init (gpointer g_class, gpointer g_class_data)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);
 	MidgardConfigClass *klass = MIDGARD_CONFIG_CLASS (g_class);
@@ -1686,10 +1655,11 @@ static void _midgard_config_class_init(
 			MIDGARD_CONFIG_PAMFILE,
 			pspec);
 	
-	pspec = g_param_spec_uint ("authtype",
+	pspec = g_param_spec_string ("authtype",
 			"AuthType",
 			"Authentication type used with connection.",
-			0, G_MAXUINT32, 0, G_PARAM_READWRITE);
+			"",
+			G_PARAM_READWRITE);
 	g_object_class_install_property (gobject_class,
 			MIDGARD_CONFIG_AUTHTYPE,
 			pspec);	
