@@ -1286,6 +1286,7 @@ gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
         mcontext.column_values = g_new (GValue *, 1);
         g_value_set_string ((mcontext.column_values[0] = gda_value_new (G_TYPE_STRING)), tablename);
 	GError *error = NULL;
+	
 	if (!gda_connection_update_meta_store (mgd->priv->connection, &mcontext, &error)) {
 		gda_value_free (mcontext.column_values[0]);
 		g_warning("Failed to update meta data for table '%s': %s", tablename, 
@@ -1415,6 +1416,33 @@ gboolean midgard_core_query_create_table(MidgardConnection *mgd,
 
 	g_object_unref(op);
 	g_clear_error(&error);
+
+#ifdef HAVE_LIBGDA_4
+
+	/* Update meta store */
+	GdaMetaStruct *mstruct;
+	GdaMetaDbObject *dbo;
+	GValue *table_value;
+	GdaMetaStore *store = gda_connection_get_meta_store (cnc);
+
+	if (!gda_connection_update_meta_store (cnc, NULL, &error)) {
+		    /* FIXME, error message */
+		    return FALSE;
+	}
+
+	mstruct = gda_meta_struct_new (store, GDA_META_STRUCT_FEATURE_NONE);
+	table_value = gda_value_new (G_TYPE_STRING);
+	g_value_set_string (table_value, tablename);
+	dbo = gda_meta_struct_complement (mstruct, GDA_META_DB_TABLE, NULL, NULL, table_value, &error);
+	gda_value_free (table_value);
+	g_object_unref (mstruct);
+
+	if (!dbo) {
+		g_warning ("Failed to update %s table meta store.", error && error->message ? error->message : "Unknown reason");
+		return FALSE;
+	}
+
+#endif /* HAVE_ILBGDA_4 */
 
 	return TRUE;
 }
