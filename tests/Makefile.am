@@ -16,6 +16,7 @@ nobase_SOURCES = \
 	midgard_test_config.c \
 	midgard_test_connection.c \
 	midgard_test_database.c \
+	midgard_test_database_provider.c \
 	midgard_test_error.c \
 	midgard_test_metadata.c \
 	midgard_test_object_basic.c \
@@ -64,6 +65,11 @@ TEST_PROGS	+= run-midgard-test-user
 bin_PROGRAMS	+= run-midgard-test-user
 run_midgard_test_user_SOURCES = run-midgard-test-user.c $(nobase_SOURCES)
 run_midgard_test_user_CPPFLAGS = $(nobase_CPPFLAGS)
+
+TEST_PROGS	+= run-midgard-test-database-provider
+bin_PROGRAMS	+= run-midgard-test-database-provider
+run_midgard_test_database_provider_SOURCES = run-midgard-test-database-provider.c $(nobase_SOURCES)
+run_midgard_test_database_provider_CPPFLAGS = $(nobase_CPPFLAGS)
 
 doc:
 	doxygen

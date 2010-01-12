@@ -2,4 +2,3 @@
 
 autoreconf -i 
 ./configure
-make
