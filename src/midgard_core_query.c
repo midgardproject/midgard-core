@@ -935,7 +935,20 @@ gint midgard_core_query_insert_records(MidgardConnection *mgd,
 
 			g_value_unset(&tval);
 
-		} else if (G_VALUE_TYPE(val) == G_TYPE_STRING
+		} else if (G_VALUE_TYPE (val) == MGD_TYPE_LONGTEXT) {
+
+		      	/* Escape string */
+			value = gda_query_field_value_new (query, G_TYPE_STRING);
+			GdaDataHandler *data_handler = gda_dict_get_handler (dict, G_TYPE_STRING);
+			gchar *escaped_str = gda_data_handler_get_sql_from_value (data_handler, (const GValue *)val);
+			GValue strv = {0, };
+			g_value_init (&strv, G_TYPE_STRING);
+			g_value_set_string (&strv, escaped_str);
+			gda_query_field_value_set_value (GDA_QUERY_FIELD_VALUE(value), &strv);
+			g_free (escaped_str);
+			g_value_unset (&strv);
+
+		} else if (G_VALUE_TYPE(val) == MGD_TYPE_STRING
 				|| G_VALUE_TYPE(val) == G_TYPE_UINT
 				|| G_VALUE_TYPE(val) == G_TYPE_INT) { 
 	
@@ -2254,5 +2267,22 @@ void midgard_core_dbjoin_free (MidgardDBJoin *mdbj)
 	mdbj->typeid = 0;	
 
 	g_free(mdbj);
+}
+
+/* Routine which is a workaround for gda_binary_stringify, 
+ * which is also registered as transform function which converts 
+ * binary value to string one.
+ * With this function we get GdaBinary->data 'as is' */ 
+gchar *  
+midgard_core_query_binary_stringify (GValue *src_value)
+{
+	g_return_val_if_fail (src_value != NULL, NULL);
+
+	GdaBinary *binary = g_value_get_boxed ((const GValue*) src_value);
+
+	if (binary == NULL)
+		return NULL;
+
+	return (gchar *) g_strdup ((gchar *) binary->data);
 }
 

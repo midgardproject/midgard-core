@@ -1049,11 +1049,18 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 						continue;
 					}
 
-					if (pspec->value_type != G_VALUE_TYPE (gvalue)) {
+					if (G_VALUE_TYPE (gvalue) == GDA_TYPE_BINARY 
+							&& G_TYPE_FUNDAMENTAL (pspec->value_type) == G_TYPE_STRING) {
+
+						gchar *stringified = midgard_core_query_binary_stringify ((GValue *)gvalue);
+						g_object_set (G_OBJECT (object), coltitle, stringified, NULL);
+						g_free (stringified);
+
+					} else if (pspec->value_type != G_VALUE_TYPE (gvalue)) {
 
 						GValue _convert = {0, };
 						g_value_init (&_convert, pspec->value_type);	
-				
+		
 						if (g_value_transform (gvalue, &_convert)) {
 
 							g_object_set_property (G_OBJECT (object), coltitle, &_convert);
