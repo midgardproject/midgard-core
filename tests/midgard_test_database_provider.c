@@ -36,7 +36,7 @@ midgard_test_database_provider_new_user_config (const gchar *provider)
   	g_object_set (config, "dbtype", provider, NULL);
   	g_object_set (config, "dbuser", "midgard", NULL);
   	g_object_set (config, "dbpass", "midgard", NULL);
-	g_object_set (config, "loglevel", "debug", NULL); 
+	//g_object_set (config, "loglevel", "debug", NULL); 
 	
 	saved = midgard_config_save_file (config, CONFIG_DB_PROVIDER_NAME, TRUE, NULL);
 	g_assert (saved == TRUE);
@@ -61,10 +61,18 @@ midgard_test_database_provider_connection_init (const gchar *provider)
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME(TEST_CLASS_NAME);
         gboolean class_table_created = midgard_storage_create_class_storage(mgd_global, MIDGARD_DBOBJECT_CLASS (klass));
 	g_assert(class_table_created == TRUE);
+
+	midgard_connection_set_loglevel (mgd_global, "debug", NULL);
 }
 
-#define VARCHAR_PROPERTY_ESCAPE_VALUE "VARCHAR \\ "
-#define LONGTEXT_PROPERTY_ESCAPE_VALUE "LONGTEXT \\ "
+#define VARCHAR_PROPERTY_ESCAPE_VALUE "VARCHAR \' "
+#define LONGTEXT_PROPERTY_ESCAPE_VALUE "LONGTEXT \' "
+
+#define VARCHAR_PROPERTY_DOUBLE_ESCAPE_VALUE "VARCHAR \\ \'  "
+#define LONGTEXT_PROPERTY_DOUBLE_ESCAPE_VALUE "LONGTEXT \\ \'  "
+
+#define VARCHAR_PROPERTY_COMPLEX_ESCAPE_VALUE "VARCHAR \' IS THE NAME"
+#define LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE "LONGTEXT \' IS THE CONTENT"
 
 static void 
 _midgard_test_database_provider_escape (const gchar *provider)
@@ -171,6 +179,216 @@ _midgard_test_database_provider_escape (const gchar *provider)
 	g_object_unref (config_global);
 }
 
+static void 
+_midgard_test_database_provider_double_escape (const gchar *provider)
+{
+	midgard_test_database_provider_connection_init (provider);
+
+	/* Initial instance */
+	MidgardObject *page = midgard_object_new (mgd_global, TEST_CLASS_NAME, NULL);
+	g_assert (page != NULL);	
+
+	g_object_set (G_OBJECT (page), 
+			"name", VARCHAR_PROPERTY_DOUBLE_ESCAPE_VALUE,
+			"content", LONGTEXT_PROPERTY_DOUBLE_ESCAPE_VALUE,
+			NULL);
+
+	gboolean created = midgard_object_create (page);
+	MIDGARD_TEST_ERROR_OK (mgd_global);
+	g_assert (created != FALSE);
+
+	GValue guid_value = {0, };
+	g_value_init (&guid_value, G_TYPE_STRING);
+	g_object_get_property (G_OBJECT (page), "guid", &guid_value);
+
+	/* Copy instance */
+	MidgardObject *copy_page = midgard_object_new (mgd_global, TEST_CLASS_NAME, &guid_value);
+	g_assert (copy_page != NULL);
+
+	/* compare values */
+	gchar *initial_name;
+	gchar *initial_content;
+	gchar *copy_name;
+	gchar *copy_content;
+
+	g_object_get (G_OBJECT (page), 
+			"name", &initial_name, 
+			"content", &initial_content, 
+			NULL);
+
+	g_object_get (G_OBJECT (copy_page), 
+			"name", &copy_name, 
+			"content", &copy_content, 
+			NULL);
+
+	/* Check invalid cases */
+	g_assert_cmpstr (copy_name, !=, "");
+	g_assert_cmpstr (copy_content, !=, "");
+	g_assert_cmpstr (copy_name, !=, "\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\ ");
+	g_assert_cmpstr (copy_name, !=, "\\\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\\\ ");
+
+	/* Check very stupid cases */
+	g_assert_cmpstr (copy_name, !=, "Abrakadabra");
+	g_assert_cmpstr (copy_content, !=, "Abrakadabra");
+
+	/* Check initial instance */
+	g_assert_cmpstr (initial_name, ==, VARCHAR_PROPERTY_DOUBLE_ESCAPE_VALUE);
+	g_assert_cmpstr (initial_content, ==, LONGTEXT_PROPERTY_DOUBLE_ESCAPE_VALUE);
+	/* Compare both instances */
+	g_assert_cmpstr (initial_name, ==, copy_name);
+	g_assert_cmpstr (initial_content, ==, copy_content);
+	/* Check copy instance */
+	g_assert_cmpstr (copy_name, ==, VARCHAR_PROPERTY_DOUBLE_ESCAPE_VALUE);
+	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_DOUBLE_ESCAPE_VALUE);
+
+	g_object_unref (copy_page);
+
+	/* Update initial instance */
+	gboolean updated = midgard_object_update (page);
+	g_assert (updated != FALSE);
+
+	/* Get copy */
+	copy_page = midgard_object_new (mgd_global, TEST_CLASS_NAME, &guid_value);
+	g_assert (copy_page != NULL);
+
+	/* Compare again */
+	/* Check invalid cases */
+	g_assert_cmpstr (copy_name, !=, "");
+	g_assert_cmpstr (copy_content, !=, "");
+	g_assert_cmpstr (copy_name, !=, "\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\ ");
+	g_assert_cmpstr (copy_name, !=, "\\\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\\\ ");
+
+	/* Check very stupid cases */
+	g_assert_cmpstr (copy_name, !=, "Abrakadabra");
+	g_assert_cmpstr (copy_content, !=, "Abrakadabra");
+
+	/* Check initial instance */
+	g_assert_cmpstr (initial_name, ==, VARCHAR_PROPERTY_DOUBLE_ESCAPE_VALUE);
+	g_assert_cmpstr (initial_content, ==, LONGTEXT_PROPERTY_DOUBLE_ESCAPE_VALUE);
+	/* Compare both instances */
+	g_assert_cmpstr (initial_name, ==, copy_name);
+	g_assert_cmpstr (initial_content, ==, copy_content);
+	/* Check copy instance */
+	g_assert_cmpstr (copy_name, ==, VARCHAR_PROPERTY_DOUBLE_ESCAPE_VALUE);
+	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_DOUBLE_ESCAPE_VALUE);
+
+	/* clean&clear*/
+	g_value_unset (&guid_value);
+	g_object_unref (page);
+	g_object_unref (copy_page);
+	g_object_unref (mgd_global);
+	g_object_unref (config_global);
+}
+
+static void 
+_midgard_test_database_provider_complex_escape (const gchar *provider)
+{
+	midgard_test_database_provider_connection_init (provider);
+
+	/* Initial instance */
+	MidgardObject *page = midgard_object_new (mgd_global, TEST_CLASS_NAME, NULL);
+	g_assert (page != NULL);
+
+	g_object_set (G_OBJECT (page), 
+			"name", VARCHAR_PROPERTY_COMPLEX_ESCAPE_VALUE,
+			"content", LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE,
+			NULL);
+
+	gboolean created = midgard_object_create (page);
+	MIDGARD_TEST_ERROR_OK (mgd_global);
+	g_assert (created != FALSE);
+
+	GValue guid_value = {0, };
+	g_value_init (&guid_value, G_TYPE_STRING);
+	g_object_get_property (G_OBJECT (page), "guid", &guid_value);
+
+	/* Copy instance */
+	MidgardObject *copy_page = midgard_object_new (mgd_global, TEST_CLASS_NAME, &guid_value);
+	g_assert (copy_page != NULL);
+
+	/* compare values */
+	gchar *initial_name;
+	gchar *initial_content;
+	gchar *copy_name;
+	gchar *copy_content;
+
+	g_object_get (G_OBJECT (page), 
+			"name", &initial_name, 
+			"content", &initial_content, 
+			NULL);
+
+	g_object_get (G_OBJECT (copy_page), 
+			"name", &copy_name, 
+			"content", &copy_content, 
+			NULL);
+
+	/* Check invalid cases */
+	g_assert_cmpstr (copy_name, !=, "");
+	g_assert_cmpstr (copy_content, !=, "");
+	g_assert_cmpstr (copy_name, !=, "\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\ ");
+	g_assert_cmpstr (copy_name, !=, "\\\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\\\ ");
+
+	/* Check very stupid cases */
+	g_assert_cmpstr (copy_name, !=, "Abrakadabra");
+	g_assert_cmpstr (copy_content, !=, "Abrakadabra");
+
+	/* Check initial instance */
+	g_assert_cmpstr (initial_name, ==, VARCHAR_PROPERTY_COMPLEX_ESCAPE_VALUE);
+	g_assert_cmpstr (initial_content, ==, LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE);
+	/* Compare both instances */
+	g_assert_cmpstr (initial_name, ==, copy_name);
+	g_assert_cmpstr (initial_content, ==, copy_content);
+	/* Check copy instance */
+	g_assert_cmpstr (copy_name, ==, VARCHAR_PROPERTY_COMPLEX_ESCAPE_VALUE);
+	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE);
+
+	g_object_unref (copy_page);
+
+	/* Update initial instance */
+	gboolean updated = midgard_object_update (page);
+	g_assert (updated != FALSE);
+
+	/* Get copy */
+	copy_page = midgard_object_new (mgd_global, TEST_CLASS_NAME, &guid_value);
+	g_assert (copy_page != NULL);
+
+	/* Compare again */
+	/* Check invalid cases */
+	g_assert_cmpstr (copy_name, !=, "");
+	g_assert_cmpstr (copy_content, !=, "");
+	g_assert_cmpstr (copy_name, !=, "\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\ ");
+	g_assert_cmpstr (copy_name, !=, "\\\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\\\ ");
+
+	/* Check very stupid cases */
+	g_assert_cmpstr (copy_name, !=, "Abrakadabra");
+	g_assert_cmpstr (copy_content, !=, "Abrakadabra");
+
+	/* Check initial instance */
+	g_assert_cmpstr (initial_name, ==, VARCHAR_PROPERTY_COMPLEX_ESCAPE_VALUE);
+	g_assert_cmpstr (initial_content, ==, LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE);
+	/* Compare both instances */
+	g_assert_cmpstr (initial_name, ==, copy_name);
+	g_assert_cmpstr (initial_content, ==, copy_content);
+	/* Check copy instance */
+	g_assert_cmpstr (copy_name, ==, VARCHAR_PROPERTY_COMPLEX_ESCAPE_VALUE);
+	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE);
+
+	/* clean&clear*/
+	g_value_unset (&guid_value);
+	g_object_unref (page);
+	g_object_unref (copy_page);
+	g_object_unref (mgd_global);
+	g_object_unref (config_global);
+}
+
 void	
 midgard_test_database_provider_mysql_escape (void)
 {
@@ -181,6 +399,30 @@ void
 midgard_test_database_provider_sqlite_escape (void)
 {
 	_midgard_test_database_provider_escape ("SQLite");
+}
+
+void	
+midgard_test_database_provider_mysql_double_escape (void)
+{
+	_midgard_test_database_provider_double_escape ("MySQL");
+}
+
+void	
+midgard_test_database_provider_sqlite_double_escape (void)
+{
+	_midgard_test_database_provider_double_escape ("SQLite");
+}
+
+void	
+midgard_test_database_provider_mysql_complex_escape (void)
+{
+	_midgard_test_database_provider_complex_escape ("MySQL");
+}
+
+void	
+midgard_test_database_provider_sqlite_complex_escape (void)
+{
+	_midgard_test_database_provider_complex_escape ("SQLite");
 }
 
 void	

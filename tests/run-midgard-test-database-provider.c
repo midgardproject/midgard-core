@@ -24,8 +24,15 @@ int main (int argc, char *argv[])
 {
 	g_test_init (&argc, &argv, NULL);
 
-	g_test_add_func("/midgard_database_provider", midgard_test_database_provider_mysql_escape);
-	g_test_add_func("/midgard_database_provider", midgard_test_database_provider_sqlite_escape);
+	/* MySQL */
+	g_test_add_func("/midgard_database_provider/mysql_escape", midgard_test_database_provider_mysql_escape);
+	g_test_add_func("/midgard_database_provider/mysql_double_escape", midgard_test_database_provider_mysql_double_escape);
+	g_test_add_func("/midgard_database_provider/mysql_complex_escape", midgard_test_database_provider_mysql_complex_escape);
+
+	/* SQLite */
+	g_test_add_func("/midgard_database_provider/sqlite_escape", midgard_test_database_provider_sqlite_escape);
+	g_test_add_func("/midgard_database_provider/sqlite_double_escape", midgard_test_database_provider_sqlite_double_escape);
+	g_test_add_func("/midgard_database_provider/sqlite_complex_escape", midgard_test_database_provider_sqlite_complex_escape);
 
 	midgard_init();
 

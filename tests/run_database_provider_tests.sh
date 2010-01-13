@@ -12,8 +12,13 @@ sudo mysql -e " FLUSH PRIVILEGES";
 # Clean files
 rm -f midgard-test-database-provider.html
 
-gtester -k -o midgard-test-database-provider.xml ./run-midgard-test-database-provider 
-gtester-report midgard-test-database-provider.xml > midgard-test-database-provider.html
+valgrind -v --log-file=db-provider.log ./run-midgard-test-database-provider 
+
+#gtester -k -o midgard-test-database-provider.xml ./run-midgard-test-database-provider 
+#gtester-report midgard-test-database-provider.xml > midgard-test-database-provider.html
 
 echo "Droping database ${MIDGARD_TEST_DB}"
 sudo mysqladmin -f drop ${MIDGARD_TEST_DB}
+
+#echo "Removing SQLite database file"
+#rm ~/.midgard2/data/midgard_test_database_provider.db
