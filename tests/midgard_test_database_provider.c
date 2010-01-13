@@ -33,8 +33,8 @@ midgard_test_database_provider_new_user_config (const gchar *provider)
 
   	g_object_set (config, "database", CONFIG_DB_PROVIDER_NAME, NULL);
   	g_object_set (config, "dbtype", provider, NULL);
-  	g_object_set (config, "dbuser", CONFIG_DB_PROVIDER_NAME, NULL);
-  	g_object_set (config, "dbpass", CONFIG_DB_PROVIDER_NAME, NULL);
+  	g_object_set (config, "dbuser", "midgard", NULL);
+  	g_object_set (config, "dbpass", "midgard", NULL);
 	g_object_set (config, "loglevel", "debug", NULL); 
 	
 	saved = midgard_config_save_file (config, CONFIG_DB_PROVIDER_NAME, TRUE, NULL);
@@ -76,7 +76,7 @@ _midgard_test_database_provider_escape (const gchar *provider)
 
 	g_object_set (G_OBJECT (page), 
 			"name", VARCHAR_PROPERTY_ESCAPE_VALUE,
-			"description", LONGTEXT_PROPERTY_ESCAPE_VALUE,
+			"content", LONGTEXT_PROPERTY_ESCAPE_VALUE,
 			NULL);
 
 	gboolean created = midgard_object_create (page);
@@ -92,41 +92,41 @@ _midgard_test_database_provider_escape (const gchar *provider)
 
 	/* compare values */
 	gchar *initial_name;
-	gchar *initial_descr;
+	gchar *initial_content;
 	gchar *copy_name;
-	gchar *copy_descr;
+	gchar *copy_content;
 
 	g_object_get (G_OBJECT (page), 
 			"name", &initial_name, 
-			"description", &initial_descr, 
+			"content", &initial_content, 
 			NULL);
 
 	g_object_get (G_OBJECT (copy_page), 
 			"name", &copy_name, 
-			"description", &copy_descr, 
+			"content", &copy_content, 
 			NULL);
 
 	/* Check invalid cases */
 	g_assert_cmpstr (copy_name, !=, "");
-	g_assert_cmpstr (copy_descr, !=, "");
+	g_assert_cmpstr (copy_content, !=, "");
 	g_assert_cmpstr (copy_name, !=, "\\ ");
-	g_assert_cmpstr (copy_descr, !=, "\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\ ");
 	g_assert_cmpstr (copy_name, !=, "\\\\ ");
-	g_assert_cmpstr (copy_descr, !=, "\\\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\\\ ");
 
 	/* Check very stupid cases */
 	g_assert_cmpstr (copy_name, !=, "Abrakadabra");
-	g_assert_cmpstr (copy_descr, !=, "Abrakadabra");
+	g_assert_cmpstr (copy_content, !=, "Abrakadabra");
 
 	/* Check initial instance */
 	g_assert_cmpstr (initial_name, ==, VARCHAR_PROPERTY_ESCAPE_VALUE);
-	g_assert_cmpstr (initial_descr, ==, LONGTEXT_PROPERTY_ESCAPE_VALUE);
+	g_assert_cmpstr (initial_content, ==, LONGTEXT_PROPERTY_ESCAPE_VALUE);
 	/* Compare both instances */
 	g_assert_cmpstr (initial_name, ==, copy_name);
-	g_assert_cmpstr (initial_descr, ==, copy_descr);
+	g_assert_cmpstr (initial_content, ==, copy_content);
 	/* Check copy instance */
 	g_assert_cmpstr (copy_name, ==, VARCHAR_PROPERTY_ESCAPE_VALUE);
-	g_assert_cmpstr (copy_descr, ==, LONGTEXT_PROPERTY_ESCAPE_VALUE);
+	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_ESCAPE_VALUE);
 
 	g_object_unref (copy_page);
 
@@ -141,25 +141,25 @@ _midgard_test_database_provider_escape (const gchar *provider)
 	/* Compare again */
 	/* Check invalid cases */
 	g_assert_cmpstr (copy_name, !=, "");
-	g_assert_cmpstr (copy_descr, !=, "");
+	g_assert_cmpstr (copy_content, !=, "");
 	g_assert_cmpstr (copy_name, !=, "\\ ");
-	g_assert_cmpstr (copy_descr, !=, "\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\ ");
 	g_assert_cmpstr (copy_name, !=, "\\\\ ");
-	g_assert_cmpstr (copy_descr, !=, "\\\\ ");
+	g_assert_cmpstr (copy_content, !=, "\\\\ ");
 
 	/* Check very stupid cases */
 	g_assert_cmpstr (copy_name, !=, "Abrakadabra");
-	g_assert_cmpstr (copy_descr, !=, "Abrakadabra");
+	g_assert_cmpstr (copy_content, !=, "Abrakadabra");
 
 	/* Check initial instance */
 	g_assert_cmpstr (initial_name, ==, VARCHAR_PROPERTY_ESCAPE_VALUE);
-	g_assert_cmpstr (initial_descr, ==, LONGTEXT_PROPERTY_ESCAPE_VALUE);
+	g_assert_cmpstr (initial_content, ==, LONGTEXT_PROPERTY_ESCAPE_VALUE);
 	/* Compare both instances */
 	g_assert_cmpstr (initial_name, ==, copy_name);
-	g_assert_cmpstr (initial_descr, ==, copy_descr);
+	g_assert_cmpstr (initial_content, ==, copy_content);
 	/* Check copy instance */
 	g_assert_cmpstr (copy_name, ==, VARCHAR_PROPERTY_ESCAPE_VALUE);
-	g_assert_cmpstr (copy_descr, ==, LONGTEXT_PROPERTY_ESCAPE_VALUE);
+	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_ESCAPE_VALUE);
 
 	/* clean&clear*/
 	g_value_unset (&guid_value);
