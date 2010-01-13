@@ -1442,7 +1442,7 @@ gboolean midgard_core_query_create_table(MidgardConnection *mgd,
 		return FALSE;
 	}
 
-#endif /* HAVE_ILBGDA_4 */
+#endif /* HAVE_LIBGDA_4 */
 
 	return TRUE;
 }
@@ -2551,5 +2551,23 @@ void midgard_core_dbjoin_free (MidgardDBJoin *mdbj)
 	mdbj->typeid = 0;	
 
 	g_free(mdbj);
+}
+
+/* Routine which is a workaround for gda_binary_stringify, 
+ *  * which is also registered as transform function which converts 
+ *   * binary value to string one.
+ *    * With this function we get GdaBinary->data 'as is' */
+gchar *
+midgard_core_query_binary_stringify (GValue *src_value)
+{
+	g_return_val_if_fail (src_value != NULL, NULL);
+
+	const GdaBinary *binary = gda_value_get_binary ((const GValue*) src_value);
+
+	if (binary == NULL || (binary && binary->binary_length == 0)
+			|| (binary && binary->data == NULL))
+		return g_strdup ("");
+
+	return (gchar *) g_strndup((const gchar *) binary->data, binary->binary_length);
 }
 
