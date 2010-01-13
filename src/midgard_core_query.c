@@ -2278,11 +2278,11 @@ midgard_core_query_binary_stringify (GValue *src_value)
 {
 	g_return_val_if_fail (src_value != NULL, NULL);
 
-	GdaBinary *binary = g_value_get_boxed ((const GValue*) src_value);
+	const GdaBinary *binary = gda_value_get_binary ((const GValue*) src_value);
 
-	if (binary == NULL)
-		return NULL;
+	if (binary == NULL || (binary && binary->binary_length == 0)
+			|| (binary && binary->data == NULL))
+		return g_strdup ("");
 
-	return (gchar *) g_strdup ((gchar *) binary->data);
+	return (gchar *) g_strndup((const gchar *) binary->data, binary->binary_length);
 }
-
