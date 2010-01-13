@@ -17,6 +17,7 @@
  */
 
 #include "midgard_test_database_provider.h" 
+#include "midgard_test.h"
 
 #define CONFIG_DB_PROVIDER_NAME "midgard_test_database_provider"
 #define TEST_CLASS_NAME "midgard_page"
@@ -80,6 +81,7 @@ _midgard_test_database_provider_escape (const gchar *provider)
 			NULL);
 
 	gboolean created = midgard_object_create (page);
+	MIDGARD_TEST_ERROR_OK (mgd_global);
 	g_assert (created != FALSE);
 
 	GValue guid_value = {0, };
