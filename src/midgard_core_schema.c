@@ -327,7 +327,7 @@ midgard_core_schema_type_add_table (MgdSchemaTypeAttr *type, const gchar *table)
 
 	g_hash_table_insert (type->tableshash, g_strdup(table), NULL);
 
-	GString *_sql = g_string_new (" ");
+	GString *_sql = g_string_new ("");
 	_str_cont *cont = g_new (_str_cont, 1);
 	cont->string = _sql;
 	cont->elts = 0;
