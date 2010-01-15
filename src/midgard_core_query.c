@@ -1934,17 +1934,19 @@ static gboolean __create_columns(MidgardConnection *mgd, xmlNode *tbln)
 		xmlFree (clmn_name);
 		xmlFree (dbtype);
 		xmlFree (gtype);
-		xmlFree (tablename);
 		if (dvalue)
 			xmlFree (dvalue);
 	
 		g_free (mdc);
 		mdc = NULL;
 
-		if (!rv)
+		if (!rv) {
+			xmlFree (tablename);
 			return FALSE;
-
+		}
 	}
+
+	xmlFree (tablename);
 
 	return TRUE;
 }
