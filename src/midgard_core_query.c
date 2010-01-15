@@ -1929,20 +1929,14 @@ static gboolean __create_columns(MidgardConnection *mgd, xmlNode *tbln)
 			mdc->dvalue = (const gchar *)dvalue;
 		}
 
-		/*
-		if(mdc->unique)
-			g_warning("PRE UNIQUE IS SET");
-
-		if(mdc->autoinc)
-			g_warning("PRE AUTO INC IS SET");
-			*/
-
 		gboolean rv = midgard_core_query_add_column(mgd, mdc);
 
 		xmlFree (clmn_name);
 		xmlFree (dbtype);
 		xmlFree (gtype);
 		xmlFree (tablename);
+		if (dvalue)
+			xmlFree (dvalue);
 	
 		g_free (mdc);
 		mdc = NULL;
