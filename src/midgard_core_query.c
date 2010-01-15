@@ -1597,8 +1597,10 @@ static gboolean __create_columns(MidgardConnection *mgd, xmlNode *tbln)
 			continue;
 
 		clmn_name = xmlGetProp (node, (const xmlChar *)"name");
-		if(clmn_name && g_str_equal(clmn_name, "id"))
+		if(clmn_name && g_str_equal(clmn_name, "id")) {
+			xmlFree (clmn_name);
 			continue;
+		}
 
 		mdc = midgard_core_dbcolumn_new();
 		mdc->table_name = (const gchar *)tablename;
