@@ -1054,8 +1054,8 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 
 						gchar *stringified = midgard_core_query_binary_stringify ((GValue *)gvalue);
 						g_object_set (G_OBJECT (object), coltitle, stringified, NULL);
-						g_free (stringified);
-
+						g_free (stringified);	
+	
 					} else if (pspec->value_type != G_VALUE_TYPE (gvalue)) {
 
 						GValue _convert = {0, };

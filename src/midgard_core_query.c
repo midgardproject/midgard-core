@@ -739,6 +739,160 @@ gboolean midgard_core_query_update_object_fields(MidgardDBObject *object, const 
 	return FALSE;
 }
 
+static gchar *
+__create_insert_query (const gchar *table, GList *cols, GList *values)
+{
+	gchar *escaped_str;
+	GString *sql_query_cols = g_string_new ("(");
+	GString *sql_query_values = g_string_new ("(");
+	guint i = 0;
+
+	while (cols != NULL) {
+
+		if (i > 0) {
+			g_string_append (sql_query_cols, ", ");
+			g_string_append (sql_query_values, ", ");
+		}
+
+		i++;
+
+		g_string_append (sql_query_cols, cols->data);	
+
+		GValue *val = (GValue *) values->data;
+
+		if (G_VALUE_TYPE (val) == G_TYPE_BOOLEAN){
+			
+			g_string_append_printf (sql_query_values, "%d", g_value_get_boolean (val));		
+
+		} else if (G_VALUE_TYPE (val) == G_TYPE_FLOAT) {
+
+			/* We use dot as decimal separator. Always. */
+			GValue fval = {0, };
+			g_value_init (&fval, G_TYPE_FLOAT);
+			gchar *lstring = setlocale (LC_NUMERIC, "0");
+			setlocale (LC_NUMERIC, "C");
+			g_value_copy (val, &fval);
+			g_string_append_printf (sql_query_values, "%g", g_value_get_float (val));		
+			g_value_unset (&fval);
+			setlocale (LC_ALL, lstring);
+
+		} else if (G_VALUE_TYPE (val) == MGD_TYPE_TIMESTAMP) {
+			
+			gchar *ts_str = midgard_timestamp_get_string (val);
+			g_string_append_printf (sql_query_values, "'%s'", ts_str);
+			g_free (ts_str);
+
+		} else if (G_VALUE_TYPE (val) == G_TYPE_STRING) {
+
+		      	/* Escape string */	
+			escaped_str = midgard_core_query_escape_string (g_value_get_string (val));
+			if (!escaped_str)
+				escaped_str = g_strdup ("");	
+			g_string_append_printf (sql_query_values, "'%s'", escaped_str);
+			g_free (escaped_str);
+
+		} else if (G_VALUE_TYPE (val) == G_TYPE_UINT) { 
+
+				g_string_append_printf (sql_query_values, "%d", g_value_get_uint (val));
+
+		} else if (G_VALUE_TYPE (val) == G_TYPE_INT) {
+
+				g_string_append_printf (sql_query_values, "%d", g_value_get_int (val));
+	
+		} else {
+
+			/* FIXME, handle this */
+		}
+
+		cols = cols->next;
+		values = values->next;
+	}
+
+	g_string_append (sql_query_cols, ")");
+	g_string_append (sql_query_values, ")");
+
+	gchar *query_str = g_strconcat ("INSERT INTO ", table, " ", sql_query_cols->str, " VALUES ", sql_query_values->str, NULL);
+
+	g_string_free (sql_query_cols, TRUE);
+	g_string_free (sql_query_values, TRUE);
+
+	return query_str;
+}
+
+static gchar *
+__create_update_query (const gchar *table, GList *cols, GList *values, const gchar *where)
+{
+	gchar *escaped_str;
+	GString *sql_query = g_string_new ("");
+	guint i = 0;
+
+	while (cols != NULL) {
+
+		if (i > 0) 
+			g_string_append (sql_query, ", ");
+
+		i++;
+
+		g_string_append_printf (sql_query, "%s=", (gchar *)cols->data);	
+
+		GValue *val = (GValue *) values->data;
+
+		if (G_VALUE_TYPE (val) == G_TYPE_BOOLEAN){
+			
+			g_string_append_printf (sql_query, "%d", g_value_get_boolean (val));		
+
+		} else if (G_VALUE_TYPE (val) == G_TYPE_FLOAT) {
+
+			/* We use dot as decimal separator. Always. */
+			GValue fval = {0, };
+			g_value_init (&fval, G_TYPE_FLOAT);
+			gchar *lstring = setlocale (LC_NUMERIC, "0");
+			setlocale (LC_NUMERIC, "C");
+			g_value_copy (val, &fval);
+			g_string_append_printf (sql_query, "%g", g_value_get_float (val));		
+			g_value_unset (&fval);
+			setlocale (LC_ALL, lstring);
+
+		} else if (G_VALUE_TYPE (val) == MGD_TYPE_TIMESTAMP) {
+			
+			gchar *ts_str = midgard_timestamp_get_string (val);
+			g_string_append_printf (sql_query, "'%s'", ts_str);
+			g_free (ts_str);
+
+		} else if (G_VALUE_TYPE (val) == G_TYPE_STRING) {
+
+		      	/* Escape string */	
+			escaped_str = midgard_core_query_escape_string (g_value_get_string (val));
+			if (!escaped_str)
+				escaped_str = g_strdup ("");
+			g_string_append_printf (sql_query, "'%s'", escaped_str);
+			g_free (escaped_str);
+
+		} else if (G_VALUE_TYPE (val) == G_TYPE_UINT) { 
+
+				g_string_append_printf (sql_query, "%d", g_value_get_uint (val));
+
+		} else if (G_VALUE_TYPE (val) == G_TYPE_INT) {
+
+				g_string_append_printf (sql_query, "%d", g_value_get_int (val));
+	
+		} else {
+
+			/* FIXME, handle this */
+		}
+
+		cols = cols->next;
+		values = values->next;
+	}
+
+	gchar *query_str = g_strconcat ("UPDATE ", table, " SET ", sql_query->str, " WHERE ", where, NULL);
+
+	g_string_free (sql_query, TRUE);
+
+	return query_str;
+
+}
+
 gint midgard_core_query_insert_records(MidgardConnection *mgd, 
 		const gchar *table, GList *cols, GList *values, 
 		guint query_type, const gchar *where)
@@ -864,149 +1018,21 @@ gint midgard_core_query_insert_records(MidgardConnection *mgd,
 	g_object_unref (stmt);
 
 	return retval == -1 ? -1 : 0;
-#else
-	/* Initialize GdaQuery */
-	GdaDict *dict = gda_dict_new();
-	gda_dict_set_connection(dict , mgd->priv->connection);
-	
-	GdaQuery *query = gda_query_new(dict);
-	gda_query_set_query_type(query, query_type);
-	
-	GdaQueryTarget *target = gda_query_target_new(query, table);
-	gda_query_add_target(query, target, NULL);
-	
-	while(cols != NULL) {
+#else	
+	gchar *query_str = NULL;
+	if (query_type == GDA_QUERY_TYPE_INSERT)
+		query_str = __create_insert_query (table, cols, values);
+	if (query_type == GDA_QUERY_TYPE_UPDATE)
+		query_str = __create_update_query (table, cols, values, where);
 
-		GdaQueryField *field = 
-			gda_query_field_field_new(query, 
-					(const gchar *) cols->data);
-		gda_entity_add_field (GDA_ENTITY(query), GDA_ENTITY_FIELD(field));
-		
-		GValue *val = (GValue *) values->data;
-		GdaQueryField *value;
-
-		if(G_VALUE_TYPE(val) == G_TYPE_BOOLEAN){
-			
-			GValue nval = {0, };
-			g_value_init(&nval, G_TYPE_UINT);
-			g_value_set_uint(&nval, 0);
-			if(g_value_get_boolean(val))
-				g_value_set_uint(&nval, 1);
-			
-			value = gda_query_field_value_new(query, G_TYPE_UINT);
-			gda_query_field_value_set_value(
-					GDA_QUERY_FIELD_VALUE(value), &nval);
-
-		} else if(G_VALUE_TYPE(val) == G_TYPE_FLOAT) {
-
-			/* We use dot as decimal separator. Always. */
-			GValue fval = {0, };
-			g_value_init(&fval, G_TYPE_FLOAT);
-			gchar *lstring = setlocale(LC_NUMERIC, "0");
-			setlocale(LC_NUMERIC, "C");
-			g_value_copy(val, &fval);
-			
-			value = gda_query_field_value_new(query, G_TYPE_FLOAT);
-			gda_query_field_value_set_value(
-					GDA_QUERY_FIELD_VALUE(value), &fval);
-
-			g_value_unset(&fval);
-			setlocale(LC_ALL, lstring);
-	
-		} else if (G_VALUE_TYPE(val) == MGD_TYPE_TIMESTAMP) {
-			
-			GValue tval = {0, };
-
-			/* GDA3 & SQLite workaround */
-			if (mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_SQLITE)
-				g_value_init(&tval, G_TYPE_STRING);
-			else
-				g_value_init(&tval, GDA_TYPE_TIMESTAMP);
-			
-			g_value_transform(val, &tval);
-		
-			/* GDA3 & SQLite workaround */
-			if (mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_SQLITE)
-				value = gda_query_field_value_new (query, G_TYPE_STRING);
-			else 
-				value = gda_query_field_value_new (query, GDA_TYPE_TIMESTAMP);
-
-			gda_query_field_value_set_value (GDA_QUERY_FIELD_VALUE (value), &tval);
-
-			g_value_unset(&tval);
-
-		} else if (G_VALUE_TYPE (val) == MGD_TYPE_LONGTEXT) {
-
-		      	/* Escape string */
-			value = gda_query_field_value_new (query, G_TYPE_STRING);
-			GdaDataHandler *data_handler = gda_dict_get_handler (dict, G_TYPE_STRING);
-			gchar *escaped_str = gda_data_handler_get_sql_from_value (data_handler, (const GValue *)val);
-			GValue strv = {0, };
-			g_value_init (&strv, G_TYPE_STRING);
-			g_value_set_string (&strv, escaped_str);
-			gda_query_field_value_set_value (GDA_QUERY_FIELD_VALUE(value), &strv);
-			g_free (escaped_str);
-			g_value_unset (&strv);
-
-		} else if (G_VALUE_TYPE(val) == MGD_TYPE_STRING
-				|| G_VALUE_TYPE(val) == G_TYPE_UINT
-				|| G_VALUE_TYPE(val) == G_TYPE_INT) { 
-	
-			value = gda_query_field_value_new(query, G_VALUE_TYPE(val));
-			
-			if (!value)
-				g_warning("Can not create new field value for given %s value type", G_VALUE_TYPE_NAME(val));
-			else
-				gda_query_field_value_set_value(GDA_QUERY_FIELD_VALUE(value), val);
-
-		} else {
-
-			value = NULL;
-			/*
-			g_warning("Unsupported %s value type", G_VALUE_TYPE_NAME(val));
-			value = gda_query_field_value_new(query, G_VALUE_TYPE(val));
-			if (!value)
-				g_warning("Can not create new field value for given %s value type", G_VALUE_TYPE_NAME(val));
-			else
-				gda_query_field_value_set_value(GDA_QUERY_FIELD_VALUE(value), val);
-				*/
-		}
-
-		if (value != NULL) {
-			
-			gda_entity_add_field(GDA_ENTITY(query), GDA_ENTITY_FIELD(value));
-			g_object_set (field, "value-provider", value, NULL);
-			gda_query_field_set_visible (GDA_QUERY_FIELD (value), FALSE);
-			
-			g_object_unref(field);
-			g_object_unref(value);
-		}
-
-		cols = cols->next;
-		values = values->next;
-	}
-
-	gchar *full_query = NULL;
-
-	if(where != NULL) {		
-		
-		const gchar *sql = gda_query_get_sql_text (query);
-		full_query = g_strconcat (sql, " WHERE ", where, NULL);
-		gda_query_set_sql_text (query, full_query, NULL);
-	}
-
-	if (full_query) {
-
-		g_debug ("%s", full_query);
-		g_free (full_query);
-	}
+	g_debug ("%s", query_str);
 
 	GError *error = NULL;
-	gda_query_execute(query, NULL, FALSE, &error);
-
-	g_object_unref(target);
-	g_object_unref(dict);
-	g_object_unref(query); 
+	GdaConnection *connection = mgd->priv->connection;
+	GdaCommand *command = gda_command_new (query_str, GDA_COMMAND_TYPE_SQL, GDA_COMMAND_OPTION_STOP_ON_ERRORS);
+	gda_connection_execute_non_select_command (connection, command, NULL, &error);
+	gda_command_free (command);
+	g_free (query_str);
 	
 	if(error){
 		g_clear_error(&error);
@@ -2286,3 +2312,53 @@ midgard_core_query_binary_stringify (GValue *src_value)
 
 	return (gchar *) g_strndup((const gchar *) binary->data, binary->binary_length);
 }
+
+/* Modified gda_default_escape_string */
+gchar *
+midgard_core_query_escape_string (const gchar *string)
+{
+	gchar *ptr, *ret, *retptr;
+	gint size;
+
+	if (!string)
+		return NULL;
+
+	/* determination of the new string size */
+	ptr = (gchar *) string;
+	size = 1;
+	while (*ptr) {
+		if ((*ptr == '\'') ||(*ptr == '\\'))
+			size += 2;
+		else
+			size += 1;
+		ptr++;
+	}
+
+	ptr = (gchar *) string;
+	ret = g_new0 (gchar, size);
+	retptr = ret;
+	
+	while (*ptr) {
+
+		if (*ptr == '\'') {
+			*retptr = '\'';
+			*(retptr+1) = *ptr;
+			retptr += 2;
+		}
+
+		else if (*ptr == '\\') {
+			*retptr = '\\';
+			*(retptr+1) = *ptr;
+			retptr += 2;
+		}
+		else {
+			*retptr = *ptr;
+			retptr ++;
+		}
+		ptr++;
+	}
+	*retptr = '\0';
+	
+	return ret;
+}
+

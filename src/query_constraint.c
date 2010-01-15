@@ -26,6 +26,7 @@
 #include "midgard_object_class.h"
 #include "midgard_tree.h"
 #include <libgda/libgda.h>
+#include "midgard_core_query.h"
 
 static void add_sql(MidgardQueryConstraint *constraint, GString *sql) {
         g_assert(constraint);
@@ -191,18 +192,16 @@ static void __condition_append_value(GString *str,
 		MidgardQueryConstraint *constraint, GValue *value)
 {
 	gchar *escaped;
+
 	if(value == NULL)
 		value = constraint->priv->value;
 
 	switch(G_VALUE_TYPE(value)) {
 
 		case G_TYPE_STRING:
-			escaped =
-				gda_connection_value_to_sql_string(
-						constraint->priv->builder->priv->mgd->priv->connection,
-						value);
-			g_string_append_printf(str, "%s", escaped);
-			g_free(escaped);
+			escaped = midgard_core_query_escape_string (g_value_get_string (value));
+			g_string_append_printf(str, "'%s'", escaped);
+			g_free (escaped);
 			break;
 
 		case G_TYPE_UINT:
