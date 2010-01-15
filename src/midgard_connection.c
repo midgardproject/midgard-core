@@ -102,7 +102,7 @@ __midgard_connection_struct_free (MidgardConnection *self, gboolean object)
 		self->priv->cache = NULL;
 	}
 
-	g_free (self->priv->cnc_str);
+	g_free ((gchar *)self->priv->cnc_str);
 	self->priv->cnc_str = NULL;
 
 	g_timer_stop (self->priv->timer);
