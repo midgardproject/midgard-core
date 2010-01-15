@@ -490,13 +490,9 @@ void midgard_query_constraint_private_free(MidgardQueryConstraintPrivate *mqcp)
 {
 	g_assert(mqcp != NULL);
 
-	g_free(mqcp->prop_left);
-	g_free(mqcp->prop_right);
-	/* PropertyAttr doesn't initialize new types so it's safe to call g_free*/
-	/* _mgd_schema_property_attr_free(mqcp->prop_left);
-	_mgd_schema_property_attr_free(mqcp->prop_right);
-	*/
-	
+	midgard_core_schema_type_property_attr_free (mqcp->prop_left);
+	midgard_core_schema_type_property_attr_free (mqcp->prop_right);
+
 	if(mqcp->condition_operator != NULL)
 		g_free(mqcp->condition_operator);
 
