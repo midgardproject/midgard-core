@@ -1682,9 +1682,10 @@ static gboolean __create_columns(MidgardConnection *mgd, xmlNode *tbln)
 		gboolean rv = 
 			midgard_core_query_add_column(mgd, mdc);
 
-		g_free(clmn_name);
-		g_free(dbtype);
-		g_free(gtype);
+		xmlFree (clmn_name);
+		xmlFree (dbtype);
+		xmlFree (gtype);
+		xmlFree (tablename);
 	
 		g_free(mdc);
 		mdc = NULL;
