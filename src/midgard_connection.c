@@ -66,6 +66,7 @@ midgard_connection_private_new (void)
 	cnc_private->connection = NULL;
 	cnc_private->cache = NULL;
 	cnc_private->configname = NULL;
+	cnc_private->cnc_str = NULL;
 
 	cnc_private->error_clbk_connected = FALSE;
 	cnc_private->authtypes = NULL;
@@ -100,6 +101,9 @@ __midgard_connection_struct_free (MidgardConnection *self, gboolean object)
 		g_free (self->priv->cache);
 		self->priv->cache = NULL;
 	}
+
+	g_free (self->priv->cnc_str);
+	self->priv->cnc_str = NULL;
 
 	g_timer_stop (self->priv->timer);
 	gdouble bench = g_timer_elapsed (self->priv->timer, NULL);
