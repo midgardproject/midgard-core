@@ -1937,17 +1937,17 @@ static gboolean __create_columns(MidgardConnection *mgd, xmlNode *tbln)
 			g_warning("PRE AUTO INC IS SET");
 			*/
 
-		gboolean rv = 
-			midgard_core_query_add_column(mgd, mdc);
+		gboolean rv = midgard_core_query_add_column(mgd, mdc);
 
-		g_free(clmn_name);
-		g_free(dbtype);
-		g_free(gtype);
+		xmlFree (clmn_name);
+		xmlFree (dbtype);
+		xmlFree (gtype);
+		xmlFree (tablename);
 	
-		g_free(mdc);
+		g_free (mdc);
 		mdc = NULL;
 
-		if(!rv)
+		if (!rv)
 			return FALSE;
 
 	}
