@@ -80,32 +80,38 @@ midgard_connection_private_new (void)
 	return cnc_private;
 }
 
-static void __midgard_connection_struct_free(MidgardConnection *self, gboolean object)
+static void 
+__midgard_connection_struct_free (MidgardConnection *self, gboolean object)
 {
 	if (self->err != NULL)
-		g_clear_error(&self->err);
+		g_clear_error (&self->err);
 
 	if (self->errstr != NULL) {
-		g_free(self->errstr);
+		g_free (self->errstr);
 		self->errstr = NULL;
 	}
 
 	if (self->priv->authstack) {
-		g_slist_free(self->priv->authstack);
+		g_slist_free (self->priv->authstack);
 		self->priv->authstack = NULL;
 	}
 
-	g_timer_stop(self->priv->timer);
-	gdouble bench = g_timer_elapsed(self->priv->timer, NULL);
-
-	if (self->priv->loghandler) {
-		g_message("MidgardConnection uptime %.04f seconds", bench);
-		g_log_remove_handler(G_LOG_DOMAIN, self->priv->loghandler);
+	if (self->priv->cache) {
+		g_free (self->priv->cache);
+		self->priv->cache = NULL;
 	}
 
-	g_timer_destroy(self->priv->timer);
+	g_timer_stop (self->priv->timer);
+	gdouble bench = g_timer_elapsed (self->priv->timer, NULL);
 
-	g_free(self->priv);
+	if (self->priv->loghandler) {
+		g_message ("MidgardConnection uptime %.04f seconds", bench);
+		g_log_remove_handler (G_LOG_DOMAIN, self->priv->loghandler);
+	}
+
+	g_timer_destroy (self->priv->timer);
+
+	g_free (self->priv);
 	self->priv = NULL;
 }
 
