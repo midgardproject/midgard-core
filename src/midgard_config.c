@@ -74,6 +74,7 @@ static MidgardConfigPrivate *midgard_config_private_new(void)
 		g_new(MidgardConfigPrivate, 1);
         config_private->keyfile = NULL;
 	config_private->log_channel = NULL;
+	config_private->configname = NULL;
 
 	return config_private;
 }
@@ -1149,6 +1150,9 @@ __midgard_config_struct_free (MidgardConfig *self)
 	if (self->priv->keyfile)
 		g_key_file_free (self->priv->keyfile);
 	self->priv->keyfile = NULL;
+
+	g_free (self->priv->configname);
+	self->priv->configname = NULL;
 
 	g_free (self->priv);
 	self->priv = NULL;
