@@ -465,8 +465,10 @@ midgard_query_constraint_private_new (void)
 {
 	MidgardQueryConstraintPrivate *priv = g_new (MidgardQueryConstraintPrivate, 1);
 	
-	priv->prop_left = midgard_core_schema_type_property_attr_new();
-	priv->prop_right = midgard_core_schema_type_property_attr_new();
+	/* Initialize empty property attr. We need only pointers. */
+	priv->prop_left = midgard_core_schema_type_property_attr_new_empty();
+	priv->prop_right = midgard_core_schema_type_property_attr_new_empty();
+
 	priv->condition_operator = NULL;
 	priv->joins = NULL;
 	priv->condition = NULL;
@@ -489,8 +491,9 @@ void midgard_query_constraint_private_free(MidgardQueryConstraintPrivate *mqcp)
 {
 	g_assert(mqcp != NULL);
 
-	midgard_core_schema_type_property_attr_free (mqcp->prop_left);
-	midgard_core_schema_type_property_attr_free (mqcp->prop_right);
+	/* Just free structures, they are initialized empty. */
+	g_free (mqcp->prop_left);
+	g_free (mqcp->prop_right);
 	
 	if(mqcp->condition_operator != NULL)
 		g_free(mqcp->condition_operator);
