@@ -281,6 +281,7 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 	tmpstr = g_key_file_get_string(keyfile, "MidgardDatabase", "PamFile", NULL);
 	if(tmpstr == NULL)
 		tmpstr = g_strdup("midgard");
+	g_free (self->pamfile);
 	self->pamfile = g_strdup(tmpstr);
 	g_free(tmpstr);
 
