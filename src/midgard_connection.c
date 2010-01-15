@@ -62,6 +62,7 @@ midgard_connection_private_new (void)
 #endif
 	cnc_private->connection = NULL;
 	cnc_private->configname = NULL;
+	cnc_private->cnc_str = NULL;
 
 	cnc_private->error_clbk_connected = FALSE;
 	cnc_private->authtypes = NULL;
@@ -93,6 +94,9 @@ static void _midgard_connection_finalize(GObject *object)
 		g_slist_free(self->priv->authstack);
 		self->priv->authstack = NULL;
 	}
+
+	g_free ((gchar *)self->priv->cnc_str);
+	self->priv->cnc_str = NULL;
 
 	g_timer_stop(self->priv->timer);
 	gdouble bench = g_timer_elapsed(self->priv->timer, NULL);
