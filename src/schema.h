@@ -96,15 +96,14 @@ void			midgard_core_schema_type_build_static_sql	(MgdSchemaTypeAttr *type_attr);
 void			midgard_core_schema_type_initialize_paramspec 	(MgdSchemaTypeAttr *type);
 void 			midgard_core_schema_type_validate_fields	(MgdSchemaTypeAttr *type);
 
-MgdSchemaPropertyAttr	*midgard_core_schema_type_property_attr_new	(void);
-void 			midgard_core_schema_type_property_attr_free	(MgdSchemaPropertyAttr *prop);
-void 			midgard_core_schema_type_property_copy		(MgdSchemaPropertyAttr *src_prop, MgdSchemaTypeAttr *dest_type);
-void			midgard_core_schema_type_property_set_gtype	(MgdSchemaPropertyAttr *prop, const gchar *type);
+MgdSchemaPropertyAttr	*midgard_core_schema_type_property_attr_new_empty	(void);
+MgdSchemaPropertyAttr	*midgard_core_schema_type_property_attr_new		(void);
+void 			midgard_core_schema_type_property_attr_free		(MgdSchemaPropertyAttr *prop);
+void 			midgard_core_schema_type_property_copy			(MgdSchemaPropertyAttr *src_prop, MgdSchemaTypeAttr *dest_type);
+void			midgard_core_schema_type_property_set_gtype		(MgdSchemaPropertyAttr *prop, const gchar *type);
 void 			midgard_core_schema_type_property_set_tablefield	(MgdSchemaPropertyAttr *prop, const gchar *table, const gchar *field);
-void			midgard_core_schema_type_property_set_table 	(MgdSchemaPropertyAttr *prop, const gchar *table);
-MgdSchemaPropertyAttr	*midgard_core_schema_type_property_lookup(MgdSchemaTypeAttr *type, const gchar *name);
-
-
+void			midgard_core_schema_type_property_set_table 		(MgdSchemaPropertyAttr *prop, const gchar *table);
+MgdSchemaPropertyAttr	*midgard_core_schema_type_property_lookup		(MgdSchemaTypeAttr *type, const gchar *name);
 
 GType 			midgard_core_schema_gtype_from_string		(const gchar *type);
 

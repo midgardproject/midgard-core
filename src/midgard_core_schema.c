@@ -27,14 +27,14 @@ typedef struct {
 
 static GHashTable *__copy_hash_table_with_strings(GHashTable *src);
 
-MgdSchemaPropertyAttr* 
-midgard_core_schema_type_property_attr_new (void)
+MgdSchemaPropertyAttr *  
+midgard_core_schema_type_property_attr_new_empty (void)
 {
 	MgdSchemaPropertyAttr *prop = g_new(MgdSchemaPropertyAttr, 1); 
 
 	/* Ensure, default type is string */
-	prop->gtype = G_TYPE_STRING;
-	prop->type = g_strdup("string");
+	prop->gtype = G_TYPE_NONE;
+	prop->type = NULL;
 
 	prop->name = NULL;	
 	prop->default_value = NULL;
@@ -53,8 +53,23 @@ midgard_core_schema_type_property_attr_new (void)
 	prop->is_link = FALSE;
 	prop->is_linked = FALSE;
 	prop->is_private = FALSE;
-	prop->description = g_strdup("");
-	prop->user_values = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
+	prop->description = NULL;
+	prop->user_values = NULL;
+
+	return prop;
+}
+
+MgdSchemaPropertyAttr * 
+midgard_core_schema_type_property_attr_new (void)
+{
+	MgdSchemaPropertyAttr *prop = midgard_core_schema_type_property_attr_new_empty();
+
+	/* Ensure, default type is string */
+	prop->gtype = G_TYPE_STRING;
+	prop->type = g_strdup ("string");
+
+	prop->description = g_strdup ("");
+	prop->user_values = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
 	return prop;
 }
