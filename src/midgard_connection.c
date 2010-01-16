@@ -33,8 +33,8 @@
  * @short_descritpion: MidgardConnection description
  */ 
 
-#ifdef HAVE_LIBGDA4
-#include <sql-parser/gda-sql-statement.h>
+#ifdef HAVE_LIBGDA_4
+#include <sql-parser/gda-sql-parser.h>
 #endif
 
 #define MGD_MYSQL_HOST "127.0.0.1"
@@ -517,13 +517,13 @@ gboolean __midgard_connection_open(
 
 	g_free(tmpstr);
 
-#ifndef HAVE_LIBGDA_4
-	mgd->priv->client = client;
-#else
+#ifdef HAVE_LIBGDA_4
 	mgd->priv->parser = gda_connection_create_parser (connection);
 	if (!mgd->priv->parser)
 		mgd->priv->parser = gda_sql_parser_new();
 	g_assert (mgd->priv->parser != NULL);
+#else 
+	mgd->priv->client = client;
 #endif
 
 	mgd->priv->connection = connection;
