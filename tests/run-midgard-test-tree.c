@@ -69,7 +69,7 @@ int main (int argc, char *argv[])
 
 		testname = g_strconcat("/midgard_object/tree/", typename, "/get_parent", NULL);
 		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
-				midgard_test_object_tree_create, midgard_test_teardown_foo);
+				midgard_test_object_tree_get_parent, midgard_test_teardown_foo);
 		g_free(testname);	
 
 		_MGD_TEST_UNREF_MGDOBJECT(object)
