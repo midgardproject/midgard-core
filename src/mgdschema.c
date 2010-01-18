@@ -579,6 +579,12 @@ _get_property_attributes(xmlNode * node,
 				} else {
 					__warn_msg(node, "Upfield redefined!");
 				}
+
+				/* If there's no explicit parent defined, set the same type which 
+				 * will be used as default one. */
+				if (!type_attr->parent)
+					type_attr->parent = g_strdup (type_attr->name);
+
 				prop_attr->upfield = g_strdup((gchar *)attrval);			
 			}
 
@@ -1305,15 +1311,6 @@ static void __midgard_schema_validate()
 						parentname, typename);
 			}
 		
-			/* validate parent property */
-			const gchar *parent_property = midgard_object_class_get_property_parent(klass);
-			
-			if(parent_property == NULL) {
-				
-				g_error("Parent property missed for %s class. %s declared as tree parent class",
-						typename, parentname);
-			}
-
 			/* validate parent property if exists */
 			const gchar *prop = midgard_object_class_get_property_parent(klass);	
 			MidgardReflectionProperty *smrp = NULL;
