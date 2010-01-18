@@ -253,23 +253,29 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 		}
 
 		/* extends */
-		attrval = xmlGetProp(node, (const xmlChar *)TYPE_RW_EXTENDS);
+		attrval = xmlGetProp (node, (const xmlChar *)TYPE_RW_EXTENDS);
 		if (attrval) { 
 
-			type_attr->extends = g_strdup((gchar *)attrval);
-			xmlChar *table_name = (xmlChar *)xmlGetProp(node, (const xmlChar *)"table");	
+			type_attr->extends = g_strdup ((gchar *)attrval);
+			xmlChar *table_name = (xmlChar *) xmlGetProp (node, (const xmlChar *)"table");	
 
 			if (table_name != NULL) {
 
-				__warn_msg(node, "Can not define 'table' and 'extends' attributes together");
-				xmlFree(table_name);
+				__warn_msg (node, "Can not define 'table' and 'extends' attributes together");
+				xmlFree (table_name);
 
 				/* This might be undefined result, so we fallback to NULL default */
-				g_free(type_attr->extends);
+				g_free (type_attr->extends);
 				type_attr->extends = NULL;
+			
+			} else {
+
+				MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, (gchar *)attrval);
+				midgard_core_schema_type_attr_extend (src, type_attr);
 			}
-	
-			xmlFree(table_name);
+
+			xmlFree (table_name);
+			xmlFree (attrval);
 		}
 
 		/* copy */
@@ -283,6 +289,11 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 
 				__warn_msg(node, "Can not copy MgdSchema type without storage defined");
 				g_error("Table definition missed");
+			
+			} else {
+
+				MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, (gchar *)attrval);
+				midgard_core_schema_type_attr_extend (src, type_attr);
 			}
 	
 			xmlFree(table_name);
