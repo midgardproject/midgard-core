@@ -149,3 +149,32 @@ void midgard_test_object_tree_create(MgdObjectTest *mot, gconstpointer data)
 	g_assert(purged != FALSE);
 	g_object_unref(object);
 }
+
+void midgard_test_object_tree_get_parent(MgdObjectTest *mot, gconstpointer data)
+{
+	g_assert(mot != NULL);
+	MgdObject *_object = MIDGARD_OBJECT(mot->object);
+	MidgardConnection *mgd = MIDGARD_CONNECTION(midgard_object_get_connection(_object));
+	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(_object);
+
+	g_test_bug ("#1594");
+	/* This bug has been caused by parent (in tree) class name not being set to any default value.
+	 * We just validate tree logic here. Real example with object fetching should be covered by 
+	 * particular, tree optimized tests. Which should be done in fresh&clean database. */
+
+	const gchar *up_property = midgard_object_class_get_property_up (klass);
+	const gchar *parent_property = midgard_object_class_get_property_parent (klass);
+	const gchar *parent_name = midgard_object_parent (_object);
+
+	/* Check if there's parent defined */
+	if (!up_property && !parent_property) {
+
+		g_assert_cmpstr (parent_name, ==, NULL);
+		return;
+	}
+
+	if (up_property || parent_property)
+		g_assert_cmpstr (parent_name, !=, NULL);
+
+	return;
+}

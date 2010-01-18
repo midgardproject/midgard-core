@@ -27,7 +27,8 @@ _MGD_TEST_OBJECT_TEARDOWN
 int main (int argc, char *argv[])
 {
 	g_test_init (&argc, &argv, NULL);
-	
+	g_test_bug_base (MIDGARD_TRAC_TICKET_BASE_URL);
+
 	midgard_init();
 
 	/* FIXME, it should be fixed with API... */
@@ -56,12 +57,17 @@ int main (int argc, char *argv[])
 		MgdObject *object = midgard_test_object_basic_new(mgd_global, typename, NULL);
 		g_assert(object != NULL);
 
-		testname = g_strconcat("/midgard_object_tree/", typename, "/basic", NULL);
+		testname = g_strconcat("/midgard_object/tree/", typename, "/basic", NULL);
 		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
 				midgard_test_object_tree_basic, midgard_test_teardown_foo);
 		g_free(testname);
 
-		testname = g_strconcat("/midgard_object_tree/", typename, "/create", NULL);
+		testname = g_strconcat("/midgard_object/tree/", typename, "/create", NULL);
+		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
+				midgard_test_object_tree_create, midgard_test_teardown_foo);
+		g_free(testname);	
+
+		testname = g_strconcat("/midgard_object/tree/", typename, "/get_parent", NULL);
 		g_test_add(testname, MgdObjectTest, object, midgard_test_setup,  
 				midgard_test_object_tree_create, midgard_test_teardown_foo);
 		g_free(testname);	
