@@ -279,12 +279,18 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 		MidgardConnection *mgd = MGD_OBJECT_CNC(object);
 		const gchar *blobdir = mgd->priv->config->blobdir;
 
-		if(blobdir == NULL) 			
-			g_error("NULL blobdir for current configuration");
+	      	if (blobdir == NULL) {
+			g_warning ("NULL blobdir for current configuration");
+			g_error ("Invalid blobdir");
+			return FALSE;
+		}
 
-		if(!g_file_test((const gchar *)blobdir,
-					G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) 
-			g_error("Configured blobdir '%s' is not a directory!", blobdir);
+		if (!g_file_test((const gchar *)blobdir,
+					G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) {
+			g_warning ("Configured blobdir '%s' is not a directory!", blobdir);
+			g_error ("Invalid blobdir");
+			return FALSE;
+		}
 
 		g_object_get(G_OBJECT(object), "location", &location, NULL);
 
