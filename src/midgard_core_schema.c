@@ -200,6 +200,30 @@ midgard_core_schema_type_attr_new (void)
 	return type;
 }
 
+void
+midgard_core_schema_type_attr_extend (MgdSchemaTypeAttr *src, MgdSchemaTypeAttr *dst)
+{
+	g_return_if_fail (src != NULL);
+	g_return_if_fail (dst != NULL);
+
+	dst->parentfield = src->parentfield ? g_strdup (src->parentfield) : NULL;
+	dst->upfield = src->upfield ? g_strdup (src->upfield) : NULL;
+	dst->parent = src->parent ? g_strdup (src->parent) : NULL;
+	dst->primary = src->primary ? g_strdup (src->primary) : NULL;
+	dst->property_up = src->property_up ? g_strdup (src->property_up) : NULL;
+	dst->property_parent = src->property_parent ? g_strdup (src->property_parent) : NULL;
+
+	if (src->children) {
+		GSList *children;
+		for (children = src->children; children != NULL; children = children->next) {
+			dst->children = g_slist_append (dst->children, g_strdup ((gchar *) children->data));
+		}
+	}
+	
+	dst->unique_name = src->unique_name ? g_strdup (src->unique_name) : NULL;
+	dst->metadata_class = src->metadata_class ? g_strdup (src->metadata_class) : NULL;
+}
+
 void 
 _destroy_property_hash (gpointer key, gpointer value, gpointer userdata)
 {
