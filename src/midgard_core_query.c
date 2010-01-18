@@ -1077,13 +1077,19 @@ gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
 		retval = FALSE;
 	g_object_unref (dm_schema);
 	return retval;
-#else	
+#else
+	GError *err = NULL;
 	GdaDataModel *dm_schema =
-		gda_connection_get_schema(mgd->priv->connection,
-				GDA_CONNECTION_SCHEMA_TABLES, NULL ,NULL);
+		gda_connection_get_schema(mgd->priv->connection, GDA_CONNECTION_SCHEMA_TABLES, NULL, &err);
+
 	if(!dm_schema) {
-		g_error("Failed to retrieve tables schema");
+		g_error("Failed to retrieve tables schema: %s", err->message);
+		g_error_free(err);
 		return TRUE;
+	}
+
+	if (err) {
+		g_error_free(err);
 	}
 
 	gint rows = gda_data_model_get_n_rows(dm_schema);

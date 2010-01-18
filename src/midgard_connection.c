@@ -231,7 +231,7 @@ static void _midgard_connection_class_init(
 	gobject_class->dispose = _midgard_connection_dispose;
 	gobject_class->get_property = _midgard_connection_get_property;
 	klass->open = midgard_connection_open;
-	klass->open_config = midgard_connection_open_config;	
+	klass->open_config = midgard_connection_open_config;
 	klass->set_loglevel = midgard_connection_set_loglevel;
 	klass->get_loglevel = midgard_connection_get_loglevel;
 	klass->set_loghandler = midgard_connection_set_loghandler;
