@@ -19,22 +19,30 @@
 /* Check underlying database provider escaping problems and possible sql injections */
 
 #include "midgard_test_database_provider.h"
+#include <libgda/gda-config.h>
 
 int main (int argc, char *argv[])
 {
 	g_test_init (&argc, &argv, NULL);
+	midgard_init();
 
 	/* MySQL */
-	g_test_add_func("/midgard_database_provider/mysql_escape", midgard_test_database_provider_mysql_escape);
-	g_test_add_func("/midgard_database_provider/mysql_double_escape", midgard_test_database_provider_mysql_double_escape);
-	g_test_add_func("/midgard_database_provider/mysql_complex_escape", midgard_test_database_provider_mysql_complex_escape);
+	if (gda_config_get_provider_by_name("MySQL") != NULL) {
+		g_test_add_func("/midgard_database_provider/mysql_escape", midgard_test_database_provider_mysql_escape);
+		g_test_add_func("/midgard_database_provider/mysql_double_escape", midgard_test_database_provider_mysql_double_escape);
+		g_test_add_func("/midgard_database_provider/mysql_complex_escape", midgard_test_database_provider_mysql_complex_escape);
+	} else {
+		printf("MySQL provider is not available. Skipping tests\n");
+	}
 
 	/* SQLite */
-	g_test_add_func("/midgard_database_provider/sqlite_escape", midgard_test_database_provider_sqlite_escape);
-	g_test_add_func("/midgard_database_provider/sqlite_double_escape", midgard_test_database_provider_sqlite_double_escape);
-	g_test_add_func("/midgard_database_provider/sqlite_complex_escape", midgard_test_database_provider_sqlite_complex_escape);
-
-	midgard_init();
+	if (gda_config_get_provider_by_name("SQLite") != NULL) {
+		g_test_add_func("/midgard_database_provider/sqlite_escape", midgard_test_database_provider_sqlite_escape);
+		g_test_add_func("/midgard_database_provider/sqlite_double_escape", midgard_test_database_provider_sqlite_double_escape);
+		g_test_add_func("/midgard_database_provider/sqlite_complex_escape", midgard_test_database_provider_sqlite_complex_escape);
+	} else {
+		printf("SQLite provider is not available. Skipping tests\n");
+	}
 
 	return g_test_run();
 }

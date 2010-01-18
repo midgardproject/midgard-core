@@ -28,16 +28,18 @@ static MidgardConfig *config_global = NULL;
 static void
 midgard_test_database_provider_new_user_config (const gchar *provider)
 {
-  	MidgardConfig *config = midgard_config_new();
-  	gboolean saved = FALSE;
-  	gboolean read = FALSE;
+	MidgardConfig *config = midgard_config_new();
+	gboolean saved = FALSE;
+	gboolean read = FALSE;
 
-  	g_object_set (config, "database", CONFIG_DB_PROVIDER_NAME, NULL);
-  	g_object_set (config, "dbtype", provider, NULL);
-  	g_object_set (config, "dbuser", "midgard", NULL);
-  	g_object_set (config, "dbpass", "midgard", NULL);
-	//g_object_set (config, "loglevel", "debug", NULL); 
-	
+	g_object_set (config, "database", CONFIG_DB_PROVIDER_NAME, NULL);
+	g_object_set (config, "dbtype", provider, NULL);
+	g_object_set (config, "dbuser", "midgard", NULL);
+	g_object_set (config, "dbpass", "midgard", NULL);
+
+	// g_object_set (config, "loglevel", "debug", NULL); 
+	// g_object_set (config, "logfilename", "/tmp/midgard-test-database-provider.log", NULL); 
+
 	saved = midgard_config_save_file (config, CONFIG_DB_PROVIDER_NAME, TRUE, NULL);
 	g_assert (saved == TRUE);
         g_object_unref (config);
@@ -53,13 +55,16 @@ midgard_test_database_provider_connection_init (const gchar *provider)
 	midgard_test_database_provider_new_user_config (provider);
 
 	gboolean connected = midgard_connection_open_config (mgd_global, config_global);
-	g_assert (connected != FALSE);
+	if (!connected) {
+		printf("ERROR: %s\n", midgard_connection_get_error_string(mgd_global));
+		g_assert (connected != FALSE);
+	}
 
 	gboolean base_storage_created = midgard_storage_create_base_storage (mgd_global);
-        g_assert(base_storage_created != FALSE);
+	g_assert(base_storage_created != FALSE);
 
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME(TEST_CLASS_NAME);
-        gboolean class_table_created = midgard_storage_create_class_storage(mgd_global, MIDGARD_DBOBJECT_CLASS (klass));
+	gboolean class_table_created = midgard_storage_create_class_storage(mgd_global, MIDGARD_DBOBJECT_CLASS (klass));
 	g_assert(class_table_created == TRUE);
 
 	midgard_connection_set_loglevel (mgd_global, "debug", NULL);
