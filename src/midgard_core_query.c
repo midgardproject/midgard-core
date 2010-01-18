@@ -740,7 +740,7 @@ gboolean midgard_core_query_update_object_fields(MidgardDBObject *object, const 
 }
 
 static gchar *
-__create_insert_query (const gchar *table, GList *cols, GList *values)
+__create_insert_query (MidgardConnection *mgd, const gchar *table, GList *cols, GList *values)
 {
 	gchar *escaped_str;
 	GString *sql_query_cols = g_string_new ("(");
@@ -785,7 +785,7 @@ __create_insert_query (const gchar *table, GList *cols, GList *values)
 		} else if (G_VALUE_TYPE (val) == G_TYPE_STRING) {
 
 		      	/* Escape string */	
-			escaped_str = midgard_core_query_escape_string (g_value_get_string (val));
+			escaped_str = midgard_core_query_escape_string (mgd, g_value_get_string (val));
 			if (!escaped_str)
 				escaped_str = g_strdup ("");	
 			g_string_append_printf (sql_query_values, "'%s'", escaped_str);
@@ -820,7 +820,7 @@ __create_insert_query (const gchar *table, GList *cols, GList *values)
 }
 
 static gchar *
-__create_update_query (const gchar *table, GList *cols, GList *values, const gchar *where)
+__create_update_query (MidgardConnection *mgd, const gchar *table, GList *cols, GList *values, const gchar *where)
 {
 	gchar *escaped_str;
 	GString *sql_query = g_string_new ("");
@@ -862,7 +862,7 @@ __create_update_query (const gchar *table, GList *cols, GList *values, const gch
 		} else if (G_VALUE_TYPE (val) == G_TYPE_STRING) {
 
 		      	/* Escape string */	
-			escaped_str = midgard_core_query_escape_string (g_value_get_string (val));
+			escaped_str = midgard_core_query_escape_string (mgd, g_value_get_string (val));
 			if (!escaped_str)
 				escaped_str = g_strdup ("");
 			g_string_append_printf (sql_query, "'%s'", escaped_str);
@@ -1021,9 +1021,9 @@ gint midgard_core_query_insert_records(MidgardConnection *mgd,
 #else	
 	gchar *query_str = NULL;
 	if (query_type == GDA_QUERY_TYPE_INSERT)
-		query_str = __create_insert_query (table, cols, values);
+		query_str = __create_insert_query (mgd, table, cols, values);
 	if (query_type == GDA_QUERY_TYPE_UPDATE)
-		query_str = __create_update_query (table, cols, values, where);
+		query_str = __create_update_query (mgd, table, cols, values, where);
 
 	g_debug ("%s", query_str);
 
@@ -2314,10 +2314,12 @@ midgard_core_query_binary_stringify (GValue *src_value)
 
 /* Modified gda_default_escape_string */
 gchar *
-midgard_core_query_escape_string (const gchar *string)
+midgard_core_query_escape_string (MidgardConnection *mgd, const gchar *string)
 {
 	gchar *ptr, *ret, *retptr;
 	gint size;
+
+	guint dbtype = mgd->priv->config->priv->dbtype;
 
 	if (!string)
 		return NULL;
@@ -2326,7 +2328,7 @@ midgard_core_query_escape_string (const gchar *string)
 	ptr = (gchar *) string;
 	size = 1;
 	while (*ptr) {
-		if ((*ptr == '\'') ||(*ptr == '\\'))
+		if ((*ptr == '\'') || ((dbtype != MIDGARD_DB_TYPE_SQLITE) && (*ptr == '\\')))
 			size += 2;
 		else
 			size += 1;
@@ -2345,7 +2347,7 @@ midgard_core_query_escape_string (const gchar *string)
 			retptr += 2;
 		}
 
-		else if (*ptr == '\\') {
+		else if (*ptr == '\\' && (dbtype != MIDGARD_DB_TYPE_SQLITE)) {
 			*retptr = '\\';
 			*(retptr+1) = *ptr;
 			retptr += 2;

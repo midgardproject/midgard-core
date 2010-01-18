@@ -213,6 +213,6 @@ GdaDataModel 		*midgard_core_query_get_dbobject_model 		(MidgardConnection *mgd,
 gboolean		midgard_core_query_create_dbobject_record 	(MidgardDBObject *object);
 gboolean		midgard_core_query_update_dbobject_record 	(MidgardDBObject *object);
 gchar 			*midgard_core_query_binary_stringify		(GValue *src_value); 
-gchar 			*midgard_core_query_escape_string		(const gchar *str);
+gchar 			*midgard_core_query_escape_string		(MidgardConnection *mgd, const gchar *str);
 
 #endif /* MIDGARD_CORE_QUERY_H */
