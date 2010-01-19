@@ -157,7 +157,7 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				joinklass = MIDGARD_DBOBJECT_CLASS(MIDGARD_OBJECT_GET_CLASS_BY_NAME((const gchar *)classname));
 
 			if (!joinklass) {
-				g_warning ("%s is not registered in GType system");
+				g_warning ("%s is not registered in GType system", classname);
 				__view_error (cur, "Invalid classname for defined join");
 				return;
 			}
