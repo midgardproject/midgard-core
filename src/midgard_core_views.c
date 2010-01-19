@@ -156,6 +156,12 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 			if (classname) 
 				joinklass = MIDGARD_DBOBJECT_CLASS(MIDGARD_OBJECT_GET_CLASS_BY_NAME((const gchar *)classname));
 
+			if (!joinklass) {
+				g_warning ("%s is not registered in GType system");
+				__view_error (cur, "Invalid classname for defined join");
+				return;
+			}
+
 			gchar *left = midgard_core_xml_get_child_attribute_content_by_name(cur, "condition", "left");
 			if (!left)
 				__view_error(cur, "Condition left is missing", NULL);
