@@ -55,6 +55,7 @@ MidgardUser     	*__midgard_user_get               (MidgardConnection *mgd, guin
 MidgardUser     	**__midgard_user_query            (MidgardConnection *mgd, guint n_params, const GParameter *parameters);
 gboolean        	__midgard_user_create             (MidgardUser *self);
 gboolean        	__midgard_user_update             (MidgardUser *self);
+gboolean		__midgard_user_delete		  (MidgardUser *self);
 gboolean        	__midgard_user_is_user            (MidgardUser *self);
 gboolean        	__midgard_user_is_admin           (MidgardUser *self);
 MgdObject		*__midgard_user_get_person        (MidgardUser *self);
@@ -733,6 +734,81 @@ __midgard_user_update (MidgardUser *self)
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_INTERNAL);
 	return FALSE;
+}
+
+/**
+ * midgard_user_delete:
+ * @self: #MidgardUser instance
+ *
+ * Delete user's storage record.
+ * 
+ * Cases to return %FALSE:
+ * <itemizedlist>
+ * <listitem><para>
+ * User's guid is not set ( MGD_ERR_INVALID_PROPERTY_VALUE )
+ * </para></listitem>
+ * <listitem><para>
+ * Failed to delete storage record ( MGD_ERR_INTERNAL )
+ * </para></listitem>
+ * </itemizedlist>
+ *
+ * Returns: @TRUE on success, @FALSE otherwise
+ *
+ * Since: 9.09.2
+ */ 
+gboolean 
+midgard_user_delete (MidgardUser *self)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+
+	MidgardUserClass *klass = MIDGARD_USER_GET_CLASS (self);
+	return klass->delete_record (self);
+}
+
+gboolean 
+__midgard_user_delete (MidgardUser *self)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (MIDGARD_IS_USER (self), FALSE);
+	
+	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
+	const gchar *guid = MGD_OBJECT_GUID (self);
+
+	g_return_val_if_fail (mgd != NULL, FALSE);
+
+	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
+
+	/* Validate guid */
+	if (!guid
+		|| (*guid && *guid == '\0')
+ 		|| (guid && !midgard_is_guid (guid))) {
+
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY_VALUE, "Invalid guid value");
+		return FALSE;
+	}
+
+	GString *del_query = g_string_new ("DELETE FROM midgard_user WHERE ");
+	g_string_append_printf (del_query, "guid='%s'", guid);
+
+      	g_debug ("%s", del_query->str);
+
+	GError *error = NULL;
+	GdaConnection *connection = mgd->priv->connection;
+	GdaCommand *command = gda_command_new (del_query->str, GDA_COMMAND_TYPE_SQL, GDA_COMMAND_OPTION_STOP_ON_ERRORS);
+	gda_connection_execute_non_select_command (connection, command, NULL, &error);
+	gda_command_free (command);
+	g_string_free (del_query, TRUE);
+	
+	if(error){
+		g_clear_error(&error);
+		return FALSE;
+	}
+
+	/* Set empty guid */
+	g_free ((gchar *)self->dbpriv->guid);
+	self->dbpriv->guid = NULL;
+
+	return TRUE;
 }
 
 /** 
@@ -1573,6 +1649,7 @@ static void _midgard_user_class_init(
 	klass->query = __midgard_user_query;
 	klass->create = __midgard_user_create;
 	klass->update = __midgard_user_update;
+	klass->delete_record = __midgard_user_delete;
 	klass->is_user = __midgard_user_is_user;
 	klass->is_admin = __midgard_user_is_admin;
 
