@@ -172,18 +172,18 @@ guint midgard_core_metadata_get_size(MidgardMetadata *self)
 
 /* This is temporary routine. Ragnaroek compatible. 
  * If it's needed for longer period, core's timestamp API should be provided */
-void __copy_date(const MidgardTimestamp *src, MidgardTimestamp *copy)
+void __copy_date(const MidgardTimestamp *src, MidgardTimestamp **copy)
 {
 	GValue srcv = {0, };
 	GValue dstv = {0, };
 
 	g_value_init(&srcv, MGD_TYPE_TIMESTAMP);
 	g_value_init(&dstv, MGD_TYPE_TIMESTAMP);
-	
+
 	g_value_set_boxed(&srcv, src);
 	g_value_copy(&srcv, &dstv);
-	
-	copy = (MidgardTimestamp *) g_value_dup_boxed(&dstv);
+
+	*copy = (MidgardTimestamp *) g_value_dup_boxed(&dstv);
 
 	g_value_unset(&srcv);
 	g_value_unset(&dstv);
@@ -203,72 +203,45 @@ MidgardMetadata *midgard_core_metadata_copy(MidgardMetadata *src)
 	if (src->priv->creator != NULL) 
 		midgard_core_metadata_set_creator(copy, src->priv->creator);
 
-	/* created */
-	__copy_date(src->priv->created, copy->priv->created);
-
-	/* revised */
-	__copy_date(src->priv->revised, copy->priv->revised);
-
 	if (src->priv->revisor != NULL)
 		midgard_core_metadata_set_revisor(copy, src->priv->revisor);
 
 	if (src->priv->locker != NULL)
 		midgard_core_metadata_set_locker(copy, src->priv->locker);
-	
-	/* locked */
-	__copy_date(src->priv->locked, copy->priv->locked);
 
-	/* approved */
-	__copy_date(src->priv->approved, copy->priv->approved);
-	
 	if (src->priv->approver != NULL)
 		midgard_core_metadata_set_approver(copy, src->priv->approver);
-	
-	if (src->priv->authors != NULL) {
 
+	if (src->priv->authors != NULL) {
 		g_free(copy->priv->authors);
 		copy->priv->authors = g_strdup(src->priv->authors);
 	}
 
 	if (src->priv->owner != NULL ) {
-
 		g_free(copy->priv->owner);
 		copy->priv->owner = g_strdup(src->priv->owner);
 	}
-	
-	copy->priv->revision = src->priv->revision;
 
-	/* schedule_start */
-	__copy_date(src->priv->schedule_start, copy->priv->schedule_start);
-	
-	/* schedule_end */
-	__copy_date(src->priv->schedule_end, copy->priv->schedule_end);
-	
-	copy->priv->hidden = src->priv->hidden;
-	
-	copy->priv->nav_noentry = src->priv->nav_noentry;
-	copy->priv->size = src->priv->size;
-	
-	/* published */
-	__copy_date(src->priv->published, copy->priv->published);
-
-	copy->priv->score = src->priv->score;
-	
-	/* exported */
-	__copy_date(src->priv->exported, copy->priv->exported);
-	
-	/* imported */
-	__copy_date(src->priv->imported, copy->priv->imported);
-
-	copy->priv->deleted = src->priv->deleted;
-
-	copy->priv->lock_is_set = src->priv->lock_is_set;
-							
-	copy->priv->is_locked = src->priv->is_locked;
+	__copy_date(src->priv->approved,       &copy->priv->approved);
+	__copy_date(src->priv->created,        &copy->priv->created);
+	__copy_date(src->priv->exported,       &copy->priv->exported);
+	__copy_date(src->priv->imported,       &copy->priv->imported);
+	__copy_date(src->priv->locked,         &copy->priv->locked);
+	__copy_date(src->priv->published,      &copy->priv->published);
+	__copy_date(src->priv->revised,        &copy->priv->revised);
+	__copy_date(src->priv->schedule_start, &copy->priv->schedule_start);
+	__copy_date(src->priv->schedule_end,   &copy->priv->schedule_end);
 
 	copy->priv->approve_is_set = src->priv->approve_is_set;
-	
-	copy->priv->is_approved = src->priv->is_approved;
+	copy->priv->deleted        = src->priv->deleted;
+	copy->priv->hidden         = src->priv->hidden;
+	copy->priv->is_approved    = src->priv->is_approved;
+	copy->priv->is_locked      = src->priv->is_locked;
+	copy->priv->lock_is_set    = src->priv->lock_is_set;
+	copy->priv->nav_noentry    = src->priv->nav_noentry;
+	copy->priv->revision       = src->priv->revision;
+	copy->priv->score          = src->priv->score;
+	copy->priv->size           = src->priv->size;
 
 	return copy;
 }
