@@ -159,6 +159,9 @@ MidgardUser
 midgard_user_new
 midgard_user_get
 midgard_user_query
+midgard_user_create
+midgard_user_update
+midgard_user_delete
 midgard_user_login
 midgard_user_logout
 midgard_user_is_user
