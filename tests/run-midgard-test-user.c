@@ -58,6 +58,8 @@ int main (int argc, char *argv[])
 			midgard_test_user_create, midgard_test_user_teardown_foo);
 	g_test_add("/midgard_user/update", MidgardUserTest, user, midgard_test_user_setup,  
 			midgard_test_user_update, midgard_test_user_teardown_foo);
+	g_test_add("/midgard_user/delete", MidgardUserTest, user, midgard_test_user_setup,  
+			midgard_test_user_delete, midgard_test_user_teardown_foo);
 	g_test_add("/midgard_user/get", MidgardUserTest, user, midgard_test_user_setup,  
 			midgard_test_user_get, midgard_test_user_teardown_foo);
 	g_test_add("/midgard_user/query", MidgardUserTest, user, midgard_test_user_setup,  

@@ -49,7 +49,7 @@ midgard_test_user_create (MidgardUserTest *mut, gconstpointer data)
 			"authtype", USER_TEST_AUTH_TYPE, 
 			NULL);
 
-	/* Create user in current test sitegroup */
+	/* Create user */
 	gboolean user_created = midgard_user_create (user);
 	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OK);
 	g_assert (user_created != FALSE);
@@ -179,6 +179,52 @@ midgard_test_user_update (MidgardUserTest *mut, gconstpointer data)
 	g_assert (duplicated_user_updated == FALSE);
 
 	g_object_unref (duser);
+	g_object_unref (user);
+}
+
+void 
+midgard_test_user_delete (MidgardUserTest *mut, gconstpointer data)
+{
+	MidgardConnection *mgd = mut->mgd;
+
+	MidgardUser *user = midgard_user_new (mgd, 0, NULL);
+	
+	g_assert (user != NULL);
+	g_assert (MIDGARD_IS_USER (user));
+	g_object_set (user, 
+			"login", "Delete me",
+			"password", "pass",
+			"authtype", USER_TEST_AUTH_TYPE, 
+			NULL);
+
+	/* Create user */
+	gboolean user_created = midgard_user_create (user);
+	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OK);
+	g_assert (user_created != FALSE);
+
+	/* Delete user */
+	gboolean user_deleted = midgard_user_delete (user);
+	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OK);
+	g_assert (user_deleted != FALSE);
+
+	g_object_unref (user);
+
+	/* Delete user which is not created yet */
+	user = midgard_user_new (mgd, 0, NULL);
+	
+	g_assert (user != NULL);
+	g_assert (MIDGARD_IS_USER (user));
+	g_object_set (user, 
+			"login", "Delete me",
+			"password", "pass",
+			"authtype", USER_TEST_AUTH_TYPE, 
+			NULL);
+	
+	/* Delete user */
+	user_deleted = midgard_user_delete (user);
+	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_INVALID_PROPERTY_VALUE);
+	g_assert (user_deleted == FALSE);
+
 	g_object_unref (user);
 }
 
