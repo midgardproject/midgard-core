@@ -57,6 +57,7 @@ struct _MidgardUserClass{
 	MidgardUser     **(*query) 		(MidgardConnection *mgd, guint n_params, const GParameter *parameters);
 	gboolean        (*create)           	(MidgardUser *self);
 	gboolean        (*update)             	(MidgardUser *self);
+	gboolean 	(*delete_record)	(MidgardUser *self);
 	gboolean 	(*is_user)		(MidgardUser *self);
 	gboolean 	(*is_admin)		(MidgardUser *self);
 };
@@ -91,6 +92,7 @@ MidgardUser 		*midgard_user_quick_login	(MidgardConnection *mgd, const gchar *lo
 MidgardUser 		**midgard_user_query		(MidgardConnection *mgd, guint n_params, const GParameter *parameters);
 gboolean		midgard_user_create		(MidgardUser *self);
 gboolean 		midgard_user_update		(MidgardUser *self);
+gboolean 		midgard_user_delete		(MidgardUser *self);
 gboolean 		midgard_user_is_user		(MidgardUser *self);
 gboolean 		midgard_user_is_admin		(MidgardUser *self);
 MidgardObject		*midgard_user_get_person	(MidgardUser *self);
