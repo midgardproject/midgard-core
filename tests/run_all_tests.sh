@@ -4,7 +4,7 @@ MIDGARD_TEST_DB="midgard_test"
 MIDAGRD_TEST_DB_USER="midgard_test"
 MIDGARD_TEST_DB_PASS="midgard_test"
 
-./autogen.sh
+# ./autogen.sh
 
 echo "sudo mysqladmin create midgard_test"
 sudo mysql -e "CREATE DATABASE ${MIDGARD_TEST_DB} CHARACTER SET utf8";
@@ -25,7 +25,14 @@ sudo mysql -e " FLUSH PRIVILEGES";
 # Clean files
 rm -f midgard-test.html
 
-gtester -k -o midgard-test.xml ./run-midgard-test-config ./run-midgard-test-connection ./run-midgard-test-object ./run-midgard-test-tree ./run-midgard-test-replicator ./run-midgard-test-replicator-import ./run-midgard-test-user
+gtester -k -o midgard-test.xml \
+	./run-midgard-test-config \
+	./run-midgard-test-connection \
+	./run-midgard-test-object \
+	./run-midgard-test-tree \
+	./run-midgard-test-replicator \
+	# ./run-midgard-test-replicator-import \
+	./run-midgard-test-user
 gtester-report midgard-test.xml > midgard-test.html
 
 # Those below might be enabled and used if one needs report file per test program 
