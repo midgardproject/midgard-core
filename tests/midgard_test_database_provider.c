@@ -177,6 +177,11 @@ _midgard_test_database_provider_escape (const gchar *provider)
 	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_ESCAPE_VALUE);
 
 	/* clean&clear*/
+	g_free (initial_name);
+	g_free (initial_content);
+	g_free (copy_name);
+	g_free (copy_content);
+
 	g_value_unset (&guid_value);
 	g_object_unref (page);
 	g_object_unref (copy_page);
@@ -282,6 +287,11 @@ _midgard_test_database_provider_double_escape (const gchar *provider)
 	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_DOUBLE_ESCAPE_VALUE);
 
 	/* clean&clear*/
+	g_free (initial_name);
+	g_free (initial_content);
+	g_free (copy_name);
+	g_free (copy_content);
+
 	g_value_unset (&guid_value);
 	g_object_unref (page);
 	g_object_unref (copy_page);
@@ -387,6 +397,11 @@ _midgard_test_database_provider_complex_escape (const gchar *provider)
 	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE);
 
 	/* clean&clear*/
+	g_free (initial_name);
+	g_free (initial_content);
+	g_free (copy_name);
+	g_free (copy_content);
+
 	g_value_unset (&guid_value);
 	g_object_unref (page);
 	g_object_unref (copy_page);
