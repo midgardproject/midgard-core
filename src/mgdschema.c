@@ -580,11 +580,6 @@ _get_property_attributes(xmlNode * node,
 					__warn_msg(node, "Upfield redefined!");
 				}
 
-				/* If there's no explicit parent defined, set the same type which 
-				 * will be used as default one. */
-				if (!type_attr->parent)
-					type_attr->parent = g_strdup (type_attr->name);
-
 				prop_attr->upfield = g_strdup((gchar *)attrval);			
 			}
 
