@@ -339,6 +339,13 @@ _CHECK_IS_UP_CIRCULAR:
 	if (up_prop == NULL)
 		return FALSE;
 
+	/* Ignore, if up property is a link to different class */
+	MidgardReflectionProperty *mrp = midgard_reflection_property_new (MIDGARD_DBOBJECT_CLASS (klass));
+	const MidgardDBObjectClass *linked_klass = midgard_reflection_property_get_link_class (mrp, up_prop);
+	g_object_unref (mrp);
+	if (MIDGARD_DBOBJECT_CLASS (linked_klass) != MIDGARD_DBOBJECT_CLASS (klass))
+		return FALSE;
+
 	/* we checked up property so "parent" class is of the same type */
 	GValue *idval = g_new0(GValue, 1);
 	g_value_init(idval , G_TYPE_UINT);
