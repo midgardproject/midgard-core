@@ -2057,31 +2057,39 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 MidgardObject *midgard_object_get_parent(MidgardObject *self)
 {
 	MidgardObject *mobj = self;
-	g_assert(mobj != NULL);
-	
-	MidgardObject *pobj;
-	const gchar *pcstring;
-	guint puint = 0;
-	gint pint = 0;
-	GParamSpec *fprop = NULL;
-	GValue pval = {0,};
-	gboolean ret_object = FALSE;
+        g_assert(mobj != NULL);
 
-	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(mobj);
-	
-	if (klass->dbpriv->storage_data->parent == NULL)
-		return NULL;
+        MidgardObject *pobj = NULL;
+        const gchar *pcstring;
+        guint puint = 0;
+        gint pint = 0;
+        GParamSpec *fprop = NULL;
+        GValue pval = {0,};
+        gboolean ret_object = FALSE;
+        const gchar *parent_class_name = NULL;
+        MidgardConnection *mgd = MGD_OBJECT_CNC (self);
+        MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(mobj);
 
-	pobj =  midgard_object_new(mobj->dbpriv->mgd , G_OBJECT_TYPE_NAME(mobj), NULL);
-	
-	if (pobj == NULL)
-		return NULL;
+        const gchar *property_up = midgard_object_class_get_property_up (klass);
 
-	const gchar *property_up = midgard_object_class_get_property_up (klass);
+        if (property_up) {
 
-	if (property_up) 
 		fprop = g_object_class_find_property( G_OBJECT_GET_CLASS(mobj), property_up);
-	
+		MidgardReflectionProperty *mrp = midgard_reflection_property_new (MIDGARD_DBOBJECT_CLASS (klass));
+		if (midgard_reflection_property_is_link (mrp, property_up)) {
+
+			parent_class_name = midgard_reflection_property_get_link_name (mrp, property_up);
+   
+			if (parent_class_name)
+				pobj = midgard_object_new (mgd, parent_class_name, NULL);
+
+			g_object_unref (mrp);
+		}
+
+		if (!pobj)
+			return NULL;
+	}
+
 	if (fprop) {
 		
 		g_value_init(&pval,fprop->value_type);
@@ -2144,6 +2152,10 @@ MidgardObject *midgard_object_get_parent(MidgardObject *self)
 	 */ 
 
 	if (midgard_object_class_get_property_parent(klass) == NULL)
+		return NULL;
+
+	parent_class_name = midgard_object_parent (self);
+	if (!parent_class_name)
 		return NULL;
 
 	pobj =  midgard_object_new(mobj->dbpriv->mgd , mobj->dbpriv->storage_data->parent, NULL);
