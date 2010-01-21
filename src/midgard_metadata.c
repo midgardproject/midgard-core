@@ -556,6 +556,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_creator");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("creator");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"creator"), prop_attr);
 
@@ -573,6 +574,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_created");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("created");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"created"), prop_attr);
 
@@ -590,6 +592,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_revisor");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("revisor");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"revisor"), prop_attr);
 
@@ -607,6 +610,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_revised");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("revised");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"revised"), prop_attr);
 
@@ -623,6 +627,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_revision");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("revision");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"revision"), prop_attr);
 
@@ -640,6 +645,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_locker");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("locker");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"locker"), prop_attr);
 
@@ -657,6 +663,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_locked");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("locked");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"locked"), prop_attr);
 
@@ -674,6 +681,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_approver");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("approver");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"approver"), prop_attr);
 
@@ -691,6 +699,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_approved");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("approved");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"approved"), prop_attr);
 
@@ -708,6 +717,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_authors");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("authors");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"authors"), prop_attr);
 
@@ -725,6 +735,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_owner");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("owner");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"owner"), prop_attr);
 
@@ -742,6 +753,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_schedule_start");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("schedulestart");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"schedulestart"), prop_attr);
 
@@ -759,6 +771,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_schedule_end");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("scheduleend");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"scheduleend"), prop_attr);
 
@@ -776,6 +789,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_hidden");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("hidden");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"hidden"), prop_attr);
 
@@ -793,6 +807,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_nav_noentry");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("navnoentry");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"navnoentry"), prop_attr);
 
@@ -809,6 +824,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_size");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("size");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"size"), prop_attr);
 
@@ -826,6 +842,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_published");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("published");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"published"), prop_attr);
 
@@ -842,6 +859,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_score");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("score");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"score"), prop_attr);
 
@@ -859,6 +877,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_exported");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("exported");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"exported"), prop_attr);
 
@@ -876,6 +895,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_imported");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("imported");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"imported"), prop_attr);
 
@@ -893,6 +913,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_deleted");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("deleted");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"deleted"), prop_attr);
 
@@ -910,6 +931,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_isapproved");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("isapproved");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"isapproved"), prop_attr);
 
@@ -927,6 +949,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	prop_attr->field = g_strdup("metadata_islocked");
 	prop_attr->table = NULL;
 	prop_attr->tablefield = NULL;
+	prop_attr->name = g_strdup ("islocked");
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)"islocked"), prop_attr);
 

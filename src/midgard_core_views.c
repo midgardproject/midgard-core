@@ -31,6 +31,8 @@
 #include "midgard_core_query.h"
 #include "query_constraint.h"
 #include "midgard_core_views.h"
+#include "midgard_object_class.h"
+#include "midgard_metadata.h"
 
 #define MGD_VIEW_RW_VIEW "view"
 #define MGD_VIEW_RW_NAME "name"
@@ -49,14 +51,55 @@ static void __view_error(xmlNode *node, const gchar *msg, ...)
 	g_error("Failed to parse %s view (line %ld)", parsed_view, xmlGetLineNo(node));
 }
 
+static void __get_property_attribute (xmlNode *node, gchar **property_string, 
+		gchar **target_name, MgdSchemaPropertyAttr **prop_attr, MidgardDBObjectClass *klass)
+{
+	*target_name = property_string[1];
+
+	if (property_string[2] != NULL && !g_str_equal (*target_name, "metadata")) {
+		__view_error (node, "%s not allowed in view configuration", target_name);
+		return;	
+	}
+
+	/* Check metadata */
+	if (property_string[2] != NULL && g_str_equal (*target_name, "metadata")) {
+
+		if (!midgard_object_class_has_metadata (MIDGARD_OBJECT_CLASS (klass))) {
+			__view_error (node, "No metadata registered for %s class", G_OBJECT_CLASS_NAME (klass));
+			return;
+		}
+
+		MidgardMetadataClass *metadata_klass = 
+			MIDGARD_METADATA_CLASS (midgard_object_class_get_metadata_class (MIDGARD_OBJECT_CLASS (klass)));
+
+		*target_name = property_string[2];
+		*prop_attr = g_hash_table_lookup (metadata_klass->dbpriv->storage_data->prophash, *target_name);
+	
+		if (!*prop_attr)
+			__view_error (node, "%s not found. Not registered for %s.metadata ?", *target_name, property_string[0]);
+	}
+
+	/* Fallback to custom properties, metadata class doesn't exist in MgdSchema scope */	
+	if (!*prop_attr) {
+		*prop_attr = g_hash_table_lookup (klass->dbpriv->storage_data->prophash, *target_name);
+		if (!*prop_attr)
+			__view_error(node, "%s not found. Not registered for %s ?", *target_name, property_string[0]);
+	}
+}
+
 static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 {
 	xmlNode *cur;
+	MgdSchemaPropertyAttr *rprop_attr = NULL;
+	gchar *property_name = NULL;
 
 	for (cur = node->children; cur; cur = cur->next) {
 
 		if (cur->type == XML_ELEMENT_NODE 
 				&& g_str_equal(cur->name, "property")) { /* FIXME, add property to reserved words constants */
+
+			//property_name = NULL;
+			//rprop_attr = NULL;
 
 			xmlChar *name = xmlGetProp(cur, (const xmlChar *)TYPE_RW_NAME);
 
@@ -68,7 +111,7 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 			if (!use_prop || (use_prop && *use_prop == '\0'))
 				__view_error(cur, "Referenced class:property can not be empty", NULL);
 
-			gchar **rprop = g_strsplit((const gchar *)use_prop, ":", -1);
+			gchar **rprop = g_strsplit_set ((const gchar *)use_prop, ":.", -1);
 			if (!rprop || rprop[0] == NULL || rprop[1] == NULL) {
 				__view_error(cur, "Referenced property can not be empty", NULL);
 				return;
@@ -82,17 +125,14 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 			if (table == NULL)
 				__view_error (cur, "Can not create proper view. Defined '%s' class has NULL storage", rprop[0]);
 
-			MgdSchemaPropertyAttr *rprop_attr = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, rprop[1]);
-			
-			if (!rprop_attr)
-				__view_error(cur, "%s not found. Not registered for %s ?", rprop[1], rprop[0]);
+			__get_property_attribute (cur, rprop, &property_name, &rprop_attr, MIDGARD_DBOBJECT_CLASS (klass));
 
 			midgard_core_schema_type_property_copy(rprop_attr, type);
 			
 			/* TODO, refactor with some usable TypeAttr related API */
 			/* Create property attributes copy using original property.
 			   Then change name. */
-			MgdSchemaPropertyAttr *prop_attr = g_hash_table_lookup(type->prophash, rprop[1]);
+			MgdSchemaPropertyAttr *prop_attr = g_hash_table_lookup(type->prophash, property_name);
 
 			if (!prop_attr)
 				g_warning("Can not found mgdschema %s.%s", type->name, name); 
@@ -125,12 +165,20 @@ static const gchar *__allowed_joins[] = {"left", "right", "inner", "inner left",
 static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 {
 	xmlNode *cur;
+	gchar *property_name = NULL;
+	MgdSchemaPropertyAttr *prop_attr = NULL;
+	MgdSchemaPropertyAttr *propright = NULL;
+	MgdSchemaPropertyAttr *propleft = NULL;
 
 	for (cur = node->children; cur; cur = cur->next) {
 	
 		if (cur->type == XML_ELEMENT_NODE 
 				&& g_str_equal(cur->name, "join")) { /* FIXME, add join to reserved words constants */
- 
+
+			property_name = NULL;
+			propright = NULL;
+			propleft = NULL;
+
 			xmlChar *jointype = xmlGetProp(cur, (const xmlChar *)"type");
 
 			if (!jointype || (jointype && *jointype == '\0'))
@@ -171,7 +219,7 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				__view_error(cur, "Condition right is missing", NULL);
 
 			/* Get left property attribute */
-			gchar **classprop = g_strsplit(left, ":", 2);
+			gchar **classprop = g_strsplit_set(left, ":.", -1);
 			if (!classprop || classprop[0] == NULL || classprop[1] == NULL) {
 				__view_error(cur, "Condition left problem", NULL);
 				return;
@@ -186,12 +234,12 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 			MgdSchemaPropertyAttr *propleft = 
 				g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
 			if (!propleft)
-				__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]);
-
+				__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]); 
+			/* __get_property_attribute (cur, classprop, &property_name, &propleft, klass); */ 
 			g_strfreev(classprop);
 
 			/* Get right property attribute */
-			classprop = g_strsplit(right, ":", 2);
+			classprop = g_strsplit_set(right, ":.", -1);
 			if (!classprop || classprop[0] == NULL || classprop[1] == NULL) {
 				__view_error(cur, "Condition right problem", NULL);
 				return;
@@ -207,7 +255,7 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
 			if (!propright)
 				__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]);
-
+			/* __get_property_attribute (cur, classprop, &property_name, &propright, klass); */
 			g_strfreev(classprop);
 
 			MidgardDBJoin *mdbj = midgard_core_dbjoin_new();
@@ -218,7 +266,7 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				mdbj->table = g_strdup(midgard_core_class_get_table(joinklass));
 			else 
 				mdbj->table = g_strdup((gchar *)table);
-			
+	
 			mdbj->left = propleft;
 			mdbj->right = propright;
 
