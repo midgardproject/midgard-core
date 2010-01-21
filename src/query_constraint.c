@@ -192,7 +192,9 @@ static void __condition_append_value(GString *str,
 		MidgardQueryConstraint *constraint, GValue *value)
 {
 	gchar *escaped;
-	MidgardConnection *mgd = constraint->priv->builder->priv->mgd;
+	MidgardConnection *mgd = NULL;
+	if (constraint->priv->builder)
+		mgd = constraint->priv->builder->priv->mgd;
 
 	if(value == NULL)
 		value = constraint->priv->value;
@@ -200,7 +202,10 @@ static void __condition_append_value(GString *str,
 	switch(G_VALUE_TYPE(value)) {
 
 		case G_TYPE_STRING:
-			escaped = midgard_core_query_escape_string (mgd, g_value_get_string (value));
+			if (mgd)
+				escaped = midgard_core_query_escape_string (mgd, g_value_get_string (value));
+			else 
+				escaped = gda_default_escape_string (g_value_get_string (value));
 			g_string_append_printf(str, "'%s'", escaped);
 			g_free (escaped);
 			break;
