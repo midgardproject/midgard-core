@@ -164,9 +164,9 @@ _midgard_view_derived_update_storage( MidgardConnection *mgd, MidgardDBObjectCla
 	g_return_val_if_fail(mgd != NULL, FALSE);
 	g_return_val_if_fail(klass != NULL, FALSE);	
 
-	g_debug("Ignoring update storage for underlying database view");
-
-	return TRUE;
+	/* View can not be updated, so we delete it and create again */
+	klass->dbpriv->delete_storage (mgd, klass);
+	return klass->dbpriv->create_storage (mgd, klass);
 }
 
 static gboolean 
