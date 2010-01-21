@@ -98,8 +98,8 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 		if (cur->type == XML_ELEMENT_NODE 
 				&& g_str_equal(cur->name, "property")) { /* FIXME, add property to reserved words constants */
 
-			//property_name = NULL;
-			//rprop_attr = NULL;
+			property_name = NULL;
+			rprop_attr = NULL;
 
 			xmlChar *name = xmlGetProp(cur, (const xmlChar *)TYPE_RW_NAME);
 
@@ -126,16 +126,16 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 				__view_error (cur, "Can not create proper view. Defined '%s' class has NULL storage", rprop[0]);
 
 			__get_property_attribute (cur, rprop, &property_name, &rprop_attr, MIDGARD_DBOBJECT_CLASS (klass));
-
+	
 			midgard_core_schema_type_property_copy(rprop_attr, type);
 			
 			/* TODO, refactor with some usable TypeAttr related API */
 			/* Create property attributes copy using original property.
 			   Then change name. */
 			MgdSchemaPropertyAttr *prop_attr = g_hash_table_lookup(type->prophash, property_name);
-
+	
 			if (!prop_attr)
-				g_warning("Can not found mgdschema %s.%s", type->name, name); 
+				g_warning("Can not find  %s.%s in newly registered view", type->name, name); 
 
 			if (prop_attr) {
 
