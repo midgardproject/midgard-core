@@ -1461,12 +1461,14 @@ static gboolean __mcq_column_exists(MidgardConnection *mgd,
 	GError *error = NULL;
 	if (!gda_connection_update_meta_store (mgd->priv->connection, &mcontext, &error)) {
 		gda_value_free (mcontext.column_values[0]);
-		g_warning("Failed to update meta data for table '%s': %s", mdc->table_name, 
+		/* FIXME, there should be warning, but for some reason 
+		 * either SQLite or gda-sqlite provider is buggy */	
+		g_debug ("Failed to update meta data for table '%s': %s", mdc->table_name, 
 				error && error->message ? error->message : "No detail");
 		if (error)
 			g_error_free(error);
 
-		return TRUE;
+		return FALSE;
 	}
 
 	GdaDataModel *dm_schema =
@@ -1666,8 +1668,10 @@ gboolean midgard_core_query_add_column(MidgardConnection *mgd,
 		gda_server_provider_perform_operation (server, cnc, op, &error);
 
 	if(!created) {
-		
-		g_warning("Can not add %s column to table '%s'. %s",
+	
+		/* FIXME, there should be warning, but for some reason 
+		 * either SQLite or gda-sqlite provider is buggy */	
+		g_debug ("Can not add %s column to table '%s'. %s",
 				column_name, table_name, error->message);
 		g_clear_error(&error);
 		g_object_unref(op);
