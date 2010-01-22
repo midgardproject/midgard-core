@@ -8,6 +8,6 @@
 void midgard_test_object_tree_basic(MidgardObjectTest *mot, gconstpointer data);
 void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data);
 
-void midgard_test_object_tree_get_parent(MgdObjectTest *mot, gconstpointer data);
+void midgard_test_object_tree_get_parent(MidgardObjectTest *mot, gconstpointer data);
 
 #endif /* MIDGARD_TEST_OBJECT_FETCH_H */

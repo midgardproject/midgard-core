@@ -150,10 +150,10 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	g_object_unref(object);
 }
 
-void midgard_test_object_tree_get_parent(MgdObjectTest *mot, gconstpointer data)
+void midgard_test_object_tree_get_parent(MidgardObjectTest *mot, gconstpointer data)
 {
 	g_assert(mot != NULL);
-	MgdObject *_object = MIDGARD_OBJECT(mot->object);
+	MidgardObject *_object = MIDGARD_OBJECT(mot->object);
 	MidgardConnection *mgd = MIDGARD_CONNECTION(midgard_object_get_connection(_object));
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(_object);
 	
