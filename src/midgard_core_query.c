@@ -1463,7 +1463,7 @@ static gboolean __mcq_column_exists(MidgardConnection *mgd,
 		gda_value_free (mcontext.column_values[0]);
 		/* FIXME, there should be warning, but for some reason 
 		 * either SQLite or gda-sqlite provider is buggy */	
-		g_debug ("Failed to update meta data for table '%s': %s", mdc->table_name, 
+		g_message ("Failed to update meta data for table '%s': %s", mdc->table_name, 
 				error && error->message ? error->message : "No detail");
 		if (error)
 			g_error_free(error);
@@ -1671,7 +1671,7 @@ gboolean midgard_core_query_add_column(MidgardConnection *mgd,
 	
 		/* FIXME, there should be warning, but for some reason 
 		 * either SQLite or gda-sqlite provider is buggy */	
-		g_debug ("Can not add %s column to table '%s'. %s",
+		g_message ("Can not add %s column to table '%s'. %s",
 				column_name, table_name, error->message);
 		g_clear_error(&error);
 		g_object_unref(op);
@@ -2324,13 +2324,14 @@ gboolean midgard_core_query_update_class_storage(MidgardConnection *mgd, Midgard
 
 	if (klass->dbpriv->has_metadata) {
 	
-		if(!midgard_core_query_create_metadata_columns(mgd, tablename)) {
-		
-			g_warning("Failed to create metadata columns"); 
+		if (!midgard_core_query_create_metadata_columns(mgd, tablename)) {
+	
+			/* FIXME, there should be warning, but for some reason 
+			 * either SQLite or gda-sqlite provider is buggy */	
+			g_message ("Failed to create metadata columns"); 
 			return FALSE;
 		}
 	}
-
 
 	return TRUE;
 }
