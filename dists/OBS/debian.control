@@ -7,7 +7,7 @@ Maintainer:  Piotr Pokora <piotrek.pokora@gmail.com>
 Uploaders: 
 Standards-Version: 3.8.3
 Homepage: http://www.midgard-project.org
-Build-Depends: debhelper (>=4), libglib2.0-dev (>=2.12),  autotools-dev, libxml2-dev(>=2.6.11), fakeroot, libdbus-glib-1-dev, libc6, libgda3-dev, zlib1g-dev  
+Build-Depends: debhelper (>=5), libglib2.0-dev (>=2.12),  autotools-dev, libxml2-dev(>=2.6.11), fakeroot, libdbus-glib-1-dev, libc6, libgda3-dev, zlib1g-dev  
 
 Package: libmidgard2-2009
 Section: libs
