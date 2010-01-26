@@ -1,3 +1,14 @@
+midgard2-core (9.09.2-3) unstable; urgency=low
+
+  * Fixed debian-rules-sets-DH_COMPAT
+  * Fixed debian-rules-ignores-make-clean-error 
+  * Fixed ancient-standards-version 3.2.1
+  * Fixed duplicate-short-description midgard2-common midgard2-bin
+  * Fixed package-depends-on-hardcoded-libc
+  * Fixed weak-library-dev-dependency libmidgard2-dev on libmidgard2-2009  
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Mon, 26 Jan 2010 18:41:09 +0200
+
 midgard2-core (9.09.2-2) unstable; urgency=low
 
   * Added Homepage field in source section

@@ -5,14 +5,14 @@ Binary: libmidgard2-2009, libmidgard2-dev, midgard2-common, midgard2-bin
 Priority: optional
 Maintainer:  Piotr Pokora <piotrek.pokora@gmail.com>
 Uploaders: 
-Standards-Version: 3.2.1
+Standards-Version: 3.8.3
 Homepage: http://www.midgard-project.org
-Build-Depends: debhelper (>=3), libglib2.0-dev (>=2.12),  autotools-dev, libxml2-dev(>=2.6.11), fakeroot, libdbus-glib-1-dev, libc6, libgda3-dev, zlib1g-dev  
+Build-Depends: debhelper (>=4), libglib2.0-dev (>=2.12),  autotools-dev, libxml2-dev(>=2.6.11), fakeroot, libdbus-glib-1-dev, libc6, libgda3-dev, zlib1g-dev  
 
 Package: libmidgard2-2009
 Section: libs
 Architecture: any
-Depends: libglib2.0-0 (>=2.12), libxml2 (>=2.6.11), libdbus-glib-1-2, dbus,  libgda3-3, libc6, ${shlibs:Depends} 
+Depends: libglib2.0-0 (>=2.12), libxml2 (>=2.6.11), libdbus-glib-1-2, dbus,  libgda3-3, ${shlibs:Depends} 
 Conflicts: 
 Suggests: mysql-server-5.0 (>=5.0)
 Description: Midgard Content Repository - Runtime Library
@@ -26,7 +26,7 @@ Description: Midgard Content Repository - Runtime Library
 Package: libmidgard2-dev
 Section: libdevel
 Architecture: any
-Depends: libmidgard2-2009 (>= ${source:Version})
+Depends: libmidgard2-2009 (= ${source:Version})
 Conflicts:
 Replaces: 
 Description: Midgard Content Management System - Development Files
@@ -56,8 +56,8 @@ Description: Midgard2 common files used by different midgard extensions
 Package: midgard2-bin
 Section: utils
 Architecture: any
-Depends: libmidgard2-2009 (>= ${source:Version}), midgard2-common (>= ${source:Version}), libc6, ${shlibs:Depends}
-Description: Midgard2 common files used by different midgard extensions
+Depends: libmidgard2-2009 (>= ${source:Version}), midgard2-common (>= ${source:Version}), ${shlibs:Depends}
+Description: Midgard2, command line tools
  .
  Midgard2 is an Open Source Content Repository. It provides an object-oriented
  and replicated environment for building data-intensive applications for both  

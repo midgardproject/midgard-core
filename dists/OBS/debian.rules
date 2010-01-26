@@ -1,9 +1,5 @@
 #! /usr/bin/make -f
 
-#export DH_VERBOSE=1
-export DH_COMPAT=4
-export DH_OPTIONS
-
 DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_BUILD_ARCH   ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
@@ -47,7 +43,7 @@ install: build
 	dh_testroot
 	dh_clean
 	dh_installdirs
-	$(MAKE) install \
+	[ ! -f Makefile ] || $(MAKE) distclean \
 		INSTALL='/usr/bin/install -c -o root -g root' \
 		DESTDIR=`pwd`/debian/tmp 
 	dh_install --sourcedir=debian/tmp
