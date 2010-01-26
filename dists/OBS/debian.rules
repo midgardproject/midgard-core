@@ -4,6 +4,9 @@ DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
 DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
 DEB_BUILD_ARCH   ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 
+export DH_COMPAT=5
+export DH_OPTIONS
+
 deb_section=
 
 CONFIGURE_FLAGS=\
@@ -33,7 +36,7 @@ configure-stamp:
 
 clean:
 	dh_testdir
-	-$(MAKE) distclean
+	[ ! -f Makefile ] || $(MAKE) distclean
 	rm -f build-stamp configure-stamp
 	dh_clean
 
@@ -43,7 +46,7 @@ install: build
 	dh_testroot
 	dh_clean
 	dh_installdirs
-	[ ! -f Makefile ] || $(MAKE) distclean \
+	$(MAKE) install \
 		INSTALL='/usr/bin/install -c -o root -g root' \
 		DESTDIR=`pwd`/debian/tmp 
 	dh_install --sourcedir=debian/tmp
@@ -59,8 +62,7 @@ binary-arch:install
 	dh_installdocs 
 	dh_installchangelogs
 	dh_installman
-	dh_installpam --name=midgard2
-	dpkg-gensymbols -plibmidgard2-2009 -d -Odebian/libmidgard2-2009.symbols -edebian/tmp/usr/lib/libmidgard2.so.2009 -v9.09.1
+	dpkg-gensymbols -plibmidgard2-2009 -d -Odebian/libmidgard2-2009.symbols -edebian/tmp/usr/lib/libmidgard2.so.2009 -v9.09.2
 	dh_makeshlibs -V
 	dh_shlibdeps -s
 	dh_strip
