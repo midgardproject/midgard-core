@@ -1,3 +1,9 @@
+midgard2-core (9.09.2-2) unstable; urgency=low
+
+  * Added Homepage field in source section
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Mon, 26 Jan 2010 08:58:56 +0200
+
 midgard2-core (9.09.2-1) unstable; urgency=low
 
   * New upstream
