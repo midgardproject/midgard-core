@@ -9,7 +9,7 @@ Homepage: http://www.midgard-project.org
 Build-Depends: debhelper (>=6), libglib2.0-dev (>=2.12),  autotools-dev, libxml2-dev(>=2.6.11), fakeroot, libdbus-glib-1-dev, libgda3-dev
 
 Package: libmidgard2-2009
-Architecture: amd64
+Architecture: any
 Depends: libglib2.0-0 (>=2.12), libxml2 (>=2.6.11), libdbus-glib-1-2, dbus,  libgda3-3, ${shlibs:Depends}, ${misc:Depends} 
 Conflicts: 
 Suggests: mysql-server-5.0 (>=5.0)
@@ -23,7 +23,7 @@ Description: Midgard Content Repository - Runtime Library
 
 Package: libmidgard2-dev
 Section: libdevel
-Architecture: amd64
+Architecture: any
 Depends: libmidgard2-2009 (= ${binary:Version}), ${misc:Depends}
 Conflicts:
 Replaces: 
@@ -39,7 +39,7 @@ Description: Midgard Content Management System - Development Files
 
 Package: midgard2-common
 Section: utils
-Architecture: amd64
+Architecture: any
 Depends: libmidgard2-2009 (>= ${source:Version}), ${misc:Depends}
 Description: Midgard2 common files used by different midgard extensions
  .
@@ -53,7 +53,7 @@ Description: Midgard2 common files used by different midgard extensions
 
 Package: midgard2-bin
 Section: utils
-Architecture: amd64
+Architecture: any
 Depends: libmidgard2-2009 (>= ${source:Version}), midgard2-common (>= ${source:Version}), ${shlibs:Depends}, ${misc:Depends}
 Description: Midgard2, command line tools
  .
