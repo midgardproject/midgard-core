@@ -1,6 +1,8 @@
 midgard2-core (9.09.2-4) unstable; urgency=low
 
   * Fixed not-binnmuable-any-depends-any libmidgard2-dev -> libmidgard2-2009
+  * Fixed binary-control-field-duplicates-source field "architecture" in package libmidgard2-2009
+  * Added debian/compat file fixes debian-rules-sets-DH_COMPAT
 
  -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 28 Jan 2010 11:35:22 +0200
 
