@@ -26,7 +26,7 @@ Description: Midgard Content Repository - Runtime Library
 Package: libmidgard2-dev
 Section: libdevel
 Architecture: any
-Depends: libmidgard2-2009 (= ${source:Version})
+Depends: libmidgard2-2009 (= ${binary:Version})
 Conflicts:
 Replaces: 
 Description: Midgard Content Management System - Development Files
