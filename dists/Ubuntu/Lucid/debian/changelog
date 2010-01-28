@@ -1,0 +1,86 @@
+midgard2-core (9.09.2-5) lucid; urgency=low
+
+  * Upload to Lucid (LP: #512860)
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Thu, 28 Jan 2010 16:29:35 +0200
+
+midgard2-core (9.09.2-4) unstable; urgency=low
+
+  * Fixed not-binnmuable-any-depends-any libmidgard2-dev -> libmidgard2-2009
+  * Fixed binary-control-field-duplicates-source field "architecture" in package libmidgard2-2009
+  * Added debian/compat file fixes debian-rules-sets-DH_COMPAT
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 27 Jan 2010 11:35:22 +0200
+
+midgard2-core (9.09.2-3) unstable; urgency=low
+
+  * Fixed debian-rules-sets-DH_COMPAT
+  * Fixed debian-rules-ignores-make-clean-error 
+  * Fixed ancient-standards-version 3.2.1
+  * Fixed duplicate-short-description midgard2-common midgard2-bin
+  * Fixed package-depends-on-hardcoded-libc
+  * Fixed weak-library-dev-dependency libmidgard2-dev on libmidgard2-2009 
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Mon, 26 Jan 2010 18:41:09 +0200
+
+midgard2-core (9.09.2-2) unstable; urgency=low
+
+  * Added Homepage field in source section
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Mon, 26 Jan 2010 08:58:56 +0200
+
+midgard2-core (9.09.2-1) unstable; urgency=low
+
+  * New upstream
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Mon, 25 Jan 2010 13:20:43 +0200
+
+midgard2-core (9.09.1-1) unstable; urgency=low
+
+  * New upstream
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Thu, 10 Dec 2009 20:37:30 +0200
+
+midgard2-core (9.09-3) unstable; urgency=low
+
+  * Debian revision not included in symbols file
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 19 Nov 2009 18:12:17 +0200
+
+midgard2-core (9.09-2) unstable; urgency=low
+
+  * Updated symbols file
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 19 Nov 2009 10:53:04 +0200
+
+midgard2-core (9.09-1) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 18 Nov 2009 11:38:51 +0200
+
+midgard2-core (9.03.99) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Thu, 15 Apr 2009 15:39:38 +0200
+
+midgard2-core (9.03.0-1+RC) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Thu, 15 Apr 2009 12:31:25 +0200
+
+midgard2-core (9.03.0beta2) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Fri, 13 Mar 2009 13:13:13 +0200
+
+midgard2-core (9.03.0beta) unstable; urgency=low
+
+  * New upstream 
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Thu, 09 Oct 2008 13:11:26 +0200
+
+

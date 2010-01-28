@@ -1,0 +1,76 @@
+#! /usr/bin/make -f
+
+DEB_HOST_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+DEB_BUILD_ARCH   ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+
+export DH_OPTIONS
+
+deb_section=
+
+CONFIGURE_FLAGS=\
+	--prefix=/usr\
+
+ifeq ($(DEB_BUILD_ARCH),armel)
+deb_section=user\/
+endif
+
+switch-arch:
+	 sed -e 's/Architecture: any/Architecture: ${DEB_BUILD_ARCH}/g' debian/control > control.dummy
+	 mv control.dummy debian/control
+
+build: build-stamp
+build-stamp: configure-stamp
+	dh_testdir
+	$(MAKE) pkgdatadir=/usr/share/midgard 
+	touch $@
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	cp -f /usr/share/misc/config.guess .
+	cp -f /usr/share/misc/config.sub .
+	./configure ${CONFIGURE_FLAGS}
+	touch $@
+
+clean:
+	dh_testdir
+	[ ! -f Makefile ] || $(MAKE) distclean
+	rm -f build-stamp configure-stamp
+	dh_clean
+
+install: DH_OPTIONS=
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean
+	dh_installdirs
+	$(MAKE) install \
+		INSTALL='/usr/bin/install -c -o root -g root' \
+		DESTDIR=`pwd`/debian/tmp 
+	dh_install --sourcedir=debian/tmp
+	
+binary-indep: DH_OPTIONS=-i
+binary-indep:
+# nothing to do
+
+binary-indep: DH_OPTIONS=-a
+binary-arch:install
+	dh_testdir
+	dh_testroot
+	dh_installdocs 
+	dh_installchangelogs
+	dh_installman
+	dpkg-gensymbols -plibmidgard2-2009 -d -Odebian/libmidgard2-2009.symbols -edebian/tmp/usr/lib/libmidgard2.so.2009 -v9.09.2
+	dh_makeshlibs -V
+	dh_shlibdeps -s
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb	
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary:	switch-arch binary-indep binary-arch
+.PHONY: switch-arch binary binary-arch binary-indep install clean configure build clean
