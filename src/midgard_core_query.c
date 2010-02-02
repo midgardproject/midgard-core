@@ -472,23 +472,39 @@ static void __get_object_properties_lists (MidgardDBObject *object, GSList **nam
 				break;
 
 			default:
-				g_value_init (value, ftype);
+				g_value_init (value, pspecs[i]->value_type);
 		}
 
-		g_object_get_property (G_OBJECT (object), pname, value);
+		g_object_get_property (G_OBJECT (object), pname, value);	
 
 		/* Append colnames */
 		const gchar *colname = midgard_core_class_get_property_colname (dbklass, pname);
+	
+		if (!colname) {
+			g_value_unset (value);
+			continue;
+		}
+
 		*names = g_slist_prepend (*names, (gpointer) colname);
 
 		/* Append value */
-		*values = g_slist_prepend (*values, (gpointer) value);
+		if (G_VALUE_TYPE (value) == MGD_TYPE_TIMESTAMP) {
 
-		/* Append metadata if exists */
-		if (dbklass->dbpriv->has_metadata) {
-			MidgardMetadata *metadata = object->dbpriv->metadata;
-			__get_object_properties_lists (MIDGARD_DBOBJECT (metadata), names, values);
+			GValue *tval = g_new0 (GValue, 1);
+			g_value_init (tval, GDA_TYPE_TIMESTAMP);
+			g_value_transform ((const GValue *) value, tval);
+			*values = g_slist_prepend (*values, (gpointer) tval);
+
+		} else {
+
+			*values = g_slist_prepend (*values, (gpointer) value);
 		}
+	}
+
+	/* Append metadata if exists */
+	if (dbklass->dbpriv->has_metadata) {
+		MidgardMetadata *metadata = object->dbpriv->metadata;
+		__get_object_properties_lists (MIDGARD_DBOBJECT (metadata), names, values);
 	}
 
 	*names = g_slist_reverse (*names);
@@ -667,9 +683,11 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 	if (!names)
 		return FALSE;
 
+	/* FIXME, query stored in connection event is not up to date.
+	 * This function must be rewritten for GDaStatement and ##syntax::type */
 	const gchar *query = NULL;
 	__get_query_string (cnc, query)
-	g_debug ("%s", query); 
+	g_debug ("CREATE DBOBJECT: %s", query); 
 
 	gboolean inserted = gda_insert_row_into_table_v (cnc, table, names, values, &error);
 	
@@ -1356,7 +1374,7 @@ midgard_core_query_insert_records (MidgardConnection *mgd,
 	gda_sql_statement_free (sqlst);
 
 	gchar *debug_query = gda_statement_to_sql (stmt, NULL, NULL);
-	g_debug("%s", debug_query);
+	g_debug("CREATE: %s", debug_query);
 	g_free (debug_query);
 
 	gint retval;
