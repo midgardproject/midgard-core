@@ -114,6 +114,7 @@ __midgard_object_instance_init (GTypeInstance *instance, gpointer g_class)
 	self->priv->_params = NULL;
 
 	/* Initialize metadata object, if enabled. */
+	/* FIXME, move it to dbpriv virtual method */
 	if (MIDGARD_DBOBJECT_CLASS (g_class)->dbpriv->has_metadata) {
 		self->metadata = midgard_metadata_new (self);
 		/* Add weak reference */
@@ -232,12 +233,9 @@ __mgdschema_object_dispose (GObject *object)
 {
 	MidgardObject *self = MIDGARD_OBJECT (object);
 
-	if (self->metadata != NULL && G_IS_OBJECT(self->metadata)) {
+	if (self->dbpriv->metadata != NULL && G_IS_OBJECT(self->dbpriv->metadata)) {
 		/* Remove weak reference */
-		g_object_remove_weak_pointer (G_OBJECT (self), (gpointer) self->metadata);
-		/* Call destructor */
-		g_object_unref (self->metadata);
-		self->metadata = NULL;
+		g_object_remove_weak_pointer (G_OBJECT (self), (gpointer) self->dbpriv->metadata);
 	}
 
 	/* Free object's parameters */
@@ -880,7 +878,8 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	}	
 
 #ifdef HAVE_LIBGDA_4
-	inserted = __insert_or_update_records(object, tablename, GDA_SQL_STATEMENT_INSERT, NULL);
+	//inserted = __insert_or_update_records(object, tablename, GDA_SQL_STATEMENT_INSERT, NULL);
+	inserted = midgard_core_query_create_dbobject_record (MIDGARD_DBOBJECT (object));
 #else
 	inserted = __insert_or_update_records(object, tablename, GDA_QUERY_TYPE_INSERT, NULL);
 #endif
@@ -1415,6 +1414,7 @@ __midgard_object_constructor (GType type,
 
 	MIDGARD_DBOBJECT(object)->dbpriv->storage_data =
 		MIDGARD_OBJECT_GET_CLASS(object)->dbpriv->storage_data;
+	MIDGARD_DBOBJECT (object)->dbpriv->metadata = MIDGARD_OBJECT (object)->metadata;
 
 	MgdSchemaTypeAttr *priv =
 		G_TYPE_INSTANCE_GET_PRIVATE ((GTypeInstance*)object, type, MgdSchemaTypeAttr);
