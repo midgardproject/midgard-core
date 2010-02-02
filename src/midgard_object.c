@@ -3224,7 +3224,7 @@ gboolean midgard_object_lock(MidgardObject *self)
 
 	/* approver guid value */
 	GValue gval = {0, };
-	g_value_init(&gval, G_TYPE_STRING);
+	g_value_init (&gval, G_TYPE_STRING);
 
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
 	if (person)
@@ -3234,13 +3234,18 @@ gboolean midgard_object_lock(MidgardObject *self)
 
 	/* approved toggle */
 	GValue aval = {0, };
-	g_value_init(&aval, G_TYPE_BOOLEAN);
-	g_value_set_boolean(&aval, TRUE);
+	g_value_init (&aval, G_TYPE_BOOLEAN);
+	g_value_set_boolean (&aval, TRUE);
 
 	/* increment revision */
 	GValue rval = {0, };
-	g_value_init(&rval, G_TYPE_UINT);
-	g_value_set_uint(&rval, self->metadata->priv->revision+1);
+	g_value_init (&rval, G_TYPE_UINT);
+	g_value_set_uint (&rval, self->metadata->priv->revision+1);
+
+	/* Transform timestamp to string */
+	GValue stval = {0, };
+	g_value_init (&stval, G_TYPE_STRING);
+	g_value_transform (tval, &stval);
 
 	if (midgard_object_is_locked(self)) {
 
@@ -3252,11 +3257,11 @@ gboolean midgard_object_lock(MidgardObject *self)
 	
 	gboolean rv = midgard_core_query_update_object_fields(
 			MIDGARD_DBOBJECT(self), 
-			"metadata_locked", tval,
+			"metadata_locked", &stval,
 			"metadata_locker", &gval, 
 			"metadata_islocked", &aval, 
 			"metadata_revisor", &gval, 
-			"metadata_revised", tval, 
+			"metadata_revised", &stval, 
 			"metadata_revision", &rval,
 			NULL);
 
@@ -3266,20 +3271,21 @@ gboolean midgard_object_lock(MidgardObject *self)
 		self->metadata->priv->lock_is_set = TRUE;
 		self->metadata->priv->is_locked = TRUE;
 
-		midgard_core_metadata_set_locked(self->metadata, tval);
-		midgard_core_metadata_set_locker(self->metadata, g_value_get_string(&gval));
-		midgard_core_metadata_set_revisor(self->metadata, g_value_get_string(&gval));
-		midgard_core_metadata_set_revised(self->metadata, tval);
-		midgard_core_metadata_increase_revision(self->metadata);
+		midgard_core_metadata_set_locked (self->metadata, tval);
+		midgard_core_metadata_set_locker (self->metadata, g_value_get_string(&gval));
+		midgard_core_metadata_set_revisor (self->metadata, g_value_get_string(&gval));
+		midgard_core_metadata_set_revised (self->metadata, tval);
+		midgard_core_metadata_increase_revision (self->metadata);
 	}
 
-	g_value_unset(tval);
-	g_value_unset(&gval);
-	g_value_unset(&aval);
-	g_value_unset(&rval);
+	g_value_unset (tval);
+	g_value_unset (&stval);
+	g_value_unset (&gval);
+	g_value_unset (&aval);
+	g_value_unset (&rval);
 
-	g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_locked, 0);
-	g_object_unref(self);
+	g_signal_emit (self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_locked, 0);
+	g_object_unref (self);
 
 	return rv;
 }

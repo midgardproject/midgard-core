@@ -309,35 +309,137 @@ midgard_core_query_get_id (MidgardConnection *mgd, const gchar *table, const gch
 	return id;
 }
 
-static void 
-_add_value_type (GString *str, GParameter parameter, gboolean add_comma)
+static void
+_add_value_type_update (GString *str, const gchar *name, GValue *value, gboolean add_comma)
 {
 	if (add_comma) 
 		g_string_append (str, ", ");
 
 	const gchar *type = "invalid";
 
-	switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE(&parameter.value))) {
+	switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE(value))) {
 		
 		case G_TYPE_STRING:
 			type = "gchararray";
-		break;
+			break;
 	
 		case G_TYPE_UINT:
 			type = "guint";
-		break;
+			break;
 
 		case G_TYPE_INT:
 			type = "gint";
-		break;
+			break;
 
 		case G_TYPE_BOOLEAN:
 			type = "gboolean";
-		break;	
+			break;	
+
+		case G_TYPE_BOXED:
+			if (G_VALUE_TYPE (value) == GDA_TYPE_TIMESTAMP) {
+				type = "timestamp";
+			} else {
+				g_warning ("_add_value_type: unhandled boxed value type (%s)", G_VALUE_TYPE_NAME (value));
+			}
+			break;	
+
+		default:
+			g_warning ("_add_value_type: unhandled value type (%s)", G_VALUE_TYPE_NAME (value));
+			break;
 	}
 
-	g_string_append_printf (str, "##/*name:'%s' type:%s*/", parameter.name, type);
+	g_string_append_printf (str, "%s=##%s::%s", name, name, type);
 }
+
+#ifdef HAVE_LIBGDA_4
+
+static void 
+_add_value_type (GString *str, const gchar *name, GValue *value, gboolean add_comma)
+{
+	if (add_comma) 
+		g_string_append (str, ", ");
+
+	const gchar *type = "invalid";
+
+	switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE(value))) {
+		
+		case G_TYPE_STRING:
+			type = "gchararray";
+			break;
+	
+		case G_TYPE_UINT:
+			type = "guint";
+			break;
+
+		case G_TYPE_INT:
+			type = "gint";
+			break;
+
+		case G_TYPE_BOOLEAN:
+			type = "gboolean";
+			break;	
+
+		case G_TYPE_BOXED:
+			if (G_VALUE_TYPE (value) == GDA_TYPE_TIMESTAMP) {
+				type = "timestamp";
+			} else {
+				g_warning ("_add_value_type: unhandled boxed value type (%s)", G_VALUE_TYPE_NAME (value));
+			}
+			break;	
+
+		default:
+			g_warning ("_add_value_type: unhandled value type (%s)", G_VALUE_TYPE_NAME (value));
+			break;
+	}
+
+	g_string_append_printf (str, "##%s::%s", name, type);
+}
+
+#else 
+
+static void 
+_add_value_type (GString *str, const gchar *name, GValue *value, gboolean add_comma)
+{
+	if (add_comma) 
+		g_string_append (str, ", ");
+
+	const gchar *type = "invalid";
+
+	switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE(value))) {
+		
+		case G_TYPE_STRING:
+			type = "gchararray";
+			break;
+	
+		case G_TYPE_UINT:
+			type = "guint";
+			break;
+
+		case G_TYPE_INT:
+			type = "gint";
+			break;
+
+		case G_TYPE_BOOLEAN:
+			type = "gboolean";
+			break;	
+
+		case G_TYPE_BOXED:
+			if (G_VALUE_TYPE (value) == GDA_TYPE_TIMESTAMP) {
+				type = "timestamp";
+			} else {
+				g_warning ("_add_value_type: unhandled boxed value type (%s)", G_VALUE_TYPE_NAME (value));
+			}
+			break;	
+
+		default:
+			g_warning ("_add_value_type: unhandled value type (%s)", G_VALUE_TYPE_NAME (value));
+			break;
+	}
+
+	g_string_append_printf (str, "## /*name:'%s' type:%s*/", name, type);
+}
+
+#endif /* HAVE_LIBGDA_4 */
 
 static void __get_object_properties_lists (MidgardDBObject *object, GSList **names, GSList **values)
 {
@@ -424,7 +526,7 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	for (i = 0; i < n_params; i++) {
 	
 		g_string_append_printf (where, "%s %s = ", i > 0 ? " AND " : "", parameters[i].name);
-		_add_value_type (where, parameters[i], FALSE);
+		_add_value_type (where, parameters[i].name, (GValue *)&parameters[i].value, FALSE);
 	}
 
 	g_string_append_printf (select, " %s ", where->str);
@@ -650,7 +752,7 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 		parameters[i].name = prop_attr->field;
 		parameters[i].value = (const GValue)value;
 		g_string_append_printf (sqlquery, "%s %s", i > 0 ? "," : "", prop_attr->field);
-		_add_value_type (values, parameters[i], i > 0 ? TRUE : FALSE);
+		_add_value_type (values, parameters[i].name, parameters[i].value, i > 0 ? TRUE : FALSE);
 		g_value_unset (&value);
 	}
 
@@ -800,7 +902,7 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		parameters[i].name = prop_attr->field;
 		parameters[i].value = (const GValue)value;
 		g_string_append_printf (sqlquery, "%s %s=", i > 0 ? "," : "", prop_attr->field);
-		_add_value_type (sqlquery, parameters[i], FALSE);
+		_add_value_type (sqlquery, parameters[i].name, (GValue *)&parameters[i].value, FALSE);
 		g_value_unset (&value);
 	}
 
@@ -886,7 +988,7 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		parameters[i].name = prop_attr->field;
 		parameters[i].value = (const GValue)value;
 		g_string_append_printf (sqlquery, "%s %s=", i > 0 ? "," : "", prop_attr->field);
-		_add_value_type (sqlquery, parameters[i], FALSE);
+		_add_value_type (sqlquery, parameters[i].name, parameters[i].value, FALSE);
 		g_value_unset (&value);
 	}
 
@@ -969,7 +1071,130 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 
 # endif /* HAVE_LIBGDA_4 */
 
-gboolean midgard_core_query_update_object_fields(MidgardDBObject *object, const gchar *field, ...)
+#ifdef HAVE_LIBGDA_4
+
+gboolean 
+midgard_core_query_update_object_fields (MidgardDBObject *object, const gchar *field, ...)
+{
+	g_return_val_if_fail (object != NULL, FALSE);
+	g_return_val_if_fail (field != NULL, FALSE);
+
+	/* Create two single list and validate arguments' list */
+
+	const gchar *name = field;
+	va_list var_args;
+	va_start(var_args, field);	
+	GValue *value_arg;
+	GSList *cols = NULL;
+	GSList *values = NULL;
+	
+	while (name != NULL) {
+
+		g_return_val_if_fail (name != NULL, FALSE);
+		cols = g_slist_append (cols, (gpointer)name);
+		
+		value_arg = va_arg (var_args, GValue*);
+		g_return_val_if_fail (value_arg != NULL, FALSE);
+
+		values = g_slist_append (values, (gpointer)value_arg);
+		name = va_arg (var_args, gchar*);
+	}
+	va_end (var_args);	
+
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	const gchar *guid = MGD_OBJECT_GUID (object);
+	const gchar *table = midgard_core_class_get_table (MIDGARD_DBOBJECT_GET_CLASS (object));
+
+	/* Build SQL query string */
+	GString *sql = g_string_new ("UPDATE ");
+	g_string_append_printf (sql, "%s SET ", table);
+	guint i = 0;
+	GSList *cl, *vl;
+
+	for (cl = cols, vl = values; cl != NULL; cl = cl->next, vl = vl->next) {
+
+		_add_value_type_update (sql, (const gchar *) cl->data, (GValue *) vl->data, i > 0 ? TRUE : FALSE);
+		i++;
+	}
+	
+	g_string_append_printf (sql, " WHERE %s.guid = '%s'", table, guid);
+
+	/* Create statement and set parameters */
+	GdaConnection *cnc = mgd->priv->connection;
+	GdaSqlParser *parser = mgd->priv->parser;
+	GdaStatement *stmt;
+	GdaSet *params;
+	GdaHolder *p;
+	GError *error = NULL;
+
+	stmt = gda_sql_parser_parse_string (parser, sql->str, NULL, &error);
+
+	if (!stmt || error) {
+
+		g_warning ("%s. Failed to create SQL statement for given query %s", 
+				error && error->message ? error->message : "Unknown reason", sql->str);
+		if (stmt)
+			g_object_unref (stmt);
+
+		g_clear_error (&error);
+		return FALSE;
+	}
+
+	g_string_free (sql, TRUE);
+	if (!gda_statement_get_parameters (stmt, &params, &error)) {
+	
+		g_warning ("Failed to get query parameters. %s", error && error->message ? error->message : "Unknown reason");
+		g_object_unref (stmt);
+		if (error) g_clear_error (&error);
+		return FALSE;
+	}
+
+	for (cl = cols, vl = values; cl != NULL; cl = cl->next, vl = vl->next) {
+	
+		p = gda_set_get_holder (params, (gchar *) cl->data);
+	
+		if (!p)
+			g_warning ("Failed to get holder for %s column", (gchar *) cl->data);
+	
+		if (!gda_holder_set_value (p, (GValue *) vl->data, &error)) {
+			g_warning ("Failed to set holder's value. %s", 
+					error && error->message ? error->message : "Unknown reason");
+			g_object_unref (stmt);
+			if (error) g_clear_error (&error);
+			return FALSE;
+		}
+	}
+
+	gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+	g_debug ("%s", debug_sql);
+	g_free (debug_sql);
+
+	gint retval = gda_connection_statement_execute_non_select (cnc, stmt, params, NULL, &error);
+
+	if (error) {
+		g_warning ("Failed to execute statement. %s", error && error->message ? error->message : "Unknown reason");
+		g_clear_error (&error);
+	}
+	
+	g_object_unref (params);
+	g_object_unref (stmt);
+
+	if (retval == -1) {
+
+		/* FIXME, provider error, handle this */
+		return FALSE;
+	}
+
+	if (retval >= 0)
+		return TRUE;
+
+	return FALSE;
+}
+
+#else 
+
+gboolean 
+midgard_core_query_update_object_fields (MidgardDBObject *object, const gchar *field, ...)
 {
 	g_assert(object != NULL);
 
@@ -1011,8 +1236,10 @@ gboolean midgard_core_query_update_object_fields(MidgardDBObject *object, const 
 
 	return FALSE;
 }
+#endif /* HAVE_LIBGDA_4 */
 
-gint midgard_core_query_insert_records(MidgardConnection *mgd, 
+gint 
+midgard_core_query_insert_records (MidgardConnection *mgd, 
 		const gchar *table, GList *cols, GList *values, 
 		guint query_type, const gchar *where)
 {
