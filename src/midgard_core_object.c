@@ -783,7 +783,8 @@ midgard_core_object_property_refuse_private (MidgardConnection *mgd, MgdSchemaTy
 	if (object)
 		klass = MIDGARD_DBOBJECT_GET_CLASS (object);
 
-	g_return_val_if_fail (object != NULL && type_attr != NULL, FALSE);
+	/* TODO, check if it's valid for cases like collector usage */
+	/* g_return_val_if_fail (object != NULL && type_attr != NULL, FALSE); */
 
 	if (!type_attr && object)
 		type_attr = klass->dbpriv->storage_data;
@@ -791,7 +792,7 @@ midgard_core_object_property_refuse_private (MidgardConnection *mgd, MgdSchemaTy
 	/* Unknown case, no storage_data which means something like no property */
 	g_return_val_if_fail (type_attr != NULL, FALSE);
 
-	MgdSchemaPropertyAttr  *attr = midgard_core_class_get_property_attr (klass, property);
+	MgdSchemaPropertyAttr *attr = midgard_core_schema_type_property_lookup (type_attr, property);
 	if (!attr)
 		return FALSE;
 

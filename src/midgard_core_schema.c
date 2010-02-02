@@ -661,5 +661,8 @@ midgard_core_schema_type_property_lookup (MgdSchemaTypeAttr *type, const gchar *
 	g_return_val_if_fail (type != NULL, NULL);
 	g_return_val_if_fail (name != NULL, NULL);
 
+	if (!type->prophash)
+		return NULL;
+
 	return g_hash_table_lookup (type->prophash, name);
 }
