@@ -373,7 +373,7 @@ void midgard_test_metadata_check_created(MidgardObject *object)
 	/* locker */
 	gchar *metadata_locker = NULL;
 	g_object_get(metadata, "locker", &metadata_locker, NULL);
-	g_assert_cmpstr(metadata_locker, ==, "");
+	g_assert_cmpstr(metadata_locker, ==, NULL);
 	g_free(metadata_locker);
 
 	/* locked */
@@ -388,7 +388,7 @@ void midgard_test_metadata_check_created(MidgardObject *object)
 	/* approver */
 	gchar *metadata_approver = NULL;
 	g_object_get(metadata, "approver", &metadata_approver, NULL);
-	g_assert_cmpstr(metadata_approver, ==, "");
+	g_assert_cmpstr(metadata_approver, ==, NULL);
 	g_free(metadata_approver);
 
 	/* approved */
@@ -621,7 +621,7 @@ void midgard_test_metadata_check_updated(MidgardObject *object)
 	/* locker */
 	gchar *metadata_locker = NULL;
 	g_object_get(metadata, "locker", &metadata_locker, NULL);
-	g_assert_cmpstr(metadata_locker, ==, "");
+	g_assert_cmpstr(metadata_locker, ==, NULL);
 	g_free(metadata_locker);
 
 	/* locked */
@@ -635,7 +635,7 @@ void midgard_test_metadata_check_updated(MidgardObject *object)
 	/* approver */
 	gchar *metadata_approver = NULL;
 	g_object_get(metadata, "approver", &metadata_approver, NULL);
-	g_assert_cmpstr(metadata_approver, ==, "");
+	g_assert_cmpstr(metadata_approver, ==, NULL);
 	g_free(metadata_approver);
 
 	/* approved */
