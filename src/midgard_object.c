@@ -730,8 +730,17 @@ static GPtrArray *__get_glists(MidgardObject *object)
 		g_value_init(&pval, pspecs[i]->value_type);		
 		g_object_get_property(G_OBJECT(object), pspecs[i]->name, &pval);
 		GValue *dval = g_new0(GValue, 1);
-		g_value_init(dval, pspecs[i]->value_type);
-		g_value_copy((const GValue*) &pval, dval);
+
+		if (G_VALUE_TYPE (&pval) == MGD_TYPE_TIMESTAMP) {
+
+			g_value_init (dval, GDA_TYPE_TIMESTAMP);
+			g_value_transform (&pval, dval);
+
+		} else { 
+
+			g_value_init(dval, pspecs[i]->value_type);
+			g_value_copy((const GValue*) &pval, dval);
+		}
 
 		values = g_list_prepend(values, (gpointer) dval);
 		cols = g_list_prepend(cols, (gpointer)colname);
@@ -756,8 +765,18 @@ static GPtrArray *__get_glists(MidgardObject *object)
 			g_value_init(&pval, pspecs[i]->value_type);		
 			g_object_get_property(G_OBJECT(mdata), pspecs[i]->name, &pval);
 			GValue *dval = g_new0(GValue, 1);
-			g_value_init(dval, pspecs[i]->value_type);
-			g_value_copy((const GValue*) &pval, dval);
+
+			if (G_VALUE_TYPE (&pval) == MGD_TYPE_TIMESTAMP) {
+	
+				g_value_init (dval, GDA_TYPE_TIMESTAMP);
+				g_value_transform (&pval, dval);
+		
+			} else { 
+				
+				g_value_init(dval, pspecs[i]->value_type);
+				g_value_copy((const GValue*) &pval, dval);
+			}
+
 			values = g_list_prepend(values, (gpointer) dval);
 			
 			cols = g_list_prepend(cols, (gpointer)colname);			

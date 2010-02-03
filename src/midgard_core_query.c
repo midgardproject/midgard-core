@@ -339,12 +339,12 @@ _add_value_type_update (GString *str, const gchar *name, GValue *value, gboolean
 			if (G_VALUE_TYPE (value) == GDA_TYPE_TIMESTAMP) {
 				type = "timestamp";
 			} else {
-				g_warning ("_add_value_type: unhandled boxed value type (%s)", G_VALUE_TYPE_NAME (value));
+				g_warning ("_add_value_type_update: unhandled boxed value type (%s)", G_VALUE_TYPE_NAME (value));
 			}
 			break;	
 
 		default:
-			g_warning ("_add_value_type: unhandled value type (%s)", G_VALUE_TYPE_NAME (value));
+			g_warning ("_add_value_type_update: unhandled value type (%s)", G_VALUE_TYPE_NAME (value));
 			break;
 	}
 
@@ -890,22 +890,22 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		return FALSE;
 	}
 
-	GString *sqlquery = g_string_new ("UPDATE ");
-	g_string_append_printf (sqlquery, "%s SET ", table);
+	GString *sql = g_string_new ("UPDATE ");
+	g_string_append_printf (sql, "%s SET ", table);
 
 	MgdSchemaPropertyAttr *prop_attr = NULL;
 	gboolean bv;
-
-	/* Create parameters from properties */
-	GParameter *parameters = g_new0 (GParameter, n_prop);
+	GValue value = {0, };
 
 	for (i = 0; i < n_prop; i++) {
-		
-		GValue value = {0, };
-		g_value_init (&value, pspecs[i]->value_type);
-		g_object_get_property (G_OBJECT (object), pspecs[i]->name, &value);
+	
 		/* Map property to storage field */
 		prop_attr = midgard_core_class_get_property_attr (klass, pspecs[i]->name);
+		if (!prop_attr || (prop_attr && !prop_attr->field))
+			continue;
+
+		g_value_init (&value, pspecs[i]->value_type);
+		g_object_get_property (G_OBJECT (object), pspecs[i]->name, &value);
 
 		/* Convert boolean to integer, it's safe for SQLite at least */
 		if (pspecs[i]->value_type == G_TYPE_BOOLEAN) {
@@ -917,19 +917,98 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 			g_value_set_uint (&value, bv ? 1 : 0);
 		}
 
-		parameters[i].name = prop_attr->field;
-		parameters[i].value = (const GValue)value;
-		g_string_append_printf (sqlquery, "%s %s=", i > 0 ? "," : "", prop_attr->field);
-		_add_value_type (sqlquery, parameters[i].name, (GValue *)&parameters[i].value, FALSE);
+		_add_value_type_update (sql, (const gchar *) prop_attr->field, &value, i > 0 ? TRUE : FALSE);
 		g_value_unset (&value);
 	}
 
-	g_string_append_printf (sqlquery, " WHERE %s.guid = '%s'", table, guid);  	
+	g_string_append_printf (sql, " WHERE %s.guid = '%s'", table, guid);  	
+
+	/* Create statement and set parameters */
+	GdaSqlParser *parser = (MGD_OBJECT_CNC (object))->priv->parser;
+	GdaStatement *stmt;
+	GdaSet *params;
+	GdaHolder *p;
+	GError *error = NULL;
+
+	stmt = gda_sql_parser_parse_string (parser, sql->str, NULL, &error);
+
+	if (!stmt || error) {
+
+		g_warning ("%s. Failed to create SQL statement for given query %s", 
+				error && error->message ? error->message : "Unknown reason", sql->str);
+		if (stmt)
+			g_object_unref (stmt);
+
+		g_clear_error (&error);
+		return FALSE;
+	}
+
+	g_string_free (sql, TRUE);
+	if (!gda_statement_get_parameters (stmt, &params, &error)) {
+	
+		g_warning ("Failed to get query parameters. %s", error && error->message ? error->message : "Unknown reason");
+		g_object_unref (stmt);
+		if (error) g_clear_error (&error);
+		return FALSE;
+	}
+
+	for (i = 0; i < n_prop; i++) {
+
+		prop_attr = midgard_core_class_get_property_attr (klass, pspecs[i]->name);
+		if (!prop_attr || (prop_attr && !prop_attr->field))
+			continue;
+
+		gchar *prop_name = pspecs[i]->name;
+
+		p = gda_set_get_holder (params, prop_name);
+	
+		if (!p)
+			g_warning ("Failed to get holder for %s column", (gchar *) prop_name);
+
+		/* FIXME, optimize this, we got property in previous loop */	
+		g_value_init (&value, pspecs[i]->value_type);
+		g_object_get_property (G_OBJECT (object), prop_name, &value);
+
+		if (!gda_holder_set_value (p, &value, &error)) {
+			g_warning ("Failed to set holder's value. %s", 
+					error && error->message ? error->message : "Unknown reason");
+			g_object_unref (stmt);
+			if (error) g_clear_error (&error);
+			return FALSE;
+		}
+
+		g_value_unset (&value);
+	}
+
+	gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+	g_debug ("%s", debug_sql);
+	g_free (debug_sql);
+
+	gint retval = gda_connection_statement_execute_non_select (cnc, stmt, params, NULL, &error);
+
+	if (error) {
+		g_warning ("Failed to execute statement. %s", error && error->message ? error->message : "Unknown reason");
+		g_clear_error (&error);
+	}
+	
+	g_free (pspecs);
+	g_object_unref (params);
+	g_object_unref (stmt);
+
+	if (retval == -1) {
+
+		/* FIXME, provider error, handle this */
+		return FALSE;
+	}
+
+	if (retval >= 0)
+		return TRUE;
+
+	return FALSE;
 
 
 
-
-	return TRUE;
+	return FALSE;
 }
 
 #else
@@ -1256,6 +1335,110 @@ midgard_core_query_update_object_fields (MidgardDBObject *object, const gchar *f
 }
 #endif /* HAVE_LIBGDA_4 */
 
+#ifdef HAVE_LIBGDA_4
+
+gint 
+midgard_core_query_insert_records (MidgardConnection *mgd, 
+		const gchar *table, GList *cols, GList *values, 
+		guint query_type, const gchar *where)
+{
+	g_assert(mgd != NULL);
+	guint ci = g_list_length(cols);
+	guint vi = g_list_length(values);
+
+	if(ci != vi) {
+
+		g_warning("%d != %d. Expected columns = values", ci, vi);
+		return -1;
+	}
+	/* Build SQL query string */
+	GString *sql = g_string_new ("UPDATE ");
+	g_string_append_printf (sql, "%s SET ", table);
+	guint i = 0;
+	GList *cl, *vl;
+
+	for (cl = cols, vl = values; cl != NULL; cl = cl->next, vl = vl->next) {
+
+		_add_value_type_update (sql, (const gchar *) cl->data, (GValue *) vl->data, i > 0 ? TRUE : FALSE);
+		i++;
+	}
+	
+	g_string_append_printf (sql, " WHERE %s", where);
+
+	/* Create statement and set parameters */
+	GdaConnection *cnc = mgd->priv->connection;
+	GdaSqlParser *parser = mgd->priv->parser;
+	GdaStatement *stmt;
+	GdaSet *params;
+	GdaHolder *p;
+	GError *error = NULL;
+
+	stmt = gda_sql_parser_parse_string (parser, sql->str, NULL, &error);
+
+	if (!stmt || error) {
+
+		g_warning ("%s. Failed to create SQL statement for given query %s", 
+				error && error->message ? error->message : "Unknown reason", sql->str);
+		if (stmt)
+			g_object_unref (stmt);
+
+		g_clear_error (&error);
+		return FALSE;
+	}
+
+	g_string_free (sql, TRUE);
+	if (!gda_statement_get_parameters (stmt, &params, &error)) {
+	
+		g_warning ("Failed to get query parameters. %s", error && error->message ? error->message : "Unknown reason");
+		g_object_unref (stmt);
+		if (error) g_clear_error (&error);
+		return FALSE;
+	}
+
+	for (cl = cols, vl = values; cl != NULL; cl = cl->next, vl = vl->next) {
+	
+		p = gda_set_get_holder (params, (gchar *) cl->data);
+	
+		if (!p)
+			g_warning ("Failed to get holder for %s column", (gchar *) cl->data);
+	
+		if (!gda_holder_set_value (p, (GValue *) vl->data, &error)) {
+			g_warning ("Failed to set holder's value. %s", 
+					error && error->message ? error->message : "Unknown reason");
+			g_object_unref (stmt);
+			if (error) g_clear_error (&error);
+			return FALSE;
+		}
+	}
+
+	gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+	g_debug ("%s", debug_sql);
+	g_free (debug_sql);
+
+	gint retval = gda_connection_statement_execute_non_select (cnc, stmt, params, NULL, &error);
+
+	if (error) {
+		g_warning ("Failed to execute statement. %s", error && error->message ? error->message : "Unknown reason");
+		g_clear_error (&error);
+	}
+	
+	g_object_unref (params);
+	g_object_unref (stmt);
+
+	if (retval == -1) {
+
+		/* FIXME, provider error, handle this */
+		return FALSE;
+	}
+
+	if (retval >= 0)
+		return TRUE;
+
+	return FALSE;
+}
+
+#else 
+
 gint 
 midgard_core_query_insert_records (MidgardConnection *mgd, 
 		const gchar *table, GList *cols, GList *values, 
@@ -1271,118 +1454,6 @@ midgard_core_query_insert_records (MidgardConnection *mgd,
 		return -1;
 	}
 
-#ifdef HAVE_LIBGDA_4
-	/* create statement's parts */
-	GdaSqlAnyPart *top;
-
-	switch (query_type) {
-		
-		case GDA_SQL_STATEMENT_INSERT:
-			top = (GdaSqlAnyPart*) g_new0 (GdaSqlStatementInsert, 1);
-			break;
-		
-		case GDA_SQL_STATEMENT_UPDATE:
-			top = (GdaSqlAnyPart*) g_new0 (GdaSqlStatementUpdate, 1);
-			break;
-		
-		default:
-			g_assert_not_reached();
-	}
-
-	top->type = query_type;
-
-	GdaSqlTable *sql_table;
-	GSList *fields_list = NULL;
-	GSList *expr_list = NULL;
-
-	sql_table = gda_sql_table_new (top);
-	if (gda_sql_identifier_needs_quotes (table))
-		sql_table->table_name = gda_sql_identifier_add_quotes (table);
-	else
-		sql_table->table_name = g_strdup (table);
-	for (; cols; cols = cols->next, values = values->next) {
-		GdaSqlField *field;
-	
-		field = gda_sql_field_new (top);
-		fields_list = g_slist_prepend (fields_list, field);
-		if (gda_sql_identifier_needs_quotes ((const gchar *) cols->data))
-			field->field_name = gda_sql_identifier_add_quotes ((const gchar *) cols->data);
-		else
-			field->field_name = g_strdup ((const gchar *) cols->data);
-
-		GdaSqlExpr *expr;
-		expr = gda_sql_expr_new (top);
-		expr_list = g_slist_prepend (expr_list, expr);
-		if (values->data)
-			expr->value = gda_value_copy ((GValue *) values->data);
-		else
-			expr->value = NULL;
-	}
-	
-	/* finalize statement's creation */
-	switch (query_type) {
-	case GDA_SQL_STATEMENT_INSERT: {
-		GdaSqlStatementInsert *ins = (GdaSqlStatementInsert*) top;
-		ins->table = sql_table;
-		ins->fields_list = g_slist_reverse (fields_list);
-		ins->values_list = g_slist_prepend (NULL, g_slist_reverse (expr_list));
-		break;
-	}
-	case GDA_SQL_STATEMENT_UPDATE: {
-		GdaSqlStatementUpdate *upd = (GdaSqlStatementUpdate*) top;
-		upd->table = sql_table;
-		upd->fields_list = g_slist_reverse (fields_list);
-		upd->expr_list = g_slist_reverse (expr_list);
-		if (where) {
-			gchar *tmp = g_strdup_printf ("SELECT * FROM a WHERE %s", where);
-			GdaStatement *tmpstmt;
-
-			/* create a parser if necessary */
-			if (!mgd->priv->parser) {
-				mgd->priv->parser = gda_connection_create_parser (mgd->priv->connection);
-				if (!mgd->priv->parser)
-					mgd->priv->parser = gda_sql_parser_new ();
-			}
-			tmpstmt = gda_sql_parser_parse_string (mgd->priv->parser, tmp, NULL, NULL);
-			g_assert (tmpstmt);
-			
-			GdaSqlStatement *sqlst;
-			g_object_get (tmpstmt, "structure", &sqlst, NULL);
-			g_object_unref (tmpstmt);
-
-
-			GdaSqlStatementSelect *sel = (GdaSqlStatementSelect*) sqlst->contents;
-			if (sel->where_cond) {
-				upd->cond = sel->where_cond;
-				GDA_SQL_ANY_PART (upd->cond)->parent = GDA_SQL_ANY_PART (upd);
-				sel->where_cond = NULL;
-			}
-			gda_sql_statement_free (sqlst);
-		}
-		break;
-	}
-	default:
-		g_assert_not_reached();
-	}
-	
-	GdaSqlStatement *sqlst;
-	sqlst = gda_sql_statement_new (query_type);
-	sqlst->contents = top;
-
-	GdaStatement *stmt;
-	stmt = (GdaStatement*) g_object_new (GDA_TYPE_STATEMENT, "structure", sqlst, NULL);
-	gda_sql_statement_free (sqlst);
-
-	gchar *debug_query = gda_statement_to_sql (stmt, NULL, NULL);
-	g_debug("CREATE: %s", debug_query);
-	g_free (debug_query);
-
-	gint retval;
-	retval = gda_connection_statement_execute_non_select (mgd->priv->connection, stmt, NULL, NULL, NULL);
-	g_object_unref (stmt);
-
-	return retval == -1 ? -1 : 0;
-#else
 	/* Initialize GdaQuery */
 	GdaDict *dict = gda_dict_new();
 	gda_dict_set_connection(dict , mgd->priv->connection);
@@ -1519,8 +1590,9 @@ midgard_core_query_insert_records (MidgardConnection *mgd,
 	}
 	
 	return 0;
-#endif
 }
+
+#endif /* HAVE_LIBGDA_4 */
 
 gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
 {
