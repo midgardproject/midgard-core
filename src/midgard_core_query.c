@@ -1696,6 +1696,7 @@ static gboolean __mcq_column_exists(MidgardConnection *mgd,
 		MidgardDBColumn *mdc) 
 {
 #ifdef HAVE_LIBGDA_4
+
 	GdaMetaContext mcontext = {"_columns", 2, NULL, NULL};
         mcontext.column_names = g_new (gchar *, 2);
         mcontext.column_names[0] = "table_name";
@@ -1937,7 +1938,55 @@ gboolean midgard_core_query_add_column(MidgardConnection *mgd,
 gboolean __index_exists(MidgardConnection *mgd, MidgardDBColumn *mdc, const gchar *index_name)
 {
 #ifdef HAVE_LIBGDA_4
-	TO_IMPLEMENT; /* Libgda can't do this yet, this is for V4.2 */
+
+	GdaConnection *cnc = mgd->priv->connection;
+	GdaMetaStore *store = gda_connection_get_meta_store (cnc);
+	const gchar *sql = "SELECT index_name FROM _table_indexes WHERE table_schema=##schema::string AND table_name=##tname::string";
+	gchar *dbname = mgd->priv->config->database;
+	gboolean index_exists = FALSE;
+
+	/* Database name - table_schema */
+	GValue tsval = {0, };
+	g_value_init (&tsval, G_TYPE_STRING);
+	g_value_set_string (&tsval, dbname);
+
+	/* Table name - table_name */
+	GValue tnval = {0, };
+	g_value_init (&tnval, G_TYPE_STRING);
+	g_value_set_string (&tnval, mdc->table_name);
+
+	GdaDataModel *data_model = gda_meta_store_extract (store, sql, NULL, "schema", &tsval, "tname", &tnval, NULL);
+
+	g_value_unset (&tsval);
+	g_value_unset (&tnval);
+
+	if (!data_model) {
+
+		g_debug ("No indexes found in meta store for table %s", mdc->table_name);
+		return index_exists;
+	}
+
+	gint rows = gda_data_model_get_n_rows (data_model);
+	gint i = 0;
+
+	if (rows == -1) {
+
+		g_warning ("Unknown number of rows for given indexes data model");
+		g_object_unref (data_model);
+		return index_exists;
+	}
+
+	for (i = 0; i < rows; i++) {
+
+		const GValue *inval = gda_data_model_get_value_at (data_model, 0, i, NULL);	
+		if (g_str_equal (index_name, g_value_get_string (inval)))
+			index_exists = TRUE;
+	}
+
+	g_object_unref (data_model);
+
+	return index_exists;
+
 #else
 	g_assert(mgd != NULL);
 	g_assert(mdc != NULL);
