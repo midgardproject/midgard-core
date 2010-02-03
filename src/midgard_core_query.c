@@ -461,6 +461,11 @@ static void __get_object_properties_lists (MidgardDBObject *object, GSList **nam
 
 	for (i = 0; i < n_prop; i++) {
 
+		/* Do not append PK property to query */
+		MgdSchemaPropertyAttr *type_attr = midgard_core_class_get_property_attr (dbklass, pspecs[i]->name);
+		if (!type_attr || (type_attr && type_attr->is_primary))
+			continue;
+
 		ftype = G_TYPE_FUNDAMENTAL (pspecs[i]->value_type);
 		value = g_new0 (GValue, 1);
 		const gchar *pname = pspecs[i]->name;
