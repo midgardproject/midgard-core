@@ -106,7 +106,8 @@ static void _midgard_connection_finalize(GObject *object)
 	gdouble bench = g_timer_elapsed(self->priv->timer, NULL);
 
 	if (self->priv->loghandler) {
-		g_message("MidgardConnection uptime %.04f seconds", bench);
+		/* uptime message disable for a while */
+		/* g_message("MidgardConnection uptime %.04f seconds", bench); */
 		g_log_remove_handler(G_LOG_DOMAIN, self->priv->loghandler);
 	}
 
