@@ -913,14 +913,14 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		g_object_get_property (G_OBJECT (object), pspecs[i]->name, &value);
 
 		/* Convert boolean to integer, it's safe for SQLite at least */
-		if (pspecs[i]->value_type == G_TYPE_BOOLEAN) {
+		/*if (pspecs[i]->value_type == G_TYPE_BOOLEAN) {
 
 			bv = g_value_get_boolean (&value);
 			g_value_unset (&value);
 
 			g_value_init (&value, G_TYPE_UINT);
 			g_value_set_uint (&value, bv ? 1 : 0);
-		}
+		}*/
 
 		_add_value_type_update (sql, (const gchar *) prop_attr->field, &value, i > 0 ? TRUE : FALSE);
 		g_value_unset (&value);
@@ -963,16 +963,16 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		if (!prop_attr || (prop_attr && !prop_attr->field))
 			continue;
 
-		gchar *prop_name = pspecs[i]->name;
+		const gchar *prop_field = prop_attr->field;
 
-		p = gda_set_get_holder (params, prop_name);
+		p = gda_set_get_holder (params, prop_field);
 	
 		if (!p)
-			g_warning ("Failed to get holder for %s column", (gchar *) prop_name);
+			g_warning ("%s: Failed to get holder for %s column", __FUNCTION__, (gchar *) prop_field);
 
 		/* FIXME, optimize this, we got property in previous loop */	
 		g_value_init (&value, pspecs[i]->value_type);
-		g_object_get_property (G_OBJECT (object), prop_name, &value);
+		g_object_get_property (G_OBJECT (object), pspecs[i]->name, &value);
 
 		if (!gda_holder_set_value (p, &value, &error)) {
 			g_warning ("Failed to set holder's value. %s", 
