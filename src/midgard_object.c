@@ -2985,6 +2985,11 @@ gboolean midgard_object_approve(MidgardObject *self)
 	g_value_init(&rval, G_TYPE_UINT);
 	g_value_set_uint(&rval, self->metadata->priv->revision+1);
 
+	/* Transform timestamp to GdaTimestamp */
+	GValue stval = {0, };
+	g_value_init (&stval, GDA_TYPE_TIMESTAMP);
+	g_value_transform (tval, &stval);
+
 	if (midgard_object_is_approved(self)) {
 
 		g_warning("Object is already approved");
@@ -2993,11 +2998,11 @@ gboolean midgard_object_approve(MidgardObject *self)
 
 	gboolean rv = midgard_core_query_update_object_fields(
 			MIDGARD_DBOBJECT(self), 
-			"metadata_approved", tval,
+			"metadata_approved", &stval,
 			"metadata_approver", &gval, 
 			"metadata_isapproved", &aval, 
 			"metadata_revisor", &gval,
-			"metadata_revised", tval,
+			"metadata_revised", &stval,
 			"metadata_revision", &rval,
 			NULL);
 
@@ -3014,10 +3019,11 @@ gboolean midgard_object_approve(MidgardObject *self)
 		self->metadata->priv->revision = g_value_get_uint(&rval);
 	}
 
-	g_value_unset(tval);
-	g_value_unset(&gval);
-	g_value_unset(&aval);
-	g_value_unset(&rval);
+	g_value_unset (tval);
+	g_value_unset (&stval);
+	g_value_unset (&gval);
+	g_value_unset (&aval);
+	g_value_unset (&rval);
 
 	g_object_unref(self);
 	g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_approved, 0);
@@ -3143,6 +3149,11 @@ gboolean midgard_object_unapprove(MidgardObject *self)
 	g_value_init(&rval, G_TYPE_UINT);
 	g_value_set_uint(&rval, self->metadata->priv->revision+1);
 
+	/* Transform timestamp to GdaTimestamp */
+	GValue stval = {0, };
+	g_value_init (&stval, GDA_TYPE_TIMESTAMP);
+	g_value_transform (tval, &stval);
+
 	if (!midgard_object_is_approved(self)) {
 
 		g_warning("Object is not approved");
@@ -3153,11 +3164,11 @@ gboolean midgard_object_unapprove(MidgardObject *self)
 	/* FIXME & TODO , I think we need revisor, revised and revision updates too */
 	gboolean rv = midgard_core_query_update_object_fields(
 			MIDGARD_DBOBJECT(self), 
-			"metadata_approved", tval,
+			"metadata_approved", &stval,
 			"metadata_approver", &gval, 
 			"metadata_isapproved", &aval, 
 			"metadata_revisor", &gval, 
-			"metadata_revised", tval, 
+			"metadata_revised", &stval, 
 			"metadata_revision", &rval, 
 			NULL);
 
@@ -3174,10 +3185,11 @@ gboolean midgard_object_unapprove(MidgardObject *self)
 		self->metadata->priv->revision = g_value_get_uint(&rval); /* FIXME use core API */
 	}
 
-	g_value_unset(tval);
-	g_value_unset(&gval);
-	g_value_unset(&aval);
-	g_value_unset(&rval);
+	g_value_unset (tval);
+	g_value_unset (&stval);
+	g_value_unset (&gval);
+	g_value_unset (&aval);
+	g_value_unset (&rval);
 
 	g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_unapproved, 0);
 	g_object_unref(self);
@@ -3446,6 +3458,11 @@ gboolean midgard_object_unlock(MidgardObject *self)
 	g_value_init(&rval, G_TYPE_UINT);
 	g_value_set_uint(&rval, self->metadata->priv->revision+1);
 
+	/* Transform timestamp to GdaTimestamp */
+	GValue stval = {0, };
+	g_value_init (&stval, GDA_TYPE_TIMESTAMP);
+	g_value_transform (tval, &stval);
+
 	if (!midgard_object_is_locked(self)) {
 
 		g_warning("Object is not locked");
@@ -3456,10 +3473,10 @@ gboolean midgard_object_unlock(MidgardObject *self)
 	gboolean rv = midgard_core_query_update_object_fields(
 			MIDGARD_DBOBJECT(self), 
 			"metadata_locker", &gval,
-			"metadata_locked", tval, 
+			"metadata_locked", &stval, 
 			"metadata_islocked", &aval, 
 			"metadata_revisor", &gval, 
-			"metadata_revised", tval, 
+			"metadata_revised", &stval, 
 			"metadata_revision", &rval,
 			NULL);
 
@@ -3476,10 +3493,11 @@ gboolean midgard_object_unlock(MidgardObject *self)
 		midgard_core_metadata_increase_revision(self->metadata);
 	}
 
-	g_value_unset(tval);
-	g_value_unset(&gval);
-	g_value_unset(&aval);
-	g_value_unset(&rval);
+	g_value_unset (tval);
+	g_value_unset (&stval);
+	g_value_unset (&gval);
+	g_value_unset (&aval);
+	g_value_unset (&rval);
 
 	g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_unlocked, 0);
 	g_object_unref(self);
