@@ -164,7 +164,7 @@ __midgard_object_set_property (GObject *object, guint prop_id,
 			break;
 				
 		case MIDGARD_PROPERTY_METADATA:
-			self->metadata = g_value_get_object (value);
+			self->dbpriv->metadata = g_value_get_object (value);
 			break;
 			
 		default:
@@ -206,8 +206,7 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 			break;
 				
 		case MIDGARD_PROPERTY_METADATA:
-			g_value_set_object(value,
-					(MidgardMetadata *) self->metadata);
+			g_value_set_object (value, (MidgardMetadata *) self->dbpriv->metadata);
 			break;
 		
 		default:
