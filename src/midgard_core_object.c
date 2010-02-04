@@ -427,7 +427,7 @@ gboolean _nodes2object(GObject *object, xmlNode *node, gboolean force)
 		if (cur->type == XML_ELEMENT_NODE) {
 		
 			linktype = NULL;
-
+	
 			GParamSpec *pspec = g_object_class_find_property(
 					G_OBJECT_GET_CLASS(G_OBJECT(object)), 
 					(const gchar *)cur->name);
@@ -533,7 +533,7 @@ gboolean _nodes2object(GObject *object, xmlNode *node, gboolean force)
 				}
 
 				set_property_unchecked:
-				switch (pspec->value_type) {
+				switch (G_TYPE_FUNDAMENTAL (pspec->value_type)) {
 				
 					case G_TYPE_STRING:
 						parser = xmlNewParserCtxt();
@@ -575,7 +575,7 @@ gboolean _nodes2object(GObject *object, xmlNode *node, gboolean force)
 						g_object_get(G_OBJECT(object),
 								(const gchar *) cur->name,
 								&prop_object, NULL);
-						_nodes2object(prop_object, cur->children, force);
+						_nodes2object(prop_object, cur->children, force);	
 						g_value_set_object(&pval, prop_object);
 						break;
 
