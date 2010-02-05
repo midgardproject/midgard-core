@@ -929,14 +929,14 @@ midgard_collector_execute (MidgardCollector *self)
 			}
 
 			midgard_collector_set(self,
-					g_value_dup_string((GValue*)ck_value),
+					g_value_get_string((GValue*)ck_value),
 					gda_data_model_get_column_title(model, columns),
 					new_value);
 			
 			if (ret_fields == 1){
 
 				midgard_collector_set(self,
-						g_value_dup_string((GValue*)ck_value),
+						g_value_get_string((GValue*)ck_value),
 						NULL,
 						NULL);
 			}

@@ -427,6 +427,7 @@ gboolean midgard_config_read_file(MidgardConfig *self, const gchar *filename, gb
 		}
 	}
 
+	g_free (sections);
 	g_free (fname);
 
 	__set_config_from_keyfile(self, keyfile, filename);
@@ -761,6 +762,7 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 	gboolean saved = g_file_set_contents(cnfpath, content, length, &kf_error);
 
 	g_free (content);
+	g_free (cnfpath);
 
 	if (!saved) {
 

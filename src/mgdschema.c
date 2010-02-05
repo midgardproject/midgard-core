@@ -528,8 +528,7 @@ _get_property_attributes(xmlNode * node,
 	attr = node->properties;
 	attr = attr->next;
 
-	while (attr != NULL) {
-		attrval = xmlNodeListGetString (node->doc, attr->children, 1);
+	while (attr != NULL) {	
 		if (!strv_contains(mgd_attribute, attr->name)) {
 			g_warning ("Wrong attribute '%s' in '%s' on line %ld",
 					attr->name, parsed_schema, xmlGetLineNo(node));

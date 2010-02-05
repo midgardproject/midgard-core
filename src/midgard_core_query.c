@@ -512,6 +512,8 @@ static void __get_object_properties_lists (MidgardDBObject *object, GSList **nam
 		__get_object_properties_lists (MIDGARD_DBOBJECT (metadata), names, values);
 	}
 
+	g_free (pspecs);
+
 	*names = g_slist_reverse (*names);
 	*values = g_slist_reverse (*values);
 }
@@ -1623,7 +1625,11 @@ gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
 						    GDA_CONNECTION_META_TABLES, NULL, 1,
                                                    "name", mcontext.column_values[0],
                                                    NULL);
+
 	gda_value_free (mcontext.column_values[0]);
+	g_free (mcontext.column_names);
+	g_free (mcontext.column_values);
+
 	if(!dm_schema) {
 		g_error("Failed to retrieve tables schema");
 		return TRUE;
@@ -1800,6 +1806,9 @@ static gboolean __mcq_column_exists(MidgardConnection *mgd,
 						    "name", mcontext.column_values[0],
 						    "field_name", mcontext.column_values[1]);
 	gda_value_free (mcontext.column_values[0]);
+	g_free (mcontext.column_names);
+	g_free (mcontext.column_values);
+
 	if(!dm_schema) {
 		g_error("Failed to retrieve tables schema");
 		return TRUE;
