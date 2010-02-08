@@ -499,6 +499,8 @@ static void __get_object_properties_lists (MidgardDBObject *object, GSList **nam
 			g_value_init (tval, GDA_TYPE_TIMESTAMP);
 			g_value_transform ((const GValue *) value, tval);
 			*values = g_slist_prepend (*values, (gpointer) tval);
+			g_value_unset (value);
+			g_free (value);
 
 		} else {
 
@@ -523,8 +525,10 @@ static void __unset_values_list (GSList *values)
 	GSList *slist;
 
 	for (slist = values; slist != NULL; slist = slist->next) {
-		g_value_unset ((GValue *) slist->data);
-		g_free ((GValue *) slist->data);
+		GValue *val = (GValue *) slist->data;
+		if (!G_VALUE_HOLDS_OBJECT (val))
+			g_value_unset (val);
+		g_free (val);
 	}
 }
 
@@ -699,7 +703,7 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 	gboolean inserted = gda_insert_row_into_table_v (cnc, table, names, values, &error);
 	
 	__unset_values_list (values);
-	g_slist_free (names);
+	g_slist_free (names);	
 	g_slist_free (values);
 
 	if (!inserted) {
@@ -1220,7 +1224,7 @@ midgard_core_query_update_object_fields (MidgardDBObject *object, const gchar *f
 		_add_value_type_update (sql, (const gchar *) cl->data, (GValue *) vl->data, i > 0 ? TRUE : FALSE);
 		i++;
 	}
-	
+
 	g_string_append_printf (sql, " WHERE %s.guid = '%s'", table, guid);
 
 	/* Create statement and set parameters */
@@ -1270,7 +1274,6 @@ midgard_core_query_update_object_fields (MidgardDBObject *object, const gchar *f
 	}
 
 	gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
-	g_debug ("%s", debug_sql);
 	g_free (debug_sql);
 
 	gint retval = gda_connection_statement_execute_non_select (cnc, stmt, params, NULL, &error);
