@@ -939,6 +939,9 @@ midgard_collector_execute (MidgardCollector *self)
 						g_value_get_string((GValue*)ck_value),
 						NULL,
 						NULL);
+
+				g_value_unset (new_value);
+				g_free (new_value);
 			}
 
 			g_value_unset(ck_value);
