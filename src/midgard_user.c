@@ -1363,6 +1363,9 @@ static void __set_from_sql(MidgardDBObject *object,
  *
  * Associates given #MidgardObject person with @self #MidgardUser.
  * Sets person property and updates user storage record.
+ *
+ * #MidgardUser @self takes ownership of the given #MidgardPerson reference, 
+ * which should be not unref any more.
  * 
  * See midgard_user_update() for returned error details.
  *
@@ -1390,6 +1393,8 @@ midgard_user_set_person (MidgardUser *self, MidgardObject *person)
 /**
  * midgard_user_get_person:
  * @self: #MidgardUser instance
+ *
+ * Returned object should not be unref.
  *
  * Returns: #MidgardObject of "midgard_person" type, of %NULL if none associated.
  */
@@ -1617,6 +1622,10 @@ __midgard_user_constructor (GType type,
 static void
 __midgard_user_dispose (GObject *object)
 {
+	MidgardUser *self = MIDGARD_USER (object);
+	if (self->priv->person)
+		g_object_unref (self->priv->person);
+	self->priv->person = NULL;
 	__parent_class->dispose (object);
 }
 
