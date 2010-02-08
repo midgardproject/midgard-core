@@ -195,6 +195,7 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 	MgdSchemaTypeAttr *priv = G_TYPE_INSTANCE_GET_PRIVATE (object, current_type, MgdSchemaTypeAttr);
 	MidgardObject *self = (MidgardObject *) object;
 	MidgardConnection *mgd = MGD_OBJECT_CNC (MIDGARD_DBOBJECT (object));
+	GValue *pval;
 
 	if (midgard_core_object_property_refuse_private (mgd, priv, MIDGARD_DBOBJECT (object), pspec->name))
 		return;
@@ -215,10 +216,20 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 			if ((prop_id_local >= 0) && (
 						prop_id_local < priv->num_properties)) {
 				if (priv->num_properties) {
-					if (priv->properties && G_IS_VALUE(
-								&priv->properties[prop_id_local]->value)) {
-						g_value_copy(&priv->properties[prop_id_local]->value, 
-								value);
+					if (priv->properties) {
+						pval = &priv->properties[prop_id_local]->value;
+						if (G_IS_VALUE (pval)) {	
+							g_value_copy(pval, value);			
+						} else {
+							/* Initialize Midgardtimestamp.
+							 * There's no need to do it in constructor. Just do it when it's really needed */
+							if (G_VALUE_TYPE (value) == MGD_TYPE_TIMESTAMP) {				
+								MidgardTimestamp *mt = midgard_timestamp_new ();
+								g_value_init (pval, MGD_TYPE_TIMESTAMP);
+								g_value_take_boxed (pval, mt);
+								g_value_copy (pval, value);
+							}
+						}
 					}
 				}
 				return;
@@ -2413,7 +2424,7 @@ gboolean midgard_object_delete(MidgardObject *object)
 	GValue tval = {0, };
 	g_value_init (&tval, MGD_TYPE_TIMESTAMP);
 	midgard_timestamp_set_current_time(&tval);
-	const gchar *timeupdated = midgard_timestamp_get_string_from_value (&tval);
+	gchar *timeupdated = midgard_timestamp_get_string_from_value (&tval);
 	object->metadata->priv->revision++;
 	g_string_append_printf(sql,
 			"metadata_revisor='%s', metadata_revised='%s',"
@@ -2423,9 +2434,10 @@ gboolean midgard_object_delete(MidgardObject *object)
 			object->metadata->priv->revision);
 
 	g_string_append_printf(sql, " WHERE guid = '%s' ",  MGD_OBJECT_GUID(object));
-
         gint qr = midgard_core_query_execute(MGD_OBJECT_CNC (object), sql->str, FALSE);
+
 	g_string_free(sql, TRUE);
+	g_free (timeupdated);
 	
 	if (qr == 0) {
 
@@ -2966,6 +2978,12 @@ gboolean midgard_object_approve(MidgardObject *self)
 		return FALSE;
 	}
 
+	if (midgard_object_is_approved(self)) {
+
+		g_warning("Object is already approved");
+		return FALSE;
+	}
+
 	/* approved time value */
 	GValue *tval = midgard_timestamp_new_current();
 
@@ -2989,12 +3007,6 @@ gboolean midgard_object_approve(MidgardObject *self)
 	g_value_init (&stval, GDA_TYPE_TIMESTAMP);
 	g_value_transform (tval, &stval);
 
-	if (midgard_object_is_approved(self)) {
-
-		g_warning("Object is already approved");
-		return FALSE;
-	}
-
 	gboolean rv = midgard_core_query_update_object_fields(
 			MIDGARD_DBOBJECT(self), 
 			"metadata_approved", &stval,
@@ -3011,11 +3023,11 @@ gboolean midgard_object_approve(MidgardObject *self)
 		self->metadata->priv->approve_is_set = TRUE;
 		self->metadata->priv->is_approved = TRUE;
 		
-		midgard_core_metadata_set_approved(self->metadata, tval);
-		self->metadata->priv->approver = g_value_dup_string(&gval);
-		self->metadata->priv->revisor = g_value_dup_string(&gval);
-		midgard_core_metadata_set_revised(self->metadata, tval);
-		self->metadata->priv->revision = g_value_get_uint(&rval);
+		midgard_core_metadata_set_approved (self->metadata, tval);
+		midgard_core_metadata_set_approver (self->metadata, g_value_get_string (&gval));
+		midgard_core_metadata_set_revisor (self->metadata, g_value_get_string (&gval));
+		midgard_core_metadata_set_revised (self->metadata, tval);
+		self->metadata->priv->revision = g_value_get_uint (&rval);
 	}
 
 	g_value_unset (tval);
@@ -3249,6 +3261,14 @@ gboolean midgard_object_lock(MidgardObject *self)
 		return FALSE;
 	}
 
+	if (midgard_object_is_locked(self)) {
+
+		g_warning("Object is already locked");
+		MIDGARD_ERRNO_SET(mgd, MGD_ERR_OBJECT_IS_LOCKED);
+		g_object_unref(self);
+		return FALSE;
+	}
+
 	/* approved time value */
 	GValue *tval = midgard_timestamp_new_current();
 
@@ -3277,14 +3297,6 @@ gboolean midgard_object_lock(MidgardObject *self)
 	g_value_init (&stval, G_TYPE_STRING);
 	g_value_transform (tval, &stval);
 
-	if (midgard_object_is_locked(self)) {
-
-		g_warning("Object is already locked");
-		MIDGARD_ERRNO_SET(mgd, MGD_ERR_OBJECT_IS_LOCKED);
-		g_object_unref(self);
-		return FALSE;
-	}
-	
 	gboolean rv = midgard_core_query_update_object_fields(
 			MIDGARD_DBOBJECT(self), 
 			"metadata_locked", &stval,

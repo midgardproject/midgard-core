@@ -40,27 +40,22 @@ _action_create_callback (MidgardObject *object, gpointer ud)
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
 
 	if (person) 
-		person_guid = (gchar *)MGD_OBJECT_GUID(person);			
-
-	GValue *tval = midgard_timestamp_new_current();
+		person_guid = (gchar *)MGD_OBJECT_GUID (person);			
 	
 	/* set creator */
-	midgard_core_metadata_set_creator(mdata, person_guid);
+	midgard_core_metadata_set_creator (mdata, person_guid);
 
-	/* set created */	
-	midgard_core_metadata_set_created(mdata, tval);
+	/* set created */
+	midgard_core_timestamp_set_current_time (mdata->priv->created);	
 
 	/* set revised */	
-	midgard_core_metadata_set_revised(mdata, tval);
+	midgard_core_timestamp_set_current_time (mdata->priv->revised);
 
 	/* set revision */
-	midgard_core_metadata_set_revision(mdata, 0);
+	midgard_core_metadata_set_revision (mdata, 0);
 
 	/* set revisor */
-	midgard_core_metadata_set_revisor(mdata, person_guid);
-	
-	g_value_unset(tval);
-	g_free (tval); 
+	midgard_core_metadata_set_revisor (mdata, person_guid);
 }
 
 static void _action_update_callback(MidgardObject *object, gpointer ud)
@@ -74,19 +69,14 @@ static void _action_update_callback(MidgardObject *object, gpointer ud)
 	if (person) 
 		person_guid = (gchar *)MGD_OBJECT_GUID(person);			
 
-	GValue *tval = midgard_timestamp_new_current();
-
 	/* set revisor */
 	midgard_core_metadata_set_revisor(mdata, person_guid);
 
 	/* set revised */
-	midgard_core_metadata_set_revised(mdata, tval);
+	midgard_core_timestamp_set_current_time (mdata->priv->revised);
 
 	/* set revision */
-	midgard_core_metadata_increase_revision(mdata);
-	
-	g_value_unset(tval);	
-	g_free (tval);
+	midgard_core_metadata_increase_revision (mdata);
 }
 
 static void _action_delete_callback(MidgardObject *object, gpointer ud)
@@ -97,13 +87,7 @@ static void _action_delete_callback(MidgardObject *object, gpointer ud)
 static void _action_import_callback(MidgardObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;	
-	GValue *tval = midgard_timestamp_new_current();
-
-	/* set imported */
-	midgard_core_metadata_set_imported (mdata, tval);
-	
-	g_value_unset (tval);
-	g_free (tval);
+	midgard_core_timestamp_set_current_time (mdata->priv->imported);
 }
 
 static void _action_export_callback(MidgardObject *object, gpointer ud)
@@ -115,21 +99,21 @@ static void _action_export_callback(MidgardObject *object, gpointer ud)
 	 * It's done in case when some old object has been never
 	 * touched by new API */
 	if (!mdata->priv->revised && !mdata->priv->created) {
-		midgard_core_metadata_set_created(mdata, tval);
-		midgard_core_metadata_set_revised(mdata, tval);
+		midgard_core_timestamp_set_current_time (mdata->priv->created);
+		midgard_core_timestamp_set_current_time (mdata->priv->revised);
 	}
 
 	if (!mdata->priv->revised && mdata->priv->created) {
-		midgard_core_metadata_set_created(mdata, tval);
+		midgard_core_timestamp_set_current_time (mdata->priv->created);
 		midgard_core_metadata_increase_revision(mdata);
 	}
 
 	if (!mdata->priv->created && mdata->priv->revised) {
-		midgard_core_metadata_set_created(mdata, tval);
+		midgard_core_timestamp_set_current_time (mdata->priv->created);
 	}
 		
 	/* set exported */
-	midgard_core_metadata_set_exported(mdata, tval);
+	midgard_core_timestamp_set_current_time (mdata->priv->exported);
 
 	g_value_unset ((GValue *)tval);
 	g_free ((GValue *)tval);
@@ -394,25 +378,25 @@ _metadata_instance_init(GTypeInstance *instance, gpointer g_class)
 	/* allocate private data */
 	self->priv = g_new(MidgardMetadataPrivate, 1);
 	self->priv->creator = NULL;
-	self->priv->created = NULL;
-	self->priv->revised = NULL;
+	self->priv->created = midgard_timestamp_new();
+	self->priv->revised = midgard_timestamp_new();
 	self->priv->revisor = NULL;
 	self->priv->locker = NULL;
-	self->priv->locked = NULL;
-	self->priv->approved = NULL;
+	self->priv->locked = midgard_timestamp_new();
+	self->priv->approved = midgard_timestamp_new();
 	self->priv->approver = NULL;
 	self->priv->authors = NULL;
 	self->priv->owner = NULL;
 	self->priv->revision = 0;
-	self->priv->schedule_start = NULL;
-	self->priv->schedule_end = NULL;
+	self->priv->schedule_start = midgard_timestamp_new();
+	self->priv->schedule_end = midgard_timestamp_new();
 	self->priv->hidden = FALSE;
 	self->priv->nav_noentry = FALSE;
 	self->priv->size = 0;
-	self->priv->published = NULL;
+	self->priv->published = midgard_timestamp_new();
 	self->priv->score = 0;
-	self->priv->exported = NULL;
-	self->priv->imported = NULL;
+	self->priv->exported = midgard_timestamp_new();
+	self->priv->imported = midgard_timestamp_new();
 	self->priv->deleted = FALSE;
 
 	self->priv->lock_is_set = FALSE;
@@ -941,6 +925,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	klass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
 	klass->dbpriv->storage_data = type_attr;
 	klass->dbpriv->set_from_xml_node = __set_from_xml_node;
+	klass->dbpriv->has_metadata = FALSE;
 }
 
 GType midgard_metadata_get_type (void)
@@ -1012,23 +997,24 @@ gchar *__get_node_content_string(xmlNode *node)
 	return (gchar*)decoded;
 }
 
-void __set_date_from_node(xmlNode *node,  MidgardTimestamp **date)
+void __set_date_from_node (xmlNode *node, MidgardTimestamp **date)
 {
-	if(!node)
+	if (!node)
 		return;
 
 	gchar *content = NULL;
-	content = (gchar *)xmlNodeGetContent(node);
+	content = (gchar *)xmlNodeGetContent (node);
 
 	if (content == NULL) {
-		g_warning("Can not handle NULL date for datetime property");
+		g_warning ("Can not handle NULL date for datetime property");
 		return;
 	}
 
 	if (*date != NULL)
-		g_free(*date);
+		g_free (*date);
 
-	*date = midgard_timestamp_new_from_iso8601(content);
+	*date = midgard_timestamp_new_from_iso8601 (content);
+	xmlFree (content);
 	
 	return;
 }

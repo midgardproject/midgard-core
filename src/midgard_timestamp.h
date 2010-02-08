@@ -50,4 +50,6 @@ GValue 			*midgard_timestamp_new_value_from_iso8601 (const gchar *iso_date);
 MidgardTimestamp 	*midgard_timestamp_new_from_iso8601	(const gchar *iso_date);
 void 			midgard_timestamp_free			(MidgardTimestamp *mt);
 
+void			midgard_core_timestamp_set_current_time (MidgardTimestamp *tm);
+
 #endif

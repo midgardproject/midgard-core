@@ -157,6 +157,53 @@ static void __timestamp_reset(const GValue *value)
 	ct->offset = 0;	
 }
 
+static void 
+__timestamp_struct_reset (MidgardTimestamp *ct) 
+{
+	g_return_if_fail (ct != NULL);
+
+	guint64 u = ct->date_value + 58486;
+	long s = u % 86400ULL;
+	long day = u / 86400ULL - 53375995543064ULL;
+	long year = day / 146097L;
+	long month;
+	//int yday; 
+
+	ct->second = s % 60; s /= 60;
+	ct->minute = s % 60; s /= 60;
+	ct->hour = s;
+
+	day = (day % 146097L) + 678881L;
+	while (day >= 146097L) { day -= 146097L; ++year; }
+
+	// year * 146097 + day - 678881 is MJD; 0 <= day < 146097 
+	// 2000-03-01, MJD 51604, is year 5, day 0 
+
+	year *= 4;
+	if (day == 146096L) { year += 3; day = 36524L; }
+	else { year += day / 36524L; day %= 36524L; }
+	year = year * 25 + day / 1461;
+	day %= 1461;
+	year *= 4;
+
+	if (day == 1460) { year += 3; day = 365; }
+	else { year += day / 365; day %= 365; }
+
+	day *= 10;
+	month = (day + 5) / 306;
+	day = (day + 5) % 306;
+	day /= 10;
+	
+	if (month >= 10) { ++year; month -= 10; }
+	else { month += 2; }
+
+	ct->year = year;
+	ct->month = month + 1;
+	ct->day = day + 1;
+	
+	ct->offset = 0;	
+}
+
 static void midgard_timestamp_set(MidgardTimestamp *ct) 
 {
 	static const unsigned long times365[4] = { 0, 365, 730, 1095 };
@@ -237,87 +284,45 @@ void midgard_timestamp_free(MidgardTimestamp *mt)
 	mt = NULL;
 }
 
-/* Internal initialization function for the midgard_timestamp value type. */
-static void value_init_timestamp(GValue *value) 
-{
-        g_assert(G_VALUE_HOLDS(value, MIDGARD_TYPE_TIMESTAMP));
-
-	MidgardTimestamp *mt = midgard_timestamp_new();
-	g_value_take_boxed(value, mt);
-}
-
 /* Internal copy function for the midgard_timestamp value type. */
-static void value_copy_timestamp(const GValue *src, GValue *dst) 
+gpointer
+__midgard_timestamp_copy (gpointer boxed) 
 {
-        g_assert(G_VALUE_HOLDS(src, MIDGARD_TYPE_TIMESTAMP));
-        g_assert(G_VALUE_HOLDS(dst, MIDGARD_TYPE_TIMESTAMP));
+	MidgardTimestamp *src = (MidgardTimestamp *) boxed;
+        //g_assert (G_VALUE_HOLDS (src, MIDGARD_TYPE_TIMESTAMP));
 
 	MidgardTimestamp *mt = midgard_timestamp_new();	
 
-	MidgardTimestamp *mtsrc = (MidgardTimestamp *) g_value_get_boxed(src);
+	mt->year = src->year;
+	mt->month = src->month;
+	mt->day = src->day;
 
-	if(mtsrc == NULL)
-		mtsrc = midgard_timestamp_new();
+	mt->hour = src->hour;
+	mt->minute = src->minute;
+	mt->second = src->second;
 
-	mt->year = mtsrc->year;
-	mt->month = mtsrc->month;
-	mt->day = mtsrc->day;
+	mt->offset = src->offset;
+	mt->nano = src->nano;
 
-	mt->hour = mtsrc->hour;
-	mt->minute = mtsrc->minute;
-	mt->second = mtsrc->second;
+	mt->date_value = src->date_value;
 
-	mt->offset = mtsrc->offset;
-	mt->nano = mtsrc->nano;
+	if (src->date_string != NULL)
+		mt->date_string = g_strdup (src->date_string);
 
-	mt->date_value = mtsrc->date_value;
-
-	if (mtsrc->date_string != NULL)
-		mt->date_string = g_strdup(mtsrc->date_string);
-
-	g_value_take_boxed(dst, mt);
+	return mt;
 }
 
-static void midgard_timestamp_value_free(GValue *value)
+void 
+__midgard_timestamp_free (gpointer boxed)
 {
-	MidgardTimestamp *mt = (MidgardTimestamp *) g_value_get_boxed(value);
-	midgard_timestamp_free(mt);	
+	MidgardTimestamp *mt = (MidgardTimestamp *) boxed;
+	if (mt->date_string)
+		g_free (mt->date_string);
+	mt->date_string = NULL;
+
+	g_free (mt);
 
 	return;
-}
-
-/* Internal collect function for the midgard_timestamp value type. */
-static gchar *value_collect_timestamp(
-                GValue *value, guint n_collect_values,
-                GTypeCValue *collect_values, guint collect_flags) 
-{
-        g_assert(G_VALUE_HOLDS(value, MIDGARD_TYPE_TIMESTAMP));
-        g_assert(n_collect_values == 1);
-        g_assert(collect_values != NULL);
-
-        const gchar *time = (const gchar *) collect_values;
-        if (time == NULL) {
-                return g_strdup("Midgard timestamp value string passed as NULL");
-        }
-
-        return NULL;
-}
-
-/* Internal lcopy function for the midgard_timestamp value type. */
-static gchar *value_lcopy_timestamp(
-                const GValue *value, guint n_collect_values,
-                GTypeCValue *collect_values, guint collect_flags) 
-{
-        g_assert(G_VALUE_HOLDS(value, MIDGARD_TYPE_TIMESTAMP));
-        g_assert(n_collect_values == 1);
-        g_assert(collect_values != NULL);
-
-        const gchar **time = (const gchar **) collect_values;
-        if (time == NULL) {
-                return g_strdup("Midgard timestamp value string passed as NULL");
-        }
-
-        return NULL;
 }
 
 static void midgard_timestamp_transform_to_string(const GValue *src, GValue *dst)
@@ -428,35 +433,13 @@ static void midgard_timestamp_transform_to_gda_timestamp(const GValue *src, GVal
 GType midgard_timestamp_get_type(void) 
 {
         static GType type = 0;
+ 
+	if (G_UNLIKELY (type == 0)) {
 
-        if (type == 0) {
-
-                static const GTypeValueTable value_table = {
-                        &value_init_timestamp,     /* value_init */
-                        &midgard_timestamp_value_free,	/* value_free */
-                        &value_copy_timestamp,     /* value_copy */
-                        NULL,                      /* value_peek_pointer */
-                        "p",                       /* collect_format */
-                        &value_collect_timestamp,  /* collect_value */
-                        "p",                       /* lcopy_format */
-                        &value_lcopy_timestamp     /* lcopy_value */
-                };
-
-                static const GTypeInfo info = {
-                        0,                         /* class_size */
-                        NULL,                      /* base_init */
-                        NULL,                      /* base_destroy */
-                        NULL,                      /* class_init */
-                        NULL,                      /* class_destroy */
-                        NULL,                      /* class_data */
-                        0,                         /* instance_size */
-                        0,                         /* n_preallocs */
-                        NULL,                      /* instance_init */
-                        &value_table               /* value_table */
-                };
-
-		type = g_type_register_static (G_TYPE_BOXED, "MidgardTimestamp", &info, 0);
-
+		type = g_boxed_type_register_static ("MidgardTimestamp",
+				(GBoxedCopyFunc) __midgard_timestamp_copy,
+				(GBoxedFreeFunc) __midgard_timestamp_free);
+		
 		/* Register transform functions */
 		g_value_register_transform_func(type, G_TYPE_STRING, midgard_timestamp_transform_to_string);
 		g_value_register_transform_func(G_TYPE_STRING, type, midgard_timestamp_transform_from_string);
@@ -467,13 +450,19 @@ GType midgard_timestamp_get_type(void)
         return type;
 }
 
-void midgard_timestamp_set_current_time(const GValue *value)
+void 
+midgard_timestamp_set_current_time (const GValue *value)
 {
-	g_assert(value != NULL);
-	g_return_if_fail(G_VALUE_HOLDS(value, MGD_TYPE_TIMESTAMP));
+	g_assert (value != NULL);
+	g_return_if_fail (G_VALUE_HOLDS(value, MGD_TYPE_TIMESTAMP));
 
-	MidgardTimestamp *mt = (MidgardTimestamp *) g_value_get_boxed(value);
-	time_t utctime = time(NULL);
+	MidgardTimestamp *mt = (MidgardTimestamp *) g_value_get_boxed (value);
+	if (!mt) {
+		mt = midgard_timestamp_new ();
+		g_value_take_boxed ((GValue *)value, mt);
+	}
+	
+	time_t utctime = time (NULL);
 	mt->date_value = utctime + 4611686018427387914ULL;	
 	mt->nano = 0;
 }
@@ -488,6 +477,18 @@ GValue *midgard_timestamp_new_current()
 	return tval;
 }
 
+void 
+midgard_core_timestamp_set_current_time (MidgardTimestamp *mt)
+{
+	g_return_if_fail (mt != NULL);
+
+	time_t utctime = time (NULL);
+	mt->date_value = utctime + 4611686018427387914ULL;	
+	mt->nano = 0;
+
+	__timestamp_struct_reset (mt);
+}
+
 gchar *midgard_timestamp_get_string(MidgardTimestamp *mt)
 {
 	g_return_val_if_fail (mt != NULL, NULL);
@@ -500,7 +501,7 @@ gchar *midgard_timestamp_get_string_from_value (const GValue *value)
 	g_assert(value != NULL);
 	g_return_val_if_fail(G_VALUE_HOLDS(value, MGD_TYPE_TIMESTAMP), NULL);
 
-	MidgardTimestamp *mt = (MidgardTimestamp *) g_value_get_boxed(value);
+	MidgardTimestamp *mt = (MidgardTimestamp *) g_value_get_boxed (value);
 
 	return caltime_fmt(mt);
 }
