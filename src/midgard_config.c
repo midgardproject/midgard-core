@@ -425,9 +425,10 @@ gboolean midgard_config_read_file(MidgardConfig *self, const gchar *filename, gb
 				g_warning ("Config-file '%s' has unsupported section [%s]. It won't be parsed.", fname, sections[i]);
 			}
 		}
+
+		g_strfreev (sections);
 	}
 
-	g_free (sections);
 	g_free (fname);
 
 	__set_config_from_keyfile(self, keyfile, filename);
