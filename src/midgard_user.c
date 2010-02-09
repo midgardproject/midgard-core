@@ -1622,10 +1622,9 @@ __midgard_user_constructor (GType type,
 static void
 __midgard_user_dispose (GObject *object)
 {
-	MidgardUser *self = MIDGARD_USER (object);
-	if (self->priv->person)
+	MidgardUser *self = MIDGARD_USER (object);	
+	if (self->priv->person && G_IS_OBJECT (self->priv->person))
 		g_object_unref (self->priv->person);
-	self->priv->person = NULL;
 	__parent_class->dispose (object);
 }
 
