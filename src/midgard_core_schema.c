@@ -605,17 +605,17 @@ midgard_core_schema_type_build_static_sql (MgdSchemaTypeAttr *type_attr)
 		return;
 
 	GString *_sql = g_string_new(" ");
-	_str_cont *cont = g_new(_str_cont, 1);
-	cont->string = _sql;
-	cont->elts = 0;
-	cont->type = type_attr;
+	_str_cont cont = {NULL, 0, NULL};
+	cont.string = _sql;
+	cont.elts = 0;
+	cont.type = type_attr;
 
-	g_hash_table_foreach (type_attr->prophash, __build_static_sql, cont);
+	g_hash_table_foreach (type_attr->prophash, __build_static_sql, &cont);
 
 	if (_sql->str == NULL)
 		return;
 
-	type_attr->sql_select_full = g_strdup(_sql->str);
+	type_attr->sql_select_full = g_string_free (_sql, FALSE);
 }
 
 static void 
