@@ -764,12 +764,8 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 
 	/* creator */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	g_free(mdata->priv->creator);
-	mdata->priv->creator = NULL;
-	if(G_VALUE_HOLDS_STRING (gvalue)) {
-		mdata->priv->creator =
-			g_value_dup_string(gvalue);
-	}
+	if(G_VALUE_HOLDS_STRING (gvalue)) 
+		midgard_core_metadata_set_creator (mdata, g_value_get_string (gvalue));
 
 	/* created */	
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -777,12 +773,8 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 
 	/* revisor */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	g_free(mdata->priv->revisor);
-	mdata->priv->revisor = NULL;
-	if(G_VALUE_HOLDS_STRING (gvalue)) {
-		mdata->priv->revisor = 
-			g_value_dup_string(gvalue);
-	}
+	if(G_VALUE_HOLDS_STRING (gvalue)) 
+		midgard_core_metadata_set_revisor (mdata, g_value_get_string (gvalue));
 		
 	/* revised */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -795,12 +787,8 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 		
 	/* locker */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	g_free(mdata->priv->locker);
-	mdata->priv->locker = NULL;
-	if(G_VALUE_HOLDS_STRING (gvalue)) {
-		mdata->priv->locker = 
-			g_value_dup_string(gvalue);
-	}
+	if(G_VALUE_HOLDS_STRING (gvalue)) 
+		midgard_core_metadata_set_locker (mdata, g_value_get_string (gvalue));
 		
 	/* locked */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -808,12 +796,9 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 
 	/* approver */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	g_free(mdata->priv->approver);
-	mdata->priv->approver = NULL;
-	if(G_VALUE_HOLDS_STRING (gvalue)) {
-		mdata->priv->approver = 
-			g_value_dup_string(gvalue);
-	}
+	if(G_VALUE_HOLDS_STRING (gvalue)) 
+		midgard_core_metadata_set_creator (mdata, g_value_get_string (gvalue));
+
 
 	/* approved */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -821,35 +806,21 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 
 	/* authors */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	g_free(mdata->priv->authors);
-	mdata->priv->authors = NULL;
-	if(G_VALUE_HOLDS_STRING (gvalue)) {
-		mdata->priv->authors = 
-			g_value_dup_string(gvalue);
-	}
+	if(G_VALUE_HOLDS_STRING (gvalue)) 
+		midgard_core_metadata_set_authors (mdata, g_value_get_string (gvalue));
 		
 	/* owner */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	g_free(mdata->priv->owner);
-	mdata->priv->owner = NULL;
-	if(G_VALUE_HOLDS_STRING (gvalue)) {
-		mdata->priv->owner = 
-			g_value_dup_string(gvalue);
-	}
+	if(G_VALUE_HOLDS_STRING (gvalue)) 
+		midgard_core_metadata_set_owner (mdata, g_value_get_string (gvalue));
 
 	/* schedule_start */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	g_value_init(&mt, MGD_TYPE_TIMESTAMP); 
-	g_value_transform(gvalue, &mt); 
-	mdata->priv->schedule_start = g_value_dup_boxed(&mt);
-	g_value_unset(&mt);
+	_SET_METADATA_TIMESTAMP (schedule_start);
 
 	/* schedule_end */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	g_value_init(&mt, MGD_TYPE_TIMESTAMP); 
-	g_value_transform(gvalue, &mt); 
-	mdata->priv->schedule_end = g_value_dup_boxed(&mt);
-	g_value_unset(&mt);
+	_SET_METADATA_TIMESTAMP (schedule_end);
 
 	/* hidden */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -876,10 +847,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 
 	/* published */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	g_value_init(&mt, MGD_TYPE_TIMESTAMP); 
-	g_value_transform(gvalue, &mt); 
-	mdata->priv->published = g_value_dup_boxed(&mt);
-	g_value_unset(&mt);
+	_SET_METADATA_TIMESTAMP (published);
 
 	/* exported */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
