@@ -93,7 +93,6 @@ static void _action_import_callback(MidgardObject *object, gpointer ud)
 static void _action_export_callback(MidgardObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;	
-	const GValue *tval = (GValue *)midgard_timestamp_new_current();
 
 	/* This is backward "compatible" defaults set.
 	 * It's done in case when some old object has been never
@@ -114,9 +113,6 @@ static void _action_export_callback(MidgardObject *object, gpointer ud)
 		
 	/* set exported */
 	midgard_core_timestamp_set_current_time (mdata->priv->exported);
-
-	g_value_unset ((GValue *)tval);
-	g_free ((GValue *)tval);
 }
 
 /**
@@ -435,36 +431,6 @@ _metadata_object_finalize(GObject *object)
 	__parent_class->finalize (object);
 }
 
-/* Set properties when object is created */
-void midgard_metadata_set_create(MidgardObject *object)
-{
-	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
-	MidgardObject *person = MGD_CNC_PERSON (mgd);
-	MidgardMetadata *metadata = (MidgardMetadata *) object->metadata;
-
-	if (person) 
-		midgard_core_metadata_set_creator(metadata, MGD_OBJECT_GUID (person));
-
-	GValue *tval = midgard_timestamp_new_current();
-	midgard_core_metadata_set_created(metadata, tval);
-	g_value_unset(tval);
-}
-
-/* Set properties when object is updated */
-void midgard_metadata_set_update(MidgardObject *object)
-{
-	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
-	MidgardObject *person = MGD_CNC_PERSON (mgd);
-	MidgardMetadata *metadata = (MidgardMetadata *) object->metadata;
-
-	if (person)
-		midgard_core_metadata_set_revisor(metadata, MGD_OBJECT_GUID (person));
-
-	GValue *tval = midgard_timestamp_new_current();
-	midgard_core_metadata_set_revised(metadata, tval);
-	g_value_unset(tval);
-}
-
 /* Initialize class */
 static void
 _metadata_class_init (gpointer g_class, gpointer g_class_data)
@@ -479,31 +445,6 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	gobject_class->get_property = _metadata_get_property;
 	gobject_class->dispose = _metadata_dispose;
 	gobject_class->finalize = _metadata_object_finalize;
-
-	/* Register signals */
-	/* Create signal which should be emitted before MidgardObject is created */
-	klass->set_created = midgard_metadata_set_create;
-	klass->signal_set_created = g_signal_new("set_created",
-			G_TYPE_FROM_CLASS(g_class),
-			G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-			G_STRUCT_OFFSET (MidgardMetadataClass, set_created),
-			NULL, /* accumulator */
-			NULL, /* accu_data */
-			NULL, /* marshaller */
-			G_TYPE_NONE,
-			0);
-    
-	/* Create signal which should be emitted before MidgardObject is updates */
-	klass->set_updated = midgard_metadata_set_update;
-	klass->signal_set_updated = g_signal_new("set_updated",
-			G_TYPE_FROM_CLASS(g_class),
-			G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-			G_STRUCT_OFFSET (MidgardMetadataClass, set_updated),
-			NULL, /* accumulator */
-			NULL, /* accu_data */
-			NULL, /* marshaller */
-			G_TYPE_NONE,
-			0);
 
 	MgdSchemaPropertyAttr *prop_attr;
 	MgdSchemaTypeAttr *type_attr = midgard_core_schema_type_attr_new();

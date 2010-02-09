@@ -23,25 +23,30 @@
 #include "midgard_metadata.h"
 
 /* Read only properties setters */
-void midgard_core_metadata_set_creator(MidgardMetadata *self, const gchar *creator);
-void midgard_core_metadata_set_created(MidgardMetadata *self, const GValue *value);
-void midgard_core_metadata_set_revisor(MidgardMetadata *self, const gchar *revisor);
-void midgard_core_metadata_set_revised(MidgardMetadata *self, const GValue *revised);
-void midgard_core_metadata_set_revision(MidgardMetadata *self, guint revision);
-void midgard_core_metadata_set_locker(MidgardMetadata *self, const gchar *locker);
-void midgard_core_metadata_set_locked(MidgardMetadata *self, const GValue *locked);
-void midgard_core_metadata_set_approver(MidgardMetadata *self, const gchar *approver);
-void midgard_core_metadata_set_approved(MidgardMetadata *self, const GValue *approved);
-void midgard_core_metadata_set_size(MidgardMetadata *self, guint size);
-void midgard_core_metadata_set_exported(MidgardMetadata *self, const GValue *exported);
-void midgard_core_metadata_set_imported(MidgardMetadata *self, const GValue *imported);
-void midgard_core_metadata_set_deleted(MidgardMetadata *self, gboolean deleted);
-void midgard_core_metadata_set_isapproved(MidgardMetadata *self, gboolean isapproved);
-void midgard_core_metadata_set_islocked(MidgardMetadata *self, gboolean islocked);
+void	midgard_core_metadata_set_creator		(MidgardMetadata *self, const gchar *creator);
+void	midgard_core_metadata_set_created		(MidgardMetadata *self, const GValue *value);
+void	midgard_core_metadata_set_revisor		(MidgardMetadata *self, const gchar *revisor);
+void	midgard_core_metadata_set_revised		(MidgardMetadata *self, const GValue *revised);
+void	midgard_core_metadata_set_revision		(MidgardMetadata *self, guint revision);
+void	midgard_core_metadata_set_locker		(MidgardMetadata *self, const gchar *locker);
+void	midgard_core_metadata_set_locked		(MidgardMetadata *self, const GValue *locked);
+void	midgard_core_metadata_set_approver		(MidgardMetadata *self, const gchar *approver);
+void	midgard_core_metadata_set_approved		(MidgardMetadata *self, const GValue *approved);
+void	midgard_core_metadata_set_size			(MidgardMetadata *self, guint size);
+void	midgard_core_metadata_set_exported		(MidgardMetadata *self, const GValue *exported);
+void	midgard_core_metadata_set_imported		(MidgardMetadata *self, const GValue *imported);
+void	midgard_core_metadata_set_deleted		(MidgardMetadata *self, gboolean deleted);
+void	midgard_core_metadata_set_isapproved		(MidgardMetadata *self, gboolean isapproved);
+void	midgard_core_metadata_set_islocked		(MidgardMetadata *self, gboolean islocked);
+void	midgard_core_metadata_set_schedule_start	(MidgardMetadata *self, const GValue *schedule);
+void	midgard_core_metadata_set_schedule_end		(MidgardMetadata *self, const GValue *schedule);
+void	midgard_core_metadata_set_published		(MidgardMetadata *self, const GValue *published);
+void	midgard_core_metadata_set_authors		(MidgardMetadata *self, const gchar *authors);
+void	midgard_core_metadata_set_owner			(MidgardMetadata *self, const gchar *owner);
 
 /* routines */
-void midgard_core_metadata_increase_revision(MidgardMetadata *self);
-MidgardMetadata *midgard_core_metadata_copy(MidgardMetadata *src);
-guint midgard_core_metadata_get_size(MidgardMetadata *self);
+void		midgard_core_metadata_increase_revision		(MidgardMetadata *self);
+MidgardMetadata *midgard_core_metadata_copy			(MidgardMetadata *src);
+guint 		midgard_core_metadata_get_size			(MidgardMetadata *self);
 
 #endif /* MIDGARD_CORE_METADATA_H */

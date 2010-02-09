@@ -19,9 +19,9 @@
 #include "midgard_core_metadata.h"
 
 #define __SET_METADATA_PROPERTY_STRING(__property, __mstrval) { \
-	g_assert(__mstrval != NULL); \
-	if (__property != NULL) \
-		g_free(__property); \
+	if (!__mstrval) \
+		return; \
+	g_free(__property); \
 	__property = g_strdup(__mstrval); }
 
 #define __SET_METADATA_PROPERTY_DATE_FROM_STRING(__property, __mstrval) { \
@@ -40,6 +40,7 @@
 		g_value_copy(__value, &__mt); \
 	else \
 		g_value_transform(__value, &__mt); \
+	g_free (__property); \
 	__property = (MidgardTimestamp *) g_value_dup_boxed(&__mt); \
 	g_value_unset(&__mt); }
 
@@ -89,6 +90,16 @@ void midgard_core_metadata_set_approved(MidgardMetadata *self, const GValue *app
 	__SET_METADATA_PROPERTY_DATE_FROM_GVALUE(self->priv->approved, approved);
 }
 
+void midgard_core_metadata_set_authors (MidgardMetadata *self, const gchar *authors)
+{
+	__SET_METADATA_PROPERTY_STRING(self->priv->authors, authors);
+}
+
+void midgard_core_metadata_set_owner (MidgardMetadata *self, const gchar *owner)
+{
+	__SET_METADATA_PROPERTY_STRING (self->priv->owner, owner);
+}
+
 void midgard_core_metadata_set_size(MidgardMetadata *self, guint size)
 {
 	self->priv->size = size;
@@ -117,6 +128,21 @@ void midgard_core_metadata_set_isapproved(MidgardMetadata *self, gboolean isappr
 void midgard_core_metadata_set_islocked(MidgardMetadata *self, gboolean islocked)
 {
 	self->priv->is_locked = islocked;
+}
+
+void midgard_core_metadata_set_schedule_start (MidgardMetadata *self, const GValue *schedule)
+{
+	__SET_METADATA_PROPERTY_DATE_FROM_GVALUE(self->priv->schedule_start, schedule);
+}
+
+void midgard_core_metadata_set_schedule_end (MidgardMetadata *self, const GValue *schedule)
+{
+	__SET_METADATA_PROPERTY_DATE_FROM_GVALUE(self->priv->schedule_end, schedule);
+}
+
+void midgard_core_metadata_set_published (MidgardMetadata *self, const GValue *published)
+{
+	__SET_METADATA_PROPERTY_DATE_FROM_GVALUE(self->priv->published, published);
 }
 
 /* routines */

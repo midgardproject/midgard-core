@@ -467,14 +467,14 @@ midgard_timestamp_set_current_time (const GValue *value)
 	mt->nano = 0;
 }
 
-GValue *midgard_timestamp_new_current()
+void 
+midgard_timestamp_new_current (GValue *value)
 {
-	GValue *tval = g_new0(GValue, 1);
-	g_value_init(tval, MGD_TYPE_TIMESTAMP);
-	midgard_timestamp_set_current_time(tval);
-	__timestamp_reset(tval);
-
-	return tval;
+	if (!G_IS_VALUE (value) || 
+			(G_IS_VALUE (value) && G_VALUE_TYPE (value) != MGD_TYPE_TIMESTAMP))
+		g_value_init (value, MGD_TYPE_TIMESTAMP);
+	midgard_timestamp_set_current_time(value);
+	__timestamp_reset(value);
 }
 
 void 

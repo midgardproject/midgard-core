@@ -163,7 +163,7 @@ midgard_replicator_export_by_guid (MidgardConnection *mgd, const gchar *guid)
 
 	const gchar *table = 
 		midgard_core_class_get_table(MIDGARD_DBOBJECT_CLASS(klass)); 
-	GValue *tval = NULL;
+	GValue tval = {0, };
 	gchar *timeupdated;
 	gint qr;
 
@@ -180,8 +180,9 @@ midgard_replicator_export_by_guid (MidgardConnection *mgd, const gchar *guid)
 					"%s SET ",
 					table);
 
-			tval = midgard_timestamp_new_current();
-			timeupdated = midgard_timestamp_get_string_from_value (tval);
+
+			midgard_timestamp_new_current (&tval);
+			timeupdated = midgard_timestamp_get_string_from_value (&tval);
 			
 			g_string_append_printf(sql, "metadata_exported='%s' WHERE guid = '%s' ", 
 					timeupdated, guid);
@@ -189,7 +190,7 @@ midgard_replicator_export_by_guid (MidgardConnection *mgd, const gchar *guid)
 			qr = midgard_core_query_execute(mgd, sql->str, TRUE);
 			g_string_free(sql, TRUE);
 
-			g_value_unset(tval);
+			g_value_unset (&tval);
 			g_free(timeupdated);
 
 			if (qr == 0) {
