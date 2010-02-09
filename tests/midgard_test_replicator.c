@@ -392,6 +392,8 @@ midgard_test_replicator_serialize (MidgardObjectTest *mot, gconstpointer data)
 	g_assert_cmpstr (serialized_object_xml, !=, "");
 
 	gboolean serialized_object_write = _write_xml_to_file (G_OBJECT (object), serialized_object_xml);
+	g_free (serialized_object_xml);
+
 	g_assert (serialized_object_write != FALSE);
 }
 
@@ -473,7 +475,7 @@ midgard_test_replicator_unserialize (MidgardObjectTest *mot, gconstpointer data)
 
 	g_object_get (orig, "metadata", &morig, NULL);
 	g_assert (morig != NULL);
-	g_object_get (copy, "metadata", &mcopy, NULL);
+	g_object_get (copy, "metadata", &mcopy, NULL);	
 	g_assert (mcopy != NULL);
 
 	pspecs = g_object_class_list_properties (G_OBJECT_GET_CLASS (morig), &n_prop);

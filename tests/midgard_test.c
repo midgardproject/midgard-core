@@ -54,6 +54,8 @@ void midgard_test_lock_root_objects(MidgardConnection *mgd, MidgardUser *user)
 			g_print("Can not lock person because %s \n", midgard_connection_get_error_string(mgd));
 		g_assert(person_locked != FALSE);
 	}
+
+	//g_object_unref (person);
 }
 
 gchar *midgard_test_get_current_person_guid(MidgardConnection *mgd)

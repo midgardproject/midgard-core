@@ -30,7 +30,7 @@ midgard_test_config_new_user_config (const gchar *name)
 	g_object_set (config, "dbuser", CONFIG_DB_NAME, NULL);
 	g_object_set (config, "dbpass", CONFIG_DB_NAME, NULL);
 	g_object_set (config, "loglevel", "debug", NULL);
-	//g_object_set(config, "dbtype", "SQLite", NULL);
+	//g_object_set (config, "dbtype", "SQLite", NULL);
 	saved = midgard_config_save_file (config, name, TRUE, NULL);
 	g_assert (saved == TRUE);
 	g_object_unref (config);

@@ -77,4 +77,6 @@ void midgard_test_object_class_get_object_by_guid_deleted (MidgardObjectTest *mo
 	MidgardObject *deleted_object = midgard_object_class_get_object_by_guid (mgd, (const gchar *)guid);
 	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OBJECT_DELETED);
 	g_assert (deleted_object == NULL);
+
+	g_free (guid);
 }

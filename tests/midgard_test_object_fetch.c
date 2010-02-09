@@ -123,14 +123,14 @@ void midgard_test_object_get_by_id_updated(MidgardObjectTest *mot, gconstpointer
 
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-		g_object_get_property(G_OBJECT(_object->metadata), "created", &tval);
-		g_object_get(_object->metadata, "creator", &creator, NULL);
+		g_object_get_property(G_OBJECT(_object->metadata), "created", &tval);	
 		created = midgard_timestamp_get_string_from_value(&tval);
-
 		g_value_unset(&tval);
+
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
 		g_object_get_property(G_OBJECT(_object->metadata), "revised", &tval);
 		revised = midgard_timestamp_get_string_from_value(&tval);
+		g_value_unset (&tval);
 
 		g_object_get(_object->metadata,
 				"revisor", &revisor, 
@@ -142,6 +142,7 @@ void midgard_test_object_get_by_id_updated(MidgardObjectTest *mot, gconstpointer
 		midgard_test_metadata_check_datetime_properties(object, created, "created", NULL);
 		midgard_test_metadata_check_person_references(object, revisor, "revisor", NULL);
 		midgard_test_metadata_check_person_references(object, creator, "creator", NULL);
+
 		g_free(revised);
 		g_free(revisor);
 		g_free(created);
