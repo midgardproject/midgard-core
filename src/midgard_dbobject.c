@@ -49,8 +49,19 @@ midgard_dbobject_constructor (GType type,
 static void 
 midgard_dbobject_dispose (GObject *object)
 {
+	MidgardDBObject *self = MIDGARD_DBOBJECT (object);
+	if (self->dbpriv->datamodel && G_IS_OBJECT (self->dbpriv->datamodel))
+		g_object_unref(self->dbpriv->datamodel);
+
+	self->dbpriv->row = -1;
+
+	/* Do not nullify metadata object, we might be in the middle of refcount decreasing */
+	if (self->dbpriv->metadata && G_IS_OBJECT (self->dbpriv->metadata)) 
+		g_object_unref (self->dbpriv->metadata);
+
 	parent_class->dispose (object);
 }
+
 
 static void 
 midgard_dbobject_finalize (GObject *object)
@@ -65,15 +76,6 @@ midgard_dbobject_finalize (GObject *object)
 
 	g_free((gchar *)self->dbpriv->guid);
 	self->dbpriv->guid = NULL;
-
-	if (self->dbpriv->datamodel)
-		g_object_unref(self->dbpriv->datamodel);
-
-	self->dbpriv->row = -1;
-
-	/* Do not nullify metadata object, we might be in the middle of refcount decreasing */
-	if (self->dbpriv->metadata)
-		g_object_unref (self->dbpriv->metadata);
 
 	g_free(self->dbpriv);
 	self->dbpriv = NULL;
