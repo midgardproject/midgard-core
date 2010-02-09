@@ -116,6 +116,7 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 				__view_error(cur, "Referenced class:property can not be empty", NULL);
 
 			gchar **rprop = g_strsplit_set ((const gchar *)use_prop, ":.", -1);
+			xmlFree (use_prop);
 			if (!rprop || rprop[0] == NULL || rprop[1] == NULL) {
 				__view_error(cur, "Referenced property can not be empty", NULL);
 				return;
