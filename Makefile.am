@@ -2,6 +2,8 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
+#DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
+
 lib_LTLIBRARIES = \
 	src/libmidgard2.la
 
@@ -74,7 +76,8 @@ EXTRA_DIST =  \
 	$(man_MANS) \
 	midgard2.pc.in \
 	$(schema_DATA) \
-	$(views_DATA)
+	$(views_DATA) \
+	m4/introspection.m4
 
 LDADD = src/libmidgard2.la
 
@@ -87,10 +90,10 @@ $(PROGRAMS): $(LDADD)
 src_libmidgard2_la_CPPFLAGS = \
 	-I$(top_srcdir)/src -DG_LOG_DOMAIN=\"midgard-core\"
 
-AM_CFLAGS = -I$(top_srcdir)/src -Wall @MIDGARD_CFLAGS@
+AM_CFLAGS = -I$(top_srcdir)/src @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 
 
-src_libmidgard2_la_LDFLAGS = -version-info 2013:0:3 $(no_undefined)
+src_libmidgard2_la_LDFLAGS = -version-info 2015:0:5 $(no_undefined)
 
 test_midgard_schema_CPPFLAGS = \
 	 -DG_LOG_DOMAIN=\"midgard-core\"
@@ -173,6 +176,29 @@ mgdschemasdir = $(datadir)/midgard2/schema
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = midgard2.pc
+
+#-include $(INTROSPECTION_MAKEFILE)
+#INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir)
+#INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
+
+#if HAVE_INTROSPECTION
+#INTROSPECTION_CFLAGS += $(AM_CFLAGS)
+#introspection_sources = $(src_libmidgard2_la_SOURCES) $(libmidgardinclude_HEADERS)
+#Midgard2-10.05.gir: $(lib_LTLIBRARIES)
+#Midgard2_10_05_gir_INCLUDES = GObject-2.0 libxml2-2.0 
+#Midgard2_10_05_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
+#Midgard2_10_05_gir_LIBS = $(lib_LTLIBRARIES) 
+#Midgard2_10_05_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
+#Midgard2_10_05_gir_PACKAGES = gobject-2.0 libxml-2.0
+#INTROSPECTION_GIRS = Midgard2-10.05.gir
+#INTROSPECTION_LIBS += -lxml2
+#girdir = $(datadir)/gir-1.0
+#dist_gir_DATA = $(INTROSPECTION_GIRS)
+
+#typelibsdir = $(libdir)/girepositry-1.0
+#typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
+#CLEANFILES = $(dist_gir_DATA) $(typelib_DATA)
+#endif
 
 doc:
 	doxygen

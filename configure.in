@@ -11,14 +11,16 @@ dnl have updated the NEWS file. Remember also to test the release
 dnl before committing.
 dnl
 AC_INIT([midgard2-core],[9.09.99])
+AC_PREREQ(2.62)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR(src/midgard.c)
 
 dnl Automake is needed for the build system.
 dnl
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([-Wno-portability])
 AM_MAINTAINER_MODE
+#GOBJECT_INTROSPECTION_CHECK([0.6.7])
 
 AM_PROG_LEX
 AC_PROG_YACC
