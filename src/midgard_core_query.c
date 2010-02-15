@@ -781,7 +781,7 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 		parameters[i].name = prop_attr->field;
 		parameters[i].value = (const GValue)value;
 		g_string_append_printf (sqlquery, "%s %s", i > 0 ? "," : "", prop_attr->field);
-		_add_value_type (values, parameters[i].name, parameters[i].value, i > 0 ? TRUE : FALSE);
+		_add_value_type (values, parameters[i].name, &parameters[i].value, i > 0 ? TRUE : FALSE);
 		g_value_unset (&value);
 	}
 
@@ -1096,7 +1096,7 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		parameters[i].name = prop_attr->field;
 		parameters[i].value = (const GValue)value;
 		g_string_append_printf (sqlquery, "%s %s=", i > 0 ? "," : "", prop_attr->field);
-		_add_value_type (sqlquery, parameters[i].name, parameters[i].value, FALSE);
+		_add_value_type (sqlquery, parameters[i].name, &parameters[i].value, FALSE);
 		g_value_unset (&value);
 	}
 
