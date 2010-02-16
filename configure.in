@@ -11,7 +11,7 @@ dnl have updated the NEWS file. Remember also to test the release
 dnl before committing.
 dnl
 AC_INIT([midgard2-core],[9.09.99])
-AC_PREREQ(2.62)
+AC_PREREQ(2.50)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR(src/midgard.c)
@@ -74,22 +74,10 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
 dnl Checks for library functions.
-AC_SEARCH_LIBS(crypt, crypt,,AC_MSG_ERROR(You need libcrypt))
-dnl AC_CHECK_HEADERS(zlib.h,,AC_MSG_ERROR(You need zlib.h))
-AC_CHECK_HEADERS(crypt.h)
-AC_CHECK_HEADERS(security/pam_appl.h pam/pam_appl.h)
-dnl AC_SEARCH_LIBS(compress, z,,AC_MSG_ERROR(You need libz))
-dnl AC_SEARCH_LIBS(gzopen, z,,AC_MSG_ERROR(You need libz))
-AC_SEARCH_LIBS(floor, m,,AC_MSG_ERROR(You need libmath))
-
-dnl LFLAGS="${LFLAGS} -Pmgdlib -olex.yy.c"
 
 dnl accomodate Solaris
 AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(htonl, socket)
-
-dnl search PAM
-AC_CHECK_LIB(pam, pam_start)
 
 AC_MSG_CHECKING([if building for some Win32 platform])
 case "$host" in
