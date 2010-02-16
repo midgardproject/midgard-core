@@ -76,8 +76,8 @@ EXTRA_DIST =  \
 	$(man_MANS) \
 	midgard2.pc.in \
 	$(schema_DATA) \
-	$(views_DATA) \
-	m4/introspection.m4
+	$(views_DATA) 
+#m4/introspection.m4
 
 LDADD = src/libmidgard2.la
 
