@@ -39,16 +39,8 @@ struct _MidgardQueryPropertyClass {
 	GObjectClass parent;
 };
 
-struct _MidgardQueryProperty {
-	GObject parent;
-	GValue value;
-	MidgardDBObjectClass *klass;
-};
-
 GType 			midgard_query_property_get_type		(void);
 MidgardQueryProperty	*midgard_query_property_new		(const gchar *propname, const gchar *classname);
-const gchar 		*midgard_query_property_get_classname 	(MidgardQueryProperty *self);
-gboolean 		midgard_query_property_set_classname	(MidgardQueryProperty *self, const gchar *classname);
 
 G_END_DECLS
 

@@ -17,25 +17,29 @@
  */
 
 #include "midgard_query_holder.h"
-#include "midgard_query_value.h"
+#include "midgard_query_property.h"
 #include "midgard_dbobject.h"
 
-struct _MidgardQueryValue {
+struct _MidgardQueryProperty {
 	GObject parent;
 	GValue value;
+	MidgardDBObjectClass *klass;
 };
 
-MidgardQueryValue *
-midgard_query_value_new (const GValue *value)
+MidgardQueryProperty *
+midgard_query_property_new (const gchar *property, const gchar *classname)
 {
-	g_return_val_if_fail (value != NULL, NULL);
-	MidgardQueryValue *self = g_object_new (MIDGARD_QUERY_VALUE_TYPE, NULL);
+	g_return_val_if_fail (property != NULL, NULL);
+	MidgardQueryProperty *self = g_object_new (MIDGARD_QUERY_PROPERTY_TYPE, NULL);
 
 	GValue pval = {0, };
-	g_value_init (&pval, G_VALUE_TYPE (value));
-	g_value_copy (value, &pval);
+	g_value_init (&pval, G_TYPE_STRING);
+	g_value_set_string (&pval, property);
 
 	self->value = pval;
+
+	if (classname != NULL) 
+		self->klass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (g_type_from_name (classname)));
 
 	return self;
 }
@@ -46,7 +50,7 @@ __get_value (MidgardQueryHolder *self, GValue *value)
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (self != NULL);
 
-	MidgardQueryValue *mqp = (MidgardQueryValue *) self;
+	MidgardQueryProperty *mqp = (MidgardQueryProperty *) self;
 
 	g_value_init (value, G_VALUE_TYPE (&mqp->value));
 	g_value_copy ((const GValue *) &mqp->value, value);
@@ -59,13 +63,14 @@ __set_value (MidgardQueryHolder *self, const GValue *value)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (value != NULL, FALSE);
+	g_return_val_if_fail (G_VALUE_HOLDS_STRING (value), FALSE);
 
-	MidgardQueryValue *mqp = (MidgardQueryValue *) self;
+	MidgardQueryProperty *mqp = (MidgardQueryProperty *) self;
 
 	if (G_IS_VALUE (&mqp->value))
 		g_value_unset (&mqp->value);
 
-	g_value_init (&mqp->value, G_VALUE_TYPE (value));
+	g_value_init (&mqp->value, G_TYPE_STRING);
 	g_value_copy (value, &mqp->value);
 
 	return TRUE;
@@ -74,37 +79,37 @@ __set_value (MidgardQueryHolder *self, const GValue *value)
 /* GOBJECT ROUTINES */
 
 static void
-midgard_query_value_init (MidgardQueryHolderIFace *iface)
+midgard_query_property_init (MidgardQueryHolderIFace *iface)
 {
        iface->get_value = __get_value;
        iface->set_value = __set_value;
 }
 
 GType
-midgard_query_value_get_type (void)
+midgard_query_property_get_type (void)
 {
 	static GType type = 0;
 	if (type == 0) {
 	  	static const GTypeInfo info = {
-			sizeof (MidgardQueryValueClass),
+			sizeof (MidgardQueryPropertyClass),
 			NULL,   /* base_init */
 			NULL,   /* base_finalize */
 			NULL,   /* class_init */
 			NULL,   /* class_finalize */
 			NULL,   /* class_data */
-			sizeof (MidgardQueryValue),
+			sizeof (MidgardQueryProperty),
 			0,      /* n_preallocs */
 			NULL    /* instance_init */
 		};
       
-		static const GInterfaceInfo value_info = {
-			(GInterfaceInitFunc) midgard_query_value_init,   
+		static const GInterfaceInfo property_info = {
+			(GInterfaceInitFunc) midgard_query_property_init,   
 			NULL,	/* interface_finalize */
 			NULL	/* interface_data */
 		};
 
-  		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryValue", &info, 0);
-		g_type_add_interface_static (type, MIDGARD_QUERY_HOLDER_TYPE, &value_info);
+  		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryProperty", &info, 0);
+		g_type_add_interface_static (type, MIDGARD_QUERY_HOLDER_TYPE, &property_info);
     	}
     	return type;
 }

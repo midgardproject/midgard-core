@@ -20,7 +20,7 @@
 #define MIDGARD_QUERY_STORAGE_H
 
 #include <glib-object.h>
-#include "midgard_defs.h"
+#include "midgard_dbobject.h"
 
 G_BEGIN_DECLS
 
@@ -41,11 +41,11 @@ struct _MidgardQueryStorageClass {
 
 struct _MidgardQueryStorage {
 	GObject parent;
-	MidgardDBObjectClass *klass;
+	//MidgardDBObjectClass *klass;
 };
 
 GType 			midgard_query_storage_get_type	(void);
-MidgardQueryStorage	*midgard_query_storage_new	(const MidgardDBObjectClass *klass);
+MidgardQueryStorage	*midgard_query_storage_new	(const gchar *classname);
 
 G_END_DECLS
 
