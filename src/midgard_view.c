@@ -119,19 +119,30 @@ _midgard_view_derived_object_get_property (GObject *object, guint prop_id,
 
 		g_value_set_string (value, "");
 		return;
+	
+	/* Avoid binary to string conversion to be done via registered gda_binary_to_string transform function */
+	} else if (G_VALUE_TYPE (dvalue) == GDA_TYPE_BINARY
+			&& G_TYPE_FUNDAMENTAL (G_VALUE_TYPE (value)) == G_TYPE_STRING) {
+
+		gchar *stringified = midgard_core_query_binary_stringify ((GValue *)dvalue);
+		g_value_set_string (value, stringified);
+
+	} else {
+
+		/* We can have integer value for registered boolean type.
+		   Therefore, transform value */
+		if (G_VALUE_TYPE(value) != G_VALUE_TYPE(dvalue)) {
+
+			if (!g_value_transform(dvalue, value))
+				g_warning("%s to %s conversion failed for midgard_view.%s", 
+						G_VALUE_TYPE_NAME(dvalue), G_VALUE_TYPE_NAME(value), pspec->name);
+		
+		} else {
+
+			g_value_copy(dvalue, value);
+		}
 	}
 
-	/* We can have integer value for registered boolean type.
-	   Therefore, transform value */
-	if (G_VALUE_TYPE(value) != G_VALUE_TYPE(dvalue)) {
-
-		if (!g_value_transform(dvalue, value))
-			g_warning("%s to %s conversion failed for midgard_view.%s", 
-					G_VALUE_TYPE_NAME(dvalue), G_VALUE_TYPE_NAME(value), pspec->name);
-		return;
-	}
-
-	g_value_copy(dvalue, value);
 	return;
 }
 
