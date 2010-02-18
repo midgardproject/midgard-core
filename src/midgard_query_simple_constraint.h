@@ -20,7 +20,6 @@
 #define MIDGARD_QUERY_SIMPLE_CONSTRAINT_H
 
 #include <glib-object.h>
-#include "midgard_query_storage.h"
 
 G_BEGIN_DECLS
 
@@ -33,17 +32,12 @@ G_BEGIN_DECLS
 typedef struct _MidgardQuerySimpleConstraint MidgardQuerySimpleConstraint; /* dummy */
 typedef struct _MidgardQuerySimpleConstraintIFace MidgardQuerySimpleConstraintIFace;
 
-struct _MidgardQuerySimpleConstraint {
-	GTypeInterface	g_iface;
-	GValue property_value;
-	GValue value;
-	const gchar *op;
-	MidgardQueryStorage *storage;
+struct _MidgardQuerySimpleConstraintIFace {
+	GTypeInterface	parent;
+	GSList 		*constraints;
 };
 
 GType 			midgard_query_simple_constraint_get_type	(void);
-void			midgard_query_simple_constraint_get_value	(MidgardQuerySimpleConstraint *self, GValue *value);
-gboolean		midgard_query_simple_constraint_set_value   	(MidgardQuerySimpleConstraint *self, const GValue *value);
 
 G_END_DECLS
 

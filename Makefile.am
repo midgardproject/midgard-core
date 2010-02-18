@@ -60,6 +60,7 @@ midgard_public_h = \
 	src/midgard_collector.h \
 	src/midgard_object_parameter.h \
 	src/midgard_object_attachment.h \
+	src/midgard_query_constraint.h \
 	src/midgard_query_holder.h \
 	src/midgard_query_value.h \
 	src/midgard_query_property.h \
@@ -162,6 +163,7 @@ src_libmidgard2_la_SOURCES = \
 	src/midgard_object_attachment.c \
 	src/midgard_query_holder.c \
 	src/midgard_query_property.c \
+	src/midgard_query_simple_constraint.c \
 	src/midgard_query_value.c \
 	src/midgard_replicator.c \
 	src/midgard_user.c \
