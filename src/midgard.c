@@ -116,7 +116,8 @@ static void __transform_string_to_boolean (const GValue *src_val, GValue *dest_v
 void midgard_init() 
 {	
 	GType type;
-	g_type_init_with_debug_flags(G_TYPE_DEBUG_OBJECTS | G_TYPE_DEBUG_MASK); 
+	g_type_init();
+	//g_type_init_with_debug_flags(G_TYPE_DEBUG_OBJECTS | G_TYPE_DEBUG_MASK); 
 
 #ifdef HAVE_LIBGDA_4
 	gda_init ();
