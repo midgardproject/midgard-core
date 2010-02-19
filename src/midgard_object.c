@@ -2533,11 +2533,6 @@ gboolean midgard_object_purge(MgdObject *object)
 		return FALSE;
 	}	
 
-	/* TODO unlink midgard_blob for midgard_attachment */
-	/* Should we delete files here? These might be shared among many attachments */
-	if (g_str_equal(G_OBJECT_TYPE_NAME(object), "midgard_attachment"))
-		g_warning("Binary file is not unlinked! midgard_blob::delete not yet implemented");
-
 	dsql = g_string_new("DELETE ");
 	g_string_append_printf(dsql, "FROM %s WHERE guid='%s' ", table, guid);
 	
