@@ -20,6 +20,8 @@
 #define MIDGARD_QUERY_CONSTRAINT_H
 
 #include <glib-object.h>
+#include "midgard_query_holder.h"
+#include "midgard_query_property.h"
 #include "midgard_query_storage.h"
 
 G_BEGIN_DECLS
@@ -35,19 +37,15 @@ G_BEGIN_DECLS
 typedef struct _MidgardQueryConstraint MidgardQueryConstraint; 
 typedef struct _MidgardQueryConstraintClass MidgardQueryConstraintClass;
 
-struct _MidgardQueryConstraint {
-	GTypeInterface	parent;
-	GValue property_value;
-	GValue value;
-	const gchar *op;
-	MidgardQueryStorage *storage;
+struct _MidgardQueryConstraintClass {
+	GObjectClass parent;
 };
 
 GType 			midgard_query_constraint_get_type	(void);
 MidgardQueryConstraint  *midgard_query_constraint_new 		(MidgardQueryProperty *property, const gchar *op, MidgardQueryHolder *holder, MidgardQueryStorage *storage);
 void			midgard_query_constraint_get_value	(MidgardQueryConstraint *self, GValue *value);
 gboolean		midgard_query_constraint_set_value   	(MidgardQueryConstraint *self, const GValue *value);
-MidgardQueryStorage	*midgard_query_constraint_get_storage	(MidgardQueryconstraint *self);
+MidgardQueryStorage	*midgard_query_constraint_get_storage	(MidgardQueryConstraint *self);
 gboolean 		midgard_query_constraint_set_storage	(MidgardQueryConstraint *self, MidgardQueryStorage *storage);
 MidgardQueryProperty	*midgard_query_constraint_get_property	(MidgardQueryConstraint *self);
 gboolean 		midgard_query_constraint_set_property	(MidgardQueryConstraint *self, MidgardQueryProperty *property);

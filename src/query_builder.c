@@ -249,20 +249,20 @@ gboolean midgard_query_builder_add_constraint(
         g_assert(op);
         g_assert(value);
      
-	MidgardQueryConstraint *constraint = midgard_query_constraint_new();
-	midgard_query_constraint_set_builder(constraint, builder);
-	midgard_query_constraint_set_class(constraint, MIDGARD_DBOBJECT_CLASS(g_type_class_peek(builder->priv->type)));
+	MidgardCoreQueryConstraint *constraint = midgard_core_query_constraint_new();
+	midgard_core_query_constraint_set_builder(constraint, builder);
+	midgard_core_query_constraint_set_class(constraint, MIDGARD_DBOBJECT_CLASS(g_type_class_peek(builder->priv->type)));
 	
-	if(!midgard_query_constraint_add_operator(constraint, op))
+	if(!midgard_core_query_constraint_add_operator(constraint, op))
 		return FALSE;
 		
-	if(!midgard_query_constraint_parse_property(&constraint, MIDGARD_DBOBJECT_CLASS(g_type_class_peek(builder->priv->type)), name))
+	if(!midgard_core_query_constraint_parse_property(&constraint, MIDGARD_DBOBJECT_CLASS(g_type_class_peek(builder->priv->type)), name))
 		return FALSE;
 
-	if(!midgard_query_constraint_add_value(constraint, value))
+	if(!midgard_core_query_constraint_add_value(constraint, value))
 		return FALSE;
 	
-	midgard_query_constraint_build_condition(constraint);
+	midgard_core_query_constraint_build_condition(constraint);
 
 	/* FIXME, table should be stored per every constraint, order, whatever */
 	midgard_core_qb_add_table(builder, constraint->priv->prop_left->table);
@@ -321,19 +321,19 @@ gboolean midgard_query_builder_add_constraint_with_property(
 
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_CLASS(g_type_class_peek(builder->priv->type));
 
-	MidgardQueryConstraint *constraint = midgard_query_constraint_new();
-	midgard_query_constraint_set_builder(constraint, builder);
-	midgard_query_constraint_set_class(constraint, klass);
+	MidgardCoreQueryConstraint *constraint = midgard_core_query_constraint_new();
+	midgard_core_query_constraint_set_builder(constraint, builder);
+	midgard_core_query_constraint_set_class(constraint, klass);
 
-	if(!midgard_query_constraint_parse_property(&constraint, klass, property_a))
+	if(!midgard_core_query_constraint_parse_property(&constraint, klass, property_a))
 		return FALSE;
 	constraint->priv->current = constraint->priv->prop_right;
-	if(!midgard_query_constraint_parse_property(&constraint, klass, property_b))
+	if(!midgard_core_query_constraint_parse_property(&constraint, klass, property_b))
 		return FALSE;
 
 	constraint->priv->condition_operator = g_strdup(op);
 
-	midgard_query_constraint_build_condition(constraint);
+	midgard_core_query_constraint_build_condition(constraint);
 
 	midgard_core_qb_add_table(builder, constraint->priv->prop_left->table);
 	midgard_core_qb_add_table(builder, constraint->priv->prop_right->table);

@@ -27,19 +27,19 @@
 #include "midgard_tree.h"
 #include <libgda/libgda.h>
 
-static void add_sql(MidgardQueryConstraint *constraint, GString *sql) {
+static void add_sql(MidgardCoreQueryConstraint *constraint, GString *sql) {
         g_assert(constraint);
         g_assert(sql);
         g_string_append(sql, "1=1");
 }
 
-G_DEFINE_TYPE(MidgardQueryConstraint, midgard_query_constraint, G_TYPE_OBJECT)
+G_DEFINE_TYPE(MidgardCoreQueryConstraint, midgard_core_query_constraint, G_TYPE_OBJECT)
 
-void midgard_query_constraint_add_sql(
-                MidgardQueryConstraint *constraint, GString *sql) {
+void midgard_core_query_constraint_add_sql(
+                MidgardCoreQueryConstraint *constraint, GString *sql) {
         g_assert(constraint);
         g_assert(sql);
-        MIDGARD_QUERY_CONSTRAINT_GET_CLASS(constraint)->add_sql(constraint, sql);
+        MIDGARD_CORE_QUERY_CONSTRAINT_GET_CLASS(constraint)->add_sql(constraint, sql);
 }
 
 static const char *valid_operator[] = {
@@ -47,9 +47,9 @@ static const char *valid_operator[] = {
 	NULL
 };
 
-gboolean midgard_query_constraint_add_operator(MidgardQueryConstraint *constraint, const gchar *op)
+gboolean midgard_core_query_constraint_add_operator(MidgardCoreQueryConstraint *constraint, const gchar *op)
 {
-	if(!midgard_query_constraint_operator_is_valid(op))
+	if(!midgard_core_query_constraint_operator_is_valid(op))
 		return FALSE;
 	
 	constraint->priv->condition_operator = g_strdup(op);
@@ -57,7 +57,7 @@ gboolean midgard_query_constraint_add_operator(MidgardQueryConstraint *constrain
 	return TRUE;
 }
 
-gboolean midgard_query_constraint_operator_is_valid(const gchar *op)
+gboolean midgard_core_query_constraint_operator_is_valid(const gchar *op)
 {
 	guint i;
 	for (i = 0; valid_operator[i] != NULL; i++) {
@@ -77,8 +77,8 @@ gboolean midgard_query_constraint_operator_is_valid(const gchar *op)
 	return TRUE;
 }
 
-gboolean midgard_query_constraint_add_value(
-		MidgardQueryConstraint *constraint, const GValue *value)
+gboolean midgard_core_query_constraint_add_value(
+		MidgardCoreQueryConstraint *constraint, const GValue *value)
 {
 	g_assert(constraint != NULL);
 	g_assert(value != NULL);
@@ -188,7 +188,7 @@ gboolean midgard_query_constraint_add_value(
 }
 
 static void __condition_append_value(GString *str, 
-		MidgardQueryConstraint *constraint, GValue *value)
+		MidgardCoreQueryConstraint *constraint, GValue *value)
 {
 	gchar *escaped;
 	if(value == NULL)
@@ -246,7 +246,7 @@ static void __condition_append_value(GString *str,
 	}
 }
 
-static void __transform_value(MidgardQueryConstraint *self)
+static void __transform_value(MidgardCoreQueryConstraint *self)
 {
 	GValue *value = self->priv->value;
 	GValue *target = g_new0(GValue, 1);
@@ -297,8 +297,8 @@ static void __transform_value(MidgardQueryConstraint *self)
 	return;
 }
 
-gboolean midgard_query_constraint_build_condition(
-		MidgardQueryConstraint *constraint)
+gboolean midgard_core_query_constraint_build_condition(
+		MidgardCoreQueryConstraint *constraint)
 {
 	g_assert(constraint != NULL);
 	
@@ -442,7 +442,7 @@ gboolean midgard_query_constraint_build_condition(
 }
 
 void            
-midgard_query_constraint_set_builder (MidgardQueryConstraint *self, MidgardQueryBuilder *builder)
+midgard_core_query_constraint_set_builder (MidgardCoreQueryConstraint *self, MidgardQueryBuilder *builder)
 {
 	g_assert(self != NULL);
 	g_assert(builder != NULL);
@@ -451,7 +451,7 @@ midgard_query_constraint_set_builder (MidgardQueryConstraint *self, MidgardQuery
 }
 
 void            
-midgard_query_constraint_set_class (MidgardQueryConstraint *self, MidgardDBObjectClass *klass)
+midgard_core_query_constraint_set_class (MidgardCoreQueryConstraint *self, MidgardDBObjectClass *klass)
 {
 	g_assert(self != NULL);
 	g_assert(klass != NULL);
@@ -461,10 +461,10 @@ midgard_query_constraint_set_class (MidgardQueryConstraint *self, MidgardDBObjec
 
 /* GOBJECT ROUTINES */
 
-MidgardQueryConstraintPrivate *
-midgard_query_constraint_private_new (void)
+MidgardCoreQueryConstraintPrivate *
+midgard_core_query_constraint_private_new (void)
 {
-	MidgardQueryConstraintPrivate *priv = g_new (MidgardQueryConstraintPrivate, 1);
+	MidgardCoreQueryConstraintPrivate *priv = g_new (MidgardCoreQueryConstraintPrivate, 1);
 	
 	/* We need empty structures. We will reuse available pointers */
 	priv->prop_left = midgard_core_schema_type_property_attr_new_empty();
@@ -488,7 +488,7 @@ midgard_query_constraint_private_new (void)
 	return priv;
 }
 
-void midgard_query_constraint_private_free(MidgardQueryConstraintPrivate *mqcp)
+void midgard_core_query_constraint_private_free(MidgardCoreQueryConstraintPrivate *mqcp)
 {
 	g_assert(mqcp != NULL);
 
@@ -514,42 +514,42 @@ void midgard_query_constraint_private_free(MidgardQueryConstraintPrivate *mqcp)
 	GSList *list;
 	
 	for(list = mqcp->joins; list != NULL; list = list->next) {
-		midgard_query_constraint_private_free(
-				(MidgardQueryConstraintPrivate*)list->data);
+		midgard_core_query_constraint_private_free(
+				(MidgardCoreQueryConstraintPrivate*)list->data);
 	}
 	g_slist_free(list);
 
 	g_free(mqcp);
 }
 
-static void midgard_query_constraint_init(MidgardQueryConstraint *self) 
+static void midgard_core_query_constraint_init(MidgardCoreQueryConstraint *self) 
 {
 	g_assert(self != NULL);
 
-	self->priv = midgard_query_constraint_private_new();
+	self->priv = midgard_core_query_constraint_private_new();
 }
 
-static void midgard_query_constraint_finalize(GObject *object)
+static void midgard_core_query_constraint_finalize(GObject *object)
 {
 	g_assert(object != NULL);
 
-	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT(object);
-	midgard_query_constraint_private_free(self->priv);		
+	MidgardCoreQueryConstraint *self = MIDGARD_CORE_QUERY_CONSTRAINT(object);
+	midgard_core_query_constraint_private_free(self->priv);		
 }
 
-static void midgard_query_constraint_class_init(
-                MidgardQueryConstraintClass *klass) 
+static void midgard_core_query_constraint_class_init(
+                MidgardCoreQueryConstraintClass *klass) 
 {
         g_assert(klass != NULL);
 	
-	klass->parent.finalize = midgard_query_constraint_finalize;
+	klass->parent.finalize = midgard_core_query_constraint_finalize;
 	klass->add_sql = add_sql;
 }
 
-MidgardQueryConstraint *midgard_query_constraint_new(void)
+MidgardCoreQueryConstraint *midgard_core_query_constraint_new(void)
 {
-	MidgardQueryConstraint *self = 
-		g_object_new(MIDGARD_TYPE_QUERY_CONSTRAINT, NULL);
+	MidgardCoreQueryConstraint *self = 
+		g_object_new(MIDGARD_CORE_TYPE_QUERY_CONSTRAINT, NULL);
 
 	return self;
 }

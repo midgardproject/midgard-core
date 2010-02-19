@@ -33,7 +33,7 @@ typedef struct _MidgardGroupConstraint MidgardGroupConstraint;
 typedef struct _MidgardGroupConstraintClass MidgardGroupConstraintClass;
 
 struct _MidgardGroupConstraint{
-        MidgardQueryConstraint parent;
+        MidgardCoreQueryConstraint parent;
 
         /* private fields */
         gchar *type;
@@ -43,7 +43,7 @@ struct _MidgardGroupConstraint{
 };
 
 struct _MidgardGroupConstraintClass{
-        MidgardQueryConstraintClass parent;
+        MidgardCoreQueryConstraintClass parent;
 
 	void (*add_sql) (MidgardGroupConstraint *group, GString *sql);
 };
@@ -53,6 +53,6 @@ GType midgard_group_constraint_get_type(void);
 MidgardGroupConstraint *midgard_group_constraint_new(const gchar *type);
 
 void midgard_group_constraint_add_constraint(
-        MidgardGroupConstraint *group, MidgardQueryConstraint *constraint);
+        MidgardGroupConstraint *group, MidgardCoreQueryConstraint *constraint);
 
 #endif

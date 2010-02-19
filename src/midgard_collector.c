@@ -138,11 +138,11 @@ MidgardCollector *midgard_collector_new(
 			"=", value);
 
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_CLASS(self->priv->klass);
-	MidgardQueryConstraint *constraint = midgard_query_constraint_new();
-	midgard_query_constraint_set_builder(constraint, self->priv->builder);
-	midgard_query_constraint_set_class(constraint, klass);
+	MidgardCoreQueryConstraint *constraint = midgard_core_query_constraint_new();
+	midgard_core_query_constraint_set_builder(constraint, self->priv->builder);
+	midgard_core_query_constraint_set_class(constraint, klass);
 
-	if(!midgard_query_constraint_parse_property(&constraint, klass, domain)) {
+	if(!midgard_core_query_constraint_parse_property(&constraint, klass, domain)) {
 		
 		g_object_unref(constraint);
 		
@@ -215,11 +215,11 @@ gboolean midgard_collector_set_key_property(
 	g_assert(self != NULL);
 
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_CLASS(g_type_class_peek(self->priv->builder->priv->type));
-	MidgardQueryConstraint *constraint = midgard_query_constraint_new();
-	midgard_query_constraint_set_builder(constraint, self->priv->builder);
-	midgard_query_constraint_set_class(constraint, klass);
+	MidgardCoreQueryConstraint *constraint = midgard_core_query_constraint_new();
+	midgard_core_query_constraint_set_builder(constraint, self->priv->builder);
+	midgard_core_query_constraint_set_class(constraint, klass);
 
-	if(!midgard_query_constraint_parse_property(&constraint, klass, key)) {
+	if(!midgard_core_query_constraint_parse_property(&constraint, klass, key)) {
 		
 		g_object_unref(constraint);
 		return FALSE;
@@ -291,11 +291,11 @@ gboolean midgard_collector_add_value_property(
 	}
 	
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_CLASS(g_type_class_peek(self->priv->builder->priv->type));
-	MidgardQueryConstraint *constraint = midgard_query_constraint_new();
-	midgard_query_constraint_set_builder(constraint, self->priv->builder);
-	midgard_query_constraint_set_class(constraint, klass);
+	MidgardCoreQueryConstraint *constraint = midgard_core_query_constraint_new();
+	midgard_core_query_constraint_set_builder(constraint, self->priv->builder);
+	midgard_core_query_constraint_set_class(constraint, klass);
 
-	if(!midgard_query_constraint_parse_property(&constraint, klass, value)) {
+	if(!midgard_core_query_constraint_parse_property(&constraint, klass, value)) {
 		
 		g_object_unref(constraint);
 		return FALSE;

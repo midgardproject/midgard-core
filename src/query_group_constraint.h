@@ -15,50 +15,50 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef QUERY_GROUP_CONSTRAINT_H
-#define QUERY_GROUP_CONSTRAINT_H
+#ifndef CORE_QUERY_GROUP_CONSTRAINT_H
+#define CORE_QUERY_GROUP_CONSTRAINT_H
 
 #include "midgard_object.h"
 #include "schema.h"
 
-#define MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT            (midgard_query_group_constraint_get_type())
-#define MIDGARD_QUERY_GROUP_CONSTRAINT(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraint))
-#define MIDGARD_QUERY_GROUP_CONSTRAINT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraintClass))
-#define MIDGARD_IS_QUERY_GROUP_CONSTRAINT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT))
-#define MIDGARD_IS_QUERY_GROUP_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT))
-#define MIDGARD_QUERY_GROUP_CONSTRAINT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraintClass))
+#define MIDGARD_CORE_TYPE_QUERY_GROUP_CONSTRAINT            (midgard_core_query_group_constraint_get_type())
+#define MIDGARD_CORE_QUERY_GROUP_CONSTRAINT(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), MIDGARD_CORE_TYPE_QUERY_GROUP_CONSTRAINT, MidgardCoreQueryGroupConstraint))
+#define MIDGARD_CORE_QUERY_GROUP_CONSTRAINT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), MIDGARD_CORE_TYPE_QUERY_GROUP_CONSTRAINT, MidgardCoreQueryGroupConstraintClass))
+#define MIDGARD_CORE_IS_QUERY_GROUP_CONSTRAINT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), MIDGARD_CORE_TYPE_QUERY_GROUP_CONSTRAINT))
+#define MIDGARD_CORE_IS_QUERY_GROUP_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), MIDGARD_CORE_TYPE_QUERY_GROUP_CONSTRAINT))
+#define MIDGARD_CORE_QUERY_GROUP_CONSTRAINT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), MIDGARD_CORE_TYPE_QUERY_GROUP_CONSTRAINT, MidgardCoreQueryGroupConstraintClass))
 
-typedef struct _MidgardQueryGroupConstraint MidgardQueryGroupConstraint;
-typedef struct _MidgardQueryGroupConstraintPrivate MidgardQueryGroupConstraintPrivate;
+typedef struct _MidgardCoreQueryGroupConstraint MidgardCoreQueryGroupConstraint;
+typedef struct _MidgardCoreQueryGroupConstraintPrivate MidgardCoreQueryGroupConstraintPrivate;
 
-struct _MidgardQueryGroupConstraintPrivate{
+struct _MidgardCoreQueryGroupConstraintPrivate{
         
 	GSList *constraints;
 	gchar *group_type;
 };
 
-struct _MidgardQueryGroupConstraint{
+struct _MidgardCoreQueryGroupConstraint{
         GObject parent;
 
-	MidgardQueryGroupConstraintPrivate *priv;
+	MidgardCoreQueryGroupConstraintPrivate *priv;
 };
 
 typedef struct {
         GObjectClass parent;
-        void (*add_sql)(MidgardQueryGroupConstraint *self, GString *sql);
-} MidgardQueryGroupConstraintClass;
+        void (*add_sql)(MidgardCoreQueryGroupConstraint *self, GString *sql);
+} MidgardCoreQueryGroupConstraintClass;
 
-GType midgard_query_group_constraint_get_type(void);
+GType midgard_core_query_group_constraint_get_type(void);
 
-MidgardQueryGroupConstraint *midgard_query_group_constraint_new(void);
+MidgardCoreQueryGroupConstraint *midgard_core_query_group_constraint_new(void);
 
-void midgard_query_group_constraint_add_sql(
-        MidgardQueryGroupConstraint *self, GString *sql);
+void midgard_core_query_group_constraint_add_sql(
+        MidgardCoreQueryGroupConstraint *self, GString *sql);
 
-gboolean midgard_query_group_constraint_type_is_valid(const gchar *type);
+gboolean midgard_core_query_group_constraint_type_is_valid(const gchar *type);
 
 /* PRIVATE */
-MidgardQueryGroupConstraintPrivate *midgard_query_group_constraint_private_new(void);
-void midgard_query_group_constraint_private_free(MidgardQueryGroupConstraintPrivate *mqcp);
+MidgardCoreQueryGroupConstraintPrivate *midgard_core_query_group_constraint_private_new(void);
+void midgard_core_query_group_constraint_private_free(MidgardCoreQueryGroupConstraintPrivate *mqcp);
 
 #endif /* QUERY_CONSTRAINT_H */

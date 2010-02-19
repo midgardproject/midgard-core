@@ -313,8 +313,8 @@ static void __get_view_constraints(xmlNode *node, MgdSchemaTypeAttr *type)
 			if (!klass)
 				__view_error(cur, "Class %s not registered", classprop[0]);
 
-			MidgardQueryConstraint *constraint = midgard_query_constraint_new();
-			if (!midgard_query_constraint_parse_property(&constraint, klass, classprop[1]))
+			MidgardCoreQueryConstraint *constraint = midgard_core_query_constraint_new();
+			if (!midgard_core_query_constraint_parse_property(&constraint, klass, classprop[1]))
 				__view_error(cur, "Can not parse %s constraint property", classprop[1]);
 
 			g_strfreev(classprop);
@@ -324,7 +324,7 @@ static void __get_view_constraints(xmlNode *node, MgdSchemaTypeAttr *type)
 			xmlChar *operator = xmlGetProp(cur, (const xmlChar *)"operator");
 			if (!operator || (operator && *operator == '\0'))
 				__view_error(cur, "Can not add constraint with empty operator", NULL);
-			if (!midgard_query_constraint_add_operator(constraint, (const gchar *)operator))
+			if (!midgard_core_query_constraint_add_operator(constraint, (const gchar *)operator))
 				__view_error(cur, "Invalid operator", NULL);
 			xmlFree(operator);
 
@@ -352,8 +352,8 @@ static void __get_view_constraints(xmlNode *node, MgdSchemaTypeAttr *type)
 			g_value_init(&val, vtype);
 			g_value_transform((const GValue *) &strval, &val);
 		
-			midgard_query_constraint_add_value(constraint, &val);
-			midgard_query_constraint_build_condition(constraint);
+			midgard_core_query_constraint_add_value(constraint, &val);
+			midgard_core_query_constraint_build_condition(constraint);
 
 			type->constraints = g_slist_append(type->constraints, (gpointer) constraint);
 			
@@ -455,7 +455,7 @@ gchar *__build_static_create_view(MgdSchemaTypeAttr *type)
 		
 		g_string_append(query, " AND ");
 		g_string_append(query,
-				MIDGARD_QUERY_CONSTRAINT(list->data)->priv->condition);
+				MIDGARD_CORE_QUERY_CONSTRAINT(list->data)->priv->condition);
 	}
 
 	return g_string_free(query, FALSE);

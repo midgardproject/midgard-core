@@ -40,7 +40,7 @@ static void add_sql(MidgardGroupConstraint *group, GString *sql)
 			&& g_slist_length(group->nested) == 0) {
 	
 		g_string_append(sql,
-				MIDGARD_QUERY_CONSTRAINT(group->constraints->data)->priv->condition);
+				MIDGARD_CORE_QUERY_CONSTRAINT(group->constraints->data)->priv->condition);
 		return;
 	}
 
@@ -53,7 +53,7 @@ static void add_sql(MidgardGroupConstraint *group, GString *sql)
 			g_string_append_printf(sql, " %s ", group->type);
 		
 		g_string_append(sql,
-				MIDGARD_QUERY_CONSTRAINT(list->data)->priv->condition);
+				MIDGARD_CORE_QUERY_CONSTRAINT(list->data)->priv->condition);
 		i++;
 	}
 
@@ -78,17 +78,17 @@ static void add_sql(MidgardGroupConstraint *group, GString *sql)
 	for(list = group->constraints; list != NULL;
 			list = list->next) {
 		
-		for(jlist = ((MidgardQueryConstraint*)list->data)->priv->joins;
+		for(jlist = ((MidgardCoreQueryConstraint*)list->data)->priv->joins;
 				jlist != NULL; jlist = jlist->next) {
 			
 			g_string_append(sql, " AND ");
 			g_string_append(sql,
-					((MidgardQueryConstraintPrivate*)jlist->data)->condition);
+					((MidgardCoreQueryConstraintPrivate*)jlist->data)->condition);
 		}
 	}
 }
 
-G_DEFINE_TYPE(MidgardGroupConstraint, midgard_group_constraint, MIDGARD_TYPE_QUERY_CONSTRAINT)
+G_DEFINE_TYPE(MidgardGroupConstraint, midgard_group_constraint, MIDGARD_CORE_TYPE_QUERY_CONSTRAINT)
 
 static void midgard_group_constraint_init(MidgardGroupConstraint *self) 
 {
@@ -156,7 +156,7 @@ MidgardGroupConstraint *midgard_group_constraint_new(const gchar *type)
 
 void midgard_group_constraint_add_constraint(
                 MidgardGroupConstraint *self,
-                MidgardQueryConstraint *constraint) 
+                MidgardCoreQueryConstraint *constraint) 
 {
 	/* NULL self is acceptable as it might be unitialized builder->priv->orders. 
 	 * If it fails, then it should be changed to orders array */

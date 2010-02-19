@@ -33,7 +33,7 @@ typedef struct MidgardQueryOrder MidgardQueryOrder;
  * The opaque query order type.
  */
 struct MidgardQueryOrder {
-	MidgardQueryConstraint *constraint;
+	MidgardCoreQueryConstraint *constraint;
 };
 
 MidgardQueryOrder *midgard_core_query_order_new(

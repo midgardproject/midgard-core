@@ -95,7 +95,7 @@ void midgard_query_builder_private_free(MidgardQueryBuilderPrivate *mqbp)
 
 	/* free joins */
 	for(list = mqbp->joins; list != NULL; list = list->next) {
-		midgard_query_constraint_private_free((MidgardQueryConstraintPrivate*) list->data);
+		midgard_core_query_constraint_private_free((MidgardCoreQueryConstraintPrivate*) list->data);
 	}
 	if(list)
 		g_slist_free(list);
@@ -119,7 +119,7 @@ void midgard_core_qb_add_table(MidgardQueryBuilder *builder, const gchar *table)
 }
 
 void midgard_core_qb_add_constraint(MidgardQueryBuilder *builder,
-		MidgardQueryConstraint *constraint)
+		MidgardCoreQueryConstraint *constraint)
 {
 	g_assert(builder != NULL);
 	g_assert(constraint != NULL);
@@ -158,14 +158,14 @@ static void __sql_add_constraints(GString *sql, MidgardQueryBuilder *builder)
 			g_string_append(sql, " AND ");
 		
 		g_string_append(sql,
-				MIDGARD_QUERY_CONSTRAINT(clist->data)->priv->condition);
+				MIDGARD_CORE_QUERY_CONSTRAINT(clist->data)->priv->condition);
 		
-		for(jlist = ((MidgardQueryConstraint*)clist->data)->priv->joins;
+		for(jlist = ((MidgardCoreQueryConstraint*)clist->data)->priv->joins;
 				jlist != NULL; jlist = jlist->next) {
 			
 			g_string_append(sql, " AND ");
 			g_string_append(sql,
-					((MidgardQueryConstraintPrivate*)jlist->data)->condition);
+					((MidgardCoreQueryConstraintPrivate*)jlist->data)->condition);
 		}
 		
 		j++;
@@ -266,7 +266,7 @@ gchar *midgard_core_qb_get_sql(
 				
 				g_string_append(sql, " AND ");				
 				g_string_append(sql,
-						((MidgardQueryConstraintPrivate*)jlist->data)->condition);                
+						((MidgardCoreQueryConstraintPrivate*)jlist->data)->condition);                
 			}
 		}
 	}
@@ -279,7 +279,7 @@ gchar *midgard_core_qb_get_sql(
 		
 			g_string_append(sql, " AND ");                          
 			g_string_append(sql,
-					((MidgardQueryConstraintPrivate*)jlist->data)->condition);                
+					((MidgardCoreQueryConstraintPrivate*)jlist->data)->condition);                
 		}
 	}
 
@@ -341,7 +341,7 @@ gchar * midgard_core_qb_get_sql_as(
 static void __join_reference(MidgardQueryBuilder *builder, const gchar *src_table, const gchar *ref_table)
 {
 	/* Join guid and parent_guid */
-	MidgardQueryConstraint *jc = midgard_query_constraint_new();
+	MidgardCoreQueryConstraint *jc = midgard_core_query_constraint_new();
 	GString *jstr = g_string_new("");
 	g_string_append_printf(jstr,"%s.parent_guid = %s.guid",
 			ref_table, src_table);
@@ -351,7 +351,7 @@ static void __join_reference(MidgardQueryBuilder *builder, const gchar *src_tabl
 	midgard_core_qb_add_constraint(builder,jc);
 	
 	/* limit to records which are not deleted */
-	MidgardQueryConstraint *dc = midgard_query_constraint_new();
+	MidgardCoreQueryConstraint *dc = midgard_core_query_constraint_new();
 	GString *dstr = g_string_new("");
 	g_string_append_printf(dstr,"%s.metadata_deleted = 0", ref_table);
 	dc->priv->condition = g_strdup(dstr->str);
@@ -362,7 +362,7 @@ static void __join_reference(MidgardQueryBuilder *builder, const gchar *src_tabl
 	return;
 }
 
-static gboolean __add_join(GSList **list, MidgardQueryConstraintPrivate *mqcp)
+static gboolean __add_join(GSList **list, MidgardCoreQueryConstraintPrivate *mqcp)
 {
 	GSList *clist = NULL;
 	gboolean exists = FALSE;
@@ -371,10 +371,10 @@ static gboolean __add_join(GSList **list, MidgardQueryConstraintPrivate *mqcp)
 	
 	for(clist = *list; clist != NULL; clist = clist->next) {
 		
-		if(((MidgardQueryConstraintPrivate *)clist->data)->condition == NULL) 
+		if(((MidgardCoreQueryConstraintPrivate *)clist->data)->condition == NULL) 
 			continue;
 		
-		if(g_str_equal(((MidgardQueryConstraintPrivate *)clist->data)->condition, mqcp->condition))
+		if(g_str_equal(((MidgardCoreQueryConstraintPrivate *)clist->data)->condition, mqcp->condition))
 			exists = TRUE;
 	}
 	
@@ -389,7 +389,7 @@ static gboolean __add_join(GSList **list, MidgardQueryConstraintPrivate *mqcp)
 
 static gboolean __set_schema_property_attr(
 		MidgardQueryBuilder *builder, MidgardDBObjectClass **klass, 
-		MidgardQueryConstraint **constraint, const gchar *name, gboolean do_link)
+		MidgardCoreQueryConstraint **constraint, const gchar *name, gboolean do_link)
 {
 	MgdSchemaPropertyAttr *attr = NULL;
 	const gchar *target_property = NULL;
@@ -492,8 +492,8 @@ static gboolean __set_schema_property_attr(
 
 			if((*constraint)->priv->current->link_target == NULL) {
 				
-				MidgardQueryConstraintPrivate *mqcp =
-					midgard_query_constraint_private_new();
+				MidgardCoreQueryConstraintPrivate *mqcp =
+					midgard_core_query_constraint_private_new();
 
 				mqcp->current->is_link = is_link;
 				mqcp->current->link_target = target_property;
@@ -532,7 +532,7 @@ static gboolean __set_schema_property_attr(
 
 				if (builder) {
 					if(!__add_join(&builder->priv->joins, mqcp)) {
-						midgard_query_constraint_private_free(mqcp);
+						midgard_core_query_constraint_private_free(mqcp);
 					}
 				}
 			}
@@ -570,7 +570,7 @@ static gboolean __set_schema_property_attr(
 }
 
 gboolean 
-midgard_query_constraint_parse_property (MidgardQueryConstraint **constraint, MidgardDBObjectClass *klass, const gchar *name)
+midgard_core_query_constraint_parse_property (MidgardCoreQueryConstraint **constraint, MidgardDBObjectClass *klass, const gchar *name)
 {
 	g_assert(name != NULL);
 

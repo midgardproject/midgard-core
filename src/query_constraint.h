@@ -16,25 +16,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef QUERY_CONSTRAINT_H
-#define QUERY_CONSTRAINT_H
+#ifndef CORE_QUERY_CONSTRAINT_H
+#define CORE_QUERY_CONSTRAINT_H
 
 #include "midgard_object.h"
 #include "schema.h"
 
-#define MIDGARD_TYPE_QUERY_CONSTRAINT            (midgard_query_constraint_get_type())
-#define MIDGARD_QUERY_CONSTRAINT(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), MIDGARD_TYPE_QUERY_CONSTRAINT, MidgardQueryConstraint))
-#define MIDGARD_QUERY_CONSTRAINT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), MIDGARD_TYPE_QUERY_CONSTRAINT, MidgardQueryConstraintClass))
-#define MIDGARD_IS_QUERY_CONSTRAINT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), MIDGARD_TYPE_QUERY_CONSTRAINT))
-#define MIDGARD_IS_QUERY_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), MIDGARD_TYPE_QUERY_CONSTRAINT))
-#define MIDGARD_QUERY_CONSTRAINT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), MIDGARD_TYPE_QUERY_CONSTRAINT, MidgardQueryConstraintClass))
+#define MIDGARD_CORE_TYPE_QUERY_CONSTRAINT            (midgard_core_query_constraint_get_type())
+#define MIDGARD_CORE_QUERY_CONSTRAINT(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj), MIDGARD_CORE_TYPE_QUERY_CONSTRAINT, MidgardCoreQueryConstraint))
+#define MIDGARD_CORE_QUERY_CONSTRAINT_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST((klass), MIDGARD_CORE_TYPE_QUERY_CONSTRAINT, MidgardCoreQueryConstraintClass))
+#define MIDGARD_IS_QUERY_CONSTRAINT(obj)         (G_TYPE_CHECK_INSTANCE_TYPE((obj), MIDGARD_CORE_TYPE_QUERY_CONSTRAINT))
+#define MIDGARD_IS_QUERY_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), MIDGARD_CORE_TYPE_QUERY_CONSTRAINT))
+#define MIDGARD_CORE_QUERY_CONSTRAINT_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), MIDGARD_CORE_TYPE_QUERY_CONSTRAINT, MidgardCoreQueryConstraintClass))
 
-typedef struct _MidgardQueryConstraint MidgardQueryConstraint;
-typedef struct _MidgardQueryConstraintPrivate MidgardQueryConstraintPrivate;
+typedef struct _MidgardCoreQueryConstraint MidgardCoreQueryConstraint;
+typedef struct _MidgardCoreQueryConstraintPrivate MidgardCoreQueryConstraintPrivate;
 
-struct _MidgardQueryConstraintPrivate{
+struct _MidgardCoreQueryConstraintPrivate{
         
-	GSList *joins; /* list of MidgardQueryConstraintPrivate */
+	GSList *joins; /* list of MidgardCoreQueryConstraintPrivate */
 	gchar *condition_operator;
 	MgdSchemaPropertyAttr *prop_left;
 	MgdSchemaPropertyAttr *prop_right;
@@ -48,32 +48,32 @@ struct _MidgardQueryConstraintPrivate{
 	const gchar *propname;
 };
 
-struct _MidgardQueryConstraint{
+struct _MidgardCoreQueryConstraint{
         GObject parent;
 
-	MidgardQueryConstraintPrivate *priv;
+	MidgardCoreQueryConstraintPrivate *priv;
 };
 
 typedef struct {
         GObjectClass parent;
-        void (*add_sql)(MidgardQueryConstraint *constraint, GString *sql);
-} MidgardQueryConstraintClass;
+        void (*add_sql)(MidgardCoreQueryConstraint *constraint, GString *sql);
+} MidgardCoreQueryConstraintClass;
 
-GType midgard_query_constraint_get_type(void);
+GType midgard_core_query_constraint_get_type(void);
 
-MidgardQueryConstraint *midgard_query_constraint_new(void);
+MidgardCoreQueryConstraint *midgard_core_query_constraint_new(void);
 
-gboolean 	midgard_query_constraint_add_operator		(MidgardQueryConstraint *self, const gchar *op);
-void 		midgard_query_constraint_add_sql		(MidgardQueryConstraint *self, GString *sql);
-gboolean 	midgard_query_constraint_operator_is_valid	(const gchar *op);
-gboolean 	midgard_query_constraint_add_value		(MidgardQueryConstraint *self, const GValue *value);
-gboolean 	midgard_query_constraint_build_condition	(MidgardQueryConstraint *self);
-gboolean	midgard_query_constraint_parse_property		(MidgardQueryConstraint **self, MidgardDBObjectClass *klass, const gchar *name);
-void		midgard_query_constraint_set_builder		(MidgardQueryConstraint *self, MidgardQueryBuilder *builder);
-void		midgard_query_constraint_set_class		(MidgardQueryConstraint *self, MidgardDBObjectClass *klass);
+gboolean 	midgard_core_query_constraint_add_operator		(MidgardCoreQueryConstraint *self, const gchar *op);
+void 		midgard_core_query_constraint_add_sql			(MidgardCoreQueryConstraint *self, GString *sql);
+gboolean 	midgard_core_query_constraint_operator_is_valid		(const gchar *op);
+gboolean 	midgard_core_query_constraint_add_value			(MidgardCoreQueryConstraint *self, const GValue *value);
+gboolean 	midgard_core_query_constraint_build_condition		(MidgardCoreQueryConstraint *self);
+gboolean	midgard_core_query_constraint_parse_property		(MidgardCoreQueryConstraint **self, MidgardDBObjectClass *klass, const gchar *name);
+void		midgard_core_query_constraint_set_builder		(MidgardCoreQueryConstraint *self, MidgardQueryBuilder *builder);
+void		midgard_core_query_constraint_set_class			(MidgardCoreQueryConstraint *self, MidgardDBObjectClass *klass);
 
 /* PRIVATE */
-MidgardQueryConstraintPrivate *midgard_query_constraint_private_new(void);
-void midgard_query_constraint_private_free(MidgardQueryConstraintPrivate *mqcp);
+MidgardCoreQueryConstraintPrivate *midgard_core_query_constraint_private_new(void);
+void midgard_core_query_constraint_private_free(MidgardCoreQueryConstraintPrivate *mqcp);
 
-#endif /* QUERY_CONSTRAINT_H */
+#endif /* CORE_QUERY_CONSTRAINT_H */

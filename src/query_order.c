@@ -53,12 +53,12 @@ MidgardQueryOrder *midgard_core_query_order_new(
 
         MidgardQueryOrder *order = g_new(MidgardQueryOrder, 1);
 
-	order->constraint = midgard_query_constraint_new();
+	order->constraint = midgard_core_query_constraint_new();
 	order->constraint->priv->order_dir = g_strdup(dir);
 
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_CLASS(g_type_class_peek(builder->priv->type));
 
-	if(!midgard_query_constraint_parse_property(&(order->constraint), klass, name)) {
+	if(!midgard_core_query_constraint_parse_property(&(order->constraint), klass, name)) {
 
 		midgard_core_query_order_free(order);
 		return FALSE;

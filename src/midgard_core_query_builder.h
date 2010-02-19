@@ -67,10 +67,10 @@ void			midgard_core_qb_add_table		(MidgardQueryBuilder *builder, const gchar *ta
 gchar 			*midgard_core_qb_get_sql		(MidgardQueryBuilder *builder, guint mode, gchar *select);
 gchar 			*midgard_core_qb_get_sql_as		(MidgardQueryBuilder *builder, const gchar *name);
 void 			midgard_core_qb_add_table		(MidgardQueryBuilder *builder, const gchar *table);
-void 			midgard_core_qb_add_constraint		(MidgardQueryBuilder *builder, MidgardQueryConstraint *constraint);
+void 			midgard_core_qb_add_constraint		(MidgardQueryBuilder *builder, MidgardCoreQueryConstraint *constraint);
 void 			midgard_core_qb_add_order		(MidgardQueryBuilder *builder, MidgardQueryOrder *order);
-void 			midgard_core_qb_add_group		(MidgardQueryBuilder *builder, MidgardQueryGroupConstraint *group);
-void 			midgard_core_qb_add_group_constraint	(MidgardQueryBuilder *builder, MidgardQueryConstraint *constraint);
+void 			midgard_core_qb_add_group		(MidgardQueryBuilder *builder, MidgardCoreQueryGroupConstraint *group);
+void 			midgard_core_qb_add_group_constraint	(MidgardQueryBuilder *builder, MidgardCoreQueryConstraint *constraint);
 gboolean 		midgard_core_qb_is_grouping		(MidgardQueryBuilder *builder);
 GObject			**midgard_core_qb_execute		(MidgardQueryBuilder *builder, guint *n_objects);
 GList 			*midgard_core_qb_set_object_from_query	(MidgardQueryBuilder *builder, guint select_type, MidgardObject *object);
