@@ -171,6 +171,7 @@ src_libmidgard2_la_SOURCES = \
 	src/midgard_query_property.c \
 	src/midgard_query_select.c \
 	src/midgard_query_simple_constraint.c \
+	src/midgard_query_storage.c \
 	src/midgard_query_value.c \
 	src/midgard_replicator.c \
 	src/midgard_user.c \

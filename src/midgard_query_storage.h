@@ -25,23 +25,18 @@
 G_BEGIN_DECLS
 
 /* convention macros */
-#define MIDGARD_QUERY_STORAGE_TYPE (midgard_query_storage_get_type()) 
-#define MIDGARD_QUERY_STORAGE(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_QUERY_STORAGE_TYPE, MidgardQueryStorage))
-#define MIDGARD_QUERY_STORAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_QUERY_STORAGE_TYPE, MidgardQueryStorageClass))
-#define MIDGARD_IS_QUERY_STORAGE(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_QUERY_STORAGE_TYPE))
-#define MIDGARD_IS_QUERY_STORAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_QUERY_STORAGE_TYPE))
-#define MIDGARD_QUERY_STORAGE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_QUERY_STORAGE_TYPE, MidgardQueryStorageClass))
+#define MIDGARD_TYPE_QUERY_STORAGE (midgard_query_storage_get_type()) 
+#define MIDGARD_QUERY_STORAGE(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_STORAGE, MidgardQueryStorage))
+#define MIDGARD_QUERY_STORAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_QUERY_STORAGE, MidgardQueryStorageClass))
+#define MIDGARD_IS_QUERY_STORAGE(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_STORAGE))
+#define MIDGARD_IS_QUERY_STORAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_QUERY_STORAGE))
+#define MIDGARD_QUERY_STORAGE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_QUERY_STORAGE, MidgardQueryStorageClass))
 
 typedef struct _MidgardQueryStorage MidgardQueryStorage;
 typedef struct _MidgardQueryStorageClass MidgardQueryStorageClass; 
 
 struct _MidgardQueryStorageClass {
 	GObjectClass parent;
-};
-
-struct _MidgardQueryStorage {
-	GObject parent;
-	//MidgardDBObjectClass *klass;
 };
 
 GType 			midgard_query_storage_get_type	(void);
