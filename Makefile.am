@@ -61,7 +61,7 @@ midgard_public_h = \
 	src/midgard_object_parameter.h \
 	src/midgard_object_attachment.h \
 	src/midgard_query_constraint.h \
-	src/midgard_query_executor.c \
+	src/midgard_query_executor.h \
 	src/midgard_query_group_constraint.h \
 	src/midgard_query_holder.h \
 	src/midgard_query_value.h \
