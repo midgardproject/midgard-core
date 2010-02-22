@@ -816,13 +816,13 @@ gboolean _midgard_object_create (	MgdObject *object,
 	if (object->dbpriv->storage_data == NULL)
 		return FALSE;
 
-	/* TODO, we should jhandle such case when object has been created already 
-	 * and another create call is executed. Note, that import unserialized object is 
-	 * similiar scenario, so probably we need private is_fetched property */
-	/* if (MGD_OBJECT_GUID (object) != NULL){
-		g_warning("Can not create object. Already fetched from database"); 
+	/* Handle pure create call. If replicate is OBJECT_UPDATE_IMPORTED, then, 
+	 * object has guid already set, which is valid for unserialized object */
+	if (replicate == OBJECT_UPDATE_NONE && MGD_OBJECT_GUID (object) != NULL) {
+		MIDGARD_ERRNO_SET(mgd, MGD_ERR_INVALID_PROPERTY_VALUE);
+		g_warning ("Can not create object, which is identified by guid already set");
 		return FALSE;
-	} */
+	}
 
 	/* Create object's guid, only if it's not already set */
 	gchar *guid = NULL;
