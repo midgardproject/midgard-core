@@ -52,8 +52,11 @@
 #include <midgard/midgard_key_config_common.h>
 #include <midgard/midgard_query_value.h>
 #include <midgard/midgard_query_property.h>
+#include <midgard/midgard_query_executor.h>
+#include <midgard/midgard_query_select.h>
 #include <midgard/midgard_query_storage.h>
 #include <midgard/midgard_query_simple_constraint.h>
+#include <midgard/midgard_query_constraint.h>
 
 #endif /* _MIDGARD_API_H_ */
 
