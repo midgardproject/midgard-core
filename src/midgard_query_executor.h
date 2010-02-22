@@ -22,11 +22,13 @@
 #include <glib-object.h>
 #include "midgard_connection.h"
 #include "midgard_query_storage.h"
+#include "midgard_query_simple_constraint.h"
+#include "midgard_query_property.h"
 
 G_BEGIN_DECLS
 
 /* convention macros */
-#define MIDGARD_TYPE_QUERY_EXECUTOR (midgard_query_executor_get_typy()) 
+#define MIDGARD_TYPE_QUERY_EXECUTOR (midgard_query_executor_get_type()) 
 #define MIDGARD_QUERY_EXECUTOR(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_EXECUTOR, MidgardQueryExecutor))
 #define MIDGARD_QUERY_EXECUTOR_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_QUERY_EXECUTOR, MidgardQueryExecutorClass))
 #define MIDGARD_IS_QUERY_EXECUTOR(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_EXECUTOR))
@@ -47,6 +49,7 @@ struct _MidgardQueryExecutorClass {
 	gboolean	(*add_order)			(MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type);
 	gboolean        (*add_join)			(MidgardQueryExecutor *self, const gchar *join_type, 
 								MidgardQueryProperty *left_property, MidgardQueryProperty *right_property);
+	gboolean	(*execute)			(MidgardQueryExecutor *self);
 };
 
 struct _MidgardQueryExecutor {
@@ -63,6 +66,7 @@ gboolean		midgard_query_executor_set_limit	(MidgardQueryExecutor *self, guint li
 gboolean 		midgard_query_executor_set_offset	(MidgardQueryExecutor *self, guint offset);
 gboolean		midgard_query_executor_add_order	(MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type);
 gboolean		midgard_query_executor_add_join		(MidgardQueryExecutor *self, const gchar *join_type, MidgardQueryProperty *left_property, MidgardQueryProperty *right_property);
+gboolean		midgard_query_executor_execute		(MidgardQueryExecutor *self);
 
 G_END_DECLS
 

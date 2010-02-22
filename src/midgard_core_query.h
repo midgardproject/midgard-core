@@ -23,6 +23,9 @@
 #include "midgard_dbobject.h"
 #include <libgda/libgda.h>
 #include "schema.h"
+#include "midgard_query_property.h"
+#include "midgard_query_storage.h"
+#include "midgard_query_simple_constraint.h"
 
 typedef struct _MidgardDBColumn MidgardDBColumn;
 typedef struct _MidgardDBJoin MidgardDBJoin;
@@ -50,6 +53,22 @@ struct _MidgardDBJoin {
 	/* pointers references */
 	MgdSchemaPropertyAttr *left;
 	MgdSchemaPropertyAttr *right;
+};
+
+struct MidgardCoreQueryOrder {
+	MidgardQueryProperty *property;
+	const gchar *type;
+};
+
+struct _MidgardQueryExecutorPrivate {
+	MidgardConnection *mgd;
+	MidgardQueryStorage *storage;
+	MidgardQuerySimpleConstraint *constraint;
+	GSList *orders;
+	GSList *joins;
+	guint limit;
+	guint offset;
+	gpointer resultset;
 };
 
 MidgardDBJoin	*midgard_core_dbjoin_new	(void);

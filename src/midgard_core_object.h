@@ -176,10 +176,6 @@ struct _MidgardBlobPrivate {
 	gchar *encoding;
 };
 
-struct _MidgardSitegroupPrivate {
-	gchar *initial_name;
-};
-
 typedef enum {
 	OBJECT_UPDATE_NONE = 0,
 	OBJECT_UPDATE_EXPORTED,
