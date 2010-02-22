@@ -20,7 +20,10 @@
 #include "uuid.h"
 
 gboolean midgard_is_guid(const gchar *guid) {
-        g_assert(guid != NULL);
+
+	if (!guid || (guid && *guid == '\0'))
+		return FALSE;
+
         int i;
         for (i = 0; guid[i] != 0 && i < 80; i++) {
                 if (guid[i] != '-' && !g_ascii_isxdigit(guid[i])) {

@@ -818,7 +818,7 @@ gboolean _midgard_object_create (	MgdObject *object,
 
 	/* Handle pure create call. If replicate is OBJECT_UPDATE_IMPORTED, then, 
 	 * object has guid already set, which is valid for unserialized object */
-	if (replicate == OBJECT_UPDATE_NONE && MGD_OBJECT_GUID (object) != NULL) {
+	if (replicate == OBJECT_UPDATE_NONE && midgard_is_guid (MGD_OBJECT_GUID (object))) {
       		midgard_set_error(mgd,
 				MGD_GENERIC_ERROR,
 				MGD_ERR_DUPLICATE,
