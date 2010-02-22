@@ -819,8 +819,10 @@ gboolean _midgard_object_create (	MgdObject *object,
 	/* Handle pure create call. If replicate is OBJECT_UPDATE_IMPORTED, then, 
 	 * object has guid already set, which is valid for unserialized object */
 	if (replicate == OBJECT_UPDATE_NONE && MGD_OBJECT_GUID (object) != NULL) {
-		MIDGARD_ERRNO_SET(mgd, MGD_ERR_INVALID_PROPERTY_VALUE);
-		g_warning ("Can not create object, which is identified by guid already set");
+      		midgard_set_error(mgd,
+				MGD_GENERIC_ERROR,
+				MGD_ERR_DUPLICATE,
+    				"Object already created.");
 		return FALSE;
 	}
 
@@ -1006,7 +1008,10 @@ gboolean _midgard_object_create (	MgdObject *object,
  * Property registered with #MGD_TYPE_GUID doesn't hold valid guid ( MGD_ERR_INVALID_PROPERTY_VALUE ) 
  * </para></listitem>
  * <listitem><para>
- * Object's class is registered with tree facilities and there is already such object in midgard tree ( MGD_ERR_DUPLICATE ) 
+ * Object's class is registered with tree facilities and there is already object with the same name in midgard tree. ( MGD_ERR_DUPLICATE ) 
+ * </para></listitem>
+ * <listitem><para>
+ * Object has guid property set already. ( MGD_ERR_DUPLICATE ) 
  * </para></listitem>
  * <listitem><para>
  * Quota is activated and its limit is reached ( MGD_ERR_QUOTA ) 
