@@ -20,7 +20,12 @@
 #include "uuid.h"
 
 gboolean midgard_is_guid(const gchar *guid) {
-        g_assert(guid != NULL);
+        
+	/* Handle the case when object's guid property might be 
+	 * initialized with NULL or empty string by default */
+	if (!guid || (guid && *guid == '\0'))
+		return FALSE;
+
         int i;
         for (i = 0; guid[i] != 0 && i < 80; i++) {
                 if (guid[i] != '-' && !g_ascii_isxdigit(guid[i])) {

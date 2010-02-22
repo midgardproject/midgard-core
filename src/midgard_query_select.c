@@ -151,7 +151,7 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	object_class->dispose = _midgard_query_select_dispose;
 	object_class->finalize = _midgard_query_select_finalize;
 
-	klass->set_constraint = _midgard_query_select_set_constraint;
+	MIDGARD_QUERY_EXECUTOR_CLASS (klass)->set_constraint = _midgard_query_select_set_constraint;
 	klass->set_limit = _midgard_query_select_set_limit;
 	klass->set_offset = _midgard_query_select_set_offset;
 	klass->add_order = _midgard_query_select_add_order;

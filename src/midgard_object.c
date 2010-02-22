@@ -91,7 +91,7 @@ static GParamSpec **_midgard_object_class_paramspec()
   
 	/* Last value is 'params[n]+1' */
 	GParamSpec **params = g_malloc(sizeof(GParamSpec*)*4);
-	params[0] = g_param_spec_string ("guid", "", "GUID identifier of the object", " ", G_PARAM_READABLE);
+	params[0] = g_param_spec_string ("guid", "", "GUID identifier of the object", "", G_PARAM_READABLE);
 	params[1] = g_param_spec_object ("metadata", "",  "midgard_metadata for the object", MIDGARD_TYPE_METADATA, G_PARAM_READWRITE);
 	params[2] = g_param_spec_string ("action", "", "Last action done to the object", "", G_PARAM_READWRITE);    
 	params[3] = NULL;
@@ -850,7 +850,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 
 	/* Handle pure create call. If replicate is OBJECT_UPDATE_IMPORTED, then, 
 	 * object has guid already set, which is valid for unserialized object */
-	if (replicate == OBJECT_UPDATE_NONE && MGD_OBJECT_GUID (object) != NULL) {
+	if (replicate == OBJECT_UPDATE_NONE && midgard_is_guid (MGD_OBJECT_GUID (object))) {
 		midgard_set_error(mgd,
 				MGD_GENERIC_ERROR,
 				MGD_ERR_DUPLICATE,

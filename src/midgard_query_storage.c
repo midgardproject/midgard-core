@@ -83,7 +83,6 @@ __midgard_query_storage_class_init (
 		gpointer g_class, gpointer g_class_data)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);
-	MidgardQueryStorageClass *klass = MIDGARD_QUERY_STORAGE_CLASS (g_class);
 	__parent_class = g_type_class_peek_parent (g_class);
 
 	gobject_class->constructor = __midgard_query_storage_constructor;
