@@ -33,34 +33,28 @@ midgard_query_select_new (MidgardConnection *mgd, MidgardQueryStorage *storage)
 }
 
 gboolean
-_midgard_query_select_set_constraint (MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *constraint)
+_midgard_query_select_set_constraint (MidgardQuerySelect *self, MidgardQuerySimpleConstraint *constraint)
 {
-	g_return_val_if_fail (executor != NULL, FALSE);
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (constraint != NULL, FALSE);
-
-	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (executor);
 
 	self->priv->constraint = constraint;
 }
 
 gboolean
-_midgard_query_select_set_limit (MidgardQueryExecutor *executor, guint limit)
+_midgard_query_select_set_limit (MidgardQuerySelect *self, guint limit)
 {
-	g_return_val_if_fail (executor != NULL, FALSE);
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (limit > 0, FALSE);
-
-	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (executor);
 
 	self->priv->limit = limit;
 }
 
 gboolean 
-_midgard_query_select_set_offset (MidgardQueryExecutor *executor, guint offset)
+_midgard_query_select_set_offset (MidgardQuerySelect *self, guint offset)
 {
-	g_return_val_if_fail (executor != NULL, FALSE);
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (offset > -1, FALSE);
-	
-	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (executor);
 
 	self->priv->offset = offset;
 }
@@ -68,29 +62,24 @@ _midgard_query_select_set_offset (MidgardQueryExecutor *executor, guint offset)
 static gchar* valid_order_types[] = {"ASC", "DESC", NULL};
 
 gboolean
-_midgard_query_select_add_order (MidgardQueryExecutor *executor, MidgardQueryProperty *property, const gchar *type)
+_midgard_query_select_add_order (MidgardQuerySelect *self, MidgardQueryProperty *property, const gchar *type)
 {
-	g_return_val_if_fail (executor != NULL, FALSE);
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);
-
-	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (executor);
 
 	/* TODO */
 
 	return FALSE;
-
 }
 
 gboolean
-_midgard_query_select_add_join (MidgardQueryExecutor *executor, const gchar *join_type, 
+_midgard_query_select_add_join (MidgardQuerySelect *self, const gchar *join_type, 
 		MidgardQueryProperty *left_property, MidgardQueryProperty *right_property)
 {
-	g_return_val_if_fail (executor != NULL, FALSE);
+	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (join_type != NULL, FALSE);
 	g_return_val_if_fail (left_property != NULL, FALSE);
 	g_return_val_if_fail (right_property != NULL, FALSE);
-
-	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (executor);
 
 	/* TODO */
 
@@ -98,11 +87,9 @@ _midgard_query_select_add_join (MidgardQueryExecutor *executor, const gchar *joi
 }
 
 gboolean 
-_midgard_query_select_execute (MidgardQueryExecutor *executor)
+_midgard_query_select_execute (MidgardQuerySelect *self)
 {
 	g_return_val_if_fail (executor != NULL, FALSE);
-
-	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (executor);
 
 	/* TODO */
 
@@ -151,7 +138,7 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	object_class->dispose = _midgard_query_select_dispose;
 	object_class->finalize = _midgard_query_select_finalize;
 
-	MIDGARD_QUERY_EXECUTOR_CLASS (klass)->set_constraint = _midgard_query_select_set_constraint;
+	klass->set_constraint = _midgard_query_select_set_constraint;
 	klass->set_limit = _midgard_query_select_set_limit;
 	klass->set_offset = _midgard_query_select_set_offset;
 	klass->add_order = _midgard_query_select_add_order;
@@ -175,7 +162,7 @@ midgard_query_select_get_type (void)
 			0,              /* n_preallocs */
 			NULL /* instance_init */
 		};
-		type = g_type_register_static (MIDGARD_TYPE_QUERY_EXECUTOR, "MidgardQuerySelect", &info, G_TYPE_FLAG_ABSTRACT);
+		type = g_type_register_static (MIDGARD_TYPE_QUERY_EXECUTOR, "MidgardQuerySelect", &info, 0);
 	}
 	return type;
 }

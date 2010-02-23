@@ -42,13 +42,13 @@ struct _MidgardQuerySelectClass {
 	GObjectClass parent;
 
 	/* virtual methods */
-	gboolean	(*set_constraint)		(MidgardQueryExecutor *self, MidgardQuerySimpleConstraint *constraint);
-	gboolean	(*set_limit)			(MidgardQueryExecutor *self, guint limit);
-	gboolean	(*set_offset)			(MidgardQueryExecutor *self, guint offset);
-	gboolean	(*add_order)			(MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type);
-	gboolean        (*add_join)			(MidgardQueryExecutor *self, const gchar *join_type, 
+	gboolean	(*set_constraint)		(MidgardQuerySelect *self, MidgardQuerySimpleConstraint *constraint);
+	gboolean	(*set_limit)			(MidgardQuerySelect *self, guint limit);
+	gboolean	(*set_offset)			(MidgardQuerySelect *self, guint offset);
+	gboolean	(*add_order)			(MidgardQuerySelect *self, MidgardQueryProperty *property, const gchar *type);
+	gboolean        (*add_join)			(MidgardQuerySelect *self, const gchar *join_type, 
 								MidgardQueryProperty *left_property, MidgardQueryProperty *right_property);
-	gboolean	(*execute)			(MidgardQueryExecutor *self);
+	gboolean	(*execute)			(MidgardQuerySelect *self);
 };
 
 struct _MidgardQuerySelect {
