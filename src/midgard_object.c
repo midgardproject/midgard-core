@@ -803,6 +803,10 @@ __insert_or_update_records(MgdObject *object, const gchar *tablename,
 	return inserted;
 }
 
+#define _CLEAR_OBJECT_GUID(object) \
+	g_free ((gchar *)MGD_OBJECT_GUID(object)); \
+	MGD_OBJECT_GUID(object) = NULL;
+
 /* Create object's data in storage */
 gboolean _midgard_object_create (	MgdObject *object,	
 					const gchar *create_guid,
@@ -839,8 +843,10 @@ gboolean _midgard_object_create (	MgdObject *object,
 	}
 
 	/* check if object is valid */
-	if (!midgard_core_object_is_valid(object))
+	if (!midgard_core_object_is_valid(object)) {
+		_CLEAR_OBJECT_GUID (object);
 		return FALSE;
+	}
 	
 	MIDGARD_ERRNO_SET (MGD_OBJECT_CNC (object), MGD_ERR_OK);	
 
@@ -871,10 +877,12 @@ gboolean _midgard_object_create (	MgdObject *object,
 	gint is_dup = _object_in_tree(object);
 	if (is_dup == OBJECT_IN_TREE_DUPLICATE) {
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_DUPLICATE);
+		_CLEAR_OBJECT_GUID (object);
 		return FALSE;
 	}
 		
 	if (!midgard_quota_create(object)){
+		_CLEAR_OBJECT_GUID (object);
 		return FALSE;
 	}	
 
@@ -885,8 +893,7 @@ gboolean _midgard_object_create (	MgdObject *object,
 #endif
 	
 	if (inserted == -1) {
-		g_free((gchar *)MGD_OBJECT_GUID (object));
-		MGD_OBJECT_GUID (object) = g_strdup("");
+		_CLEAR_OBJECT_GUID (object);
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
 		return FALSE;
 	}
