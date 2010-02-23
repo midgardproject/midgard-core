@@ -1,3 +1,9 @@
+midgard2-core (9.09.2.1-1) unstable; urgency=low
+
+  * Upstream hotfix
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Tue, 23 Feb 2010 13:25:35 +0200
+
 midgard2-core (9.09.2-4) unstable; urgency=low
 
   * Fixed not-binnmuable-any-depends-any libmidgard2-dev -> libmidgard2-2009
