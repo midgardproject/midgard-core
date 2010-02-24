@@ -866,6 +866,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	klass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
 	klass->dbpriv->storage_data = type_attr;
 	klass->dbpriv->set_from_xml_node = __set_from_xml_node;
+	klass->dbpriv->add_fields_to_select_statement = NULL;
 	klass->dbpriv->has_metadata = FALSE;
 }
 

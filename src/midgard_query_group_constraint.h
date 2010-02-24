@@ -29,25 +29,26 @@
 G_BEGIN_DECLS
 
 /* convention macros */
-#define MIDGARD_QUERY_GROUP_CONSTRAINT_TYPE (midgard_query_group_constraint_get_type()) 
+#define MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT (midgard_query_group_constraint_get_type()) 
 #define MIDGARD_QUERY_GROUP_CONSTRAINT(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraint))
-#define MIDGARD_QUERY_GROUP_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_QUERY_GROUP_CONSTRAINT_TYPE, MidgardQueryGroupConstraintClass))
+#define MIDGARD_QUERY_GROUP_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraintClass))
 #define MIDGARD_IS_QUERY_GROUP_CONSTRAINT(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT))
-#define MIDGARD_IS_QUERY_GROUP_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_QUERY_GROUP_CONSTRAINT_TYPE))
-#define MIDGARD_QUERY_GROUP_CONSTRAINT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_QUERY_GROUP_CONSTRAINT_TYPE, MidgardQueryGroupConstraintClass))
+#define MIDGARD_IS_QUERY_GROUP_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT))
+#define MIDGARD_QUERY_GROUP_CONSTRAINT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraintClass))
 
 typedef struct _MidgardQueryGroupConstraint MidgardQueryGroupConstraint; 
 typedef struct _MidgardQueryGroupConstraintClass MidgardQueryGroupConstraintClass;
 
 struct _MidgardQueryGroupConstraintClass {
 	GObjectClass parent;
+	MidgardQuerySimpleConstraint	**(*list_constraints)	(MidgardQueryGroupConstraint *self, guint *n_objects);
 };
 
 GType 				midgard_query_group_constraint_get_type		(void);
 MidgardQueryGroupConstraint  	*midgard_query_group_constraint_new 		(const gchar *type, MidgardQuerySimpleConstraint *constraint, ...);
 const gchar 			*midgard_query_group_constraint_get_group_type	(MidgardQueryGroupConstraint *self);
 gboolean			midgard_query_group_constraint_set_group_type		(MidgardQueryGroupConstraint *self, const gchar *type);
-gboolean			midgard_query_group_constraint_add_constraint	(MidgardQueryGroupConstraint *self, MidgardQuerySimpleConstraint *constraint);
+gboolean			midgard_query_group_constraint_add_constraint	(MidgardQueryGroupConstraint *self, MidgardQuerySimpleConstraint *constraint, ...);
 MidgardQuerySimpleConstraint 	**midgard_query_group_constraint_list_constraints (MidgardQueryGroupConstraint *self, guint *n_objects);
 
 G_END_DECLS

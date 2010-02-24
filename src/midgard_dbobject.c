@@ -19,8 +19,102 @@
 #include "midgard_dbobject.h"
 #include "schema.h"
 #include "midgard_core_object.h"
+#include "midgard_core_object_class.h"
+#include "midgard_object_class.h"
 
 static GObjectClass *parent_class= NULL;
+
+/* Create GdaSqlSelectField for every property registered for the class. */
+void
+_add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSelect *select)
+{
+	guint n_prop;
+	guint i;
+	GdaSqlSelectField *select_field;
+	GdaSqlExpr *expr;
+	GValue *val;
+	gchar *table_field;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (klass), &n_prop);
+	if (!pspecs)
+		return;
+
+	for (i = 0; i < n_prop; i++) {
+
+		const gchar *property = pspecs[i]->name;
+		const gchar *property_field = midgard_core_class_get_property_colname (klass, property);
+		const gchar *property_table = midgard_core_class_get_property_table (klass, property); 
+
+		/* Ignore properties with NULL storage and those of object type */
+		if (!property_table || pspecs[i]->value_type == G_TYPE_OBJECT)
+			continue;
+
+       		select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
+		select_field->field_name = g_strdup (property_field);
+		select_field->table_name = g_strdup (property_table);
+		select_field->as = g_strdup (property);
+		select->expr_list = g_slist_append (select->expr_list, select_field);
+		expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
+		val = g_new0 (GValue, 1);
+		g_value_init (val, G_TYPE_STRING);
+		table_field = g_strconcat (property_table, ".", property_field, NULL);
+		g_value_set_string (val, table_field);
+		g_free (table_field);
+		expr->value = val;
+		select_field->expr = expr;
+	}
+
+	g_free (pspecs);
+
+	if (!klass->dbpriv->has_metadata)
+		return;
+
+	/* Check if metadata provides own method to add fields. If not, use given class storage. */
+	if (MIDGARD_IS_OBJECT_CLASS (klass)) {
+
+		MidgardMetadataClass *mklass = (MidgardMetadataClass *) midgard_object_class_get_metadata_class (MIDGARD_OBJECT_CLASS (klass));
+		if (!mklass)
+			return;
+
+		if (MIDGARD_DBOBJECT_CLASS (mklass)->dbpriv->add_fields_to_select_statement) {
+			MIDGARD_DBOBJECT_CLASS (mklass)->dbpriv->add_fields_to_select_statement (MIDGARD_DBOBJECT_CLASS (mklass), select);
+			return;
+		}
+
+		const gchar *table = midgard_core_class_get_table (klass);
+
+		/* TODO, Once we stabilize use case, refactor this below to minimize code usage */
+		GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (mklass), &n_prop);
+		if (!pspecs)
+			return;
+		
+		for (i = 0; i < n_prop; i++) {
+
+			const gchar *property = pspecs[i]->name;
+			const gchar *property_field = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), property);	
+
+			if (pspecs[i]->value_type == G_TYPE_OBJECT)
+				continue;
+			
+			select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
+			select_field->field_name = g_strdup (property_field);
+			select_field->table_name = g_strdup (table);
+			select_field->as = g_strdup (property);
+			select->expr_list = g_slist_append (select->expr_list, select_field);
+			expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
+			val = g_new0 (GValue, 1);
+			g_value_init (val, G_TYPE_STRING);
+			table_field = g_strconcat (table, ".", property_field, NULL);
+			g_value_set_string (val, table_field);
+			g_free (table_field);
+			expr->value = val;
+			select_field->expr = expr;
+		}
+
+		g_free (pspecs);
+	}
+
+	return;
+}
 
 static GObject *
 midgard_dbobject_constructor (GType type,
@@ -101,11 +195,12 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 
 	klass->get_connection = __get_connection;
 
-	klass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
+	klass->dbpriv = g_new (MidgardDBObjectPrivate, 1);
 	klass->dbpriv->create_storage = NULL;
 	klass->dbpriv->update_storage = NULL;
 	klass->dbpriv->storage_exists = NULL;
 	klass->dbpriv->delete_storage = NULL;
+	klass->dbpriv->add_fields_to_select_statement = _add_fields_to_select_statement;
 }
 
 /* Registers the type as a fundamental GType unless already registered. */ 

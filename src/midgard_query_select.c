@@ -18,6 +18,8 @@
 
 #include "midgard_query_select.h"
 #include "midgard_core_query.h"
+#include "midgard_core_object.h"
+#include "midgard_core_object_class.h"
 
 MidgardQuerySelect *
 midgard_query_select_new (MidgardConnection *mgd, MidgardQueryStorage *storage)
@@ -67,6 +69,7 @@ _midgard_query_select_add_order (MidgardQuerySelect *self, MidgardQueryProperty 
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);
 
+
 	/* TODO */
 
 	return FALSE;
@@ -89,9 +92,62 @@ _midgard_query_select_add_join (MidgardQuerySelect *self, const gchar *join_type
 gboolean 
 _midgard_query_select_execute (MidgardQuerySelect *self)
 {
-	g_return_val_if_fail (executor != NULL, FALSE);
+	g_return_val_if_fail (self != NULL, FALSE);
 
-	/* TODO */
+	if (!self->priv->storage) {
+		/* FIXME, handle error */
+		g_warning ("Missed QueryStorage associated with QuerySelect");
+		return FALSE;
+	}
+	
+	MidgardDBObjectClass *klass = self->priv->storage->klass;
+	if (!klass->dbpriv->add_fields_to_select_statement) {
+		/* FIXME, handle error */
+		g_warning ("Missed private DBObjectClass' fields to statement helper");
+		return FALSE;
+	}
+
+	GdaConnection *cnc = self->priv->mgd->priv->connection;
+	GdaSqlStatement *sql_stm;
+	GdaSqlStatementSelect *sss;
+	sql_stm = gda_sql_statement_new (GDA_SQL_STATEMENT_SELECT);
+	sss = (GdaSqlStatementSelect*) sql_stm->contents;
+	g_assert (GDA_SQL_ANY_PART (sss)->type == GDA_SQL_ANY_STMT_SELECT);
+
+	/* Create targets (FROM) */
+	sss->from = gda_sql_select_from_new (GDA_SQL_ANY_PART (sss));
+	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (sss->from));
+	s_target->table_name = g_strdup (midgard_core_class_get_table (klass));
+	sss->from->targets = g_slist_append (sss->from->targets, s_target);
+	GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
+	GValue *tval = g_new0 (GValue, 1);
+	g_value_init (tval, G_TYPE_STRING);
+	g_value_set_string (tval, "page");
+	texpr->value = tval;
+	s_target->expr = texpr;
+
+	/* Add fields for all properties registered per class */
+	klass->dbpriv->add_fields_to_select_statement (klass, sss);
+
+	/* Create condition */
+	GdaSqlExpr *where;
+	where = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
+	sss->where_cond = where;
+
+	/* Create statement */
+	GdaStatement *stmt = gda_statement_new ();	
+	g_object_set (G_OBJECT (stmt), "structure", sql_stm, NULL);
+	gda_sql_statement_free (sql_stm);
+
+	gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+	g_print ("%s", debug_sql);
+	g_free (debug_sql);
+
+	/* execute statement */
+	GError *error = NULL;
+	gda_connection_statement_execute_select (cnc, stmt, NULL, &error);
+	if (error)
+		g_print ("Execute error - %s", error->message);
 
 	return FALSE;
 }

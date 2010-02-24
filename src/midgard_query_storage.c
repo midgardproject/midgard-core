@@ -17,11 +17,7 @@
  */
 
 #include "midgard_query_storage.h"
-
-struct _MidgardQueryStorage {
-	GObject parent;
-	MidgardDBObjectClass *klass;
-};
+#include "midgard_core_query.h"
 
 MidgardQueryStorage*
 midgard_query_storage_new (const gchar *classname)

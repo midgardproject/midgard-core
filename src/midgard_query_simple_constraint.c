@@ -18,14 +18,19 @@
 
 #include "midgard_query_simple_constraint.h"
 
-static __list_constraints (MidgardQuerySimpleConstraint *self);
+MidgardQuerySimpleConstraint**
+midgard_query_simple_constraint_list_constraints (MidgardQuerySimpleConstraint *self, guint *n_objects)
+{
+	return MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (self)->list_constraints (self, n_objects);
+}
 
 static void
 simple_constraint_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	MidgardQuerySimpleConstraintIFace *iface = (MidgardQuerySimpleConstraintIFace *)g_iface;
-	iface->constraints = NULL;
+	iface->list_constraints = NULL;
 }
+
 
 GType
 midgard_query_simple_constraint_get_type (void)

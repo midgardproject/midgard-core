@@ -26,6 +26,7 @@
 struct _MidgardQueryGroupConstraint {
 	GObject  parent;
 	gchar *type;
+	GSList *constraints;
 };
 
 MidgardQueryGroupConstraint *
@@ -34,7 +35,7 @@ midgard_query_group_constraint_new (const gchar *type, MidgardQuerySimpleConstra
 	g_return_val_if_fail (type != NULL, NULL);
 	g_return_val_if_fail (constraint != NULL, NULL);
 
-	MidgardQueryGroupConstraint *self = g_object_new (MIDGARD_QUERY_GROUP_CONSTRAINT_TYPE, NULL);
+	MidgardQueryGroupConstraint *self = g_object_new (MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, NULL);
 	self->type = g_strdup (type);
 	
 	return self;
@@ -57,7 +58,7 @@ midgard_query_group_constraint_set_group_type (MidgardQueryGroupConstraint *self
 }
 
 gboolean
-midgard_query_group_constraint_add_constraint (MidgardQueryGroupConstraint *self, MidgardQuerySimpleConstraint *constraint)
+midgard_query_group_constraint_add_constraint (MidgardQueryGroupConstraint *self, MidgardQuerySimpleConstraint *constraint, ...)
 {
 	return FALSE;
 }
@@ -70,10 +71,36 @@ midgard_query_group_constraint_list_constraints (MidgardQueryGroupConstraint *se
 
 /* GOBJECT ROUTINES */
 
+MidgardQuerySimpleConstraint**
+_midgard_query_group_constraint_list_constraints (MidgardQueryGroupConstraint *self, guint *n_objects)
+{
+	g_return_val_if_fail (self != NULL, NULL);
+
+	GSList *l;
+	GSList *self_constraints = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->constraints;
+	guint i = 0;
+
+	/* count constraints */
+	for (l = self_constraints; l != NULL; l = l->next)
+		i++;
+
+	MidgardQuerySimpleConstraint **constraints = g_new (MidgardQuerySimpleConstraint*, i);
+
+	i = 0;
+	for (l = self_constraints; l != NULL; l = l->next)
+	{
+		constraints[i] = MIDGARD_QUERY_SIMPLE_CONSTRAINT (l->data);
+		i++;
+	}
+
+	*n_objects = i;
+	return constraints;
+}
+
 static void
 midgard_query_group_constraint_init (MidgardQuerySimpleConstraintIFace *iface)
 {
-	iface->constraints = NULL;
+	iface->list_constraints = _midgard_query_group_constraint_list_constraints;
 	return;
 }
 
@@ -101,7 +128,7 @@ midgard_query_group_constraint_get_type (void)
 		};
 
   		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryGroupConstraint", &info, 0);
-		g_type_add_interface_static (type, MIDGARD_QUERY_SIMPLE_CONSTRAINT_TYPE, &property_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_SIMPLE_CONSTRAINT, &property_info);
     	}
     	return type;
 }

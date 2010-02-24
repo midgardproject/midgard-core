@@ -60,6 +60,11 @@ struct MidgardCoreQueryOrder {
 	const gchar *type;
 };
 
+struct _MidgardQueryStorage {
+	GObject parent;
+	MidgardDBObjectClass *klass;
+};
+
 struct _MidgardQueryExecutorPrivate {
 	MidgardConnection *mgd;
 	MidgardQueryStorage *storage;

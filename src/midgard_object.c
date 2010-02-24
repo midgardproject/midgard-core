@@ -1310,6 +1310,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		mklass->dbpriv->update_storage = _object_update_storage;
 		mklass->dbpriv->storage_exists = _object_storage_exists;
 		mklass->dbpriv->delete_storage = _object_delete_storage;
+		mklass->dbpriv->add_fields_to_select_statement = MIDGARD_OBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement;
 	}
 
 	if (G_OBJECT_CLASS_TYPE(g_class) != MIDGARD_TYPE_OBJECT) {
@@ -1530,6 +1531,7 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	MidgardObjectClass *mklass = klass;
 
 	mklass->get_connection = MIDGARD_DBOBJECT_CLASS(mklass)->get_connection;
+	mklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->add_fields_to_select_statement;
 
 	if (!signals_registered && mklass) {
 		

@@ -101,10 +101,16 @@ midgard_query_constraint_set_operator (MidgardQueryConstraint *self, const gchar
 
 /* GOBJECT ROUTINES */
 
+MidgardQuerySimpleConstraint**
+_midgard_query_constraint_list_constraints (MidgardQueryConstraint *self, guint *n_objects)
+{
+	return NULL;
+}
+
 static void
 midgard_query_constraint_init (MidgardQuerySimpleConstraintIFace *iface)
 {
-	iface->constraints = NULL;
+	iface->list_constraints = _midgard_query_constraint_list_constraints;
 	return;
 }
 
@@ -132,7 +138,7 @@ midgard_query_constraint_get_type (void)
 		};
 
   		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryConstraint", &info, 0);
-		g_type_add_interface_static (type, MIDGARD_QUERY_SIMPLE_CONSTRAINT_TYPE, &property_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_SIMPLE_CONSTRAINT, &property_info);
     	}
     	return type;
 }

@@ -38,8 +38,7 @@ struct _MidgardQueryValueClass {
 	GObjectClass parent;
 
 	void			(*get_value)	(MidgardQueryValue *self, GValue *value);
-	MidgardQueryValue 	*(*set_value)	(MidgardQueryValue *self);
-
+	MidgardQueryValue 	*(*set_value)	(MidgardQueryValue *self, const GValue *value);
 };
 
 GType 			midgard_query_value_get_type	(void);
