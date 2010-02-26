@@ -26,6 +26,7 @@
 #include "midgard_query_property.h"
 #include "midgard_query_storage.h"
 #include "midgard_query_simple_constraint.h"
+#include "midgard_query_executor.h"
 
 typedef struct _MidgardDBColumn MidgardDBColumn;
 typedef struct _MidgardDBJoin MidgardDBJoin;
@@ -74,6 +75,10 @@ struct _MidgardQueryExecutorPrivate {
 	guint limit;
 	guint offset;
 	gpointer resultset;
+};
+
+struct _MidgardQuerySimpleConstraintPrivate {
+	void	(*add_conditions_to_statement)	(MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *self, GdaSqlStatement *stm);
 };
 
 MidgardDBJoin	*midgard_core_dbjoin_new	(void);

@@ -22,11 +22,14 @@
 #include "midgard_query_holder.h"
 #include "midgard_query_simple_constraint.h"
 #include "midgard_dbobject.h"
+#include "midgard_core_query.h"
+#include "midgard_core_object_class.h"
+#include "midgard_core_object.h"
 
 struct _MidgardQueryConstraint {
 	GObject  parent;
 	MidgardQueryProperty *property_value;
-	const gchar *op;
+	gchar *op;
 	MidgardQueryStorage *storage;
 	MidgardQueryHolder *holder;
 };
@@ -39,9 +42,9 @@ midgard_query_constraint_new (MidgardQueryProperty *property, const gchar *op,
 	g_return_val_if_fail (op != NULL, NULL);
 	g_return_val_if_fail (holder != NULL, NULL);
 
-	MidgardQueryConstraint *self = g_object_new (MIDGARD_QUERY_CONSTRAINT_TYPE, NULL);
+	MidgardQueryConstraint *self = g_object_new (MIDGARD_TYPE_QUERY_CONSTRAINT, NULL);
 	self->property_value = property;
-	self->op = op;
+	self->op = g_strdup (op);
 	self->holder = holder;
 
 	/* Allow NULL storage */
@@ -101,17 +104,143 @@ midgard_query_constraint_set_operator (MidgardQueryConstraint *self, const gchar
 
 /* GOBJECT ROUTINES */
 
+static GObjectClass *parent_class = NULL;
+
 MidgardQuerySimpleConstraint**
-_midgard_query_constraint_list_constraints (MidgardQueryConstraint *self, guint *n_objects)
+_midgard_query_constraint_list_constraints (MidgardQuerySimpleConstraint *self, guint *n_objects)
 {
 	return NULL;
+}
+
+void 
+_midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *simple_constraint, GdaSqlStatement *stmt)
+{	
+	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (simple_constraint);
+	GdaConnection *cnc = executor->priv->mgd->priv->connection;
+	MidgardDBObjectClass *dbklass = NULL;
+       	if (self->storage)
+	       dbklass = self->storage->klass;
+	if (!dbklass)
+		dbklass = executor->priv->storage->klass;
+	g_return_if_fail (dbklass != NULL);
+
+	/* Get table */
+	const gchar *table = midgard_core_class_get_table (dbklass);
+
+	/* Get table alias */
+
+	/* Get field name */
+	GValue field_value = {0, };
+	midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (MIDGARD_QUERY_CONSTRAINT (simple_constraint)->property_value), &field_value);
+
+	GdaSqlStatementSelect *select = stmt->contents;
+	GdaSqlExpr *top_where, *where, *expr;
+	GdaSqlOperation *top_operation, *cond;
+	GValue *value;
+	gboolean take_where_condition = FALSE;
+
+	if (!select->where_cond) {	
+		top_where = gda_sql_expr_new (GDA_SQL_ANY_PART (select));
+		take_where_condition = TRUE;
+		top_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (top_where));
+		top_operation->operator_type = GDA_SQL_OPERATOR_TYPE_AND;
+		top_where->cond = top_operation;
+	} else {
+		top_where = select->where_cond;
+		top_operation = top_where->cond;
+	}
+
+	where = gda_sql_expr_new (GDA_SQL_ANY_PART (top_operation));
+	top_operation->operands = g_slist_append (top_operation->operands, where);
+
+	cond = gda_sql_operation_new (GDA_SQL_ANY_PART (where));
+	where->cond = cond;
+	cond->operator_type = GDA_SQL_OPERATOR_TYPE_EQ;
+	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
+	g_value_take_string ((value = gda_value_new (G_TYPE_STRING)), g_value_dup_string (&field_value));
+	expr->value = value;
+	cond->operands = g_slist_append (cond->operands, expr);
+	gchar *str;
+	str = g_strdup_printf ("%s", "0");
+	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
+	g_value_take_string ((value = gda_value_new (G_TYPE_STRING)), str);
+
+	GValue val = {0, };
+	midgard_query_holder_get_value (MIDGARD_QUERY_CONSTRAINT (simple_constraint)->holder, &val);
+	expr->value = gda_value_new (G_VALUE_TYPE (&val));
+	g_value_copy (&val , expr->value);
+	expr->value_is_ident = (gpointer) 0x1;
+	g_value_unset (&val);
+	cond->operands = g_slist_append (cond->operands, expr);
+	if (take_where_condition)
+		gda_sql_statement_select_take_where_cond (stmt, top_where);
+
+	/*
+	GError *error = NULL;
+	if (gda_sql_statement_check_structure (stmt, &error) == FALSE) {
+		g_warning (_("Can't build SELECT statement: %s)"),
+				error && error->message ? error->message : _("No detail"));
+		if (error)
+			g_error_free (error);
+		return;
+	} */
 }
 
 static void
 midgard_query_constraint_init (MidgardQuerySimpleConstraintIFace *iface)
 {
 	iface->list_constraints = _midgard_query_constraint_list_constraints;
+	iface->priv = g_new (MidgardQuerySimpleConstraintPrivate, 1);
+	iface->priv->add_conditions_to_statement = _midgard_query_constraint_add_conditions_to_statement;
 	return;
+}
+
+static GObject *
+_midgard_query_constraint_constructor (GType type,
+		guint n_construct_properties,
+		GObjectConstructParam *construct_properties)
+{
+	GObject *object = (GObject *)
+		G_OBJECT_CLASS (parent_class)->constructor (type,
+				n_construct_properties,
+				construct_properties);
+
+	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (object);
+	self->property_value = NULL;
+	self->op = NULL;
+	self->storage = NULL;
+	self->holder = NULL;
+
+	return G_OBJECT(object);
+}
+
+static void
+_midgard_query_constraint_dispose (GObject *object)
+{
+	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (object);
+	parent_class->dispose (object);
+}
+
+static void
+_midgard_query_constraint_finalize (GObject *object)
+{
+	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (object);
+
+	g_free (self->op);
+	self->op = NULL;
+
+	parent_class->finalize;
+}
+
+static void
+_midgard_query_constraint_class_init (MidgardQueryConstraintClass *klass, gpointer class_data)
+{
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	parent_class = g_type_class_peek_parent (klass);
+
+	object_class->constructor = _midgard_query_constraint_constructor;
+	object_class->dispose = _midgard_query_constraint_dispose;
+	object_class->finalize = _midgard_query_constraint_finalize;
 }
 
 GType
@@ -123,7 +252,7 @@ midgard_query_constraint_get_type (void)
 			sizeof (MidgardQueryConstraintClass),
 			NULL,   /* base_init */
 			NULL,   /* base_finalize */
-			NULL,   /* class_init */
+			(GClassInitFunc)_midgard_query_constraint_class_init,   /* class_init */
 			NULL,   /* class_finalize */
 			NULL,   /* class_data */
 			sizeof (MidgardQueryConstraint),

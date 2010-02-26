@@ -31,10 +31,12 @@ G_BEGIN_DECLS
 
 typedef struct _MidgardQuerySimpleConstraint MidgardQuerySimpleConstraint; /* dummy */
 typedef struct _MidgardQuerySimpleConstraintIFace MidgardQuerySimpleConstraintIFace;
+typedef struct _MidgardQuerySimpleConstraintPrivate MidgardQuerySimpleConstraintPrivate;
 
 struct _MidgardQuerySimpleConstraintIFace {
 	GTypeInterface	parent;
 	MidgardQuerySimpleConstraint	**(*list_constraints)	(MidgardQuerySimpleConstraint *self, guint *n_objects); 
+	MidgardQuerySimpleConstraintPrivate *priv;
 };
 
 GType 				midgard_query_simple_constraint_get_type		(void);

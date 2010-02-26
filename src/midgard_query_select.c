@@ -39,7 +39,7 @@ _midgard_query_select_set_constraint (MidgardQuerySelect *self, MidgardQuerySimp
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (constraint != NULL, FALSE);
-
+	
 	self->priv->constraint = constraint;
 }
 
@@ -89,6 +89,41 @@ _midgard_query_select_add_join (MidgardQuerySelect *self, const gchar *join_type
 	return FALSE;
 }
 
+void 
+_midgard_core_query_select_add_deleted_condition (GdaConnection *cnc, MidgardDBObjectClass *klass, GdaSqlStatement *stmt)
+{
+	const gchar *table = midgard_core_class_get_table (klass);
+
+	GdaSqlStatementSelect *select = stmt->contents;
+	GdaSqlExpr *where, *expr;
+	GdaSqlOperation *cond;
+	GValue *value;
+	where = gda_sql_expr_new (GDA_SQL_ANY_PART (select));
+	cond = gda_sql_operation_new (GDA_SQL_ANY_PART (where));
+	where->cond = cond;
+	cond->operator_type = GDA_SQL_OPERATOR_TYPE_EQ;
+	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
+	g_value_take_string ((value = gda_value_new (G_TYPE_STRING)), g_strdup ("metadata_deleted"));
+	expr->value = value;
+	cond->operands = g_slist_append (NULL, expr);
+	gchar *str;
+	str = g_strdup_printf ("%s", "0");
+	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
+	g_value_take_string ((value = gda_value_new (G_TYPE_STRING)), str);
+	expr->value = value;
+	cond->operands = g_slist_append (cond->operands, expr);	
+	gda_sql_statement_select_take_where_cond (stmt, where);
+
+	GError *error = NULL;
+	if (gda_sql_statement_check_structure (stmt, &error) == FALSE) {
+		g_warning (_("Can't build SELECT statement: %s)"),
+				error && error->message ? error->message : _("No detail"));
+		if (error)
+			g_error_free (error);
+		return;
+	}
+}
+
 gboolean 
 _midgard_query_select_execute (MidgardQuerySelect *self)
 {
@@ -129,10 +164,12 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	/* Add fields for all properties registered per class */
 	klass->dbpriv->add_fields_to_select_statement (klass, sss);
 
-	/* Create condition */
-	GdaSqlExpr *where;
-	where = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
-	sss->where_cond = where;
+	//_midgard_core_query_select_add_deleted_condition (cnc, klass, sql_stm);
+
+	/* Add constraints' conditions */
+	if (self->priv->constraint)
+		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (self->priv->constraint)->priv->add_conditions_to_statement (
+				MIDGARD_QUERY_EXECUTOR (self), self->priv->constraint, sql_stm);
 
 	/* Create statement */
 	GdaStatement *stmt = gda_statement_new ();	

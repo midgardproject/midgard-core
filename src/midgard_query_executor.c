@@ -68,8 +68,8 @@ _midgard_query_executor_constructor (GType type,
 		G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_properties,
 				construct_properties);
-	
-	MIDGARD_QUERY_EXECUTOR (object)->priv = g_new(MidgardQueryExecutorPrivate, 1);
+
+	MIDGARD_QUERY_EXECUTOR (object)->priv = g_new (MidgardQueryExecutorPrivate, 1);
 
 	return G_OBJECT(object);
 }

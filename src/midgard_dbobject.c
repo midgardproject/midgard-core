@@ -49,8 +49,8 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 			continue;
 
        		select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
-		select_field->field_name = g_strdup (property_field);
-		select_field->table_name = g_strdup (property_table);
+		/*select_field->field_name = g_strdup (property_field);
+		select_field->table_name = g_strdup (property_table);*/
 		select_field->as = g_strdup (property);
 		select->expr_list = g_slist_append (select->expr_list, select_field);
 		expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
@@ -96,8 +96,8 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 				continue;
 			
 			select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
-			select_field->field_name = g_strdup (property_field);
-			select_field->table_name = g_strdup (table);
+			/*select_field->field_name = g_strdup (property_field);
+			select_field->table_name = g_strdup (table);*/
 			select_field->as = g_strdup (property);
 			select->expr_list = g_slist_append (select->expr_list, select_field);
 			expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));

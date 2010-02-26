@@ -28,7 +28,7 @@
 G_BEGIN_DECLS
 
 /* convention macros */
-#define MIDGARD_QUERY_CONSTRAINT_TYPE (midgard_query_constraint_get_type()) 
+#define MIDGARD_TYPE_QUERY_CONSTRAINT (midgard_query_constraint_get_type()) 
 #define MIDGARD_QUERY_CONSTRAINT(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_CONSTRAINT, MidgardQueryConstraint))
 #define MIDGARD_QUERY_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_QUERY_CONSTRAINT_TYPE, MidgardQueryConstraintClass))
 #define MIDGARD_IS_QUERY_CONSTRAINT(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_CONSTRAINT))

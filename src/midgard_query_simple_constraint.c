@@ -17,6 +17,7 @@
  */
 
 #include "midgard_query_simple_constraint.h"
+#include "midgard_core_query.h"
 
 MidgardQuerySimpleConstraint**
 midgard_query_simple_constraint_list_constraints (MidgardQuerySimpleConstraint *self, guint *n_objects)
@@ -29,8 +30,10 @@ simple_constraint_iface_init (gpointer g_iface, gpointer iface_data)
 {
 	MidgardQuerySimpleConstraintIFace *iface = (MidgardQuerySimpleConstraintIFace *)g_iface;
 	iface->list_constraints = NULL;
+	/* Initialize private structure */
+	iface->priv = g_new (MidgardQuerySimpleConstraintPrivate, 1);
+	iface->priv->add_conditions_to_statement = NULL;
 }
-
 
 GType
 midgard_query_simple_constraint_get_type (void)
@@ -44,7 +47,8 @@ midgard_query_simple_constraint_get_type (void)
 			NULL,   /* class_init */
 			NULL,   /* class_finalize */
 			NULL,   /* class_data */
-			NULL,
+			0,	
+			//sizeof (MidgardQuerySimpleConstraint),
 			0,      /* n_preallocs */
 			NULL    /* instance_init */
 		};
