@@ -64,6 +64,8 @@ struct MidgardCoreQueryOrder {
 struct _MidgardQueryStorage {
 	GObject parent;
 	MidgardDBObjectClass *klass;
+	gchar *table_alias;
+	const gchar *table;
 };
 
 struct _MidgardQueryExecutorPrivate {
@@ -75,11 +77,18 @@ struct _MidgardQueryExecutorPrivate {
 	guint limit;
 	guint offset;
 	gpointer resultset;
+	guint tableid;
+	gchar *table_alias;
 };
 
 struct _MidgardQuerySimpleConstraintPrivate {
-	void	(*add_conditions_to_statement)	(MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *self, GdaSqlStatement *stm);
+	void	(*add_conditions_to_statement)	(MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *self, 
+			GdaSqlStatement *stm, GdaSqlExpr *where_expr_node);
 };
+
+#define MQE_SET_TABLE_ALIAS(executor, table) \
+	if (!table) \
+		table = g_strdup_printf ("t%d", ++executor->priv->tableid);
 
 MidgardDBJoin	*midgard_core_dbjoin_new	(void);
 void		midgard_core_dbjoin_free	(MidgardDBJoin *mdbj);
@@ -242,5 +251,7 @@ GdaDataModel 		*midgard_core_query_get_dbobject_model 		(MidgardConnection *mgd,
 gboolean		midgard_core_query_create_dbobject_record 	(MidgardDBObject *object);
 gboolean		midgard_core_query_update_dbobject_record 	(MidgardDBObject *object);
 gchar                   *midgard_core_query_binary_stringify            (GValue *src_value);
+gchar 			*midgard_core_query_compute_constraint_property	(MidgardQueryExecutor *executor, MidgardQueryStorage *storage, const gchar *name);
+
 
 #endif /* MIDGARD_CORE_QUERY_H */

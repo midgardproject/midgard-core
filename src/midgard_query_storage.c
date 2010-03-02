@@ -38,6 +38,7 @@ midgard_query_storage_new (const gchar *classname)
 
 	MidgardQueryStorage *self = g_object_new (MIDGARD_TYPE_QUERY_STORAGE, NULL);
 	self->klass = klass;
+	self->table = midgard_core_class_get_table (klass);
 
 	return self;
 }
@@ -57,6 +58,8 @@ __midgard_query_storage_constructor (GType type,
 				construct_properties);
 
 	MIDGARD_QUERY_STORAGE (object)->klass = NULL;
+	MIDGARD_QUERY_STORAGE (object)->table_alias = NULL;
+	MIDGARD_QUERY_STORAGE (object)->table = NULL;
 
 	return object;
 }
@@ -71,6 +74,10 @@ __midgard_query_storage_dispose (GObject *object)
 static void 
 __midgard_query_storage_finalize (GObject *object)
 {
+	MidgardQueryStorage *self = MIDGARD_QUERY_STORAGE (object);
+	g_free (self->table_alias);
+	self->table_alias = NULL;
+
 	__parent_class->finalize (object);
 }
 

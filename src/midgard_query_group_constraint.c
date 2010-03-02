@@ -27,6 +27,7 @@
 struct _MidgardQueryGroupConstraint {
 	GObject  parent;
 	gchar *type;
+	GdaSqlOperatorType op_type;
 	GSList *constraints;
 };
 
@@ -36,8 +37,24 @@ midgard_query_group_constraint_new (const gchar *type, MidgardQuerySimpleConstra
 	g_return_val_if_fail (type != NULL, NULL);
 	g_return_val_if_fail (constraint != NULL, NULL);
 
+	GdaSqlOperatorType op_type;
+
+	/* Validate given type. We expect type to be NULL terminated. */
+	gchar *valid_type = g_ascii_strdown (type, -1);
+	if (g_str_equal (valid_type, "and"))
+		op_type = GDA_SQL_OPERATOR_TYPE_AND;
+	else if (g_str_equal (valid_type, "or"))
+		op_type = GDA_SQL_OPERATOR_TYPE_OR;
+	else {
+		/* FIXME, handle catchable error */
+		g_warning ("Invalid group type. Expected 'AND' or 'OR'. '%s' given", type);
+		g_free (valid_type);
+		return NULL;
+	}
+
 	MidgardQueryGroupConstraint *self = g_object_new (MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, NULL);
-	self->type = g_strdup (type);
+	self->type = valid_type;
+	self->op_type = op_type;
 
 	MidgardQuerySimpleConstraint *cnstr = constraint;
 	va_list args;
@@ -111,7 +128,8 @@ _midgard_query_group_constraint_list_constraints (MidgardQuerySimpleConstraint *
 }
 
 void
-_midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *self, GdaSqlStatement *stmt)
+_midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *self, 
+		GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node)
 {	
 	guint n_objects;
 	guint i;
@@ -120,9 +138,31 @@ _midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor
 	if (!constraints)
 		return;
 
+	GdaSqlStatementSelect *select = stmt->contents;
+	GdaSqlExpr *top_where, *where, *expr;
+	GdaSqlOperation *top_operation, *operation;	
+	
+	/* Create base top expression and operation */
+	if (!select->where_cond) {
+		top_where = gda_sql_expr_new (GDA_SQL_ANY_PART (select));
+		top_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (top_where));
+		top_operation->operator_type = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->op_type;
+		top_where->cond = top_operation;
+	     	gda_sql_statement_select_take_where_cond (stmt, top_where);
+	} else if (where_expr_node) {
+		/* This is nested groups case: '... AND (f2=1 OR f2=2)...' */
+		where = where_expr_node;
+		operation = where->cond;
+		top_where = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
+		top_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (where_expr_node));
+		top_operation->operator_type = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->op_type;
+		top_where->cond = top_operation;
+		operation->operands = g_slist_append (operation->operands, top_where);
+	}
+
 	for (i = 0; i < n_objects; i++) {
 
-		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (constraints[i])->priv->add_conditions_to_statement (executor, MIDGARD_QUERY_SIMPLE_CONSTRAINT (constraints[i]), stmt);
+		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (constraints[i])->priv->add_conditions_to_statement (executor, MIDGARD_QUERY_SIMPLE_CONSTRAINT (constraints[i]), stmt, top_where);
 	}
 
 	g_free (constraints);

@@ -153,23 +153,25 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	sss->from = gda_sql_select_from_new (GDA_SQL_ANY_PART (sss));
 	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (sss->from));
 	s_target->table_name = g_strdup (midgard_core_class_get_table (klass));
+	s_target->as = g_strdup_printf ("t%d", ++self->priv->tableid);
+	self->priv->table_alias = g_strdup (s_target->as);
 	sss->from->targets = g_slist_append (sss->from->targets, s_target);
 	GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
 	GValue *tval = g_new0 (GValue, 1);
 	g_value_init (tval, G_TYPE_STRING);
-	g_value_set_string (tval, "page");
+	g_value_set_string (tval, s_target->table_name);
 	texpr->value = tval;
 	s_target->expr = texpr;
 
 	/* Add fields for all properties registered per class */
-	klass->dbpriv->add_fields_to_select_statement (klass, sss);
+	klass->dbpriv->add_fields_to_select_statement (klass, sss, s_target->as);
 
 	//_midgard_core_query_select_add_deleted_condition (cnc, klass, sql_stm);
 
 	/* Add constraints' conditions */
 	if (self->priv->constraint)
 		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (self->priv->constraint)->priv->add_conditions_to_statement (
-				MIDGARD_QUERY_EXECUTOR (self), self->priv->constraint, sql_stm);
+				MIDGARD_QUERY_EXECUTOR (self), self->priv->constraint, sql_stm, NULL);
 
 	/* Create statement */
 	GdaStatement *stmt = gda_statement_new ();	

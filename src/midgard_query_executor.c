@@ -70,6 +70,16 @@ _midgard_query_executor_constructor (GType type,
 				construct_properties);
 
 	MIDGARD_QUERY_EXECUTOR (object)->priv = g_new (MidgardQueryExecutorPrivate, 1);
+	MIDGARD_QUERY_EXECUTOR (object)->priv->mgd = NULL;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->storage = NULL;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->constraint = NULL;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->orders = NULL;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->joins = NULL;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->limit = -1;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->offset = -1;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->resultset = NULL;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->tableid = 0;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->table_alias = NULL;
 
 	return G_OBJECT(object);
 }
@@ -85,6 +95,9 @@ static void
 _midgard_query_executor_finalize (GObject *object)
 {
 	MidgardQueryExecutor *self = MIDGARD_QUERY_EXECUTOR (object);
+
+	g_free (self->priv->table_alias);
+	self->priv->table_alias;
 
 	g_free (self->priv);
 	self->priv = NULL;

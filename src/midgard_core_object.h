@@ -39,7 +39,8 @@ struct _MidgardDBObjectPrivate {
 	gint row;	
 
 	/* GdaSql virtual helpers */
-	void			(*add_fields_to_select_statement)	(MidgardDBObjectClass *klass, GdaSqlStatementSelect *select);
+	void			(*add_fields_to_select_statement)	(MidgardDBObjectClass *klass, 
+			GdaSqlStatementSelect *select, const gchar *table_name);
 
 	GSList 			*(*set_from_sql)	(MidgardConnection *mgd, GType type, const gchar *sql);	
 	void 			(*__set_from_sql)	(MidgardDBObject *self, GdaDataModel *model, gint row);

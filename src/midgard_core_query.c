@@ -30,7 +30,7 @@
 #ifdef HAVE_LIBGDA_4
 #include <sql-parser/gda-sql-parser.h>
 #endif
-
+#include "midgard_metadata.h"
 
 /* Do not use _DB_DEFAULT_DATETIME.
  * Some databases (like MySQL) fails to create datetime column with datetime which included timezone. 
@@ -2956,4 +2956,100 @@ midgard_core_query_binary_stringify (GValue *src_value)
 
 	return (gchar *) g_strndup((const gchar *) binary->data, binary->binary_length);
 }
+
+#define _RESERVED_BLOB_NAME "attachment"
+#define _RESERVED_BLOB_TABLE "blobs"
+#define _RESERVED_PARAM_NAME "parameter"
+#define _RESERVED_PARAM_TABLE "record_extension"
+#define _RESERVED_METADATA_NAME "metadata"
+
+typedef struct {
+	const MidgardDBObjectClass *klass;
+	const gchar *table;
+	const gchar *table_alias;
+	const gchar *colname;
+} Psh;
+
+gboolean 
+__compute_reserved_property_constraint (Psh *holder, const gchar *token_1, const gchar *token_2)
+{
+	/* metadata */
+	if (g_str_equal (_RESERVED_METADATA_NAME, token_1)) {
+		MidgardMetadataClass *mklass = g_type_class_peek (MIDGARD_TYPE_METADATA);
+		const gchar *property_field = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), token_2);
+		if (!property_field)
+			return FALSE;
+		holder->colname = property_field;
+		return TRUE;
+	}
+
+	/* parameters */
+
+	/* attachments */
+
+	/* fallback to default */
+	MidgardReflectionProperty *mrp = midgard_reflection_property_new (MIDGARD_DBOBJECT_CLASS (holder->klass));
+	if (midgard_reflection_property_is_link(mrp, token_1)) {
+		holder->klass = midgard_reflection_property_get_link_class (mrp, token_1);
+		holder->table = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS (holder->klass));
+		holder->table_alias = holder->table;
+	}
+
+	return TRUE;
+}
+
+gchar *
+midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
+		                MidgardQueryStorage *storage, const gchar *name)
+{
+	g_return_val_if_fail (executor != NULL, FALSE);
+	g_return_val_if_fail (name != NULL, FALSE);
+
+	/* Set table alias if it's not set */
+	if (storage)
+		MQE_SET_TABLE_ALIAS (executor, storage->table_alias);
+
+	gchar *table_field = NULL;
+	gchar *table_alias = executor->priv->table_alias;
+       	MidgardDBObjectClass *klass = executor->priv->storage->klass; 
+	if (storage) {
+		table_alias = storage->table_alias;
+		klass = storage->klass;	
+	}
+
+      	gchar **spltd = g_strsplit(name, ".", 0);
+	guint i = 0;
+	guint j = 0;
+
+	/* We can support max 3 tokens */
+	while(spltd[i] != NULL)
+		i++;
+
+	/* case: property */
+	if (i == 1) {
+		const gchar *property_field = midgard_core_class_get_property_colname (klass, name);
+		table_field = g_strdup_printf ("%s.%s", table_alias, property_field);
+	} else if (i < 4) {
+		Psh holder = {NULL, NULL, NULL};
+		holder.table_alias = table_alias;
+		holder.klass = klass;
+		while (spltd[j] != NULL) {
+			if (spltd[j+1] == NULL)
+				break;
+			/* case: metadata.property, attachment.property, property.link, etc */	
+			if (!__compute_reserved_property_constraint (&holder, spltd[j], spltd[j+1]))
+				break;
+			j++;
+		}
+		if (holder.table_alias && holder.colname)
+			table_field = g_strdup_printf ("%s.%s", holder.table_alias, holder.colname);
+	} else {
+		  g_warning("Failed to parse '%s'. At most 3 tokens allowed", name);
+	}
+
+	g_strfreev (spltd);
+
+	return table_field;
+}
+
 

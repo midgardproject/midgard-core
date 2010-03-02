@@ -26,7 +26,7 @@ static GObjectClass *parent_class= NULL;
 
 /* Create GdaSqlSelectField for every property registered for the class. */
 void
-_add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSelect *select)
+_add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSelect *select, const gchar *table_name)
 {
 	guint n_prop;
 	guint i;
@@ -38,11 +38,15 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 	if (!pspecs)
 		return;
 
+	const gchar *property_table = NULL;
+
 	for (i = 0; i < n_prop; i++) {
 
 		const gchar *property = pspecs[i]->name;
 		const gchar *property_field = midgard_core_class_get_property_colname (klass, property);
-		const gchar *property_table = midgard_core_class_get_property_table (klass, property); 
+		property_table = midgard_core_class_get_property_table (klass, property); 
+		if (property_table && table_name)
+			property_table = table_name;
 
 		/* Ignore properties with NULL storage and those of object type */
 		if (!property_table || pspecs[i]->value_type == G_TYPE_OBJECT)
@@ -76,11 +80,13 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 			return;
 
 		if (MIDGARD_DBOBJECT_CLASS (mklass)->dbpriv->add_fields_to_select_statement) {
-			MIDGARD_DBOBJECT_CLASS (mklass)->dbpriv->add_fields_to_select_statement (MIDGARD_DBOBJECT_CLASS (mklass), select);
+			MIDGARD_DBOBJECT_CLASS (mklass)->dbpriv->add_fields_to_select_statement (MIDGARD_DBOBJECT_CLASS (mklass), select, table_name);
 			return;
 		}
 
 		const gchar *table = midgard_core_class_get_table (klass);
+		if (table_name)
+			table = table_name;
 
 		/* TODO, Once we stabilize use case, refactor this below to minimize code usage */
 		GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (mklass), &n_prop);
