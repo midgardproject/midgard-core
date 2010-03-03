@@ -79,6 +79,8 @@ struct _MidgardQueryExecutorPrivate {
 	gpointer resultset;
 	guint tableid;
 	gchar *table_alias;
+	guint joinid;
+	GdaSqlStatement *stmt;
 };
 
 struct _MidgardQuerySimpleConstraintPrivate {

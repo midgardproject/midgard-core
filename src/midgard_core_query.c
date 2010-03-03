@@ -2962,13 +2962,52 @@ midgard_core_query_binary_stringify (GValue *src_value)
 #define _RESERVED_PARAM_NAME "parameter"
 #define _RESERVED_PARAM_TABLE "record_extension"
 #define _RESERVED_METADATA_NAME "metadata"
+#define _RESERVED_GUID_NAME "guid"
 
 typedef struct {
 	const MidgardDBObjectClass *klass;
 	const gchar *table;
 	const gchar *table_alias;
+	const gchar *target_table;
+	const gchar *target_table_alias;
 	const gchar *colname;
+	const gchar *target_colname;
+	MidgardQueryExecutor *executor;
 } Psh;
+
+static void 
+__add_join (Psh *holder) 
+{
+	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (holder->executor);
+	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) executor->priv->stmt;
+	GdaSqlSelectFrom *from = select->from;
+	GdaSqlSelectJoin *join = gda_sql_select_join_new (GDA_SQL_ANY_PART (from));
+	join->type = GDA_SQL_SELECT_JOIN_LEFT;
+
+	GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (join));
+        expr->value = gda_value_new (G_TYPE_STRING);
+	g_value_take_string (expr->value, g_strdup_printf ("%s.%s = %s.%s", 
+				holder->table_alias, holder->colname, holder->target_table_alias, holder->target_colname));
+	join->expr = expr;
+	join->position = ++executor->priv->joinid;
+
+	gda_sql_select_from_take_new_join (from , join);
+
+	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (from));
+	s_target->table_name = g_strdup (holder->target_table);
+	s_target->as = g_strdup (holder->target_table_alias);
+	gda_sql_select_from_take_new_target (from, s_target);
+
+	g_print ("JOIN %s AS %s cond: %s \n", s_target->table_name, s_target->as, g_value_get_string (expr->value));
+
+	/* Set target expression */     
+	GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
+	GValue *tval = g_new0 (GValue, 1);
+	g_value_init (tval, G_TYPE_STRING);
+	g_value_set_string (tval, s_target->table_name);
+	texpr->value = tval;
+	s_target->expr = texpr;
+}
 
 gboolean 
 __compute_reserved_property_constraint (Psh *holder, const gchar *token_1, const gchar *token_2)
@@ -2983,16 +3022,47 @@ __compute_reserved_property_constraint (Psh *holder, const gchar *token_1, const
 		return TRUE;
 	}
 
-	/* parameters */
+	/* parameter */
+	if (g_str_equal (_RESERVED_PARAM_NAME, token_1)) {
+		holder->klass = g_type_class_peek (g_type_from_name ("midgard_parameter"));
+		holder->target_colname = "parent_guid";
+		holder->target_table = _RESERVED_PARAM_TABLE;
+		holder->target_table_alias = g_strdup_printf ("t%d", ++holder->executor->priv->tableid);
+		holder->colname = _RESERVED_GUID_NAME;
+		__add_join (holder);
+		holder->colname = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (holder->klass), token_2);
+		holder->table = holder->target_table;
+		holder->table_alias = holder->target_table_alias;
+		return TRUE;
+	}
 
-	/* attachments */
+	/* attachment */
+	if (g_str_equal (_RESERVED_BLOB_NAME, token_1)) {
+		holder->klass = g_type_class_peek (g_type_from_name ("midgard_attachment"));
+		holder->target_colname = "parent_guid";
+		holder->target_table = _RESERVED_BLOB_TABLE;
+		holder->target_table_alias = g_strdup_printf ("t%d", ++holder->executor->priv->tableid);
+		holder->colname = _RESERVED_GUID_NAME;
+		__add_join (holder);
+		holder->colname = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (holder->klass), token_2);
+		holder->table = holder->target_table;
+		holder->table_alias = holder->target_table_alias;
+		return TRUE;
+	}
 
 	/* fallback to default */
 	MidgardReflectionProperty *mrp = midgard_reflection_property_new (MIDGARD_DBOBJECT_CLASS (holder->klass));
+	holder->colname = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (holder->klass), token_1);
+	/* Add implicit join if property is a link */
 	if (midgard_reflection_property_is_link(mrp, token_1)) {
 		holder->klass = midgard_reflection_property_get_link_class (mrp, token_1);
-		holder->table = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS (holder->klass));
-		holder->table_alias = holder->table;
+		const gchar *target_property = midgard_reflection_property_get_link_target (mrp, token_1);
+		holder->target_colname = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (holder->klass), target_property);
+		holder->target_table = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS (holder->klass));
+		holder->target_table_alias = g_strdup_printf ("t%d", ++holder->executor->priv->tableid);;
+		__add_join (holder);
+		holder->table = holder->target_table;
+		holder->table_alias = holder->target_table_alias;
 	}
 
 	return TRUE;
@@ -3011,8 +3081,10 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 
 	gchar *table_field = NULL;
 	gchar *table_alias = executor->priv->table_alias;
+	const gchar *table = executor->priv->storage->table;
        	MidgardDBObjectClass *klass = executor->priv->storage->klass; 
 	if (storage) {
+		table = executor->priv->storage->table;
 		table_alias = storage->table_alias;
 		klass = storage->klass;	
 	}
@@ -3030,19 +3102,27 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 		const gchar *property_field = midgard_core_class_get_property_colname (klass, name);
 		table_field = g_strdup_printf ("%s.%s", table_alias, property_field);
 	} else if (i < 4) {
-		Psh holder = {NULL, NULL, NULL};
+		/* Set all pointers we need to generate valid tables' names, aliases or joins */
+		Psh holder = {NULL, };
+		holder.table = table;
 		holder.table_alias = table_alias;
 		holder.klass = klass;
+		holder.executor = MIDGARD_QUERY_EXECUTOR (executor);
+		holder.colname = NULL;
+		
 		while (spltd[j] != NULL) {
 			if (spltd[j+1] == NULL)
 				break;
+			/* Set all pointers we need to generate valid tables' names, aliases or joins */
 			/* case: metadata.property, attachment.property, property.link, etc */	
 			if (!__compute_reserved_property_constraint (&holder, spltd[j], spltd[j+1]))
 				break;
 			j++;
-		}
+		}	
+		
 		if (holder.table_alias && holder.colname)
 			table_field = g_strdup_printf ("%s.%s", holder.table_alias, holder.colname);
+
 	} else {
 		  g_warning("Failed to parse '%s'. At most 3 tokens allowed", name);
 	}

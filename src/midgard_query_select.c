@@ -149,13 +149,17 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	sss = (GdaSqlStatementSelect*) sql_stm->contents;
 	g_assert (GDA_SQL_ANY_PART (sss)->type == GDA_SQL_ANY_STMT_SELECT);
 
+	self->priv->stmt = (GdaSqlStatement *)sss;
+
 	/* Create targets (FROM) */
 	sss->from = gda_sql_select_from_new (GDA_SQL_ANY_PART (sss));
 	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (sss->from));
 	s_target->table_name = g_strdup (midgard_core_class_get_table (klass));
 	s_target->as = g_strdup_printf ("t%d", ++self->priv->tableid);
 	self->priv->table_alias = g_strdup (s_target->as);
-	sss->from->targets = g_slist_append (sss->from->targets, s_target);
+	gda_sql_select_from_take_new_target (sss->from, s_target);
+
+	/* Set target expression */	
 	GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
 	GValue *tval = g_new0 (GValue, 1);
 	g_value_init (tval, G_TYPE_STRING);
@@ -163,15 +167,25 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	texpr->value = tval;
 	s_target->expr = texpr;
 
-	/* Add fields for all properties registered per class */
+	/* Add fields for all properties registered per class (SELECT a,b,c...) */
 	klass->dbpriv->add_fields_to_select_statement (klass, sss, s_target->as);
 
 	//_midgard_core_query_select_add_deleted_condition (cnc, klass, sql_stm);
 
-	/* Add constraints' conditions */
+	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (self->priv->constraint)
 		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (self->priv->constraint)->priv->add_conditions_to_statement (
 				MIDGARD_QUERY_EXECUTOR (self), self->priv->constraint, sql_stm, NULL);
+
+	GError *error = NULL;
+	if (!gda_sql_statement_check_structure (sql_stm, &error)) {
+		g_warning (_("Can't build SELECT statement: %s)"),
+				error && error->message ? error->message : _("Unknown reason"));
+		if (error)
+			g_error_free (error);
+		gda_sql_statement_free (sql_stm);
+		return FALSE;
+	}
 
 	/* Create statement */
 	GdaStatement *stmt = gda_statement_new ();	
@@ -183,7 +197,6 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	g_free (debug_sql);
 
 	/* execute statement */
-	GError *error = NULL;
 	gda_connection_statement_execute_select (cnc, stmt, NULL, &error);
 	if (error)
 		g_print ("Execute error - %s", error->message);

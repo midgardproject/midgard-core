@@ -80,6 +80,8 @@ _midgard_query_executor_constructor (GType type,
 	MIDGARD_QUERY_EXECUTOR (object)->priv->resultset = NULL;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->tableid = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->table_alias = NULL;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->stmt = NULL;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->joinid = 0;
 
 	return G_OBJECT(object);
 }
