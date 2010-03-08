@@ -21,6 +21,7 @@
 
 #include <glib-object.h>
 #include "midgard_defs.h"
+#include "midgard_query_storage.h"
 
 G_BEGIN_DECLS
 
@@ -40,7 +41,7 @@ struct _MidgardQueryPropertyClass {
 };
 
 GType 			midgard_query_property_get_type		(void);
-MidgardQueryProperty	*midgard_query_property_new		(const gchar *propname, const gchar *classname);
+MidgardQueryProperty	*midgard_query_property_new		(const gchar *propname, MidgardQueryStorage *storage);
 
 G_END_DECLS
 

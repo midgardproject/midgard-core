@@ -68,6 +68,13 @@ struct _MidgardQueryStorage {
 	const gchar *table;
 };
 
+struct _MidgardQueryProperty {
+	GObject parent;
+	GValue value;
+	MidgardDBObjectClass *klass;
+	MidgardQueryStorage *storage;
+};
+
 struct _MidgardQueryExecutorPrivate {
 	MidgardConnection *mgd;
 	MidgardQueryStorage *storage;

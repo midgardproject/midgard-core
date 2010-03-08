@@ -19,15 +19,11 @@
 #include "midgard_query_holder.h"
 #include "midgard_query_property.h"
 #include "midgard_dbobject.h"
-
-struct _MidgardQueryProperty {
-	GObject parent;
-	GValue value;
-	MidgardDBObjectClass *klass;
-};
+#include "midgard_query_storage.h"
+#include "midgard_core_query.h"
 
 MidgardQueryProperty *
-midgard_query_property_new (const gchar *property, const gchar *classname)
+midgard_query_property_new (const gchar *property, MidgardQueryStorage *storage)
 {
 	g_return_val_if_fail (property != NULL, NULL);
 	MidgardQueryProperty *self = g_object_new (MIDGARD_QUERY_PROPERTY_TYPE, NULL);
@@ -38,8 +34,8 @@ midgard_query_property_new (const gchar *property, const gchar *classname)
 
 	self->value = pval;
 
-	if (classname != NULL) 
-		self->klass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (g_type_from_name (classname)));
+	if (storage != NULL)
+		self->storage = storage;
 
 	return self;
 }
@@ -78,8 +74,49 @@ __set_value (MidgardQueryHolder *self, const GValue *value)
 
 /* GOBJECT ROUTINES */
 
+static GObjectClass *parent_class= NULL;
+
+static GObject *
+_midgard_query_property_constructor (GType type,
+		guint n_construct_properties,
+		GObjectConstructParam *construct_properties)
+{
+	GObject *object = (GObject *)
+		G_OBJECT_CLASS (parent_class)->constructor (type,
+				n_construct_properties, construct_properties);
+	
+	MIDGARD_QUERY_PROPERTY (object)->storage = NULL;
+
+	return G_OBJECT(object);
+}
+
 static void
-midgard_query_property_init (MidgardQueryHolderIFace *iface)
+_midgard_query_property_dispose (GObject *object)
+{
+	MidgardQueryProperty *self = MIDGARD_QUERY_PROPERTY (object);
+	parent_class->dispose (object);
+}
+
+static void
+_midgard_query_property_finalize (GObject *object)
+{
+	MidgardQueryProperty *self = MIDGARD_QUERY_PROPERTY (object);
+        parent_class->finalize;
+}
+
+static void
+_midgard_query_property_class_init (MidgardQueryPropertyClass *klass, gpointer class_data)
+{
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	parent_class = g_type_class_peek_parent (klass);
+
+	object_class->constructor = _midgard_query_property_constructor;
+	object_class->dispose = _midgard_query_property_dispose;
+	object_class->finalize = _midgard_query_property_finalize;
+}
+
+static void
+midgard_query_property_iface_init (MidgardQueryHolderIFace *iface)
 {
        iface->get_value = __get_value;
        iface->set_value = __set_value;
@@ -94,7 +131,7 @@ midgard_query_property_get_type (void)
 			sizeof (MidgardQueryPropertyClass),
 			NULL,   /* base_init */
 			NULL,   /* base_finalize */
-			NULL,   /* class_init */
+			(GClassInitFunc) _midgard_query_property_class_init,
 			NULL,   /* class_finalize */
 			NULL,   /* class_data */
 			sizeof (MidgardQueryProperty),
@@ -103,7 +140,7 @@ midgard_query_property_get_type (void)
 		};
       
 		static const GInterfaceInfo property_info = {
-			(GInterfaceInitFunc) midgard_query_property_init,   
+			(GInterfaceInitFunc) midgard_query_property_iface_init,   
 			NULL,	/* interface_finalize */
 			NULL	/* interface_data */
 		};

@@ -2979,7 +2979,8 @@ static void
 __add_join (Psh *holder) 
 {
 	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (holder->executor);
-	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) executor->priv->stmt;
+	GdaSqlStatement *sql_stm = executor->priv->stmt;
+	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;
 	GdaSqlSelectFrom *from = select->from;
 	GdaSqlSelectJoin *join = gda_sql_select_join_new (GDA_SQL_ANY_PART (from));
 	join->type = GDA_SQL_SELECT_JOIN_LEFT;
@@ -2997,8 +2998,6 @@ __add_join (Psh *holder)
 	s_target->table_name = g_strdup (holder->target_table);
 	s_target->as = g_strdup (holder->target_table_alias);
 	gda_sql_select_from_take_new_target (from, s_target);
-
-	g_print ("JOIN %s AS %s cond: %s \n", s_target->table_name, s_target->as, g_value_get_string (expr->value));
 
 	/* Set target expression */     
 	GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
