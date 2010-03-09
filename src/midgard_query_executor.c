@@ -19,6 +19,11 @@
 #include "midgard_query_executor.h"
 #include "midgard_core_query.h"
 
+/* MidgardQueryExecutor properties */
+enum {
+	PROPERTY_RESULTS_COUNT = 1
+};
+
 MidgardQueryExecutor *
 midgard_query_executor_new (MidgardConnection *mgd, MidgardQueryStorage *storage)
 {
@@ -55,6 +60,11 @@ midgard_query_executor_add_join (MidgardQueryExecutor *self, const gchar *join_t
 	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->add_join (self, join_type, left_property, right_property);
 }
 
+guint 
+midgard_query_executor_get_results_count (MidgardQueryExecutor *self)
+{
+	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->get_results_count (self);
+}
 /* GOBJECT ROUTINES */
 
 static GObjectClass *parent_class= NULL;
@@ -82,6 +92,7 @@ _midgard_query_executor_constructor (GType type,
 	MIDGARD_QUERY_EXECUTOR (object)->priv->table_alias = NULL;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->stmt = NULL;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->joinid = 0;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->results_count = 0;
 
 	return G_OBJECT(object);
 }
@@ -98,6 +109,18 @@ _midgard_query_executor_finalize (GObject *object)
 {
 	MidgardQueryExecutor *self = MIDGARD_QUERY_EXECUTOR (object);
 
+	if (self->priv->joins) {
+		g_slist_foreach (self->priv->joins, (GFunc) g_free, NULL);
+		g_slist_free (self->priv->joins);
+		self->priv->joins = NULL;
+	}
+
+	if (self->priv->orders) {
+		g_slist_foreach (self->priv->orders, (GFunc) g_free, NULL);
+		g_slist_free (self->priv->orders);
+		self->priv->orders = NULL;
+	}
+
 	g_free (self->priv->table_alias);
 	self->priv->table_alias;
 
@@ -105,6 +128,24 @@ _midgard_query_executor_finalize (GObject *object)
 	self->priv = NULL;
 
 	parent_class->finalize;
+}
+
+static void
+_midgard_query_executor_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	MidgardQueryExecutor *self = MIDGARD_QUERY_EXECUTOR (object);
+
+	switch (property_id) {
+		
+		case PROPERTY_RESULTS_COUNT:
+			g_value_set_uint (value, self->priv->results_count);
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID(self, property_id, pspec);
+			break;
+	}
 }
 
 static void 
@@ -116,6 +157,13 @@ _midgard_query_executor_class_init (MidgardQueryExecutorClass *klass, gpointer c
 	object_class->constructor = _midgard_query_executor_constructor;
 	object_class->dispose = _midgard_query_executor_dispose;
 	object_class->finalize = _midgard_query_executor_finalize;
+	object_class->get_property = _midgard_query_executor_get_property;
+
+	GParamSpec *pspec = g_param_spec_uint ("resultscount",
+			"Number of objects.", "",
+			0, G_MAXUINT32, 0, G_PARAM_READABLE);
+	g_object_class_install_property (object_class,
+			PROPERTY_RESULTS_COUNT, pspec);
 
 	klass->set_constraint = NULL;
 	klass->set_limit = NULL;
@@ -123,6 +171,7 @@ _midgard_query_executor_class_init (MidgardQueryExecutorClass *klass, gpointer c
 	klass->add_order = NULL;
 	klass->add_join = NULL;
 	klass->execute = NULL;
+	klass->get_results_count = NULL;
 }
 
 GType

@@ -49,6 +49,8 @@ struct _MidgardQuerySelectClass {
 	gboolean        (*add_join)			(MidgardQuerySelect *self, const gchar *join_type, 
 								MidgardQueryProperty *left_property, MidgardQueryProperty *right_property);
 	gboolean	(*execute)			(MidgardQuerySelect *self);
+	guint           (*get_results_count)            (MidgardQuerySelect *self);
+	MidgardDBObject	**(*list_objects)		(MidgardQuerySelect *self);
 };
 
 struct _MidgardQuerySelect {
@@ -60,6 +62,7 @@ struct _MidgardQuerySelect {
 
 GType 			midgard_query_select_get_type		(void);
 MidgardQuerySelect	*midgard_query_select_new 		(MidgardConnection *mgd, MidgardQueryStorage *storage);
+MidgardDBObject		**midgard_query_select_list_objects	(MidgardQuerySelect *self);
 
 G_END_DECLS
 

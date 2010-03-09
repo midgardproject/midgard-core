@@ -50,6 +50,7 @@ struct _MidgardQueryExecutorClass {
 	gboolean        (*add_join)			(MidgardQueryExecutor *self, const gchar *join_type, 
 								MidgardQueryProperty *left_property, MidgardQueryProperty *right_property);
 	gboolean	(*execute)			(MidgardQueryExecutor *self);
+	guint 		(*get_results_count)		(MidgardQueryExecutor *self);
 };
 
 struct _MidgardQueryExecutor {
@@ -67,6 +68,7 @@ gboolean 		midgard_query_executor_set_offset	(MidgardQueryExecutor *self, guint 
 gboolean		midgard_query_executor_add_order	(MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type);
 gboolean		midgard_query_executor_add_join		(MidgardQueryExecutor *self, const gchar *join_type, MidgardQueryProperty *left_property, MidgardQueryProperty *right_property);
 gboolean		midgard_query_executor_execute		(MidgardQueryExecutor *self);
+guint 			midgard_query_executor_get_results_count	(MidgardQueryExecutor *self);
 
 G_END_DECLS
 

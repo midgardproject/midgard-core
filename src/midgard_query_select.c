@@ -332,6 +332,8 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 		return FALSE;
 	}
 
+	g_object_ref (self);
+
 	GdaConnection *cnc = self->priv->mgd->priv->connection;
 	GdaSqlStatement *sql_stm;
 	GdaSqlStatementSelect *sss;
@@ -363,10 +365,8 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	//_midgard_core_query_select_add_deleted_condition (cnc, klass, sql_stm);
 
 	/* Add joins */
-	if (!__query_select_add_joins (self)) {
-		gda_sql_statement_free (sql_stm);
-		return FALSE;
-	}
+	if (!__query_select_add_joins (self)) 
+		goto return_false;
 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (self->priv->constraint)
@@ -379,15 +379,12 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 				error && error->message ? error->message : _("Unknown reason"));
 		if (error)
 			g_error_free (error);
-		gda_sql_statement_free (sql_stm);
-		return FALSE;
+		goto return_false;
 	}
 
 	/* Add orders */
-	if (!__query_select_add_orders (self)) {
-		gda_sql_statement_free (sql_stm);
-		return FALSE;
-	}
+	if (!__query_select_add_orders (self)) 
+		goto return_false;
 
 	/* Add limit */
 	if (self->priv->limit) {
@@ -413,17 +410,60 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	GdaStatement *stmt = gda_statement_new ();	
 	g_object_set (G_OBJECT (stmt), "structure", sql_stm, NULL);
 	gda_sql_statement_free (sql_stm);
+	sql_stm = NULL;
 
 	gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 	g_print ("%s", debug_sql);
 	g_free (debug_sql);
 
 	/* execute statement */
-	gda_connection_statement_execute_select (cnc, stmt, NULL, &error);
-	if (error)
-		g_print ("Execute error - %s", error->message);
+	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &error);
+
+	if (!model && !error)
+		goto return_false;
+
+	if (error) {
+		/* FIXME, set domain error code */
+		g_warning ("Execute error - %s", error->message);
+		g_error_free (error);
+		goto return_false;
+	}
+	
+	self->priv->results_count = gda_data_model_get_n_rows (model);
+	if (self->priv->resultset && G_IS_OBJECT (self->priv->resultset))
+		g_object_unref (G_OBJECT (self->priv->resultset));
+	self->priv->resultset = (gpointer) model;
+	g_object_unref (self);
+	
+	return TRUE;
+
+return_false:
+	if (sql_stm)
+		gda_sql_statement_free (sql_stm);
+	g_object_unref (self);
 
 	return FALSE;
+}
+
+guint
+_midgard_query_select_get_results_count (MidgardQuerySelect *self)
+{
+	g_return_val_if_fail (self != NULL, 0);
+
+	return self->priv->results_count;
+}
+
+MidgardDBObject **
+_midgard_query_select_list_objects (MidgardQuerySelect *self)
+{
+	/* TODO */
+	return NULL;
+}
+
+MidgardDBObject **
+midgard_query_select_list_objects (MidgardQuerySelect *self)
+{
+	return MIDGARD_QUERY_SELECT_GET_CLASS (self)->list_objects (self);
 }
 
 /* GOBJECT ROUTINES */
@@ -455,17 +495,10 @@ _midgard_query_select_finalize (GObject *object)
 {
 	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (object);
 
-	if (self->priv->joins) {
-		g_slist_foreach (self->priv->joins, (GFunc) g_free, NULL);
-		g_slist_free (self->priv->joins);
-		self->priv->joins = NULL;
-	}
-
-	if (self->priv->orders) {
-		g_slist_foreach (self->priv->orders, (GFunc) g_free, NULL);
-		g_slist_free (self->priv->orders);
-		self->priv->orders = NULL;
-	}
+	/* DO NOT nullify resultset object, other objects might still hold 
+	 * reference to it. */
+	if (self->priv->resultset && G_IS_OBJECT (self->priv->resultset))
+		g_object_unref (self->priv->resultset);
 
 	parent_class->finalize;
 }
@@ -486,6 +519,8 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	klass->add_order = _midgard_query_select_add_order;
 	klass->add_join = _midgard_query_select_add_join;
 	klass->execute = _midgard_query_select_execute;
+	klass->get_results_count = _midgard_query_select_get_results_count;
+	klass->list_objects = _midgard_query_select_list_objects;
 }
 
 GType
