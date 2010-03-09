@@ -42,6 +42,8 @@ _midgard_query_select_set_constraint (MidgardQuerySelect *self, MidgardQuerySimp
 	g_return_val_if_fail (constraint != NULL, FALSE);
 	
 	self->priv->constraint = constraint;
+
+	return TRUE;
 }
 
 gboolean
@@ -51,18 +53,25 @@ _midgard_query_select_set_limit (MidgardQuerySelect *self, guint limit)
 	g_return_val_if_fail (limit > 0, FALSE);
 
 	self->priv->limit = limit;
+
+	return TRUE;
 }
 
 gboolean 
 _midgard_query_select_set_offset (MidgardQuerySelect *self, guint offset)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
-	g_return_val_if_fail (offset > -1, FALSE);
+	g_return_val_if_fail (offset > 0, FALSE);
 
 	self->priv->offset = offset;
+
+	return TRUE;
 }
 
-static gchar* valid_order_types[] = {"ASC", "DESC", NULL};
+typedef struct {
+	MidgardQueryProperty *property;
+	gboolean asc;
+} qso;
 
 gboolean
 _midgard_query_select_add_order (MidgardQuerySelect *self, MidgardQueryProperty *property, const gchar *type)
@@ -70,8 +79,24 @@ _midgard_query_select_add_order (MidgardQuerySelect *self, MidgardQueryProperty 
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);
 
+	gboolean asc = FALSE;
 
-	/* TODO */
+	gchar *lorder = g_ascii_strdown (type, -1);
+	if (g_str_equal (lorder, "asc")) {
+		asc = TRUE;
+	} else if (g_str_equal (lorder, "desc")) {
+		asc = FALSE;
+	} else {
+		g_warning ("Invalid order type '%s'. Expected ASC or DESC", type);
+	}
+
+	g_free (lorder);
+
+	qso *_qs = g_new (qso, 1);
+	_qs->asc = asc;
+	_qs->property = property;
+
+	self->priv->orders = g_slist_append (self->priv->orders, _qs);
 
 	return FALSE;
 }
@@ -150,6 +175,48 @@ _midgard_query_select_add_join (MidgardQuerySelect *self, const gchar *join_type
 	_sj->join_type = join_type_id;
 
 	executor->priv->joins = g_slist_append (executor->priv->joins, _sj);
+
+	return TRUE;
+}
+
+gboolean __query_select_add_orders (MidgardQuerySelect *self)
+{
+	if (!self->priv->orders)
+		return TRUE;
+
+	GSList *l = NULL;
+
+	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
+	GdaSqlStatement *sql_stm = executor->priv->stmt;
+	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;	
+	GdaSqlSelectOrder *order; 
+	
+	for (l = self->priv->orders; l != NULL; l = l->next) {
+
+		qso *_so = (qso*) l->data;
+
+		/* Create new order */
+		order = gda_sql_select_order_new (GDA_SQL_ANY_PART (select));
+		order->asc = _so->asc;
+		MidgardQueryProperty *property = _so->property;
+		MidgardQueryStorage *storage = property->storage;
+
+		/* Compute table.colname for given property name */
+		GValue rval = {0, };
+		midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (property), &rval);
+		gchar *table_field = midgard_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval));
+		g_value_unset (&rval);
+
+		GValue *value = g_new0 (GValue, 1);
+		g_value_init (value, G_TYPE_STRING);
+		g_value_take_string (value, table_field);
+
+		/* Set order's expression and add new one to statement orders list */
+		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (order));
+		expr->value = value;
+		order->expr = expr;
+		select->order_by = g_slist_append (select->order_by, order);
+	}
 
 	return TRUE;
 }
@@ -316,6 +383,32 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 		return FALSE;
 	}
 
+	/* Add orders */
+	if (!__query_select_add_orders (self)) {
+		gda_sql_statement_free (sql_stm);
+		return FALSE;
+	}
+
+	/* Add limit */
+	if (self->priv->limit) {
+		GdaSqlExpr *limit_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
+		GValue *limit_val = g_new0 (GValue, 1);
+		g_value_init (limit_val, G_TYPE_STRING);
+		g_value_take_string (limit_val, g_strdup_printf ("%d", self->priv->limit));
+		limit_expr->value = limit_val;
+		sss->limit_count = limit_expr;
+	}
+
+	/* Add offset */
+	if (self->priv->offset) {
+		GdaSqlExpr *offset_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
+		GValue *offset_val = g_new0 (GValue, 1);
+		g_value_init (offset_val, G_TYPE_STRING);
+		g_value_take_string (offset_val, g_strdup_printf ("%d", self->priv->offset));
+		offset_expr->value = offset_val;
+		sss->limit_offset = offset_expr;
+	}
+
 	/* Create statement */
 	GdaStatement *stmt = gda_statement_new ();	
 	g_object_set (G_OBJECT (stmt), "structure", sql_stm, NULL);
@@ -366,6 +459,12 @@ _midgard_query_select_finalize (GObject *object)
 		g_slist_foreach (self->priv->joins, (GFunc) g_free, NULL);
 		g_slist_free (self->priv->joins);
 		self->priv->joins = NULL;
+	}
+
+	if (self->priv->orders) {
+		g_slist_foreach (self->priv->orders, (GFunc) g_free, NULL);
+		g_slist_free (self->priv->orders);
+		self->priv->orders = NULL;
 	}
 
 	parent_class->finalize;
