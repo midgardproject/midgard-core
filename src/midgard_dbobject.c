@@ -104,7 +104,7 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 			select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
 			/*select_field->field_name = g_strdup (property_field);
 			select_field->table_name = g_strdup (table);*/
-			select_field->as = g_strdup (property);
+			select_field->as = g_strconcat ("metadata_", property, NULL);
 			select->expr_list = g_slist_append (select->expr_list, select_field);
 			expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
 			val = g_new0 (GValue, 1);
@@ -121,6 +121,65 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 
 	return;
 }
+
+gboolean
+_midgard_dbobject_get_property (MidgardDBObject *self, const gchar *name, GValue *value)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (name != NULL, FALSE);
+	g_return_val_if_fail (G_IS_VALUE (value), FALSE);
+	
+	GdaDataModel *model = GDA_DATA_MODEL (self->dbpriv->datamodel);
+	if (!model)
+		return FALSE;
+
+	gint col_idx = gda_data_model_get_column_index (model, name);
+	if (col_idx == -1)
+		return FALSE;
+
+	const GValue *src_val = gda_data_model_get_value_at (model, col_idx, self->dbpriv->row, NULL);
+	if (!src_val)
+		return FALSE;
+
+	if (!G_IS_VALUE (src_val)) {
+		/* NULL fetched from underlying field */
+		if (G_VALUE_HOLDS_STRING (value)) {
+			g_value_set_string (value, "");
+			return TRUE;
+		}
+		g_warning ("Can not find value for given '%s' property \n", name);
+		return FALSE;
+	}
+
+	if (G_VALUE_TYPE (src_val) != G_VALUE_TYPE (value))
+		g_value_transform (src_val, value);
+	else 
+		g_value_copy (src_val, value);
+
+	return TRUE;
+}
+
+gboolean
+_midgard_dbobject_set_property (MidgardDBObject *self, const gchar *name, GValue *value)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (name != NULL, FALSE);
+	g_return_val_if_fail (G_IS_VALUE (value), FALSE);
+	
+	GdaDataModel *model = GDA_DATA_MODEL (self->dbpriv->datamodel);
+	if (!model)
+		return FALSE;
+
+	gint col_idx = gda_data_model_get_column_index (model, name);
+	if (col_idx == -1)
+		return FALSE;
+
+	gboolean rv = gda_data_model_set_value_at (model, col_idx, self->dbpriv->row, (const GValue *) value, NULL);
+
+	return rv;
+}
+
+/* GOBJECT ROUTINES */
 
 static GObject *
 midgard_dbobject_constructor (GType type,
@@ -161,7 +220,6 @@ midgard_dbobject_dispose (GObject *object)
 
 	parent_class->dispose (object);
 }
-
 
 static void 
 midgard_dbobject_finalize (GObject *object)
@@ -207,6 +265,8 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->dbpriv->storage_exists = NULL;
 	klass->dbpriv->delete_storage = NULL;
 	klass->dbpriv->add_fields_to_select_statement = _add_fields_to_select_statement;
+	klass->dbpriv->get_property = _midgard_dbobject_get_property;
+	klass->dbpriv->set_property = _midgard_dbobject_set_property;
 }
 
 /* Registers the type as a fundamental GType unless already registered. */ 

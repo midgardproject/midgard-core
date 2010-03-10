@@ -387,7 +387,7 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 		goto return_false;
 
 	/* Add limit */
-	if (self->priv->limit) {
+	if (self->priv->limit > 0) {
 		GdaSqlExpr *limit_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
 		GValue *limit_val = g_new0 (GValue, 1);
 		g_value_init (limit_val, G_TYPE_STRING);
@@ -397,7 +397,7 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	}
 
 	/* Add offset */
-	if (self->priv->offset) {
+	if (self->priv->offset >= 0) {
 		GdaSqlExpr *offset_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
 		GValue *offset_val = g_new0 (GValue, 1);
 		g_value_init (offset_val, G_TYPE_STRING);
@@ -454,16 +454,46 @@ _midgard_query_select_get_results_count (MidgardQuerySelect *self)
 }
 
 MidgardDBObject **
-_midgard_query_select_list_objects (MidgardQuerySelect *self)
+_midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 {
-	/* TODO */
-	return NULL;
+	g_return_val_if_fail (self != NULL, NULL);
+	
+	GdaDataModel *model = GDA_DATA_MODEL (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset);
+	if (!model || (model && !GDA_IS_DATA_MODEL (model)))
+		return NULL;
+
+	guint i;
+	guint rows = gda_data_model_get_n_rows (model);
+	if (rows < 1)
+		return NULL;
+
+
+	MidgardConnection *mgd = self->priv->mgd;
+	MidgardDBObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->klass;
+	MidgardDBObject **objects = g_new (MidgardDBObject *, rows+1);
+
+	for (i = 0; i < rows; i++) {
+		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), NULL);
+		gint col_idx = gda_data_model_get_column_index (model, "guid");
+		const GValue *gval = gda_data_model_get_value_at (model, col_idx, i, NULL);
+		/* Set MidgardDBObject data */
+		MGD_OBJECT_GUID (objects[i]) = g_value_dup_string (gval);
+		MIDGARD_DBOBJECT(objects[i])->dbpriv->mgd = mgd;
+		MIDGARD_DBOBJECT(objects[i])->dbpriv->datamodel = model;
+		MIDGARD_DBOBJECT(objects[i])->dbpriv->row = i;
+		g_object_ref (model);
+	}
+
+	objects[i] = NULL;
+	*n_objects = rows;
+
+	return objects;
 }
 
 MidgardDBObject **
-midgard_query_select_list_objects (MidgardQuerySelect *self)
+midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 {
-	return MIDGARD_QUERY_SELECT_GET_CLASS (self)->list_objects (self);
+	return MIDGARD_QUERY_SELECT_GET_CLASS (self)->list_objects (self, n_objects);
 }
 
 /* GOBJECT ROUTINES */

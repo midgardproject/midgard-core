@@ -50,6 +50,8 @@ struct _MidgardDBObjectPrivate {
 	gboolean 		(*update_storage)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
 	gboolean		(*storage_exists)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
 	gboolean		(*delete_storage)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
+	gboolean		(*get_property)		(MidgardDBObject *self, const gchar *name, GValue *value);
+	gboolean		(*set_property)		(MidgardDBObject *self, const gchar *name, GValue *value);
 };
 
 #define MGD_OBJECT_GUID(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->guid

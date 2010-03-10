@@ -194,10 +194,14 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 	GType current_type = G_TYPE_FROM_INSTANCE(object);
 	MgdSchemaTypeAttr *priv = G_TYPE_INSTANCE_GET_PRIVATE (object, current_type, MgdSchemaTypeAttr);
 	MidgardObject *self = (MidgardObject *) object;
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (object);
 	MidgardConnection *mgd = MGD_OBJECT_CNC (MIDGARD_DBOBJECT (object));
 	GValue *pval;
 
 	if (midgard_core_object_property_refuse_private (mgd, priv, MIDGARD_DBOBJECT (object), pspec->name))
+		return;
+
+	if (dbklass->dbpriv->get_property (MIDGARD_DBOBJECT (self), pspec->name, value))
 		return;
 
 	switch (prop_id) {
@@ -1311,6 +1315,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		mklass->dbpriv->storage_exists = _object_storage_exists;
 		mklass->dbpriv->delete_storage = _object_delete_storage;
 		mklass->dbpriv->add_fields_to_select_statement = MIDGARD_OBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement;
+		mklass->dbpriv->get_property = MIDGARD_OBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_property;
 	}
 
 	if (G_OBJECT_CLASS_TYPE(g_class) != MIDGARD_TYPE_OBJECT) {
@@ -1532,6 +1537,8 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 
 	mklass->get_connection = MIDGARD_DBOBJECT_CLASS(mklass)->get_connection;
 	mklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->add_fields_to_select_statement;
+	mklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_property;
+
 
 	if (!signals_registered && mklass) {
 		

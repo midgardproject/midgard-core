@@ -81,8 +81,8 @@ struct _MidgardQueryExecutorPrivate {
 	MidgardQuerySimpleConstraint *constraint;
 	GSList *orders;
 	GSList *joins;
-	guint limit;
-	guint offset;
+	gint limit;
+	gint offset;
 	gpointer resultset;
 	guint tableid;
 	gchar *table_alias;

@@ -162,6 +162,10 @@ MidgardMetadata *midgard_metadata_new(MidgardObject *object)
 	return self;
 }
 
+/* GOBJECT ROUTINES */
+
+static GObjectClass *__parent_class = NULL;
+
 enum {
     MIDGARD_METADATA_CREATOR = 1,
     MIDGARD_METADATA_CREATED,
@@ -187,6 +191,17 @@ enum {
     MIDGARD_METADATA_ISAPPROVED,
     MIDGARD_METADATA_ISLOCKED
 };
+
+gboolean
+_midgard_metadata_db_set_property (MidgardDBObject *self, const gchar *name, GValue *value)
+{
+	gchar *datamodel_property = g_strconcat ("metadata_", name, NULL);
+	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (MIDGARD_METADATA (self)->priv->object);
+	gboolean rv = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_property (dbobject, datamodel_property, value);
+	g_free (datamodel_property);
+
+	return rv;
+}
 
 static void
 _metadata_set_property (GObject *object, guint property_id,
@@ -238,13 +253,27 @@ _metadata_set_property (GObject *object, guint property_id,
 			break;                  
 	}
 }
-    
+
+gboolean
+_midgard_metadata_db_get_property (MidgardDBObject *self, const gchar *name, GValue *value)
+{
+	gchar *datamodel_property = g_strconcat ("metadata_", name, NULL);
+	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (MIDGARD_METADATA (self)->priv->object);
+	gboolean rv = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->get_property (dbobject, datamodel_property, value);
+	g_free (datamodel_property);
+
+	return rv;
+}
+
 static void
 _metadata_get_property (GObject *object, guint property_id,
         GValue *value, GParamSpec *pspec)
 {    
 	MidgardMetadata *self =	(MidgardMetadata *) object;
-	
+
+	if (MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->get_property (MIDGARD_DBOBJECT (object), pspec->name, value))
+		return;
+
 	switch (property_id) {
 		
 		case MIDGARD_METADATA_CREATOR: 
@@ -344,8 +373,6 @@ _metadata_get_property (GObject *object, guint property_id,
 			break;
 	}
 }
-
-static GObjectClass *__parent_class = NULL;
 
 static GObject *
 _metadata_constructor (GType type, guint n_construct_properties,
@@ -868,6 +895,7 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	klass->dbpriv->set_from_xml_node = __set_from_xml_node;
 	klass->dbpriv->add_fields_to_select_statement = NULL;
 	klass->dbpriv->has_metadata = FALSE;
+	klass->dbpriv->get_property = _midgard_metadata_db_get_property;
 }
 
 GType midgard_metadata_get_type (void)
