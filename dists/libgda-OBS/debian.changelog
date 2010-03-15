@@ -1,0 +1,656 @@
+midgard-libgda4 (4.0.8-1) unstable; urgency=low
+
+  [ Emilio Pozuelo Monfort ]
+  * debian/rules:
+    - Run the test suite during the build, but don't make it fatal (yet).
+
+  [ Piotr Pokora ]
+  * New upstream
+  * Build depend on libmysqlclient-dev package.
+  * Added libgda4 possible conflicts (also added to Replaces for save updates).
+  * New gir1.0-gda-4.0 package
+  * Dev package suggests doc one
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Mon, 08 Mar 2010 19:34:07 +0100
+
+libgda4 (4.0.7-1) unstable; urgency=low
+
+  * New upstream
+  * Removed libgda3-doc suggested package
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 10 Feb 2010 16:28:43 +0100
+
+libgda4 (4.0.6-1) unstable; urgency=low
+
+  [ Emilio Pozuelo Monfort ]
+  * Build depend on libreadline-dev rather than libreadline5-dev.
+    Closes: #553798.
+
+  [ Josselin Mouette ]
+  * Explicitly disable java.
+
+  [ Piotr Pokora ]
+  * New upstream release
+  * Removed duplicated libsqlite3-dev build dependency
+
+  [ Emilio Pozuelo Monfort ]
+  * Standards-Version is 3.8.4, no changes needed.
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Thu, 28 Jan 2010 11:31:29 +0100
+
+libgda4 (4.0.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * Bump libglib2.0-dev build dependency and remove libgnomevfs-dev,
+    to build with gio support.
+  * debian/patches/01_manpage.patch:
+    - Removed, fixed upstream.
+  * Standards-Version is 3.8.3, no changes needed.
+  * Remove DM-Upload-Allowed field.
+  * debian/rules:
+    - Don't install the trml python modules, they are optional
+      and we should use the standalone packages in any case.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Tue, 01 Sep 2009 00:01:06 +0200
+
+libgda4 (4.0.2-1) unstable; urgency=low
+
+  [ Gustavo R. Montesino ]
+  * New major upstream version. Closes: #520092.
+    - Update packaging for the new version.
+  * debian/control.in: 
+    - Add misc depends to libgda4-common
+    - Fix MySQL spelling
+  * debian/patches:
+    - 01_gds_info_new_remove.patch: Removed - not relevant anymore
+    - 02_libgda3_ia64_segv.patch: Removed - applied upstream 
+
+  [ Emilio Pozuelo Monfort ]
+  * debian/watch: don't uupdate.
+  * The dbg package is section debug.
+  * debian/rules: little cleanup.
+  * debian/copyright: point to the versionful license.
+  * debian/control: Inherit the Section from the source stanza where
+    it's duplicated.
+  * Standards-Version is 3.8.2, changes:
+    - Don't ship our own copy of jquery.js, link to the one in libjs-jquery
+      instead. Thus depend on libjs-jquery.
+  * Move some packages to the database section.
+  * debian/control: clean up whitespaces.
+  * Add Homepage field.
+  * New upstream release.
+    - Use the system sqlite instead of our own copy.
+  * debian/copyright: Updated.
+  * Rename the binary packages to match the library name in the packages.
+
+  [ Josselin Mouette ]
+  * 01_manpage.patch: fix syntax error in a manual page.
+  * Don’t include libtool files.
+  * Put the sqlite provider directly in the library package, so that 
+    there is always at least one working provider.
+  * Set the list as maintainer, since Gustavo’s email bounces.
+
+ -- Josselin Mouette <joss@debian.org>  Fri, 14 Aug 2009 16:52:54 +0200
+
+libgda3 (3.0.2-5) unstable; urgency=high
+
+  * Acknowledge NMU, thanks Steve.
+  * debian/control.in: build-depend on sqlite3 to make the sqlite version 
+    test on configure work correctly. (closes: #500288, LP: #145361)
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Mon, 06 Oct 2008 19:31:12 -0300
+
+libgda3 (3.0.2-4.1) unstable; urgency=high
+
+  * Non-maintainer upload with maintainer's approval.
+  * High-urgency upload for RC bugfix.
+  * Drop libgda3-freetds, which was being built against a private
+    "libtds" that was never meant to be used by external applications,
+    and which is no longer supported upstream.  Should be replaced by
+    libgda3-sybase, but the sybase driver doesn't currently compile.
+    Closes: #493356.
+
+ -- Steve Langasek <vorlon@debian.org>  Sat, 02 Aug 2008 09:58:30 +0000
+
+libgda3 (3.0.2-4) unstable; urgency=medium
+
+  * debian/configure.in: Move gtk-doc related packages to build-depends-indep
+  * debian/rules: Rebuild the docs only if gtk-doc is installed 
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Sun, 13 Apr 2008 09:12:54 -0300
+
+libgda3 (3.0.2-3) unstable; urgency=medium
+
+  * debian/patches/02_libgda3_ia64_segv.patch: Add patch from ubuntu to fix
+    FTBFS due to segv while building the docs; thanks to Steve Langasek and 
+    Chris Brotherton.
+  * debian/copyright: updated to the machine readable proposal
+    + Change Copyright lines to make Lintian happy
+    + Add information about the docs license (GFDL)
+  * debian/libgda3-doc.doc-base.libgda3-reference: Updated section. 
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Mon, 31 Mar 2008 23:07:52 -0300
+
+libgda3 (3.0.2-2) unstable; urgency=medium
+
+  * Promote gtk-doc-tools and sgmltools-lite from build-dep-indep to build-dep
+    as --enable-gtk-doc is passed unconditionally for all builds;
+    closes: #466431.
+
+ -- Loic Minier <lool@dooz.org>  Tue, 04 Mar 2008 12:50:23 +0100
+
+libgda3 (3.0.2-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/rules:
+    - Add utils.mk cdbs rules to make list-missing target work
+    - Explictly disable plugins which aren't packaged
+    - Set --as-needed flag to prevent links against uneeded libs
+  * debian/control.in:
+    - Update standards-version to 3.7.3 -- no changes required
+    - Added the Vcs-* fields
+    - Allow uploads by DMs
+  * Fix FTBFS if building twice in a row (closes: #442634)
+    - debian/control.in: Build-depend on flex
+    - debian/rules: Remove files generated by flex and bison on clean
+  * debian/patches/01_gds_info_new_remove.patch:
+    Remove gda_data_source_info_new prototype from gda-config.h.
+    Backported from upstream svn (closes: #457704)
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Sun, 03 Feb 2008 22:40:13 -0200
+
+libgda3 (3.0.1-1) unstable; urgency=low
+
+  [ Loic Minier ]
+  * Fix description of the -dbg package.
+
+  [ Gustavo R. Montesino ]
+  * New upstream release
+  * patches/01_missing_man.patch: removed - applied upstream
+  * patches/02_missing_include.patch: removed - applied upstream
+  * Build-depend on bison. (closes: #424520)
+
+ -- Loic Minier <lool@dooz.org>  Fri, 25 May 2007 20:50:58 +0200
+
+libgda3 (3.0.0-1) unstable; urgency=low
+
+
+  [ Gustavo R. Montesino ]
+  * New major upstream release.
+    - debian/libgda3-3.install: Some libraries were removed/merged.
+    - libgda3-dev.install, $(plugin).install: Install the new pkgconfig
+      files to test the installed plugions in the plugin packages.
+  * debian/rules: Build with unresolved symbol checking (-z defs).
+  * debian/patches/01_missing_man.patch: Fix missing manpages in upstream's
+    tarball.
+  * debian/patches/02_missing_include.patch: Fix potential segfault on 64 bit
+    architetures due to missing include; thanks Dann Frazier. (closes: #420677)
+
+  [ Loic Minier ]
+  * Wrap build-deps and deps.
+  * DISABLE_UPDATE_UPLOADERS and build-depend on gnome-pkg-tools >= 0.11.
+  * Drop useless @VERSION@ substitution.
+  * Cleanups.
+  * Don't export LDFLAGS.
+  * Fix watch file to track all stable versions and use HTTP.
+  * Use the gnome.org full URL in copyright.
+  * Bump up Debhelper compatibility level to 5.
+
+ -- Loic Minier <lool@dooz.org>  Mon, 30 Apr 2007 11:07:59 +0200
+
+libgda3 (2.99.5-1) unstable; urgency=low
+
+  [ Gustavo R. Montesino ]
+  * New major upstream beta version.
+  * Use a libgda3-3.install file instead of installing the files in the rules.
+  * Merge changes from libgda2/1.2.3-5 from unstable:
+    - rules: Really exclude providers from dh_makeshlibs.
+    - control.in: Fix depends to allow binNMU's.
+    - libgda3-doc.{install,links}, libgda3-doc.doc-base.libgda3-reference:
+      Install the html API documentation in /usr/share/gtk-doc/html, with
+      symlink in /usr/share/doc/libgda3-doc/.
+  * debian/rules: Don't override CDBS-defined LDFLAGS.
+  * debian/watch: update
+
+  [ Loic Minier ]
+  * Start merging libgda2/1.2.3-4 from unstable up to r8241.
+  * Add a get-orig-source target to retrieve the upstream tarball.
+  * Include the new check-dist Makefile to prevent accidental uploads to
+    unstable; bump build-dep on gnome-pkg-tools to >= 0.10.
+  * Finish merging libgda2/1.2.3-4 from unstable up to r8421.
+  * Upload to unstable; drop check-dist include.
+
+ -- Loic Minier <lool@dooz.org>  Wed, 14 Mar 2007 16:27:53 +0100
+
+libgda2 (1.2.3-4) unstable; urgency=low
+
+  * Fix typo in package description; thanks A. Costa; closes: #405645.
+  * Add a get-orig-source target to retrieve the upstream tarball.
+
+ -- Loic Minier <lool@dooz.org>  Sun, 14 Jan 2007 00:06:52 +0100
+
+libgda2 (1.2.3-3) unstable; urgency=low
+
+  * debian/patches/003_freetds_database_segfault.patch: Fix FreeTDS provider
+    segfault when DSN contains DATABASE, thanks to Gert-jan Los
+    (closes: #382178)
+  * debian/patches/004_const_void_fix.patch: Remove ignored const from
+    gpointer return, fix gcc 4 warning. (Closes: #387591)
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Sat, 21 Oct 2006 07:25:48 -0300
+
+libgda2 (1.2.3-2) unstable; urgency=low
+
+  * Add missing "shell" function name in ${pg_config --includedir} expansion.
+    [debian/rules]
+
+ -- Loic Minier <lool@dooz.org>  Sun,  4 Jun 2006 17:15:20 +0200
+
+libgda2 (1.2.3-1) unstable; urgency=low
+
+  * Acknowledge NMU (Closes: #355551).
+  * New upstream release.
+  * debian/patches:
+    - 001_freetds_063.patch: Adapted, most of it was merged in upstream
+      codebase.
+    - 003_format_string.patch: Removed - Merged upstream.
+  * debian/copyright: Changed the FSF address.
+  * debian/control.in:
+    - Changed the dependency of libgda2-common on libgda2-<soname> to
+      recommends (Closes: #354996).
+    - Added a new libgda2-bin package.
+    - Change libgda2-common arch from any to all
+    - Update to the lastest debian policy - no changes required.
+    - Add ${misc:Depends} to all Depends: lines
+    - Remove libgda2-dev dependency against pkg-config
+    - Remove useless versioning from suggested packages
+    - Make the package binNMU-safe
+      + build-depend on dpkg-dev (>= 1.13.19)
+      + Use ${source:Version} instead of ${Source-Version}
+  * debian/rules:
+    - Don't call ldconfig on maintainer scripts of plugin packages
+    - Put the binaries and its man pages into libgda2-bin
+  * debian/rules, *.{install,manpages,links}:
+    - use install and install-like files to let rules cleaner
+  * debian/changelog
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Sat, 27 May 2006 15:06:31 -0300
+
+libgda2 (1.2.2-1.1) unstable; urgency=low
+
+   * Non-maintainer upload.
+   * Change mysql build depedency to libmysqlclient15-dev.
+     (Closes: #355551)
+
+ -- Kurt Roeckx <kurt@roeckx.be>  Sun, 2 Apr 2006 15:19:35 +0200
+
+libgda2 (1.2.2-1) unstable; urgency=high
+
+  [ Gustavo R. Montesino <grmontesino@ig.com.br> ]
+  * New upstream release.
+  * Migrate to new postgresql packages (Closes: #317104):
+    - Build-depends against libpq-dev instead of postgresql-dev.
+    - Set the postgres include dir through pg_config.
+  * Update mysql build-dep to libmysqlclient14.
+  * patches:
+    - 001_freetds063.patch: Fix compilation with freetds 0.63
+      (Closes: #322855, #319332, #332256).
+    - 002_sqlite.patch: Fix compilation with sqlite 3.
+    - 003_format_string.patch: Fix potentially exploitable format string
+      attack in logging code [CAN-2005-2958]
+
+  [ Josselin Mouette <joss@debian.org> ]
+  * Don't overwrite DEB_CONFIGURE_SCRIPT_ENV completely.
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Wed, 12 Oct 2005 16:05:33 -0300
+
+libgda2 (1.2.1-2) unstable; urgency=low
+
+  * debian/control.in:
+    - libgda2-common conflicts/replaces with libgda-common (<< 0.2.96-6.2)
+      (Closes: #304024).
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Sun, 10 Apr 2005 09:57:19 -0300
+
+libgda2 (1.2.1-1) unstable; urgency=low
+
+  * Gustavo R. Montesino:
+    - New upstream release (Closes: #279587).
+      + Compiles cleanly with gcc-3.4 (Closes: #280265).
+      + Update soname.
+    - debian/control.in
+      + Set myself as maintainer.
+      + Update libsqlite build-dep to libsqlite3-dev.
+      + Update libmysqlclient build-dep to libmysqlclient12-dev.
+    - debian/patches
+      + 000_libgda2-omf.patch: Removed.
+      + 002_revert_tds_process_result_tokens_arguments_change.patch: Removed.
+      + 003_gcc-2.4_fix.patch: Removed.
+    - debian/rules
+      + Removed the needless -V argument to dh_makeshlibs.
+      + Install files here instead of using *.install and similar files.
+    - Moved the xml provider from libgda-common to libgda2-<soname>.
+    - Don't remove /etc/libgda on libgda2-common purge.
+    - Updated debian/watch.
+  * Jordi Mallach:
+    - debian/control.in: rename libgda2-dbg to libgda2-3-dbg.
+    - debian/rules: generate -dbg package using dh_strip's feature.
+
+ -- Jordi Mallach <jordi@debian.org>  Fri,  8 Apr 2005 18:49:02 +0200
+
+libgda2 (1.1.99-1) experimental; urgency=low
+
+  * New upstream development release.
+  * [debian/control.in] Switched from readline4 to readline5.
+  * [debian/patches/003_gcc-3.4_fix.patch] Trimmed down.
+  * [debian/copyright] Corrected authors list and encoding. (Closes: #253525)
+
+ -- J.H.M. Dassen (Ray) <jdassen@debian.org>  Mon, 11 Oct 2004 11:03:13 +0200
+
+libgda2 (1.1.6-1) experimental; urgency=low
+
+  * New upstream development release.
+  * [debian/rules] Ensure at build time that all symbols are resolvable; make
+    the linker work a bit harder to make loading faster.
+
+ -- J.H.M. Dassen (Ray) <jdassen@debian.org>  Sat, 14 Aug 2004 11:30:17 +0200
+
+libgda2 (1.1.5-2) experimental; urgency=low
+
+  * GNOME Team upload.
+  * Added a conflict between libgda2-doc and libgda-doc (closes: #261626)
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Tue, 27 Jul 2004 17:01:16 -0300
+
+libgda2 (1.1.5-1) experimental; urgency=low
+
+  * GNOME Team upload.
+  * New upstream release.
+  * debian/control.in: added myself as uploader.
+  * debian/patches/000_libgda2-omf.patch: Changed to really allow yelp to show
+    the docs.
+  * debian/patches/003_add_mkinstalldirs.patch: Removed - fixed upstream.
+  * debian/patches/003_gcc-3.4_fix.patch: Added to build with gcc 3.4, thanks
+    to Andreas Jochens <aj@andaco.de> (closes: #260426).
+  * debian/rules: Correctly install .devhelp and .png doc files.
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Sat, 24 Jul 2004 19:02:21 -0300
+
+libgda2 (1.1.4-1) experimental; urgency=low
+
+  * Gnome Team upload.
+  * New upstream release.
+    + Upstream removed undefined functions from the headers. (closes: #222083)
+  * Switched package to cdbs.
+  * [debian/patches/001_include_for_gda_type_to_string.patch] Removed.
+    Added upstream.
+  * [debian/patches/003_add_mkinstalldirs.patch] New. Add mkinstalldirs
+    script; it's missing in upstream tarball.
+
+ -- Gustavo R. Montesino <grmontesino@ig.com.br>  Sat,  10 Jul 2004 15:10:21 -0300
+
+libgda2 (1.0.4-1) unstable; urgency=medium
+
+  * Gnome Team upload.
+  * New upstream release.
+  * [002_revert_tds_process_result_tokens_arguments_change.patch] New. Revert
+    the freetds provider sources to the 1.0.3 ones as the 1.0.4 ones do not
+    build with sid's freetds-dev 0.61-5.
+
+ -- J.H.M. Dassen (Ray) <jdassen@debian.org>  Tue,  8 Jun 2004 22:27:51 +0200
+
+libgda2 (1.0.3-3) unstable; urgency=medium
+
+  * Gnome Team Upload
+  * [debian/control.in] Tightened libglib2.0-dev build dependency to >= the
+    version used for GNOME 2.6.
+  * [debian/rules] Configure --disable-gtk-doc as documentation generation
+    currently fails (report filed upstream).
+
+ -- J.H.M. Dassen (Ray) <jdassen@debian.org>  Mon,  7 Jun 2004 21:32:29 +0200
+
+libgda2 (1.0.3-2) unstable; urgency=low
+
+  * debian/scripts/vars: fixed to build new one. (closes: Bug#233494)
+  * Ack to NMU. (closes: Bug#226560)
+
+ -- Akira TAGOH <tagoh@debian.org>  Thu, 19 Feb 2004 00:23:45 +0900
+
+libgda2 (1.0.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * Gnome Team Upload.
+
+ -- Sebastien Bacher <seb128@debian.org>  Mon, 16 Feb 2004 23:28:02 +0100
+
+libgda2 (1.0.2-2) unstable; urgency=high
+
+  * Gnome Team Upload
+  * [debian/patches/001_include_for_gda_type_to_string.patch] New. Include the
+    header declaring gda_type_to_string to prevent crashes on 64-bit
+    architectures. (Closes: #226560)
+
+ -- J.H.M. Dassen (Ray) <jdassen@debian.org>  Sat, 10 Jan 2004 22:58:53 +0100
+
+libgda2 (1.0.2-1) unstable; urgency=low
+
+  * New upstream release (Closes: #224141).
+  * Gnome Team Upload.
+
+ -- Sebastien Bacher <seb128@debian.org>  Fri, 26 Dec 2003 22:06:27 +0100
+
+libgda2 (1.0.1-1) unstable; urgency=low
+
+  * New upstream release. (closes: Bug#215439)
+  * debian/control:
+    - added Uploaders to maintain as team.
+    - added gnome-pkg-tools to Build-Depends.
+  * debian/rules:
+    - modified to generate debian/control from gnome-pkg-tools.
+  * debian/libgda2-common.postrm:
+    - ensure to remove /etc/libgda on purge. (closes: Bug#217340)
+  * debian/patches/000_libgda2-0.91.0-freetds-includepath.patch:
+    - removed unnecessary patch.
+
+ -- Akira TAGOH <tagoh@debian.org>  Mon, 27 Oct 2003 15:37:52 +0900
+
+libgda2 (0.91.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    - bumped Standards-Version to 3.6.1.0.
+  * debian/patches/000_libgda2-0.91.0-freetds-includepath.patch:
+    - applied to fix the build of freetds backend.
+
+ -- Akira TAGOH <tagoh@debian.org>  Mon,  8 Sep 2003 12:05:54 +0900
+
+libgda2 (0.90.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control: update Build-Depends.
+  * debian/rules: use dh_scrollkeeper.
+  * debian/libgda2-doc.post{inst,rm}: removed.
+  * debian/patches/000_libgda2-omf.patch: updated.
+
+ -- Akira TAGOH <tagoh@debian.org>  Sun,  6 Jul 2003 12:29:28 +0900
+
+libgda2 (0.12.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    - use libgdbm-dev instead of libgdbmg1-dev for Build-Depends.
+
+ -- Akira TAGOH <tagoh@debian.org>  Wed, 11 Jun 2003 00:50:54 +0900
+
+libgda2 (0.12.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    - bumped Standards-Version to 3.5.10.0.
+    - changed the sections for gda2-* to gnome, and for libgda2-dev and
+      libgda2-dbg to libdevel.
+    - real name is GNOME Data Access.
+  * debian/compat:
+    - use it instead of DH_COMPAT.
+  * debian/patches/000_libgda2-0.11.0-postgres-passwd.patch:
+    - removed.
+  * debian/gda-test.1:
+    - added.
+
+ -- Akira TAGOH <tagoh@debian.org>  Sun,  1 Jun 2003 18:06:09 +0900
+
+libgda2 (0.11.0-2) unstable; urgency=low
+
+  * debian/patches/000_libgda2-0.11.0-postgres-passwd.patch:
+    applied to fix the fails-password-authentication. (closes: Bug#185181)
+
+ -- Akira TAGOH <tagoh@debian.org>  Tue, 18 Mar 2003 07:27:56 +0900
+
+libgda2 (0.11.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/rules:
+    - bumped DH_COMPAT to 4.
+  * debian/control:
+    - updated Build-Depends.
+    - added the versioned dependency of libgda2-common.
+  * debian/patches/001_libgda2-0.10.0-proper_C_comments.patch:
+    - removed. it was merged by the upstream.
+
+ -- Akira TAGOH <tagoh@debian.org>  Tue, 11 Mar 2003 05:32:23 +0900
+
+libgda2 (0.10.0-1) unstable; urgency=low
+
+  * New upstream release. (closes: Bug#178825)
+  * debian/control:
+    - add gda2-freetds package.
+    - use unixodbc-dev instead of libiodbc2-dev.
+
+ -- Akira TAGOH <tagoh@debian.org>  Sun,  2 Feb 2003 15:06:09 +0900
+
+libgda2 (0.9.0-2) unstable; urgency=low
+
+  * Build against the latest postgresql.
+  * debian/control:
+    updated Build-Depends.
+
+ -- Akira TAGOH <tagoh@debian.org>  Sun,  5 Jan 2003 16:24:39 +0900
+
+libgda2 (0.9.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * ack to NMU. (closes: Bug#167474, Bug#169203)
+  * debian/control:
+    bumped Standards-Version to 3.5.8.
+  * debian/copyright:
+    fix copyright-lists-upstream-authors-with-dh_make-boilerplate issue.
+  * debian/patches:
+    - 001_proper_C_comments.patch: removed because it can't be applied.
+    - 001_libgda2-0.9.0-proper_C_comments.patch: applied to fix C++ comments.
+
+ -- Akira TAGOH <tagoh@debian.org>  Mon, 16 Dec 2002 00:20:00 +0900
+
+libgda2 (0.8.199-2.1) unstable; urgency=low
+
+  * NMU
+  * debian/patches/001_proper_C_comments.patch: Added. (Closes: #167474)
+
+ -- J.H.M. Dassen (Ray) <jdassen@debian.org>  Fri, 15 Nov 2002 11:53:48 +0100
+
+libgda2 (0.8.199-2) unstable; urgency=low
+
+  * debian/libgda2-common.files: fix duplicate manpage. (closes: Bug#166730,
+    Bug#166688)
+
+ -- Akira TAGOH <tagoh@debian.org>  Mon, 28 Oct 2002 21:31:55 +0900
+
+libgda2 (0.8.199-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/patches/000_libgda2-omf.patch: updated.
+
+ -- Akira TAGOH <tagoh@debian.org>  Sun, 27 Oct 2002 10:30:43 +0900
+
+libgda2 (0.8.193-2) unstable; urgency=low
+
+  * debian/control: according to GNOME bugzilla #94024, add gda2-sqlite
+    package.
+  * debian/rules: supports noopt option for DEB_BUILD_OPTIONS.
+
+ -- Akira TAGOH <tagoh@debian.org>  Wed, 16 Oct 2002 02:07:04 +0900
+
+libgda2 (0.8.193-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    - bumped Standards-Version to 3.5.7.
+    - updated Build-Depends.
+  * debian/patches/000_libgda2-omf.patch:
+    applied to fix a document path and omf filename.
+
+ -- Akira TAGOH <tagoh@debian.org>  Sat, 14 Sep 2002 03:15:17 +0900
+
+libgda2 (0.8.192-2) unstable; urgency=low
+
+  * debian/control: removed libc6-dev from Build-Depends.
+
+ -- Akira TAGOH <tagoh@debian.org>  Thu, 22 Aug 2002 04:30:16 +0900
+
+libgda2 (0.8.192-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control: update Build-Depends
+
+ -- Akira TAGOH <tagoh@debian.org>  Tue,  9 Jul 2002 23:09:51 +0900
+
+libgda2 (0.8.191-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Akira TAGOH <tagoh@debian.org>  Sun, 26 May 2002 19:10:13 +0900
+
+libgda2 (0.8.190-2) unstable; urgency=low
+
+  * debian/rules: Fix relink issue. (closes: Bug#146194)
+
+ -- Akira TAGOH <tagoh@debian.org>  Wed,  8 May 2002 10:10:24 +0900
+
+libgda2 (0.8.190-1) unstable; urgency=low
+
+  * New upstream release.
+    - No longer needs CORBA stuff.
+  * debian/control: remove liborbit2-dev, libbonobo-activation-dev,
+    libbonobo2-dev, libgconf2-dev, libgnome-vfs2-dev from Build-Depends.
+  * debian/patches/000_libgda2-0.8.105-fixschema.patch:
+    removed. this patch is no longer needed.
+
+ -- Akira TAGOH <tagoh@debian.org>  Sun,  5 May 2002 03:52:57 +0900
+
+libgda2 (0.8.105-4) unstable; urgency=low
+
+  * debian/control: add libxslt1-dev to Depends for -dev.
+
+ -- Akira TAGOH <tagoh@debian.org>  Mon, 22 Apr 2002 15:13:11 +0900
+
+libgda2 (0.8.105-3) unstable; urgency=low
+
+  * debian/control: fix the missing dependency for -dev.
+
+ -- Akira TAGOH <tagoh@debian.org>  Mon, 15 Apr 2002 02:04:26 +0900
+
+libgda2 (0.8.105-2) unstable; urgency=low
+
+  * debian/control:
+    - add versioned dependency for libxml2-dev.
+    - this library is for GNOME2, but doesn't require GNOME2.
+
+ -- Akira TAGOH <tagoh@debian.org>  Sun, 14 Apr 2002 22:26:49 +0900
+
+libgda2 (0.8.105-1) unstable; urgency=low
+
+  * Initial Release.
+  * debian/patches/000_libgda2-0.8.105-fixschema.patch:
+    fix an invalid schema.
+
+ -- Akira TAGOH <tagoh@debian.org>  Tue,  9 Apr 2002 00:57:38 +0900
+

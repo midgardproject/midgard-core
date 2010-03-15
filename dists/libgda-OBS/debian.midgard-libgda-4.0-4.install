@@ -1,0 +1,2 @@
+usr/lib/libgda*.so.*
+usr/lib/libgda*/providers/libgda-sqlite.so

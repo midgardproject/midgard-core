@@ -1,0 +1,182 @@
+Source: libgda4
+Section: libs
+Priority: optional
+Maintainer: Debian GNOME Maintainers <pkg-gnome-maintainers@lists.alioth.debian.org>
+Uploaders: Emilio Pozuelo Monfort <pochu@debian.org>, Josselin Mouette <joss@debian.org>, Loic Minier <lool@dooz.org>, Piotr Pokora <piotrek.pokora@gmail.com>
+Vcs-Browser: http://svn.debian.org/viewsvn/pkg-gnome/packages/unstable/libgda4/
+Vcs-Svn: svn://svn.debian.org/pkg-gnome/packages/unstable/libgda4/
+Build-Depends: cdbs (>= 0.4.41),
+               debhelper (>= 5),
+               dpkg-dev (>= 1.13.19),
+               gnome-pkg-tools (>= 0.11),
+               intltool,
+               pkg-config (>= 0.18),
+               libglib2.0-dev (>= 2.16),
+               libsqlite3-dev,
+               libxml2-dev (>= 2.4.22),
+               libxslt1-dev (>= 1.0.18),
+               libmysqlclient-dev,
+               libncurses5-dev,
+               libpq-dev,
+               libreadline-dev,
+               libpopt-dev,
+               libsoup2.4-dev,
+               zlib1g-dev,
+               scrollkeeper,
+               gobject-introspection,
+               libgirepository1.0-dev
+Build-Depends-Indep: gtk-doc-tools,
+                     sgmltools-lite
+Standards-Version: 3.8.4
+Homepage: http://www.gnome-db.org/
+
+Package: midgard-libgda-4.0-4
+Architecture: any
+Depends: midgard-libgda-4.0-common (>= ${source:Version}),
+         ${shlibs:Depends},
+         ${misc:Depends}
+Suggests: midgard-libgda-4.0-bin,
+          midgard-libgda-4.0-mysql,
+          midgard-libgda-4.0-postgres
+Conflicts: libgda2-1, libgda4-4, libgda4-sqlite
+Replaces: libgda2-1, libgda4-4, libgda4-sqlite
+Description: data abstraction library based on GLib
+ libgda is a (relatively small) database abstraction/access library
+ integrated on the GLib object model. It can be used as a metadata
+ extractor, to get information about all database objects in a common
+ way, and as an ODBC-like wrapper to access data in different engines
+ through an easier API.
+
+Package: midgard-libgda-4.0-bin
+Section: database
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Conflicts: libgda-common (<< 0.2.96-6.2), libgda4-bin
+Replaces: libgda-common (<< 0.2.96-6.2), libgda4-bin
+Description: data abstraction library based on GLib -- binary files
+ libgda is a (relatively small) database abstraction/access library
+ integrated on the GLib object model. It can be used as a metadata
+ extractor, to get information about all database objects in a common
+ way, and as an ODBC-like wrapper to access data in different engines
+ through an easier API.
+ .
+ This package contains binary files for libgda.
+
+
+Package: midgard-libgda-4.0-common
+Section: database
+Architecture: all
+Depends: ${misc:Depends},
+         libjs-jquery
+Recommends: midgard-libgda-4.0-4
+Conflicts: libgda-common (<< 0.2.96-6.2), libgda4-common
+Replaces: libgda-common (<< 0.2.96-6.2), libgda4-common
+Description: data abstraction library based on GLib -- common files
+ libgda is a (relatively small) database abstraction/access library
+ integrated on the GLib object model. It can be used as a metadata
+ extractor, to get information about all database objects in a common
+ way, and as an ODBC-like wrapper to access data in different engines
+ through an easier API.
+ .
+ This package contains common files for libgda.
+
+Package: midgard-libgda-4.0-dev
+Section: libdevel
+Architecture: any
+Depends: midgard-libgda-4.0-4 (= ${binary:Version}),
+         libglib2.0-dev (>= 2.2.0),
+         libxslt1-dev,
+         ${misc:Depends}
+Suggests: midgard-libgda-4.0-doc
+Conflicts: libgda4-dev, libgda4-sqlite
+Replaces: libgda4-dev, libgda4-sqlite
+Description: data abstraction library based on GLib -- development files
+ libgda is a (relatively small) database abstraction/access library
+ integrated on the GLib object model. It can be used as a metadata
+ extractor, to get information about all database objects in a common
+ way, and as an ODBC-like wrapper to access data in different engines
+ through an easier API.
+ .
+ This package contains the header files and libraries needed for
+ development.
+
+Package: midgard-libgda-4.0-4-dbg
+Section: debug
+Priority: extra
+Architecture: any
+Depends: midgard-libgda-4.0-4 (= ${binary:Version}),
+         ${misc:Depends}
+Description: data abstraction library based on GLib -- debug files
+ libgda is a (relatively small) database abstraction/access library
+ integrated on the GLib object model. It can be used as a metadata
+ extractor, to get information about all database objects in a common
+ way, and as an ODBC-like wrapper to access data in different engines
+ through an easier API.
+ .
+ This package contains dettached symbols for debug. Most people
+ don't need this package.
+
+Package: midgard-libgda-4.0-doc
+Section: doc
+Architecture: all
+Depends: lynx | www-browser,
+         ${misc:Depends}
+Conflicts: libgda-doc
+Description: data abstraction library based on GLib -- documentation files
+ libgda is a (relatively small) database abstraction/access library
+ integrated on the GLib object model. It can be used as a metadata
+ extractor, to get information about all database objects in a common
+ way, and as an ODBC-like wrapper to access data in different engines
+ through an easier API.
+ .
+ This package contains document files about libgda API.
+
+Package: midgard-libgda-4.0-mysql
+Section: database
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Conflicts: libgda4-mysql
+Replaces: libgda4-mysql
+Description: MySQL provider for libgda database abstraction library
+ libgda is a (relatively small) database abstraction/access library
+ integrated on the GLib object model. It can be used as a metadata
+ extractor, to get information about all database objects in a common
+ way, and as an ODBC-like wrapper to access data in different engines
+ through an easier API.
+ .
+ This package contains the provider needed to access MySQL databases
+ through libgda.
+
+Package: midgard-libgda-4.0-postgres
+Section: database
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends}
+Conflicts: libgda4-postgres
+Replaces: libgda4-postgres
+Description: PostgreSQL provider for libgda database abstraction library
+ libgda is a (relatively small) database abstraction/access library
+ integrated on the GLib object model. It can be used as a metadata
+ extractor, to get information about all database objects in a common
+ way, and as an ODBC-like wrapper to access data in different engines
+ through an easier API.
+ .
+ This package contains the provider needed to access PostgreSQL
+ databases through libgda.
+
+Package: gir1.0-gda-4.0
+Section: libs
+Architecture: any
+Depends: midgard-libgda-4.0-4 (= ${binary:Version}),
+        ${shlibs:Depends},
+        ${misc:Depends}
+Description: data abstraction library based on GLib -- GObject Introspection
+ libgda is a (relatively small) database abstraction/access library
+ integrated on the GLib object model. It can be used as a metadata
+ extractor, to get information about all database objects in a common
+ way, and as an ODBC-like wrapper to access data in different engines
+ through an easier API.
+ .
+ This package contains introspection data for libgda.

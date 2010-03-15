@@ -1,0 +1,61 @@
+#!/usr/bin/make -f 
+# -*- Makefile -*-
+
+DISABLE_UPDATE_UPLOADERS := 1
+include /usr/share/gnome-pkg-tools/1/rules/uploaders.mk
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/simple-patchsys.mk
+include /usr/share/cdbs/1/rules/utils.mk
+include /usr/share/cdbs/1/class/gnome.mk
+-include /usr/share/gnome-pkg-tools/1/rules/gnome-get-source.mk
+
+GNOME_MODULE := libgda
+SONAME := 4
+
+LDFLAGS += -Wl,-z,defs -Wl,--as-needed -Wl,-O1
+DEB_DH_MAKESHLIBS_ARGS_ALL += -X /usr/lib/libgda-4.0/providers
+DEB_DH_INSTALL_SOURCEDIR := debian/tmp
+
+DEB_MAKE_CHECK_TARGET = check || true
+
+DEB_CONFIGURE_EXTRA_FLAGS += --with-postgres=$(shell pg_config --includedir)	\
+				--without-bdb		\
+				--without-mSQL		\
+				--without-ibmdb2	\
+				--without-sybase	\
+				--without-tds		\
+				--without-oracle	\
+				--without-firebird	\
+				--without-xbase		\
+				--without-mdb		\
+				--without-ldap		\
+				--without-java		\
+				--enable-system-sqlite
+
+# Only build the docs if this file is present (e.g. when building arch.all packages)
+$(DEB_BUILDDIR)/config.status: DEB_CONFIGURE_EXTRA_FLAGS += $(shell if test -f /usr/share/pkgconfig/gtk-doc.pc; then echo "--enable-gtk-doc"; fi)
+
+clean::	
+	# remove generated files
+	rm -f libsql/lexer.c
+	rm -f libsql/parser.c
+
+binary-install/libgda-4.0-common::
+	# Don't ship our own copy of jquery.js
+	rm debian/libgda-4.0-common/usr/share/libgda-4.0/web/jquery.js
+	ln -s ../../javascript/jquery/jquery.js \
+		debian/libgda-4.0-common/usr/share/libgda-4.0/web/
+
+binary-install/libgda-4.0-bin::
+	# Remove gda_trml2{html,pdf} from /usr/bin, see GNOME #579458
+	rm -r debian/libgda-4.0-bin/usr/bin/gda_trml2*
+
+common-binary-post-install-arch::
+	for i in libgda-4.0-common libgda-4.0-bin libgda-4.0-dev libgda-4.0-$(SONAME)-dbg \
+	  libgda-4.0-mysql libgda-4.0-postgres libgda-4.0-sqlite; \
+	do \
+		rm -rf debian/$$i/usr/share/doc; \
+		dh_link -p$$i usr/share/doc/libgda-4.0-$(SONAME) usr/share/doc/$$i; \
+	done
+
+.PHONY: clean common-binary-post-install-arch

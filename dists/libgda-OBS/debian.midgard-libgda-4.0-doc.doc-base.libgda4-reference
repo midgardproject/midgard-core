@@ -1,0 +1,9 @@
+Document: libgda4-reference
+Title: libgda4 Reference Manual
+Author: Rodrigo Moya <rodrigo@gnome-db.org>
+Abstract: This manual describes API which libgda offers
+Section: Programming/C
+
+Format: HTML
+Index: /usr/share/doc/libgda4-doc/html/index.html
+Files: /usr/share/doc/libgda4-doc/html/*.html
