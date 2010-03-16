@@ -34,6 +34,7 @@ AM_PROG_LIBTOOL
 dnl Checks for libraries.
 AC_MSG_CHECKING([whether to use Libgda4 (libgda3 by default)])
 AC_ARG_WITH(libgda4, [  --with-libgda4], gdamodule="libgda-4.0", gdamodule="libgda-3.0")
+gdamodule="libgda-4.0"
 AC_MSG_RESULT($gdamodule)
 
 _MIDGARD_DBUS_SUPPORT=yes
@@ -53,8 +54,6 @@ PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 $gdamodule $dbus_libs
 if test "$gdamodule" == "libgda-4.0"; then
     MIDGARD_CFLAGS="${MIDGARD_CFLAGS} -DHAVE_LIBGDA_4"
 fi
-
-MIDGARD_CFLAGS="${MIDGARD_CFLAGS} -DHAVE_LIBGDA_4"
 
 DBUS_CONF_DIR="/etc"
 if test "$_MIDGARD_DBUS_SUPPORT" == "yes"; then
