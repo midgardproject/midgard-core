@@ -54,6 +54,8 @@ if test "$gdamodule" == "libgda-4.0"; then
     MIDGARD_CFLAGS="${MIDGARD_CFLAGS} -DHAVE_LIBGDA_4"
 fi
 
+MIDGARD_CFLAGS="${MIDGARD_CFLAGS} -DHAVE_LIBGDA_4"
+
 DBUS_CONF_DIR="/etc"
 if test "$_MIDGARD_DBUS_SUPPORT" == "yes"; then
 	#MIDGARD_DBUS_SUPPORT=1
