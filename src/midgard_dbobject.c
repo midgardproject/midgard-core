@@ -174,9 +174,69 @@ _midgard_dbobject_set_property (MidgardDBObject *self, const gchar *name, GValue
 	if (col_idx == -1)
 		return FALSE;
 
-	gboolean rv = gda_data_model_set_value_at (model, col_idx, self->dbpriv->row, (const GValue *) value, NULL);
+	GError *error = NULL;
+	gboolean rv = gda_data_model_set_value_at (model, col_idx, self->dbpriv->row, (const GValue *) value, &error);
+
 
 	return rv;
+}
+
+void
+_midgard_dbobject_set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row)
+{
+	g_return_if_fail (self != NULL);	
+	g_return_if_fail (model != NULL);
+	g_return_if_fail (row > -1);
+
+	GError *error = NULL;
+
+	/* First property is a guid */
+	const GValue *guid = gda_data_model_get_value_at (model, 0, row, &error);	
+	if (!guid) {
+		g_warning ("Failed to get guid value: %s", error && error->message ? error->message : "Unknown reason");
+		g_clear_error (&error);
+		return;
+	}
+	MGD_OBJECT_GUID (self) = g_value_dup_string (guid);
+
+	if (error)
+		g_clear_error (&error);
+
+	/* Set user defined properties */
+	guint n_props;
+	guint i;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_GET_CLASS (self), &n_props);
+	if (!pspecs)
+		return;
+
+	const GValue *pval;
+	for (i = 1; i < n_props; i++) {
+		const gchar *pname = pspecs[i]->name;
+		gint col_idx = gda_data_model_get_column_index (model, pname);
+		if (col_idx == -1)
+			continue;
+		
+		pval = gda_data_model_get_value_at (model, col_idx, row, &error);
+		if (!pval) {
+			g_warning ("Failed to get '%s' property value: %s", pname, 
+					error && error->message ? error->message : "Unknown reason");
+			continue;
+		}
+		/* Overwrite NULL values */
+		if (G_VALUE_TYPE (pval) == GDA_TYPE_NULL && pspecs[i]->value_type == G_TYPE_STRING)
+			g_object_set (G_OBJECT (self), pname, "", NULL);
+		else
+			g_object_set_property (G_OBJECT (self), pname, pval);
+	}
+
+	/* Set metadata */
+	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (self);
+	MidgardMetadata *metadata = dbobject->dbpriv->metadata;
+	if (metadata)
+		MIDGARD_DBOBJECT_GET_CLASS (MIDGARD_DBOBJECT (metadata))->dbpriv->set_from_data_model (
+				MIDGARD_DBOBJECT (metadata), model, row);
+
+	return;
 }
 
 /* GOBJECT ROUTINES */
@@ -267,6 +327,7 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->dbpriv->add_fields_to_select_statement = _add_fields_to_select_statement;
 	klass->dbpriv->get_property = _midgard_dbobject_get_property;
 	klass->dbpriv->set_property = _midgard_dbobject_set_property;
+	klass->dbpriv->set_from_data_model = _midgard_dbobject_set_from_data_model;
 }
 
 /* Registers the type as a fundamental GType unless already registered. */ 

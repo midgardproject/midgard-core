@@ -3008,6 +3008,20 @@ __add_join (Psh *holder)
 	s_target->expr = texpr;
 }
 
+void 
+__exclude_deleted_constraint (MidgardQueryExecutor *executor, const gchar *table_alias)
+{
+	GdaSqlStatement *sql_stm = executor->priv->stmt;
+	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;
+	GdaSqlExpr *where = select->where_cond;
+	GdaSqlOperation *operation = where->cond;
+
+	GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
+	expr->value = gda_value_new (G_TYPE_STRING);
+	g_value_set_string (expr->value, "t1.metadata_deleted = 0");
+	operation->operands = g_slist_append (operation->operands, expr);
+}
+
 gboolean 
 __compute_reserved_property_constraint (Psh *holder, const gchar *token_1, const gchar *token_2)
 {

@@ -89,6 +89,7 @@ struct _MidgardQueryExecutorPrivate {
 	guint joinid;
 	GdaSqlStatement *stmt;
 	guint results_count;
+	gboolean read_only;
 };
 
 struct _MidgardQuerySimpleConstraintPrivate {

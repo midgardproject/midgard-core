@@ -218,15 +218,8 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	GdaSqlExpr *top_where, *where, *expr;
 	GdaSqlOperation *top_operation, *cond;
 	GValue *value;
-	gboolean take_where_condition = FALSE;
 
-	if (!select->where_cond) {	
-		top_where = gda_sql_expr_new (GDA_SQL_ANY_PART (select));
-		take_where_condition = TRUE;
-		top_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (top_where));
-		top_operation->operator_type = GDA_SQL_OPERATOR_TYPE_AND;
-		top_where->cond = top_operation;
-	} else if (where_expr_node) {
+	if (where_expr_node) {
 		top_where = where_expr_node;
 		top_operation = top_where->cond;
 	} else {
@@ -258,6 +251,7 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	GValue val = {0, };
 	midgard_query_holder_get_value (MIDGARD_QUERY_CONSTRAINT (simple_constraint)->holder, &val);
 	GType v_type = G_VALUE_TYPE (&val);
+	/* FIXME, create parameter name::type */
 	//GValue *dval = gda_value_new (G_TYPE_STRING);
 	//g_value_transform (&val, dval);
 	//expr->param_spec = gda_sql_param_spec_new (dval);
@@ -266,9 +260,6 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	__set_expression_value (expr->value, &val);
 	g_value_unset (&val);
 	cond->operands = g_slist_append (cond->operands, expr);
-
-	if (take_where_condition)
-		gda_sql_statement_select_take_where_cond (stmt, top_where);
 }
 
 static void

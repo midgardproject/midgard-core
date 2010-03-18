@@ -765,7 +765,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 	/* creator */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
 	if(G_VALUE_HOLDS_STRING (gvalue)) 
-		midgard_core_metadata_set_creator (mdata, g_value_get_string (gvalue));
+		midgard_core_metadata_set_creator (mdata, gvalue);
 
 	/* created */	
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -774,7 +774,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 	/* revisor */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
 	if(G_VALUE_HOLDS_STRING (gvalue)) 
-		midgard_core_metadata_set_revisor (mdata, g_value_get_string (gvalue));
+		midgard_core_metadata_set_revisor (mdata, gvalue);
 		
 	/* revised */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -788,7 +788,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 	/* locker */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
 	if(G_VALUE_HOLDS_STRING (gvalue)) 
-		midgard_core_metadata_set_locker (mdata, g_value_get_string (gvalue));
+		midgard_core_metadata_set_locker (mdata, gvalue);
 		
 	/* locked */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -797,7 +797,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 	/* approver */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
 	if(G_VALUE_HOLDS_STRING (gvalue)) 
-		midgard_core_metadata_set_creator (mdata, g_value_get_string (gvalue));
+		midgard_core_metadata_set_creator (mdata, gvalue);
 
 
 	/* approved */
@@ -807,12 +807,12 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 	/* authors */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
 	if(G_VALUE_HOLDS_STRING (gvalue)) 
-		midgard_core_metadata_set_authors (mdata, g_value_get_string (gvalue));
+		midgard_core_metadata_set_authors (mdata, gvalue);
 		
 	/* owner */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
 	if(G_VALUE_HOLDS_STRING (gvalue)) 
-		midgard_core_metadata_set_owner (mdata, g_value_get_string (gvalue));
+		midgard_core_metadata_set_owner (mdata, gvalue);
 
 	/* schedule_start */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);

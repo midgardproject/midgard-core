@@ -93,6 +93,7 @@ _midgard_query_executor_constructor (GType type,
 	MIDGARD_QUERY_EXECUTOR (object)->priv->stmt = NULL;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->joinid = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->results_count = 0;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->read_only = TRUE;
 
 	return G_OBJECT(object);
 }

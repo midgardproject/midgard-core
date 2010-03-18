@@ -21,6 +21,7 @@
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
 #include "midgard_query_holder.h"
+#include "midgard_dbobject.h"
 
 MidgardQuerySelect *
 midgard_query_select_new (MidgardConnection *mgd, MidgardQueryStorage *storage)
@@ -221,41 +222,6 @@ gboolean __query_select_add_orders (MidgardQuerySelect *self)
 	return TRUE;
 }
 
-void 
-_midgard_core_query_select_add_deleted_condition (GdaConnection *cnc, MidgardDBObjectClass *klass, GdaSqlStatement *stmt)
-{
-	const gchar *table = midgard_core_class_get_table (klass);
-
-	GdaSqlStatementSelect *select = stmt->contents;
-	GdaSqlExpr *where, *expr;
-	GdaSqlOperation *cond;
-	GValue *value;
-	where = gda_sql_expr_new (GDA_SQL_ANY_PART (select));
-	cond = gda_sql_operation_new (GDA_SQL_ANY_PART (where));
-	where->cond = cond;
-	cond->operator_type = GDA_SQL_OPERATOR_TYPE_EQ;
-	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
-	g_value_take_string ((value = gda_value_new (G_TYPE_STRING)), g_strdup ("metadata_deleted"));
-	expr->value = value;
-	cond->operands = g_slist_append (NULL, expr);
-	gchar *str;
-	str = g_strdup_printf ("%s", "0");
-	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
-	g_value_take_string ((value = gda_value_new (G_TYPE_STRING)), str);
-	expr->value = value;
-	cond->operands = g_slist_append (cond->operands, expr);	
-	gda_sql_statement_select_take_where_cond (stmt, where);
-
-	GError *error = NULL;
-	if (gda_sql_statement_check_structure (stmt, &error) == FALSE) {
-		g_warning (_("Can't build SELECT statement: %s)"),
-				error && error->message ? error->message : _("No detail"));
-		if (error)
-			g_error_free (error);
-		return;
-	}
-}
-
 gboolean __query_select_add_joins (MidgardQuerySelect *self)
 {
 	if (!self->priv->joins)
@@ -314,10 +280,34 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self)
 	}
 }
 
+static void 
+__add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperation *operation)
+{
+	GSList *l;
+
+	/* Create new constraint group, (t1.deleted AND t2.deleted AND ...) */
+ 	GdaSqlExpr *deleted_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
+	GdaSqlOperation *deleted_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (deleted_expr));
+	deleted_operation->operator_type = GDA_SQL_OPERATOR_TYPE_AND;
+	deleted_expr->cond = deleted_operation;
+	operation->operands = g_slist_append (operation->operands, deleted_expr);
+
+	/* Add metadata_deleted constraint for each statement's table */
+	for (l = select->from->targets; l != NULL; l = l->next) {
+		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
+		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
+        	expr->value = gda_value_new (G_TYPE_STRING);
+        	g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = 0", target->as));
+        	deleted_operation->operands = g_slist_append (deleted_operation->operands, expr);
+	}
+}
+
 gboolean 
 _midgard_query_select_execute (MidgardQuerySelect *self)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
+	
+	GError *error = NULL;
 
 	if (!self->priv->storage) {
 		/* FIXME, handle error */
@@ -343,6 +333,13 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	g_assert (GDA_SQL_ANY_PART (sss)->type == GDA_SQL_ANY_STMT_SELECT);
 	self->priv->stmt = sql_stm;
 	sss->from = gda_sql_select_from_new (GDA_SQL_ANY_PART (sss));
+
+	/* Initialize top base expresion and operation with default AND operator type */
+	GdaSqlExpr *base_where = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
+	GdaSqlOperation *base_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (base_where));
+	base_operation->operator_type = GDA_SQL_OPERATOR_TYPE_AND;
+	base_where->cond = base_operation;
+	gda_sql_statement_select_take_where_cond (sql_stm, base_where);
 
 	/* Create targets (FROM) */
 	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (sss->from));
@@ -371,22 +368,18 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (self->priv->constraint)
 		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (self->priv->constraint)->priv->add_conditions_to_statement (
-				MIDGARD_QUERY_EXECUTOR (self), self->priv->constraint, sql_stm, NULL);
+				MIDGARD_QUERY_EXECUTOR (self), self->priv->constraint, sql_stm, base_where);
 
-	GError *error = NULL;
-	if (!gda_sql_statement_check_structure (sql_stm, &error)) {
-		g_warning (_("Can't build SELECT statement: %s)"),
-				error && error->message ? error->message : _("Unknown reason"));
-		if (error)
-			g_error_free (error);
-		goto return_false;
-	}
-
-	/* Add orders */
+	/* Add orders , ORDER BY t1.field... */
 	if (!__query_select_add_orders (self)) 
 		goto return_false;
 
-	/* Add limit */
+	/* Exclude deleted */
+	GdaSqlExpr *where = sss->where_cond;
+	GdaSqlOperation *operation = where->cond;
+	__add_exclude_deleted_constraints (sss, operation);
+
+	/* Add limit, LIMIT x */
 	if (self->priv->limit > 0) {
 		GdaSqlExpr *limit_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
 		GValue *limit_val = g_new0 (GValue, 1);
@@ -396,7 +389,7 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 		sss->limit_count = limit_expr;
 	}
 
-	/* Add offset */
+	/* Add offset, OFFSET x */
 	if (self->priv->offset >= 0) {
 		GdaSqlExpr *offset_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
 		GValue *offset_val = g_new0 (GValue, 1);
@@ -405,6 +398,15 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 		offset_expr->value = offset_val;
 		sss->limit_offset = offset_expr;
 	}
+
+	/* Check structure */
+	if (!gda_sql_statement_check_structure (sql_stm, &error)) {
+		g_warning (_("Can't build SELECT statement: %s)"),
+				error && error->message ? error->message : _("Unknown reason"));
+		if (error)
+			g_error_free (error);
+		goto return_false;
+	} 
 
 	/* Create statement */
 	GdaStatement *stmt = gda_statement_new ();	
@@ -467,21 +469,26 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 	if (rows < 1)
 		return NULL;
 
-
 	MidgardConnection *mgd = self->priv->mgd;
 	MidgardDBObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->klass;
 	MidgardDBObject **objects = g_new (MidgardDBObject *, rows+1);
 
 	for (i = 0; i < rows; i++) {
 		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), NULL);
-		gint col_idx = gda_data_model_get_column_index (model, "guid");
-		const GValue *gval = gda_data_model_get_value_at (model, col_idx, i, NULL);
-		/* Set MidgardDBObject data */
-		MGD_OBJECT_GUID (objects[i]) = g_value_dup_string (gval);
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->mgd = mgd;
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->datamodel = model;
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->row = i;
 		g_object_ref (model);
+
+		if (MIDGARD_QUERY_EXECUTOR (self)->priv->read_only) {
+			gint col_idx = gda_data_model_get_column_index (model, "guid");
+			const GValue *gval = gda_data_model_get_value_at (model, col_idx, i, NULL);
+			/* Set MidgardDBObject data */
+			MGD_OBJECT_GUID (objects[i]) = g_value_dup_string (gval);
+		} else {
+			MIDGARD_DBOBJECT_GET_CLASS (objects[i])->dbpriv->set_from_data_model (
+					MIDGARD_DBOBJECT (objects[i]), model, i);
+		}
 	}
 
 	objects[i] = NULL;
@@ -494,6 +501,20 @@ MidgardDBObject **
 midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 {
 	return MIDGARD_QUERY_SELECT_GET_CLASS (self)->list_objects (self, n_objects);
+}
+
+void 
+_midgard_query_select_toggle_read_only (MidgardQuerySelect *self, gboolean toggle)
+{
+	g_return_if_fail (self != NULL);
+	MIDGARD_QUERY_EXECUTOR (self)->priv->read_only = toggle;
+	return;
+}
+
+void
+midgard_query_select_toggle_read_only (MidgardQuerySelect *self, gboolean toggle)
+{
+	MIDGARD_QUERY_SELECT_GET_CLASS (self)->toggle_read_only (self, toggle);
 }
 
 /* GOBJECT ROUTINES */
@@ -551,6 +572,7 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	klass->execute = _midgard_query_select_execute;
 	klass->get_results_count = _midgard_query_select_get_results_count;
 	klass->list_objects = _midgard_query_select_list_objects;
+	klass->toggle_read_only = _midgard_query_select_toggle_read_only;
 }
 
 GType

@@ -148,7 +148,7 @@ _midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor
 		top_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (top_where));
 		top_operation->operator_type = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->op_type;
 		top_where->cond = top_operation;
-	     	gda_sql_statement_select_take_where_cond (stmt, top_where);
+	     	gda_sql_statement_select_take_where_cond (stmt, top_where);	
 	} else if (where_expr_node) {
 		/* This is nested groups case: '... AND (f2=1 OR f2=2)...' */
 		where = where_expr_node;

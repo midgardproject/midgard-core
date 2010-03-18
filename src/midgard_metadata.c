@@ -38,12 +38,20 @@ _action_create_callback (MidgardObject *object, gpointer ud)
 	gchar *person_guid = "";
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (mdata);
 
 	if (person) 
 		person_guid = (gchar *)MGD_OBJECT_GUID (person);			
 	
 	/* set creator */
-	midgard_core_metadata_set_creator (mdata, person_guid);
+	GValue rval = {0, };
+	g_value_init (&rval, G_TYPE_STRING);
+	g_value_set_string (&rval, person_guid);
+	/* set creator */
+	midgard_core_metadata_set_creator (mdata, (const GValue *)&rval);
+	/* set revisor */
+	midgard_core_metadata_set_revisor (mdata, (const GValue *)&rval);
+	g_value_unset (&rval);
 
 	/* set created */
 	midgard_core_timestamp_set_current_time (mdata->priv->created);	
@@ -53,44 +61,57 @@ _action_create_callback (MidgardObject *object, gpointer ud)
 
 	/* set revision */
 	midgard_core_metadata_set_revision (mdata, 0);
-
-	/* set revisor */
-	midgard_core_metadata_set_revisor (mdata, person_guid);
 }
 
-static void _action_update_callback(MidgardObject *object, gpointer ud)
+static void 
+_action_update_callback (MidgardObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;
 	
 	gchar *person_guid = "";
 	MidgardConnection *mgd = MGD_OBJECT_CNC(object);
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (mdata);
 
 	if (person) 
 		person_guid = (gchar *)MGD_OBJECT_GUID(person);			
 
 	/* set revisor */
-	midgard_core_metadata_set_revisor(mdata, person_guid);
+	GValue rval = {0, };
+	g_value_init (&rval, G_TYPE_STRING);
+	g_value_set_string (&rval, person_guid);
+	midgard_core_metadata_set_revisor (mdata, (const GValue *)&rval);
+	g_value_unset (&rval);
 
 	/* set revised */
-	midgard_core_timestamp_set_current_time (mdata->priv->revised);
+	GValue tval = {0, };
+	midgard_timestamp_new_current (&tval);
+	midgard_core_metadata_set_revised (mdata, (const GValue *)&tval);	
+	g_value_unset (&tval);
+
+	GValue _val = {0, };
+	g_value_init (&_val, MIDGARD_TYPE_TIMESTAMP);
+	g_object_get_property (G_OBJECT (mdata), "revised", &_val);
 
 	/* set revision */
 	midgard_core_metadata_increase_revision (mdata);
 }
 
-static void _action_delete_callback(MidgardObject *object, gpointer ud)
+static void 
+_action_delete_callback(MidgardObject *object, gpointer ud)
 {
 	return;
 }
 
-static void _action_import_callback(MidgardObject *object, gpointer ud)
+static void 
+_action_import_callback(MidgardObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;	
 	midgard_core_timestamp_set_current_time (mdata->priv->imported);
 }
 
-static void _action_export_callback(MidgardObject *object, gpointer ud)
+static void 
+_action_export_callback(MidgardObject *object, gpointer ud)
 {
 	MidgardMetadata *mdata = (MidgardMetadata *) ud;	
 
@@ -135,31 +156,143 @@ static void _action_export_callback(MidgardObject *object, gpointer ud)
  *
  * Returns: newly allocated midgard_metadata instance
  */ 
-MidgardMetadata *midgard_metadata_new(MidgardObject *object)
+MidgardMetadata 
+*midgard_metadata_new (MidgardObject *object)
 {
-	g_assert(object != NULL);
+	g_assert (object != NULL);
 	
 	MidgardMetadata *self = 
-		(MidgardMetadata *) g_object_new(MIDGARD_TYPE_METADATA, NULL);
+		(MidgardMetadata *) g_object_new (MIDGARD_TYPE_METADATA, NULL);
 
-	g_signal_connect(G_OBJECT(object), "action-create",
-			G_CALLBACK(_action_create_callback), self);
+	g_signal_connect (G_OBJECT (object), "action-create",
+			G_CALLBACK (_action_create_callback), self);
 
-	g_signal_connect(G_OBJECT(object), "action-update",
-			G_CALLBACK(_action_update_callback), self);
+	g_signal_connect (G_OBJECT (object), "action-update",
+			G_CALLBACK (_action_update_callback), self);
 
-	g_signal_connect(G_OBJECT(object), "action-delete", 
-			G_CALLBACK(_action_delete_callback), self);
+	g_signal_connect (G_OBJECT (object), "action-delete", 
+			G_CALLBACK (_action_delete_callback), self);
 
-	g_signal_connect(G_OBJECT(object), "action-import", 
-			G_CALLBACK(_action_import_callback), self);
+	g_signal_connect (G_OBJECT (object), "action-import", 
+			G_CALLBACK (_action_import_callback), self);
 
-	g_signal_connect(G_OBJECT(object), "action-export", 
-			G_CALLBACK(_action_export_callback), self);
+	g_signal_connect (G_OBJECT (object), "action-export", 
+			G_CALLBACK (_action_export_callback), self);
 
 	self->priv->object = object;
 
 	return self;
+}
+
+void 
+_midgard_metadata_set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row)
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (model != NULL);
+	g_return_if_fail (row > -1);
+
+	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (MIDGARD_METADATA (self)->priv->object);
+	MgdSchemaTypeAttr *type_attr = MIDGARD_DBOBJECT_GET_CLASS (dbobject)->dbpriv->storage_data;
+	MidgardMetadata *metadata = MIDGARD_METADATA (self);
+
+	/* ignore metadata and action properties so decrease properties count */
+	guint n_props = type_attr->class_nprop - 2;
+	if (n_props< 1) {
+		g_warning ("Expected positive number of properties for given %s class", G_OBJECT_TYPE_NAME (G_OBJECT (dbobject)));
+		return;
+	}
+
+	/* creator */
+	const GValue *val = gda_data_model_get_value_at (model, n_props, row, NULL);
+	midgard_core_metadata_set_creator (metadata, (GValue *) val);
+
+	/* created */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_created (metadata, val);
+
+	/* revisor */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_revisor (metadata, val);
+
+	/* revised */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_revised (metadata, val);
+	
+	/* revision */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_revision (metadata, val);
+	
+	/* locker */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_locker (metadata, val);
+
+	/* locked */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_locked (metadata, val);
+
+	/* approver */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_approver (metadata, val);
+
+	/* approved */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_approved (metadata, val);
+
+	/* authors */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_authors (metadata, val);
+
+	/* owner */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_owner (metadata, val);
+
+	/* schedule_start */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_schedule_start (metadata, val);
+
+	/* schedule_end */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_schedule_end (metadata, val);
+
+	/* hidden */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_hidden (metadata, val);
+
+	/* navnoentry */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_navnoentry (metadata, val);
+
+	/* size */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_size (metadata, val);
+
+	/* published */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_published (metadata, val);
+
+	/* score */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_score (metadata, val);
+
+	/* imported */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_imported (metadata, val);
+
+	/* exported */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_exported (metadata, val);
+
+	/* deleted */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_deleted (metadata, val);
+
+	/* isapproved */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_isapproved (metadata, val);
+
+	/* islocked */
+	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	midgard_core_metadata_set_islocked (metadata, val);
 }
 
 /* GOBJECT ROUTINES */
@@ -191,17 +324,6 @@ enum {
     MIDGARD_METADATA_ISAPPROVED,
     MIDGARD_METADATA_ISLOCKED
 };
-
-gboolean
-_midgard_metadata_db_set_property (MidgardDBObject *self, const gchar *name, GValue *value)
-{
-	gchar *datamodel_property = g_strconcat ("metadata_", name, NULL);
-	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (MIDGARD_METADATA (self)->priv->object);
-	gboolean rv = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_property (dbobject, datamodel_property, value);
-	g_free (datamodel_property);
-
-	return rv;
-}
 
 static void
 _metadata_set_property (GObject *object, guint property_id,
@@ -255,7 +377,7 @@ _metadata_set_property (GObject *object, guint property_id,
 }
 
 gboolean
-_midgard_metadata_db_get_property (MidgardDBObject *self, const gchar *name, GValue *value)
+_midgard_metadata_dbpriv_get_property (MidgardDBObject *self, const gchar *name, GValue *value)
 {
 	gchar *datamodel_property = g_strconcat ("metadata_", name, NULL);
 	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (MIDGARD_METADATA (self)->priv->object);
@@ -895,7 +1017,9 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 	klass->dbpriv->set_from_xml_node = __set_from_xml_node;
 	klass->dbpriv->add_fields_to_select_statement = NULL;
 	klass->dbpriv->has_metadata = FALSE;
-	klass->dbpriv->get_property = _midgard_metadata_db_get_property;
+	klass->dbpriv->get_property = _midgard_metadata_dbpriv_get_property;
+	klass->dbpriv->set_property = midgard_core_metadata_dbpriv_set_property;
+	klass->dbpriv->set_from_data_model = _midgard_metadata_set_from_data_model;
 }
 
 GType midgard_metadata_get_type (void)
@@ -935,7 +1059,7 @@ xmlNode *__metadata_lookup_node(xmlNode *node, const gchar *name)
 		
 		if (cur->type == XML_ELEMENT_NODE) {
 			
-			if(g_str_equal(cur->name, name))
+			if (g_str_equal (cur->name, name))
 					return cur;
 		}
 	}
