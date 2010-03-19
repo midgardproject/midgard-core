@@ -283,7 +283,19 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self)
 static void 
 __add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperation *operation)
 {
-	GSList *l;
+	GSList *l = select->from->targets;
+
+	/* We have only one target table, so create one expression and add to top operation */
+	if (g_slist_length (l) == 1) {
+
+		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
+		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
+		expr->value = gda_value_new (G_TYPE_STRING);
+		g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = 0", target->as));
+		operation->operands = g_slist_append (operation->operands, expr);
+
+		return;
+	}
 
 	/* Create new constraint group, (t1.deleted AND t2.deleted AND ...) */
  	GdaSqlExpr *deleted_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
@@ -300,6 +312,17 @@ __add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperatio
         	g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = 0", target->as));
         	deleted_operation->operands = g_slist_append (deleted_operation->operands, expr);
 	}
+}
+
+static void
+__add_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *top_operation)
+{
+	GdaSqlExpr *dexpr = gda_sql_expr_new (GDA_SQL_ANY_PART (top_operation));
+	dexpr->value = gda_value_new (G_TYPE_STRING);
+	g_value_take_string (dexpr->value, g_strdup ("1=1"));
+	top_operation->operands = g_slist_append (top_operation->operands, dexpr);
+
+	return;
 }
 
 gboolean 
@@ -359,24 +382,25 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	/* Add fields for all properties registered per class (SELECT a,b,c...) */
 	klass->dbpriv->add_fields_to_select_statement (klass, sss, s_target->as);
 
-	//_midgard_core_query_select_add_deleted_condition (cnc, klass, sql_stm);
-
-	/* Add joins */
+	/* Add joins, LEFT JOIN tbl2 ON... */
 	if (!__query_select_add_joins (self)) 
 		goto return_false;
+
+	GdaSqlExpr *where = sss->where_cond;
+	GdaSqlOperation *operation = where->cond;
 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (self->priv->constraint)
 		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (self->priv->constraint)->priv->add_conditions_to_statement (
 				MIDGARD_QUERY_EXECUTOR (self), self->priv->constraint, sql_stm, base_where);
+	else 
+		__add_dummy_constraint (sss, operation); /* no constraints, add dummy WHERE 1=1 */	
 
 	/* Add orders , ORDER BY t1.field... */
 	if (!__query_select_add_orders (self)) 
 		goto return_false;
 
 	/* Exclude deleted */
-	GdaSqlExpr *where = sss->where_cond;
-	GdaSqlOperation *operation = where->cond;
 	__add_exclude_deleted_constraints (sss, operation);
 
 	/* Add limit, LIMIT x */
