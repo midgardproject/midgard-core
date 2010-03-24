@@ -63,7 +63,7 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 	
 	/* Create midgard_user storage */
 	MidgardUserClass *user_klass = MIDGARD_USER_CLASS(G_OBJECT_CLASS (g_type_class_peek (MIDGARD_TYPE_USER)));
-	midgard_storage_create_class_storage (mgd, MIDGARD_DBOBJECT_CLASS (user_klass));
+	midgard_storage_create (mgd, g_type_name (MIDGARD_TYPE_USER));
 
 	GString *query = g_string_new ("SELECT id from midgard_user where guid = ");
 	g_string_append_printf (query, "'%s'", ADMIN_USER_GUID);
@@ -93,18 +93,18 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 	/* quota table */
 	MidgardObjectClass *quota_klass = 
 		MIDGARD_OBJECT_GET_CLASS_BY_NAME("midgard_quota");
-	midgard_storage_create_class_storage(mgd, MIDGARD_DBOBJECT_CLASS(quota_klass));
+	midgard_storage_create (mgd, "midgard_quota");
 
 	/* Those below are important for legacy authentication. Backward compatibility FIXME */
 	/* person table */
 	MidgardObjectClass *person_klass = 
 		MIDGARD_OBJECT_GET_CLASS_BY_NAME("midgard_person");
-	midgard_storage_create_class_storage(mgd, MIDGARD_DBOBJECT_CLASS(person_klass));
+	midgard_storage_create (mgd, "midgard_person");
 
 	/* member table */
 	MidgardObjectClass *member_klass = 
 		MIDGARD_OBJECT_GET_CLASS_BY_NAME("midgard_member");
-	midgard_storage_create_class_storage(mgd, MIDGARD_DBOBJECT_CLASS(member_klass));
+	midgard_storage_create (mgd, "midgard_member");
 
 	sql = "SELECT lastname, firstname FROM person WHERE guid='f6b665f1984503790ed91f39b11b5392'";
 
@@ -138,14 +138,12 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 }
 
 /**
- * midgard_storage_create_class_storage:
+ * midgard_storage_create:
  * @mgd: #MidgardConnection instance
- * @klass: #MidgardDBObjectClass pointer
+ * @name: name of #MidgardDBObjectClass derived class
  * 
- * Creates underlying storage (e.g. table in database) for given @klass.
- * Given @klass can be any #MidgardDBObjectClass derived one. 
- * It may be class which represents any underlying storage type. 
- * For example, database table or view.
+ * Creates underlying storage (e.g. table in database) for class which is identified by given @name.
+ * It may be class which represents any underlying storage type (database table or view, for example).
  *
  * If underlying storage already exists, this method silently ignore creation
  * and returns %TRUE. Such case is not considered an error.
@@ -173,14 +171,15 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
  *
  * Returns: %TRUE on success, %FALSE otherwise
  *
- * Since: 9.09
+ * Since: 10.05
  */
 gboolean 
-midgard_storage_create_class_storage (MidgardConnection *mgd, MidgardDBObjectClass *klass)
+midgard_storage_create (MidgardConnection *mgd, const gchar *name)
 {
-	g_assert(mgd != NULL);
-	g_assert(klass != NULL);
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	g_return_val_if_fail (name != NULL, FALSE);
 
+	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (name));
 	g_return_val_if_fail(MIDGARD_IS_DBOBJECT_CLASS (klass), FALSE);
 
 	if (klass->dbpriv->create_storage == NULL)
@@ -190,27 +189,28 @@ midgard_storage_create_class_storage (MidgardConnection *mgd, MidgardDBObjectCla
 }
 
 /**
- * midgard_storage_update_class_storage:
+ * midgard_storage_update:
  * @mgd: #MidgardConnection instance
- * @klass: #MidgardDBObjectClass pointer
+ * @name: Name of #MidgardDBObjectClass derived class.
  *
- * Update underlying storage, which is used by given @klass.
+ * Update underlying storage.
  * 
  * This method doesn't create storage. It creates new columns if are defined
- * for @klass properties and do not exist in storage yet.
+ * for class properties and do not exist in storage yet.
  *
- * See midgard_storage_create_class_storage() if you need more info about indexes.
+ * See midgard_storage_create() if you need more info about indexes.
  *
  * Returns: %TRUE on success, %FALSE otherwise
  *
- * Since: 9.09
+ * Since: 10.05
  */
 gboolean 
-midgard_storage_update_class_storage (MidgardConnection *mgd, MidgardDBObjectClass *klass)
+midgard_storage_update (MidgardConnection *mgd, const gchar *name)
 {
-	g_assert(mgd != NULL);
-	g_assert(klass != NULL);
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	g_return_val_if_fail (name != NULL, FALSE);
 
+	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (name));
 	g_return_val_if_fail(MIDGARD_IS_DBOBJECT_CLASS (klass), FALSE);
 
 	if (klass->dbpriv->update_storage == NULL)
@@ -220,22 +220,23 @@ midgard_storage_update_class_storage (MidgardConnection *mgd, MidgardDBObjectCla
 }
 
 /**
- * midgard_storage_class_storage_exists:
+ * midgard_storage_exists:
  * @mgd: #MidgardConnection instance
- * @klass: #MidgardDBObjectClass pointer
+ * @name: Name of #MidgardDBObjectClass derived class
  *
- * Checks whether storage for given @klass exists.
+ * Checks whether storage for given class exists.
  *
  * Returns: %TRUE if storage exists, %FALSE otherwise
  *
- * Since: 9.09
+ * Since: 10.05
  */ 
 gboolean 
-midgard_storage_class_storage_exists (MidgardConnection *mgd, MidgardDBObjectClass *klass)
+midgard_storage_exists (MidgardConnection *mgd, const gchar *name)
 {
-	g_assert(mgd != NULL);
-	g_assert(klass != NULL);
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	g_return_val_if_fail (name != NULL, FALSE);
 
+	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (name));
 	g_return_val_if_fail(MIDGARD_IS_DBOBJECT_CLASS (klass), FALSE);
 
 	if (klass->dbpriv->storage_exists == NULL)
@@ -245,21 +246,22 @@ midgard_storage_class_storage_exists (MidgardConnection *mgd, MidgardDBObjectCla
 }
 
 /**
- * midgard_storage_delete_class_storage:
+ * midgard_storage_delete:
  * @mgd: #MidgardConnection instance
- * @klass: #MidgardDBObjectClass pointer
+ * @name: name of #MidgardDBObjectClass derived class.
  * 
- * Delete storage for given @klass.
+ * Delete storage for given class.
  * 
  * Returns: %TRUE on success, %FALSE otherwise
  *
- * Since: 9.09
+ * Since: 10.05
  */ 
-gboolean midgard_storage_delete_class_storage (MidgardConnection *mgd, MidgardDBObjectClass *klass)
+gboolean midgard_storage_delete (MidgardConnection *mgd, const gchar *name)
 {
-	g_assert(mgd != NULL);
-	g_assert(klass != NULL);
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	g_return_val_if_fail (name != NULL, FALSE);
 
+	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (name));
 	g_return_val_if_fail(MIDGARD_IS_DBOBJECT_CLASS (klass), FALSE);
 
 	if (klass->dbpriv->delete_storage == NULL)
@@ -290,8 +292,7 @@ midgard_storage_get_type(void)
 			NULL
 		};
 
-		type = g_type_register_static (G_TYPE_OBJECT,
-				"midgard_storage", &info, 0);
+		type = g_type_register_static (G_TYPE_OBJECT, "MidgardStorage", &info, 0);
 	}
 	return type;
 }

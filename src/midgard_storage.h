@@ -40,9 +40,9 @@ typedef struct _MidgardStorageClass MidgardStorageClass;
 GType	midgard_storage_get_type	(void);
 
 gboolean midgard_storage_create_base_storage	(MidgardConnection *mgd);
-gboolean midgard_storage_create_class_storage 	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
-gboolean midgard_storage_update_class_storage 	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
-gboolean midgard_storage_class_storage_exists 	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
-gboolean midgard_storage_delete_class_storage 	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
+gboolean midgard_storage_create		 	(MidgardConnection *mgd, const gchar *name);
+gboolean midgard_storage_update 		(MidgardConnection *mgd, const gchar *name);
+gboolean midgard_storage_exists 		(MidgardConnection *mgd, const gchar *name);
+gboolean midgard_storage_delete 		(MidgardConnection *mgd, const gchar *name);
 
 #endif /* MIDGARD_STORAGE_H */
