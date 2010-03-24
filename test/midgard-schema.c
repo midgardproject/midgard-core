@@ -219,15 +219,13 @@ main (int argc, char **argv)
 		g_message("Type %s", typename);
 		MidgardObject *object = midgard_object_new(mgd, typename, NULL);
 
-		MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME(typename);
-
 		/* Create tables */
 		if (tablecreate) 
-			midgard_storage_create_class_storage (mgd, MIDGARD_DBOBJECT_CLASS (klass));
+			midgard_storage_create (mgd, typename);
 
 		/* Update tables */
 		if (tableupdate) 
-			midgard_storage_update_class_storage (mgd, MIDGARD_DBOBJECT_CLASS (klass));
+			midgard_storage_update (mgd, typename);
 			
 		/* Test objects */
 		if (testunit)
