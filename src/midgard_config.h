@@ -50,6 +50,7 @@ struct MidgardConfig{
 	gchar *database;
 	gchar *dbuser;
 	gchar *dbpass;
+	gchar *dbdir;
 	gchar *logfilename;	
 	gchar *loglevel;
 	gboolean tablecreate;
