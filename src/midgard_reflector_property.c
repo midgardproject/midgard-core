@@ -287,7 +287,7 @@ midgard_reflector_property_is_private (MidgardReflectorProperty *self, const gch
 
 enum {
 	MIDGARD_REFLECTOR_PROPERTY_DBCLASS = 1
-}
+};
 
 static GObjectClass *__parent_class = NULL;
 
@@ -342,11 +342,12 @@ __midgard_reflector_property_set_property (GObject *object, guint property_id,
 		const GValue *value, GParamSpec *pspec)
 {
 	MidgardReflectorProperty *self = (MidgardReflectorProperty *) (object);
+	MidgardDBObjectClass *dbklass = NULL;
 
 	switch (property_id) {
 
 		case MIDGARD_REFLECTOR_PROPERTY_DBCLASS:
-			MidgardDBObjectClass *dbklass = g_type_class_peek (g_type_from_name (g_value_get_string (value)));
+			dbklass = g_type_class_peek (g_type_from_name (g_value_get_string (value)));
 			if (dbklass) {
 				self->klass = dbklass;
 				self->classname = G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (dbklass));
