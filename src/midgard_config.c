@@ -46,7 +46,8 @@ enum {
 	MIDGARD_CONFIG_DBNAME,
 	MIDGARD_CONFIG_DBPORT,
 	MIDGARD_CONFIG_DBUSER, 
-	MIDGARD_CONFIG_DBPASS, 
+	MIDGARD_CONFIG_DBPASS,
+       	MIDGARD_CONFIG_DBDIR,	
 	MIDGARD_CONFIG_HOST,
 	MIDGARD_CONFIG_LOGFILENAME,
 	MIDGARD_CONFIG_LOGLEVEL,
@@ -194,6 +195,14 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 	if(tmpstr != NULL && *tmpstr != '\0') {
 		g_free (self->dbpass);
 		self->dbpass = g_strdup(tmpstr);
+	}
+	g_free (tmpstr);
+
+	/* Get directory for SQLite database  */
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "DatabaseDir", NULL);
+	if(tmpstr != NULL && *tmpstr != '\0') {
+		g_free (self->dbdir);
+		self->dbdir = g_strdup(tmpstr);
 	}
 	g_free (tmpstr);
 
@@ -907,6 +916,7 @@ static void __config_struct_new(MidgardConfig *self)
 	self->dbport = 0;	
 	self->dbuser = g_strdup("midgard");
 	self->dbpass = g_strdup("midgard");
+	self->dbdir = g_strdup ("");
 	self->logfilename = g_strdup ("");;
 	self->loglevel = g_strdup("warn");
 	self->pamfile = g_strdup ("");
@@ -1026,6 +1036,9 @@ __midgard_config_struct_free (MidgardConfig *self)
 
 	g_free (self->dbpass);
 	self->dbpass = NULL;
+
+	g_free (self->dbdir);
+	self->dbdir = NULL;
 
 	g_free (self->logfilename);
 	self->logfilename = NULL;
@@ -1357,6 +1370,11 @@ _midgard_config_set_property (GObject *object, guint property_id,
 			self->dbport = g_value_get_uint (value);
 			break;
 
+		case MIDGARD_CONFIG_DBDIR:
+			g_free (self->dbdir);
+			self->dbdir = g_value_dup_string (value);
+			break;
+
 		case MIDGARD_CONFIG_LOGFILENAME:
 			g_free (self->logfilename);
 			self->logfilename = g_value_dup_string (value);
@@ -1448,6 +1466,10 @@ _midgard_config_get_property (GObject *object, guint property_id,
 
 		case MIDGARD_CONFIG_DBPASS: 
 			g_value_set_string (value, self->dbpass);
+			break;
+		
+		case MIDGARD_CONFIG_DBDIR:
+			g_value_set_string (value, self->dbdir);
 			break;
 
 		case MIDGARD_CONFIG_HOST:
@@ -1595,6 +1617,15 @@ _midgard_config_class_init (gpointer g_class, gpointer g_class_data)
 			MIDGARD_CONFIG_DBPASS,
 			pspec);
 	
+	pspec = g_param_spec_string ("dbdir",
+			"DatabaseDir",
+			"Directory for SQLite database file ('~/.midgard2/data' by default)",
+			"",
+			G_PARAM_READWRITE);
+	g_object_class_install_property (gobject_class,
+			MIDGARD_CONFIG_DBDIR,
+			pspec);
+
 	pspec = g_param_spec_string ("logfilename",
 			"Logfile",
 			"Location of the log file",

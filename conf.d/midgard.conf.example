@@ -40,6 +40,9 @@ Username=midgard
 #Password for username
 Password=midgard
 
+#Directory for SQLite database file ('~/.midgard2/data' by default)
+#DatabaseDir=
+
 #Default language used by application. Unknown by default.
 #DefaultLanguage=pl
 

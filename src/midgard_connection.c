@@ -438,8 +438,15 @@ gboolean __midgard_connection_open(
 
 	if(config->priv->dbtype == MIDGARD_DB_TYPE_SQLITE) {
 
-		const gchar *sqlite_dir[] = {"data", NULL};
-		gchar *path = midgard_core_config_build_path(sqlite_dir, NULL, TRUE);
+		gchar *path = NULL;
+		gchar *dbdir = config->dbdir;
+		if (!dbdir || *dbdir == '\0') {
+			const gchar *sqlite_dir[] = {"data", NULL};
+			path = midgard_core_config_build_path(sqlite_dir, NULL, TRUE);
+		} else {
+			path = dbdir;
+		}
+
 		tmpstr = g_strconcat("DB_DIR=", path, ";", "DB_NAME=", dbname, NULL);
 		g_free(path);
 

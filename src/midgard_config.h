@@ -47,6 +47,7 @@ struct MidgardConfig{
 	gchar *host;
 	guint dbport;
 	gchar *database;
+	gchar *dbdir;
 	gchar *dbuser;
 	gchar *dbpass;
 	gchar *logfilename;	
