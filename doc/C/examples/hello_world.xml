@@ -69,15 +69,6 @@ main (int argc, char **argv)
 	/* Tables are created, set warning loglevel */
 	midgard_connection_set_loglevel(mgd, "warn", NULL);
 
-	/* Make easiest athentication */
-	MidgardUser *user = midgard_user_auth(mgd, "root", "password", NULL, FALSE);
-
-	if (!user) {
-
-		g_warning("Failed to authenticate default root user");
-		return 1;
-	}
-
 	/* Create new object (record) */
 	MgdObject *person = midgard_object_new(mgd, "midgard_person", NULL);
 	
