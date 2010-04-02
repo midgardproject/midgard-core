@@ -47,6 +47,7 @@ struct _MgdSchemaPropertyAttr{
 	gboolean is_primary;
 	gboolean is_reversed;
 	gboolean is_private;
+	gboolean is_unique;
 	gchar *description;
 	GHashTable *user_values;
 };

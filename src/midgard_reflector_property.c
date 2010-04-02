@@ -46,8 +46,14 @@ midgard_reflector_property_new (const gchar *classname)
 	if (!dbklass)
 		return NULL;
 
-	MidgardReflectorProperty *self = g_object_new(MIDGARD_TYPE_REFLECTOR_PROPERTY, NULL);
-	self->klass = dbklass;
+	g_return_val_if_fail (MIDGARD_IS_DBOBJECT_CLASS (dbklass), NULL);
+
+	GValue val = {0, };
+	g_value_init (&val, G_TYPE_STRING);
+	g_value_set_string (&val, classname);
+	MidgardReflectorProperty *self = g_object_new(MIDGARD_TYPE_REFLECTOR_PROPERTY, "dbclass", &val, NULL);
+	g_value_unset (&val);
+
 	return self;
 }
 
@@ -65,6 +71,7 @@ midgard_reflector_property_get_midgard_type (MidgardReflectorProperty *self, con
 {
 	g_return_val_if_fail (self != NULL, 0);
 	g_return_val_if_fail (propname != NULL, 0);
+	g_return_val_if_fail (self->klass != NULL, 0);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
@@ -91,6 +98,7 @@ midgard_reflector_property_is_link (MidgardReflectorProperty *self, const gchar 
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (propname != NULL, FALSE);
+	g_return_val_if_fail (self->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
@@ -118,6 +126,7 @@ midgard_reflector_property_is_linked (MidgardReflectorProperty *self, const gcha
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (propname != NULL, FALSE);
+	g_return_val_if_fail (self->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
@@ -143,6 +152,7 @@ midgard_reflector_property_get_link_name (MidgardReflectorProperty *self, const 
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (propname != NULL, NULL);	
+	g_return_val_if_fail (self->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
@@ -168,6 +178,7 @@ midgard_reflector_property_get_link_target (MidgardReflectorProperty *self, cons
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (propname != NULL, NULL);
+	g_return_val_if_fail (self->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
@@ -193,7 +204,8 @@ midgard_reflector_property_description (MidgardReflectorProperty *self, const gc
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (propname != NULL, NULL);
-	
+	g_return_val_if_fail (self->klass != NULL, NULL);
+
 	GParamSpec *prop = g_object_class_find_property(
 			G_OBJECT_CLASS(self->klass), propname);
 
@@ -218,6 +230,7 @@ midgard_reflector_property_get_link_class (MidgardReflectorProperty *self, const
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (propname != NULL, NULL);
+	g_return_val_if_fail (self->klass != NULL, NULL);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
@@ -251,6 +264,7 @@ midgard_reflector_property_get_user_value (MidgardReflectorProperty *self, const
 	g_assert (self != NULL);
 	g_return_val_if_fail (property != NULL, NULL);	
 	g_return_val_if_fail (name != NULL, NULL);
+	g_return_val_if_fail (self->klass != NULL, NULL);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
@@ -274,6 +288,7 @@ midgard_reflector_property_is_private (MidgardReflectorProperty *self, const gch
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);	
+	g_return_val_if_fail (self->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
@@ -281,6 +296,112 @@ midgard_reflector_property_is_private (MidgardReflectorProperty *self, const gch
 		return FALSE;
 	
 	return prop_attr->is_private;
+}
+
+/**
+ * midgard_reflector_property_is_unique:
+ * @self: #MidgardReflectorProperty instance
+ * @property: property name to check
+ *
+ * Returns: %TRUE, if property is defined as unique, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
+gboolean
+midgard_reflector_property_is_unique (MidgardReflectorProperty *self, const gchar *property)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (property != NULL, FALSE);	
+	g_return_val_if_fail (self->klass != NULL, FALSE);
+
+	MgdSchemaPropertyAttr *prop_attr = 
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+	if (prop_attr == NULL)
+		return FALSE;
+	
+	return prop_attr->is_unique;
+}
+
+/**
+ * midgard_reflector_property_is_primary:
+ * @self: #MidgardReflectorProperty instance
+ * @property: property name to check
+ *
+ * Returns: %TRUE, if property is primary, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
+gboolean
+midgard_reflector_property_is_primary (MidgardReflectorProperty *self, const gchar *property)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (property != NULL, FALSE);	
+	g_return_val_if_fail (self->klass != NULL, FALSE);
+
+	MgdSchemaPropertyAttr *prop_attr = 
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+	if (prop_attr == NULL)
+		return FALSE;
+	
+	return prop_attr->is_primary;
+}
+
+/**
+ * midgard_reflector_property_has_default_value:
+ * @self: #MidgardReflectorProperty instance
+ * @property: property name to check
+ *
+ * Returns: %TRUE, if property has default value, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
+gboolean
+midgard_reflector_property_has_default_value (MidgardReflectorProperty *self, const gchar *property)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (property != NULL, FALSE);	
+	g_return_val_if_fail (self->klass != NULL, FALSE);
+
+	MgdSchemaPropertyAttr *prop_attr = 
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+	if (prop_attr == NULL)
+		return FALSE;
+	
+	return prop_attr->default_value ? TRUE : FALSE;
+}
+
+/**
+ * midgard_reflector_property_get_default_value:
+ * @self: #MidgardReflectorProperty instance
+ * @property: property name to check
+ * @value: (inout): value which stores default value defined for given property
+ *
+ * @value should not be initialized for particular type. It's a copy of original value, 
+ * so it should be unset when no longer needed.
+ *
+ * Returns: %TRUE, if property has default value and its copy has been made, %FALSE otherwise
+ *
+ * Since: 10.05
+ */
+gboolean
+midgard_reflector_property_get_default_value (MidgardReflectorProperty *self, const gchar *property, GValue *value)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (property != NULL, FALSE);	
+	g_return_val_if_fail (self->klass != NULL, FALSE);
+
+	MgdSchemaPropertyAttr *prop_attr = 
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+	if (prop_attr == NULL)
+		return FALSE;
+	
+	if (!prop_attr->default_value)
+		return FALSE;
+
+	g_value_init (value, G_VALUE_TYPE (prop_attr->default_value));
+	g_value_copy (prop_attr->default_value, value);
+
+	return TRUE;
 }
 
 /* GOBJECT ROUTINES */

@@ -501,6 +501,7 @@ midgard_core_schema_get_unique_name(xmlNode * node, MgdSchemaTypeAttr *type_attr
 					gchar *propname = (gchar *)xmlGetProp(node, (const xmlChar *)"name");
 					type_attr->unique_name = g_strdup(propname);
 					g_free(propname);
+					prop_attr->is_unique = TRUE;
 				}
 
 				if (attrval != NULL)

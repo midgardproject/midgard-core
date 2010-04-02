@@ -53,6 +53,7 @@ midgard_core_schema_type_property_attr_new_empty (void)
 	prop->is_link = FALSE;
 	prop->is_linked = FALSE;
 	prop->is_private = FALSE;
+	prop->is_unique = FALSE;
 	prop->description = NULL;
 	prop->user_values = NULL;
 

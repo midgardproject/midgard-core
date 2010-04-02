@@ -49,5 +49,9 @@ const gchar 			*midgard_reflector_property_get_link_target 	(MidgardReflectorPro
 const gchar 			*midgard_reflector_property_description 	(MidgardReflectorProperty *self, const gchar *propname);
 const gchar 			*midgard_reflector_property_get_user_value 	(MidgardReflectorProperty *self, const gchar *property, const gchar *name);
 gboolean			midgard_reflector_property_is_private 		(MidgardReflectorProperty *self, const gchar *property);
+gboolean			midgard_reflector_property_is_unique		(MidgardReflectorProperty *self, const gchar *property);
+gboolean			midgard_reflector_property_is_primary		(MidgardReflectorProperty *self, const gchar *property);
+gboolean			midgard_reflector_property_has_default_value	(MidgardReflectorProperty *self, const gchar *property);
+gboolean			midgard_reflector_property_get_default_value	(MidgardReflectorProperty *self, const gchar *property, GValue *value);
 
 #endif /* MIDGARD_REFLECTOR_PROPERTY_H */
