@@ -1,5 +1,5 @@
 <!-- ##### SECTION Title ##### -->
-midgard_connection
+MidgardConnection
 
 <!-- ##### SECTION Short_Description ##### -->
  Connection and environment variables handler.
