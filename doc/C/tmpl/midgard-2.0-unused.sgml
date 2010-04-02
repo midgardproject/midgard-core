@@ -1174,6 +1174,12 @@ midgard_sitegroup
 </para>
 
 
+<!-- ##### TYPEDEF midgard_dbus ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### TYPEDEF midgard_metadata ##### -->
 <para>
 
@@ -1490,6 +1496,12 @@ midgard_sitegroup
 
 @self: 
 @Returns: 
+
+<!-- ##### TYPEDEF midgard_storage ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### FUNCTION midgard_storage_class_storage_exists ##### -->
 <para>

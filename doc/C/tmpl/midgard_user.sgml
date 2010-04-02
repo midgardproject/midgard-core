@@ -164,6 +164,24 @@ midgard_user
 @Returns: 
 
 
+<!-- ##### FUNCTION midgard_user_log_in ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_log_out ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION midgard_user_is_user ##### -->
 <para>
 

@@ -24,12 +24,6 @@ which creates storage tables. Instead, it invokes private routines of #MidgardDB
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### TYPEDEF midgard_storage ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT MidgardStorage ##### -->
 <para>
 
@@ -50,6 +44,46 @@ which creates storage tables. Instead, it invokes private routines of #MidgardDB
 </para>
 
 @mgd: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_storage_create ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_storage_update ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_storage_exists ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@name: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_storage_delete ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@name: 
 @Returns: 
 
 

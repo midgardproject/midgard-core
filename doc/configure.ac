@@ -10,7 +10,7 @@ dnl If the version contains user visible changes then you should
 dnl have updated the NEWS file. Remember also to test the release
 dnl before committing.
 dnl
-AC_INIT([midgard-core],[9.03])
+AC_INIT([midgard-core],[9.09.99])
 dnl AC_CONFIG_HEADERS([config.h])
 dnl AC_CONFIG_SRCDIR(src/midgard.c)
 

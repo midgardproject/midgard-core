@@ -6,17 +6,24 @@
 <!ENTITY howto-get_midgard_lib SYSTEM "howto-get-midgard-lib.xml">
 <!ENTITY howto-compile_midgard_lib SYSTEM "howto-compile-midgard-lib.xml">
 <!ENTITY howto-compile_midgard_app SYSTEM "howto-compile-midgard-app.xml">
+<!ENTITY midgard2-architecture SYSTEM "midgard2-architecture.xml">
 
 ]>
 <book id="index" xmlns:xi="http://www.w3.org/2003/XInclude">
   <bookinfo>
     <title>Midgard2 Reference Manual</title>
     <releaseinfo>
-      for 9.09 "Mjolnir"
+      for 10.05 "Ratatoskr"
     </releaseinfo>
   </bookinfo>
 
   <part label="I">
+    <title>Architecture</title>
+
+    &midgard2-architecture;
+  </part>
+
+  <part label="II">
     <title>Build and compile</title>
 
     &howto-get_midgard_lib;
@@ -25,7 +32,7 @@
   </part>
 
 
-  <part label="II">
+  <part label="III">
   <title>API reference</title>
     
     <chapter id="midgard-Basic">
@@ -92,8 +99,8 @@
   <index role="deprecated">
     <title>Index of deprecated symbols</title>
   </index>
-  <index role="9.09">
-    <title>Index of new symbols in 9.09</title>
+  <index role="10.05">
+    <title>Index of new symbols in 10.05</title>
   </index>
 
 </book>

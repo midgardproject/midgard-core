@@ -1,7 +1,6 @@
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_config</FILE>
-midgard_config
 MidgardConfig
 MidgardConfigClass
 MidgardConfigPrivate
@@ -29,7 +28,6 @@ MIDGARD_CONFIG_GET_CLASS
 GETTEXT_PACKAGE
 MidgardConnectionClass
 MidgardConnectionPrivate
-midgard_connection
 midgard_connection_new
 midgard_connection_open
 midgard_connection_open_config
@@ -57,9 +55,8 @@ MIDGARD_CONNECTION_GET_CLASS
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_dbobject</FILE>
-midgard_dbobject
 MidgardDBObjectPrivate
-<TITLE>midgard_dbobject</TITLE>
+<TITLE>MidgardDBObject</TITLE>
 MidgardDBObject
 <SUBSECTION Standard>
 MIDGARD_DBOBJECT
@@ -74,11 +71,9 @@ MIDGARD_DBOBJECT_GET_CLASS
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_object</FILE>
-<TITLE>midgard_object</TITLE>
+<TITLE>MidgardObject</TITLE>
 MIDGARD_OBJECT_GET_CLASS_BY_NAME
 MidgardObject
-MidgardObject
-midgard_object
 MidgardObjectPrivate
 MidgardObjectClassPrivate
 midgard_object_new
@@ -119,9 +114,8 @@ MIDGARD_OBJECT_GET_CLASS
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>query_builder</FILE>
-<TITLE>midgard_query_builder</TITLE>
+<TITLE>MidgardQueryBuilder</TITLE>
 MidgardQueryBuilder
-midgard_query_builder
 MidgardQueryBuilderPrivate
 MidgardQueryBuilderClass
 midgard_query_builder_new
@@ -149,7 +143,6 @@ MIDGARD_QUERY_BUILDER_GET_CLASS
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_user</FILE>
-midgard_user
 MidgardUserClass
 MidgardUserPrivate
 MidgardUser
@@ -159,8 +152,8 @@ midgard_user_query
 midgard_user_create
 midgard_user_update
 midgard_user_delete
-midgard_user_login
-midgard_user_logout
+midgard_user_log_in
+midgard_user_log_out
 midgard_user_is_user
 midgard_user_is_admin
 midgard_user_get_person
@@ -178,7 +171,6 @@ MIDGARD_USER_GET_CLASS
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_collector</FILE>
-midgard_collector
 MidgardCollector
 MidgardCollectorClass
 midgard_collector_new
@@ -212,7 +204,6 @@ MIDGARD_COLLECTOR_GET_CLASS
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_blob</FILE>
-midgard_blob
 MidgardBlob
 MidgardBlobClass
 MidgardBlobPrivate
@@ -236,7 +227,6 @@ MIDGARD_BLOB_GET_CLASS
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_metadata</FILE>
-midgard_metadata
 MidgardMetadata
 MidgardMetadataClass
 MidgardMetadataPrivate
@@ -310,7 +300,6 @@ MIDGARD_REFLECTOR_PROPERTY_GET_CLASS
 MidgardReplicatorPrivate
 MidgardReplicator
 MidgardReplicatorClass
-midgard_replicator_new
 midgard_replicator_serialize
 midgard_replicator_export
 midgard_replicator_export_purged
@@ -484,8 +473,7 @@ midgard_uuid_external
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_transaction</FILE>
 MidgardTransactionClass
-<TITLE>midgard_transaction</TITLE>
-midgard_transaction
+<TITLE>MidgardTransaction</TITLE>
 MidgardTransaction
 midgard_transaction_new
 midgard_transaction_begin
@@ -506,15 +494,14 @@ MIDGARD_TRANSACTION_GET_CLASS
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_storage</FILE>
-<TITLE>midgard_storage</TITLE>
-midgard_storage
+<TITLE>MidgardStorage</TITLE>
 MidgardStorage
 MidgardStorageClass
 midgard_storage_create_base_storage
-midgard_storage_create_class_storage
-midgard_storage_update_class_storage
-midgard_storage_class_storage_exists
-midgard_storage_delete_class_storage
+midgard_storage_create
+midgard_storage_update
+midgard_storage_exists
+midgard_storage_delete
 <SUBSECTION Standard>
 MIDGARD_STORAGE
 MIDGARD_IS_STORAGE
@@ -527,8 +514,7 @@ MIDGARD_STORAGE_GET_CLASS
 
 <SECTION>
 <FILE>midgard_view</FILE>
-<TITLE>midgard_view</TITLE>
-midgard_view
+<TITLE>MidgardView</TITLE>
 MidgardView
 MidgardViewClass
 <SUBSECTION Standard>
@@ -544,7 +530,6 @@ MIDGARD_VIEW_GET_CLASS
 <SECTION>
 <FILE>midgard_dbus</FILE>
 <TITLE>midgard_dbus</TITLE>
-midgard_dbus
 MidgardDbus
 MidgardDbusClass
 midgard_dbus_new
