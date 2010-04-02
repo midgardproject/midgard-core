@@ -21,18 +21,11 @@ Optimized database query that doesn't return objects
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### TYPEDEF midgard_collector ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT MidgardCollector ##### -->
 <para>
 
 </para>
 
-@parent: 
 
 <!-- ##### TYPEDEF MidgardCollectorClass ##### -->
 <para>

@@ -58,14 +58,20 @@ The #MidgardQueryBuilder methods can be used to manipulate  the queries.
 
 </para>
 
-@parent: 
-@priv: 
 
-<!-- ##### TYPEDEF midgard_query_builder ##### -->
+<!-- ##### SIGNAL MidgardQueryBuilder::execution-end ##### -->
 <para>
 
 </para>
 
+@midgardquerybuilder: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardQueryBuilder::execution-start ##### -->
+<para>
+
+</para>
+
+@midgardquerybuilder: the object which received the signal.
 
 <!-- ##### STRUCT MidgardQueryBuilderPrivate ##### -->
 <para>

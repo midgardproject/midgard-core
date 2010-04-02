@@ -17,149 +17,126 @@ midgard_metadata
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### TYPEDEF midgard_metadata ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SIGNAL midgard_metadata::set-created ##### -->
-<para>
-
-</para>
-
-@midgard_metadata: the object which received the signal.
-
-<!-- ##### SIGNAL midgard_metadata::set-updated ##### -->
-<para>
-
-</para>
-
-@midgard_metadata: the object which received the signal.
-
-<!-- ##### ARG midgard_metadata:approved ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:approver ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:authors ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:created ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:creator ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:deleted ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:exported ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:hidden ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:imported ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:isapproved ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:islocked ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:locked ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:locker ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:navnoentry ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:owner ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:published ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:revised ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:revision ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:revisor ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:scheduleend ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:schedulestart ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:score ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_metadata:size ##### -->
-<para>
-
-</para>
-
 <!-- ##### STRUCT MidgardMetadata ##### -->
 <para>
 
 </para>
 
-@parent: 
-@dbpriv: 
-@priv: 
+
+<!-- ##### ARG MidgardMetadata:approved ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:approver ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:authors ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:created ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:creator ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:deleted ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:exported ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:hidden ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:imported ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:isapproved ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:islocked ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:locked ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:locker ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:navnoentry ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:owner ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:published ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:revised ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:revision ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:revisor ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:scheduleend ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:schedulestart ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:score ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardMetadata:size ##### -->
+<para>
+
+</para>
 
 <!-- ##### STRUCT MidgardMetadataClass ##### -->
 <para>

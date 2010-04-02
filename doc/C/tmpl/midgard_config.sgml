@@ -22,107 +22,111 @@ midgard_config
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### TYPEDEF midgard_config ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### ARG midgard_config:authtype ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:blobdir ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:cachedir ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:database ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:dbpass ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:dbtype ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:dbuser ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:host ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:logfilename ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:loglevel ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:midgardpassword ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:midgardusername ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:pamfile ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:sharedir ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:tablecreate ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:tableupdate ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:testunit ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_config:vardir ##### -->
-<para>
-
-</para>
-
 <!-- ##### TYPEDEF MidgardConfig ##### -->
 <para>
 
 </para>
 
+
+<!-- ##### ARG MidgardConfig:authtype ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:blobdir ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:cachedir ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:database ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:dbdir ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:dbpass ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:dbtype ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:dbuser ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:host ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:logfilename ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:loglevel ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:midgardpassword ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:midgardusername ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:pamfile ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:port ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:sharedir ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:tablecreate ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:tableupdate ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:testunit ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardConfig:vardir ##### -->
+<para>
+
+</para>
 
 <!-- ##### TYPEDEF MidgardConfigClass ##### -->
 <para>
@@ -211,35 +215,12 @@ midgard_config
 @Returns: 
 
 
-<!-- ##### FUNCTION midgard_config_create_midgard_tables ##### -->
+<!-- ##### FUNCTION midgard_config_create_blobdir ##### -->
 <para>
 
 </para>
 
 @self: 
-@mgd: 
-@Returns: 
-
-
-<!-- ##### FUNCTION midgard_config_create_class_table ##### -->
-<para>
-
-</para>
-
-@self: 
-@klass: 
-@mgd: 
-@Returns: 
-
-
-<!-- ##### FUNCTION midgard_config_update_class_table ##### -->
-<para>
-
-</para>
-
-@self: 
-@klass: 
-@mgd: 
 @Returns: 
 
 

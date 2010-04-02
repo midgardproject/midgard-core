@@ -25,263 +25,556 @@ midgard_object
 @name: 
 
 
-<!-- ##### STRUCT MgdObject ##### -->
-<para>
-
-</para>
-
-@parent: 
-@dbpriv: 
-@priv: 
-@metadata: 
-
-<!-- ##### TYPEDEF MidgardObject ##### -->
+<!-- ##### STRUCT MidgardObject ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### TYPEDEF midgard_object ##### -->
+<!-- ##### SIGNAL MidgardObject::action-approve ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-approve-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-approved ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-create ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-create-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-created ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-delete ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-delete-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-deleted ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-export ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-export-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-exported ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-import ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-import-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-imported ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-loaded ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-loaded-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-lock ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-lock-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-locked ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-purge ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-purge-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-purged ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-unapprove ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-unapprove-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-unapproved ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-unlock ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-unlock-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-unlocked ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-update ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-update-hook ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardObject::action-updated ##### -->
+<para>
+
+</para>
+
+@:
+
+@midgardobject: the object which received the signal.
+
+<!-- ##### ARG MidgardObject:action ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardObject:guid ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardObject:metadata ##### -->
+<para>
+
+</para>
+
+<!-- ##### STRUCT MidgardObject ##### -->
 <para>
 
 </para>
 
 
-<!-- ##### SIGNAL midgard_object::action-approve ##### -->
+<!-- ##### SIGNAL MidgardObject::action-approve ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-approve-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-approve-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-approved ##### -->
+<!-- ##### SIGNAL MidgardObject::action-approved ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-create ##### -->
+<!-- ##### SIGNAL MidgardObject::action-create ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-create-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-create-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-created ##### -->
+<!-- ##### SIGNAL MidgardObject::action-created ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-delete ##### -->
+<!-- ##### SIGNAL MidgardObject::action-delete ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-delete-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-delete-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-deleted ##### -->
+<!-- ##### SIGNAL MidgardObject::action-deleted ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-export ##### -->
+<!-- ##### SIGNAL MidgardObject::action-export ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-export-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-export-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-exported ##### -->
+<!-- ##### SIGNAL MidgardObject::action-exported ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-import ##### -->
+<!-- ##### SIGNAL MidgardObject::action-import ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-import-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-import-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-imported ##### -->
+<!-- ##### SIGNAL MidgardObject::action-imported ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-loaded ##### -->
+<!-- ##### SIGNAL MidgardObject::action-loaded ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-loaded-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-loaded-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-lock ##### -->
+<!-- ##### SIGNAL MidgardObject::action-lock ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-lock-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-lock-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-locked ##### -->
+<!-- ##### SIGNAL MidgardObject::action-locked ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-purge ##### -->
+<!-- ##### SIGNAL MidgardObject::action-purge ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-purge-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-purge-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-purged ##### -->
+<!-- ##### SIGNAL MidgardObject::action-purged ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-unapprove ##### -->
+<!-- ##### SIGNAL MidgardObject::action-unapprove ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-unapprove-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-unapprove-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-unapproved ##### -->
+<!-- ##### SIGNAL MidgardObject::action-unapproved ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-unlock ##### -->
+<!-- ##### SIGNAL MidgardObject::action-unlock ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-unlock-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-unlock-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-unlocked ##### -->
+<!-- ##### SIGNAL MidgardObject::action-unlocked ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-update ##### -->
+<!-- ##### SIGNAL MidgardObject::action-update ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-update-hook ##### -->
+<!-- ##### SIGNAL MidgardObject::action-update-hook ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### SIGNAL midgard_object::action-updated ##### -->
+<!-- ##### SIGNAL MidgardObject::action-updated ##### -->
 <para>
 
 </para>
 
-@midgard_object: the object which received the signal.
+@midgardobject: the object which received the signal.
 
-<!-- ##### ARG midgard_object:action ##### -->
+<!-- ##### ARG MidgardObject:action ##### -->
 <para>
 
 </para>
 
-<!-- ##### ARG midgard_object:guid ##### -->
+<!-- ##### ARG MidgardObject:guid ##### -->
 <para>
 
 </para>
 
-<!-- ##### ARG midgard_object:metadata ##### -->
+<!-- ##### ARG MidgardObject:metadata ##### -->
 <para>
 
 </para>

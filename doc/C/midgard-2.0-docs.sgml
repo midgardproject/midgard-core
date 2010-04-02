@@ -57,6 +57,11 @@
       <xi:include href="xml/midgard_view.xml"/>
     </chapter>
 
+    <chapter id="midgard-Midgard-Schema-Reflection">
+      <title>Reflection types for Midgard Schema User Defined types</title>
+      <xi:include href="xml/midgard_reflector_property.xml"/>
+    </chapter>
+
     <chapter id="midgard-Types">
       <title>Types</title> 
       <xi:include href="xml/midgard_type.xml"/>

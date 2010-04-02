@@ -277,6 +277,35 @@ MIDGARD_REFLECTION_PROPERTY_GET_CLASS
 
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
+<FILE>midgard_reflector_property</FILE>
+<TITLE>MidgardReflectorProperty</TITLE>
+MidgardReflectorProperty
+midgard_reflector_property_new
+midgard_reflector_property_get_midgard_type
+midgard_reflector_property_is_link
+midgard_reflector_property_is_linked
+midgard_reflector_property_get_link_class
+midgard_reflector_property_get_link_name
+midgard_reflector_property_get_link_target
+midgard_reflector_property_description
+midgard_reflector_property_get_user_value
+midgard_reflector_property_is_private
+midgard_reflector_property_is_unique
+midgard_reflector_property_is_primary
+midgard_reflector_property_has_default_value
+midgard_reflector_property_get_default_value
+<SUBSECTION Standard>
+MIDGARD_REFLECTOR_PROPERTY
+MIDGARD_IS_REFLECTOR_PROPERTY
+MIDGARD_TYPE_REFLECTOR_PROPERTY
+midgard_reflector_property_get_type
+MIDGARD_REFLECTOR_PROPERTY_CLASS
+MIDGARD_IS_REFLECTOR_PROPERTY_CLASS
+MIDGARD_REFLECTOR_PROPERTY_GET_CLASS
+</SECTION>
+
+<SECTION>
+<INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_replicator</FILE>
 MidgardReplicatorPrivate
 MidgardReplicator

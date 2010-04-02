@@ -40,27 +40,21 @@ Files and binary data.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### TYPEDEF midgard_blob ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### ARG midgard_blob:content ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_blob:parentguid ##### -->
-<para>
-
-</para>
-
 <!-- ##### TYPEDEF MidgardBlob ##### -->
 <para>
 
 </para>
 
+
+<!-- ##### ARG MidgardBlob:content ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardBlob:parentguid ##### -->
+<para>
+
+</para>
 
 <!-- ##### TYPEDEF MidgardBlobClass ##### -->
 <para>

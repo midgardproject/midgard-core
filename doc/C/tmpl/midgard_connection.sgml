@@ -43,33 +43,6 @@ midgard_connection
 </para>
 
 
-<!-- ##### TYPEDEF midgard_connection ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### SIGNAL midgard_connection::auth-changed ##### -->
-<para>
-
-</para>
-
-@midgard_connection: the object which received the signal.
-
-<!-- ##### SIGNAL midgard_connection::error ##### -->
-<para>
-
-</para>
-
-@midgard_connection: the object which received the signal.
-
-<!-- ##### SIGNAL midgard_connection::lost-provider ##### -->
-<para>
-
-</para>
-
-@midgard_connection: the object which received the signal.
-
 <!-- ##### FUNCTION midgard_connection_new ##### -->
 <para>
 

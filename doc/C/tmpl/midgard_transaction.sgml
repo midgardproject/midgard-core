@@ -30,12 +30,6 @@ Database single transaction.
 @get_name: 
 @Since: 9.09
 
-<!-- ##### TYPEDEF midgard_transaction ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT MidgardTransaction ##### -->
 <para>
 

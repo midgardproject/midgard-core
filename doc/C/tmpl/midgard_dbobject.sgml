@@ -17,12 +17,6 @@ midgard_dbobject
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### TYPEDEF midgard_dbobject ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT MidgardDBObjectPrivate ##### -->
 <para>
 
@@ -34,5 +28,4 @@ midgard_dbobject
 
 </para>
 
-@parent: 
 

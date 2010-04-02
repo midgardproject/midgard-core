@@ -26,19 +26,11 @@ Since: 9.09
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### TYPEDEF midgard_view ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### STRUCT MidgardView ##### -->
 <para>
 
 </para>
 
-@parent: 
-@dbpriv: 
 @Since: 9.09
 
 <!-- ##### STRUCT MidgardViewClass ##### -->

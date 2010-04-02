@@ -33,52 +33,6 @@ midgard_user
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### TYPEDEF midgard_user ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### ARG midgard_user:active ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_user:authtype ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_user:authtypeid ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_user:guid ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_user:login ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_user:password ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_user:person ##### -->
-<para>
-
-</para>
-
-<!-- ##### ARG midgard_user:usertype ##### -->
-<para>
-
-</para>
-
 <!-- ##### STRUCT MidgardUserClass ##### -->
 <para>
 
@@ -88,12 +42,13 @@ midgard_user
 @dbpriv: 
 @get_connection: 
 @get_person: 
-@login: 
-@logout: 
+@log_in: 
+@log_out: 
 @get: 
 @query: 
 @create: 
 @update: 
+@delete_record: 
 @is_user: 
 @is_admin: 
 
@@ -108,8 +63,46 @@ midgard_user
 
 </para>
 
-@parent: 
-@dbpriv: 
+
+<!-- ##### ARG MidgardUser:active ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardUser:authtype ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardUser:authtypeid ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardUser:guid ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardUser:login ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardUser:password ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardUser:person ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardUser:usertype ##### -->
+<para>
+
+</para>
 
 <!-- ##### FUNCTION midgard_user_new ##### -->
 <para>
@@ -144,7 +137,7 @@ midgard_user
 @Returns: 
 
 
-<!-- ##### FUNCTION midgard_user_login ##### -->
+<!-- ##### FUNCTION midgard_user_create ##### -->
 <para>
 
 </para>
@@ -153,7 +146,16 @@ midgard_user
 @Returns: 
 
 
-<!-- ##### FUNCTION midgard_user_logout ##### -->
+<!-- ##### FUNCTION midgard_user_update ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_user_delete ##### -->
 <para>
 
 </para>

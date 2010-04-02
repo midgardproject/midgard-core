@@ -78,6 +78,23 @@ midgard_sitegroup
 </para>
 
 
+<!-- ##### STRUCT MgdObject ##### -->
+<para>
+
+</para>
+
+@parent: 
+@dbpriv: 
+@priv: 
+@metadata: 
+
+<!-- ##### STRUCT MgdSchema ##### -->
+<para>
+
+</para>
+
+@types: 
+
 <!-- ##### STRUCT MidgardCollectorPrivate ##### -->
 <para>
 
@@ -872,6 +889,18 @@ midgard_sitegroup
 </para>
 
 
+<!-- ##### TYPEDEF midgard_blob ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF midgard_collector ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### FUNCTION midgard_collector_destroy ##### -->
 <para>
 
@@ -893,6 +922,31 @@ midgard_sitegroup
 </para>
 
 @self: 
+
+<!-- ##### TYPEDEF midgard_config ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION midgard_config_create_class_table ##### -->
+<para>
+
+</para>
+
+@self: 
+@klass: 
+@mgd: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_config_create_midgard_tables ##### -->
+<para>
+
+</para>
+
+@self: 
+@mgd: 
+@Returns: 
 
 <!-- ##### FUNCTION midgard_config_init ##### -->
 <para>
@@ -924,6 +978,16 @@ midgard_sitegroup
 
 @Returns: 
 
+<!-- ##### FUNCTION midgard_config_update_class_table ##### -->
+<para>
+
+</para>
+
+@self: 
+@klass: 
+@mgd: 
+@Returns: 
+
 <!-- ##### FUNCTION midgard_config_update_midgard_table ##### -->
 <para>
 
@@ -933,6 +997,12 @@ midgard_sitegroup
 @klass: 
 @mgd: 
 @Returns: 
+
+<!-- ##### TYPEDEF midgard_connection ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### FUNCTION midgard_connection_close ##### -->
 <para>
@@ -1098,6 +1168,24 @@ midgard_sitegroup
 
 @mgd: 
 
+<!-- ##### TYPEDEF midgard_dbobject ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF midgard_metadata ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF midgard_object ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### FUNCTION midgard_object_build_path ##### -->
 <para>
 
@@ -1130,6 +1218,12 @@ midgard_sitegroup
 @self: 
 @n_objects: 
 @Returns: 
+
+<!-- ##### TYPEDEF midgard_query_builder ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### FUNCTION midgard_query_builder_free ##### -->
 <para>
@@ -1397,6 +1491,42 @@ midgard_sitegroup
 @self: 
 @Returns: 
 
+<!-- ##### FUNCTION midgard_storage_class_storage_exists ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_storage_create_class_storage ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_storage_delete_class_storage ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_storage_update_class_storage ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@Returns: 
+
 <!-- ##### FUNCTION midgard_timestamp_dup_string ##### -->
 <para>
 
@@ -1429,6 +1559,18 @@ midgard_sitegroup
 @value: 
 @time: 
 
+<!-- ##### TYPEDEF midgard_transaction ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF midgard_user ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### FUNCTION midgard_user_auth ##### -->
 <para>
 
@@ -1460,6 +1602,22 @@ midgard_sitegroup
 @sitegroup: 
 @Returns: 
 
+<!-- ##### FUNCTION midgard_user_login ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_user_logout ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 <!-- ##### FUNCTION midgard_user_password ##### -->
 <para>
 
@@ -1489,6 +1647,12 @@ midgard_sitegroup
 @user: 
 @flag: 
 @Returns: 
+
+<!-- ##### TYPEDEF midgard_view ##### -->
+<para>
+
+</para>
+
 
 <!-- ##### FUNCTION set_created ##### -->
 <para>

@@ -13,3 +13,4 @@ midgard_transaction_get_type
 midgard_view_get_type
 midgard_storage_get_type
 midgard_dbus_get_type
+midgard_reflector_property_get_type
