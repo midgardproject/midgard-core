@@ -36,9 +36,9 @@ GType midgard_longtext_get_type(void);
 
 #define MGD_TYPE_PARAM_LONGTEXT (midgard_param_longtext_get_type())
 #define MGD_IS_PARAM_SPEC_LONGTEXT(pspec)    (G_TYPE_CHECK_INSTANCE_TYPE ((pspec), MGD_TYPE_PARAM_LONGTEXT))
-#define MGD_PARAM_SPEC_LONGTEXT(pspec)       (G_TYPE_CHECK_INSTANCE_CAST ((pspec), MGD_TYPE_PARAM_LONGTEXT, MgdParamSpecLongtext))
+#define MGD_PARAM_SPEC_LONGTEXT(pspec)       (G_TYPE_CHECK_INSTANCE_CAST ((pspec), MGD_TYPE_PARAM_LONGTEXT, MidgardParamSpecLongtext))
 
-typedef struct _MgdParamSpecLongtext MgdParamSpecLongtext;
+typedef struct _MidgardParamSpecLongtext MidgardParamSpecLongtext;
 
 GType midgard_param_longtext_get_type(void);
 

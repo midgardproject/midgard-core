@@ -64,6 +64,11 @@
       <xi:include href="xml/midgard_view.xml"/>
     </chapter>
 
+    <chapter id="midgard-Midgard-Query">
+      <title>Midgard Query</title>
+      <xi:include href="xml/midgard_query_constraint.xml"/>
+    </chapter>
+
     <chapter id="midgard-Midgard-Schema-Reflection">
       <title>Reflection types for Midgard Schema User Defined types</title>
       <xi:include href="xml/midgard_reflector_property.xml"/>

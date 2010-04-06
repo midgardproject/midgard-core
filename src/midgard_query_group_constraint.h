@@ -30,14 +30,22 @@ G_BEGIN_DECLS
 
 /* convention macros */
 #define MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT (midgard_query_group_constraint_get_type()) 
-#define MIDGARD_QUERY_GROUP_CONSTRAINT(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraint))
+#define MIDGARD_QUERY_GROUP_CONSTRAINT(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraint))
 #define MIDGARD_QUERY_GROUP_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraintClass))
 #define MIDGARD_IS_QUERY_GROUP_CONSTRAINT(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT))
 #define MIDGARD_IS_QUERY_GROUP_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT))
 #define MIDGARD_QUERY_GROUP_CONSTRAINT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, MidgardQueryGroupConstraintClass))
 
 typedef struct _MidgardQueryGroupConstraint MidgardQueryGroupConstraint; 
+typedef struct _MidgardQueryGroupConstraintPrivate MidgardQueryGroupConstraintPrivate; 
 typedef struct _MidgardQueryGroupConstraintClass MidgardQueryGroupConstraintClass;
+
+struct _MidgardQueryGroupConstraint {
+	GObject parent;
+
+	/* < private > */
+	MidgardQueryGroupConstraintPrivate *priv;
+};
 
 struct _MidgardQueryGroupConstraintClass {
 	GObjectClass parent;

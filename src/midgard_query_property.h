@@ -34,7 +34,15 @@ G_BEGIN_DECLS
 #define MIDGARD_QUERY_PROPERTY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_QUERY_PROPERTY_TYPE, MidgardQueryPropertyClass))
 
 typedef struct _MidgardQueryProperty MidgardQueryProperty;
+typedef struct _MidgardQueryPropertyPrivate MidgardQueryPropertyPrivate;
 typedef struct _MidgardQueryPropertyClass MidgardQueryPropertyClass; 
+
+struct _MidgardQueryProperty {
+	GObject parent;
+
+	/* < private > */
+	MidgardQueryPropertyPrivate *priv;
+};
 
 struct _MidgardQueryPropertyClass {
 	GObjectClass parent;

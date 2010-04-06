@@ -39,7 +39,7 @@ typedef struct _MidgardQuerySelectClass MidgardQuerySelectClass;
 typedef struct _MidgardQuerySelectPrivate MidgardQuerySelectPrivate; 
 
 struct _MidgardQuerySelectClass {
-	GObjectClass parent;
+	MidgardQueryExecutorClass parent;
 
 	/* virtual methods */
 	gboolean	(*set_constraint)		(MidgardQuerySelect *self, MidgardQuerySimpleConstraint *constraint);
@@ -55,7 +55,7 @@ struct _MidgardQuerySelectClass {
 };
 
 struct _MidgardQuerySelect {
-	GObject parent;
+	MidgardQueryExecutor parent;
 
 	/* < private > */
 	MidgardQueryExecutorPrivate *priv;

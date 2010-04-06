@@ -27,7 +27,7 @@ G_BEGIN_DECLS
 #define MIDGARD_TYPE_QUERY_SIMPLE_CONSTRAINT (midgard_query_simple_constraint_get_type()) 
 #define MIDGARD_QUERY_SIMPLE_CONSTRAINT(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_SIMPLE_CONSTRAINT, MidgardQuerySimpleConstraint))
 #define MIDGARD_IS_QUERY_SIMPLE_CONSTRAINT(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_SIMPLE_CONSTRAINT))
-#define MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), MIDGARD_TYPE_QUERY_SIMPLE_CONSTRAINT , MidgardQuerySimpleConstraintIFace))
+#define MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), MIDGARD_TYPE_QUERY_SIMPLE_CONSTRAINT, MidgardQuerySimpleConstraintIFace))
 
 typedef struct _MidgardQuerySimpleConstraint MidgardQuerySimpleConstraint; /* dummy */
 typedef struct _MidgardQuerySimpleConstraintIFace MidgardQuerySimpleConstraintIFace;
@@ -35,6 +35,7 @@ typedef struct _MidgardQuerySimpleConstraintPrivate MidgardQuerySimpleConstraint
 
 struct _MidgardQuerySimpleConstraintIFace {
 	GTypeInterface	parent;
+
 	MidgardQuerySimpleConstraint	**(*list_constraints)	(MidgardQuerySimpleConstraint *self, guint *n_objects); 
 	MidgardQuerySimpleConstraintPrivate *priv;
 };

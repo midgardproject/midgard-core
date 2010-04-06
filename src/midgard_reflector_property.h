@@ -24,14 +24,22 @@
 
 /* convention macros */
 #define MIDGARD_TYPE_REFLECTOR_PROPERTY (midgard_reflector_property_get_type())
-#define MIDGARD_REFLECTOR_PROPERTY(object) (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_REFLECTOR_PROPERTY, MidgardReflectorProperty))
+#define MIDGARD_REFLECTOR_PROPERTY(object) (G_TYPE_CHECK_INSTANCE_CAST ((object), MIDGARD_TYPE_REFLECTOR_PROPERTY, MidgardReflectorProperty))
 #define MIDGARD_REFLECTOR_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_REFLECTOR_PROPERTY, MidgardReflectorPropertyClass))
 #define MIDGARD_IS_REFLECTOR_PROPERTY(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_REFLECTOR_PROPERTY))
 #define MIDGARD_IS_REFLECTOR_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_REFLECTOR_OBJECT_PROPERTY))
 #define MIDGARD_REFLECTOR_PROPERTY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_REFLECTOR_PROPERTY, MidgardReflectorPropertyClass))
 
 typedef struct _MidgardReflectorProperty MidgardReflectorProperty;
+typedef struct _MidgardReflectorPropertyPrivate MidgardReflectorPropertyPrivate;
 typedef struct _MidgardReflectorPropertyClass MidgardReflectorPropertyClass;
+
+struct _MidgardReflectorProperty {
+	GObject parent;
+
+	/* < private > */
+	MidgardReflectorPropertyPrivate *priv;
+};
 
 struct _MidgardReflectorPropertyClass{
 	GObjectClass parent;

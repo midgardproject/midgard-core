@@ -31,12 +31,6 @@ midgard_type
 
 
 
-<!-- ##### STRUCT MgdParamSpecLongtext ##### -->
-<para>
-
-</para>
-
-
 <!-- ##### FUNCTION midgard_param_longtext_get_type ##### -->
 <para>
 

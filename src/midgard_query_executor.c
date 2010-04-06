@@ -100,8 +100,7 @@ _midgard_query_executor_constructor (GType type,
 
 static void
 _midgard_query_executor_dispose (GObject *object)
-{
-	MidgardQueryExecutor *self = MIDGARD_QUERY_EXECUTOR (object);
+{	
 	parent_class->dispose (object);
 }
 
@@ -123,12 +122,12 @@ _midgard_query_executor_finalize (GObject *object)
 	}
 
 	g_free (self->priv->table_alias);
-	self->priv->table_alias;
+	self->priv->table_alias = NULL;
 
 	g_free (self->priv);
 	self->priv = NULL;
 
-	parent_class->finalize;
+	parent_class->finalize (object);
 }
 
 static void

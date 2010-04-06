@@ -21,8 +21,7 @@
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
 
-struct _MidgardReflectorProperty {
-	GObject parent;
+struct _MidgardReflectorPropertyPrivate {
 	MidgardDBObjectClass *klass;
 	const gchar *classname;
 };
@@ -71,11 +70,11 @@ midgard_reflector_property_get_midgard_type (MidgardReflectorProperty *self, con
 {
 	g_return_val_if_fail (self != NULL, 0);
 	g_return_val_if_fail (propname != NULL, 0);
-	g_return_val_if_fail (self->klass != NULL, 0);
+	g_return_val_if_fail (self->priv->klass != NULL, 0);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
-				MIDGARD_DBOBJECT_CLASS(self->klass), propname);
+				MIDGARD_DBOBJECT_CLASS(self->priv->klass), propname);
 	if (prop_attr == NULL)
 		return MGD_TYPE_NONE;
 
@@ -98,11 +97,11 @@ midgard_reflector_property_is_link (MidgardReflectorProperty *self, const gchar 
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (propname != NULL, FALSE);
-	g_return_val_if_fail (self->klass != NULL, FALSE);
+	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
-				MIDGARD_DBOBJECT_CLASS(self->klass), propname);
+				MIDGARD_DBOBJECT_CLASS(self->priv->klass), propname);
 	if (prop_attr == NULL)
 		return FALSE;
 	
@@ -126,11 +125,11 @@ midgard_reflector_property_is_linked (MidgardReflectorProperty *self, const gcha
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (propname != NULL, FALSE);
-	g_return_val_if_fail (self->klass != NULL, FALSE);
+	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
-				MIDGARD_DBOBJECT_CLASS(self->klass), propname);
+				MIDGARD_DBOBJECT_CLASS(self->priv->klass), propname);
 	if (prop_attr == NULL)
 		return FALSE;
 
@@ -152,11 +151,11 @@ midgard_reflector_property_get_link_name (MidgardReflectorProperty *self, const 
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (propname != NULL, NULL);	
-	g_return_val_if_fail (self->klass != NULL, FALSE);
+	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
-				MIDGARD_DBOBJECT_CLASS(self->klass), propname);
+				MIDGARD_DBOBJECT_CLASS(self->priv->klass), propname);
 	if (prop_attr == NULL)
 		return NULL;
 	
@@ -178,11 +177,11 @@ midgard_reflector_property_get_link_target (MidgardReflectorProperty *self, cons
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (propname != NULL, NULL);
-	g_return_val_if_fail (self->klass != NULL, FALSE);
+	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
-				MIDGARD_DBOBJECT_CLASS(self->klass), propname);
+				MIDGARD_DBOBJECT_CLASS(self->priv->klass), propname);
 
 	if (prop_attr == NULL)
 		return NULL;	
@@ -204,10 +203,10 @@ midgard_reflector_property_description (MidgardReflectorProperty *self, const gc
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (propname != NULL, NULL);
-	g_return_val_if_fail (self->klass != NULL, NULL);
+	g_return_val_if_fail (self->priv->klass != NULL, NULL);
 
 	GParamSpec *prop = g_object_class_find_property(
-			G_OBJECT_CLASS(self->klass), propname);
+			G_OBJECT_CLASS(self->priv->klass), propname);
 
 	if (prop == NULL)
 		return NULL;
@@ -220,7 +219,7 @@ midgard_reflector_property_description (MidgardReflectorProperty *self, const gc
  * @self: #MidgardReflectorProperty instance
  * @propname: property name
  *
- * Returns the pointer to the #MidgardDBObjectClass, a given property is a link to.
+ * Returns: the pointer to the #MidgardDBObjectClass, a given property is a link to.
  * @see midgard_reflector_property_get_link_name()
  *
  * Since: 10.05
@@ -230,11 +229,11 @@ midgard_reflector_property_get_link_class (MidgardReflectorProperty *self, const
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (propname != NULL, NULL);
-	g_return_val_if_fail (self->klass != NULL, NULL);
+	g_return_val_if_fail (self->priv->klass != NULL, NULL);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr(
-				MIDGARD_DBOBJECT_CLASS(self->klass), propname);
+				MIDGARD_DBOBJECT_CLASS(self->priv->klass), propname);
 	if (prop_attr == NULL)
 		return NULL;
 	
@@ -264,10 +263,10 @@ midgard_reflector_property_get_user_value (MidgardReflectorProperty *self, const
 	g_assert (self != NULL);
 	g_return_val_if_fail (property != NULL, NULL);	
 	g_return_val_if_fail (name != NULL, NULL);
-	g_return_val_if_fail (self->klass != NULL, NULL);
+	g_return_val_if_fail (self->priv->klass != NULL, NULL);
 
 	MgdSchemaPropertyAttr *prop_attr = 
-		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->priv->klass), property);
 	if (prop_attr == NULL)
 		return NULL;
 	
@@ -288,10 +287,10 @@ midgard_reflector_property_is_private (MidgardReflectorProperty *self, const gch
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);	
-	g_return_val_if_fail (self->klass != NULL, FALSE);
+	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
-		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->priv->klass), property);
 	if (prop_attr == NULL)
 		return FALSE;
 	
@@ -312,10 +311,10 @@ midgard_reflector_property_is_unique (MidgardReflectorProperty *self, const gcha
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);	
-	g_return_val_if_fail (self->klass != NULL, FALSE);
+	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
-		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->priv->klass), property);
 	if (prop_attr == NULL)
 		return FALSE;
 	
@@ -336,10 +335,10 @@ midgard_reflector_property_is_primary (MidgardReflectorProperty *self, const gch
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);	
-	g_return_val_if_fail (self->klass != NULL, FALSE);
+	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
-		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->priv->klass), property);
 	if (prop_attr == NULL)
 		return FALSE;
 	
@@ -360,10 +359,10 @@ midgard_reflector_property_has_default_value (MidgardReflectorProperty *self, co
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);	
-	g_return_val_if_fail (self->klass != NULL, FALSE);
+	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
-		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->priv->klass), property);
 	if (prop_attr == NULL)
 		return FALSE;
 	
@@ -388,10 +387,10 @@ midgard_reflector_property_get_default_value (MidgardReflectorProperty *self, co
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);	
-	g_return_val_if_fail (self->klass != NULL, FALSE);
+	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
 
 	MgdSchemaPropertyAttr *prop_attr = 
-		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->klass), property);
+		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->priv->klass), property);
 	if (prop_attr == NULL)
 		return FALSE;
 	
@@ -422,8 +421,10 @@ __midgard_reflector_property_constructor (GType type,
 				n_construct_properties,
 				construct_properties);
 
-	MIDGARD_REFLECTOR_PROPERTY (object)->klass = NULL;
-	MIDGARD_REFLECTOR_PROPERTY (object)->classname = NULL;
+	MidgardReflectorProperty *self = (MidgardReflectorProperty *) object;
+	self->priv = g_new (MidgardReflectorPropertyPrivate, 1);
+	self->priv->klass = NULL;
+	self->priv->classname = NULL;
 
 	return G_OBJECT(object);
 }
@@ -437,6 +438,10 @@ __midgard_reflector_property_dispose (GObject *object)
 static void
 __midgard_reflector_property_finalize (GObject *object)
 {
+	MidgardReflectorProperty *self = (MidgardReflectorProperty *) object;
+	g_free (self->priv);
+	self->priv = NULL;
+
 	__parent_class->finalize (object);
 }
 
@@ -449,7 +454,7 @@ __midgard_reflector_property_get_property (GObject *object, guint property_id,
 	switch (property_id) {
 		
 		case MIDGARD_REFLECTOR_PROPERTY_DBCLASS:
-			g_value_set_string (value, self->classname);
+			g_value_set_string (value, self->priv->classname);
 			break;
 
 		default:
@@ -470,8 +475,8 @@ __midgard_reflector_property_set_property (GObject *object, guint property_id,
 		case MIDGARD_REFLECTOR_PROPERTY_DBCLASS:
 			dbklass = g_type_class_peek (g_type_from_name (g_value_get_string (value)));
 			if (dbklass) {
-				self->klass = dbklass;
-				self->classname = G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (dbklass));
+				self->priv->klass = dbklass;
+				self->priv->classname = G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (dbklass));
 			}
 			break;
 
@@ -493,11 +498,19 @@ __midgard_reflector_property_class_init (MidgardDBObjectClass *klass, gpointer g
 
 	object_class->set_property = __midgard_reflector_property_set_property;
 	object_class->get_property = __midgard_reflector_property_get_property;
+
+	/* Properties */
 	GParamSpec *pspec = g_param_spec_string ("dbclass",
 			"MidgardDBObject derived class name.",
 			"",
 			"",
 			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+	/**
+	 * MidgardReflectorProperty:dbclass:
+	 * 
+	 * Holds the name of the class which, #MidgardReflectorProperty has been initialized for.
+	 * 
+	 */  
 	g_object_class_install_property (object_class, MIDGARD_REFLECTOR_PROPERTY_DBCLASS, pspec);
 }
 

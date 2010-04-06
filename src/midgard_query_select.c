@@ -158,8 +158,8 @@ _midgard_query_select_add_join (MidgardQuerySelect *self, const gchar *join_type
 	if (!__query_join_type_is_valid (join_type, &join_type_id)) 
 		return FALSE;
 
-	MidgardQueryStorage *left_storage = left_property->storage;
-	MidgardQueryStorage *right_storage = right_property->storage;
+	/* MidgardQueryStorage *left_storage = left_property->priv->storage; */
+	MidgardQueryStorage *right_storage = right_property->priv->storage;
 
 	/* We can not join the same table adding new implicit table alias */
 	if (!right_storage) {
@@ -200,7 +200,7 @@ gboolean __query_select_add_orders (MidgardQuerySelect *self)
 		order = gda_sql_select_order_new (GDA_SQL_ANY_PART (select));
 		order->asc = _so->asc;
 		MidgardQueryProperty *property = _so->property;
-		MidgardQueryStorage *storage = property->storage;
+		MidgardQueryStorage *storage = property->priv->storage;
 
 		/* Compute table.colname for given property name */
 		GValue rval = {0, };
@@ -242,8 +242,8 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self)
 		join = gda_sql_select_join_new (GDA_SQL_ANY_PART (from));
 		join->type = _sj->join_type;
 
-		MidgardQueryStorage *left_storage = _sj->left_property->storage;
-		MidgardQueryStorage *right_storage = _sj->right_property->storage;
+		MidgardQueryStorage *left_storage = _sj->left_property->priv->storage;
+		MidgardQueryStorage *right_storage = _sj->right_property->priv->storage;
 
 		GValue lval = {0, };
 		midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (_sj->left_property), &lval);
@@ -263,21 +263,23 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self)
 		join->position = ++executor->priv->joinid;
 
 		/* Add right storage to targets */
-		MQE_SET_TABLE_ALIAS (executor, right_storage->table_alias);
+		MQE_SET_TABLE_ALIAS (executor, right_storage->priv->table_alias);
 		gda_sql_select_from_take_new_join (from , join);
 		GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (from));
-		s_target->table_name = g_strdup (right_storage->table);
-		s_target->as = g_strdup (right_storage->table_alias);
+		s_target->table_name = g_strdup (right_storage->priv->table);
+		s_target->as = g_strdup (right_storage->priv->table_alias);
 		gda_sql_select_from_take_new_target (from, s_target);
 	
 		// Set target expression 
 		GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
 		GValue *tval = g_new0 (GValue, 1);
 		g_value_init (tval, G_TYPE_STRING);
-		g_value_set_string (tval, right_storage->table);
+		g_value_set_string (tval, right_storage->priv->table);
 		texpr->value = tval;
 		s_target->expr = texpr;
 	}
+
+	return TRUE;
 }
 
 static void 
@@ -338,7 +340,7 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 		return FALSE;
 	}
 	
-	MidgardDBObjectClass *klass = self->priv->storage->klass;
+	MidgardDBObjectClass *klass = self->priv->storage->priv->klass;
 	if (!klass->dbpriv->add_fields_to_select_statement) {
 		/* FIXME, handle error */
 		g_warning ("Missed private DBObjectClass' fields to statement helper");
@@ -494,7 +496,7 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 		return NULL;
 
 	MidgardConnection *mgd = self->priv->mgd;
-	MidgardDBObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->klass;
+	MidgardDBObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
 	MidgardDBObject **objects = g_new (MidgardDBObject *, rows+1);
 
 	for (i = 0; i < rows; i++) {
@@ -560,8 +562,7 @@ _midgard_query_select_constructor (GType type,
 
 static void
 _midgard_query_select_dispose (GObject *object)
-{
-	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (object);
+{	
 	parent_class->dispose (object);
 }
 
@@ -575,7 +576,7 @@ _midgard_query_select_finalize (GObject *object)
 	if (self->priv->resultset && G_IS_OBJECT (self->priv->resultset))
 		g_object_unref (self->priv->resultset);
 
-	parent_class->finalize;
+	parent_class->finalize (object);
 }
 
 static void 

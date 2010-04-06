@@ -24,10 +24,10 @@
 G_BEGIN_DECLS
 
 /* convention macros */
-#define MIDGARD_QUERY_HOLDER_TYPE (midgard_query_holder_get_type()) 
-#define MIDGARD_QUERY_HOLDER(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_QUERY_HOLDER_TYPE, MidgardQueryHolder))
-#define MIDGARD_IS_QUERY_HOLDER(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_QUERY_HOLDER_TYPE))
-#define MIDGARD_QUERY_HOLDER_GET_INTERFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), MIDGARD_QUERY_HOLDER_TYPE, MidgardQueryHolderIFace))
+#define MIDGARD_TYPE_QUERY_HOLDER (midgard_query_holder_get_type()) 
+#define MIDGARD_QUERY_HOLDER(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_HOLDER, MidgardQueryHolder))
+#define MIDGARD_IS_QUERY_HOLDER(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_HOLDER))
+#define MIDGARD_QUERY_HOLDER_GET_INTERFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), MIDGARD_TYPE_QUERY_HOLDER, MidgardQueryHolderIFace))
 
 typedef struct _MidgardQueryHolder MidgardQueryHolder; /* dummy object */
 typedef struct _MidgardQueryHolderIFace MidgardQueryHolderIFace; 

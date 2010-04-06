@@ -24,8 +24,7 @@
 #include "midgard_dbobject.h"
 #include "midgard_core_query.h"
 
-struct _MidgardQueryGroupConstraint {
-	GObject  parent;
+struct _MidgardQueryGroupConstraintPrivate {
 	gchar *type;
 	GdaSqlOperatorType op_type;
 	GSList *constraints;
@@ -53,15 +52,15 @@ midgard_query_group_constraint_new (const gchar *type, MidgardQuerySimpleConstra
 	}
 
 	MidgardQueryGroupConstraint *self = g_object_new (MIDGARD_TYPE_QUERY_GROUP_CONSTRAINT, NULL);
-	self->type = valid_type;
-	self->op_type = op_type;
+	self->priv->type = valid_type;
+	self->priv->op_type = op_type;
 
 	MidgardQuerySimpleConstraint *cnstr = constraint;
 	va_list args;
 	va_start (args, constraint);
 	while (cnstr != NULL) {
 		if (MIDGARD_IS_QUERY_SIMPLE_CONSTRAINT (cnstr))
-			self->constraints = g_slist_append (self->constraints, cnstr);
+			self->priv->constraints = g_slist_append (self->priv->constraints, cnstr);
 		cnstr = va_arg (args, MidgardQuerySimpleConstraint*);
 	}
 	va_end (args);
@@ -73,7 +72,7 @@ const gchar *
 midgard_query_group_constraint_get_group_type (MidgardQueryGroupConstraint *self)
 {
 	g_return_val_if_fail (self != NULL, NULL);
-	return (const gchar *)self->type;
+	return (const gchar *)self->priv->type;
 }
 
 gboolean
@@ -107,7 +106,7 @@ _midgard_query_group_constraint_list_constraints (MidgardQuerySimpleConstraint *
 	g_return_val_if_fail (self != NULL, NULL);
 
 	GSList *l;
-	GSList *self_constraints = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->constraints;
+	GSList *self_constraints = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->priv->constraints;
 	guint i = 0;
 
 	/* count constraints */
@@ -139,14 +138,14 @@ _midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor
 		return;
 
 	GdaSqlStatementSelect *select = stmt->contents;
-	GdaSqlExpr *top_where, *where, *expr;
+	GdaSqlExpr *top_where = NULL, *where;
 	GdaSqlOperation *top_operation, *operation;	
 	
 	/* Create base top expression and operation */
 	if (!select->where_cond) {
 		top_where = gda_sql_expr_new (GDA_SQL_ANY_PART (select));
 		top_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (top_where));
-		top_operation->operator_type = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->op_type;
+		top_operation->operator_type = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->priv->op_type;
 		top_where->cond = top_operation;
 	     	gda_sql_statement_select_take_where_cond (stmt, top_where);	
 	} else if (where_expr_node) {
@@ -155,7 +154,7 @@ _midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor
 		operation = where->cond;
 		top_where = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
 		top_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (where_expr_node));
-		top_operation->operator_type = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->op_type;
+		top_operation->operator_type = MIDGARD_QUERY_GROUP_CONSTRAINT (self)->priv->op_type;
 		top_where->cond = top_operation;
 		operation->operands = g_slist_append (operation->operands, top_where);
 	}
@@ -189,8 +188,9 @@ _midgard_query_group_constraint_constructor (GType type,
 				construct_properties);
 
 	MidgardQueryGroupConstraint *self = MIDGARD_QUERY_GROUP_CONSTRAINT (object);
-	self->type = NULL;
-	self->constraints = NULL;
+	self->priv = g_new (MidgardQueryGroupConstraintPrivate, 1);
+	self->priv->type = NULL;
+	self->priv->constraints = NULL;
 
 	return G_OBJECT(object);
 }
@@ -198,8 +198,6 @@ _midgard_query_group_constraint_constructor (GType type,
 static void
 _midgard_query_group_constraint_dispose (GObject *object)
 {
-	MidgardQueryGroupConstraint *self = MIDGARD_QUERY_GROUP_CONSTRAINT (object);	
-
 	parent_class->dispose (object);
 }
 
@@ -208,14 +206,17 @@ _midgard_query_group_constraint_finalize (GObject *object)
 {
 	MidgardQueryGroupConstraint *self = MIDGARD_QUERY_GROUP_CONSTRAINT (object);
 	
-	g_free (self->type);
-	self->type = NULL;
+	g_free (self->priv->type);
+	self->priv->type = NULL;
 
-	if (self->constraints)
-		g_slist_free (self->constraints);
-	self->constraints = NULL; 
+	if (self->priv->constraints)
+		g_slist_free (self->priv->constraints);
+	self->priv->constraints = NULL; 
 
-	parent_class->finalize;
+	g_free (self->priv);
+	self->priv = NULL;
+
+	parent_class->finalize (object);
 }
 
 static void

@@ -117,7 +117,7 @@ GType midgard_longtext_get_type(void) {
 }                                       
 
 /* MIDGARD_TYPE_PARAM_LONGTEXT */
-struct _MgdParamSpecLongtext {
+struct _MidgardParamSpecLongtext {
 	GParamSpec    parent_instance;
 	gchar        *default_value;
 	gchar        *cset_first;
@@ -129,7 +129,7 @@ struct _MgdParamSpecLongtext {
 
 static void _param_string_init (GParamSpec *pspec)
 {
-	MgdParamSpecLongtext *ltspec = MGD_PARAM_SPEC_LONGTEXT (pspec);
+	MidgardParamSpecLongtext *ltspec = MGD_PARAM_SPEC_LONGTEXT (pspec);
 	
 	ltspec->default_value = NULL;
 	ltspec->cset_first = NULL;
@@ -141,7 +141,7 @@ static void _param_string_init (GParamSpec *pspec)
 
 static void _param_string_finalize (GParamSpec *pspec)	
 {
-	MgdParamSpecLongtext *ltspec = MGD_PARAM_SPEC_LONGTEXT (pspec);
+	MidgardParamSpecLongtext *ltspec = MGD_PARAM_SPEC_LONGTEXT (pspec);
 	GParamSpecClass *parent_class = g_type_class_peek (g_type_parent (MGD_TYPE_PARAM_LONGTEXT));
 
 	g_free (ltspec->default_value);
@@ -161,7 +161,7 @@ static void _param_string_set_default (GParamSpec *pspec, GValue *value)
 
 static gboolean _param_string_validate (GParamSpec *pspec, GValue *value)
 {
-	MgdParamSpecLongtext *ltspec = MGD_PARAM_SPEC_LONGTEXT (pspec);
+	MidgardParamSpecLongtext *ltspec = MGD_PARAM_SPEC_LONGTEXT (pspec);
 	gchar *string = value->data[0].v_pointer;
 	guint changed = 0;
 
@@ -221,7 +221,7 @@ GType midgard_param_longtext_get_type(void)
 	if (type == 0) {
 		{
 			const GParamSpecTypeInfo pspec_info = {
-				sizeof (MgdParamSpecLongtext),     /* instance_size */
+				sizeof (MidgardParamSpecLongtext),     /* instance_size */
 				16,                                /* n_preallocs */
 				_param_string_init,     	   /* instance_init */
 				MGD_TYPE_LONGTEXT,                 /* value_type */
@@ -230,7 +230,7 @@ GType midgard_param_longtext_get_type(void)
 				_param_string_validate,            /* value_validate */
 				_param_string_values_cmp,          /* values_cmp */
 			};
-			type = g_param_type_register_static ("MgdParamLongtext", &pspec_info);
+			type = g_param_type_register_static ("MidgardParamLongtext", &pspec_info);
 		}
 	}
 	return type;	
@@ -255,7 +255,7 @@ GType midgard_guid_get_type(void)
 		};
 		type = g_type_register_static(
 				G_TYPE_STRING, 
-				"MgdTypeGuid", 
+				"MidgardTypeGuid", 
 				&info, 0);
 	}
 	return type;

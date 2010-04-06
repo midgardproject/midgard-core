@@ -32,10 +32,10 @@ midgard_query_property_new (const gchar *property, MidgardQueryStorage *storage)
 	g_value_init (&pval, G_TYPE_STRING);
 	g_value_set_string (&pval, property);
 
-	self->value = pval;
+	self->priv->value = pval;
 
 	if (storage != NULL)
-		self->storage = storage;
+		self->priv->storage = storage;
 
 	return self;
 }
@@ -48,8 +48,8 @@ __get_value (MidgardQueryHolder *self, GValue *value)
 
 	MidgardQueryProperty *mqp = (MidgardQueryProperty *) self;
 
-	g_value_init (value, G_VALUE_TYPE (&mqp->value));
-	g_value_copy ((const GValue *) &mqp->value, value);
+	g_value_init (value, G_VALUE_TYPE (&mqp->priv->value));
+	g_value_copy ((const GValue *) &mqp->priv->value, value);
 
 	return;
 }
@@ -63,11 +63,11 @@ __set_value (MidgardQueryHolder *self, const GValue *value)
 
 	MidgardQueryProperty *mqp = (MidgardQueryProperty *) self;
 
-	if (G_IS_VALUE (&mqp->value))
-		g_value_unset (&mqp->value);
+	if (G_IS_VALUE (&mqp->priv->value))
+		g_value_unset (&mqp->priv->value);
 
-	g_value_init (&mqp->value, G_TYPE_STRING);
-	g_value_copy (value, &mqp->value);
+	g_value_init (&mqp->priv->value, G_TYPE_STRING);
+	g_value_copy (value, &mqp->priv->value);
 
 	return TRUE;
 }
@@ -84,16 +84,18 @@ _midgard_query_property_constructor (GType type,
 	GObject *object = (GObject *)
 		G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_properties, construct_properties);
-	
-	MIDGARD_QUERY_PROPERTY (object)->storage = NULL;
+
+	MidgardQueryProperty *self = (MidgardQueryProperty *) object;
+	self->priv = g_new (MidgardQueryPropertyPrivate, 1);	
+	self->priv->storage = NULL;
+	self->priv->klass = NULL;
 
 	return G_OBJECT(object);
 }
 
 static void
 _midgard_query_property_dispose (GObject *object)
-{
-	MidgardQueryProperty *self = MIDGARD_QUERY_PROPERTY (object);
+{	
 	parent_class->dispose (object);
 }
 
@@ -101,7 +103,14 @@ static void
 _midgard_query_property_finalize (GObject *object)
 {
 	MidgardQueryProperty *self = MIDGARD_QUERY_PROPERTY (object);
-        parent_class->finalize;
+
+	if (G_IS_VALUE (&self->priv->value))
+		g_value_unset (&self->priv->value);
+
+	g_free (self->priv);
+	self->priv = NULL;
+
+        parent_class->finalize (object);
 }
 
 static void
@@ -146,7 +155,7 @@ midgard_query_property_get_type (void)
 		};
 
   		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryProperty", &info, 0);
-		g_type_add_interface_static (type, MIDGARD_QUERY_HOLDER_TYPE, &property_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_HOLDER, &property_info);
     	}
     	return type;
 }

@@ -26,7 +26,7 @@
 #include "midgard_core_object_class.h"
 #include "midgard_core_object.h"
 
-struct _MidgardQueryConstraint {
+struct _MidgardQueryConstraintPrivate {
 	GObject  parent;
 	MidgardQueryProperty *property_value;
 	gchar *op;
@@ -85,14 +85,14 @@ midgard_query_constraint_new (MidgardQueryProperty *property, const gchar *op,
 		return NULL;	
 
 	MidgardQueryConstraint *self = g_object_new (MIDGARD_TYPE_QUERY_CONSTRAINT, NULL);
-	self->property_value = property;
-	self->op = g_strdup (op);
-	self->op_type = op_type;
-	self->holder = holder;
+	self->priv->property_value = property;
+	self->priv->op = g_strdup (op);
+	self->priv->op_type = op_type;
+	self->priv->holder = holder;
 
 	/* Allow NULL storage */
 	if (storage)
-		self->storage = storage;
+		self->priv->storage = storage;
 	
 	return self;
 }
@@ -197,22 +197,22 @@ void
 _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *simple_constraint, GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node)
 {	
 	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (simple_constraint);
-	GdaConnection *cnc = executor->priv->mgd->priv->connection;
+	//GdaConnection *cnc = executor->priv->mgd->priv->connection;
 	MidgardDBObjectClass *dbklass = NULL;
-       	if (self->storage) {
-	       dbklass = self->storage->klass;
-	       MQE_SET_TABLE_ALIAS (executor, self->storage->table_alias);
+       	if (self->priv->storage) {
+	       dbklass = self->priv->storage->priv->klass;
+	       MQE_SET_TABLE_ALIAS (executor, self->priv->storage->priv->table_alias);
 	}
 	if (!dbklass)
-		dbklass = executor->priv->storage->klass;
+		dbklass = executor->priv->storage->priv->klass;
 	g_return_if_fail (dbklass != NULL);
 
 	/* Get table */
-	const gchar *table = midgard_core_class_get_table (dbklass);	
+	//const gchar *table = midgard_core_class_get_table (dbklass);	
 
 	/* Get field name */
 	GValue field_value = {0, };
-	midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (MIDGARD_QUERY_CONSTRAINT (simple_constraint)->property_value), &field_value);
+	midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (MIDGARD_QUERY_CONSTRAINT (simple_constraint)->priv->property_value), &field_value);
 
 	GdaSqlStatementSelect *select = stmt->contents;
 	GdaSqlExpr *top_where, *where, *expr;
@@ -232,13 +232,13 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 
 	cond = gda_sql_operation_new (GDA_SQL_ANY_PART (where));
 	where->cond = cond;	
-	cond->operator_type = self->op_type;
+	cond->operator_type = self->priv->op_type;
 
 	/* Create table_alias.field name */
 	gchar *table_alias_field;
 	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
 	table_alias_field = midgard_core_query_compute_constraint_property (executor, 
-			MIDGARD_QUERY_CONSTRAINT (simple_constraint)->storage, g_value_get_string (&field_value));
+			MIDGARD_QUERY_CONSTRAINT (simple_constraint)->priv->storage, g_value_get_string (&field_value));
 	if (!table_alias_field)
 		g_warning ("Null table.field alias for given '%s'", g_value_get_string (&field_value));
 	/* TODO, handle error case when table_alias_field is NULL */
@@ -249,9 +249,9 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 
 	/* Create value */
 	GValue val = {0, };
-	midgard_query_holder_get_value (MIDGARD_QUERY_CONSTRAINT (simple_constraint)->holder, &val);
-	GType v_type = G_VALUE_TYPE (&val);
-	/* FIXME, create parameter name::type */
+	midgard_query_holder_get_value (MIDGARD_QUERY_CONSTRAINT (simple_constraint)->priv->holder, &val);
+	/*GType v_type = G_VALUE_TYPE (&val);
+	//FIXME, create parameter name::type */
 	//GValue *dval = gda_value_new (G_TYPE_STRING);
 	//g_value_transform (&val, dval);
 	//expr->param_spec = gda_sql_param_spec_new (dval);
@@ -282,18 +282,18 @@ _midgard_query_constraint_constructor (GType type,
 				construct_properties);
 
 	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (object);
-	self->property_value = NULL;
-	self->op = NULL;
-	self->storage = NULL;
-	self->holder = NULL;
+	self->priv = g_new (MidgardQueryConstraintPrivate, 1);
+	self->priv->property_value = NULL;
+	self->priv->op = NULL;
+	self->priv->storage = NULL;
+	self->priv->holder = NULL;
 
 	return G_OBJECT(object);
 }
 
 static void
 _midgard_query_constraint_dispose (GObject *object)
-{
-	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (object);
+{	
 	parent_class->dispose (object);
 }
 
@@ -302,10 +302,13 @@ _midgard_query_constraint_finalize (GObject *object)
 {
 	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (object);
 
-	g_free (self->op);
-	self->op = NULL;
+	g_free (self->priv->op);
+	self->priv->op = NULL;
 
-	parent_class->finalize;
+	g_free (self->priv);
+	self->priv = NULL;
+
+	parent_class->finalize (object);
 }
 
 static void

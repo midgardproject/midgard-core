@@ -33,7 +33,15 @@ G_BEGIN_DECLS
 #define MIDGARD_QUERY_STORAGE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_QUERY_STORAGE, MidgardQueryStorageClass))
 
 typedef struct _MidgardQueryStorage MidgardQueryStorage;
+typedef struct _MidgardQueryStoragePrivate MidgardQueryStoragePrivate;
 typedef struct _MidgardQueryStorageClass MidgardQueryStorageClass; 
+
+struct _MidgardQueryStorage {
+	GObject parent;
+
+	/* < private > */
+	MidgardQueryStoragePrivate *priv;
+};
 
 struct _MidgardQueryStorageClass {
 	GObjectClass parent;

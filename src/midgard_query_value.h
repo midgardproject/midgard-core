@@ -32,7 +32,15 @@ G_BEGIN_DECLS
 #define MIDGARD_QUERY_VALUE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_QUERY_VALUE_TYPE, MidgardQueryValueClass))
 
 typedef struct _MidgardQueryValue MidgardQueryValue;
+typedef struct _MidgardQueryValuePrivate MidgardQueryValuePrivate;
 typedef struct _MidgardQueryValueClass MidgardQueryValueClass; 
+
+struct _MidgardQueryValue {
+	GObject parent;
+
+	/* < private > */
+	MidgardQueryValuePrivate *priv;
+};
 
 struct _MidgardQueryValueClass {
 	GObjectClass parent;

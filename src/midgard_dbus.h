@@ -32,7 +32,6 @@ G_BEGIN_DECLS
 #define MIDGARD_IS_DBUS_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_DBUS))
 #define MIDGARD_DBUS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_DBUS, MidgardDbusClass))
 
-typedef struct _MidgardDbus midgard_dbus;
 typedef struct _MidgardDbus MidgardDbus;
 typedef struct _MidgardDbusClass MidgardDbusClass;
 typedef struct _MidgardDbusPrivate MidgardDbusPrivate; 

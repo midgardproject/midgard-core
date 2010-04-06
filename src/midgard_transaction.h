@@ -38,7 +38,15 @@ G_BEGIN_DECLS
 	        (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_TRANSACTION, MidgardTransactionClass))
 
 typedef struct _MidgardTransaction MidgardTransaction;
+typedef struct _MidgardTransactionPrivate MidgardTransactionPrivate;
 typedef struct _MidgardTransactionClass MidgardTransactionClass;
+
+struct _MidgardTransaction {
+	GObject parent;
+
+	/* < private > */
+	MidgardTransactionPrivate *priv;
+};
 
 struct _MidgardTransactionClass{
 	GObjectClass parent;

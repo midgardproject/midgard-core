@@ -65,6 +65,7 @@ void	midgard_core_metadata_set_schedule_start	(MidgardMetadata *self, const GVal
 void	midgard_core_metadata_set_schedule_end		(MidgardMetadata *self, const GValue *schedule);
 void	midgard_core_metadata_set_published		(MidgardMetadata *self, const GValue *published);
 void	midgard_core_metadata_set_authors		(MidgardMetadata *self, const GValue *authors);
+void	midgard_core_metadata_set_owner			(MidgardMetadata *self, const GValue *owner);
 void	midgard_core_metadata_set_score			(MidgardMetadata *self, const GValue *score);
 void	midgard_core_metadata_set_hidden		(MidgardMetadata *self, const GValue *hidden);
 void	midgard_core_metadata_set_navnoentry		(MidgardMetadata *self, const GValue *navnoentry);

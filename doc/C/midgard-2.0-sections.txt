@@ -529,7 +529,7 @@ MIDGARD_VIEW_GET_CLASS
 
 <SECTION>
 <FILE>midgard_dbus</FILE>
-<TITLE>midgard_dbus</TITLE>
+<TITLE>MidgardDbus</TITLE>
 MidgardDbus
 MidgardDbusClass
 midgard_dbus_new
@@ -543,5 +543,29 @@ midgard_dbus_get_type
 MIDGARD_DBUS_CLASS
 MIDGARD_IS_DBUS_CLASS
 MIDGARD_DBUS_GET_CLASS
+</SECTION>
+
+<SECTION>
+<FILE>midgard_query_constraint</FILE>
+<TITLE>MidgardQueryConstraint</TITLE>
+MidgardQueryConstraint
+MidgardQueryConstraintClass
+midgard_query_constraint_new
+midgard_query_constraint_get_value  
+midgard_query_constraint_set_value 
+midgard_query_constraint_get_storage 
+midgard_query_constraint_set_storage 
+midgard_query_constraint_get_property
+midgard_query_constraint_set_property
+midgard_query_constraint_get_operator
+midgard_query_constraint_set_operator
+<SUBSECTION Standard>
+MIDGARD_QUERY_CONSTRAINT
+MIDGARD_IS_QUERY_CONSTRAINT
+MIDGARD_TYPE_QUERY_CONSTRAINT
+midgard_query_constraint_get_type
+MIDGARD_QUERY_CONSTRAINT_CLASS
+MIDGARD_IS_QUERY_CONSTRAINT_CLASS
+MIDGARD_QUERY_CONSTRAINT_GET_CLASS
 </SECTION>
 

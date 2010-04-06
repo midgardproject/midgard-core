@@ -61,15 +61,13 @@ struct MidgardCoreQueryOrder {
 	const gchar *type;
 };
 
-struct _MidgardQueryStorage {
-	GObject parent;
+struct _MidgardQueryStoragePrivate {
 	MidgardDBObjectClass *klass;
 	gchar *table_alias;
 	const gchar *table;
 };
 
-struct _MidgardQueryProperty {
-	GObject parent;
+struct _MidgardQueryPropertyPrivate {
 	GValue value;
 	MidgardDBObjectClass *klass;
 	MidgardQueryStorage *storage;

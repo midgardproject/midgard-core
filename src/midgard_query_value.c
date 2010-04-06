@@ -20,10 +20,12 @@
 #include "midgard_query_value.h"
 #include "midgard_dbobject.h"
 
-struct _MidgardQueryValue {
+struct _MidgardQueryValuePrivate {
 	GObject parent;
 	GValue value;
 };
+
+#warning constructor and finalize missed for MidgardQueryValue
 
 MidgardQueryValue *
 midgard_query_value_new (const GValue *value)
@@ -35,7 +37,8 @@ midgard_query_value_new (const GValue *value)
 	g_value_init (&pval, G_VALUE_TYPE (value));
 	g_value_copy (value, &pval);
 
-	self->value = pval;
+	self->priv = g_new (MidgardQueryValuePrivate, 1);
+	self->priv->value = pval;
 
 	return self;
 }
@@ -48,8 +51,8 @@ __get_value (MidgardQueryHolder *self, GValue *value)
 
 	MidgardQueryValue *mqp = (MidgardQueryValue *) self;
 
-	g_value_init (value, G_VALUE_TYPE (&mqp->value));
-	g_value_copy ((const GValue *) &mqp->value, value);
+	g_value_init (value, G_VALUE_TYPE (&mqp->priv->value));
+	g_value_copy ((const GValue *) &mqp->priv->value, value);
 
 	return;
 }
@@ -62,11 +65,11 @@ __set_value (MidgardQueryHolder *self, const GValue *value)
 
 	MidgardQueryValue *mqp = (MidgardQueryValue *) self;
 
-	if (G_IS_VALUE (&mqp->value))
-		g_value_unset (&mqp->value);
+	if (G_IS_VALUE (&mqp->priv->value))
+		g_value_unset (&mqp->priv->value);
 
-	g_value_init (&mqp->value, G_VALUE_TYPE (value));
-	g_value_copy (value, &mqp->value);
+	g_value_init (&mqp->priv->value, G_VALUE_TYPE (value));
+	g_value_copy (value, &mqp->priv->value);
 
 	return TRUE;
 }
@@ -104,7 +107,7 @@ midgard_query_value_get_type (void)
 		};
 
   		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryValue", &info, 0);
-		g_type_add_interface_static (type, MIDGARD_QUERY_HOLDER_TYPE, &value_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_HOLDER, &value_info);
     	}
     	return type;
 }

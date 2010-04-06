@@ -18,6 +18,7 @@
 
 #include "midgard_query_storage.h"
 #include "midgard_core_query.h"
+#include "midgard_core_object_class.h"
 
 MidgardQueryStorage*
 midgard_query_storage_new (const gchar *classname)
@@ -37,8 +38,8 @@ midgard_query_storage_new (const gchar *classname)
 	}
 
 	MidgardQueryStorage *self = g_object_new (MIDGARD_TYPE_QUERY_STORAGE, NULL);
-	self->klass = klass;
-	self->table = midgard_core_class_get_table (klass);
+	self->priv->klass = klass;
+	self->priv->table = midgard_core_class_get_table (klass);
 
 	return self;
 }
@@ -57,9 +58,10 @@ __midgard_query_storage_constructor (GType type,
 				n_construct_properties,
 				construct_properties);
 
-	MIDGARD_QUERY_STORAGE (object)->klass = NULL;
-	MIDGARD_QUERY_STORAGE (object)->table_alias = NULL;
-	MIDGARD_QUERY_STORAGE (object)->table = NULL;
+	MIDGARD_QUERY_STORAGE (object)->priv = g_new (MidgardQueryStoragePrivate, 1);
+	MIDGARD_QUERY_STORAGE (object)->priv->klass = NULL;
+	MIDGARD_QUERY_STORAGE (object)->priv->table_alias = NULL;
+	MIDGARD_QUERY_STORAGE (object)->priv->table = NULL;
 
 	return object;
 }
@@ -67,7 +69,6 @@ __midgard_query_storage_constructor (GType type,
 static void
 __midgard_query_storage_dispose (GObject *object)
 {
-	MidgardQueryStorage *self = MIDGARD_QUERY_STORAGE (object);
 	__parent_class->dispose (object);
 }
 
@@ -75,8 +76,12 @@ static void
 __midgard_query_storage_finalize (GObject *object)
 {
 	MidgardQueryStorage *self = MIDGARD_QUERY_STORAGE (object);
-	g_free (self->table_alias);
-	self->table_alias = NULL;
+	
+	g_free (self->priv->table_alias);
+	self->priv->table_alias = NULL;
+
+	g_free (self->priv);
+	self->priv = NULL;
 
 	__parent_class->finalize (object);
 }

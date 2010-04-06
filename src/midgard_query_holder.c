@@ -70,18 +70,11 @@ midgard_query_holder_get_type (void)
 			NULL,   /* class_init */
 			NULL,   /* class_finalize */
 			NULL,   /* class_data */
-			NULL,
+			0,
 			0,      /* n_preallocs */
 			NULL    /* instance_init */
 		};
-      
-		static const GInterfaceInfo holder_info = {
-			(GInterfaceInitFunc) query_holder_iface_init,    /* interface_init */
-			NULL,	/* interface_finalize */
-			NULL	/* interface_data */
-		};
-
-  		type = g_type_register_static (G_TYPE_INTERFACE, "MidgardQueryHolder", &info, 0);
+		type = g_type_register_static (G_TYPE_INTERFACE, "MidgardQueryHolder", &info, 0);
 		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
     	}
     	return type;

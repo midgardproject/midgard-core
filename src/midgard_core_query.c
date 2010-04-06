@@ -3090,16 +3090,16 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 
 	/* Set table alias if it's not set */
 	if (storage)
-		MQE_SET_TABLE_ALIAS (executor, storage->table_alias);
+		MQE_SET_TABLE_ALIAS (executor, storage->priv->table_alias);
 
 	gchar *table_field = NULL;
 	gchar *table_alias = executor->priv->table_alias;
-	const gchar *table = executor->priv->storage->table;
-       	MidgardDBObjectClass *klass = executor->priv->storage->klass; 
+	const gchar *table = executor->priv->storage->priv->table;
+       	MidgardDBObjectClass *klass = executor->priv->storage->priv->klass; 
 	if (storage) {
-		table = executor->priv->storage->table;
-		table_alias = storage->table_alias;
-		klass = storage->klass;	
+		table = executor->priv->storage->priv->table;
+		table_alias = storage->priv->table_alias;
+		klass = storage->priv->klass;	
 	}
 
       	gchar **spltd = g_strsplit(name, ".", 0);

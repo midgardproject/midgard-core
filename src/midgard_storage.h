@@ -34,7 +34,6 @@
 #define MIDGARD_STORAGE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_STORAGE, MidgardStorageClass))
 
 typedef struct _MidgardStorage MidgardStorage;
-typedef struct _MidgardStorage midgard_storage;
 typedef struct _MidgardStorageClass MidgardStorageClass;
 
 GType	midgard_storage_get_type	(void);

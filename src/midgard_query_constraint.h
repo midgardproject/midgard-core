@@ -35,8 +35,16 @@ G_BEGIN_DECLS
 #define MIDGARD_IS_QUERY_CONSTRAINT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_QUERY_CONSTRAINT_TYPE))
 #define MIDGARD_QUERY_CONSTRAINT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_QUERY_CONSTRAINT_TYPE, MidgardQueryConstraintClass))
 
-typedef struct _MidgardQueryConstraint MidgardQueryConstraint; 
+typedef struct _MidgardQueryConstraint MidgardQueryConstraint;
+typedef struct _MidgardQueryConstraintPrivate MidgardQueryConstraintPrivate;
 typedef struct _MidgardQueryConstraintClass MidgardQueryConstraintClass;
+
+struct _MidgardQueryConstraint {
+	GObject parent;
+
+	/* < private > */
+	MidgardQueryConstraintPrivate *priv;
+};	
 
 struct _MidgardQueryConstraintClass {
 	GObjectClass parent;

@@ -21,19 +21,16 @@
 #include "midgard_error.h"
 #include "uuid.h"
 
-struct _MidgardTransaction {
-	GObject parent;
-
-	/* < private > */
+struct _MidgardTransactionPrivate {
 	MidgardConnection *mgd;
 	const gchar *name;
 };
 
 #define _ASSERT_T_MGD(_s) { \
-	g_assert(_s->mgd != NULL); \
-	g_assert(_s->mgd->priv->connection != NULL); }
+	g_assert(_s->priv->mgd != NULL); \
+	g_assert(_s->priv->mgd->priv->connection != NULL); }
 
-#define _T_CNC(_s) _s->mgd->priv->connection;
+#define _T_CNC(_s) _s->priv->mgd->priv->connection;
 
 /**
  * midgard_transaction_new:
@@ -53,7 +50,7 @@ midgard_transaction_new (MidgardConnection *mgd)
 	if (!self)
 		return NULL;
 
-	self->mgd = mgd;
+	self->priv->mgd = mgd;
 
 	return self;
 }
@@ -76,12 +73,12 @@ midgard_transaction_begin (MidgardTransaction *self)
 
 	gboolean rv = FALSE;
 	GdaConnection *cnc = _T_CNC(self);
-	MidgardConnection *mgd = self->mgd;
+	MidgardConnection *mgd = self->priv->mgd;
 	GError *error = NULL;
 
-	g_debug("Begin named transaction '%s'", self->name);
+	g_debug("Begin named transaction '%s'", self->priv->name);
 
-	rv = gda_connection_begin_transaction(cnc, self->name, 
+	rv = gda_connection_begin_transaction(cnc, self->priv->name, 
 			GDA_TRANSACTION_ISOLATION_UNKNOWN, &error);
 
 	if (!error && rv)
@@ -115,12 +112,12 @@ midgard_transaction_commit (MidgardTransaction *self)
 
 	gboolean rv = FALSE;
 	GdaConnection *cnc = _T_CNC(self);
-	MidgardConnection *mgd = self->mgd;
+	MidgardConnection *mgd = self->priv->mgd;
 	GError *error = NULL;
 
-	g_debug("Commit named transaction '%s'", self->name);
+	g_debug("Commit named transaction '%s'", self->priv->name);
 
-	rv = gda_connection_commit_transaction(cnc, self->name, &error);
+	rv = gda_connection_commit_transaction(cnc, self->priv->name, &error);
 
 	if (!error && rv)
 		return TRUE;
@@ -153,12 +150,12 @@ midgard_transaction_rollback (MidgardTransaction *self)
 
 	gboolean rv = FALSE;
 	GdaConnection *cnc = _T_CNC(self);
-	MidgardConnection *mgd = self->mgd;
+	MidgardConnection *mgd = self->priv->mgd;
 	GError *error = NULL;
 
-	g_debug("Rollback named transaction '%s'", self->name);
+	g_debug("Rollback named transaction '%s'", self->priv->name);
 
-	rv = gda_connection_rollback_transaction(cnc, self->name, &error);
+	rv = gda_connection_rollback_transaction(cnc, self->priv->name, &error);
 
 	if (!error && rv)
 		return TRUE;
@@ -217,7 +214,7 @@ midgard_transaction_get_name (MidgardTransaction *self)
 {
 	g_assert(self != NULL);
 
-	return self->name;
+	return self->priv->name;
 }
 
 /* GOBJECT ROUTINES */
@@ -234,10 +231,12 @@ static void __midgard_transaction_instance_init(
 	   That's why we create new 'mgd' prefixed uuid like string. */
 	gchar *uuid = midgard_uuid_new();
 	uuid = g_strdelimit(uuid, "-", '_');
-	self->name = (const gchar *)g_strconcat("mgd", uuid, NULL);
+
+	self->priv = g_new (MidgardTransactionPrivate, 1);
+	self->priv->name = (const gchar *)g_strconcat("mgd", uuid, NULL);
 	g_free(uuid);
 
-	self->mgd = NULL;
+	self->priv->mgd = NULL;
 }
 
 
@@ -247,8 +246,11 @@ static void __midgard_transaction_finalize(GObject *object)
 
 	MidgardTransaction *self = (MidgardTransaction *)object;
 
-	g_free((gchar *)self->name);
-	self->name = NULL;
+	g_free((gchar *)self->priv->name);
+	self->priv->name = NULL;
+
+	g_free (self->priv);
+	self->priv = NULL;
 }
 
 static void __midgard_transaction_class_init(

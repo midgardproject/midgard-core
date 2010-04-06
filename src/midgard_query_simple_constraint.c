@@ -25,16 +25,6 @@ midgard_query_simple_constraint_list_constraints (MidgardQuerySimpleConstraint *
 	return MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (self)->list_constraints (self, n_objects);
 }
 
-static void
-simple_constraint_iface_init (gpointer g_iface, gpointer iface_data)
-{
-	MidgardQuerySimpleConstraintIFace *iface = (MidgardQuerySimpleConstraintIFace *)g_iface;
-	iface->list_constraints = NULL;
-	/* Initialize private structure */
-	iface->priv = g_new (MidgardQuerySimpleConstraintPrivate, 1);
-	iface->priv->add_conditions_to_statement = NULL;
-}
-
 GType
 midgard_query_simple_constraint_get_type (void)
 {
@@ -48,17 +38,9 @@ midgard_query_simple_constraint_get_type (void)
 			NULL,   /* class_finalize */
 			NULL,   /* class_data */
 			0,	
-			//sizeof (MidgardQuerySimpleConstraint),
 			0,      /* n_preallocs */
 			NULL    /* instance_init */
 		};
-
-		static const GInterfaceInfo holder_info = {
-			(GInterfaceInitFunc) simple_constraint_iface_init,    /* interface_init */
-			NULL,   /* interface_finalize */
-			NULL    /* interface_data */
-		};
-		
 		type = g_type_register_static (G_TYPE_INTERFACE, "MidgardQuerySimpleConstraint", &info, 0);
 		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}

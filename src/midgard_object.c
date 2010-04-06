@@ -1,5 +1,5 @@
 /* 
-Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009 Piotr Pokora <piotrek.pokora@gmail.com>
+Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Piotr Pokora <piotrek.pokora@gmail.com>
 Copyright (C) 2004 Alexander Bokovoy <ab@samba.org>
 
 This program is free software; you can redistribute it and/or modify it
@@ -1980,127 +1980,84 @@ MidgardObject *
 midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 {
 	g_return_val_if_fail (mgd != NULL, NULL);
+	g_return_val_if_fail (name != NULL, NULL);
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
-	GType type;
+	GType type = g_type_from_name (name);
 	MidgardObject *self;
 	const gchar *field = "id";	
 
-	if ((type = g_type_from_name(name))){
+	if (!type)
+		return NULL;
+
+	/* Empty object instance */
+	if (value == NULL || (value && G_VALUE_TYPE (value) == G_TYPE_NONE)) {	
+		goto return_empty_object;
+	} else {
 		
-		/* Empty object instance */
-		if (value == NULL) {	
-
-			self = g_object_new(type, NULL);
-			midgard_core_object_class_set_midgard(mgd, G_OBJECT(self));
-
-		} else {
-						
-			/* We have to accept both integer and unsigned integer type.
-			   There might be no control over value passed on bindings level. */
-			if (G_VALUE_TYPE(value) != G_TYPE_STRING) {
-
-				if (G_VALUE_TYPE(value) != G_TYPE_UINT) {
-					
-					if (G_VALUE_TYPE(value) != G_TYPE_INT) {
-
-						g_warning("Expected value of string or integer type");
-						return NULL;
-					}
+		/* We have to accept both integer and unsigned integer type.
+		 * There might be no control over value passed on bindings level. */
+		if (G_VALUE_TYPE(value) != G_TYPE_STRING) {
+			if (G_VALUE_TYPE(value) != G_TYPE_UINT) {
+				if (G_VALUE_TYPE(value) != G_TYPE_INT) {
+					g_warning ("Expected value of string or integer type");
+					return NULL;
 				}
 			}
-
-			if (G_VALUE_TYPE(value) == G_TYPE_UINT) {
-
-				if (g_value_get_uint(value) == 0) {
-
-					midgard_set_error(mgd,
-							MGD_GENERIC_ERROR,
-							MGD_ERR_INVALID_PROPERTY_VALUE,
-							"Expected integer ID. Got 0. ");
-					return NULL;
-				}
-			}	
-
-			if (G_VALUE_TYPE(value) == G_TYPE_INT) {
-
-				if (g_value_get_int(value) < 1) {
-
-					midgard_set_error(mgd,
-							MGD_GENERIC_ERROR,
-							MGD_ERR_INVALID_PROPERTY_VALUE,
-							"Expected integer ID. Got 0 or negative. ");
-					return NULL;
-				}
-			}	
-
-			if (G_VALUE_TYPE(value) == G_TYPE_STRING) {
-				
-				const gchar *guidval = g_value_get_string(value);
-
-				if (guidval == NULL) {
-					
-					midgard_set_error(mgd,
-							MGD_GENERIC_ERROR,
-							MGD_ERR_INVALID_PROPERTY_VALUE,
-							"Expected guid. Got NULL. ");
-					return NULL;
-				}
-
-				if (!midgard_is_guid(guidval)) {
-
-					midgard_set_error(mgd,
-							MGD_GENERIC_ERROR,
-							MGD_ERR_INVALID_PROPERTY_VALUE,
-							"String value '%s' is not a guid.",
-							g_value_get_string(value));
-					return NULL;
-				}
-				field = "guid";
-			}
-
-			MidgardQueryBuilder *builder =
-				midgard_query_builder_new(mgd, name);
-
-			midgard_query_builder_add_constraint(builder, field, "=", value);
-		
-			guint n_objects;
-			GObject **objects = midgard_query_builder_execute(builder, &n_objects);
-
-			g_object_unref(builder);
-
-			if (!objects) {
-
-				MIDGARD_ERRNO_SET(mgd, MGD_ERR_NOT_EXISTS);				
-				return NULL;
-			}
-
-			self = MIDGARD_OBJECT(objects[0]);
-			g_free(objects);
-
-			__dbus_send(self, "get");
 		}
+
+		if (G_VALUE_TYPE(value) == G_TYPE_UINT) {
+			if (g_value_get_uint(value) == 0) {
+				goto return_empty_object;
+			}
+		}	
+
+		if (G_VALUE_TYPE(value) == G_TYPE_INT) {
+			if (g_value_get_int(value) < 1) {
+				goto return_empty_object;
+			}
+		}	
+
+		if (G_VALUE_TYPE(value) == G_TYPE_STRING) {
+			const gchar *guidval = g_value_get_string(value);
+			if (!guidval || (guidval && !midgard_is_guid (guidval)))
+					goto return_empty_object;
+		}
+		
+		field = "guid";
+		MidgardQueryBuilder *builder = midgard_query_builder_new(mgd, name);
+		midgard_query_builder_add_constraint(builder, field, "=", value);
+		guint n_objects;
+		GObject **objects = midgard_query_builder_execute(builder, &n_objects);
+		g_object_unref(builder);
+
+		if (!objects) {
+			MIDGARD_ERRNO_SET(mgd, MGD_ERR_NOT_EXISTS);				
+			return NULL;
+		}
+
+		self = MIDGARD_OBJECT(objects[0]);
+		g_free(objects);	
 
 		if (!self) {
 			MIDGARD_ERRNO_SET(mgd, MGD_ERR_INTERNAL);
 			return NULL;
 		}
 
-		self->dbpriv->storage_data = 
-			MIDGARD_OBJECT_GET_CLASS(self)->dbpriv->storage_data;
-		
-		if (!g_type_class_peek(type)) {
-			g_object_unref(self);
-			MIDGARD_ERRNO_SET(mgd, MGD_ERR_INTERNAL);
-			return NULL;
-		}
-		
-		self->dbpriv->mgd = mgd;	
+		__dbus_send(self, "get");
+		self->dbpriv->storage_data = MIDGARD_OBJECT_GET_CLASS(self)->dbpriv->storage_data;
+		MGD_OBJECT_CNC (self) = mgd;	
 		
 		return self;
 	}
-	return NULL; 
+
+return_empty_object:
+	self = g_object_new(type, NULL);
+	MGD_OBJECT_CNC (self) = mgd;
+
+	g_warning ("RETURN EMPTY SELF");
+	return self;
 }
 
 /**
