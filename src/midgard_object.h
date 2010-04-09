@@ -37,7 +37,7 @@ typedef struct _MidgardObjectPrivate MidgardObjectPrivate;
 typedef struct _MidgardObjectClassPrivate MidgardObjectClassPrivate;
 
 struct _MidgardObject {
-	GObject parent;
+	MidgardDBObject parent;
 
 	/* <private> */
 	MidgardDBObjectPrivate *dbpriv;
@@ -46,10 +46,10 @@ struct _MidgardObject {
 };
 
 struct _MidgardObjectClass {
-	GObjectClass parent;
+	MidgardDBObjectClass parent;
 	
 	/* private */
-	MidgardDBObjectPrivate *dbpriv;
+	//MidgardDBObjectPrivate *dbpriv;
 	MidgardObjectClassPrivate *priv;
 
 	/* methods */

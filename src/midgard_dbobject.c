@@ -320,6 +320,7 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->get_connection = __get_connection;
 
 	klass->dbpriv = g_new (MidgardDBObjectPrivate, 1);
+	klass->dbpriv->storage_data = NULL;
 	klass->dbpriv->create_storage = NULL;
 	klass->dbpriv->update_storage = NULL;
 	klass->dbpriv->storage_exists = NULL;
@@ -327,7 +328,7 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->dbpriv->add_fields_to_select_statement = _add_fields_to_select_statement;
 	klass->dbpriv->get_property = _midgard_dbobject_get_property;
 	klass->dbpriv->set_property = _midgard_dbobject_set_property;
-	klass->dbpriv->set_from_data_model = _midgard_dbobject_set_from_data_model;
+	klass->dbpriv->set_from_data_model = _midgard_dbobject_set_from_data_model;	
 }
 
 /* Registers the type as a fundamental GType unless already registered. */ 

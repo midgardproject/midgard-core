@@ -526,8 +526,7 @@ MgdSchemaPropertyAttr *midgard_core_class_get_property_attr(
 	g_assert(klass != NULL);
 	g_assert(name != NULL);
 
-	MgdSchemaPropertyAttr *prop_attr = NULL;
-	
+	MgdSchemaPropertyAttr *prop_attr = NULL;	
 	prop_attr = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, name);
 
 	if(prop_attr == NULL)

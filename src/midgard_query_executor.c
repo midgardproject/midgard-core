@@ -65,6 +65,14 @@ midgard_query_executor_get_results_count (MidgardQueryExecutor *self)
 {
 	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->get_results_count (self);
 }
+
+gboolean
+midgard_query_executor_execute (MidgardQueryExecutor *self)
+{
+	g_print ("INVOKE EXECUTE %p %s %p", self, G_OBJECT_TYPE_NAME (self), MIDGARD_QUERY_EXECUTOR_CLASS (G_OBJECT_GET_CLASS (self))->execute);
+	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->execute (self);
+}
+
 /* GOBJECT ROUTINES */
 
 static GObjectClass *parent_class= NULL;

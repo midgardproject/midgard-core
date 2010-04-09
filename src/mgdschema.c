@@ -1331,7 +1331,7 @@ static void __midgard_schema_validate()
 
 		g_free(pspecs);
 
-		parentname = klass->dbpriv->storage_data->parent;
+		parentname = MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data->parent;
 
 		if(parentname != NULL) {
 			

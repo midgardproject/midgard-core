@@ -100,7 +100,7 @@ gboolean midgard_object_is_in_parent_tree(MidgardObject *self, guint rootid, gui
 
 	parent_table = 
 		midgard_core_class_get_table(MIDGARD_DBOBJECT_CLASS(parent_class));
-	up_field = parent_class->dbpriv->storage_data->upfield;
+	up_field = MIDGARD_DBOBJECT_CLASS (parent_class)->dbpriv->storage_data->upfield;
 
 	GString *where = g_string_new("");
 	g_string_append_printf(where, "id = %d ", id);

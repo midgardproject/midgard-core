@@ -80,17 +80,6 @@ struct MidgardConfig{
 struct MidgardConfigClass{
 	GObjectClass parent;
 	
-	/* class members */
-	gboolean (*read_config) (MidgardConfig *self, 
-				const gchar *filename, gboolean user, GError **error);
-	gboolean (*save_config) (MidgardConfig *self,
-				const gchar *name, gboolean user, GError **error);
-	gchar (**list_files) (gboolean user);
-	gboolean (*create_midgard_tables)(MidgardConfig *self,
-					MidgardConnection *mgd);
-	gboolean (*create_class_table) (MidgardConfig *self,
-					MidgardObjectClass *klass, 
-					MidgardConnection *mgd);
 };
 
 GType midgard_config_get_type(void);

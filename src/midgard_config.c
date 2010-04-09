@@ -1559,10 +1559,7 @@ _midgard_config_class_init (gpointer g_class, gpointer g_class_data)
 	gobject_class->set_property = _midgard_config_set_property;
 	gobject_class->get_property = _midgard_config_get_property;
 	gobject_class->finalize = _midgard_config_finalize;
-		
-	klass->read_config = midgard_config_read_file;
-	/* klass->connect = mgd_connect; */
-
+	
 	/* Register properties */
 	pspec = g_param_spec_string ("dbtype",
 			"Type",

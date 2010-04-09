@@ -247,7 +247,7 @@ __mgdschema_object_dispose (GObject *object)
 {
 	MidgardObject *self = MIDGARD_OBJECT (object);
 
-	if (self->dbpriv->metadata != NULL && G_IS_OBJECT(self->dbpriv->metadata)) {
+	if (self->dbpriv && (self->dbpriv->metadata != NULL && G_IS_OBJECT(self->dbpriv->metadata))) {
 		/* Remove weak reference */
 		g_object_remove_weak_pointer (G_OBJECT (self), (gpointer) self->dbpriv->metadata);
 	}
@@ -1280,10 +1280,12 @@ static void
 __mgdschema_class_init(gpointer g_class, gpointer class_data)
 {
 	MgdSchemaTypeAttr *data = (MgdSchemaTypeAttr *) class_data;
+
 	GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
 	MidgardObjectClass *mklass = (MidgardObjectClass *) g_class;
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (g_class);
 	guint idx;
-
+	
 	__mgdschema_parent_class = g_type_class_peek_parent (g_class);
 
 	gobject_class->set_property = __midgard_object_set_property;
@@ -1296,32 +1298,32 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 
 	if (mklass) {
 
-		mklass->priv = g_new(MidgardObjectClassPrivate, 1);
-		mklass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
+		mklass->priv = g_new (MidgardObjectClassPrivate, 1);
+		dbklass->dbpriv = g_new (MidgardDBObjectPrivate, 1);
 
 		/* Check metadata. No support for user declared one yet. */
 		if (data->metadata_class == NULL) 
-			mklass->dbpriv->has_metadata = FALSE;
+			dbklass->dbpriv->has_metadata = FALSE;
 		else 
-			mklass->dbpriv->has_metadata = TRUE;
+			dbklass->dbpriv->has_metadata = TRUE;
 
-		mklass->dbpriv->storage_data = data;
-		mklass->dbpriv->set_from_sql = NULL;
-		mklass->dbpriv->__set_from_sql = NULL;
-		mklass->dbpriv->set_from_xml_node = NULL;
+		dbklass->dbpriv->storage_data = data;
+		dbklass->dbpriv->set_from_sql = NULL;
+		dbklass->dbpriv->__set_from_sql = NULL;
+		dbklass->dbpriv->set_from_xml_node = NULL;
 
-		mklass->dbpriv->create_storage = _object_create_storage;
-		mklass->dbpriv->update_storage = _object_update_storage;
-		mklass->dbpriv->storage_exists = _object_storage_exists;
-		mklass->dbpriv->delete_storage = _object_delete_storage;
-		mklass->dbpriv->add_fields_to_select_statement = MIDGARD_OBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement;
-		mklass->dbpriv->get_property = MIDGARD_OBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_property;
-		mklass->dbpriv->set_from_data_model = MIDGARD_OBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model;
+		dbklass->dbpriv->create_storage = _object_create_storage;
+		dbklass->dbpriv->update_storage = _object_update_storage;
+		dbklass->dbpriv->storage_exists = _object_storage_exists;
+		dbklass->dbpriv->delete_storage = _object_delete_storage;
+		dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement;
+		dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_property;
+		dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model;
 
-	}
+	}	
 
 	if (G_OBJECT_CLASS_TYPE(g_class) != MIDGARD_TYPE_OBJECT) {
-		__add_core_properties(mklass->dbpriv->storage_data);
+		__add_core_properties(dbklass->dbpriv->storage_data);
 	}
 
 	g_type_class_add_private (g_class, 
@@ -1342,8 +1344,9 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 
 	/* Note, that we start numbering from 1 , not from 0. property_id must be > 0 */
 	for (idx = 1; idx <= data->num_properties; idx++) {
-		/* g_warning("Installing property id %d :: %s",
-				idx, data->params[idx-1]->name); */
+		gchar *pname = data->params[idx-1]->name;
+		/* g_print ("Installing property id %d :: %s.%s \n",
+				idx, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (g_class)), pname); */
 		g_object_class_install_property(
 				gobject_class, 
 				data->base_index + idx , 
@@ -1378,10 +1381,12 @@ __mgdschema_object_constructor (GType type,
 	
 	/* Workaround to set default values for every property.
 	 * I have no idea why we get 0 n_construct_properties and null GObjectConstructParam */
-	GObjectClass *g_class = g_type_class_peek (type);
+	//GObjectClass *g_class = g_type_class_peek (type);
+	GObjectClass *g_class = G_OBJECT_GET_CLASS (object);
 	guint n_prop, i;
 	GParamSpec **pspecs = g_object_class_list_properties(g_class, &n_prop);
 
+	MgdSchemaTypeAttr *type_attr = MIDGARD_DBOBJECT_CLASS (g_class)->dbpriv->storage_data;
 	for (i = 0; i < n_prop ; i++) {
 	
 		MgdSchemaPropertyAttr *prop_attr = 
@@ -1464,7 +1469,7 @@ __midgard_object_constructor (GType type,
 				construct_properties);
 
 	MIDGARD_DBOBJECT(object)->dbpriv->storage_data =
-		MIDGARD_OBJECT_GET_CLASS(object)->dbpriv->storage_data;
+		MIDGARD_DBOBJECT_GET_CLASS(object)->dbpriv->storage_data;
 	MIDGARD_DBOBJECT (object)->dbpriv->metadata = MIDGARD_OBJECT (object)->metadata;
 
 	MgdSchemaTypeAttr *priv =
@@ -1506,11 +1511,14 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	GObjectClass *g_class = G_OBJECT_CLASS (klass);
 	__midgard_object_parent_class = g_type_class_peek_parent (klass);
 
-	klass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
-	klass->dbpriv->create_storage = NULL;
-	klass->dbpriv->update_storage = NULL;
-	klass->dbpriv->delete_storage = NULL;
-	klass->dbpriv->storage_exists = NULL;
+
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (klass);
+
+	//klass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
+	dbklass->dbpriv->create_storage = NULL;
+	dbklass->dbpriv->update_storage = NULL;
+	dbklass->dbpriv->delete_storage = NULL;
+	dbklass->dbpriv->storage_exists = NULL;
 
 	g_class->constructor = __midgard_object_constructor;
 	g_class->dispose = __midgard_object_dispose;
@@ -1538,9 +1546,9 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	MidgardObjectClass *mklass = klass;
 
 	mklass->get_connection = MIDGARD_DBOBJECT_CLASS(mklass)->get_connection;
-	mklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->add_fields_to_select_statement;
-	mklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_property;
-	mklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_from_data_model;
+	dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->add_fields_to_select_statement;
+	dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_property;
+	dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_from_data_model;
 
 	if (!signals_registered && mklass) {
 		
@@ -2046,7 +2054,7 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 		}
 
 		__dbus_send(self, "get");
-		self->dbpriv->storage_data = MIDGARD_OBJECT_GET_CLASS(self)->dbpriv->storage_data;
+		MIDGARD_DBOBJECT (self)->dbpriv->storage_data = MIDGARD_DBOBJECT_GET_CLASS(self)->dbpriv->storage_data;
 		MGD_OBJECT_CNC (self) = mgd;	
 		
 		return self;

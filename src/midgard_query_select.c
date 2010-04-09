@@ -30,14 +30,14 @@ midgard_query_select_new (MidgardConnection *mgd, MidgardQueryStorage *storage)
 	g_return_val_if_fail (storage != NULL, NULL);
 
 	MidgardQuerySelect *self = g_object_new (MIDGARD_TYPE_QUERY_SELECT, NULL);
-	self->priv->mgd = mgd;
-	self->priv->storage = storage;
+	MIDGARD_QUERY_EXECUTOR (self)->priv->mgd = mgd;
+	MIDGARD_QUERY_EXECUTOR (self)->priv->storage = storage;
 
 	return self;
 }
 
 gboolean
-_midgard_query_select_set_constraint (MidgardQuerySelect *self, MidgardQuerySimpleConstraint *constraint)
+_midgard_query_select_set_constraint (MidgardQueryExecutor *self, MidgardQuerySimpleConstraint *constraint)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (constraint != NULL, FALSE);
@@ -48,7 +48,7 @@ _midgard_query_select_set_constraint (MidgardQuerySelect *self, MidgardQuerySimp
 }
 
 gboolean
-_midgard_query_select_set_limit (MidgardQuerySelect *self, guint limit)
+_midgard_query_select_set_limit (MidgardQueryExecutor *self, guint limit)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (limit > 0, FALSE);
@@ -59,7 +59,7 @@ _midgard_query_select_set_limit (MidgardQuerySelect *self, guint limit)
 }
 
 gboolean 
-_midgard_query_select_set_offset (MidgardQuerySelect *self, guint offset)
+_midgard_query_select_set_offset (MidgardQueryExecutor *self, guint offset)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (offset > 0, FALSE);
@@ -75,7 +75,7 @@ typedef struct {
 } qso;
 
 gboolean
-_midgard_query_select_add_order (MidgardQuerySelect *self, MidgardQueryProperty *property, const gchar *type)
+_midgard_query_select_add_order (MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);
@@ -145,7 +145,7 @@ typedef struct {
 } qsj;
 
 gboolean
-_midgard_query_select_add_join (MidgardQuerySelect *self, const gchar *join_type, 
+_midgard_query_select_add_join (MidgardQueryExecutor *self, const gchar *join_type, 
 		MidgardQueryProperty *left_property, MidgardQueryProperty *right_property)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
@@ -166,8 +166,6 @@ _midgard_query_select_add_join (MidgardQuerySelect *self, const gchar *join_type
 		g_warning ("Can not add join. Right property storage is NULL. ");
 	       return FALSE;	
 	}
-	
-	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
 
 	qsj *_sj = g_new (qsj, 1);
 	_sj->left_property = left_property;
@@ -175,12 +173,12 @@ _midgard_query_select_add_join (MidgardQuerySelect *self, const gchar *join_type
 
 	_sj->join_type = join_type_id;
 
-	executor->priv->joins = g_slist_append (executor->priv->joins, _sj);
+	self->priv->joins = g_slist_append (self->priv->joins, _sj);
 
 	return TRUE;
 }
 
-gboolean __query_select_add_orders (MidgardQuerySelect *self)
+gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 {
 	if (!self->priv->orders)
 		return TRUE;
@@ -192,7 +190,7 @@ gboolean __query_select_add_orders (MidgardQuerySelect *self)
 	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;	
 	GdaSqlSelectOrder *order; 
 	
-	for (l = self->priv->orders; l != NULL; l = l->next) {
+	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->orders; l != NULL; l = l->next) {
 
 		qso *_so = (qso*) l->data;
 
@@ -224,7 +222,7 @@ gboolean __query_select_add_orders (MidgardQuerySelect *self)
 
 gboolean __query_select_add_joins (MidgardQuerySelect *self)
 {
-	if (!self->priv->joins)
+	if (!MIDGARD_QUERY_EXECUTOR (self)->priv->joins)
 		return TRUE;
 
 	GSList *l = NULL;
@@ -235,7 +233,7 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self)
 	GdaSqlSelectFrom *from = select->from;
 	GdaSqlSelectJoin *join; 
 	
-	for (l = self->priv->joins; l != NULL; l = l->next) {
+	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->joins; l != NULL; l = l->next) {
 
 		qsj *_sj = (qsj*) l->data;
 
@@ -328,13 +326,14 @@ __add_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *top_oper
 }
 
 gboolean 
-_midgard_query_select_execute (MidgardQuerySelect *self)
+_midgard_query_select_execute (MidgardQueryExecutor *self)
 {
+	g_print ("SELECT EXECUTE %p \n", self);
 	g_return_val_if_fail (self != NULL, FALSE);
 	
 	GError *error = NULL;
 
-	if (!self->priv->storage) {
+	if (!MIDGARD_QUERY_EXECUTOR (self)->priv->storage) {
 		/* FIXME, handle error */
 		g_warning ("Missed QueryStorage associated with QuerySelect");
 		return FALSE;
@@ -356,7 +355,7 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	sql_stm = gda_sql_statement_new (GDA_SQL_STATEMENT_SELECT);
 	sss = (GdaSqlStatementSelect*) sql_stm->contents;
 	g_assert (GDA_SQL_ANY_PART (sss)->type == GDA_SQL_ANY_STMT_SELECT);
-	self->priv->stmt = sql_stm;
+	MIDGARD_QUERY_EXECUTOR (self)->priv->stmt = sql_stm;
 	sss->from = gda_sql_select_from_new (GDA_SQL_ANY_PART (sss));
 
 	/* Initialize top base expresion and operation with default AND operator type */
@@ -369,8 +368,8 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	/* Create targets (FROM) */
 	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (sss->from));
 	s_target->table_name = g_strdup (midgard_core_class_get_table (klass));
-	s_target->as = g_strdup_printf ("t%d", ++self->priv->tableid);
-	self->priv->table_alias = g_strdup (s_target->as);
+	s_target->as = g_strdup_printf ("t%d", ++MIDGARD_QUERY_EXECUTOR (self)->priv->tableid);
+	MIDGARD_QUERY_EXECUTOR (self)->priv->table_alias = g_strdup (s_target->as);
 	gda_sql_select_from_take_new_target (sss->from, s_target);
 
 	/* Set target expression */	
@@ -385,16 +384,16 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	klass->dbpriv->add_fields_to_select_statement (klass, sss, s_target->as);
 
 	/* Add joins, LEFT JOIN tbl2 ON... */
-	if (!__query_select_add_joins (self)) 
+	if (!__query_select_add_joins (MIDGARD_QUERY_SELECT (self))) 
 		goto return_false;
 
 	GdaSqlExpr *where = sss->where_cond;
 	GdaSqlOperation *operation = where->cond;
 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
-	if (self->priv->constraint)
-		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (self->priv->constraint)->priv->add_conditions_to_statement (
-				MIDGARD_QUERY_EXECUTOR (self), self->priv->constraint, sql_stm, base_where);
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)
+		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement (
+				MIDGARD_QUERY_EXECUTOR (self), MIDGARD_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where);
 	else 
 		__add_dummy_constraint (sss, operation); /* no constraints, add dummy WHERE 1=1 */	
 
@@ -406,21 +405,21 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 	__add_exclude_deleted_constraints (sss, operation);
 
 	/* Add limit, LIMIT x */
-	if (self->priv->limit > 0) {
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->limit > 0) {
 		GdaSqlExpr *limit_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
 		GValue *limit_val = g_new0 (GValue, 1);
 		g_value_init (limit_val, G_TYPE_STRING);
-		g_value_take_string (limit_val, g_strdup_printf ("%d", self->priv->limit));
+		g_value_take_string (limit_val, g_strdup_printf ("%d", MIDGARD_QUERY_EXECUTOR (self)->priv->limit));
 		limit_expr->value = limit_val;
 		sss->limit_count = limit_expr;
 	}
 
 	/* Add offset, OFFSET x */
-	if (self->priv->offset >= 0) {
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->offset >= 0) {
 		GdaSqlExpr *offset_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
 		GValue *offset_val = g_new0 (GValue, 1);
 		g_value_init (offset_val, G_TYPE_STRING);
-		g_value_take_string (offset_val, g_strdup_printf ("%d", self->priv->offset));
+		g_value_take_string (offset_val, g_strdup_printf ("%d", MIDGARD_QUERY_EXECUTOR (self)->priv->offset));
 		offset_expr->value = offset_val;
 		sss->limit_offset = offset_expr;
 	}
@@ -457,10 +456,10 @@ _midgard_query_select_execute (MidgardQuerySelect *self)
 		goto return_false;
 	}
 	
-	self->priv->results_count = gda_data_model_get_n_rows (model);
-	if (self->priv->resultset && G_IS_OBJECT (self->priv->resultset))
-		g_object_unref (G_OBJECT (self->priv->resultset));
-	self->priv->resultset = (gpointer) model;
+	MIDGARD_QUERY_EXECUTOR (self)->priv->results_count = gda_data_model_get_n_rows (model);
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset && G_IS_OBJECT (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset))
+		g_object_unref (G_OBJECT (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset));
+	MIDGARD_QUERY_EXECUTOR (self)->priv->resultset = (gpointer) model;
 	g_object_unref (self);
 	
 	return TRUE;
@@ -474,7 +473,7 @@ return_false:
 }
 
 guint
-_midgard_query_select_get_results_count (MidgardQuerySelect *self)
+_midgard_query_select_get_results_count (MidgardQueryExecutor *self)
 {
 	g_return_val_if_fail (self != NULL, 0);
 
@@ -495,7 +494,7 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 	if (rows < 1)
 		return NULL;
 
-	MidgardConnection *mgd = self->priv->mgd;
+	MidgardConnection *mgd = MIDGARD_QUERY_EXECUTOR (self)->priv->mgd;
 	MidgardDBObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
 	MidgardDBObject **objects = g_new (MidgardDBObject *, rows+1);
 
@@ -573,8 +572,8 @@ _midgard_query_select_finalize (GObject *object)
 
 	/* DO NOT nullify resultset object, other objects might still hold 
 	 * reference to it. */
-	if (self->priv->resultset && G_IS_OBJECT (self->priv->resultset))
-		g_object_unref (self->priv->resultset);
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset && G_IS_OBJECT (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset))
+		g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset);
 
 	parent_class->finalize (object);
 }
@@ -584,18 +583,20 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 {
        	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	parent_class = g_type_class_peek_parent (klass);
+	MidgardQueryExecutorClass *executor_class = MIDGARD_QUERY_EXECUTOR_CLASS (klass);
 
 	object_class->constructor = _midgard_query_select_constructor;
 	object_class->dispose = _midgard_query_select_dispose;
 	object_class->finalize = _midgard_query_select_finalize;
 
-	klass->set_constraint = _midgard_query_select_set_constraint;
-	klass->set_limit = _midgard_query_select_set_limit;
-	klass->set_offset = _midgard_query_select_set_offset;
-	klass->add_order = _midgard_query_select_add_order;
-	klass->add_join = _midgard_query_select_add_join;
-	klass->execute = _midgard_query_select_execute;
-	klass->get_results_count = _midgard_query_select_get_results_count;
+	executor_class->set_constraint = _midgard_query_select_set_constraint;
+	executor_class->set_limit = _midgard_query_select_set_limit;
+	executor_class->set_offset = _midgard_query_select_set_offset;
+	executor_class->add_order = _midgard_query_select_add_order;
+	executor_class->add_join = _midgard_query_select_add_join;
+	executor_class->execute = _midgard_query_select_execute;
+	executor_class->get_results_count = _midgard_query_select_get_results_count;
+	
 	klass->list_objects = _midgard_query_select_list_objects;
 	klass->toggle_read_only = _midgard_query_select_toggle_read_only;
 }
