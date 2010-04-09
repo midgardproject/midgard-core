@@ -77,17 +77,17 @@ static void _write_nodes(GObject *object, xmlNodePtr node)
 
 		gint object_action = -1;	
 
-		if(mgdobject->dbpriv->guid) {
+		if(MGD_OBJECT_GUID (mgdobject)) {
 
 			GString *_sql = g_string_new(" ");
 			g_string_append_printf(_sql, "guid = '%s' ",	
-					mgdobject->dbpriv->guid);
+					MGD_OBJECT_GUID (mgdobject));
 			
 			gchar *tmpstr = g_string_free(_sql, FALSE);
 						
 			GValue *avalue =
 				midgard_core_query_get_field_value(
-						mgdobject->dbpriv->mgd,	
+						MGD_OBJECT_CNC (mgdobject),	
 						"object_action",
 						"repligard", 
 						(const gchar*)tmpstr);
@@ -142,13 +142,13 @@ static void _write_nodes(GObject *object, xmlNodePtr node)
 		if(g_str_equal("guid", pspec[i]->name)) {
 			/* Add guid attribute */
 			xmlNewProp(node, BAD_CAST "guid", 
-					BAD_CAST MIDGARD_OBJECT(object)->dbpriv->guid);
+					BAD_CAST MGD_OBJECT_GUID (object));
 			g_value_unset(&pval);
 			continue;
 		}
 				
 		/* Object is not fetched from database. Skip references */
-		if(mgdobject->dbpriv->guid == NULL)
+		if(MGD_OBJECT_GUID (mgdobject) == NULL)
 			goto export_unchecked_property;
 
 		/* If property is a link we need to query guid 
@@ -194,7 +194,7 @@ static void _write_nodes(GObject *object, xmlNodePtr node)
 				
 				if(linktype){
 					mc = midgard_collector_new(
-							mgdobject->dbpriv->mgd,
+							MGD_OBJECT_CNC (mgdobject),
 							linktype,
 							"id",
 							lval);

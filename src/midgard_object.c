@@ -207,11 +207,11 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 	switch (prop_id) {
 
 		case MIDGARD_PROPERTY_GUID:	
-			g_value_set_string (value, self->dbpriv->guid);
+			g_value_set_string (value, MIDGARD_DBOBJECT (self)->dbpriv->guid);
 			break;
 				
 		case MIDGARD_PROPERTY_METADATA:
-			g_value_set_object (value, (MidgardMetadata *) self->dbpriv->metadata);
+			g_value_set_object (value, (MidgardMetadata *) MIDGARD_DBOBJECT (self)->dbpriv->metadata);
 			break;
 		
 		default:
@@ -852,8 +852,8 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	const gchar *tablename;
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);	
 	gint inserted;
-	
-	if (object->dbpriv->storage_data == NULL)
+
+	if (MIDGARD_DBOBJECT (object)->dbpriv->storage_data == NULL)
 		return FALSE;
 
 	/* Handle pure create call. If replicate is OBJECT_UPDATE_IMPORTED, then, 
@@ -893,7 +893,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		return FALSE;
 	}
 	*/
-	
+
 	tablename = midgard_core_class_get_table(MIDGARD_DBOBJECT_GET_CLASS(object));	
 
 	/* FIXME , move this to object_is_valid */
@@ -2064,7 +2064,6 @@ return_empty_object:
 	self = g_object_new(type, NULL);
 	MGD_OBJECT_CNC (self) = mgd;
 
-	g_warning ("RETURN EMPTY SELF");
 	return self;
 }
 
