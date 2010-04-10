@@ -704,7 +704,8 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 		if(rf_error) 
 			g_propagate_error(error, rf_error);	
 		
-		MIDGARD_ERRNO_SET (self, MGD_ERR_NOT_CONNECTED);
+		MIDGARD_ERRNO_SET_STRING (self, MGD_ERR_NOT_CONNECTED, 
+				"%s", error && error->message ? error->message : "Unknown reason");
 		return FALSE;
 	}
 	
