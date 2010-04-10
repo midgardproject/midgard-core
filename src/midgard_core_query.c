@@ -2326,7 +2326,9 @@ midgard_core_query_escape_string (MidgardConnection *mgd, const gchar *string)
 	gchar *ptr, *ret, *retptr;
 	gint size;
 
-	guint dbtype = mgd->priv->config->priv->dbtype;
+	guint dbtype = 0;
+	if (mgd && mgd->priv->config)
+		dbtype = mgd->priv->config->priv->dbtype;
 
 	if (!string)
 		return NULL;
