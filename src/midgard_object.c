@@ -164,7 +164,7 @@ __midgard_object_set_property (GObject *object, guint prop_id,
 			break;
 				
 		case MIDGARD_PROPERTY_METADATA:
-			self->dbpriv->metadata = g_value_get_object (value);
+			MGD_DBOBJECT_METADATA (self) = g_value_get_object (value);
 			break;
 			
 		default:
@@ -207,7 +207,7 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 	switch (prop_id) {
 
 		case MIDGARD_PROPERTY_GUID:	
-			g_value_set_string (value, MIDGARD_DBOBJECT (self)->dbpriv->guid);
+			g_value_set_string (value, MGD_OBJECT_GUID (self));
 			break;
 				
 		case MIDGARD_PROPERTY_METADATA:
@@ -247,9 +247,11 @@ __mgdschema_object_dispose (GObject *object)
 {
 	MidgardObject *self = MIDGARD_OBJECT (object);
 
-	if (self->dbpriv && (self->dbpriv->metadata != NULL && G_IS_OBJECT(self->dbpriv->metadata))) {
+	if (MIDGARD_DBOBJECT (self)->dbpriv 
+			&& (MGD_DBOBJECT_METADATA (self) != NULL 
+				&& G_IS_OBJECT(MGD_DBOBJECT_METADATA (self)))) {
 		/* Remove weak reference */
-		g_object_remove_weak_pointer (G_OBJECT (self), (gpointer) self->dbpriv->metadata);
+		g_object_remove_weak_pointer (G_OBJECT (self), (gpointer) MGD_DBOBJECT_METADATA (self));
 	}
 
 	/* Free object's parameters */
@@ -525,31 +527,31 @@ gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid)
 	g_assert(self != NULL);
 	g_assert(guid != NULL);
 	
-	MIDGARD_ERRNO_SET(self->dbpriv->mgd, MGD_ERR_OK);
+	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_OK);
 	
-	if (self->dbpriv->guid != NULL) {
+	if (MGD_OBJECT_GUID (self) != NULL) {
 		
-		MIDGARD_ERRNO_SET(self->dbpriv->mgd, MGD_ERR_INVALID_PROPERTY_VALUE);
+		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_INVALID_PROPERTY_VALUE);
 		return FALSE;
 	}
 	
 	if (!midgard_is_guid(guid)) {
 		
-		MIDGARD_ERRNO_SET(self->dbpriv->mgd, MGD_ERR_INVALID_PROPERTY_VALUE);
+		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_INVALID_PROPERTY_VALUE);
 		return FALSE;
 	}
 
 	MidgardObject *dbobject =
-		midgard_object_class_get_object_by_guid(self->dbpriv->mgd, guid);
+		midgard_object_class_get_object_by_guid(MGD_OBJECT_CNC (self), guid);
 	
 	if (dbobject) {
 		
-		MIDGARD_ERRNO_SET(self->dbpriv->mgd, MGD_ERR_DUPLICATE);
+		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_DUPLICATE);
 		g_object_unref(dbobject);
 		return FALSE;
 	}
 	
-	self->dbpriv->guid = g_strdup(guid);
+	MGD_OBJECT_GUID (self) = g_strdup(guid);
 
 	return TRUE;
 }
@@ -564,7 +566,7 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 	GString *sql = NULL;
 	guint object_init_size = 0;
 	
-	if (gobj->dbpriv->guid == NULL)
+	if (MGD_OBJECT_GUID (gobj) == NULL)
 		g_critical("Object's guid is NULL. Can not update");
 
 	/* Get object's size as it's needed for size' diff.
@@ -587,7 +589,7 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 	}
 	*/
 	
-	if (gobj->dbpriv->storage_data == NULL) {
+	if (MIDGARD_DBOBJECT (gobj)->dbpriv->storage_data == NULL) {
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (gobj), MGD_ERR_INTERNAL);
 		return FALSE;
 	}
@@ -1093,8 +1095,8 @@ void _object_copy_properties(GObject *src, GObject *dest)
 
 	/* guid property are set directly */
 	if (MIDGARD_IS_OBJECT(src) && MIDGARD_IS_OBJECT(dest)) {
-		MIDGARD_OBJECT(dest)->dbpriv->guid =
-			g_strdup(MIDGARD_OBJECT(src)->dbpriv->guid);
+		MIDGARD_DBOBJECT(dest)->dbpriv->guid =
+			g_strdup(MIDGARD_DBOBJECT(src)->dbpriv->guid);
 	}
 	
 	for(i = 2; i <+ nprop; i++){		
@@ -2183,7 +2185,7 @@ MidgardObject *midgard_object_get_parent(MidgardObject *self)
 	if (!parent_class_name)
 		return NULL;
 
-	pobj =  midgard_object_new(mobj->dbpriv->mgd , mobj->dbpriv->storage_data->parent, NULL);
+	pobj =  midgard_object_new(MGD_OBJECT_CNC (self) , MIDGARD_DBOBJECT (mobj)->dbpriv->storage_data->parent, NULL);
 	
 	if (pobj == NULL)
 		return NULL;
@@ -2271,7 +2273,7 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 {
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 	
-	if (object->dbpriv->storage_data == NULL) {
+	if (MIDGARD_DBOBJECT (object)->dbpriv->storage_data == NULL) {
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
 		return FALSE; 
 	}
@@ -2357,7 +2359,7 @@ gboolean midgard_object_delete(MidgardObject *object)
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_delete, 0);		
 	
-	if (object->dbpriv->storage_data == NULL) {
+	if (MIDGARD_DBOBJECT (object)->dbpriv->storage_data == NULL) {
 		g_warning("No schema attributes for class %s",
 				G_OBJECT_TYPE_NAME(object));
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
@@ -2515,7 +2517,7 @@ gboolean midgard_object_purge(MidgardObject *object)
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purge, 0);	
 
-	if (object->dbpriv->storage_data == NULL){
+	if (MIDGARD_DBOBJECT (object)->dbpriv->storage_data == NULL){
 		g_warning("No schema attributes for class %s", 
 				G_OBJECT_TYPE_NAME(object));
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
@@ -2679,17 +2681,17 @@ GObject **midgard_object_list_children(MidgardObject *object,
 	*n_objects = 0;
 
 	GParamSpec *fprop ;
-	const gchar *primary_prop = object->dbpriv->storage_data->primary;
+	const gchar *primary_prop = MIDGARD_DBOBJECT (object)->dbpriv->storage_data->primary;
 
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 
-	if ((childcname == NULL) || (object->dbpriv->storage_data->children == NULL)) {
+	if ((childcname == NULL) || (MIDGARD_DBOBJECT (object)->dbpriv->storage_data->children == NULL)) {
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);    
 		return NULL;
 	}
 
 	GSList *list;
-	GSList *children = object->dbpriv->storage_data->children;
+	GSList *children = MIDGARD_DBOBJECT (object)->dbpriv->storage_data->children;
 	gboolean found = FALSE;
 
 	for (list = children; list != NULL; list = list->next) {
@@ -2784,7 +2786,7 @@ gboolean midgard_object_has_dependents(MidgardObject *self)
 		return TRUE;
 
 	GSList *list = NULL;
-	GSList *children = self->dbpriv->storage_data->children;
+	GSList *children = MIDGARD_DBOBJECT (self)->dbpriv->storage_data->children;
 
 	for (list = children ; list != NULL; list = list->next) {
 
@@ -2816,8 +2818,8 @@ const gchar *midgard_object_parent(MidgardObject *self)
 {
 	g_assert(self != NULL);	
 
-	if (self->dbpriv->storage_data->parent)
-		return self->dbpriv->storage_data->parent;
+	if (MIDGARD_DBOBJECT (self)->dbpriv->storage_data->parent)
+		return MIDGARD_DBOBJECT (self)->dbpriv->storage_data->parent;
 	
 	return NULL;    
 }
@@ -2844,7 +2846,7 @@ gboolean midgard_object_get_by_path(MidgardObject *self, const gchar *path)
 
 	MidgardObject *object = 
 		midgard_object_class_get_object_by_path(
-				self->dbpriv->mgd, 
+				MGD_OBJECT_CNC (self), 
 				G_OBJECT_TYPE_NAME(self),
 				path);
 
@@ -3368,7 +3370,7 @@ gboolean midgard_object_is_locked(MidgardObject *self)
 	g_string_append_printf(where, "guid = '%s' ", MGD_OBJECT_GUID (self));
 
 	GValue *aval = 
-		midgard_core_query_get_field_value(self->dbpriv->mgd, 
+		midgard_core_query_get_field_value(MGD_OBJECT_CNC (self), 
 				"metadata_islocked", 
 				midgard_core_class_get_table(MIDGARD_DBOBJECT_GET_CLASS(self)), 
 				where->str);
@@ -3507,8 +3509,36 @@ gboolean midgard_object_unlock(MidgardObject *self)
 	g_value_unset (&aval);
 	g_value_unset (&rval);
 
-	g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_unlocked, 0);
-	g_object_unref(self);
+	g_signal_emit (self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_unlocked, 0);
+	g_object_unref (self);
 
 	return rv;
 }
+
+/* C# helpers */
+GValue *
+midgard_object_get_schema_property (MidgardObject *self, const gchar *property)
+{
+	g_return_val_if_fail (self != NULL, NULL);
+	g_return_val_if_fail (property != NULL, NULL);
+
+	GParamSpec *pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (G_OBJECT (self)), property);
+	if (!pspec) 
+		return NULL;
+
+	GValue *value = g_new0 (GValue, 1);
+	g_value_init (value, pspec->value_type);
+	g_object_get_property (G_OBJECT (self), property, value);
+
+	return value;
+}
+
+void midgard_object_set_schema_property (MidgardObject *self, const gchar *property, GValue *value)
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (property != NULL);
+
+	g_object_set_property (G_OBJECT (self), property, value);
+	return;
+}
+

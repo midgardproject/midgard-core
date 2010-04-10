@@ -78,12 +78,12 @@ gboolean midgard_object_is_in_parent_tree(MidgardObject *self, guint rootid, gui
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 
-	if(!self->dbpriv->mgd) {
+	if (!MGD_OBJECT_CNC (self)) {
 		g_warning("Object has no connection pointer!");
 		return FALSE;
 	}
 
-	MidgardConnection *mgd = self->dbpriv->mgd;
+	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
 
 	MidgardObjectClass *parent_class = MIDGARD_OBJECT_GET_CLASS_BY_NAME (midgard_object_parent(self));
 
@@ -128,7 +128,7 @@ gboolean midgard_object_is_in_parent_tree(MidgardObject *self, guint rootid, gui
 		return FALSE;
 
 	gboolean rv = 
-		_midgard_tree_exists(self->dbpriv->mgd, parent_table, 
+		_midgard_tree_exists(MGD_OBJECT_CNC (self), parent_table, 
 				up_field, rootid, _id);
 
 	return rv;
@@ -153,20 +153,20 @@ gboolean midgard_object_is_in_tree(MidgardObject *self, guint rootid, guint id)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	
-	if(!self->dbpriv->mgd) {
+	if(!MGD_OBJECT_CNC (self)) {
 		g_warning("Object has no connection pointer!");
 		return FALSE;
 	}
 
 	const gchar *table = 
 		midgard_core_class_get_table(MIDGARD_DBOBJECT_GET_CLASS(self));
-	const gchar *upfield = self->dbpriv->storage_data->upfield;
+	const gchar *upfield = MIDGARD_DBOBJECT (self)->dbpriv->storage_data->upfield;
 
 	if(table == NULL || upfield == NULL)
 		return FALSE;
 
 	gboolean rv =
-		_midgard_tree_exists(self->dbpriv->mgd, table,
+		_midgard_tree_exists(MGD_OBJECT_CNC (self), table,
 				upfield, rootid, id);
 	
 	return rv;

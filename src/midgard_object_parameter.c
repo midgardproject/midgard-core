@@ -65,27 +65,27 @@ static void __register_domain_collector(
 
 static gboolean __is_guid_valid(MidgardObject *self)
 {
-	if(self->dbpriv->guid == NULL) {
+	if(MGD_OBJECT_GUID (self) == NULL) {
 
-		midgard_set_error(self->dbpriv->mgd,
+		midgard_set_error(MGD_OBJECT_CNC (self),
 				MGD_GENERIC_ERROR,
 				MGD_ERR_INVALID_PROPERTY_VALUE,
 				" Guid property is NULL for %s. ", 
 				G_OBJECT_TYPE_NAME(self));
-		g_warning("%s", self->dbpriv->mgd->err->message); 
-		g_clear_error(&self->dbpriv->mgd->err);
+		g_warning("%s", MGD_OBJECT_CNC (self)->err->message); 
+		g_clear_error(&MGD_OBJECT_CNC (self)->err);
 		return FALSE;
 	}
 
-	if(!midgard_is_guid(self->dbpriv->guid)) {
+	if(!midgard_is_guid(MGD_OBJECT_GUID (self))) {
 
-		midgard_set_error(self->dbpriv->mgd,
+		midgard_set_error(MGD_OBJECT_CNC (self),
 				MGD_GENERIC_ERROR,
 				MGD_ERR_INVALID_PROPERTY_VALUE,
 				" Guid-property of %s has invalid value.", 
 				G_OBJECT_TYPE_NAME(self));
-		g_warning("%s", self->dbpriv->mgd->err->message);
-		g_clear_error(&self->dbpriv->mgd->err);
+		g_warning("%s", MGD_OBJECT_CNC (self)->err->message);
+		g_clear_error(&MGD_OBJECT_CNC (self)->err);
 		return FALSE;
 	}
 
@@ -118,12 +118,12 @@ const GValue *midgard_object_get_parameter(MidgardObject *self,
 	if(domain_collector == NULL){
 		
 		MidgardCollector *mc = 
-			__create_domain_collector(self->dbpriv->mgd, domain);
+			__create_domain_collector(MGD_OBJECT_CNC (self), domain);
 
 		/* Limit records to these with parent guid */
 		GValue guid_value = {0, };
 		g_value_init(&guid_value, G_TYPE_STRING);
-		g_value_set_string(&guid_value, self->dbpriv->guid);
+		g_value_set_string(&guid_value, MGD_OBJECT_GUID (self));
 	
 		midgard_collector_add_constraint(mc,
 				"parentguid", "=", &guid_value);
@@ -191,25 +191,25 @@ midgard_object_set_parameter (MidgardObject *self, const gchar *domain, const gc
 
 	if(!domain_collector) {
 
-		domain_collector = __create_domain_collector(self->dbpriv->mgd, domain);
+		domain_collector = __create_domain_collector(MGD_OBJECT_CNC (self), domain);
 		__register_domain_collector(self, domain, domain_collector);
 	}
 
 	/* This is the case when set_parameter is invoked
 	 * before any get_parameter */
 	if(get_value == NULL && delete_parameter) {
-		MIDGARD_ERRNO_SET(self->dbpriv->mgd, MGD_ERR_NOT_EXISTS);
+		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_NOT_EXISTS);
 		return FALSE;
 	}
 
 	/* Parameter doesn't exist. We have to create it */
 	if(get_value == NULL && !delete_parameter){
 		
-		param = midgard_object_new(self->dbpriv->mgd, "midgard_parameter", NULL);
+		param = midgard_object_new(MGD_OBJECT_CNC (self), "midgard_parameter", NULL);
 		g_object_set(param, 
 				"domain", domain, 
 				"name", name,
-				"parentguid", self->dbpriv->guid,
+				"parentguid", MGD_OBJECT_GUID (self),
 				NULL);
 			
 		g_object_set_property(G_OBJECT(param), "value", value);
@@ -238,11 +238,11 @@ midgard_object_set_parameter (MidgardObject *self, const gchar *domain, const gc
 	} else {
 		
 		MidgardQueryBuilder *builder = 
-			midgard_query_builder_new(self->dbpriv->mgd,
+			midgard_query_builder_new(MGD_OBJECT_CNC (self),
 					"midgard_parameter");
 		GValue gval = {0,};
 		g_value_init(&gval, G_TYPE_STRING);
-		g_value_set_string(&gval, self->dbpriv->guid);
+		g_value_set_string(&gval, MGD_OBJECT_GUID (self));
 		midgard_query_builder_add_constraint(builder,
 				"parentguid", "=", &gval);
 		g_value_unset(&gval);
@@ -319,15 +319,15 @@ midgard_object_set_parameter (MidgardObject *self, const gchar *domain, const gc
 MidgardObject **midgard_object_list_parameters(MidgardObject *self, const gchar *domain)
 {
 	g_return_val_if_fail(self != NULL, NULL);
-	g_return_val_if_fail(self->dbpriv->guid != NULL, NULL);
-	g_return_val_if_fail(self->dbpriv->mgd != NULL, NULL);
+	g_return_val_if_fail(MGD_OBJECT_GUID (self) != NULL, NULL);
+	g_return_val_if_fail(MGD_OBJECT_CNC (self) != NULL, NULL);
 
 	MidgardObject **objects = NULL;
 
 	if(domain == NULL) {
 
 		objects = midgard_core_object_parameters_list(
-				self->dbpriv->mgd, "midgard_parameter", self->dbpriv->guid);
+				MGD_OBJECT_CNC (self), "midgard_parameter", MGD_OBJECT_GUID (self));
 		
 		return objects;
 	}
@@ -341,8 +341,8 @@ MidgardObject **midgard_object_list_parameters(MidgardObject *self, const gchar 
 	parameters[0].value = dval;
 
 	objects = midgard_core_object_parameters_find(
-			self->dbpriv->mgd, "midgard_parameter", 
-			self->dbpriv->guid, 1, (const GParameter*) parameters);
+			MGD_OBJECT_CNC (self), "midgard_parameter", 
+			MGD_OBJECT_GUID (self), 1, (const GParameter*) parameters);
 
 	g_value_unset(&dval);
 	g_free(parameters);
@@ -367,14 +367,14 @@ gboolean midgard_object_delete_parameters(MidgardObject *self,
 {
 	g_assert(self != NULL);
 
-	if(!self->dbpriv->guid) {
+	if(!MGD_OBJECT_GUID (self)) {
 		
 		g_warning("Object is not fetched from database. Empty guid");
 	}
 
 	return midgard_core_object_parameters_delete(
-			self->dbpriv->mgd, "midgard_parameter", 
-			self->dbpriv->guid, n_params, parameters);
+			MGD_OBJECT_CNC (self), "midgard_parameter", 
+			MGD_OBJECT_GUID (self), n_params, parameters);
 }
 
 /**
@@ -394,14 +394,14 @@ gboolean midgard_object_purge_parameters(MidgardObject *self,
 {
 	g_assert(self != NULL);
 
-	if(!self->dbpriv->guid) {
+	if(!MGD_OBJECT_GUID (self)) {
 		
 		g_warning("Object is not fetched from database. Empty guid");
 	}
 
 	return midgard_core_object_parameters_purge(
-			self->dbpriv->mgd, "midgard_parameter", 
-			self->dbpriv->guid, n_params, parameters);
+			MGD_OBJECT_CNC (self), "midgard_parameter", 
+			MGD_OBJECT_GUID (self), n_params, parameters);
 }
 
 /**
@@ -421,14 +421,14 @@ MidgardObject **midgard_object_find_parameters(MidgardObject *self,
 {
 	g_assert(self != NULL);
 
-	if(!self->dbpriv->guid) {
+	if(!MGD_OBJECT_GUID (self)) {
 		
 		g_warning("Object is not fetched from database. Empty guid");
 	}
 
 	return midgard_core_object_parameters_find(
-			self->dbpriv->mgd, "midgard_parameter", 
-			self->dbpriv->guid, n_params, parameters);
+			MGD_OBJECT_CNC (self), "midgard_parameter", 
+			MGD_OBJECT_GUID (self), n_params, parameters);
 }
 
 /**

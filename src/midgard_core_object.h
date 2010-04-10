@@ -58,6 +58,8 @@ struct _MidgardDBObjectPrivate {
 #define MGD_OBJECT_GUID(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->guid
 #define MGD_OBJECT_CNC(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->mgd
 
+#define MGD_DBOBJECT_METADATA(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->metadata
+
 /* Private structure for private data of MgdSchema objects */
 struct _MidgardObjectPrivate{
 	const gchar *action;

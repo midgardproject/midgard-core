@@ -465,20 +465,20 @@ gboolean _nodes2object(GObject *object, xmlNode *node, gboolean force)
 
 					/* we can use nodeprop directly */
 					lobject = midgard_object_class_get_object_by_guid(
-							mobject->dbpriv->mgd,
+							MIDGARD_DBOBJECT (mobject)->dbpriv->mgd,
 							(const gchar *) nodeprop);
 
 					if(!lobject && !force){
 						g_object_unref(mrp);
 						g_value_unset(&pval);
-						midgard_set_error(mobject->dbpriv->mgd, 
+						midgard_set_error(MGD_OBJECT_CNC (mobject), 
 								MGD_GENERIC_ERROR, 
 								MGD_ERR_MISSED_DEPENDENCE, 
 								" Can not import %s. "
 								"No '%s' object identified by '%s'",
 								G_OBJECT_TYPE_NAME(object),
 								linktype, nodeprop); 
-						g_clear_error(&mobject->dbpriv->mgd->err);	
+						g_clear_error(&MIDGARD_DBOBJECT (mobject)->dbpriv->mgd->err);	
 						return FALSE;
 					}
 					

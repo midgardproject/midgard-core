@@ -36,13 +36,13 @@
 MidgardObject **midgard_object_list_attachments(MidgardObject *self)
 {
 	g_return_val_if_fail(self != NULL, NULL);
-	g_return_val_if_fail(self->dbpriv->guid != NULL, NULL);
-	g_return_val_if_fail(self->dbpriv->mgd != NULL, NULL);
+	g_return_val_if_fail(MGD_OBJECT_GUID (self) != NULL, NULL);
+	g_return_val_if_fail(MGD_OBJECT_CNC (self) != NULL, NULL);
 
 	MidgardObject **objects = NULL;
 
 	objects = midgard_core_object_parameters_list(
-			self->dbpriv->mgd, "midgard_attachment", self->dbpriv->guid);
+			MGD_OBJECT_CNC (self), "midgard_attachment", MGD_OBJECT_GUID (self));
 		
 	return objects;
 }
@@ -64,7 +64,7 @@ MidgardObject *midgard_object_create_attachment(MidgardObject *self,
 {
 	g_return_val_if_fail(self != NULL, NULL);
 
-	if(!self->dbpriv->guid) {
+	if(!MGD_OBJECT_GUID (self)) {
 		g_warning("Object is not fetched from database. Empty guid");
 		return NULL;
 	}
@@ -75,14 +75,14 @@ MidgardObject *midgard_object_create_attachment(MidgardObject *self,
 	if(name != NULL && *name != '\0') {
 		
 		MidgardQueryBuilder *builder = 
-			midgard_query_builder_new(self->dbpriv->mgd, "midgard_attachment");
+			midgard_query_builder_new(MGD_OBJECT_CNC (self), "midgard_attachment");
 		
 		if(!builder)
 			return NULL;
 
 		GValue pval = {0, };
 		g_value_init(&pval, G_TYPE_STRING);
-		g_value_set_string(&pval, self->dbpriv->guid);
+		g_value_set_string(&pval, MGD_OBJECT_GUID (self));
 		midgard_query_builder_add_constraint(builder, "parentguid", "=", &pval);
 		g_value_unset(&pval);
 		g_value_init(&pval, G_TYPE_STRING);
@@ -95,7 +95,7 @@ MidgardObject *midgard_object_create_attachment(MidgardObject *self,
 
 		if(i > 0) {
 			
-			MIDGARD_ERRNO_SET(self->dbpriv->mgd, MGD_ERR_OBJECT_NAME_EXISTS);
+			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_OBJECT_NAME_EXISTS);
 			return NULL;
 		}
 	}
@@ -146,8 +146,8 @@ MidgardObject *midgard_object_create_attachment(MidgardObject *self,
 	}
 
 	MidgardObject *att = 
-		midgard_core_object_parameters_create(self->dbpriv->mgd, 
-				"midgard_attachment", self->dbpriv->guid, 
+		midgard_core_object_parameters_create(MGD_OBJECT_CNC (self), 
+				"midgard_attachment", MGD_OBJECT_GUID (self), 
 				n_params, parameters);
 	
 	for(i = 0; i < n_params; i++) {	
@@ -176,14 +176,14 @@ gboolean midgard_object_delete_attachments(MidgardObject *self,
 {
 	g_assert(self != NULL);
 
-	if(!self->dbpriv->guid) {
+	if(!MGD_OBJECT_GUID (self)) {
 		
 		g_warning("Object is not fetched from database. Empty guid");
 	}
 
 	return midgard_core_object_parameters_delete(
-			self->dbpriv->mgd, "midgard_attachment", 
-			self->dbpriv->guid, n_params, parameters);
+			MGD_OBJECT_CNC (self), "midgard_attachment", 
+			MGD_OBJECT_GUID (self), n_params, parameters);
 }
 
 
@@ -213,7 +213,7 @@ gboolean midgard_object_purge_attachments(MidgardObject *self, gboolean delete_b
 {
 	g_assert(self != NULL);
 
-	if(!self->dbpriv->guid) {
+	if(!MGD_OBJECT_GUID (self)) {
 		
 		g_warning("Object is not fetched from database. Empty guid");
 	}
@@ -223,14 +223,14 @@ gboolean midgard_object_purge_attachments(MidgardObject *self, gboolean delete_b
 	if(delete_blob) {
 	
 		rv = midgard_core_object_parameters_purge_with_blob(
-				self->dbpriv->mgd, "midgard_attachment", 
-				self->dbpriv->guid, n_params, parameters);
+				MGD_OBJECT_CNC (self), "midgard_attachment", 
+				MGD_OBJECT_GUID (self), n_params, parameters);
 	
 	} else {
 		
 		rv = midgard_core_object_parameters_purge(
-				self->dbpriv->mgd, "midgard_attachment",
-				self->dbpriv->guid, n_params, parameters);
+				MGD_OBJECT_CNC (self), "midgard_attachment",
+				MGD_OBJECT_GUID (self), n_params, parameters);
 	}
 
 	return rv;
@@ -253,14 +253,14 @@ MidgardObject **midgard_object_find_attachments(MidgardObject *self,
 {
 	g_assert(self != NULL);
 
-	if(!self->dbpriv->guid) {
+	if(!MGD_OBJECT_GUID (self)) {
 		
 		g_warning("Object is not fetched from database. Empty guid");
 	}
 
 	return midgard_core_object_parameters_find(
-			self->dbpriv->mgd, "midgard_attachment", 
-			self->dbpriv->guid, n_params, parameters);
+			MGD_OBJECT_CNC (self), "midgard_attachment", 
+			MGD_OBJECT_GUID (self), n_params, parameters);
 }
 
 /**

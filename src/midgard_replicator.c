@@ -347,7 +347,7 @@ midgard_replicator_serialize_blob (MidgardObject *object)
 				"midgard_blob",
 				BAD_CAST encoded);
 	xmlNewProp(blob_node, BAD_CAST "guid",
-			BAD_CAST object->dbpriv->guid);
+			BAD_CAST MGD_OBJECT_GUID (object));
 
 	g_free(encoded);
 
@@ -640,7 +640,7 @@ static gboolean __import_blob_from_xml(	MidgardConnection *mgd,
 	}
 
 	/* FIXME, define even macro to get blobdir ( core level only ) */
-	gchar *blobdir = object->dbpriv->mgd->priv->config->blobdir;
+	gchar *blobdir = MIDGARD_DBOBJECT (object)->dbpriv->mgd->priv->config->blobdir;
 
 	if (!blobdir || (*blobdir != '/')
 			|| (stat(blobdir, &statbuf) != 0)
@@ -765,7 +765,7 @@ midgard_replicator_import_from_xml (MidgardConnection *mgd,  const gchar *xml, g
 		}
 
 		if (guid_attr) {
-			object->dbpriv->guid = (const gchar *)g_strdup((gchar *)guid_attr);
+			MGD_OBJECT_GUID (object) = (const gchar *)g_strdup((gchar *)guid_attr);
 		}
 
 		if(!_nodes2object(G_OBJECT(object), child->children, force)) {

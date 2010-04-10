@@ -147,11 +147,11 @@ static void __get_channel(MidgardBlob *self, const gchar *mode)
  * 
  * Returns: newly instatiated #MidgardBlob object or %NULL on failure
  */
-MidgardBlob *midgard_blob_new(MidgardObject *attachment, const gchar *encoding)
+MidgardBlob *midgard_blob_new (MidgardObject *attachment, const gchar *encoding)
 {
 	g_assert(attachment != NULL);
 	
-	MidgardConnection *mgd = attachment->dbpriv->mgd;
+	MidgardConnection *mgd = MGD_OBJECT_CNC (attachment);
 
 	if(mgd == NULL) {
 		g_critical("MidgardConnection not found for given attachment");
@@ -160,12 +160,12 @@ MidgardBlob *midgard_blob_new(MidgardObject *attachment, const gchar *encoding)
 
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
-	const gchar *blobdir = attachment->dbpriv->mgd->priv->config->blobdir;
+	const gchar *blobdir = MIDGARD_DBOBJECT (attachment)->dbpriv->mgd->priv->config->blobdir;
 	if(!g_file_test(blobdir,G_FILE_TEST_EXISTS)) {
 		midgard_set_error(mgd,
 				MGD_GENERIC_ERROR,
 				MGD_ERR_INTERNAL,
-				" Blobs directory doesn't exist. %s", attachment->dbpriv->mgd->priv->config->blobdir);
+				" Blobs directory doesn't exist. %s", blobdir);
 		return NULL;
 	}
 
@@ -176,7 +176,7 @@ MidgardBlob *midgard_blob_new(MidgardObject *attachment, const gchar *encoding)
 
 	MidgardBlob *self = g_object_new(MIDGARD_TYPE_BLOB, NULL);
 	self->priv->attachment = attachment;
-	self->priv->mgd = attachment->dbpriv->mgd;
+	self->priv->mgd = mgd;
 	self->priv->blobdir = g_strdup(blobdir);
 	self->priv->channel = NULL;
 	self->priv->encoding = NULL;

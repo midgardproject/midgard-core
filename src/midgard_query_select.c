@@ -328,7 +328,6 @@ __add_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *top_oper
 gboolean 
 _midgard_query_select_execute (MidgardQueryExecutor *self)
 {
-	g_print ("SELECT EXECUTE %p \n", self);
 	g_return_val_if_fail (self != NULL, FALSE);
 	
 	GError *error = NULL;
@@ -518,7 +517,7 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 
 	objects[i] = NULL;
 	*n_objects = rows;
-
+	
 	return objects;
 }
 

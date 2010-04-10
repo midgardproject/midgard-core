@@ -479,8 +479,8 @@ void midgard_core_object_class_set_guid(
 	GObjectClass *klass = G_OBJECT_GET_CLASS(object);
 
 	if (MIDGARD_IS_OBJECT_CLASS (klass)) {
-		g_free((gchar *)MIDGARD_OBJECT(object)->dbpriv->guid);
-		MIDGARD_OBJECT(object)->dbpriv->guid = g_strdup(guid);
+		g_free((gchar *) MGD_OBJECT_GUID (object));
+		MGD_OBJECT_GUID (object) = g_strdup(guid);
 	}	
 	
 	return;
