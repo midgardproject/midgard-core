@@ -1,215 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Schema xmlns="http://www.midgard-project.org/repligard/1.4">
-    <type name="midgard_host" table="host">
-        <property name="id" type="unsigned integer" primaryfield="id">
-            <description>Local non-replication-safe database identifier</description>
-        </property>
-        <property name="name"     type="string" index="yes" unique="yes">
-            <description>Hostname (for example `www.example.net`)</description>
-        </property>
-        <property name="info"     type="string" dbtype="set('auth')">
-            <description>Host information, including whether authentication is to be used</description>
-        </property>
-        <property name="port"     type="integer" index="yes">
-            <description>Host port number (for example `80`)</description>
-        </property>
-        <property name="online"   type="boolean" index="yes">
-            <description>Whether host is online</description>
-        </property>
-        <property name="prefix"   type="string" index="yes">
-            <description>Host directory prefix (for example `/campaign`)</description>
-        </property>
-        <property name="root"     type="unsigned integer" link="midgard_page:id">
-            <description>Root page of the host</description>
-        </property>
-        <property name="style"    type="unsigned integer" link="midgard_style:id">
-            <description>Style used with the host</description>
-        </property>
-    </type>
-
-    <type name="midgard_style" table="style">
-        <property name="id" type="unsigned integer" primaryfield="id">
-            <description>Local non-replication-safe database identifier</description>
-        </property>
-        <property name="name"     type="string" index="yes" unique="yes">
-            <description>Path name of the style</description>
-        </property>
-        <property name="owner"    type ="unsigned integer" link="midgard_group:id">
-            <description>Style owner group (legacy field)</description>
-        </property>
-        <property name="up"       type="unsigned integer" link="midgard_style:id" upfield="up">
-            <description>Style the style is under</description>
-        </property>
-    </type>
-
-    <type name="midgard_element" table="element" parent="midgard_style">
-        <property name="id" type="unsigned integer" primaryfield="id">
-            <description>Local non-replication-safe database identifier</description>
-        </property>
-        <property name="name"     type="string" index="yes" unique="yes">
-            <description>Path name of the element</description>
-        </property>
-        <property name="style"    type="unsigned integer" link="midgard_style:id" parentfield="style">
-            <description>Style the element is in</description>
-        </property>
-        <property name="value"    type="text">
-            <description>Contents of the style element</description>
-        </property>
-    </type>
-
-    <type name="midgard_page" table="page">
-        <property name="id" type="unsigned integer" primaryfield="id">
-            <description>Local non-replication-safe database identifier</description>
-        </property>
-        <property name="name"     type="string" index="yes" unique="yes">
-            <description>Path name of the page</description>
-        </property>
-        <property name="info"     type="string" dbtype="set('auth','active')">
-            <description>Settings for active and authenticated pages</description>
-        </property>
-        <property name="style"    type="unsigned integer" link="midgard_style:id">
-            <description>Style used with the host</description>
-        </property>
-        <property name="up"       type="unsigned integer" link="midgard_page:id" upfield="up">
-            <description>Page the page is under</description>
-        </property>
-        <property name="component"    type="string" index="yes">
-            <description>Component used for the page</description>
-        </property>
-        <property name="title"    type="string">
-            <description>Title of the page</description>
-        </property>
-        <property name="content"  type="text">
-            <description>Content of the page</description>
-        </property>
-    </type>
-
-    <type name="midgard_pageelement" table="pageelement" parent="midgard_page">
-        <property name="id" type="unsigned integer" primaryfield="id">
-            <description>Local non-replication-safe database identifier</description>
-        </property>
-        <property name="name"     type="string" index="yes" unique="yes">
-            <description>Path name of the page element</description>
-        </property>
-        <property name="info"     type="string" dbtype="set('inherit')">
-            <description>Whether the page element is inherited</description>
-        </property>
-        <property name="page"     type="unsigned integer" link="midgard_page:id" parentfield="page">
-            <description>Page the element is under</description>
-        </property>
-        <property name="value"    type="text">
-            <description>Value of the page element</description>
-        </property>
-    </type>
-
-    <type name="midgard_group" table="grp">
-        <property name="id" type="unsigned integer" primaryfield="id">
-            <description>Local non-replication-safe database identifier</description>
-        </property>
-        <property name="name"     type="string" index="yes" unique="yes">
-            <description>Path name of the group</description>
-        </property>
-        <property name="official" type="string">
-            <description>Official name of the group</description>
-        </property>
-        <property name="street"   type="string">
-            <description>Street address of the group</description>
-        </property>
-        <property name="postcode" type="string">
-            <description>Zip code of the group</description>
-        </property>
-        <property name="city"     type="string">
-            <description>City of the group</description>
-        </property>
-        <property name="country"  type="string">
-            <description>Country of the group</description>
-        </property>
-        <property name="homepage" type="string">
-            <description>Homepage URL of the group</description>
-        </property>
-        <property name="email"    type="string">
-            <description>Email of the group</description>
-        </property>
-        <property name="phone"    type="string">
-            <description>Phone number of the group</description>
-        </property>
-        <property name="fax"      type="string">
-            <description>Fax number of the group</description>
-        </property>
-        <property name="extra"    type="text">
-            <description>Additional information about the group</description>
-        </property>
-        <property name="owner"    link="midgard_group:id" type="unsigned integer" upfield="owner">
-            <description>Group the group is under</description>
-        </property>
-    </type>
-
-    <type name="midgard_member" table="member">
-        <property name="id" type="unsigned integer" primaryfield="id">
-            <description>Local non-replication-safe database identifier</description>
-        </property>
-        <property name="uid"      type="unsigned integer" link="midgard_person:id">
-            <description>Identifier of the user that belongs to a group</description>
-        </property>
-        <property name="gid"      type="unsigned integer" link="midgard_group:id" parentfield="gid">
-            <description>Identifier of the group that the user belongs to</description>
-        </property>
-        <property name="extra"    type="string">
-            <description>Additional information about the membership</description>
-        </property>
-    </type>
-
     <type name="midgard_person" table="person">
         <property name="id" type="unsigned integer" primaryfield="id">
             <description>Local non-replication-safe database identifier</description>
-        </property>
-        <property name="username" type="string" index="yes">
-            <description>Username of the person</description>
-        </property>
-        <property name="password" type="string" dbtype="varchar(13) binary">
-            <description>Password of the person</description>
         </property>
         <property name="firstname" type="string" index="yes" unique="yes">
             <description>First name of the person</description>
         </property>
         <property name="lastname" type="string" index="yes">
             <description>Last name of the person</description>
-        </property>
-        <property name="birthdate" type="datetime">
-            <description>Birth date of the person</description>
-        </property>
-        <property name="street"   type="string">
-            <description>Street address of the person</description>
-        </property>
-        <property name="postcode" type="string">
-            <description>Zip code of the person</description>
-        </property>
-        <property name="city"     type="string">
-            <description>City of the person</description>
-        </property>
-        <property name="homephone" type="string">
-            <description>Home phone number of the person</description>
-        </property>
-        <property name="handphone" type="string">
-            <description>Cell phone number of the person</description>
-        </property>
-        <property name="workphone" type="string">
-            <description>Work phone name of the person</description>
-        </property>
-        <property name="homepage" type="string">
-            <description>Homepage URL of the person</description>
-        </property>
-        <property name="email"    type="string" index="yes">
-            <description>Email address of the person</description>
-        </property>
-        <property name="jid"      type="string" index="yes">
-            <description>XMPP (Jabber) ID of the person</description>
-        </property>
-        <property name="pgpkey"   type="text">
-            <description>PGP public key of the person</description>
-        </property>
-        <property name="extra"    type="text">
-            <description>Additional information about the person</description>
         </property>
     </type>
 
@@ -256,13 +55,10 @@
         <property name="id" type="unsigned integer" primaryfield="id">
             <description>Local non-replication-safe database identifier</description>
         </property>
-        <property name="name"     type="string" index="yes" unique="yes">
+        <property name="name" type="string" index="yes" unique="yes">
             <description>Path name of the snippetdir</description>
         </property>
-        <property name="description" type="text">
-            <description>Description of the snippetdir</description>
-        </property>
-        <property name="up"       type="unsigned integer" link="midgard_snippetdir:id" upfield="up">
+        <property name="up" type="unsigned integer" link="midgard_snippetdir:id" upfield="up">
             <description>Snippetdir the snippetdir is under</description>
         </property>
     </type>
@@ -271,16 +67,16 @@
         <property name="id" type="unsigned integer" primaryfield="id">
             <description>Local non-replication-safe database identifier</description>
         </property>
-        <property name="name"     type="string" index="yes" unique="yes">
+        <property name="name" type="string" index="yes" unique="yes">
             <description>Path name of the snippet</description>
         </property>
-        <property name="up"       type="unsigned integer" link="midgard_snippetdir:id" parentfield="up">
+        <property name="snippetdir" type="unsigned integer" link="midgard_snippetdir:id" parentfield="snippetdir">
             <description>Snippetdir the snippet is under</description>
         </property>
-        <property name="code"     type="text">
+        <property name="code" type="text">
             <description>Code of the snippet</description>
         </property>
-        <property name="doc"      type="text">
+        <property name="doc" type="text">
             <description>Documentation of the snippet</description>
         </property>
     </type>
@@ -315,27 +111,6 @@
         </property>
         <property name="typerecords" type="integer" field="type_records">
             <description>Number of records of the type for the sitegroup</description>
-        </property>
-    </type>
-
-    <type name="midgard_language" table="midgard_language">
-        <property name="id" type="unsigned integer" primaryfield="id">
-            <description>Local non-replication-safe database identifier</description>
-        </property>
-        <property name="code"        type="string" dbtype="varchar(2)" index="yes">
-            <description>ISO 639-1 two-letter language code</description>
-        </property>
-        <property name="name"        type="string" index="yes" unique="yes">
-            <description>Name of the language in English</description>
-        </property>
-        <property name="native"        type="string">
-            <description>Name of the language in the language itself</description>
-        </property>
-        <property name="locale"        type="string">
-            <description>System locale for the language</description>
-        </property>
-        <property name="description"    type="text">
-            <description>Description of the language</description>
         </property>
     </type>
 
