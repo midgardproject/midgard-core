@@ -2,7 +2,7 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
-#DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
+DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
 
 lib_LTLIBRARIES = \
 	src/libmidgard2.la
@@ -87,7 +87,7 @@ EXTRA_DIST =  \
 	midgard2.pc.in \
 	$(schema_DATA) \
 	$(views_DATA) 
-#m4/introspection.m4
+	m4/introspection.m4
 
 LDADD = src/libmidgard2.la
 
@@ -108,42 +108,22 @@ src_libmidgard2_la_LDFLAGS = -version-info 2015:0:5 $(no_undefined)
 test_midgard_schema_CPPFLAGS = \
 	 -DG_LOG_DOMAIN=\"midgard-core\"
 
-src_libmidgard2_la_SOURCES = \
-	src/midgard.c \
+src_libmidgard2_la_core_SOURCES = \
 	src/midgard_core_connection.h \
 	src/midgard_core_connection.c \
 	src/midgard_core_query.h \
 	src/midgard_core_query.c \
-	src/midgard_key_config.c \
-	src/midgard_key_config_context.c \
-	src/midgard_key_config_file.c \
-	src/midgard_key_config_file_context.c \
-	src/midgard_key_config_common.h \
-	src/midgard_object.c \
-	src/uuid.c \
-	src/guid.c \
-        src/midgard_type.c \
 	src/mgdschema.c \
-	src/midgard_config.c \
-	src/query_builder.c \
+	src/midgard_quota.c \
 	src/query_constraint.c \
+	src/query_constraint.h \
 	src/group_constraint.c \
-	src/query_order.c \
+	src/group_constraint.h \
 	src/query_group_constraint.h \
 	src/query_group_constraint.c \
-	src/midgard_metadata.c \
-	src/midgard_timestamp.c \
-	src/midgard_datatypes.c \
-	src/midgard_object_class.c \
-	src/midgard_quota.c \
-	src/query_constraint.h \
-	src/group_constraint.h \
+	src/query_order.c \
 	src/query_order.h \
 	src/schema.h \
-	src/midgard_reflection_property.c \
-	src/midgard_connection.c \
-	src/midgard_error.c \
-	src/midgard_collector.c \
 	src/midgard_core_metadata.c \
 	src/midgard_core_metadata.h \
 	src/midgard_core_object_class.c \
@@ -159,7 +139,29 @@ src_libmidgard2_la_SOURCES = \
 	src/midgard_core_views.c \
 	src/midgard_core_views.h \
 	src/midgard_core_xml.h \
-	src/midgard_core_xml.c \
+	src/midgard_core_xml.c 
+
+src_libmidgard2_la_public_SOURCES = \
+	src/midgard.c \
+	src/midgard_key_config.c \
+	src/midgard_key_config_context.c \
+	src/midgard_key_config_file.c \
+	src/midgard_key_config_file_context.c \
+	src/midgard_key_config_common.h \
+	src/midgard_object.c \
+	src/uuid.c \
+	src/guid.c \
+        src/midgard_type.c \
+	src/midgard_config.c \
+	src/query_builder.c \
+	src/midgard_metadata.c \
+	src/midgard_timestamp.c \
+	src/midgard_datatypes.c \
+	src/midgard_object_class.c \
+	src/midgard_reflection_property.c \
+	src/midgard_connection.c \
+	src/midgard_error.c \
+	src/midgard_collector.c \
 	src/midgard_dbus.h \
 	src/midgard_dbus.c \
 	src/midgard_dbus_interface.h \
@@ -192,33 +194,35 @@ pkglibdir = $(libdir)/midgard2
 libmidgardincludedir = $(includedir)/midgard2/midgard
 libmidgardinclude_HEADERS = $(midgard_public_h) 
 
+src_libmidgard2_la_SOURCES = $(src_libmidgard2_la_public_SOURCES) $(src_libmidgard2_la_core_SOURCES)
+
 mgdschemasdir = $(datadir)/midgard2/schema
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = midgard2.pc
 
-#-include $(INTROSPECTION_MAKEFILE)
-#INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir)
-#INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
+-include $(INTROSPECTION_MAKEFILE)
+INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir)
+INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
-#if HAVE_INTROSPECTION
-#INTROSPECTION_CFLAGS += $(AM_CFLAGS)
-#introspection_sources = $(src_libmidgard2_la_SOURCES) $(libmidgardinclude_HEADERS)
-#Midgard2-10.05.gir: $(lib_LTLIBRARIES)
-#Midgard2_10_05_gir_INCLUDES = GObject-2.0 libxml2-2.0 
-#Midgard2_10_05_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
-#Midgard2_10_05_gir_LIBS = $(lib_LTLIBRARIES) 
-#Midgard2_10_05_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
-#Midgard2_10_05_gir_PACKAGES = gobject-2.0 libxml-2.0
-#INTROSPECTION_GIRS = Midgard2-10.05.gir
-#INTROSPECTION_LIBS += -lxml2
-#girdir = $(datadir)/gir-1.0
-#dist_gir_DATA = $(INTROSPECTION_GIRS)
+if HAVE_INTROSPECTION
+INTROSPECTION_CFLAGS += $(AM_CFLAGS)
+introspection_sources = $(src_libmidgard2_la_public_SOURCES) $(libmidgardinclude_HEADERS)
+Midgard2-10.05.gir: $(lib_LTLIBRARIES)
+Midgard2_10_05_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0 
+Midgard2_10_05_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
+Midgard2_10_05_gir_LIBS = $(lib_LTLIBRARIES) 
+Midgard2_10_05_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
+Midgard2_10_05_gir_PACKAGES = gobject-2.0 libxml-2.0 libgda-4.0
+INTROSPECTION_GIRS = Midgard2-10.05.gir
+INTROSPECTION_LIBS += -lxml2
+girdir = $(datadir)/gir-1.0
+dist_gir_DATA = $(INTROSPECTION_GIRS)
 
-#typelibsdir = $(libdir)/girepositry-1.0
-#typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
-#CLEANFILES = $(dist_gir_DATA) $(typelib_DATA)
-#endif
+typelibsdir = $(libdir)/girepositry-1.0
+typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
+CLEANFILES = $(dist_gir_DATA) $(typelib_DATA)
+endif
 
 doc:
 	doxygen
