@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include <stdlib.h>
 #include "midgard_defs.h"
 #include "midgard_type.h"
-#include "midgard_object_class.h"
+#include "midgard_reflector_object.h"
 #include "midgard_metadata.h"
 #include "query_builder.h"
 #include "midgard_timestamp.h"
@@ -44,7 +44,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_core_metadata.h"
 #include "midgard_object_parameter.h"
 #include "midgard_object_attachment.h"
-
+#include "midgard_schema_object_factory.h"
 
 GType _midgard_attachment_type = 0;
 static gboolean signals_registered = FALSE;
@@ -115,7 +115,7 @@ __midgard_object_instance_init (GTypeInstance *instance, gpointer g_class)
 
 	/* Initialize metadata object, if enabled. */
 	/* FIXME, move it to dbpriv virtual method */
-	if (MIDGARD_DBOBJECT_CLASS (g_class)->dbpriv->has_metadata) {
+	if (MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (g_class))) {
 		self->metadata = midgard_metadata_new (self);
 		/* Add weak reference */
 		g_object_add_weak_pointer (G_OBJECT (self), (gpointer) self->metadata);	
@@ -342,8 +342,7 @@ static gboolean _is_circular(MidgardObject *object)
 	if (oid == 0)
 		return FALSE;
 	
-	const gchar *up_prop = 
-		midgard_object_class_get_property_parent(klass);
+	const gchar *up_prop = midgard_reflector_object_get_property_parent (G_OBJECT_TYPE_NAME (object)); 
 
 	/* there's goto statement, because we might want to check other 
 	 * circular references in a near future */
@@ -351,7 +350,7 @@ static gboolean _is_circular(MidgardObject *object)
 		goto _CHECK_IS_UP_CIRCULAR;
 
 _CHECK_IS_UP_CIRCULAR:
-	up_prop = midgard_object_class_get_property_up(klass);
+	up_prop = midgard_reflector_object_get_property_up (G_OBJECT_TYPE_NAME (object)); 
 
 	if (up_prop == NULL)
 		return FALSE;
@@ -409,15 +408,16 @@ guint _object_in_tree(MidgardObject *object)
 {
 	GParamSpec *name_prop, *up_prop;
 	GValue pval = {0,};
+	const gchar *classname = G_OBJECT_TYPE_NAME (object);
 
 	if (_is_circular(object))
 		return OBJECT_IN_TREE_DUPLICATE;
 
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);	
-	const gchar *upname = midgard_object_class_get_property_parent(klass);
-	const gchar *unique_name = midgard_object_class_get_property_unique(klass);
+	const gchar *upname = midgard_reflector_object_get_property_parent (classname);
+	const gchar *unique_name = midgard_reflector_object_get_property_unique (classname);
 	if (upname == NULL)
-		upname = midgard_object_class_get_property_up(klass);
+		upname = midgard_reflector_object_get_property_up (classname);
 
 	if (upname == NULL)
 		return OBJECT_IN_TREE_NONE;
@@ -541,8 +541,7 @@ gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid)
 		return FALSE;
 	}
 
-	MidgardObject *dbobject =
-		midgard_object_class_get_object_by_guid(MGD_OBJECT_CNC (self), guid);
+	MidgardObject *dbobject = midgard_schema_object_factory_get_object_by_guid(MGD_OBJECT_CNC (self), guid);
 	
 	if (dbobject) {
 		
@@ -722,6 +721,7 @@ static GPtrArray *__get_glists(MidgardObject *object)
 	GList *values = NULL;
 	GValue pval = {0, };
 	const gchar *colname;
+	const gchar *classname = G_OBJECT_TYPE_NAME (object);
 
 	GParamSpec **pspecs =
 		g_object_class_list_properties(G_OBJECT_GET_CLASS(object), &n_prop);
@@ -738,7 +738,7 @@ static GPtrArray *__get_glists(MidgardObject *object)
 
 		/* FIXME, we should have boolean(s) here , not g_str_equal */
 		const gchar *pprop = 
-			midgard_object_class_get_primary_property(klass);
+			midgard_reflector_object_get_property_primary(classname);
 		if (g_str_equal(pprop, pspecs[i]->name)) {
 			if (pspecs[i]->value_type == G_TYPE_UINT
 					|| pspecs[i]->value_type == G_TYPE_INT)
@@ -768,7 +768,7 @@ static GPtrArray *__get_glists(MidgardObject *object)
 
 	g_free(pspecs);
 
-	if (MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->has_metadata) {
+	if (MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (klass))) {
 
 		n_prop = 0;
 		MidgardMetadata *mdata = object->metadata;
@@ -1304,7 +1304,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv = g_new (MidgardDBObjectPrivate, 1);
 
 		/* Check metadata. No support for user declared one yet. */
-		if (data->metadata_class == NULL) 
+		if (data->metadata_class_name == NULL) 
 			dbklass->dbpriv->has_metadata = FALSE;
 		else 
 			dbklass->dbpriv->has_metadata = TRUE;
@@ -2096,8 +2096,9 @@ MidgardObject *midgard_object_get_parent(MidgardObject *self)
         const gchar *parent_class_name = NULL;
         MidgardConnection *mgd = MGD_OBJECT_CNC (self);
         MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(mobj);
+	const gchar *classname = G_OBJECT_TYPE_NAME (self);
 
-        const gchar *property_up = midgard_object_class_get_property_up (klass);
+        const gchar *property_up = midgard_reflector_object_get_property_up (classname);
 
         if (property_up) {
 
@@ -2121,7 +2122,7 @@ MidgardObject *midgard_object_get_parent(MidgardObject *self)
 		
 		g_value_init(&pval,fprop->value_type);
 		g_object_get_property(G_OBJECT(mobj), 
-				midgard_object_class_get_property_up(klass), &pval);
+				midgard_reflector_object_get_property_up(classname), &pval);
 		
 		switch(fprop->value_type) {
 			
@@ -2178,7 +2179,7 @@ MidgardObject *midgard_object_get_parent(MidgardObject *self)
 	 * with  value returned for mobj->priv->storage_data->tree->property_up 
 	 */ 
 
-	if (midgard_object_class_get_property_parent(klass) == NULL)
+	if (midgard_reflector_object_get_property_parent(classname) == NULL)
 		return NULL;
 
 	parent_class_name = midgard_object_parent (self);
@@ -2192,14 +2193,14 @@ MidgardObject *midgard_object_get_parent(MidgardObject *self)
 	
 	fprop = g_object_class_find_property(
 			G_OBJECT_GET_CLASS(mobj),
-			midgard_object_class_get_property_parent(klass));
+			midgard_reflector_object_get_property_parent(classname));
 
 	if (!fprop)
 		return NULL;
        
         g_value_init(&pval,fprop->value_type);
         g_object_get_property(G_OBJECT(mobj), 
-			midgard_object_class_get_property_parent(klass) , &pval);
+			midgard_reflector_object_get_property_parent(classname) , &pval);
 
         switch(fprop->value_type) {
             
@@ -2377,7 +2378,7 @@ gboolean midgard_object_delete(MidgardObject *object)
 	}
 
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!midgard_object_class_has_metadata (klass)) {
+	if (!MGD_DBCLASS_METADATA_CLASS (klass)) {
 
 		MIDGARD_ERRNO_SET (MGD_OBJECT_CNC (object), MGD_ERR_NO_METADATA);
 		return FALSE;
@@ -2621,14 +2622,15 @@ GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
 
 	g_assert(object != NULL);
 	GParamSpec *fprop;
+	const gchar *classname = G_OBJECT_TYPE_NAME (object);
 
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);	
 	const gchar *primary_prop = 
-		midgard_object_class_get_primary_property(klass);
+		midgard_reflector_object_get_property_primary(classname);
 
-	if (midgard_object_class_get_property_up(klass) == NULL) 
+	if (midgard_reflector_object_get_property_up(classname) == NULL) 
 		return NULL;
 	
 	if ((fprop = g_object_class_find_property(
@@ -2637,7 +2639,7 @@ GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
 		
 		if (g_object_class_find_property(
 						G_OBJECT_GET_CLASS(G_OBJECT(object)),
-						midgard_object_class_get_property_up(klass)) == NULL ) {
+						midgard_reflector_object_get_property_up(classname)) == NULL ) {
 			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
 			return NULL;
 		}
@@ -2656,7 +2658,7 @@ GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
 		g_object_get_property(G_OBJECT(object), primary_prop, &pval);
 		
 		midgard_query_builder_add_constraint(builder,
-				midgard_object_class_get_property_up(klass), "=", &pval);
+				midgard_reflector_object_get_property_up(classname), "=", &pval);
 		
 		g_value_unset(&pval);
 		GObject **objects = midgard_query_builder_execute(builder, n_objects);
@@ -2712,7 +2714,7 @@ GObject **midgard_object_list_children(MidgardObject *object,
 	MidgardObject *child = midgard_object_new(MGD_OBJECT_CNC (object), childcname, NULL);
 	MidgardObjectClass *child_klass = MIDGARD_OBJECT_GET_CLASS(child);
 
-	if (midgard_object_class_get_property_parent(child_klass) == NULL) {
+	if (midgard_reflector_object_get_property_parent(childcname) == NULL) {
 		g_object_unref(child);
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
 		return NULL;
@@ -2736,7 +2738,7 @@ GObject **midgard_object_list_children(MidgardObject *object,
 		g_object_get_property(G_OBJECT(object), primary_prop, &pval);
 		
 		if (midgard_query_builder_add_constraint(builder, 
-					midgard_object_class_get_property_parent(child_klass)
+					midgard_reflector_object_get_property_parent(childcname)
 					, "=", &pval)) {
 
 			g_value_unset(&pval);
@@ -2845,7 +2847,7 @@ gboolean midgard_object_get_by_path(MidgardObject *self, const gchar *path)
 	g_return_val_if_fail(path != NULL, FALSE);
 
 	MidgardObject *object = 
-		midgard_object_class_get_object_by_path(
+		midgard_schema_object_factory_get_object_by_path(
 				MGD_OBJECT_CNC (self), 
 				G_OBJECT_TYPE_NAME(self),
 				path);
@@ -2858,21 +2860,6 @@ gboolean midgard_object_get_by_path(MidgardObject *self, const gchar *path)
 	g_object_unref(object);
 
 	return TRUE;
-}
-
-
-/**
- * midgard_object_undelete:
- * @mgd: #MidgardConnection handler
- * @guid: identifier of deleted object
- * 
- * Deprecated. See midgard_object_class_undelete()
- * 
- * Returns: %TRUE if object has been undeleted, %FALSE otherwise.
- */
-gboolean midgard_object_undelete(MidgardConnection *mgd, const gchar *guid)
-{
-	return midgard_object_class_undelete(mgd, guid);
 }
 
 /** 
@@ -3244,7 +3231,7 @@ gboolean midgard_object_lock(MidgardObject *self)
 	MidgardConnection *mgd = MGD_OBJECT_CNC(self);
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
-	if (!midgard_object_class_has_metadata (klass)) {
+	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (klass))) {
 
 		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NO_METADATA);
 		g_object_unref (self);
@@ -3356,7 +3343,7 @@ gboolean midgard_object_is_locked(MidgardObject *self)
 
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (self);
 
-	if (!midgard_object_class_has_metadata (klass)) {
+	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (klass))) {
 
 		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NO_METADATA);
 		g_object_unref (self);
@@ -3430,7 +3417,7 @@ gboolean midgard_object_unlock(MidgardObject *self)
 	MidgardConnection *mgd = MGD_OBJECT_CNC(self);
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
-	if (!midgard_object_class_has_metadata (klass)) {
+	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (klass))) {
 
 		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NO_METADATA);
 		g_object_unref (self);

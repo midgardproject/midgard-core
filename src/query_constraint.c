@@ -23,7 +23,6 @@
 #include "midgard_core_query_builder.h"
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
-#include "midgard_object_class.h"
 #include "midgard_tree.h"
 #include <libgda/libgda.h>
 

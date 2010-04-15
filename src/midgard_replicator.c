@@ -24,10 +24,10 @@
 #include "midgard_blob.h"
 #include "midgard_timestamp.h"
 #include "midgard_error.h"
-#include "midgard_object_class.h"
 #include "midgard_user.h"
 #include "midgard_core_query.h"
 #include "guid.h"
+#include "midgard_schema_object_factory.h"
 
 #define __mr_dbus_send(_obj, _action) \
 	gchar *_dbus_path = g_strconcat("/replication/", \
@@ -582,8 +582,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 			g_object_get (G_OBJECT (MIDGARD_OBJECT (object)->metadata), "deleted", &undelete, NULL);
 
 			if ((deleted && !undelete)) {
-
-				midgard_object_undelete (mgd, MGD_OBJECT_GUID (dbobject));
+				midgard_schema_object_factory_object_undelete (mgd, MGD_OBJECT_GUID (dbobject));
 				goto _update_object;
 			}
 
@@ -629,7 +628,7 @@ static gboolean __import_blob_from_xml(	MidgardConnection *mgd,
 		return FALSE;
 	}
 
-	MidgardObject *object = midgard_object_class_get_object_by_guid(mgd, guid);
+	MidgardObject *object = midgard_schema_object_factory_get_object_by_guid (mgd, guid);
 
 	/* TODO , Add more error messages to inform about object state. 
 	 * One is already set by midgard_object_class_get_object_by_guid */
@@ -735,8 +734,7 @@ midgard_replicator_import_from_xml (MidgardConnection *mgd,  const gchar *xml, g
 
 		if(g_str_equal(attr, "yes")) {
 			
-			dbobject = midgard_object_class_get_object_by_guid(
-					mgd, (const gchar *)guid_attr);
+			dbobject = midgard_schema_object_factory_get_object_by_guid (mgd, (const gchar *)guid_attr);
 
 			if(dbobject || 
 					( !dbobject && 

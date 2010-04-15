@@ -19,7 +19,6 @@
 #include "midgard_collector.h"
 #include "midgard_object.h"
 #include "query_builder.h"
-#include "midgard_object_class.h"
 #include "midgard_core_query_builder.h"
 #include <libgda/libgda.h>
 #include "midgard_core_query.h"

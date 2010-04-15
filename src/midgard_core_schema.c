@@ -197,7 +197,8 @@ midgard_core_schema_type_attr_new (void)
 	type->constraints = NULL;
 	type->is_view = FALSE;
 	type->sql_create_view = NULL;
-	type->metadata_class = NULL;
+	type->metadata_class_name = NULL;
+	type->metadata_class_ptr = NULL;
 	type->user_values = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
 
 	return type;
@@ -224,7 +225,8 @@ midgard_core_schema_type_attr_extend (MgdSchemaTypeAttr *src, MgdSchemaTypeAttr 
 	}
 
 	dst->unique_name = src->unique_name ? g_strdup (src->unique_name) : NULL;
-	dst->metadata_class = src->metadata_class ? g_strdup (src->metadata_class) : NULL;
+	dst->metadata_class_name = src->metadata_class_name ? g_strdup (src->metadata_class_name) : NULL;
+	dst->metadata_class_ptr = src->metadata_class_ptr ? g_strdup (src->metadata_class_ptr) : NULL;
 }
 
 void 
@@ -300,8 +302,8 @@ midgard_core_schema_type_attr_free (MgdSchemaTypeAttr *type)
 
 	g_free (type->sql_create_view);
 	type->sql_create_view = NULL;
-	g_free (type->metadata_class);
-	type->metadata_class = NULL;
+	g_free (type->metadata_class_name);
+	type->metadata_class_name = NULL;
 
 	g_hash_table_destroy (type->user_values);
         type->user_values = NULL;

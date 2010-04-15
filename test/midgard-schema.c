@@ -17,7 +17,6 @@
  */
 
 #include "src/midgard_error.h"
-#include "src/midgard_object_class.h"
 #include "src/midgard_user.h"
 #include "src/midgard_object_parameter.h"
 #include "src/midgard_utils.h"

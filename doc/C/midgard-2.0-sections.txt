@@ -569,3 +569,21 @@ MIDGARD_IS_QUERY_CONSTRAINT_CLASS
 MIDGARD_QUERY_CONSTRAINT_GET_CLASS
 </SECTION>
 
+<SECTION>
+<INCLUDE>midgard/midgard.h</INCLUDE>
+<FILE>midgard_schema</FILE>
+<TITLE>MidgardSchemaObjectFactory</TITLE>
+MidgardSchemaObjectFactory
+MidgardSchemaObjectFactoryClass
+midgard_schema_object_factory_get_object_by_guid
+midgard_schema_object_factory_get_object_by_path
+midgard_schema_object_factory_undelete
+<SUBSECTION Standard>
+MIDGARD_SCHEMA_OBJECT_FACTORY
+MIDGARD_IS_SCHEMA_OBJECT_FACTORY
+MIDGARD_TYPE_SCHEMA_OBJECT_FACTORY
+midgard_schema_object_factory_get_type
+MIDGARD_SCHEMA_OBJECT_FACTORY_CLASS
+MIDGARD_IS_SCHEMA_OBJECT_FACTORY_CLASS
+MIDGARD_SCHEMA_OBJECT_FACTORY_GET_CLASS
+</SECTION>

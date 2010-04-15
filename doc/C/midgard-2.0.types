@@ -15,3 +15,4 @@ midgard_storage_get_type
 midgard_dbus_get_type
 midgard_reflector_property_get_type
 midgard_query_constraint_get_type
+midgard_schema_object_factory_get_type

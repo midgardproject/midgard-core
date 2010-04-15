@@ -31,7 +31,6 @@
 #include "midgard_core_query.h"
 #include "query_constraint.h"
 #include "midgard_core_views.h"
-#include "midgard_object_class.h"
 #include "midgard_metadata.h"
 
 #define MGD_VIEW_RW_VIEW "view"
@@ -64,13 +63,12 @@ static void __get_property_attribute (xmlNode *node, gchar **property_string,
 	/* Check metadata */
 	if (property_string[2] != NULL && g_str_equal (*target_name, "metadata")) {
 
-		if (!midgard_object_class_has_metadata (MIDGARD_OBJECT_CLASS (klass))) {
+		if (!MGD_DBCLASS_METADATA_CLASS (klass)) {
 			__view_error (node, "No metadata registered for %s class", G_OBJECT_CLASS_NAME (klass));
 			return;
 		}
 
-		MidgardMetadataClass *metadata_klass = 
-			MIDGARD_METADATA_CLASS (midgard_object_class_get_metadata_class (MIDGARD_OBJECT_CLASS (klass)));
+		MidgardMetadataClass *metadata_klass = MGD_DBCLASS_METADATA_CLASS (klass); 
 
 		*target_name = property_string[2];
 		*prop_attr = g_hash_table_lookup (metadata_klass->dbpriv->storage_data->prophash, *target_name);

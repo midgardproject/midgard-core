@@ -27,7 +27,7 @@
 #include "midgard_core_metadata.h"
 #include "midgard_dbobject.h"
 #include "midgard_metadata.h"
-#include "midgard_object_class.h"
+#include "midgard_reflector_object.h"
 
 #define get_varchar_size(str) \
 	        if(str == NULL) \
@@ -81,22 +81,19 @@ gboolean midgard_core_object_prop_up_is_valid(GType ptype)
 	return  midgard_core_object_prop_link_is_valid(ptype);
 }
 
-GType midgard_core_object_get_property_parent_type(MidgardObjectClass *klass)
+GType 
+midgard_core_object_get_property_parent_type (MidgardObjectClass *klass)
 {
-	g_assert(klass != NULL);
+	g_assert(klass != NULL);	
 
-	const gchar *prop = midgard_object_class_get_property_parent(klass);
-
+	const gchar *prop = MGD_DBCLASS_PROPERTY_PARENT (klass);
 	if(prop == NULL) {
-
 		g_warning("Failed to get parent property");
 		return 0;
 	}
 
 	GParamSpec *pspec = g_object_class_find_property(G_OBJECT_CLASS(klass), prop);
-
 	if(pspec == NULL) {
-
 		g_error("Failed to find GParamSpec for parent '%s' property", prop);
 		return 0;
 	}
@@ -107,22 +104,20 @@ GType midgard_core_object_get_property_parent_type(MidgardObjectClass *klass)
 	return pspec->value_type;
 }
 
-GType midgard_core_object_get_property_up_type(MidgardObjectClass *klass)
+GType 
+midgard_core_object_get_property_up_type (MidgardObjectClass *klass)
 {
 	g_assert(klass != NULL);
 
-	const gchar *prop = midgard_object_class_get_property_up(klass);
+	const gchar *prop = MGD_DBCLASS_PROPERTY_UP (klass);
 
 	if(prop == NULL) {
-
 		g_warning("Failed to get up property");
 		return 0;
 	}
 
 	GParamSpec *pspec = g_object_class_find_property(G_OBJECT_CLASS(klass), prop);
-
 	if(pspec == NULL) {
-
 		g_error("Failed to find GParamSpec for up '%s' property", prop);
 		return 0;
 	}
@@ -145,7 +140,7 @@ gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object)
 
 	GValue gval = {0, };
 	g_value_init(&gval, ptype);
-	const gchar *prop = midgard_object_class_get_property_parent(klass);
+	const gchar *prop = MGD_DBCLASS_PROPERTY_PARENT (klass);
 
 	g_object_get_property(G_OBJECT(object), prop, &gval);
 
@@ -169,7 +164,8 @@ gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object)
 	return FALSE;
 }
 
-gboolean midgard_core_object_prop_up_is_set(MidgardObject *object)
+gboolean 
+midgard_core_object_prop_up_is_set (MidgardObject *object)
 {
 	g_assert(object != NULL);
 
@@ -181,7 +177,7 @@ gboolean midgard_core_object_prop_up_is_set(MidgardObject *object)
 
 	GValue gval = {0, };
 	g_value_init(&gval, ptype);
-	const gchar *prop = midgard_object_class_get_property_up(klass);
+	const gchar *prop = MGD_DBCLASS_PROPERTY_UP (klass);
 
 	g_object_get_property(G_OBJECT(object), prop, &gval);
 
@@ -229,8 +225,8 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 	}
 
 	/* Check if object is dependent */
-	const gchar *parent_prop = midgard_object_class_get_property_parent(klass);
-	const gchar *up = midgard_object_class_get_property_up(klass);
+	const gchar *parent_prop = MGD_DBCLASS_PROPERTY_PARENT (klass);
+	const gchar *up = MGD_DBCLASS_PROPERTY_UP (klass);
 
 	/* Make sure parent and up are integers */
 	GParamSpec *parent_pspec = NULL;
@@ -399,11 +395,11 @@ gboolean midgard_core_object_has_dependents(MidgardObject *self, const gchar *cl
 	/* Do we check the same type? */
 	if (G_OBJECT_TYPE(self) == g_type_from_name(classname)) {
 		
-		up_property = midgard_object_class_get_property_up(klass);
+		up_property = MGD_DBCLASS_PROPERTY_UP (klass);
 	
 	} else {
 		
-		up_property = midgard_object_class_get_property_parent(klass);
+		up_property = MGD_DBCLASS_PROPERTY_PARENT (klass);
 	}
 	
 	if (up_property == NULL)

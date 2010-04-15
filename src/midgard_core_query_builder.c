@@ -31,7 +31,6 @@
 #include "midgard_metadata.h"
 #include "midgard_user.h"
 #include "midgard_core_object.h"
-#include "midgard_object_class.h"
 
 #define _RESERVED_BLOB_NAME "attachment"
 #define _RESERVED_BLOB_TABLE "blobs"

@@ -6,7 +6,6 @@
 #include "midgard_core_query.h"
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
-#include "midgard_object_class.h"
 
 gboolean _midgard_tree_exists(MidgardConnection *mgd, 
 		const gchar *table, const gchar *upfield, 
@@ -235,10 +234,11 @@ guint *_midgard_tree_ids(MidgardConnection *mgd,
 
 	const gchar *table = midgard_core_class_get_table(MIDGARD_DBOBJECT_CLASS(klass));
 	const gchar *pcol, *pprop;
-	pprop = midgard_object_class_get_property_parent(klass);
+	const gchar *classname = G_OBJECT_CLASS_NAME (klass);
+	pprop = midgard_reflector_object_get_property_parent(classname);
 
 	if(pprop == NULL)
-		pprop = midgard_object_class_get_property_up(klass);
+		pprop = MGD_DBCLASS_PROPERTY_UP (klass);
 
 	pcol = midgard_core_class_get_property_colname(MIDGARD_DBOBJECT_CLASS(klass), pprop);
 

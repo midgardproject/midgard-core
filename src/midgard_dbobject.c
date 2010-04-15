@@ -20,7 +20,6 @@
 #include "schema.h"
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
-#include "midgard_object_class.h"
 
 static GObjectClass *parent_class= NULL;
 
@@ -75,7 +74,7 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 	/* Check if metadata provides own method to add fields. If not, use given class storage. */
 	if (MIDGARD_IS_OBJECT_CLASS (klass)) {
 
-		MidgardMetadataClass *mklass = (MidgardMetadataClass *) midgard_object_class_get_metadata_class (MIDGARD_OBJECT_CLASS (klass));
+		MidgardMetadataClass *mklass = MGD_DBCLASS_METADATA_CLASS (klass);
 		if (!mklass)
 			return;
 

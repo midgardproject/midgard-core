@@ -22,7 +22,6 @@
 #include <libxml/parserInternals.h>
 #include "midgard_metadata.h"
 #include "midgard_timestamp.h"
-#include "midgard_object_class.h"
 #include "midgard_core_object.h"
 #include "schema.h"
 #include "midgard_core_metadata.h"

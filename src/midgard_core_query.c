@@ -23,7 +23,6 @@
 #include "midgard_core_object.h"
 #include "midgard_core_config.h"
 #include "midgard_core_object_class.h"
-#include "midgard_object_class.h"
 #include "midgard_error.h"
 #include "midgard_core_connection.h"
 #include "midgard_timestamp.h"
@@ -31,6 +30,7 @@
 #include <sql-parser/gda-sql-parser.h>
 #endif
 #include "midgard_metadata.h"
+#include "midgard_reflector_object.h"
 
 /* Do not use _DB_DEFAULT_DATETIME.
  * Some databases (like MySQL) fails to create datetime column with datetime which included timezone. 
@@ -2557,9 +2557,10 @@ void __check_property_index(MidgardDBObjectClass *klass, MidgardReflectionProper
 
 	const gchar *parent = NULL;
 	const gchar *up = NULL;
+	const gchar *classname = G_OBJECT_CLASS_NAME (klass);
 	if (MIDGARD_IS_OBJECT_CLASS (klass)) {
-		parent = midgard_object_class_get_property_parent(MIDGARD_OBJECT_CLASS(klass));
-		up = midgard_object_class_get_property_up(MIDGARD_OBJECT_CLASS(klass));	
+		parent = midgard_reflector_object_get_property_parent (classname);
+		up = midgard_reflector_object_get_property_up (classname);	
 	}
 
 	if (parent && g_str_equal(parent, property)) {
@@ -2765,7 +2766,7 @@ gboolean midgard_core_query_create_class_storage(
 	const gchar *pfield = NULL;
 	const gchar *primary_field = NULL;
 	if (MIDGARD_IS_OBJECT_CLASS (klass))
-		pprop = midgard_object_class_get_primary_property(MIDGARD_OBJECT_CLASS(klass));
+		pprop = midgard_reflector_object_get_property_primary (classname);
 	
 	if(pprop) {
 

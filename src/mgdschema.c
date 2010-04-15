@@ -25,7 +25,6 @@
 #include "midgard_datatypes.h"
 #include "midgard_type.h"
 #include "schema.h"
-#include "midgard_object_class.h"
 #include "midgard_core_config.h"
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
@@ -34,6 +33,8 @@
 #include <libxml/parserInternals.h>
 #include "guid.h"
 #include "midgard_core_xml.h"
+#include "midgard_metadata.h"
+#include "midgard_reflector_object.h"
 
 /* TODO tune header files , no need to include string.h while we need to include midgard.h in almost every case */
 
@@ -307,18 +308,21 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 
 			if (g_str_equal (attrval, "false")) {
 
-				type_attr->metadata_class = NULL;
+				type_attr->metadata_class_name = NULL;
+				type_attr->metadata_class_ptr = NULL;
 			
 			} else {
 
-				type_attr->metadata_class = g_strdup((gchar *)attrval);
+				type_attr->metadata_class_name = g_strdup((gchar *)attrval);
+				type_attr->metadata_class_ptr = g_type_class_peek (g_type_from_name (attrval));
 			}
 
 			xmlFree(attrval);
 		
 		} else {
 
-			type_attr->metadata_class = g_strdup ("MidgardMetadata");
+			type_attr->metadata_class_name = g_strdup ("MidgardMetadata");
+			type_attr->metadata_class_ptr = g_type_class_peek (MIDGARD_TYPE_METADATA);
 		}
 	}
 }
@@ -1345,7 +1349,7 @@ static void __midgard_schema_validate()
 			}
 	
 			/* validate parent property if exists */
-			const gchar *prop = midgard_object_class_get_property_parent(klass);	
+			const gchar *prop = midgard_reflector_object_get_property_parent (typename);	
 			MidgardReflectionProperty *smrp = NULL;
 	
 			if(prop) {
@@ -1360,7 +1364,7 @@ static void __midgard_schema_validate()
 			}
 			
 			/* validate up property link */
-			prop = midgard_object_class_get_property_up(klass);
+			prop = midgard_reflector_object_get_property_up (typename);
 			
 			if(prop) {
 				

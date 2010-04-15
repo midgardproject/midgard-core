@@ -49,8 +49,7 @@ midgard_public_h = \
 	src/midgard_timestamp.h \
 	src/uuid.h \
 	src/guid.h \
-	src/midgard_datatypes.h \
-	src/midgard_object_class.h \
+	src/midgard_datatypes.h \	
 	src/midgard_type.h \
 	src/midgard_quota.h \
 	src/midgard_reflection_property.h \
@@ -69,8 +68,10 @@ midgard_public_h = \
 	src/midgard_query_select.h \
 	src/midgard_query_storage.h \
 	src/midgard_query_simple_constraint.h \
+	src/midgard_reflector_object.h \
 	src/midgard_reflector_property.h \
 	src/midgard_replicator.h \
+	src/midgard_schema_object_factory.h \
 	src/midgard_blob.h \
 	src/midgard_storage.h \
 	src/midgard_transaction.h \
@@ -157,7 +158,6 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_metadata.c \
 	src/midgard_timestamp.c \
 	src/midgard_datatypes.c \
-	src/midgard_object_class.c \
 	src/midgard_reflection_property.c \
 	src/midgard_connection.c \
 	src/midgard_error.c \
@@ -176,9 +176,12 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_query_simple_constraint.c \
 	src/midgard_query_storage.c \
 	src/midgard_query_value.c \
+	src/midgard_reflector_object.c \
 	src/midgard_reflector_property.c \
 	src/midgard_replicator.c \
 	src/midgard_user.c \
+	src/midgard_schema_object_factory.c \
+	src/midgard_schema_object_factory.h \
 	src/midgard_storage.c \
 	src/midgard_storage.h \
 	src/midgard_dbobject.c \

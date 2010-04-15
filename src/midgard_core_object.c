@@ -33,11 +33,11 @@
 #include "midgard_blob.h"
 #include "midgard_user.h"
 #include "midgard_object.h"
-#include "midgard_object_class.h"
 #include "midgard_metadata.h"
 #include "guid.h"
 #include "midgard_core_metadata.h"
 #include "midgard_core_object_class.h"
+#include "midgard_schema_object_factory.h"
 
 static const gchar *MIDGARD_OBJECT_HREF = "http://www.midgard-project.org/midgard_object/1.8";
 
@@ -464,7 +464,7 @@ gboolean _nodes2object(GObject *object, xmlNode *node, gboolean force)
 					}
 
 					/* we can use nodeprop directly */
-					lobject = midgard_object_class_get_object_by_guid(
+					lobject = midgard_schema_object_factory_get_object_by_guid (
 							MIDGARD_DBOBJECT (mobject)->dbpriv->mgd,
 							(const gchar *) nodeprop);
 

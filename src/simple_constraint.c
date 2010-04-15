@@ -143,14 +143,11 @@ static void add_sql(MidgardQueryConstraint *constraint, GString *sql) {
 		 * This should be changed when midgard_tree is implemented */
 		const gchar *parent_field, *up_field = NULL;
 		guint j = 0;
-		parent_field = 
-			midgard_object_class_get_property_parent(
-					(MidgardObjectClass *)simple->klass);
+		parent_field = MGD_DBCLASS_PROPERTY_PARENT ((MidgardObjectClass *)simple->klass);
 		if(parent_field == NULL)
 			parent_field = "";
-		up_field =
-				midgard_object_class_get_property_up(
-						(MidgardObjectClass *)simple->klass);	
+		up_field = MGD_DBCLASS_PROPERTY_UP ((MidgardObjectClass *)simple->klass);	
+
 		if(up_field == NULL)
 			up_field = "";
 		if(!g_str_equal(parent_field, simple->spec->name))

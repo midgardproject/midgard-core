@@ -23,7 +23,6 @@
 #include "query_constraint.h"
 #include "group_constraint.h"
 #include "query_order.h"
-#include "midgard_object_class.h"
 #include "schema.h"
 #include "midgard_core_query_builder.h"
 #include "midgard_error.h"
@@ -39,6 +38,7 @@
 #include "midgard_timestamp.h"
 #include "midgard_core_metadata.h"
 #include "midgard_view.h"
+#include "midgard_reflector_object.h"
 
 /* Internal prototypes , I am not sure if should be included in API */
 gchar *midgard_query_builder_get_object_select(MidgardQueryBuilder *builder, guint select_type);
@@ -992,7 +992,10 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 
 			if (dbklass->dbpriv->has_metadata) {
 
-				GObjectClass *metadata_class = midgard_object_class_get_metadata_class (MIDGARD_OBJECT_CLASS (dbklass));
+				/* FIXME, provide metadata class pointer member for MidgardDBObjectClass */
+				const gchar *metadata_classname = 
+					midgard_reflector_object_get_metadata_class (G_OBJECT_CLASS_NAME (dbklass));
+				GObjectClass *metadata_class = g_type_class_peek (g_type_from_name (metadata_classname));
 				GParamSpec **pspec = g_object_class_list_properties (metadata_class, &n_md_props);
 				g_free (pspec);
 			}

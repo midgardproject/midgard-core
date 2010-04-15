@@ -80,7 +80,8 @@ struct _MgdSchemaTypeAttr {
 	GSList *constraints;
 	gboolean is_view;
 	gchar *sql_create_view;
-	gchar *metadata_class;
+	gchar *metadata_class_name;
+	MidgardMetadataClass *metadata_class_ptr;
 	GHashTable *user_values;	
 };
 

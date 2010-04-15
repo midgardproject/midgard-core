@@ -59,6 +59,10 @@ struct _MidgardDBObjectPrivate {
 #define MGD_OBJECT_CNC(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->mgd
 
 #define MGD_DBOBJECT_METADATA(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->metadata
+#define MGD_DBCLASS_METADATA_CLASS(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->metadata_class_ptr
+#define MGD_DBCLASS_PROPERTY_UP(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->property_up
+#define MGD_DBCLASS_PROPERTY_PARENT(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->property_parent
+#define MGD_DBCLASS_PROPERTY_UNIQUE(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->unique_name
 
 /* Private structure for private data of MgdSchema objects */
 struct _MidgardObjectPrivate{

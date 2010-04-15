@@ -59,6 +59,7 @@
 #include <midgard/midgard_query_storage.h>
 #include <midgard/midgard_query_constraint.h>
 #include <midgard/midgard_query_group_constraint.h>
+#include <midgard/midgard_reflector_object.h>
 #include <midgard/midgard_reflector_property.h>
 
 #endif /* _MIDGARD_API_H_ */

@@ -20,7 +20,6 @@
 #define MIDGARD_QUOTA_H
 
 #include "midgard_object.h"
-#include "midgard_object_class.h"
 
 guint 		midgard_quota_get_object_size	(MidgardObject *object);
 gboolean 	midgard_quota_create		(MidgardObject *object);
