@@ -31,7 +31,6 @@
 #include <midgard/midgard_connection.h>
 #include <midgard/midgard_metadata.h>
 #include <midgard/midgard_object.h>
-#include <midgard/midgard_object_class.h>
 #include <midgard/midgard_quota.h>
 #include <midgard/midgard_reflection_property.h>
 #include <midgard/midgard_collector.h>
