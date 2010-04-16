@@ -61,7 +61,7 @@ midgard_public_h = \
 	src/midgard_object_attachment.h \
 	src/midgard_query_constraint.h \
 	src/midgard_query_executor.h \
-	src/midgard_query_group_constraint.h \
+	src/midgard_query_constraint_group.h \
 	src/midgard_query_holder.h \
 	src/midgard_query_value.h \
 	src/midgard_query_property.h \
@@ -169,7 +169,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_object_attachment.c \
 	src/midgard_query_constraint.c \
 	src/midgard_query_executor.c \
-	src/midgard_query_group_constraint.c \
+	src/midgard_query_constraint_group.c \
 	src/midgard_query_holder.c \
 	src/midgard_query_property.c \
 	src/midgard_query_select.c \
