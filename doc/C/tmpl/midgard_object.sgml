@@ -430,16 +430,6 @@ MidgardObject
 @Returns: 
 
 
-<!-- ##### FUNCTION midgard_object_undelete ##### -->
-<para>
-
-</para>
-
-@mgd: 
-@guid: 
-@Returns: 
-
-
 <!-- ##### FUNCTION midgard_object_set_guid ##### -->
 <para>
 

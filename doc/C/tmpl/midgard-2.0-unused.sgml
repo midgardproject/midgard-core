@@ -1,3 +1,29 @@
+<!-- ##### SECTION ./tmpl/midgard_object_class.sgml:Long_Description ##### -->
+<para>
+ #MidgardObjectClass is a helper and reflection like class for every #MgdObject derived one.
+ With #MidgardObjectClass you may create new instances: midgard_object_class_factory(), 
+ undelete objects: midgard_object_class_undelete(), check if class is multilang, etc.  
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_object_class.sgml:See_Also ##### -->
+<para>
+#MgdObject, #MidgardSchema
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_object_class.sgml:Short_Description ##### -->
+ Reflection class for #MgdObject derived ones.
+
+
+<!-- ##### SECTION ./tmpl/midgard_object_class.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/midgard_object_class.sgml:Title ##### -->
+midgard_object_class
+
+
 <!-- ##### SECTION ./tmpl/midgard_request.sgml:Long_Description ##### -->
 <para>
 
@@ -1206,12 +1232,82 @@ midgard_sitegroup
 @mobj: 
 @Returns: 
 
+<!-- ##### FUNCTION midgard_object_class_factory ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@klass: 
+@val: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_class_get_object_by_guid ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@guid: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_class_get_object_by_path ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@classname: 
+@object_path: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_class_get_primary_property ##### -->
+<para>
+
+</para>
+
+@klass: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_class_get_property_parent ##### -->
+<para>
+
+</para>
+
+@klass: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_class_get_property_up ##### -->
+<para>
+
+</para>
+
+@klass: 
+@Returns: 
+
 <!-- ##### FUNCTION midgard_object_class_is_multilang ##### -->
 <para>
 
 </para>
 
 @klass: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_class_list_children ##### -->
+<para>
+
+</para>
+
+@klass: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_class_undelete ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@guid: 
 @Returns: 
 
 <!-- ##### FUNCTION midgard_object_get ##### -->
@@ -1229,6 +1325,15 @@ midgard_sitegroup
 
 @self: 
 @n_objects: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_undelete ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@guid: 
 @Returns: 
 
 <!-- ##### TYPEDEF midgard_query_builder ##### -->
