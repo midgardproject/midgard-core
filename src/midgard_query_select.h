@@ -40,15 +40,6 @@ typedef struct _MidgardQuerySelectClass MidgardQuerySelectClass;
 struct _MidgardQuerySelectClass {
 	MidgardQueryExecutorClass parent;
 
-	/* virtual methods */
-	/*gboolean	(*set_constraint)		(MidgardQuerySelect *self, MidgardQuerySimpleConstraint *constraint);
-	gboolean	(*set_limit)			(MidgardQuerySelect *self, guint limit);
-	gboolean	(*set_offset)			(MidgardQuerySelect *self, guint offset);
-	gboolean	(*add_order)			(MidgardQuerySelect *self, MidgardQueryProperty *property, const gchar *type);
-	gboolean        (*add_join)			(MidgardQuerySelect *self, const gchar *join_type, 
-								MidgardQueryProperty *left_property, MidgardQueryProperty *right_property);
-	gboolean	(*execute)			(MidgardQuerySelect *self);
-	guint           (*get_results_count)            (MidgardQuerySelect *self);*/
 	MidgardDBObject	**(*list_objects)		(MidgardQuerySelect *self, guint *n_objects);
 	void		(*toggle_read_only)		(MidgardQuerySelect *self, gboolean toggle);
 };

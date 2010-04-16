@@ -67,7 +67,7 @@ midgard_public_h = \
 	src/midgard_query_property.h \
 	src/midgard_query_select.h \
 	src/midgard_query_storage.h \
-	src/midgard_query_simple_constraint.h \
+	src/midgard_query_constraint_simple.h \
 	src/midgard_reflector_object.h \
 	src/midgard_reflector_property.h \
 	src/midgard_replicator.h \
@@ -173,7 +173,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_query_holder.c \
 	src/midgard_query_property.c \
 	src/midgard_query_select.c \
-	src/midgard_query_simple_constraint.c \
+	src/midgard_query_constraint_simple.c \
 	src/midgard_query_storage.c \
 	src/midgard_query_value.c \
 	src/midgard_reflector_object.c \

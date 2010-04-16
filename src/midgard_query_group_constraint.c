@@ -20,7 +20,7 @@
 #include "midgard_query_property.h"
 #include "midgard_query_storage.h"
 #include "midgard_query_holder.h"
-#include "midgard_query_simple_constraint.h"
+#include "midgard_query_constraint_simple.h"
 #include "midgard_dbobject.h"
 #include "midgard_core_query.h"
 
@@ -31,7 +31,7 @@ struct _MidgardQueryGroupConstraintPrivate {
 };
 
 MidgardQueryGroupConstraint *
-midgard_query_group_constraint_new (const gchar *type, MidgardQuerySimpleConstraint *constraint, ...)
+midgard_query_group_constraint_new (const gchar *type, MidgardQueryConstraintSimple *constraint, ...)
 {
 	g_return_val_if_fail (type != NULL, NULL);
 	g_return_val_if_fail (constraint != NULL, NULL);
@@ -55,13 +55,13 @@ midgard_query_group_constraint_new (const gchar *type, MidgardQuerySimpleConstra
 	self->priv->type = valid_type;
 	self->priv->op_type = op_type;
 
-	MidgardQuerySimpleConstraint *cnstr = constraint;
+	MidgardQueryConstraintSimple *cnstr = constraint;
 	va_list args;
 	va_start (args, constraint);
 	while (cnstr != NULL) {
-		if (MIDGARD_IS_QUERY_SIMPLE_CONSTRAINT (cnstr))
+		if (MIDGARD_IS_QUERY_CONSTRAINT_SIMPLE (cnstr))
 			self->priv->constraints = g_slist_append (self->priv->constraints, cnstr);
-		cnstr = va_arg (args, MidgardQuerySimpleConstraint*);
+		cnstr = va_arg (args, MidgardQueryConstraintSimple*);
 	}
 	va_end (args);
 
@@ -85,12 +85,12 @@ midgard_query_group_constraint_set_group_type (MidgardQueryGroupConstraint *self
 }
 
 gboolean
-midgard_query_group_constraint_add_constraint (MidgardQueryGroupConstraint *self, MidgardQuerySimpleConstraint *constraint, ...)
+midgard_query_group_constraint_add_constraint (MidgardQueryGroupConstraint *self, MidgardQueryConstraintSimple *constraint, ...)
 {
 	return FALSE;
 }
 
-MidgardQuerySimpleConstraint **
+MidgardQueryConstraintSimple **
 midgard_query_group_constraint_list_constraints (MidgardQueryGroupConstraint *self, guint *n_objects)
 {
 	return FALSE;
@@ -100,8 +100,8 @@ midgard_query_group_constraint_list_constraints (MidgardQueryGroupConstraint *se
 
 GObjectClass *parent_class = NULL;
 
-MidgardQuerySimpleConstraint**
-_midgard_query_group_constraint_list_constraints (MidgardQuerySimpleConstraint *self, guint *n_objects)
+MidgardQueryConstraintSimple**
+_midgard_query_group_constraint_list_constraints (MidgardQueryConstraintSimple *self, guint *n_objects)
 {
 	g_return_val_if_fail (self != NULL, NULL);
 
@@ -113,12 +113,12 @@ _midgard_query_group_constraint_list_constraints (MidgardQuerySimpleConstraint *
 	for (l = self_constraints; l != NULL; l = l->next)
 		i++;
 
-	MidgardQuerySimpleConstraint **constraints = g_new (MidgardQuerySimpleConstraint*, i);
+	MidgardQueryConstraintSimple **constraints = g_new (MidgardQueryConstraintSimple*, i);
 
 	i = 0;
 	for (l = self_constraints; l != NULL; l = l->next)
 	{
-		constraints[i] = MIDGARD_QUERY_SIMPLE_CONSTRAINT (l->data);
+		constraints[i] = MIDGARD_QUERY_CONSTRAINT_SIMPLE (l->data);
 		i++;
 	}
 
@@ -127,13 +127,13 @@ _midgard_query_group_constraint_list_constraints (MidgardQuerySimpleConstraint *
 }
 
 void
-_midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *self, 
+_midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQueryConstraintSimple *self, 
 		GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node)
 {	
 	guint n_objects;
 	guint i;
-	MidgardQuerySimpleConstraint **constraints = 
-		midgard_query_simple_constraint_list_constraints (MIDGARD_QUERY_SIMPLE_CONSTRAINT (self), &n_objects);
+	MidgardQueryConstraintSimple **constraints = 
+		midgard_query_constraint_simple_list_constraints (MIDGARD_QUERY_CONSTRAINT_SIMPLE (self), &n_objects);
 	if (!constraints)
 		return;
 
@@ -161,17 +161,17 @@ _midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor
 
 	for (i = 0; i < n_objects; i++) {
 
-		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (constraints[i])->priv->add_conditions_to_statement (executor, MIDGARD_QUERY_SIMPLE_CONSTRAINT (constraints[i]), stmt, top_where);
+		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (constraints[i])->priv->add_conditions_to_statement (executor, MIDGARD_QUERY_CONSTRAINT_SIMPLE (constraints[i]), stmt, top_where);
 	}
 
 	g_free (constraints);
 }
 
 static void
-_midgard_query_group_constraint_iface_init (MidgardQuerySimpleConstraintIFace *iface)
+_midgard_query_group_constraint_iface_init (MidgardQueryConstraintSimpleIFace *iface)
 {
 	iface->list_constraints = _midgard_query_group_constraint_list_constraints;
-	iface->priv = g_new (MidgardQuerySimpleConstraintPrivate, 1);
+	iface->priv = g_new (MidgardQueryConstraintSimplePrivate, 1);
 	iface->priv->add_conditions_to_statement = _midgard_query_group_add_conditions_to_statement;
 	
 	return;
@@ -254,7 +254,7 @@ midgard_query_group_constraint_get_type (void)
 		};
 
   		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryGroupConstraint", &info, 0);
-		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_SIMPLE_CONSTRAINT, &property_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_CONSTRAINT_SIMPLE, &property_info);
     	}
     	return type;
 }

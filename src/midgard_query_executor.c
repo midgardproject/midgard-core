@@ -31,7 +31,7 @@ midgard_query_executor_new (MidgardConnection *mgd, MidgardQueryStorage *storage
 }
 
 gboolean
-midgard_query_executor_set_constraint (MidgardQueryExecutor *self, MidgardQuerySimpleConstraint *constraint)
+midgard_query_executor_set_constraint (MidgardQueryExecutor *self, MidgardQueryConstraintSimple *constraint)
 {
 	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->set_constraint (self, constraint);
 }

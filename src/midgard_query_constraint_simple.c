@@ -16,22 +16,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "midgard_query_simple_constraint.h"
+#include "midgard_query_constraint_simple.h"
 #include "midgard_core_query.h"
 
-MidgardQuerySimpleConstraint**
-midgard_query_simple_constraint_list_constraints (MidgardQuerySimpleConstraint *self, guint *n_objects)
+MidgardQueryConstraintSimple**
+midgard_query_constraint_simple_list_constraints (MidgardQueryConstraintSimple *self, guint *n_objects)
 {
-	return MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (self)->list_constraints (self, n_objects);
+	return MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (self)->list_constraints (self, n_objects);
 }
 
 GType
-midgard_query_simple_constraint_get_type (void)
+midgard_query_constraint_simple_get_type (void)
 {
 	static GType type = 0;
 	if (type == 0) {
 		static const GTypeInfo info = {
-			sizeof (MidgardQuerySimpleConstraintIFace),
+			sizeof (MidgardQueryConstraintSimpleIFace),
 			NULL,   /* base_init */
 			NULL,   /* base_finalize */
 			NULL,   /* class_init */
@@ -41,7 +41,7 @@ midgard_query_simple_constraint_get_type (void)
 			0,      /* n_preallocs */
 			NULL    /* instance_init */
 		};
-		type = g_type_register_static (G_TYPE_INTERFACE, "MidgardQuerySimpleConstraint", &info, 0);
+		type = g_type_register_static (G_TYPE_INTERFACE, "MidgardQueryConstraintSimple", &info, 0);
 		g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 	}
 	return type;

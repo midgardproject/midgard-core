@@ -25,7 +25,7 @@
 #include "schema.h"
 #include "midgard_query_property.h"
 #include "midgard_query_storage.h"
-#include "midgard_query_simple_constraint.h"
+#include "midgard_query_constraint_simple.h"
 #include "midgard_query_executor.h"
 
 typedef struct _MidgardDBColumn MidgardDBColumn;
@@ -76,7 +76,7 @@ struct _MidgardQueryPropertyPrivate {
 struct _MidgardQueryExecutorPrivate {
 	MidgardConnection *mgd;
 	MidgardQueryStorage *storage;
-	MidgardQuerySimpleConstraint *constraint;
+	MidgardQueryConstraintSimple *constraint;
 	GSList *orders;
 	GSList *joins;
 	gint limit;
@@ -90,8 +90,8 @@ struct _MidgardQueryExecutorPrivate {
 	gboolean read_only;
 };
 
-struct _MidgardQuerySimpleConstraintPrivate {
-	void	(*add_conditions_to_statement)	(MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *self, 
+struct _MidgardQueryConstraintSimplePrivate {
+	void	(*add_conditions_to_statement)	(MidgardQueryExecutor *executor, MidgardQueryConstraintSimple *self, 
 			GdaSqlStatement *stm, GdaSqlExpr *where_expr_node);
 };
 

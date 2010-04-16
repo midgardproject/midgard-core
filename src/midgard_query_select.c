@@ -37,7 +37,7 @@ midgard_query_select_new (MidgardConnection *mgd, MidgardQueryStorage *storage)
 }
 
 gboolean
-_midgard_query_select_set_constraint (MidgardQueryExecutor *self, MidgardQuerySimpleConstraint *constraint)
+_midgard_query_select_set_constraint (MidgardQueryExecutor *self, MidgardQueryConstraintSimple *constraint)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (constraint != NULL, FALSE);
@@ -391,7 +391,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)
-		MIDGARD_QUERY_SIMPLE_CONSTRAINT_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement (
+		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement (
 				MIDGARD_QUERY_EXECUTOR (self), MIDGARD_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where);
 	else 
 		__add_dummy_constraint (sss, operation); /* no constraints, add dummy WHERE 1=1 */	

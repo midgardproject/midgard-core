@@ -20,7 +20,7 @@
 #include "midgard_query_property.h"
 #include "midgard_query_storage.h"
 #include "midgard_query_holder.h"
-#include "midgard_query_simple_constraint.h"
+#include "midgard_query_constraint_simple.h"
 #include "midgard_dbobject.h"
 #include "midgard_core_query.h"
 #include "midgard_core_object_class.h"
@@ -149,8 +149,8 @@ midgard_query_constraint_set_operator (MidgardQueryConstraint *self, const gchar
 
 static GObjectClass *parent_class = NULL;
 
-MidgardQuerySimpleConstraint**
-_midgard_query_constraint_list_constraints (MidgardQuerySimpleConstraint *self, guint *n_objects)
+MidgardQueryConstraintSimple**
+_midgard_query_constraint_list_constraints (MidgardQueryConstraintSimple *self, guint *n_objects)
 {
 	return NULL;
 }
@@ -194,9 +194,9 @@ __set_expression_value (GValue *dest, GValue *src)
 }
 
 void 
-_midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQuerySimpleConstraint *simple_constraint, GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node)
+_midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQueryConstraintSimple *constraint_simple, GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node)
 {	
-	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (simple_constraint);
+	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (constraint_simple);
 	//GdaConnection *cnc = executor->priv->mgd->priv->connection;
 	MidgardDBObjectClass *dbklass = NULL;
        	if (self->priv->storage) {
@@ -212,7 +212,7 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 
 	/* Get field name */
 	GValue field_value = {0, };
-	midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (MIDGARD_QUERY_CONSTRAINT (simple_constraint)->priv->property_value), &field_value);
+	midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (MIDGARD_QUERY_CONSTRAINT (constraint_simple)->priv->property_value), &field_value);
 
 	GdaSqlStatementSelect *select = stmt->contents;
 	GdaSqlExpr *top_where, *where, *expr;
@@ -238,7 +238,7 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	gchar *table_alias_field;
 	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
 	table_alias_field = midgard_core_query_compute_constraint_property (executor, 
-			MIDGARD_QUERY_CONSTRAINT (simple_constraint)->priv->storage, g_value_get_string (&field_value));
+			MIDGARD_QUERY_CONSTRAINT (constraint_simple)->priv->storage, g_value_get_string (&field_value));
 	if (!table_alias_field)
 		g_warning ("Null table.field alias for given '%s'", g_value_get_string (&field_value));
 	/* TODO, handle error case when table_alias_field is NULL */
@@ -249,7 +249,7 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 
 	/* Create value */
 	GValue val = {0, };
-	midgard_query_holder_get_value (MIDGARD_QUERY_CONSTRAINT (simple_constraint)->priv->holder, &val);
+	midgard_query_holder_get_value (MIDGARD_QUERY_CONSTRAINT (constraint_simple)->priv->holder, &val);
 	/*GType v_type = G_VALUE_TYPE (&val);
 	//FIXME, create parameter name::type */
 	//GValue *dval = gda_value_new (G_TYPE_STRING);
@@ -263,10 +263,10 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 }
 
 static void
-midgard_query_constraint_init (MidgardQuerySimpleConstraintIFace *iface)
+midgard_query_constraint_init (MidgardQueryConstraintSimpleIFace *iface)
 {
 	iface->list_constraints = _midgard_query_constraint_list_constraints;
-	iface->priv = g_new (MidgardQuerySimpleConstraintPrivate, 1);
+	iface->priv = g_new (MidgardQueryConstraintSimplePrivate, 1);
 	iface->priv->add_conditions_to_statement = _midgard_query_constraint_add_conditions_to_statement;
 	return;
 }
@@ -346,7 +346,7 @@ midgard_query_constraint_get_type (void)
 		};
 
   		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryConstraint", &info, 0);
-		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_SIMPLE_CONSTRAINT, &property_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_CONSTRAINT_SIMPLE, &property_info);
     	}
     	return type;
 }

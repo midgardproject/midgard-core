@@ -24,7 +24,7 @@
 #include "midgard_query_property.h"
 #include "midgard_query_storage.h"
 #include "midgard_query_constraint.h"
-#include "midgard_query_simple_constraint.h"
+#include "midgard_query_constraint_simple.h"
 
 G_BEGIN_DECLS
 
@@ -49,15 +49,15 @@ struct _MidgardQueryGroupConstraint {
 
 struct _MidgardQueryGroupConstraintClass {
 	GObjectClass parent;
-	MidgardQuerySimpleConstraint	**(*list_constraints)	(MidgardQueryGroupConstraint *self, guint *n_objects);
+	MidgardQueryConstraintSimple	**(*list_constraints)	(MidgardQueryGroupConstraint *self, guint *n_objects);
 };
 
 GType 				midgard_query_group_constraint_get_type		(void);
-MidgardQueryGroupConstraint  	*midgard_query_group_constraint_new 		(const gchar *type, MidgardQuerySimpleConstraint *constraint, ...);
+MidgardQueryGroupConstraint  	*midgard_query_group_constraint_new 		(const gchar *type, MidgardQueryConstraintSimple *constraint, ...);
 const gchar 			*midgard_query_group_constraint_get_group_type	(MidgardQueryGroupConstraint *self);
 gboolean			midgard_query_group_constraint_set_group_type		(MidgardQueryGroupConstraint *self, const gchar *type);
-gboolean			midgard_query_group_constraint_add_constraint	(MidgardQueryGroupConstraint *self, MidgardQuerySimpleConstraint *constraint, ...);
-MidgardQuerySimpleConstraint 	**midgard_query_group_constraint_list_constraints (MidgardQueryGroupConstraint *self, guint *n_objects);
+gboolean			midgard_query_group_constraint_add_constraint	(MidgardQueryGroupConstraint *self, MidgardQueryConstraintSimple *constraint, ...);
+MidgardQueryConstraintSimple 	**midgard_query_group_constraint_list_constraints (MidgardQueryGroupConstraint *self, guint *n_objects);
 
 G_END_DECLS
 

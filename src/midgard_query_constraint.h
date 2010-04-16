@@ -23,7 +23,7 @@
 #include "midgard_query_holder.h"
 #include "midgard_query_property.h"
 #include "midgard_query_storage.h"
-#include "midgard_query_simple_constraint.h"
+#include "midgard_query_constraint_simple.h"
 
 G_BEGIN_DECLS
 
@@ -48,7 +48,7 @@ struct _MidgardQueryConstraint {
 
 struct _MidgardQueryConstraintClass {
 	GObjectClass parent;
-	MidgardQuerySimpleConstraint	**(*list_constraints)	(MidgardQueryConstraint *self, guint *n_objects);
+	MidgardQueryConstraintSimple	**(*list_constraints)	(MidgardQueryConstraint *self, guint *n_objects);
 };
 
 GType 			midgard_query_constraint_get_type	(void);
