@@ -882,6 +882,7 @@ gboolean midgard_connection_open_config(
 		return FALSE;
 	}
 
+	g_object_ref(config);
 	self->priv->config = config;
 
 	GHashTable *hash = NULL;
