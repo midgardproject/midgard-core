@@ -375,7 +375,7 @@ __midgard_user_get (MidgardConnection *mgd, guint n_params, const GParameter *pa
 	MidgardUser *self = g_object_new (MIDGARD_TYPE_USER, NULL);
 	MGD_OBJECT_CNC (self) = mgd;
 
-	klass->dbpriv->__set_from_sql (MIDGARD_DBOBJECT (self), model, 0);
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql (MIDGARD_DBOBJECT (self), model, 0);
 
 	return self;
 }
@@ -476,7 +476,7 @@ __midgard_user_query (MidgardConnection *mgd, guint n_params, const GParameter *
 	
 		users[i] = g_object_new (MIDGARD_TYPE_USER, NULL);
 		MIDGARD_DBOBJECT (users[i])->dbpriv->mgd = mgd;
-		klass->dbpriv->__set_from_sql (MIDGARD_DBOBJECT (users[i]), model, i);
+		MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql (MIDGARD_DBOBJECT (users[i]), model, i);
 	}
 
 	users[i] = NULL;
@@ -595,13 +595,13 @@ __midgard_user_create (MidgardUser *self)
 	/* Set correct auth type id */
 
 	/* Create record */
-	self->dbpriv->guid = midgard_guid_new (mgd);
+	MIDGARD_DBOBJECT (self)->dbpriv->guid = midgard_guid_new (mgd);
 
 	if (midgard_core_query_create_dbobject_record (MIDGARD_DBOBJECT (self)))
 		return TRUE;
 
-	g_free ( (gchar *)self->dbpriv->guid);
-	self->dbpriv->guid = NULL;
+	g_free ( (gchar *)MIDGARD_DBOBJECT (self)->dbpriv->guid);
+	MIDGARD_DBOBJECT (self)->dbpriv->guid = NULL;
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_INTERNAL);
 
@@ -814,8 +814,8 @@ __midgard_user_delete (MidgardUser *self)
 	}
 
 	/* Set empty guid */
-	g_free ((gchar *)self->dbpriv->guid);
-	self->dbpriv->guid = NULL;
+	g_free ((gchar *)MIDGARD_DBOBJECT (self)->dbpriv->guid);
+	MIDGARD_DBOBJECT (self)->dbpriv->guid = NULL;
 
 	return TRUE;
 }
@@ -1017,12 +1017,12 @@ gboolean midgard_user_set_active(MidgardUser *self, gboolean flag)
 {
 	g_assert(self != NULL);
 
-	if(!self->dbpriv->mgd) {
+	if(!MIDGARD_DBOBJECT (self)->dbpriv->mgd) {
 		g_warning("Can not set activity for user without person assigned");
 		return FALSE;
 	}
 
-	MidgardConnection *mgd = self->dbpriv->mgd;
+	MidgardConnection *mgd = MIDGARD_DBOBJECT (self)->dbpriv->mgd;
 	MidgardUser *user = MIDGARD_USER(mgd->priv->user);
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
@@ -1045,7 +1045,7 @@ gboolean midgard_user_set_active(MidgardUser *self, gboolean flag)
 	g_string_append_printf(sql, 
 			"active = %d WHERE guid = '%s' ",
 			active,
-			self->dbpriv->guid); 
+			MIDGARD_DBOBJECT (self)->dbpriv->guid); 
 			
 	
 	gint rv =  midgard_core_query_execute(mgd, sql->str, FALSE);
@@ -1077,7 +1077,7 @@ static void __set_from_sql(MidgardDBObject *object,
 	/* GUID */
 	value = midgard_data_model_get_value_at_col_name (model, "guid", row);
 	if (value)
-		self->dbpriv->guid = g_value_dup_string (value);
+		MIDGARD_DBOBJECT (self)->dbpriv->guid = g_value_dup_string (value);
 
 	/* LOGIN */
 	value = midgard_data_model_get_value_at_col_name (model, "login", row);
@@ -1248,7 +1248,7 @@ static void _midgard_user_finalize(GObject *object)
 	
 	MidgardUser *self = (MidgardUser *) object;
 	
-	if (self && (self->dbpriv && self->priv->is_logged))
+	if (self && (MIDGARD_DBOBJECT (self)->dbpriv && self->priv->is_logged))
 		(void) midgard_user_log_out (self);
 
 	g_free (self->priv->auth_type);
@@ -1329,7 +1329,7 @@ _midgard_user_get_property (GObject *object, guint property_id,
 	switch (property_id) {
 		
 		case MIDGARD_USER_GUID:
-			g_value_set_string(value, self->dbpriv->guid);
+			g_value_set_string(value, MIDGARD_DBOBJECT (self)->dbpriv->guid);
 			break;
 
 		case MIDGARD_USER_LOGIN:
@@ -1591,18 +1591,18 @@ static void _midgard_user_class_init(
 	/* This must be replaced with GDA classes */
 	type_attr->sql_select_full = g_strdup("guid, login, password, auth_type as authtype, auth_type_id as authtypeid, active, person_guid as person, user_type AS usertype");
 
-	klass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
-	klass->dbpriv->storage_data = type_attr;
-	klass->dbpriv->storage_data->table = g_strdup(MIDGARD_USER_TABLE);
-	klass->dbpriv->storage_data->tables = g_strdup(MIDGARD_USER_TABLE);
-	klass->dbpriv->has_metadata = FALSE;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv = g_new(MidgardDBObjectPrivate, 1);
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data = type_attr;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data->table = g_strdup(MIDGARD_USER_TABLE);
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data->tables = g_strdup(MIDGARD_USER_TABLE);
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->has_metadata = FALSE;
 
-	klass->dbpriv->__set_from_sql = __set_from_sql;
-	klass->dbpriv->set_from_sql = NULL;
-	klass->dbpriv->create_storage = midgard_core_query_create_class_storage;	
-	klass->dbpriv->update_storage = midgard_core_query_update_class_storage;
-	klass->dbpriv->storage_exists = _user_storage_exists; 
-	klass->dbpriv->delete_storage = _user_storage_delete;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql = __set_from_sql;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_sql = NULL;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->create_storage = midgard_core_query_create_class_storage;	
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->update_storage = midgard_core_query_update_class_storage;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_exists = _user_storage_exists; 
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->delete_storage = _user_storage_delete;
 }
 
 static void _midgard_user_instance_init(

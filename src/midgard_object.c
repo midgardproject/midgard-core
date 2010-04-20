@@ -112,16 +112,6 @@ __midgard_object_instance_init (GTypeInstance *instance, gpointer g_class)
 	self->priv->imported = NULL;
 	self->priv->parameters = NULL;
 	self->priv->_params = NULL;
-
-	/* Initialize metadata object, if enabled. */
-	/* FIXME, move it to dbpriv virtual method */
-	if (MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (g_class))) {
-		self->metadata = midgard_metadata_new (self);
-		/* Add weak reference */
-		g_object_add_weak_pointer (G_OBJECT (self), (gpointer) self->metadata);	
-	} else {
-		self->metadata = NULL;
-	}
 }
                 
 /* AB: This is shortcut macro for traversing through class hierarchy (from child to ancestor)
@@ -1404,6 +1394,12 @@ __mgdschema_object_constructor (GType type,
 
 	g_free(pspecs);
 
+	if (MGD_TYPE_ATTR_METADATA_CLASS (type_attr)) {
+		MIDGARD_DBOBJECT (object)->dbpriv->metadata = midgard_metadata_new (MIDGARD_DBOBJECT (object));
+		/* Add weak reference */
+		g_object_add_weak_pointer (object, (gpointer) MIDGARD_DBOBJECT (object)->dbpriv->metadata);
+	}
+	
 	return object;
 }
 
@@ -1515,8 +1511,7 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 
 
 	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (klass);
-
-	//klass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
+	
 	dbklass->dbpriv->create_storage = NULL;
 	dbklass->dbpriv->update_storage = NULL;
 	dbklass->dbpriv->delete_storage = NULL;

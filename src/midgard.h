@@ -60,6 +60,7 @@
 #include <midgard/midgard_query_constraint_group.h>
 #include <midgard/midgard_reflector_object.h>
 #include <midgard/midgard_reflector_property.h>
+#include <midgard/midgard_schema_object_factory.h>
 
 #endif /* _MIDGARD_API_H_ */
 

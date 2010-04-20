@@ -119,9 +119,9 @@ midgard_schema_object_factory_get_object_by_guid (MidgardConnection *mgd, const 
     			g_value_set_string (&pval, guid);
 			object = midgard_object_new (mgd, g_value_get_string ((GValue*)type_value), &pval);
 	   		g_value_unset (&pval);
-
-			if (!object)
+			if (!object) {
 				MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
+		       	}
 			break;
 	}
 	

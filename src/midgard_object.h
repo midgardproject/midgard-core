@@ -40,7 +40,6 @@ struct _MidgardObject {
 	MidgardDBObject parent;
 
 	/* <private> */
-	//MidgardDBObjectPrivate *dbpriv;
 	MidgardObjectPrivate *priv;	
 	MidgardMetadata *metadata;	
 };
@@ -49,7 +48,6 @@ struct _MidgardObjectClass {
 	MidgardDBObjectClass parent;
 	
 	/* private */
-	//MidgardDBObjectPrivate *dbpriv;
 	MidgardObjectClassPrivate *priv;
 
 	/* methods */

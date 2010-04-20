@@ -43,8 +43,6 @@ typedef struct _MidgardUserPrivate MidgardUserPrivate;
 
 struct _MidgardUserClass{
 	MidgardDBObjectClass parent;
-
-	MidgardDBObjectPrivate *dbpriv;
 	
 	/* methods */
 	const MidgardConnection *(*get_connection) (MidgardDBObject *);
@@ -64,7 +62,7 @@ struct _MidgardUserClass{
 
 struct _MidgardUser{
 	MidgardDBObject parent;
-	MidgardDBObjectPrivate *dbpriv;
+
 	/* < private > */
 	MidgardUserPrivate *priv;
 	/* MidgardMetadata *metadata; */

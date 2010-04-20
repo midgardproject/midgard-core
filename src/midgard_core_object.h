@@ -58,6 +58,8 @@ struct _MidgardDBObjectPrivate {
 #define MGD_OBJECT_GUID(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->guid
 #define MGD_OBJECT_CNC(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->mgd
 
+#define MGD_DBOBJECT_DBPRIV (__obj) MIDGARD_DBOBJECT(__obj)->dbpriv
+#define MGD_DBOBJECT_HAS_METADATA (__obj) MGD_TYPE_ATTR_METADATA_CLASS(MGD_DBOBJECT_DBPRIV(__obj)->storage_data) ? TRUE : FALSE; 
 #define MGD_DBOBJECT_METADATA(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->metadata
 #define MGD_DBCLASS_METADATA_CLASS(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->metadata_class_ptr
 #define MGD_DBCLASS_PROPERTY_UP(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->property_up

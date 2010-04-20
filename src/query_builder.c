@@ -555,7 +555,7 @@ static GList *midgard_query_builder_execute_or_count(MidgardQueryBuilder *builde
 
 			GValue gval = {0, };
 			g_value_init(&gval, G_TYPE_STRING);
-			g_value_set_string(&gval, user->dbpriv->guid);
+			g_value_set_string(&gval, MIDGARD_DBOBJECT (user)->dbpriv->guid);
 
 			midgard_query_builder_add_constraint(builder, "guid", "=", &gval);
 		}
