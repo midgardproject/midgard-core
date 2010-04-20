@@ -15,7 +15,7 @@ midgard_test_schema_object_factory_get_object_by_guid (MidgardObjectTest *mot, g
 	g_assert (new_object != NULL);
 
 	/* Check object's type */
-	g_assert_cmpstr (G_OBJECT_TYPE_NAME (object), !=, G_OBJECT_TYPE_NAME (new_object));
+	g_assert_cmpstr (G_OBJECT_TYPE_NAME (object), ==, G_OBJECT_TYPE_NAME (new_object));
 	g_assert (new_object);
 		
 	/* Check object which doesn't exist */

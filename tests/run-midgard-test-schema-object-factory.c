@@ -42,9 +42,14 @@ int main (int argc, char *argv[])
 				|| g_str_equal(typename, "midgard_parameter"))
 			continue;
 
+		/* FIXME, ignore dependent objects for a while*/
+		if (midgard_reflector_object_get_property_parent (typename))
+			continue;
+
 		object = midgard_test_object_basic_new (mgd_global, typename, NULL);
 		g_assert (object != NULL);
 		gboolean object_created = midgard_object_create (object);
+		MIDGARD_TEST_ERROR_OK(mgd_global);
 		g_assert (object_created != FALSE);
 
 		testname = g_strconcat ("/midgard_schema_object_factory/", typename, "/get_by_guid", NULL);

@@ -5,8 +5,8 @@
 #include "midgard_test_connection.h"
 
 #define MIDGARD_TEST_ERROR_OK(__mgd) \
-	g_assert_cmpstr(midgard_connection_get_error_string(mgd), ==, "MGD_ERR_OK"); \
-	g_assert_cmpint(midgard_connection_get_error(mgd), ==, MGD_ERR_OK);
+	g_assert_cmpstr(midgard_connection_get_error_string(__mgd), ==, "MGD_ERR_OK"); \
+	g_assert_cmpint(midgard_connection_get_error(__mgd), ==, MGD_ERR_OK);
 
 #define MIDGARD_TEST_ERROR_STRING_ASSERT(__mgd, errcode) \
 	g_assert_cmpint(midgard_connection_get_error(mgd), ==, errcode); \
