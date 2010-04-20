@@ -96,8 +96,7 @@ void midgard_test_object_basic_create(MidgardObjectTest *mot, gconstpointer data
 	}
 
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);
-	const gchar *parent_property = midgard_object_class_get_property_parent(klass);
-	const gchar *up_property = midgard_object_class_get_property_up(klass);
+	const gchar *parent_property = midgard_reflector_object_get_property_parent (G_OBJECT_CLASS_NAME (klass));
 	gboolean object_created = FALSE;
 
 	if (parent_property) {
@@ -155,13 +154,12 @@ void midgard_test_object_basic_update(MidgardObjectTest *mot, gconstpointer data
 {
 	g_assert(mot != NULL);
 
-	MidgardObject *object = mot->object;	
-	MidgardConnection *mgd = mot->mgd;
+	_MGD_TEST_MOT (mot);
 
-	gboolean object_updated = midgard_object_update(object);
+	gboolean object_updated = midgard_object_update (object);
 
-	g_assert(object_updated == TRUE);
-	MIDGARD_TEST_ERROR_OK(mgd);
+	g_assert (object_updated == TRUE);
+	MIDGARD_TEST_ERROR_OK (mgd);
 	
 	/* Check known metadata properties */
 	midgard_test_metadata_check_update(object);
@@ -194,7 +192,7 @@ void midgard_test_object_basic_delete(MidgardObjectTest *mot, gconstpointer data
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
 	gboolean object_deleted = midgard_object_delete(object);
@@ -235,7 +233,7 @@ void midgard_test_object_basic_purge(MidgardObjectTest *mot, gconstpointer data)
 	const gchar *class_name = G_OBJECT_TYPE_NAME(mot->object);
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (mot->object);
 
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
 	GObject **objects = midgard_test_query_builder_list_all_unlocked(mgd, class_name);
@@ -417,7 +415,7 @@ void midgard_test_object_basic_lock(MidgardObjectTest *mot, gconstpointer data)
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
 	gboolean object_islocked = midgard_object_is_locked(object);
@@ -476,7 +474,7 @@ void midgard_test_object_basic_unlock(MidgardObjectTest *mot, gconstpointer data
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
 	gboolean object_islocked = midgard_object_is_locked(object);
@@ -535,7 +533,7 @@ void midgard_test_object_basic_approve(MidgardObjectTest *mot, gconstpointer dat
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
 	gboolean object_isapproved = midgard_object_is_approved(object);
@@ -595,7 +593,7 @@ void midgard_test_object_basic_unapprove(MidgardObjectTest *mot, gconstpointer d
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
 	gboolean object_isapproved = midgard_object_is_approved(object);

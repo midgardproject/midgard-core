@@ -523,7 +523,7 @@ midgard_test_user_logout (MidgardUserTest *mut, gconstpointer data)
 	/* Check empty user logout */
 	if (g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
 		MidgardUser *empty = midgard_user_new (mgd, 0, NULL);
-		gboolean empty_user_logout = midgard_user_log_out (empty);
+		midgard_user_log_out (empty);
 	}
 	// this test is supposed to "abort", which is equivalent to failure in g_test terms
 	g_test_trap_assert_failed();

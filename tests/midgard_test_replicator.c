@@ -401,7 +401,7 @@ void
 midgard_test_replicator_unserialize (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
-
+	const gchar *classname = G_OBJECT_TYPE_NAME (object);
 	gchar *object_xml_content = _read_object_xml_file (G_OBJECT(object));
 	
 	g_assert(object_xml_content != NULL);
@@ -459,7 +459,7 @@ midgard_test_replicator_unserialize (MidgardObjectTest *mot, gconstpointer data)
 
 	g_free(pspecs);
 
-	if (!midgard_object_class_has_metadata (MIDGARD_OBJECT_GET_CLASS (object))) {
+	if (!midgard_reflector_object_has_metadata_class (classname)) {
 	
 		i = 0;
 		while (objects[i] != NULL) {
@@ -531,8 +531,9 @@ midgard_test_replicator_object_delete (MidgardObjectTest *mot, gconstpointer dat
 void midgard_test_replicator_export_created (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
+	const gchar *classname = G_OBJECT_TYPE_NAME (object);
 
-	if (!midgard_object_class_has_metadata (MIDGARD_OBJECT_GET_CLASS (object)))
+	if (!midgard_reflector_object_has_metadata_class (classname))
 		return;
 
 	/* Initialize GValue of MIDGARD_TYPE_TIMESTAMP */
@@ -569,8 +570,9 @@ void midgard_test_replicator_export_created (MidgardObjectTest *mot, gconstpoint
 void midgard_test_replicator_export_updated (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
+	const gchar *classname = G_OBJECT_TYPE_NAME (object);
 
-	if (!midgard_object_class_has_metadata (MIDGARD_OBJECT_GET_CLASS (object)))
+	if (!midgard_reflector_object_has_metadata_class (classname))
 		return;
 
 	/* Initialize GValue of MIDGARD_TYPE_TIMESTAMP */
@@ -696,8 +698,9 @@ void midgard_test_replicator_export_media(MidgardObjectTest *mot, gconstpointer 
 void midgard_test_replicator_import_object_already_imported(MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT(mot);
+	const gchar *classname = G_OBJECT_TYPE_NAME (object);
 
-	if (!midgard_object_class_has_metadata (MIDGARD_OBJECT_GET_CLASS (object)))
+	if (!midgard_reflector_object_has_metadata_class (classname))
 		return;
 
 	gboolean midgard_object_imported = midgard_replicator_import_object (MIDGARD_DBOBJECT (object), FALSE);

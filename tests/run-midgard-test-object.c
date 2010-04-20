@@ -21,7 +21,7 @@
 static MidgardConnection *mgd_global = NULL;
 
 _MGD_TEST_OBJECT_SETUP
-_MGD_TEST_OBJECT_TEARDOWN
+//_MGD_TEST_OBJECT_TEARDOWN
 
 int main (int argc, char *argv[])
 {
@@ -43,8 +43,8 @@ int main (int argc, char *argv[])
 	GType *all_types = g_type_children(MIDGARD_TYPE_OBJECT, &n_types);
 
 	MidgardConfig *config = NULL;
-	guint loghandler =
-		g_log_set_handler("midgard-core", G_LOG_LEVEL_MASK, midgard_error_default_log, NULL);
+	/* guint loghandler =
+		g_log_set_handler("midgard-core", G_LOG_LEVEL_MASK, midgard_error_default_log, NULL); */
 	mgd_global = midgard_test_connection_open_user_config(CONFIG_CONFIG_NAME, &config);
 	/* midgard_connection_set_loglevel(mgd_global, "debug", NULL); */
 	MidgardUser *user = midgard_user_quick_login (mgd_global, "admin", "password");
@@ -175,9 +175,9 @@ int main (int argc, char *argv[])
 				midgard_test_object_basic_delete, midgard_test_teardown_foo);
 		g_free(testname);
 
-		testname = g_strconcat("/midgard_object_class/", typename, "/get_object_by_guid_deleted", NULL);
+		testname = g_strconcat("/midgard_schema_object_factory/", typename, "/get_object_by_guid_deleted", NULL);
 		g_test_add(testname, MidgardObjectTest, object, midgard_test_setup,  
-				midgard_test_object_class_get_object_by_guid_deleted, midgard_test_teardown_foo);
+				midgard_test_schema_object_factory_get_object_by_guid_deleted, midgard_test_teardown_foo);
 		g_free(testname);
 	
 		/*testname = g_strconcat("/midgard_replicator/", typename, "/serialize", NULL);

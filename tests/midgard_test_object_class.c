@@ -59,24 +59,3 @@ void midgard_test_object_class_undelete(MidgardObjectTest *mot, gconstpointer da
 
 	g_free(objects);
 }
-
-void midgard_test_object_class_get_object_by_guid_deleted (MidgardObjectTest *mot, gconstpointer data)
-{
-	g_assert(mot != NULL);
-	
-	MidgardConnection *mgd = mot->mgd;
-	MidgardObject *object = mot->object;
-
-	g_return_if_fail (object != NULL);
-
-	g_test_bug ("#1513");
-
-	gchar *guid;
-	g_object_get (G_OBJECT (object), "guid", &guid, NULL);
-
-	MidgardObject *deleted_object = midgard_object_class_get_object_by_guid (mgd, (const gchar *)guid);
-	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OBJECT_DELETED);
-	g_assert (deleted_object == NULL);
-
-	g_free (guid);
-}

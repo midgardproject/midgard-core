@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+ACLOCAL_AMFLAGS = -I m4
+
 bin_PROGRAMS = 
 	
 nobase_CPPFLAGS = \
@@ -26,6 +28,8 @@ nobase_SOURCES = \
 	midgard_test_replicator.c \
 	midgard_test_replicator_import.c \
 	midgard_test_query_builder.c \
+	midgard_test_schema_object_factory.c \
+	midgard_test_storage.c \
 	midgard_test_user.c
 
 #midgard_test_SOURCES = midgard_test.c $(nobase_SOURCES)
@@ -59,6 +63,11 @@ TEST_PROGS	+= run-midgard-test-tree
 bin_PROGRAMS	+= run-midgard-test-tree
 run_midgard_test_tree_SOURCES = run-midgard-test-tree.c $(nobase_SOURCES)
 run_midgard_test_tree_CPPFLAGS = $(nobase_CPPFLAGS)
+
+TEST_PROGS	+= run-midgard-test-schema-object-factory
+bin_PROGRAMS	+= run-midgard-test-schema-object-factory
+run_midgard_test_schema_object_factory_SOURCES = run-midgard-test-schema-object-factory.c $(nobase_SOURCES)
+run_midgard_test_schema_object_factory_CPPFLAGS = $(nobase_CPPFLAGS)
 
 TEST_PROGS	+= run-midgard-test-user
 bin_PROGRAMS	+= run-midgard-test-user

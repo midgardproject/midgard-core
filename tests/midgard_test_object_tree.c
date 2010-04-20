@@ -35,10 +35,11 @@ void midgard_test_object_tree_basic(MidgardObjectTest *mot, gconstpointer data)
 	g_assert(pklass != NULL);
 
 	/* There is tree parent declared so parent property can not be NULL */
-	const gchar *parent_property = midgard_object_class_get_property_parent(klass);
+	const gchar *parent_property = midgard_reflector_object_get_property_parent (G_OBJECT_CLASS_NAME (klass));
 	g_assert(parent_property != NULL);
 
-	MidgardObjectClass **children = midgard_object_class_list_children(pklass);
+	guint n_child;
+	gchar **children = midgard_reflector_object_list_children (G_OBJECT_CLASS_NAME (pklass), &n_child);
 	g_assert(children != NULL);
 
 	guint i = 0;
@@ -46,7 +47,7 @@ void midgard_test_object_tree_basic(MidgardObjectTest *mot, gconstpointer data)
 	
 	while(children[i] != NULL) {
 
-		if(G_OBJECT_CLASS_TYPE(children[i]) == G_OBJECT_CLASS_TYPE(klass))
+		if(G_OBJECT_CLASS_TYPE(g_type_from_name (children[i])) == G_OBJECT_CLASS_TYPE(klass))
 			has_child_class = TRUE;
 		i++;
 	}
@@ -73,7 +74,7 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	g_assert(pklass != NULL);
 
 	/* Check if class has unique property */
-	const gchar *unique_name = midgard_object_class_get_property_unique(klass);
+	const gchar *unique_name = midgard_reflector_object_get_property_unique (G_OBJECT_CLASS_NAME (klass));
 
 	if (!unique_name)
 		return;
@@ -87,7 +88,7 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	g_object_set(object, unique_name, "", NULL);
 
 	/* Workaround */
-	const gchar *parent_property = midgard_object_class_get_property_parent(klass);
+	const gchar *parent_property = midgard_reflector_object_get_property_parent (G_OBJECT_CLASS_NAME (klass));
 	
 	if (parent_property)
 		g_object_set(object, parent_property, 1, NULL);
@@ -104,7 +105,7 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	g_object_set(object, "name", "", NULL);
 
 	/* Workaround */
-	parent_property = midgard_object_class_get_property_parent(klass);
+	parent_property = midgard_reflector_object_get_property_parent (G_OBJECT_CLASS_NAME (klass));
 	
 	if (parent_property)
 		g_object_set(object, parent_property, 1, NULL);
@@ -122,7 +123,7 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	g_object_set(object, unique_name, "Unique", NULL);
 
 	/* Workaround */
-	parent_property = midgard_object_class_get_property_parent(klass);
+	parent_property = midgard_reflector_object_get_property_parent (G_OBJECT_CLASS_NAME (klass));
 	
 	if (parent_property)
 		g_object_set(object, parent_property, 1, NULL);
@@ -135,7 +136,7 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	g_object_set(dupobject, unique_name, "Unique", NULL);
 	
 	/* Workaround */
-	parent_property = midgard_object_class_get_property_parent(klass);
+	parent_property = midgard_reflector_object_get_property_parent (G_OBJECT_CLASS_NAME (klass));
 	
 	if (parent_property)
 		g_object_set(dupobject, parent_property, 1, NULL);
@@ -164,8 +165,8 @@ void midgard_test_object_tree_get_parent(MidgardObjectTest *mot, gconstpointer d
 	 * We just validate tree logic here. Real example with object fetching should be covered by 
 	 * particular, tree optimized tests. Which should be done in fresh&clean database. */
 
-	const gchar *up_property = midgard_object_class_get_property_up (klass);
-	const gchar *parent_property = midgard_object_class_get_property_parent (klass);
+	const gchar *up_property = midgard_reflector_object_get_property_up (G_OBJECT_CLASS_NAME (klass));
+	const gchar *parent_property = midgard_reflector_object_get_property_parent (G_OBJECT_CLASS_NAME (klass));
 	const gchar *parent_name = midgard_object_parent (_object);
 
 	/* Check if there's parent defined */

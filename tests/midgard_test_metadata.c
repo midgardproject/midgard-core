@@ -28,7 +28,7 @@ void __metadata_datetime_empty(const gchar *datetime)
 void midgard_test_metadata_check_new(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
 	MidgardMetadata *metadata;
@@ -199,7 +199,7 @@ void midgard_test_metadata_check_new(MidgardObject *object)
 void midgard_test_metadata_check_create(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 	
 	MidgardMetadata *metadata;
@@ -326,7 +326,7 @@ void midgard_test_metadata_check_create(MidgardObject *object)
 void midgard_test_metadata_check_created(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 	
 	MidgardMetadata *metadata;
@@ -453,7 +453,7 @@ void midgard_test_metadata_check_created(MidgardObject *object)
 void midgard_test_metadata_check_update(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 	
 	MidgardMetadata *metadata;
@@ -575,7 +575,7 @@ void midgard_test_metadata_check_update(MidgardObject *object)
 void midgard_test_metadata_check_updated(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 	
 	MidgardMetadata *metadata;
@@ -697,7 +697,7 @@ void midgard_test_metadata_check_updated(MidgardObject *object)
 void midgard_test_metadata_check_delete(MidgardObject *object)
 {
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 	
 	MidgardMetadata *metadata;
@@ -817,7 +817,7 @@ void midgard_test_metadata_check_person_references(MidgardObject *object, const 
 	g_assert (object != NULL);
 
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 	
 	va_list var_args;
@@ -858,7 +858,7 @@ void midgard_test_metadata_check_datetime_properties(MidgardObject *object, cons
 	g_assert(object != NULL);
 
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 	
 	va_list var_args;

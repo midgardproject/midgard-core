@@ -69,7 +69,7 @@ void midgard_test_object_get_by_id_created(MidgardObjectTest *mot, gconstpointer
 	g_assert(fetched_by_id == TRUE);
 	MIDGARD_TEST_ERROR_OK(mgd);
 
-	if (midgard_object_class_has_metadata (klass)) {
+	if (midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass))) {
 
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
@@ -119,7 +119,7 @@ void midgard_test_object_get_by_id_updated(MidgardObjectTest *mot, gconstpointer
 	g_assert(fetched_by_id == TRUE);
 	MIDGARD_TEST_ERROR_OK(mgd);
 
-	if (midgard_object_class_has_metadata (klass)) {
+	if (midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass))) {
 
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
@@ -162,7 +162,7 @@ void midgard_test_object_get_by_id_deleted(MidgardObjectTest *mot, gconstpointer
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (_object);
 
-	if (!midgard_object_class_has_metadata (klass))
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
 	guint oid = 0;
@@ -208,7 +208,7 @@ void midgard_test_object_constructor_id_created(MidgardObjectTest *mot, gconstpo
 	g_assert(object != NULL);
 	MIDGARD_TEST_ERROR_OK(mgd);
 
-	if (midgard_object_class_has_metadata (klass)) {
+	if (midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass))) {
 	
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
@@ -275,7 +275,7 @@ void midgard_test_object_get_by_guid_created(MidgardObjectTest *mot, gconstpoint
 	g_assert(fetched_by_guid == TRUE);
 	MIDGARD_TEST_ERROR_OK(mgd);
 
-	if (midgard_object_class_has_metadata (klass)) {
+	if (midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass))) {
 	
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
@@ -318,7 +318,7 @@ void midgard_test_object_constructor_guid_created(MidgardObjectTest *mot, gconst
 	MidgardObject *object = midgard_test_object_basic_new(mgd, G_OBJECT_TYPE_NAME(_object), &gval);
 	g_assert(object != NULL);
 
-	if (midgard_object_class_has_metadata (klass)) {
+	if (midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass))) {
 		
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);

@@ -19,10 +19,10 @@
 #include "midgard_test_query_builder.h"
 #include "midgard_test_object_basic.h"
 
-GObject **midgard_test_query_builder_list_all_unlocked(MidgardConnection *mgd, const gchar *name)
-{
-	MidgardObjectClass *klass = g_type_class_peek (g_type_from_name (name));
-	if (!midgard_object_class_has_metadata (klass))
+GObject**
+midgard_test_query_builder_list_all_unlocked (MidgardConnection *mgd, const gchar *name)
+{	
+	if (!midgard_reflector_object_has_metadata_class (name))
 		return NULL;
 
 	MidgardQueryBuilder *builder =

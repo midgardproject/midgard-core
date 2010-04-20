@@ -12,6 +12,8 @@
 #include "midgard_test_replicator.h"
 #include "midgard_test_replicator_import.h"
 #include "midgard_test_user.h"
+#include "midgard_test_schema_object_factory.h"
+#include "midgard_test_storage.h"
 
 #define MGD_TEST_SITEGROUP_NAME "midgard_test_sitegroup"
 #define MIDGARD_TRAC_TICKET_BASE_URL "http:/""/trac.midgard-project.org/ticket/"

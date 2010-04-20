@@ -25,7 +25,6 @@ gboolean midgard_test_database_create(MidgardConnection *mgd)
 	guint n_types, i;
 	const gchar *typename;
 	MidgardObjectClass *klass = NULL;
-	gboolean class_table_updated;
        	gboolean class_table_exists;
 	gboolean class_table_created;
 	GType *all_types = g_type_children(MIDGARD_TYPE_OBJECT, &n_types);
@@ -44,10 +43,10 @@ gboolean midgard_test_database_create(MidgardConnection *mgd)
 		typename = g_type_name(all_types[i]);
 		klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME(typename);
 
-		class_table_created = midgard_storage_create_class_storage(mgd, MIDGARD_DBOBJECT_CLASS (klass));
+		class_table_created = midgard_storage_create(mgd, typename);
 		g_assert(class_table_created == TRUE);
 
-		class_table_exists = midgard_storage_class_storage_exists(mgd, MIDGARD_DBOBJECT_CLASS (klass));
+		class_table_exists = midgard_storage_exists(mgd, typename);
 		g_assert(class_table_exists == TRUE);		
 	}
 	
@@ -77,10 +76,10 @@ gboolean midgard_test_database_update(MidgardConnection *mgd)
 		typename = g_type_name(all_types[i]);
 		klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME(typename);
 
-		updated = midgard_storage_update_class_storage (mgd, MIDGARD_DBOBJECT_CLASS (klass));
-		g_assert(created == TRUE);
+		updated = midgard_storage_update (mgd, typename);
+		g_assert(updated == TRUE);
 
-		exists = midgard_storage_class_storage_exists (mgd, MIDGARD_DBOBJECT_CLASS (klass));
+		exists = midgard_storage_exists (mgd, typename);
 		g_assert(exists == TRUE);		
 	}
 	
