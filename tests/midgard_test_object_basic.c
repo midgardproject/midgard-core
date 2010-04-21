@@ -414,9 +414,12 @@ void midgard_test_object_basic_lock(MidgardObjectTest *mot, gconstpointer data)
 	MidgardObject *object = mot->object;
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
+	MidgardMetadata *metadata;
 
 	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
+
+	g_object_get (object, "metadata", &metadata, NULL);
 
 	gboolean object_islocked = midgard_object_is_locked(object);
 	g_assert(object_islocked != TRUE);
@@ -425,7 +428,7 @@ void midgard_test_object_basic_lock(MidgardObjectTest *mot, gconstpointer data)
 	g_assert(locked_value != FALSE);
 
 	gboolean locked_property;
-	g_object_get(object->metadata, "islocked", &locked_property, NULL);
+	g_object_get(metadata, "islocked", &locked_property, NULL);
 	g_assert(locked_property != FALSE);
 
 	object_islocked = midgard_object_is_locked(object);
@@ -438,7 +441,7 @@ void midgard_test_object_basic_lock(MidgardObjectTest *mot, gconstpointer data)
 	gchar *revised = NULL;
 	GValue tval = {0, };
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-	g_object_get_property(G_OBJECT(object->metadata), "revised", &tval);
+	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
 	revised = midgard_timestamp_get_string_from_value(&tval);
 	midgard_test_metadata_check_datetime_properties(object,                      
 			revised, "locked", "revised", NULL);
@@ -477,6 +480,9 @@ void midgard_test_object_basic_unlock(MidgardObjectTest *mot, gconstpointer data
 	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
+	MidgardMetadata *metadata;
+	g_object_get (object, "metadata", &metadata, NULL);
+
 	gboolean object_islocked = midgard_object_is_locked(object);
 	g_assert(object_islocked != FALSE);
 
@@ -484,7 +490,7 @@ void midgard_test_object_basic_unlock(MidgardObjectTest *mot, gconstpointer data
 	g_assert(unlocked_object != FALSE);
 
 	gboolean locked_property;
-	g_object_get(object->metadata, "islocked", &locked_property, NULL);
+	g_object_get(metadata, "islocked", &locked_property, NULL);
 	g_assert(locked_property != TRUE);
 
 	object_islocked = midgard_object_is_locked(object);
@@ -497,7 +503,7 @@ void midgard_test_object_basic_unlock(MidgardObjectTest *mot, gconstpointer data
 	gchar *revised = NULL;
 	GValue tval = {0, };
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-	g_object_get_property(G_OBJECT(object->metadata), "revised", &tval);
+	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
 	revised = midgard_timestamp_get_string_from_value(&tval);
 	midgard_test_metadata_check_datetime_properties(object,                      
 			revised, "locked", "revised", NULL);
@@ -536,6 +542,9 @@ void midgard_test_object_basic_approve(MidgardObjectTest *mot, gconstpointer dat
 	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
+	MidgardMetadata *metadata;
+	g_object_get (object, "metadata", &metadata, NULL);
+
 	gboolean object_isapproved = midgard_object_is_approved(object);
 	g_assert(object_isapproved != TRUE);
 
@@ -543,7 +552,7 @@ void midgard_test_object_basic_approve(MidgardObjectTest *mot, gconstpointer dat
 	g_assert(approve_value != FALSE);
 
 	gboolean approved_property;
-	g_object_get(object->metadata, "isapproved", &approved_property, NULL);
+	g_object_get(metadata, "isapproved", &approved_property, NULL);
 	g_assert(approved_property != FALSE);
 
 	object_isapproved = midgard_object_is_approved(object);
@@ -556,7 +565,7 @@ void midgard_test_object_basic_approve(MidgardObjectTest *mot, gconstpointer dat
 	gchar *revised = NULL;
 	GValue tval = {0, };
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-	g_object_get_property(G_OBJECT(object->metadata), "revised", &tval);
+	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
 	revised = midgard_timestamp_get_string_from_value(&tval);
 	midgard_test_metadata_check_datetime_properties(object,                      
 			revised, "approved", "revised", NULL);
@@ -596,6 +605,9 @@ void midgard_test_object_basic_unapprove(MidgardObjectTest *mot, gconstpointer d
 	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
+	MidgardMetadata *metadata;
+	g_object_get (object, "metadata", &metadata, NULL);
+
 	gboolean object_isapproved = midgard_object_is_approved(object);
 	g_assert(object_isapproved != FALSE);
 
@@ -603,7 +615,7 @@ void midgard_test_object_basic_unapprove(MidgardObjectTest *mot, gconstpointer d
 	g_assert(unapprove_value != FALSE);
 
 	gboolean approved_property;
-	g_object_get(object->metadata, "isapproved", &approved_property, NULL);
+	g_object_get(metadata, "isapproved", &approved_property, NULL);
 	g_assert(approved_property != TRUE);
 
 	object_isapproved = midgard_object_is_approved(object);
@@ -616,7 +628,7 @@ void midgard_test_object_basic_unapprove(MidgardObjectTest *mot, gconstpointer d
 	gchar *revised = NULL;
 	GValue tval = {0, };
 	g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-	g_object_get_property(G_OBJECT(object->metadata), "revised", &tval);
+	g_object_get_property(G_OBJECT(metadata), "revised", &tval);
 	revised = midgard_timestamp_get_string_from_value(&tval);
 	midgard_test_metadata_check_datetime_properties(object,                      
 			revised, "approved", "revised", NULL);

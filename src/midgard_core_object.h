@@ -114,7 +114,7 @@ struct _MidgardMetadataPrivate {
 	gboolean approve_is_set;
 	
 	/* Other sruct members */
-	MidgardObject *object;
+	MidgardDBObject *object;
 };
 
 /* Private structure for Midgard Config object */

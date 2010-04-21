@@ -29,6 +29,8 @@ int main (int argc, char *argv[])
 	mgd_global = midgard_connection_new ();
 	gboolean connection_opened = midgard_connection_open_config (mgd_global, config);
 
+	//midgard_connection_set_loglevel (mgd_global, "debug", NULL);
+
 	/* Create storage for this test */
 	midgard_test_storage_create_test_storage (mgd_global);
 

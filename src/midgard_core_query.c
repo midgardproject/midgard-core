@@ -510,7 +510,7 @@ static void __get_object_properties_lists (MidgardDBObject *object, GSList **nam
 
 	/* Append metadata if exists */
 	if (dbklass->dbpriv->has_metadata) {
-		MidgardMetadata *metadata = object->dbpriv->metadata;
+		MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
 		__get_object_properties_lists (MIDGARD_DBOBJECT (metadata), names, values);
 	}
 

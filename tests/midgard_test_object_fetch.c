@@ -55,9 +55,11 @@ void midgard_test_object_get_by_id_created(MidgardObjectTest *mot, gconstpointer
 	gchar *oguid = NULL;
 	gchar *created = NULL;
 	gchar *creator = NULL;
+	MidgardMetadata *metadata;
 	g_object_get(_object,
 			"id", &oid,
 			"guid", &oguid,
+			"metadata", &metadata,
 			NULL);
 		
 	g_assert_cmpuint(oid, >, 0);
@@ -73,8 +75,8 @@ void midgard_test_object_get_by_id_created(MidgardObjectTest *mot, gconstpointer
 
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-		g_object_get_property(G_OBJECT(_object->metadata), "created", &tval);
-		g_object_get(_object->metadata, "creator", &creator, NULL);
+		g_object_get_property(G_OBJECT(metadata), "created", &tval);
+		g_object_get(metadata, "creator", &creator, NULL);
 		created = midgard_timestamp_get_string_from_value(&tval);
 	
 		midgard_test_metadata_check_created(object);
@@ -104,9 +106,11 @@ void midgard_test_object_get_by_id_updated(MidgardObjectTest *mot, gconstpointer
 	gchar *revisor = NULL;
 	gchar *creator = NULL;
 	gchar *created = NULL;
+	MidgardMetadata *metadata;
 	g_object_get(_object,
 			"id", &oid,
 			"guid", &oguid,
+			"metadata", &metadata,
 			NULL);
 	
 	g_assert_cmpuint(oid, >, 0);
@@ -123,16 +127,16 @@ void midgard_test_object_get_by_id_updated(MidgardObjectTest *mot, gconstpointer
 
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-		g_object_get_property(G_OBJECT(_object->metadata), "created", &tval);	
+		g_object_get_property(G_OBJECT(metadata), "created", &tval);	
 		created = midgard_timestamp_get_string_from_value(&tval);
 		g_value_unset(&tval);
 
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-		g_object_get_property(G_OBJECT(_object->metadata), "revised", &tval);
+		g_object_get_property(G_OBJECT(metadata), "revised", &tval);
 		revised = midgard_timestamp_get_string_from_value(&tval);
 		g_value_unset (&tval);
 
-		g_object_get(_object->metadata,
+		g_object_get(metadata,
 				"revisor", &revisor, 
 				"creator", &creator, 
 				NULL);
@@ -193,9 +197,11 @@ void midgard_test_object_constructor_id_created(MidgardObjectTest *mot, gconstpo
 	gchar *oguid = NULL;
 	gchar *created = NULL;
 	gchar *creator = NULL;
+	MidgardMetadata *metadata;
 	g_object_get(_object,
 			"id", &oid,
 			"guid", &oguid,
+			"metadata", &metadata,
 			NULL);
 
 	g_assert_cmpuint(oid, >, 0);
@@ -212,8 +218,8 @@ void midgard_test_object_constructor_id_created(MidgardObjectTest *mot, gconstpo
 	
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-		g_object_get_property(G_OBJECT(_object->metadata), "created", &tval);
-		g_object_get(_object->metadata,	"creator", &creator, NULL);
+		g_object_get_property(G_OBJECT(metadata), "created", &tval);
+		g_object_get(metadata, "creator", &creator, NULL);
 		created = midgard_timestamp_get_string_from_value(&tval);
 	
 		midgard_test_metadata_check_created(object);
@@ -263,9 +269,11 @@ void midgard_test_object_get_by_guid_created(MidgardObjectTest *mot, gconstpoint
 	gchar *oguid = NULL;
 	gchar *created = NULL;
 	gchar *creator = NULL;
+	MidgardMetadata *metadata;
 	g_object_get(_object,
 			"id", &oid,
 			"guid", &oguid,
+			"metadata", &metadata,
 			NULL);
 		
 	MidgardObject *object = midgard_test_object_basic_new(mgd, G_OBJECT_TYPE_NAME(_object), NULL);
@@ -279,9 +287,9 @@ void midgard_test_object_get_by_guid_created(MidgardObjectTest *mot, gconstpoint
 	
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-		g_object_get_property(G_OBJECT(_object->metadata), "created", &tval);
-		g_object_get(_object->metadata,	"creator", &creator, NULL);
-		created = midgard_timestamp_get_string_from_value(&tval);
+		g_object_get_property (G_OBJECT(metadata), "created", &tval);
+		g_object_get (metadata, "creator", &creator, NULL);
+		created = midgard_timestamp_get_string_from_value (&tval);
 		
 		midgard_test_metadata_check_created(object);
 		
@@ -305,9 +313,11 @@ void midgard_test_object_constructor_guid_created(MidgardObjectTest *mot, gconst
 	gchar *oguid = NULL;
 	gchar *created = NULL;
 	gchar *creator = NULL;
+	MidgardMetadata *metadata;
 	g_object_get(_object,
 			"id", &oid,
 			"guid", &oguid,
+			"metadata", &metadata, 
 			NULL);
 
 	g_assert_cmpuint(oid, >, 0);
@@ -322,8 +332,8 @@ void midgard_test_object_constructor_guid_created(MidgardObjectTest *mot, gconst
 		
 		GValue tval = {0, };
 		g_value_init(&tval, MGD_TYPE_TIMESTAMP);
-		g_object_get_property(G_OBJECT(_object->metadata), "created", &tval);
-		g_object_get(_object->metadata,	"creator", &creator, NULL);
+		g_object_get_property(G_OBJECT(metadata), "created", &tval);
+		g_object_get(metadata, "creator", &creator, NULL);
 		created = midgard_timestamp_get_string_from_value(&tval);
 	
 		midgard_test_metadata_check_created(object);

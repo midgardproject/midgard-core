@@ -28,7 +28,7 @@ void midgard_test_object_tree_basic(MidgardObjectTest *mot, gconstpointer data)
 	/* Get parent (in tree) class and check if parent has the same child declared */
 	const gchar *pname = midgard_object_parent(object);
 	
-	if(!pname)
+	if (!pname)
 		return;
 
 	MidgardObjectClass *pklass = MIDGARD_OBJECT_GET_CLASS_BY_NAME(pname);
@@ -45,15 +45,12 @@ void midgard_test_object_tree_basic(MidgardObjectTest *mot, gconstpointer data)
 	guint i = 0;
 	gboolean has_child_class = FALSE;
 	
-	while(children[i] != NULL) {
-
-		if(G_OBJECT_CLASS_TYPE(g_type_from_name (children[i])) == G_OBJECT_CLASS_TYPE(klass))
+	for (i = 0; i < n_child; i++) {
+		if (g_type_from_name (children[i]) == G_OBJECT_CLASS_TYPE(klass))
 			has_child_class = TRUE;
-		i++;
 	}
 
 	g_free(children);
-
 	g_assert(has_child_class != FALSE);
 }
 

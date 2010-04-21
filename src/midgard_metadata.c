@@ -53,13 +53,17 @@ _action_create_callback (MidgardObject *object, gpointer ud)
 	g_value_unset (&rval);
 
 	/* set created */
-	midgard_core_timestamp_set_current_time (mdata->priv->created);	
+	midgard_core_timestamp_set_current_time (mdata->priv->created);
 
 	/* set revised */	
 	midgard_core_timestamp_set_current_time (mdata->priv->revised);
 
 	/* set revision */
-	midgard_core_metadata_set_revision (mdata, 0);
+	GValue rev_val = {0, };
+	g_value_init (&rev_val, G_TYPE_UINT);
+	g_value_set_uint (&rev_val, 0);
+	midgard_core_metadata_set_revision (mdata, (const GValue *)&rev_val);
+	g_value_unset (&rev_val);
 }
 
 static void 
@@ -155,10 +159,10 @@ _action_export_callback(MidgardObject *object, gpointer ud)
  *
  * Returns: newly allocated midgard_metadata instance
  */ 
-MidgardMetadata 
-*midgard_metadata_new (MidgardObject *object)
+MidgardMetadata *
+midgard_metadata_new (MidgardDBObject *object)
 {
-	g_assert (object != NULL);
+	g_return_val_if_fail (object != NULL, NULL);
 	
 	MidgardMetadata *self = 
 		(MidgardMetadata *) g_object_new (MIDGARD_TYPE_METADATA, NULL);
@@ -1039,15 +1043,6 @@ GType midgard_metadata_get_type (void)
 		type = g_type_register_static (MIDGARD_TYPE_DBOBJECT, "MidgardMetadata", &info, 0);
 	}
 	return type;
-}
-
-MidgardMetadata *midgard_object_metadata_get(MidgardObject *object){
-
-    MidgardMetadata *mm = midgard_metadata_new(object);
-    if(mm)
-        return mm;
-
-    return NULL;
 }
 
 xmlNode *__metadata_lookup_node(xmlNode *node, const gchar *name)

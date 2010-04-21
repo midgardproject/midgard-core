@@ -230,7 +230,7 @@ _midgard_dbobject_set_from_data_model (MidgardDBObject *self, GdaDataModel *mode
 
 	/* Set metadata */
 	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (self);
-	MidgardMetadata *metadata = dbobject->dbpriv->metadata;
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (dbobject);
 	if (metadata)
 		MIDGARD_DBOBJECT_GET_CLASS (MIDGARD_DBOBJECT (metadata))->dbpriv->set_from_data_model (
 				MIDGARD_DBOBJECT (metadata), model, row);
@@ -274,8 +274,9 @@ midgard_dbobject_dispose (GObject *object)
 	self->dbpriv->row = -1;
 
 	/* Do not nullify metadata object, we might be in the middle of refcount decreasing */
-	if (self->dbpriv->metadata && G_IS_OBJECT (self->dbpriv->metadata)) 
-		g_object_unref (self->dbpriv->metadata);
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
+	if (metadata && G_IS_OBJECT (metadata)) 
+		g_object_unref (metadata);
 
 	parent_class->dispose (object);
 }

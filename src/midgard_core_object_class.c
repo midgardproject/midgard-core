@@ -30,7 +30,7 @@
 #include "midgard_reflector_object.h"
 
 #define get_varchar_size(str) \
-	        if(str == NULL) \
+	        if (str == NULL) \
                 size++; \
         else \
                 size = strlen((const gchar *)str) + 1 + size; \
@@ -44,7 +44,7 @@
 
 gboolean midgard_core_object_prop_type_is_valid(GType src_type, GType dst_type)
 {
-	if(src_type == dst_type)
+	if (src_type == dst_type)
 		return TRUE;
 
 	return FALSE;
@@ -52,15 +52,15 @@ gboolean midgard_core_object_prop_type_is_valid(GType src_type, GType dst_type)
 
 gboolean midgard_core_object_prop_link_is_valid(GType ltype)
 {
-	if(ltype == MGD_TYPE_UINT) {
+	if (ltype == MGD_TYPE_UINT) {
 
 		return TRUE;
 
-	} else if(ltype == MGD_TYPE_GUID) {
+	} else if (ltype == MGD_TYPE_GUID) {
 
 		return TRUE;
 
-	} else if(ltype == MGD_TYPE_STRING) {
+	} else if (ltype == MGD_TYPE_STRING) {
 
 		return TRUE;
 
@@ -87,18 +87,18 @@ midgard_core_object_get_property_parent_type (MidgardObjectClass *klass)
 	g_assert(klass != NULL);	
 
 	const gchar *prop = MGD_DBCLASS_PROPERTY_PARENT (klass);
-	if(prop == NULL) {
+	if (prop == NULL) {
 		g_warning("Failed to get parent property");
 		return 0;
 	}
 
 	GParamSpec *pspec = g_object_class_find_property(G_OBJECT_CLASS(klass), prop);
-	if(pspec == NULL) {
+	if (pspec == NULL) {
 		g_error("Failed to find GParamSpec for parent '%s' property", prop);
 		return 0;
 	}
 
-	if(!midgard_core_object_prop_parent_is_valid(pspec->value_type))
+	if (!midgard_core_object_prop_parent_is_valid(pspec->value_type))
 		return 0;
 
 	return pspec->value_type;
@@ -111,18 +111,18 @@ midgard_core_object_get_property_up_type (MidgardObjectClass *klass)
 
 	const gchar *prop = MGD_DBCLASS_PROPERTY_UP (klass);
 
-	if(prop == NULL) {
+	if (prop == NULL) {
 		g_warning("Failed to get up property");
 		return 0;
 	}
 
 	GParamSpec *pspec = g_object_class_find_property(G_OBJECT_CLASS(klass), prop);
-	if(pspec == NULL) {
+	if (pspec == NULL) {
 		g_error("Failed to find GParamSpec for up '%s' property", prop);
 		return 0;
 	}
 
-	if(!midgard_core_object_prop_parent_is_valid(pspec->value_type))
+	if (!midgard_core_object_prop_parent_is_valid(pspec->value_type))
 		return 0;
 
 	return pspec->value_type;
@@ -135,7 +135,7 @@ gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object)
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);
 	GType ptype = midgard_core_object_get_property_parent_type(klass);
 
-	if(ptype == 0) 
+	if (ptype == 0) 
 		return FALSE;
 
 	GValue gval = {0, };
@@ -144,18 +144,18 @@ gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object)
 
 	g_object_get_property(G_OBJECT(object), prop, &gval);
 
-	if(ptype == G_TYPE_UINT) {
+	if (ptype == G_TYPE_UINT) {
 		
 		guint i = g_value_get_uint(&gval);
-		if(i == 0)
+		if (i == 0)
 			return FALSE;
 
 		return TRUE;
 	
-	} else if(ptype == G_TYPE_STRING) {
+	} else if (ptype == G_TYPE_STRING) {
 
 		const gchar *s = g_value_get_string(&gval);
-		if(s == NULL || *s == '\0')
+		if (s == NULL || *s == '\0')
 			return FALSE;
 
 		return TRUE;
@@ -172,7 +172,7 @@ midgard_core_object_prop_up_is_set (MidgardObject *object)
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);
 	GType ptype = midgard_core_object_get_property_up_type(klass);
 
-	if(ptype == 0) 
+	if (ptype == 0) 
 		return FALSE;
 
 	GValue gval = {0, };
@@ -181,18 +181,18 @@ midgard_core_object_prop_up_is_set (MidgardObject *object)
 
 	g_object_get_property(G_OBJECT(object), prop, &gval);
 
-	if(ptype == G_TYPE_UINT) {
+	if (ptype == G_TYPE_UINT) {
 		
 		guint i = g_value_get_uint(&gval);
-		if(i == 0)
+		if (i == 0)
 			return FALSE;
 
 		return TRUE;
 	
-	} else if(ptype == G_TYPE_STRING) {
+	} else if (ptype == G_TYPE_STRING) {
 
 		const gchar *s = g_value_get_string(&gval);
-		if(s == NULL || *s == '\0')
+		if (s == NULL || *s == '\0')
 			return FALSE;
 
 		return TRUE;
@@ -213,7 +213,7 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 
 	GParamSpec **props = g_object_class_list_properties(
 			G_OBJECT_GET_CLASS(G_OBJECT(object)), &propn);
-	if(!props){
+	if (!props){
 		midgard_set_error(MGD_OBJECT_CNC (object),
 				MGD_GENERIC_ERROR,
 				MGD_ERR_INVALID_OBJECT,
@@ -231,15 +231,15 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 	/* Make sure parent and up are integers */
 	GParamSpec *parent_pspec = NULL;
 	GParamSpec *up_pspec = NULL;
-	if(parent_prop)	
+	if (parent_prop)	
 		parent_pspec = g_object_class_find_property(G_OBJECT_CLASS(klass), parent_prop);
-	if(up_pspec)
+	if (up_pspec)
 		up_pspec = g_object_class_find_property(G_OBJECT_CLASS(klass), up);
 
 	/* Parent declared, up not. Parent can not be 0 */
-	if(parent_pspec && !up_pspec) {
+	if (parent_pspec && !up_pspec) {
 	
-		if(!midgard_core_object_prop_parent_is_set(object)) {
+		if (!midgard_core_object_prop_parent_is_set(object)) {
 			
 			midgard_set_error(MGD_OBJECT_CNC(object),
 					MGD_GENERIC_ERROR,
@@ -253,9 +253,9 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 	}
 
 	/* Parent declared, up declared. Parent might be 0, only if up is not 0. */
-	if(parent_pspec && up_pspec) {
+	if (parent_pspec && up_pspec) {
 
-		if(!midgard_core_object_prop_parent_is_set(object)
+		if (!midgard_core_object_prop_parent_is_set(object)
 				&& !midgard_core_object_prop_up_is_set(object)) {
 			
 			midgard_set_error(MGD_OBJECT_CNC(object),
@@ -269,7 +269,7 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 	}
 
 	/* Attachment, we need to get file size */
-	if(g_str_equal(typename, "midgard_attachment")){
+	if (g_str_equal(typename, "midgard_attachment")){
 		
 		gint statv;
 		MidgardConnection *mgd = MGD_OBJECT_CNC(object);
@@ -290,15 +290,15 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 
 		g_object_get(G_OBJECT(object), "location", &location, NULL);
 
-		if(location != NULL && *location != '\0') {
+		if (location != NULL && *location != '\0') {
 				
 			blobpath = g_build_path(G_DIR_SEPARATOR_S, blobdir, location, NULL);
 
 				statv = g_stat(blobpath, &statbuf);
 
-				if(statv == 0) {
+				if (statv == 0) {
 					
-					if(g_file_test((const gchar *)blobpath,
+					if (g_file_test((const gchar *)blobpath,
 								G_FILE_TEST_EXISTS | G_FILE_TEST_IS_REGULAR)) {
 
 						size = statbuf.st_size;
@@ -343,7 +343,7 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 		} else if (prop_type == MGD_TYPE_LONGTEXT) {
 					
 			g_object_get(G_OBJECT(object), props[i]->name, &prop_str, NULL);
-			if(prop_str == NULL) prop_str = g_strdup("");
+			if (prop_str == NULL) prop_str = g_strdup("");
 			size = (strlen(prop_str)) + 4 + size;
 			g_free (prop_str);
 		
@@ -352,12 +352,12 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 			/* TODO, Check if timestamp value is valid */
 			size =  8 + size;
 		
-		} else if(prop_type == MGD_TYPE_STRING) {
+		} else if (prop_type == MGD_TYPE_STRING) {
 			
 			g_object_get(G_OBJECT(object), props[i]->name, &prop_str, NULL);
 			get_varchar_size(prop_str);
 
-		} else if(prop_type == MGD_TYPE_UINT 
+		} else if (prop_type == MGD_TYPE_UINT 
 				&& prop_type == MGD_TYPE_INT
 				&& prop_type == MGD_TYPE_FLOAT
 				&& prop_type == MGD_TYPE_BOOLEAN){
@@ -371,8 +371,9 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 	g_free(props);
 
 	/* Object metadata */
-	if (object->metadata)
-		object->metadata->priv->size = size + midgard_core_metadata_get_size(object->metadata);
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
+	if (metadata)
+		metadata->priv->size = size + midgard_core_metadata_get_size (metadata);
 
 	return TRUE;
 }
@@ -484,7 +485,7 @@ void midgard_core_object_class_set_guid(
 
 MgdSchemaTypeAttr *midgard_core_class_get_type_attr(MidgardDBObjectClass *klass)
 {
-	if(!G_TYPE_IS_CLASSED(G_TYPE_FROM_CLASS(klass))){
+	if (!G_TYPE_IS_CLASSED(G_TYPE_FROM_CLASS(klass))){
 		g_warning("Class pointer is not a GObjectClass pointer");
 		return NULL;
 	}
@@ -499,7 +500,7 @@ const gchar *midgard_core_class_get_table(MidgardDBObjectClass *klass)
 	MgdSchemaTypeAttr *type_attr = NULL;
 	type_attr = midgard_core_class_get_type_attr(klass);
 	
-	if(!type_attr)
+	if (!type_attr)
 		return NULL;
 
 	return type_attr->table;
@@ -510,7 +511,7 @@ const gchar *midgard_core_class_get_tables(MidgardDBObjectClass *klass)
 	MgdSchemaTypeAttr *type_attr = NULL;
 	type_attr = midgard_core_class_get_type_attr(klass);
 	
-	if(!type_attr)
+	if (!type_attr)
 		return NULL;
 	
 	return type_attr->tables;
@@ -525,7 +526,7 @@ MgdSchemaPropertyAttr *midgard_core_class_get_property_attr(
 	MgdSchemaPropertyAttr *prop_attr = NULL;	
 	prop_attr = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, name);
 
-	if(prop_attr == NULL)
+	if (prop_attr == NULL)
 		return NULL;
 	
 	return prop_attr;
@@ -540,7 +541,7 @@ const gchar *midgard_core_class_get_property_table(
 	MgdSchemaPropertyAttr *prop_attr = NULL;
 	prop_attr = midgard_core_class_get_property_attr(klass, name);
 
-	if(prop_attr == NULL)
+	if (prop_attr == NULL)
 		return NULL;
 	
 	return prop_attr->table;
@@ -555,7 +556,7 @@ const gchar *midgard_core_class_get_property_colname(
 	MgdSchemaPropertyAttr *prop_attr = NULL;
 	prop_attr = midgard_core_class_get_property_attr(klass, name);
 	
-	if(prop_attr == NULL)
+	if (prop_attr == NULL)
 		return NULL;
 	
 	return prop_attr->field;
@@ -570,7 +571,7 @@ const gchar *midgard_core_class_get_property_tablefield(
 	MgdSchemaPropertyAttr *prop_attr = NULL;
 	prop_attr = midgard_core_class_get_property_attr(klass, name);
 
-	if(prop_attr == NULL)
+	if (prop_attr == NULL)
 		return NULL;
 	return prop_attr->tablefield;
 }

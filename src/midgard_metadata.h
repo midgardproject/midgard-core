@@ -53,6 +53,6 @@ struct _MidgardMetadata {
 };
 
 GType 			midgard_metadata_get_type 	(void);
-MidgardMetadata 	*midgard_metadata_new		(MidgardObject *object);
+MidgardMetadata 	*midgard_metadata_new		(MidgardDBObject *object);
 
 #endif /* MIDGARD_METADATA_H */

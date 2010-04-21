@@ -201,7 +201,7 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 			break;
 				
 		case MIDGARD_PROPERTY_METADATA:
-			g_value_set_object (value, (MidgardMetadata *) MIDGARD_DBOBJECT (self)->dbpriv->metadata);
+			g_value_set_object (value, (MidgardMetadata *) MGD_DBOBJECT_METADATA (self));
 			break;
 		
 		default:
@@ -560,8 +560,9 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 
 	/* Get object's size as it's needed for size' diff.
 	 * midgard_core_object_is_valid computes new size */
-	if (gobj->metadata)
-		object_init_size = gobj->metadata->priv->size;		
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (gobj);
+	if (metadata)
+		object_init_size = metadata->priv->size;		
 
 	if (!midgard_core_object_is_valid(gobj))
 		return FALSE;
@@ -595,9 +596,9 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 	if (_object_in_tree(gobj) == OBJECT_IN_TREE_DUPLICATE) 
 		return FALSE;
 
-	if (gobj->metadata) {
+	if (metadata) {
 	
-		guint object_size = gobj->metadata->priv->size;
+		guint object_size = metadata->priv->size;
 	
 		if (midgard_quota_size_is_reached(gobj, object_size)){
 	
@@ -761,7 +762,7 @@ static GPtrArray *__get_glists(MidgardObject *object)
 	if (MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (klass))) {
 
 		n_prop = 0;
-		MidgardMetadata *mdata = object->metadata;
+		MidgardMetadata *mdata = MGD_DBOBJECT_METADATA (object);
 
 		pspecs = g_object_class_list_properties(G_OBJECT_GET_CLASS(mdata), &n_prop);
 
@@ -1104,7 +1105,7 @@ void _object_copy_properties(GObject *src, GObject *dest)
 				MidgardMetadata *new_metadata = 
 					midgard_core_metadata_copy(MIDGARD_METADATA(nm));
 				g_object_unref(nm);
-				MIDGARD_OBJECT(dest)->metadata = new_metadata;
+				MGD_DBOBJECT_METADATA (dest) = new_metadata;
 			}
 
 		} else {
@@ -1395,9 +1396,9 @@ __mgdschema_object_constructor (GType type,
 	g_free(pspecs);
 
 	if (MGD_TYPE_ATTR_METADATA_CLASS (type_attr)) {
-		MIDGARD_DBOBJECT (object)->dbpriv->metadata = midgard_metadata_new (MIDGARD_DBOBJECT (object));
+		MGD_DBOBJECT_METADATA (object) = midgard_metadata_new (MIDGARD_DBOBJECT (object));
 		/* Add weak reference */
-		g_object_add_weak_pointer (object, (gpointer) MIDGARD_DBOBJECT (object)->dbpriv->metadata);
+		g_object_add_weak_pointer (object, (gpointer) MGD_DBOBJECT_METADATA (object));
 	}
 	
 	return object;
@@ -1468,7 +1469,7 @@ __midgard_object_constructor (GType type,
 
 	MIDGARD_DBOBJECT(object)->dbpriv->storage_data =
 		MIDGARD_DBOBJECT_GET_CLASS(object)->dbpriv->storage_data;
-	MIDGARD_DBOBJECT (object)->dbpriv->metadata = MIDGARD_OBJECT (object)->metadata;
+	//MIDGARD_DBOBJECT (object)->dbpriv->metadata = MIDGARD_OBJECT (object)->metadata;
 
 	MgdSchemaTypeAttr *priv =
 		G_TYPE_INSTANCE_GET_PRIVATE ((GTypeInstance*)object, type, MgdSchemaTypeAttr);
@@ -2420,14 +2421,16 @@ gboolean midgard_object_delete(MidgardObject *object)
 
 	g_string_free(sql, TRUE);
 	g_free (timeupdated);
-	
+
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
+
 	if (qr == 0) {
 
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
 		g_value_unset(&tval);
 		
-		if (object->metadata)
-			object->metadata->priv->revision--;
+		if (metadata)
+			metadata->priv->revision--;
 
 		return FALSE;
 
@@ -2446,15 +2449,15 @@ gboolean midgard_object_delete(MidgardObject *object)
 	}
 
 	/* Set metadata properties */
-	if (object->metadata) {
+	if (metadata) {
 
-		midgard_core_metadata_set_revised (object->metadata, &tval);
+		midgard_core_metadata_set_revised (metadata, &tval);
 		GValue gval = {0, };
 		g_value_init (&gval, G_TYPE_STRING);
 		g_value_set_string (&gval, person_guid);
-		midgard_core_metadata_set_revisor (object->metadata, &gval);
+		midgard_core_metadata_set_revisor (metadata, &gval);
 		g_value_unset (&gval);
-		object->metadata->priv->deleted = TRUE;
+		metadata->priv->deleted = TRUE;
 	}
 
 	g_value_unset(&tval);
@@ -2933,6 +2936,8 @@ gboolean midgard_object_approve(MidgardObject *self)
 	MidgardConnection *mgd = MGD_OBJECT_CNC(self);
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
+
 	MidgardUser *user = midgard_connection_get_user(mgd);
 	const MidgardObject *person = midgard_user_get_person(user);
 
@@ -2973,7 +2978,7 @@ gboolean midgard_object_approve(MidgardObject *self)
 	/* increment revision */
 	GValue rval = {0, };
 	g_value_init(&rval, G_TYPE_UINT);
-	g_value_set_uint(&rval, self->metadata->priv->revision+1);
+	g_value_set_uint(&rval, metadata->priv->revision+1);
 
 	/* Transform timestamp to GdaTimestamp */
 	GValue stval = {0, };
@@ -2993,14 +2998,14 @@ gboolean midgard_object_approve(MidgardObject *self)
 	/* Set object properties if query succeeded */
 	if (rv) {
 		
-		self->metadata->priv->approve_is_set = TRUE;
-		self->metadata->priv->is_approved = TRUE;
+		metadata->priv->approve_is_set = TRUE;
+		metadata->priv->is_approved = TRUE;
 		
-		midgard_core_metadata_set_approved (self->metadata, &tval);
-		midgard_core_metadata_set_approver (self->metadata, &gval);
-		midgard_core_metadata_set_revisor (self->metadata, &gval);
-		midgard_core_metadata_set_revised (self->metadata, &tval);
-		midgard_core_metadata_set_revision (self->metadata, &rval);
+		midgard_core_metadata_set_approved (metadata, &tval);
+		midgard_core_metadata_set_approver (metadata, &gval);
+		midgard_core_metadata_set_revisor (metadata, &gval);
+		midgard_core_metadata_set_revised (metadata, &tval);
+		midgard_core_metadata_set_revision (metadata, &rval);
 	}
 
 	g_value_unset (&tval);
@@ -3032,8 +3037,10 @@ gboolean midgard_object_is_approved(MidgardObject *self)
 	MidgardConnection *mgd = MGD_OBJECT_CNC(self);
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
-	if (self->metadata->priv->approve_is_set)
-		return self->metadata->priv->is_approved;
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
+
+	if (metadata->priv->approve_is_set)
+		return metadata->priv->is_approved;
 
 	GString *where = g_string_new("");
 	g_string_append_printf(where, "guid = '%s' ", MGD_OBJECT_GUID(self));
@@ -3055,8 +3062,8 @@ gboolean midgard_object_is_approved(MidgardObject *self)
 	gboolean av = FALSE;
 	MIDGARD_GET_BOOLEAN_FROM_VALUE(av, aval)
 
-	self->metadata->priv->approve_is_set = TRUE;
-	self->metadata->priv->is_approved = av;
+	metadata->priv->approve_is_set = TRUE;
+	metadata->priv->is_approved = av;
 
 	g_value_unset(aval);
 	g_free(aval);
@@ -3098,6 +3105,8 @@ gboolean midgard_object_unapprove(MidgardObject *self)
 	MidgardConnection *mgd = MGD_OBJECT_CNC(self);
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
+
 	MidgardUser *user = midgard_connection_get_user(mgd);
 	const MidgardObject *person = midgard_user_get_person(user);
 
@@ -3132,7 +3141,7 @@ gboolean midgard_object_unapprove(MidgardObject *self)
 	/* increment revision */
 	GValue rval = {0, };
 	g_value_init(&rval, G_TYPE_UINT);
-	g_value_set_uint(&rval, self->metadata->priv->revision+1);
+	g_value_set_uint(&rval, metadata->priv->revision+1);
 
 	/* Transform timestamp to GdaTimestamp */
 	GValue stval = {0, };
@@ -3160,14 +3169,14 @@ gboolean midgard_object_unapprove(MidgardObject *self)
 	/* Set object properties if query succeeded */
 	if (rv) {
 		
-		self->metadata->priv->approve_is_set = TRUE;
-		self->metadata->priv->is_approved = FALSE;
+		metadata->priv->approve_is_set = TRUE;
+		metadata->priv->is_approved = FALSE;
 
-		midgard_core_metadata_set_approved (self->metadata, &tval);
-		midgard_core_metadata_set_approver (self->metadata, &gval);
-		midgard_core_metadata_set_revisor (self->metadata, &gval);
-		midgard_core_metadata_set_revised (self->metadata, &tval);
-		midgard_core_metadata_set_revision (self->metadata, &rval);
+		midgard_core_metadata_set_approved (metadata, &tval);
+		midgard_core_metadata_set_approver (metadata, &gval);
+		midgard_core_metadata_set_revisor (metadata, &gval);
+		midgard_core_metadata_set_revised (metadata, &tval);
+		midgard_core_metadata_set_revision (metadata, &rval);
 	}
 
 	g_value_unset (&tval);
@@ -3221,6 +3230,8 @@ gboolean midgard_object_lock(MidgardObject *self)
 	MidgardConnection *mgd = MGD_OBJECT_CNC(self);
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
+
 	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (klass))) {
 
 		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NO_METADATA);
@@ -3265,7 +3276,7 @@ gboolean midgard_object_lock(MidgardObject *self)
 	/* increment revision */
 	GValue rval = {0, };
 	g_value_init (&rval, G_TYPE_UINT);
-	g_value_set_uint (&rval, self->metadata->priv->revision+1);
+	g_value_set_uint (&rval, metadata->priv->revision+1);
 
 	/* Transform timestamp to string */
 	GValue stval = {0, };
@@ -3285,14 +3296,14 @@ gboolean midgard_object_lock(MidgardObject *self)
 	/* Set object properties if query succeeded */
 	if (rv) {
 		
-		self->metadata->priv->lock_is_set = TRUE;
-		self->metadata->priv->is_locked = TRUE;
+		metadata->priv->lock_is_set = TRUE;
+		metadata->priv->is_locked = TRUE;
 
-		midgard_core_metadata_set_locked (self->metadata, &tval);
-		midgard_core_metadata_set_locker (self->metadata, &gval);
-		midgard_core_metadata_set_revisor (self->metadata, &gval);
-		midgard_core_metadata_set_revised (self->metadata, &tval);
-		midgard_core_metadata_increase_revision (self->metadata);
+		midgard_core_metadata_set_locked (metadata, &tval);
+		midgard_core_metadata_set_locker (metadata, &gval);
+		midgard_core_metadata_set_revisor (metadata, &gval);
+		midgard_core_metadata_set_revised (metadata, &tval);
+		midgard_core_metadata_increase_revision (metadata);
 	}
 
 	g_value_unset (&tval);
@@ -3331,6 +3342,8 @@ gboolean midgard_object_is_locked(MidgardObject *self)
 	MidgardConnection *mgd = MGD_OBJECT_CNC(self);
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
+
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (self);
 
 	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (klass))) {
@@ -3340,8 +3353,8 @@ gboolean midgard_object_is_locked(MidgardObject *self)
 		return FALSE;
 	}
 
-	if (self->metadata->priv->lock_is_set)
-		return self->metadata->priv->is_locked;
+	if (metadata->priv->lock_is_set)
+		return metadata->priv->is_locked;
 
 	GString *where = g_string_new("");
 	g_string_append_printf(where, "guid = '%s' ", MGD_OBJECT_GUID (self));
@@ -3363,8 +3376,8 @@ gboolean midgard_object_is_locked(MidgardObject *self)
 	gboolean av = FALSE;
 	MIDGARD_GET_BOOLEAN_FROM_VALUE(av, aval)
 
-	self->metadata->priv->lock_is_set = TRUE;
-	self->metadata->priv->is_locked = av;
+	metadata->priv->lock_is_set = TRUE;
+	metadata->priv->is_locked = av;
 
 	g_value_unset(aval);
 	g_free(aval);
@@ -3403,6 +3416,8 @@ gboolean midgard_object_unlock(MidgardObject *self)
 	g_object_ref(self);
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (self);
 	g_signal_emit(self, klass->signal_action_unlock, 0);
+
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC(self);
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
@@ -3443,7 +3458,7 @@ gboolean midgard_object_unlock(MidgardObject *self)
 	/* increment revision */
 	GValue rval = {0, };
 	g_value_init(&rval, G_TYPE_UINT);
-	g_value_set_uint(&rval, self->metadata->priv->revision+1);
+	g_value_set_uint(&rval, metadata->priv->revision+1);
 
 	/* Transform timestamp to GdaTimestamp */
 	GValue stval = {0, };
@@ -3470,14 +3485,14 @@ gboolean midgard_object_unlock(MidgardObject *self)
 	/* Set object properties if query succeeded */
 	if (rv) {
 		
-		self->metadata->priv->lock_is_set = TRUE;
-		self->metadata->priv->is_locked = FALSE;
+		metadata->priv->lock_is_set = TRUE;
+		metadata->priv->is_locked = FALSE;
 
-		midgard_core_metadata_set_locked (self->metadata, &tval);
-		midgard_core_metadata_set_locker (self->metadata, &gval);
-		midgard_core_metadata_set_revisor (self->metadata, &gval);
-		midgard_core_metadata_set_revised (self->metadata, &tval);
-		midgard_core_metadata_increase_revision (self->metadata);
+		midgard_core_metadata_set_locked (metadata, &tval);
+		midgard_core_metadata_set_locker (metadata, &gval);
+		midgard_core_metadata_set_revisor (metadata, &gval);
+		midgard_core_metadata_set_revised (metadata, &tval);
+		midgard_core_metadata_increase_revision (metadata);
 	}
 
 	g_value_unset (&tval);

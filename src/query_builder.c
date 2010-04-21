@@ -1085,16 +1085,11 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 		}
 		
 		/* Set metadata */
-	     	if (dbklass->dbpriv->has_metadata) {
-	
+		MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
+	     	if (metadata) {
 			GParamSpec *pspec = g_object_class_find_property(G_OBJECT_GET_CLASS(object), "metadata");
-
-			if(pspec){
-	
-				MidgardMetadata *mdata = object->metadata;	
-				if(mdata)
-					__mqb_set_metadata(mdata, model, rows);
-			}
+			if (pspec)
+				__mqb_set_metadata(metadata, model, rows);
 		}	
 
 		list = g_list_append(list, G_OBJECT(object));                		
