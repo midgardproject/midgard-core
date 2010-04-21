@@ -89,7 +89,8 @@ void
 midgard_test_schema_object_factory_object_undelete (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT (mot);
-	const gchar *guid = (const gchar *) data;
+	const gchar *guid;
+	g_object_get (object, "guid", &guid, NULL);
 
 	/* Delete and undelete given object */
 	gboolean object_delete = midgard_object_delete (object);
@@ -111,6 +112,8 @@ midgard_test_schema_object_factory_object_undelete (MidgardObjectTest *mot, gcon
 	gboolean invalid_guid_undelete = midgard_schema_object_factory_object_undelete (mgd, invalid_guid);
 	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_NOT_EXISTS);
 	g_assert (invalid_guid_undelete == FALSE);
+
+	g_free (guid);
 }
 
 /* Particular case tests */
