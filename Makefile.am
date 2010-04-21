@@ -49,7 +49,7 @@ midgard_public_h = \
 	src/midgard_timestamp.h \
 	src/uuid.h \
 	src/guid.h \
-	src/midgard_datatypes.h \	
+	src/midgard_datatypes.h \
 	src/midgard_type.h \
 	src/midgard_quota.h \
 	src/midgard_reflection_property.h \
