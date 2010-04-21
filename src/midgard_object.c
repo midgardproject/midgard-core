@@ -1291,7 +1291,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 	if (mklass) {
 
 		mklass->priv = g_new (MidgardObjectClassPrivate, 1);
-		dbklass->dbpriv = g_new (MidgardDBObjectPrivate, 1);
+		dbklass->dbpriv = g_new (MidgardDBObjectPrivate, 1);	
 
 		/* Check metadata. No support for user declared one yet. */
 		if (data->metadata_class_name == NULL) 
@@ -1971,10 +1971,6 @@ GType midgard_object_get_type(void)
  * @value holds valid id or guid but object doesn't exists in database ( MGD_ERR_NOT_EXISTS )
  * </para></listitem>
  * <listitem><para>
- * more than one object identified by particular id or guid returned 
- * ( case possible if logged in user is root ) ( MGD_ERR_SITEGROUP_VIOLATION )
- * </para></listitem>
- * <listitem><para>
  * unspecified internal error ( MGD_ERR_INTERNAL ) 
  * </para></listitem>
  * </itemizedlist> 
@@ -2026,11 +2022,11 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 
 		if (G_VALUE_TYPE(value) == G_TYPE_STRING) {
 			const gchar *guidval = g_value_get_string(value);
+			field = "guid";
 			if (!guidval || (guidval && !midgard_is_guid (guidval)))
 					goto return_empty_object;
 		}
 		
-		field = "guid";
 		MidgardQueryBuilder *builder = midgard_query_builder_new(mgd, name);
 		midgard_query_builder_add_constraint(builder, field, "=", value);
 		guint n_objects;
@@ -2372,9 +2368,8 @@ gboolean midgard_object_delete(MidgardObject *object)
 		return FALSE;
 	}
 
-	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!MGD_DBCLASS_METADATA_CLASS (klass)) {
-
+	//MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
+	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_GET_CLASS (object))) {
 		MIDGARD_ERRNO_SET (MGD_OBJECT_CNC (object), MGD_ERR_NO_METADATA);
 		return FALSE;
 	}
@@ -2412,13 +2407,13 @@ gboolean midgard_object_delete(MidgardObject *object)
 	g_value_init (&tval, MGD_TYPE_TIMESTAMP);
 	midgard_timestamp_set_current_time(&tval);
 	gchar *timeupdated = midgard_timestamp_get_string_from_value (&tval);
-	object->metadata->priv->revision++;
+	midgard_core_metadata_increase_revision (MGD_DBOBJECT_METADATA (object));
 	g_string_append_printf(sql,
 			"metadata_revisor='%s', metadata_revised='%s',"
 			"metadata_revision=%d, "
 			"metadata_deleted=1 ",
 			person_guid, timeupdated, 
-			object->metadata->priv->revision);
+			MGD_DBOBJECT_METADATA (object)->priv->revision);
 
 	g_string_append_printf(sql, " WHERE guid = '%s' ",  MGD_OBJECT_GUID(object));
         gint qr = midgard_core_query_execute(MGD_OBJECT_CNC (object), sql->str, FALSE);

@@ -226,7 +226,7 @@ midgard_core_schema_type_attr_extend (MgdSchemaTypeAttr *src, MgdSchemaTypeAttr 
 
 	dst->unique_name = src->unique_name ? g_strdup (src->unique_name) : NULL;
 	dst->metadata_class_name = src->metadata_class_name ? g_strdup (src->metadata_class_name) : NULL;
-	dst->metadata_class_ptr = src->metadata_class_ptr ? g_strdup (src->metadata_class_ptr) : NULL;
+	dst->metadata_class_ptr = src->metadata_class_ptr ? src->metadata_class_ptr : NULL;
 }
 
 void 

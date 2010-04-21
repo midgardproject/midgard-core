@@ -212,7 +212,7 @@ midgard_schema_object_factory_get_object_by_path (MidgardConnection *mgd, const 
 	if (g_str_has_prefix (path, "//")) 
 		g_warning ("Empty element in object's path '%s'", path);
 	
-	if (g_str_has_prefix (object_path, "/")) {
+	if (g_str_has_prefix (path, "/")) {
 		object_path = g_strdup (path);
 	} else  {
 		object_path = g_strconcat ("/", path, NULL);
@@ -360,13 +360,19 @@ midgard_schema_object_factory_object_undelete (MidgardConnection *mgd, const gch
 
 	if (!model) {
 		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
-		return rv;
+		return ret;
 	}
 
 	const GValue *action_value = midgard_data_model_get_value_at (model, 1, 0);
  	const GValue *type_value = midgard_data_model_get_value_at (model, 0, 0);
 
-	switch (g_value_get_uint ((GValue*)action_value)) {
+	guint aval = 0;
+	if (G_VALUE_HOLDS_UINT (action_value))
+		aval = g_value_get_uint ((GValue *) action_value);
+	if (G_VALUE_HOLDS_INT (action_value))
+		aval = (guint) g_value_get_int ((GValue *) action_value);
+
+	switch (aval) {
 
 		case MGD_OBJECT_ACTION_DELETE:
 			klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME (g_value_get_string ((GValue *)type_value));

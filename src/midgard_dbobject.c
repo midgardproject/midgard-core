@@ -255,7 +255,7 @@ midgard_dbobject_constructor (GType type,
 	MIDGARD_DBOBJECT (object)->dbpriv->guid = NULL;
 	MIDGARD_DBOBJECT (object)->dbpriv->datamodel = NULL;
 	MIDGARD_DBOBJECT (object)->dbpriv->row = -1;	
-	MIDGARD_DBOBJECT (object)->dbpriv->has_metadata = TRUE;
+	MIDGARD_DBOBJECT (object)->dbpriv->has_metadata = FALSE;
 	MIDGARD_DBOBJECT (object)->dbpriv->metadata = NULL;
 
 	MIDGARD_DBOBJECT (object)->dbpriv->storage_data =

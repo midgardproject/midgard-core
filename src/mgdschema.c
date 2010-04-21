@@ -322,7 +322,7 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 		} else {
 
 			type_attr->metadata_class_name = g_strdup ("MidgardMetadata");
-			type_attr->metadata_class_ptr = g_type_class_peek (MIDGARD_TYPE_METADATA);
+			type_attr->metadata_class_ptr = g_type_class_peek (MIDGARD_TYPE_METADATA);	
 		}
 	}
 }
