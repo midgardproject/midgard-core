@@ -497,11 +497,13 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 		g_value_init (&updated_timestamp, MGD_TYPE_TIMESTAMP);
 		GValue dbupdated_timestamp = {0, };
 		g_value_init (&dbupdated_timestamp, MGD_TYPE_TIMESTAMP);
+		
+		MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
 
 		/* Compare revised datetimes. We must know if imported 
 		 * object is newer than that one which exists in database */
-		g_object_get_property (G_OBJECT (MIDGARD_OBJECT (object)->metadata), "revised", &updated_timestamp);
-		g_object_get_property (G_OBJECT (MIDGARD_OBJECT (dbobject)->metadata), "revised", &dbupdated_timestamp);
+		g_object_get_property (G_OBJECT (metadata), "revised", &updated_timestamp);
+		g_object_get_property (G_OBJECT (metadata), "revised", &dbupdated_timestamp);
 
 		updated = midgard_timestamp_get_string_from_value ((const GValue *)&updated_timestamp);
 		dbupdated = midgard_timestamp_get_string_from_value ((const GValue *)&dbupdated_timestamp);
@@ -563,7 +565,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 			/* Database object is elder */	
 			
 			/* DELETE */
-			g_object_get (G_OBJECT (MIDGARD_OBJECT (object)->metadata), "deleted", &deleted, NULL);
+			g_object_get (G_OBJECT (metadata), "deleted", &deleted, NULL);
 			/* Imported object is marked as deleted , so 
 			 * * we delete object from database */
 			if (deleted) {
@@ -575,11 +577,13 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 
 			/* UPDATE */
 		
+			MidgardMetadata *db_metadata = MGD_DBOBJECT_METADATA (dbobject);
+
 			/* Check if dbobject is deleted */
-			g_object_get (G_OBJECT (dbobject->metadata), "deleted", &deleted, NULL);
+			g_object_get (db_metadata, "deleted", &deleted, NULL);
 
 			guint undelete;
-			g_object_get (G_OBJECT (MIDGARD_OBJECT (object)->metadata), "deleted", &undelete, NULL);
+			g_object_get (G_OBJECT (metadata), "deleted", &undelete, NULL);
 
 			if ((deleted && !undelete)) {
 				midgard_schema_object_factory_object_undelete (mgd, MGD_OBJECT_GUID (dbobject));

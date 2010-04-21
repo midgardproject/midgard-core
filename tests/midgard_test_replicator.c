@@ -536,10 +536,13 @@ void midgard_test_replicator_export_created (MidgardObjectTest *mot, gconstpoint
 	if (!midgard_reflector_object_has_metadata_class (classname))
 		return;
 
+	MidgardMetadata *metadata;
+	g_object_get (object, "metadata", &metadata, NULL);
+
 	/* Initialize GValue of MIDGARD_TYPE_TIMESTAMP */
 	GValue tval = {0, };
 	g_value_init (&tval, MIDGARD_TYPE_TIMESTAMP);
-	g_object_get_property (G_OBJECT (object->metadata), "exported", &tval);
+	g_object_get_property (G_OBJECT (metadata), "exported", &tval);
 
 	/* And convert it to string */
 	GValue strval = {0, };
@@ -556,7 +559,7 @@ void midgard_test_replicator_export_created (MidgardObjectTest *mot, gconstpoint
 	g_assert (object_is_exported != FALSE);
 
 	g_value_init (&tval, MIDGARD_TYPE_TIMESTAMP);
-	g_object_get_property (G_OBJECT (object->metadata), "exported", &tval);
+	g_object_get_property (G_OBJECT (metadata), "exported", &tval);
 
 	g_value_init (&strval, G_TYPE_STRING);
 	g_value_transform (&tval, &strval);
@@ -575,10 +578,13 @@ void midgard_test_replicator_export_updated (MidgardObjectTest *mot, gconstpoint
 	if (!midgard_reflector_object_has_metadata_class (classname))
 		return;
 
+	MidgardMetadata *metadata;
+	g_object_get (object, "metadata", &metadata, NULL);
+
 	/* Initialize GValue of MIDGARD_TYPE_TIMESTAMP */
 	GValue tval = {0, };
 	g_value_init (&tval, MIDGARD_TYPE_TIMESTAMP);
-	g_object_get_property (G_OBJECT (object->metadata), "exported", &tval);
+	g_object_get_property (G_OBJECT (metadata), "exported", &tval);
 
 	/* And convert it to string */
 	GValue strval = {0, };
@@ -595,7 +601,7 @@ void midgard_test_replicator_export_updated (MidgardObjectTest *mot, gconstpoint
 	g_assert (object_is_exported != FALSE);
 
 	g_value_init (&tval, MIDGARD_TYPE_TIMESTAMP);
-	g_object_get_property (G_OBJECT (object->metadata), "exported", &tval);
+	g_object_get_property (G_OBJECT (metadata), "exported", &tval);
 
 	g_value_init (&strval, G_TYPE_STRING);
 	g_value_transform (&tval, &strval);
