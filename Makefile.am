@@ -222,7 +222,7 @@ INTROSPECTION_LIBS += -lxml2
 girdir = $(datadir)/gir-1.0
 dist_gir_DATA = $(INTROSPECTION_GIRS)
 
-typelibsdir = $(libdir)/girepositry-1.0
+typelibsdir = $(libdir)/girepository-1.0
 typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
 CLEANFILES = $(dist_gir_DATA) $(typelib_DATA)
 endif
