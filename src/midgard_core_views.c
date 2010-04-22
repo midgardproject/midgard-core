@@ -68,10 +68,8 @@ static void __get_property_attribute (xmlNode *node, gchar **property_string,
 			return;
 		}
 
-		MidgardMetadataClass *metadata_klass = MGD_DBCLASS_METADATA_CLASS (klass); 
-
 		*target_name = property_string[2];
-		*prop_attr = g_hash_table_lookup (metadata_klass->dbpriv->storage_data->prophash, *target_name);
+		*prop_attr = g_hash_table_lookup (MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data->prophash, *target_name);
 	
 		if (!*prop_attr)
 			__view_error (node, "%s not found. Not registered for %s.metadata ?", *target_name, property_string[0]);

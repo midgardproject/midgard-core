@@ -1015,14 +1015,15 @@ _metadata_class_init (gpointer g_class, gpointer g_class_data)
 			g_strdup((gchar *)"islocked"), prop_attr);
 
 	/* Initialize private member */
-	klass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
-	klass->dbpriv->storage_data = type_attr;
-	klass->dbpriv->set_from_xml_node = __set_from_xml_node;
-	klass->dbpriv->add_fields_to_select_statement = NULL;
-	klass->dbpriv->has_metadata = FALSE;
-	klass->dbpriv->get_property = _midgard_metadata_dbpriv_get_property;
-	klass->dbpriv->set_property = midgard_core_metadata_dbpriv_set_property;
-	klass->dbpriv->set_from_data_model = _midgard_metadata_set_from_data_model;
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (klass);
+	dbklass->dbpriv = g_new(MidgardDBObjectPrivate, 1);
+	dbklass->dbpriv->storage_data = type_attr;
+	dbklass->dbpriv->set_from_xml_node = __set_from_xml_node;
+	dbklass->dbpriv->add_fields_to_select_statement = NULL;
+	dbklass->dbpriv->has_metadata = FALSE;
+	dbklass->dbpriv->get_property = _midgard_metadata_dbpriv_get_property;
+	dbklass->dbpriv->set_property = midgard_core_metadata_dbpriv_set_property;
+	dbklass->dbpriv->set_from_data_model = _midgard_metadata_set_from_data_model;
 }
 
 GType midgard_metadata_get_type (void)

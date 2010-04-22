@@ -417,7 +417,7 @@ gboolean _nodes2object(GObject *object, xmlNode *node, gboolean force)
 					MIDGARD_DBOBJECT_CLASS(klass));
 	}
 
-	gpointer set_from_xml_func = MIDGARD_METADATA_GET_CLASS(object)->dbpriv->set_from_xml_node;
+	gpointer set_from_xml_func = MIDGARD_DBOBJECT_GET_CLASS(object)->dbpriv->set_from_xml_node;
 	if(set_from_xml_func != NULL) {
 		MIDGARD_DBOBJECT_GET_CLASS(object)->dbpriv->set_from_xml_node(MIDGARD_DBOBJECT(object), node);
 		return TRUE;

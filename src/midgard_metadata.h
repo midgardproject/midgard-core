@@ -34,25 +34,15 @@
 typedef struct _MidgardMetadataPrivate MidgardMetadataPrivate;
 
 struct _MidgardMetadataClass {
-
-	GObjectClass parent;
-	MidgardDBObjectPrivate *dbpriv;
-	
-	guint signal_set_created;
-	guint signal_set_updated;
-	
-	void (*set_created) (MidgardObject *self);
-	void (*set_updated) (MidgardObject *self);	
+	MidgardDBObjectClass parent;
 };
 
 struct _MidgardMetadata {
-
-	GObject parent;	
-	MidgardDBObjectPrivate *dbpriv;
+	MidgardDBObject parent;	
 	MidgardMetadataPrivate *priv;
 };
 
 GType 			midgard_metadata_get_type 	(void);
-MidgardMetadata 	*midgard_metadata_new		(MidgardDBObject *object);
+MidgardMetadata		*midgard_metadata_new 		(MidgardDBObject *object);
 
 #endif /* MIDGARD_METADATA_H */
