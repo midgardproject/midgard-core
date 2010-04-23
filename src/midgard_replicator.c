@@ -219,9 +219,12 @@ midgard_replicator_export_by_guid (MidgardConnection *mgd, const gchar *guid)
  * Returns: xml buffer with serialized objects or %NULL if there are no objects matching given criteria.
  */ 
 gchar *
-midgard_replicator_export_purged (MidgardConnection *mgd, MidgardObjectClass *klass, const gchar *startdate, const gchar *enddate)
+midgard_replicator_export_purged (MidgardConnection *mgd, const gchar *classname, const gchar *startdate, const gchar *enddate)
 {
 	g_return_val_if_fail (mgd != NULL, NULL);
+	g_return_val_if_fail (classname != NULL, NULL);
+
+	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (classname));
 	g_return_val_if_fail (klass != NULL, NULL);
 
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);

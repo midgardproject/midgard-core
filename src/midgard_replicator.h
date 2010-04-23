@@ -50,7 +50,7 @@ struct MidgardReplicatorClass {
 	/* API methods */
 	gchar 		*(*serialize)		(GObject *object);
 	gboolean	(*export)		(MidgardDBObject *object);
-	gchar 		*(*export_purged)	(MidgardConnection *mgd, MidgardDBObjectClass *klass, const gchar *startdate, const gchar *enddate);
+	gchar 		*(*export_purged)	(MidgardConnection *mgd, const gchar *classname, const gchar *startdate, const gchar *enddate);
 	gchar 		*(*serialize_blob)	(MidgardObject *object);
 	gchar 		*(*export_blob)		(MidgardObject *object);
 	gboolean 	(*export_by_guid)	(const gchar *guid);
@@ -64,7 +64,7 @@ GType midgard_replicator_get_type (void);
 
 gchar 			*midgard_replicator_serialize		(GObject *object);
 gboolean 		midgard_replicator_export		(MidgardDBObject *object);
-gchar 			*midgard_replicator_export_purged	(MidgardConnection *mgd, MidgardObjectClass *klass, const gchar *startdate, const gchar *enddate);
+gchar 			*midgard_replicator_export_purged	(MidgardConnection *mgd, const gchar *classname, const gchar *startdate, const gchar *enddate);
 gchar 			*midgard_replicator_serialize_blob	(MidgardObject *object);
 gchar 			*midgard_replicator_export_blob		(MidgardObject *object);
 gboolean 		midgard_replicator_export_by_guid 	(MidgardConnection *mgd, const gchar *guid);
