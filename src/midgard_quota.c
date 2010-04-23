@@ -29,6 +29,10 @@ gboolean midgard_quota_size_is_reached(MidgardObject *object, gint size)
 	GString *query;
 	guint limit_tmp_size = 0, tmp_size = 0;	
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+
+	if (!mgd->priv->quota)
+		return FALSE;
+
 	guint rows = 0;
 	const GValue *tmp_size_value;
 	const GValue *limit_tmp_size_value;	
@@ -94,6 +98,10 @@ gboolean midgard_quota_size_is_reached(MidgardObject *object, gint size)
 guint midgard_quota_get_object_size(MidgardObject *object)
 {
 	g_assert(object != NULL);
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+
+	if (!mgd->priv->quota)
+		return 0;
 
 	const gchar *tablename = 
 		midgard_core_class_get_table(MIDGARD_DBOBJECT_GET_CLASS(object));
@@ -130,7 +138,11 @@ guint midgard_quota_get_object_size(MidgardObject *object)
 gboolean midgard_quota_update(MidgardObject *object, guint32 init_size)
 {
 	g_assert(object != NULL);
-	g_assert(MGD_OBJECT_CNC (object) != NULL);
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	g_assert(mgd != NULL);
+
+	if (!mgd->priv->quota)
+		return TRUE;
 
 	guint32 size = 0;
 	guint32 qsize = 0;
@@ -140,7 +152,7 @@ gboolean midgard_quota_update(MidgardObject *object, guint32 init_size)
 	if (!object->metadata)
 		return TRUE;
 
-	size = object->metadata->priv->size;
+	size = MGD_DBOBJECT_METADATA (object)->priv->size;
 	
 	/* nothing to update, this should never happen */
 	if(size == 0) return TRUE;
@@ -181,6 +193,9 @@ gboolean midgard_quota_create(MidgardObject *object)
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 	gchar *tmpstr;
 
+	if (!mgd->priv->quota)
+		return TRUE;
+
 	/* Bit of hack, but there's no hook to store object's size */
 	if (!object->metadata)
 		return TRUE;
@@ -207,6 +222,11 @@ gboolean midgard_quota_create(MidgardObject *object)
 void midgard_quota_remove(MidgardObject *object, guint size){
 
 	g_assert(object != NULL);
+
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+
+	if (!mgd->priv->quota)
+		return;
 
 	GString *query;
 	gchar *tmpstr;

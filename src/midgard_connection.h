@@ -85,5 +85,7 @@ MidgardUser 		*midgard_connection_get_user			(MidgardConnection *self);
 MidgardConnection 	*midgard_connection_copy			(MidgardConnection *self);
 gboolean		midgard_connection_reopen			(MidgardConnection *self);
 gchar 			**midgard_connection_list_auth_types		(MidgardConnection *self, guint *n_types);
+void			midgard_connection_enable_quota			(MidgardConnection *self, gboolean toggle);
+void			midgard_connection_enable_replication		(MidgardConnection *self, gboolean toggle);
 
 #endif /* MIDGARD_CONNNECTION_H */

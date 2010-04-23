@@ -623,17 +623,20 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 		return FALSE;
 	}
 
-	midgard_quota_update(gobj, object_init_size);   
-	sql = g_string_new("UPDATE repligard SET ");
-	g_string_append_printf(sql,
-			"typename='%s', object_action=%d WHERE guid='%s' ",	
-			G_OBJECT_TYPE_NAME(gobj),
-			MGD_OBJECT_ACTION_UPDATE,
-			MGD_OBJECT_GUID (gobj));
-	fquery = g_string_free(sql, FALSE);
-	midgard_core_query_execute (MGD_OBJECT_CNC (gobj), fquery, FALSE);
-	g_free(fquery);
-	/* TODO: Should I worry about error in repligard table here? */		
+	midgard_quota_update(gobj, object_init_size);  
+
+	/* Do not touch repligard table if replication is disabled */
+	if (mgd->priv->replication) {
+		sql = g_string_new("UPDATE repligard SET ");
+		g_string_append_printf(sql,
+				"typename='%s', object_action=%d WHERE guid='%s' ",	
+				G_OBJECT_TYPE_NAME(gobj),
+				MGD_OBJECT_ACTION_UPDATE,
+				MGD_OBJECT_GUID (gobj));
+		fquery = g_string_free(sql, FALSE);
+		midgard_core_query_execute (MGD_OBJECT_CNC (gobj), fquery, FALSE);
+		g_free(fquery);
+	}
 
 	/* Success, emit done signals */
 	switch(replicate){
@@ -2434,7 +2437,7 @@ gboolean midgard_object_delete(MidgardObject *object)
 
 		return FALSE;
 
-	} else {
+	} else if (mgd->priv->replication) {
 
 		sql = g_string_new("UPDATE repligard SET ");
 		g_string_append_printf(sql,

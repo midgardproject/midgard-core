@@ -794,7 +794,7 @@ gboolean midgard_connection_open_config(
 		MIDGARD_ERRNO_SET_STRING (self, MGD_ERR_INTERNAL, "Midgard connection already associated with configuration");
 		return FALSE;
 	}
-
+#warning FIXME, copy config
 	g_object_ref(config);
 	self->priv->config = config;
 
@@ -862,7 +862,12 @@ gboolean midgard_connection_set_loglevel(
 		self->priv->loglevel = loglevel;
 	else
 		return FALSE;
-	
+
+	self->priv->debug = FALSE;
+
+	if (loglevel == G_LOG_DEBUG)
+		self->priv->debug = TRUE;
+
 	guint loghandler = midgard_connection_get_loghandler(self);
 	if(loghandler)
 		g_log_remove_handler(G_LOG_DOMAIN, loghandler);
@@ -1164,4 +1169,40 @@ MidgardConnection *midgard_connection_copy(MidgardConnection *self)
 	midgard_core_connection_disconnect_error_callback(self);
 
 	return new_mgd;
+}
+
+/**
+ * midgard_connection_enable_quota:
+ * @self: #MidgardConnection instance
+ * @toggle: quota enable, disable toggle
+ *
+ * Enable or disable quota table usage.
+ * If enabled, every base operation (create, update, delete) will be recorded in quota table, 
+ * limiting particular types usage.
+ *
+ * Since: 10.05
+ */ 
+void
+midgard_connection_enable_quota (MidgardConnection *self, gboolean toggle)
+{
+	g_return_if_fail (slef != NULL);
+	self->priv->quota = toggle;
+}
+
+/**
+ * midgard_connection_enable_replication:
+ * @self: #MidgardConnection instance
+ * @toggle: replication enable, disable toggle
+ *
+ * Enable or partially disable repligard table usage.
+ * If enabled, every base operation (create, update, delete) will be recorded in repligard table.
+ * If disabled, only create and delete ones will be recorded.
+ *
+ * Since: 10.05
+ */ 
+void
+midgard_connection_enable_replication (MidgardConnection *self, gboolean toggle)
+{
+	g_return_if_fail (self != NULL);
+	self->priv->replication = toggle;
 }
