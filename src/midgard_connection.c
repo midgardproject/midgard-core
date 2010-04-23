@@ -865,7 +865,7 @@ gboolean midgard_connection_set_loglevel(
 
 	self->priv->debug = FALSE;
 
-	if (loglevel == G_LOG_DEBUG)
+	if (loglevel == G_LOG_LEVEL_DEBUG)
 		self->priv->debug = TRUE;
 
 	guint loghandler = midgard_connection_get_loghandler(self);
@@ -1185,7 +1185,7 @@ MidgardConnection *midgard_connection_copy(MidgardConnection *self)
 void
 midgard_connection_enable_quota (MidgardConnection *self, gboolean toggle)
 {
-	g_return_if_fail (slef != NULL);
+	g_return_if_fail (self != NULL);
 	self->priv->quota = toggle;
 }
 
