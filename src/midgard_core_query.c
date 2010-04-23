@@ -2785,6 +2785,11 @@ gboolean midgard_core_query_create_class_storage(
 				break;
 		}
 
+		/* Override dbtype if explicitly defined */
+		MgdSchemaPropertyAttr *prop_attr = midgard_core_class_get_property_attr (klass, pspecs[i]->name);
+		if (prop_attr && prop_attr->dbtype)
+			mdc->dbtype = prop_attr->dbtype;
+
 		/* Check not fundamental types */
 		if (mgd_type == MGD_TYPE_TIMESTAMP) {
 			
