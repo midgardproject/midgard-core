@@ -78,6 +78,10 @@ midgard_connection_private_new (void)
 	cnc_private->timer = g_timer_new();
 	g_timer_start(cnc_private->timer);	
 
+	cnc_private->replication = FALSE;
+	cnc_private->quota = FALSE;
+	cnc_private->debug = FALSE;
+
 	return cnc_private;
 }
 

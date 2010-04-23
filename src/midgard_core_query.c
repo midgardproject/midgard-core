@@ -191,7 +191,8 @@ GdaDataModel *midgard_core_query_get_model(MidgardConnection *mgd, const gchar *
 		g_error_free(lerror);
 	}
 
-	g_debug("Model query = %s", query);
+	if (mgd->priv->debug)
+		g_debug("Model query = %s", query);
 
 	/* This is query error */
 	if(!model) 
@@ -608,9 +609,11 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	
 	exec_res = gda_connection_statement_execute_select (mgd->priv->connection, stmt, params, &error);
 
-	gchar *debug_query = gda_statement_serialize (stmt);
-	g_debug ("%s", debug_query);
-	g_free (debug_query);
+	if (mgd->priv->debug) {
+		gchar *debug_query = gda_statement_serialize (stmt);
+		g_debug ("%s", debug_query);
+		g_free (debug_query);
+	}
 
 	g_object_unref (params);
 	g_object_unref (stmt);
@@ -641,7 +644,8 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	GError *error = NULL;
 	GdaObject *exec_res = gda_query_execute (query, plist, FALSE, &error);
 
-	g_debug("%s", gda_query_get_sql_text(query));
+	if (mgd->priv->debug)
+		g_debug("%s", gda_query_get_sql_text(query));
 
 	if (!exec_res) {
 		
@@ -672,7 +676,8 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 {
 	g_return_val_if_fail (object != NULL, FALSE);
 	
-	GdaConnection *cnc = (MGD_OBJECT_CNC (object))->priv->connection;
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	GdaConnection *cnc = mgd->priv->connection;
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_GET_CLASS (object);
 	if (!klass) {
 		g_warning ("Can not find class pointer for %s instance", G_OBJECT_TYPE_NAME (object));
@@ -696,9 +701,11 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 
 	/* FIXME, query stored in connection event is not up to date.
 	 * This function must be rewritten for GDaStatement and ##syntax::type */
-	const gchar *query = NULL;
-	__get_query_string (cnc, query)
-	g_debug ("CREATE DBOBJECT: %s", query); 
+	if (mgd->priv->debug) {
+		const gchar *query = NULL;
+		__get_query_string (cnc, query);
+		g_debug ("CREATE DBOBJECT: %s", query); 
+	}
 
 	gboolean inserted = gda_insert_row_into_table_v (cnc, table, names, values, &error);
 	
@@ -871,8 +878,9 @@ gboolean
 midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 {
 	g_return_val_if_fail (object != NULL, FALSE);
-	
-	GdaConnection *cnc = (MGD_OBJECT_CNC (object))->priv->connection;
+
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);	
+	GdaConnection *cnc = mgd->priv->connection;
 	g_return_val_if_fail (cnc != NULL, FALSE);
 
 	MidgardDBObjectClass *klass = g_type_class_peek (G_OBJECT_TYPE (object));
@@ -991,9 +999,11 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		g_value_unset (&value);
 	}
 
-	gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
-	g_debug ("%s", debug_sql);
-	g_free (debug_sql);
+	if (mgd->priv->debug) {
+		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+		g_debug ("%s", debug_sql);
+		g_free (debug_sql);
+	}
 
 	gint retval = gda_connection_statement_execute_non_select (cnc, stmt, params, NULL, &error);
 
@@ -1421,9 +1431,11 @@ midgard_core_query_insert_records (MidgardConnection *mgd,
 		}
 	}
 
-	gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
-	g_debug ("%s", debug_sql);
-	g_free (debug_sql);
+	if (mgd->priv->debug) {
+		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+		g_debug ("%s", debug_sql);
+		g_free (debug_sql);
+	}
 
 	gint retval = gda_connection_statement_execute_non_select (cnc, stmt, params, NULL, &error);
 
@@ -2226,195 +2238,84 @@ gboolean midgard_core_query_add_index(MidgardConnection *mgd,
 	return FALSE;
 }
 
-static gboolean __create_columns(MidgardConnection *mgd, xmlNode *tbln)
+static gboolean
+__create_repligard_table (MidgardConnection *mgd)
 {
-
-	xmlNode *node; 
-	xmlChar *clmn_name = NULL, *autoinc = NULL, *unique = NULL, *primary = NULL;
-	xmlChar *index = NULL, *dbtype = NULL, *gtype = NULL, *dvalue = NULL;
+	/* Create table with primary key */
+	const gchar *table = "repligard";
+	if (!midgard_core_query_create_table (mgd, table, table, "id"))
+		return FALSE;
+	
+	/* Create columns */
 	MidgardDBColumn *mdc = NULL;
 
-	xmlChar *tablename = xmlGetProp (tbln, (const xmlChar *)"name");
+	/* GUID */
+	mdc = midgard_core_dbcolumn_new ();
+	mdc->table_name = table;
+	mdc->column_name = "guid";
+	mdc->index = TRUE;
+	mdc->dbtype = "varchar(80)";
+	mdc->gtype = MGD_TYPE_STRING;
+	mdc->unique = FALSE;
 
-	for(node = tbln->children; node != NULL; node = node->next) {
-		
-		if(!g_str_equal(node->name, "column"))
-			continue;
+	gboolean rv = midgard_core_query_add_column (mgd, mdc);
+	g_free (mdc);
+	if (!rv) 
+		return FALSE;
 
-		clmn_name = xmlGetProp (node, (const xmlChar *)"name");
-		if(clmn_name && g_str_equal(clmn_name, "id")) {
-			xmlFree (clmn_name);
-			continue;
-		}
+	/* TYPENAME */	
+	mdc = midgard_core_dbcolumn_new ();
+	mdc->table_name = table;
+	mdc->column_name = "typename";
+	mdc->index = FALSE;
+	mdc->dbtype = "varchar(255)";
+	mdc->gtype = MGD_TYPE_STRING;
+	mdc->unique = FALSE;
 
-		mdc = midgard_core_dbcolumn_new();
-		mdc->table_name = (const gchar *)tablename;
+	rv = midgard_core_query_add_column (mgd, mdc);
+	g_free (mdc);
+	if (!rv) 
+		return FALSE;
 
-		if(clmn_name) 
-			mdc->column_name = (const gchar *)clmn_name;
+	/* OBJECT ACTION */
+	mdc = midgard_core_dbcolumn_new ();
+	mdc->table_name = table;
+	mdc->column_name = "object_action";
+	mdc->index = FALSE;
+	mdc->dbtype = "int";
+	mdc->gtype = MGD_TYPE_INT;
+	mdc->unique = FALSE;
+	mdc->dvalue = "0";
 
-		autoinc = xmlGetProp (node, (const xmlChar *)"autoinc");
-		if(autoinc) { 
-			if(g_str_equal(autoinc, "true"))
-				mdc->autoinc = TRUE;
-			g_free(autoinc);
-		}
+	rv = midgard_core_query_add_column (mgd, mdc);
+	g_free (mdc);
+	if (!rv) 
+		return FALSE;
 
-		unique = xmlGetProp (node, (const xmlChar *)"unique");
-		if(unique) {
-			if(g_str_equal(unique, "true"))
-				mdc->unique = TRUE;
-			g_free(unique);
-		}
+	/* OBJECT ACTION DATE */
+	mdc = midgard_core_dbcolumn_new ();
+	mdc->table_name = table;
+	mdc->column_name = "object_action_date";
+	mdc->index = FALSE;
+	mdc->dbtype = "datetime";
+	mdc->gtype = MGD_TYPE_TIMESTAMP;
+	mdc->unique = FALSE;
+	mdc->dvalue = "0001-01-01 00:00:00";
 
-		primary = xmlGetProp (node, (const xmlChar *)"primary");
-		if(primary) {
-			if(g_str_equal(primary, "true"))
-				mdc->primary = TRUE;
-			g_free(primary);
-		}
-
-		index = xmlGetProp (node, (const xmlChar *)"index");
-		if(index) {
-			if(g_str_equal(index, "true"))
-				mdc->index = TRUE;
-			g_free(index);
-		}
-
-		dbtype = xmlGetProp (node, (const xmlChar *)"dbtype");
-		if(dbtype) {
-			mdc->dbtype = (const gchar *)dbtype;
-		}
-		
-		gtype = xmlGetProp (node, (const xmlChar *)"gtype");
-		if(gtype) {
-			
-			if(g_str_equal(gtype, "string"))
-				mdc->gtype = MGD_TYPE_STRING;
-			
-			if(g_str_equal(gtype, "integer"))
-				mdc->gtype = MGD_TYPE_INT;
-
-			if(g_str_equal(gtype, "float"))
-				mdc->gtype = MGD_TYPE_FLOAT;
-			
-			if(g_str_equal(gtype, "boolean"))
-				mdc->gtype = MGD_TYPE_BOOLEAN;
-			
-			if(g_str_equal(gtype, "bool")) 
-				mdc->gtype = MGD_TYPE_BOOLEAN; 
-
-			if(g_str_equal(gtype, "datetime"))
-				mdc->gtype = MGD_TYPE_TIMESTAMP;
-
-			if(g_str_equal(gtype, "text"))
-				mdc->gtype = MGD_TYPE_LONGTEXT;			
-		}
-
-		dvalue = xmlGetProp (node, (const xmlChar *)"default");
-		if(dvalue) {
-			mdc->dvalue = (const gchar *)dvalue;
-		}
-
-		gboolean rv = midgard_core_query_add_column(mgd, mdc);
-
-		xmlFree (clmn_name);
-		xmlFree (dbtype);
-		xmlFree (gtype);
-		if (dvalue)
-			xmlFree (dvalue);
-	
-		g_free (mdc);
-		mdc = NULL;
-
-		if (!rv) {
-			xmlFree (tablename);
-			return FALSE;
-		}
-	}
-
-	xmlFree (tablename);
+	rv = midgard_core_query_add_column (mgd, mdc);
+	g_free (mdc);
+	if (!rv) 
+		return FALSE;
 
 	return TRUE;
 }
 
-gboolean midgard_core_query_create_basic_db(MidgardConnection *mgd)
+gboolean 
+midgard_core_query_create_basic_db (MidgardConnection *mgd)
 {
 	g_return_val_if_fail(mgd != NULL, FALSE);
-	
-	gchar *dbxml = g_build_path(G_DIR_SEPARATOR_S,
-			mgd->priv->config->sharedir, "midgard_initial_database.xml", NULL);
 
-	if(!g_file_test((const gchar *)dbxml,
-				G_FILE_TEST_EXISTS)) {
-
-		g_error("Can not read initial database definition. %s, file doesn't exist.", dbxml);
-		g_free(dbxml);
-		return FALSE;
-	}
-
-	xmlDoc *doc = NULL;
-	xmlNode *root = NULL, *node = NULL;
-
-	LIBXML_TEST_VERSION;
-	g_debug("Reading %s", dbxml);
-	doc = xmlReadFile(dbxml, NULL, 0);
-	
-	if (doc == NULL) {
-
-		g_warning("Can not parse %s", dbxml);
-		g_free(dbxml);
-		return FALSE;
-	}
-	
-	root = xmlDocGetRootElement(doc);
-
-	if(!root) {
-		g_warning("Can not find root element in %s", dbxml);
-		xmlFreeDoc(doc);
-		return FALSE;
-	}
-
-	g_free(dbxml);
-	
-	xmlNode *_clmn;
-	for (node = root; node != NULL ; node = node->next) {
-		if (node->type == XML_ELEMENT_NODE) {
-
-			for (_clmn = node->children; _clmn; _clmn = _clmn->next) {
-
-				if(!g_str_equal(_clmn->name, "table"))
-					continue;
-
-				xmlChar *tablename = 
-					xmlGetProp (_clmn, 
-							(const xmlChar *)"name");
-				midgard_core_query_create_table(mgd,
-						(const gchar *)tablename,
-						(const gchar *)tablename, 
-						"id");
-				__create_columns(mgd, _clmn);
-
-				xmlChar *mdata = 
-					xmlGetProp(_clmn, (const xmlChar *)"metadata");
-				if(mdata != NULL) {
-
-					if(g_str_equal(mdata, "yes"))
-						midgard_core_query_create_metadata_columns(mgd, 
-								(const gchar *)tablename);
-
-					xmlFree(mdata);
-				}
-
-				xmlFree(tablename);
-			}
-		}
-	}
-
-	xmlFreeDoc(doc);
-	xmlCleanupParser();
-
-	return TRUE;
+	return __create_repligard_table (mgd);	
 }
 
 gboolean midgard_core_query_create_metadata_columns(

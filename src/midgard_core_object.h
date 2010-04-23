@@ -175,6 +175,10 @@ struct _MidgardConnectionPrivate {
 	/* Auth stack & types */
 	GSList *authtypes;
 	GSList *authstack;
+
+	gboolean replication;
+	gboolean quota;
+	gboolean debug;
 };
 
 #define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL;
