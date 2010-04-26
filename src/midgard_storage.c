@@ -55,6 +55,7 @@ gboolean
 midgard_storage_create_base_storage(MidgardConnection *mgd)
 {
 	g_return_val_if_fail(mgd != NULL, FALSE);
+	g_return_val_if_fail(mgd->priv->connection != NULL, FALSE);
 
 	gboolean ret =  midgard_core_query_create_basic_db(mgd);
 
