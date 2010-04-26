@@ -336,6 +336,14 @@ _add_value_type_update (GString *str, const gchar *name, GValue *value, gboolean
 			type = "gboolean";
 			break;	
 
+		case G_TYPE_DOUBLE:
+			type = "gfloat";
+			break;	
+
+		case G_TYPE_FLOAT:
+			type = "gfloat";
+			break;
+
 		case G_TYPE_BOXED:
 			if (G_VALUE_TYPE (value) == GDA_TYPE_TIMESTAMP) {
 				type = "timestamp";
