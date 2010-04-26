@@ -314,7 +314,7 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 			} else {
 
 				type_attr->metadata_class_name = g_strdup((gchar *)attrval);
-				type_attr->metadata_class_ptr = g_type_class_peek (g_type_from_name (attrval));
+				type_attr->metadata_class_ptr = g_type_class_peek(g_type_from_name((gchar *)attrval));
 			}
 
 			xmlFree(attrval);
