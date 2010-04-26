@@ -865,7 +865,7 @@ gboolean midgard_connection_set_loglevel(
 
 	self->priv->debug = FALSE;
 
-	if (loglevel == G_LOG_LEVEL_DEBUG)
+	if (loglevel > G_LOG_LEVEL_DEBUG)
 		self->priv->debug = TRUE;
 
 	guint loghandler = midgard_connection_get_loghandler(self);

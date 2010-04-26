@@ -1,6 +1,6 @@
 
 #define MIDGARD_LIB_PREFIX "@prefix@"
-#define MIDGARD_GLOBAL_SCHEMA "@prefix@/share/midgard2/MgdObjects.xml"
+#define MIDGARD_GLOBAL_SCHEMA "@prefix@/share/midgard2/MidgardObjects.xml"
 
 /* Define directory path where all 'local' schemas are stored.
  * Global schema is basic midgard schema , while local ones are defined 

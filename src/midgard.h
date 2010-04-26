@@ -61,6 +61,7 @@
 #include <midgard/midgard_reflector_object.h>
 #include <midgard/midgard_reflector_property.h>
 #include <midgard/midgard_schema_object_factory.h>
+#include <midgard/midgard_schema_object_tree.h>
 
 #endif /* _MIDGARD_API_H_ */
 

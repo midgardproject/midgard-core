@@ -45,6 +45,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_object_parameter.h"
 #include "midgard_object_attachment.h"
 #include "midgard_schema_object_factory.h"
+#include "midgard_schema_object_tree.h"
 
 GType _midgard_attachment_type = 0;
 static gboolean signals_registered = FALSE;
@@ -2177,7 +2178,7 @@ MidgardObject *midgard_object_get_parent(MidgardObject *self)
 	if (midgard_reflector_object_get_property_parent(classname) == NULL)
 		return NULL;
 
-	parent_class_name = midgard_object_parent (self);
+	parent_class_name = midgard_schema_object_tree_get_parent_name (self);
 	if (!parent_class_name)
 		return NULL;
 
@@ -2437,7 +2438,7 @@ gboolean midgard_object_delete(MidgardObject *object)
 
 		return FALSE;
 
-	} else if (mgd->priv->replication) {
+	} else {
 
 		sql = g_string_new("UPDATE repligard SET ");
 		g_string_append_printf(sql,
@@ -2802,24 +2803,6 @@ gboolean midgard_object_has_dependents(MidgardObject *self)
 		return TRUE;
 
 	return FALSE;
-}
-
-/**
- * midgard_object_parent:
- * @self: #MidgardObject instance
- *
- * Returned class name is owned by midgard and should not be freed.
- * 
- * Returns: class name of parent object ( in content tree ).
- */ 
-const gchar *midgard_object_parent(MidgardObject *self)
-{
-	g_assert(self != NULL);	
-
-	if (MIDGARD_DBOBJECT (self)->dbpriv->storage_data->parent)
-		return MIDGARD_DBOBJECT (self)->dbpriv->storage_data->parent;
-	
-	return NULL;    
 }
 
 /** 

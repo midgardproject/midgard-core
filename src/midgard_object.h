@@ -146,15 +146,6 @@ gboolean midgard_object_purge(MidgardObject *object);
 
 gchar * midgard_object_build_path(MidgardObject *mobj);
 
-gboolean midgard_object_is_in_parent_tree(MidgardObject *self, guint rootid, guint id);
-gboolean midgard_object_is_in_tree(MidgardObject *self, guint rootid, guint id);
-gchar * midgard_object_get_tree(MidgardObject *object, GSList *tnodes);
-const gchar *midgard_object_parent(MidgardObject *self);
-MidgardObject *midgard_object_get_parent(MidgardObject *self);
-
-GObject **midgard_object_list(MidgardObject *self, guint *n_objects);
-GObject **midgard_object_list_children(MidgardObject *object, const gchar *childname, guint *n_objects);
-
 gboolean midgard_object_has_dependents(MidgardObject *self);
 gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid);
 void midgard_object_set_connection(MidgardObject *self, MidgardConnection *mgd);

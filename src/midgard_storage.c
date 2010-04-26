@@ -118,11 +118,11 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 		
 		/* midgard_person record */
 		sql = "INSERT INTO person (guid, birthdate, homepage, email, extra, "
-			"metadata_creator, lastname, firstname, metadata_created, metadata_revision, username, password ) "
+			"metadata_creator, lastname, firstname, metadata_created, metadata_revision, username ) "
 			"VALUES ('f6b665f1984503790ed91f39b11b5392', '1999-05-18 14:40:01', "
 			"'http://www.midgard-project.org', 'dev@lists.midgard-project.org', "
 			"'Default administrator account for Midgard', 'f6b665f1984503790ed91f39b11b5392', "
-			"'Administrator', 'Midgard', '1999-05-18 14:40:01', 1, '', '')";
+			"'Administrator', 'Midgard', '1999-05-18 14:40:01', 0, '')";
 		
 		midgard_core_query_execute(mgd, sql, TRUE);
 
