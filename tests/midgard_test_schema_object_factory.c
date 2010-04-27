@@ -89,7 +89,7 @@ void
 midgard_test_schema_object_factory_object_undelete (MidgardObjectTest *mot, gconstpointer data)
 {
 	_MGD_TEST_MOT (mot);
-	const gchar *guid;
+	gchar *guid;
 	g_object_get (object, "guid", &guid, NULL);
 
 	/* Delete and undelete given object */

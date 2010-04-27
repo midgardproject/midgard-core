@@ -41,14 +41,16 @@ void midgard_test_object_class_undelete(MidgardObjectTest *mot, gconstpointer da
 		
 		/* Fail if metadata.deleted is FALSE. We deleted all objects before. */
 		gboolean deleted;
-		g_object_get(MIDGARD_OBJECT(objects[i])->metadata, "deleted", &deleted, NULL);
+		MidgardMetadata *metadata;
+		g_object_get (objects[i], "metadata", &metadata, NULL);
+		g_object_get (metadata, "deleted", &deleted, NULL);
 		g_assert(deleted != FALSE);
 
 		g_object_get(objects[i], "guid", &guid, NULL);
 		g_assert_cmpstr(guid, !=, NULL);
 		
 		gboolean undeleted;
-		undeleted = midgard_object_class_undelete(mgd, guid);
+		undeleted = midgard_schema_object_factory_object_undelete(mgd, guid);
 		g_free(guid);
 		MIDGARD_TEST_ERROR_OK(mgd);
 		/* g_print(" BOOL %d", undeleted); */

@@ -26,7 +26,7 @@ void midgard_test_object_tree_basic(MidgardObjectTest *mot, gconstpointer data)
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);
 
 	/* Get parent (in tree) class and check if parent has the same child declared */
-	const gchar *pname = midgard_object_parent(object);
+	const gchar *pname = midgard_schema_object_tree_get_parent_name (object);
 	
 	if (!pname)
 		return;
@@ -62,7 +62,7 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(_object);
 
 	/* Get parent (in tree) class and check if parent has the same child declared */
-	const gchar *pname = midgard_object_parent(_object);
+	const gchar *pname = midgard_schema_object_tree_get_parent_name(_object);
 	
 	if(!pname)
 		return;
@@ -164,7 +164,7 @@ void midgard_test_object_tree_get_parent(MidgardObjectTest *mot, gconstpointer d
 
 	const gchar *up_property = midgard_reflector_object_get_property_up (G_OBJECT_CLASS_NAME (klass));
 	const gchar *parent_property = midgard_reflector_object_get_property_parent (G_OBJECT_CLASS_NAME (klass));
-	const gchar *parent_name = midgard_object_parent (_object);
+	const gchar *parent_name = midgard_schema_object_tree_get_parent_name (_object);
 
 	/* Check if there's parent defined */
 	if (!up_property && !parent_property) {

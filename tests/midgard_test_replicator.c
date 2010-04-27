@@ -649,7 +649,7 @@ midgard_test_replicator_export_archive (MidgardObjectTest *mot, gconstpointer da
 	_MGD_TEST_MOT (mot);
 
 	gchar *filepath = NULL;
-	MidgardObject *parent_object = midgard_object_get_parent (object);
+	MidgardObject *parent_object = midgard_schema_object_tree_get_parent_object (object);
 	if (parent_object) {
 
 		filepath = _create_xml_path (MIDGARD_TEST_REPLICATOR_DEPENDENT_DIR, object);

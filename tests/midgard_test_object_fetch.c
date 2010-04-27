@@ -78,7 +78,7 @@ void midgard_test_object_get_by_id_created(MidgardObjectTest *mot, gconstpointer
 		g_object_get_property(G_OBJECT(metadata), "created", &tval);
 		g_object_get(metadata, "creator", &creator, NULL);
 		created = midgard_timestamp_get_string_from_value(&tval);
-	
+
 		midgard_test_metadata_check_created(object);
 		midgard_test_metadata_check_datetime_properties(object, created, "created", "revised", NULL);
 		midgard_test_metadata_check_person_references(object, creator, "creator", "revisor", NULL);
