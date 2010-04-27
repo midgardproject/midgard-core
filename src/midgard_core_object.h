@@ -202,6 +202,9 @@ typedef enum {
 } _ObjectActionUpdate;
 
 
+/* MidgardDBObject */
+GParamSpec **midgard_core_dbobject_class_list_properties (MidgardDBObjectClass *klass, guint *n_props); 
+
 /* Object's xml */
 xmlDoc *midgard_core_object_create_xml_doc(void);
 void midgard_core_object_get_xml_doc(  MidgardConnection *mgd,

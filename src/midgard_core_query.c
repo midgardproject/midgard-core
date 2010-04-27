@@ -478,27 +478,25 @@ static void __get_object_properties_lists (MidgardDBObject *object, GSList **nam
 		ftype = G_TYPE_FUNDAMENTAL (pspecs[i]->value_type);
 		value = g_new0 (GValue, 1);
 		const gchar *pname = pspecs[i]->name;
+		const gchar *colname = midgard_core_class_get_property_colname (dbklass, pname);
+		if (!colname)
+			continue;
 
 		switch (ftype) {
 
 			case G_TYPE_STRING:
 				g_value_init (value, G_TYPE_STRING);
+				g_object_get_property (G_OBJECT (object), pname, value);
+				if (!g_value_get_string (value))
+					g_value_set_string (value, "");
 				break;
 
 			default:
 				g_value_init (value, pspecs[i]->value_type);
-		}
-
-		g_object_get_property (G_OBJECT (object), pname, value);	
-
-		/* Append colnames */
-		const gchar *colname = midgard_core_class_get_property_colname (dbklass, pname);
-	
-		if (!colname) {
-			g_value_unset (value);
-			continue;
-		}
-
+				g_object_get_property (G_OBJECT (object), pname, value);
+				break;
+		}	
+			
 		*names = g_slist_prepend (*names, (gpointer) colname);
 
 		/* Append value */
@@ -614,8 +612,17 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 				break;
 		}
 	}
+
+	GType *col_types = g_new (GType, type_attr->num_properties+1);
 	
-	exec_res = gda_connection_statement_execute_select (mgd->priv->connection, stmt, params, &error);
+	for (i = 0; i < type_attr->num_properties; i++) {	
+		col_types[i] = type_attr->params[i]->value_type;	
+	}
+	/* terminate array with 0 */
+	col_types[i] = G_TYPE_NONE;
+
+	exec_res = gda_connection_statement_execute_select_full (mgd->priv->connection, stmt, params,
+			GDA_STATEMENT_MODEL_RANDOM_ACCESS, col_types, &error);
 
 	if (mgd->priv->debug) {
 		gchar *debug_query = gda_statement_serialize (stmt);
@@ -933,7 +940,7 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 
 		g_value_init (&value, pspecs[i]->value_type);
 		g_object_get_property (G_OBJECT (object), pspecs[i]->name, &value);
-
+	
 		/* Convert boolean to integer, it's safe for SQLite at least */
 		/*if (pspecs[i]->value_type == G_TYPE_BOOLEAN) {
 
@@ -1035,9 +1042,6 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 
 	return FALSE;
 
-
-
-	return FALSE;
 }
 
 #else
@@ -1922,7 +1926,7 @@ gboolean midgard_core_query_add_column(MidgardConnection *mgd,
 	GdaServerProvider *server;
 	GdaConnection *cnc = mgd->priv->connection;
 
-	g_debug("Check if column exists");
+	g_debug("Check if column '%s.%s' exists", mdc->table_name, mdc->column_name);
 	if(__mcq_column_exists(mgd, mdc))
 		return TRUE;
 #ifdef HAVE_LIBGDA_4

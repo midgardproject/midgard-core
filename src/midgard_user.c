@@ -1093,18 +1093,15 @@ static void __set_from_sql(MidgardDBObject *object,
 
 	/* PERSON GUID */
 	value = midgard_data_model_get_value_at_col_name (model, "person", row);
-	if (value && G_VALUE_HOLDS_STRING (value))
+	if (value && G_IS_VALUE (value) && G_VALUE_HOLDS_STRING (value))
 		self->priv->person_guid = g_value_dup_string (value);
-	else if (value && G_VALUE_TYPE (value) == GDA_TYPE_NULL)
-		self->priv->person_guid = g_strdup ("");
 	else 
 		g_warning ("Invalid value type for user's person guid. Expected string, got %s", G_VALUE_TYPE_NAME (value));
 
 	/* ACTIVE */
 	value = midgard_data_model_get_value_at_col_name (model, "active", row);
 	if (value) {
-		MIDGARD_GET_BOOLEAN_FROM_VALUE (active, value);
-		self->priv->active = active;
+		self->priv->active = g_value_get_boolean (value);
 	}
 
 	/* AUTH TYPE */
@@ -1184,8 +1181,10 @@ __midgard_user_get_person(MidgardUser *self)
 
 	if (self->priv->person == NULL) {
 
+		gchar *person_guid = self->priv->person_guid;
+
 		/* Load person from storage if user holds its guid reference */
-		if (self->priv->person_guid) {
+		if (person_guid && *person_guid != '\0') {
 		
 			GValue gval = {0, };
 			g_value_init (&gval, G_TYPE_STRING);
@@ -1378,7 +1377,7 @@ __midgard_user_constructor (GType type,
 
 	MIDGARD_USER (object)->priv = g_new(MidgardUserPrivate, 1);
 	MIDGARD_USER (object)->priv->person = NULL;
-	MIDGARD_USER (object)->priv->person_guid = NULL;
+	MIDGARD_USER (object)->priv->person_guid = g_strdup ("");
 	MIDGARD_USER (object)->priv->user_type = MIDGARD_USER_TYPE_NONE;
 	MIDGARD_USER (object)->priv->fetched = FALSE;
 	MIDGARD_USER (object)->priv->login = NULL;
@@ -1448,9 +1447,11 @@ static void _midgard_user_class_init(
 	MgdSchemaTypeAttr *type_attr = midgard_core_schema_type_attr_new();
 
 	GParamSpec *pspec;
+	gchar *property_name;
 
 	 /* GUID */
-	pspec = g_param_spec_string ("guid",
+	property_name = "guid";
+	pspec = g_param_spec_string (property_name,
 			"Guid which identifies user object.",
 			"",
 			"",
@@ -1460,14 +1461,16 @@ static void _midgard_user_class_init(
 			pspec);
 	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_GUID;
-	prop_attr->field = g_strdup("guid");
+	prop_attr->field = g_strdup(property_name);
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
-	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, "guid", NULL);
+	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, property_name, NULL);
 	g_hash_table_insert(type_attr->prophash,
-			g_strdup((gchar *)"guid"), prop_attr);
+			g_strdup((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
 
 	/* LOGIN */
-	pspec = g_param_spec_string ("login",
+	property_name = "login";
+	pspec = g_param_spec_string (property_name,
 			"midgard_user's login",
 			"",
 			"",
@@ -1477,14 +1480,15 @@ static void _midgard_user_class_init(
 			pspec);
 	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_STRING;
-	prop_attr->field = g_strdup("login");
+	prop_attr->field = g_strdup(property_name);
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
-	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, "login", NULL);
+	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, property_name, NULL);
 	prop_attr->dbindex = TRUE;
-	g_hash_table_insert(type_attr->prophash,
-			g_strdup((gchar *)"login"), prop_attr);
+	g_hash_table_insert(type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
 
 	 /* PASSWORD */
+	property_name = "password";
 	pspec = g_param_spec_string ("password",
 			"midgard_user's password",
 			"",
@@ -1495,14 +1499,15 @@ static void _midgard_user_class_init(
 			pspec);
 	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_STRING;
-	prop_attr->field = g_strdup("password");
+	prop_attr->field = g_strdup(property_name);
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
-	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, "password", NULL);
-	g_hash_table_insert(type_attr->prophash,
-			g_strdup((gchar *)"password"), prop_attr);
-	
+	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, property_name, NULL);
+	g_hash_table_insert(type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
+
        	/* PERSON */
-	pspec = g_param_spec_string ("person",
+	property_name = "person";
+	pspec = g_param_spec_string (property_name,
 			"Guid which identifies person object associated with user.",
 			"",
 			"",
@@ -1518,11 +1523,12 @@ static void _midgard_user_class_init(
 	prop_attr->is_link = TRUE;
 	prop_attr->link = g_strdup ("midgard_person");
 	prop_attr->link_target = g_strdup ("guid");
-	g_hash_table_insert(type_attr->prophash,
-			g_strdup((gchar *)"person"), prop_attr);
+	g_hash_table_insert(type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
 
 	/* ACTIVE */
-	pspec = g_param_spec_boolean ("active",
+	property_name = "active";
+	pspec = g_param_spec_boolean (property_name,
 			"midgard_user's active info",
 			"",
 			FALSE, G_PARAM_READWRITE);
@@ -1531,14 +1537,15 @@ static void _midgard_user_class_init(
 			pspec);
 	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_BOOLEAN;
-	prop_attr->field = g_strdup("active");
+	prop_attr->field = g_strdup(property_name);
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
-	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, "active", NULL);
-	g_hash_table_insert(type_attr->prophash,
-			g_strdup((gchar *)"active"), prop_attr);
+	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, property_name, NULL);
+	g_hash_table_insert(type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
 
 	 /* AUTH TYPE  */
-	pspec = g_param_spec_string ("authtype",
+	property_name = "authtype";
+	pspec = g_param_spec_string (property_name,
 			"midgard_user's authentication type",
 			"",
 			"",
@@ -1551,11 +1558,12 @@ static void _midgard_user_class_init(
 	prop_attr->field = g_strdup("auth_type");
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
 	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, "auth_type", NULL);
-	g_hash_table_insert(type_attr->prophash,
-			g_strdup((gchar *)"authtype"), prop_attr);
+	g_hash_table_insert(type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
 
 	/* AUTH TYPE ID */
-	pspec = g_param_spec_uint ("authtypeid",
+	property_name = "authtypeid";
+	pspec = g_param_spec_uint (property_name,
 			"midgard_user's authentication type id",
 			"",
 			0, G_MAXUINT32, 0, G_PARAM_READABLE);
@@ -1568,11 +1576,12 @@ static void _midgard_user_class_init(
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
 	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, "auth_type_id", NULL);
 	prop_attr->dbindex = TRUE;
-	g_hash_table_insert(type_attr->prophash,
-			g_strdup((gchar *)"authtypeid"), prop_attr);
+	g_hash_table_insert(type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
 
 	/* USER TYPE */
-	pspec = g_param_spec_uint ("usertype",
+	property_name = "usertype";
+	pspec = g_param_spec_uint (property_name,
 			"midgard_user's type",
 			"",
 			0, G_MAXUINT32, 0, G_PARAM_READWRITE);
@@ -1585,11 +1594,8 @@ static void _midgard_user_class_init(
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
 	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, "user_type", NULL);
 	prop_attr->dbindex = TRUE;
-	g_hash_table_insert(type_attr->prophash,
-			g_strdup((gchar *)"usertype"), prop_attr);
-
-	/* This must be replaced with GDA classes */
-	type_attr->sql_select_full = g_strdup("guid, login, password, auth_type as authtype, auth_type_id as authtypeid, active, person_guid as person, user_type AS usertype");
+	g_hash_table_insert(type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
 
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv = g_new(MidgardDBObjectPrivate, 1);
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data = type_attr;
@@ -1603,6 +1609,20 @@ static void _midgard_user_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->update_storage = midgard_core_query_update_class_storage;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_exists = _user_storage_exists; 
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->delete_storage = _user_storage_delete;
+
+	type_attr->params = midgard_core_dbobject_class_list_properties (MIDGARD_DBOBJECT_CLASS (klass), &type_attr->num_properties);	
+	guint i;
+	const gchar *field_name;
+	GString *sql_full = g_string_new ("");
+
+	for (i = 0; i < type_attr->num_properties; i++) {
+		field_name = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (klass), type_attr->params[i]->name);
+		if (i > 0)
+			g_string_append (sql_full, ", ");
+		g_string_append_printf (sql_full, "%s AS %s", field_name, type_attr->params[i]->name);
+	}
+	type_attr->sql_select_full = g_strdup (sql_full->str);
+	g_string_free (sql_full, TRUE);
 }
 
 static void _midgard_user_instance_init(

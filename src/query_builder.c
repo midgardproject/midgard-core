@@ -764,8 +764,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 
 	/* creator */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	if(G_VALUE_HOLDS_STRING (gvalue)) 
-		midgard_core_metadata_set_creator (mdata, gvalue);
+	midgard_core_metadata_set_creator (mdata, gvalue);
 
 	/* created */	
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);

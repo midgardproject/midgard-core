@@ -347,7 +347,8 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 
 	g_object_ref (self);
 
-	GdaConnection *cnc = self->priv->mgd->priv->connection;
+	MidgardConnection *mgd = self->priv->mgd;
+	GdaConnection *cnc = mgd->priv->connection;
 	GdaSqlStatement *sql_stm;
 	GdaSqlStatementSelect *sss;
 
@@ -438,9 +439,11 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	gda_sql_statement_free (sql_stm);
 	sql_stm = NULL;
 
-	gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
-	g_print ("%s", debug_sql);
-	g_free (debug_sql);
+	if (mgd->priv->debug) {
+		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+		g_debug ("QuerySelect: %s", debug_sql);
+		g_free (debug_sql);
+	}
 
 	/* execute statement */
 	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &error);
