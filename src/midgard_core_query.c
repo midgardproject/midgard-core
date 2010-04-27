@@ -1949,15 +1949,11 @@ gboolean midgard_core_query_add_column(MidgardConnection *mgd,
 	gda_server_operation_set_value_at(op, table_name,
 			NULL, "/COLUMN_DEF_P/TABLE_NAME");
 	/* NOT NULL not implemented in PostgreSQL 8.1 ( 28.02.2007 ) */
-	/* Disabled for now. Probably we won't need NOT NULL 
 	if(mgd->priv->config->priv->dbtype != MIDGARD_DB_TYPE_POSTGRES)
-		gda_server_operation_set_value_at(op, "true",
-				NULL, "/COLUMN_DEF_P/COLUMN_NNUL");
-	*/
-	gda_server_operation_set_value_at(op, column_name,
-				NULL, "/COLUMN_DEF_P/COLUMN_NAME");
-	gda_server_operation_set_value_at(op, column_type_str,
-			NULL, "/COLUMN_DEF_P/COLUMN_TYPE");
+		gda_server_operation_set_value_at(op, "true", NULL, "/COLUMN_DEF_P/COLUMN_NNUL");
+
+	gda_server_operation_set_value_at(op, column_name, NULL, "/COLUMN_DEF_P/COLUMN_NAME");
+	gda_server_operation_set_value_at(op, column_type_str, NULL, "/COLUMN_DEF_P/COLUMN_TYPE");
 	
 	gchar *dval = NULL; 
 
