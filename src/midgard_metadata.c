@@ -401,8 +401,8 @@ _metadata_get_property (GObject *object, guint property_id,
 
 	switch (property_id) {
 		
-		case MIDGARD_METADATA_CREATOR: 
-			g_value_set_string (value, self->priv->creator);
+		case MIDGARD_METADATA_CREATOR:
+			g_value_set_string (value, self->priv->creator);	
 			break;
 			
 		case MIDGARD_METADATA_CREATED:
@@ -522,7 +522,7 @@ static void
 _metadata_instance_init(GTypeInstance *instance, gpointer g_class) 
 {	
 	MidgardMetadata *self = (MidgardMetadata *)instance;
-	
+
 	/* allocate private data */
 	self->priv = g_new(MidgardMetadataPrivate, 1);
 	self->priv->creator = NULL;
@@ -559,7 +559,7 @@ _metadata_object_finalize(GObject *object)
 {
 	g_assert(object);
 
-	MidgardMetadata *self = (MidgardMetadata *)object;
+	MidgardMetadata *self = (MidgardMetadata *)object;	
 
 	/* Free private data */
 	g_free(self->priv->creator);

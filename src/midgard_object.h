@@ -41,7 +41,6 @@ struct _MidgardObject {
 
 	/* <private> */
 	MidgardObjectPrivate *priv;	
-	MidgardMetadata *metadata;	
 };
 
 struct _MidgardObjectClass {

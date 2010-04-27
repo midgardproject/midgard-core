@@ -763,7 +763,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 	GValue mt = {0, };
 
 	/* creator */
-	gvalue = midgard_data_model_get_value_at(model, ++col, i);
+	gvalue = midgard_data_model_get_value_at(model, ++col, i);	
 	midgard_core_metadata_set_creator (mdata, gvalue);
 
 	/* created */	
@@ -796,7 +796,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 	/* approver */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
 	if(G_VALUE_HOLDS_STRING (gvalue)) 
-		midgard_core_metadata_set_creator (mdata, gvalue);
+		midgard_core_metadata_set_approver (mdata, gvalue);
 
 
 	/* approved */
@@ -890,11 +890,10 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 }
 
 GList *
-midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint select_type, MidgardObject *nobject)
+midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint select_type, MidgardObject **nobject)
 {
         g_assert(builder != NULL);
-
-        MidgardObject *object;
+ 
         guint ret_rows, ret_fields;
 	MidgardConnection *mgd = builder->priv->mgd;
       
@@ -928,6 +927,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 	if(!model) 
 		return NULL;	
 
+	MidgardObject *object = NULL;
 	gint rows, columns;
 	const GValue *gvalue = NULL;
 
@@ -972,10 +972,10 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 	/* Get every row */
 	for (rows = 0; rows < ret_rows; rows++) {
 	
-		if(nobject)
-			object = nobject;
-		else
+		if(!nobject)
 			object = g_object_new(builder->priv->type, NULL);
+		else 
+			object = *nobject;
 
 		MIDGARD_DBOBJECT(object)->dbpriv->mgd = builder->priv->mgd;
 				

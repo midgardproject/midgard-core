@@ -713,7 +713,7 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd,
 					GValue strval = {0, };
 					g_value_init(&strval, G_TYPE_STRING);
 					g_value_set_string(&strval, purged);
-					midgard_core_metadata_set_revised(MIDGARD_OBJECT(object)->metadata, (const GValue*)&strval);
+					midgard_core_metadata_set_revised(MGD_DBOBJECT_METADATA(object), (const GValue*)&strval);
 					g_value_unset(&strval);
 				}
 				
@@ -834,7 +834,7 @@ midgard_core_object_property_refuse_private (MidgardConnection *mgd, MgdSchemaTy
 	gchar *creator_guid = NULL;
 
 	if (MIDGARD_IS_OBJECT (object)) {
-		MidgardMetadata *metadata = MIDGARD_OBJECT (object)->metadata;
+		MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
 		creator_guid = metadata->priv->creator;
 	}
 

@@ -201,7 +201,7 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 			g_value_set_string (value, MGD_OBJECT_GUID (self));
 			break;
 				
-		case MIDGARD_PROPERTY_METADATA:
+		case MIDGARD_PROPERTY_METADATA:	
 			g_value_set_object (value, (MidgardMetadata *) MGD_DBOBJECT_METADATA (self));
 			break;
 		
@@ -1203,10 +1203,9 @@ gboolean midgard_object_get_by_id(MidgardObject *object, guint id)
 	if (midgard_query_builder_add_constraint(builder,
 				"id",
 				"=", &pval)) {
-	
+
 		GList *olist =
-			midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, object);
-		
+			midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, &object);
 		g_value_unset(&pval);
 		g_object_unref(G_OBJECT(builder));
 		
@@ -2299,7 +2298,7 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 				"=", &pval)) {
 	
 		GList *olist =
-			midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, object);
+			midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, &object);
 		
 		g_value_unset(&pval);
 		g_object_unref(G_OBJECT(builder));

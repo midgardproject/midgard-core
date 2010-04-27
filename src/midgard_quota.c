@@ -149,7 +149,7 @@ gboolean midgard_quota_update(MidgardObject *object, guint32 init_size)
 	const gchar *typename = G_OBJECT_TYPE_NAME(object);	
 	gchar *tmpstr;
 
-	if (!object->metadata)
+	if (!MGD_DBOBJECT_METADATA (object))
 		return TRUE;
 
 	size = MGD_DBOBJECT_METADATA (object)->priv->size;
@@ -197,10 +197,10 @@ gboolean midgard_quota_create(MidgardObject *object)
 		return TRUE;
 
 	/* Bit of hack, but there's no hook to store object's size */
-	if (!object->metadata)
+	if (!MGD_DBOBJECT_METADATA (object))
 		return TRUE;
 
-	guint32 size = object->metadata->priv->size;
+	guint32 size = MGD_DBOBJECT_METADATA (object)->priv->size;
 	if(midgard_quota_size_is_reached(object, size)){
 		MIDGARD_ERRNO_SET(mgd, MGD_ERR_QUOTA);
 		return FALSE;
