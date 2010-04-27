@@ -557,10 +557,10 @@ _get_property_attributes(xmlNode * node,
 			__warn_msg(node, "Invalid (reserved) column name defined");
 			g_error ("Invalid column name");
 		} 
-		prop_attr->field = g_strdup ((gchar *)attrval);
+		prop_attr->field = g_ascii_strdown ((gchar *)attrval, -1);
 		xmlFree (attrval);
 	} else {
-		prop_attr->field = g_strdup (prop_attr->name);
+		prop_attr->field = g_ascii_strdown (prop_attr->name, -1);
 	}
 		
 	/* index */
@@ -929,7 +929,7 @@ void __get_pdata_foreach(gpointer key, gpointer value, gpointer user_data)
 		midgard_core_schema_type_property_set_tablefield(prop_attr, table, parentfield);
 
 	if(prop_attr->field == NULL)
-		prop_attr->field = g_strdup(pname);
+		prop_attr->field = g_ascii_strdown (pname, -1);
 
 	/* Force G_TYPE_UINT type for primaryfield */
 	if((prop_attr->is_primary) && (prop_attr->gtype != G_TYPE_UINT))

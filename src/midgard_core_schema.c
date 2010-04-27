@@ -495,7 +495,7 @@ midgard_core_schema_type_property_set_tablefield (MgdSchemaPropertyAttr *prop, c
 		g_free ((gchar *)prop->tablefield);
 
 	gchar *_table = g_strdup (table);
-	gchar *_field = g_strdup (field);
+	gchar *_field = g_ascii_strdown (field, -1);
 
 	if (prop->table) g_free ( (gchar *)prop->table);
 	prop->table = g_strdup(_table);
