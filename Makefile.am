@@ -220,7 +220,7 @@ Midgard_10_05_gir_PACKAGES = gobject-2.0 libxml-2.0 libgda-4.0
 INTROSPECTION_GIRS = Midgard-10.05.gir
 INTROSPECTION_LIBS += -lxml2
 girdir = $(datadir)/gir-1.0
-dist_gir_DATA = $(INTROSPECTION_GIRS)
+gir_DATA = $(INTROSPECTION_GIRS)
 
 typelibsdir = $(libdir)/girepository-1.0
 typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
