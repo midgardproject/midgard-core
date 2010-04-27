@@ -1,4 +1,3 @@
-usr/share/midgard2/midgard_initial_database.xml
 usr/share/midgard2/midgard_auth_types.xml
 usr/share/midgard2/MidgardObjects.xml
 etc/midgard2/conf.d/midgard.conf.example
