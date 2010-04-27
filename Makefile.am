@@ -71,10 +71,10 @@ midgard_public_h = \
 	src/midgard_reflector_property.h \
 	src/midgard_replicator.h \
 	src/midgard_schema_object_factory.h \
+	src/midgard_schema_object_tree.h \
 	src/midgard_blob.h \
 	src/midgard_storage.h \
 	src/midgard_transaction.h \
-	src/midgard_tree.h \
 	src/midgard_user.h \
 	src/midgard_utils.h \
 	src/midgard_view.h
@@ -181,12 +181,13 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_user.c \
 	src/midgard_schema_object_factory.c \
 	src/midgard_schema_object_factory.h \
+	src/midgard_schema_object_tree.c \
+	src/midgard_schema_object_tree.h \
 	src/midgard_storage.c \
 	src/midgard_storage.h \
 	src/midgard_dbobject.c \
 	src/midgard_blob.c \
 	src/midgard_transaction.c \
-	src/midgard_tree.c \
 	src/midgard_md5.c \
 	src/midgard_md5.h \
 	src/midgard_view.c
