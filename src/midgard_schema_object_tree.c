@@ -33,14 +33,8 @@ gboolean _midgard_tree_exists(MidgardConnection *mgd,
 	g_return_val_if_fail(table != NULL, FALSE);
 	g_return_val_if_fail(upfield != NULL, FALSE);
 
-	if(root == id) {
-		g_warning("tree_exists: expected root != id");
-		return FALSE;
-	}
-
-	if(root == 0 || id == 0) {
-		g_warning("tree_exists: root(%d), id(%d). Expected root > 0 and id > 0",
-				root, id);
+	if(id == 0) {
+		g_warning("tree_exists: expected id > 0");
 		return FALSE;
 	}
 	
