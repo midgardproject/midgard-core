@@ -112,13 +112,17 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 	if(!model || ret_rows == 0) {
 		
 		/* midgard_person record */
+		/*
 		sql = "INSERT INTO person (guid, birthdate, homepage, email, extra, "
 			"metadata_creator, lastname, firstname, metadata_created, metadata_revision, username ) "
 			"VALUES ('f6b665f1984503790ed91f39b11b5392', '1999-05-18 14:40:01', "
 			"'http://www.midgard-project.org', 'dev@lists.midgard-project.org', "
 			"'Default administrator account for Midgard', 'f6b665f1984503790ed91f39b11b5392', "
-			"'Administrator', 'Midgard', '1999-05-18 14:40:01', 0, '')";
-		
+			"'Administrator', 'Midgard', '1999-05-18 14:40:01', 0, '')";*/
+	
+		sql = "INSERT INTO person (guid, metadata_creator, lastname, firstname, metadata_created, metadata_revision) "
+			"VALUES ('f6b665f1984503790ed91f39b11b5392', 'f6b665f1984503790ed91f39b11b5392', "
+			"'Administrator', 'Midgard', '1999-05-18 14:40:01', 0 )";
 		midgard_core_query_execute(mgd, sql, TRUE);
 
 		/* Create root's repligard entry */
