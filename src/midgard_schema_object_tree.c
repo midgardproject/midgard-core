@@ -37,7 +37,7 @@ gboolean _midgard_tree_exists(MidgardConnection *mgd,
 		g_warning("tree_exists: expected id > 0");
 		return FALSE;
 	}
-	
+
 	gint _id = id;
 	gint _root = root;
 	gboolean _exists = FALSE;
@@ -123,6 +123,9 @@ gboolean midgard_object_is_in_parent_tree(MidgardObject *self, guint rootid, gui
 
 	if(_id == 0)
 		return FALSE;
+
+	if (_id == rootid)
+		return TRUE;
 
 	gboolean rv = 
 		_midgard_tree_exists(MGD_OBJECT_CNC (self), parent_table, 
