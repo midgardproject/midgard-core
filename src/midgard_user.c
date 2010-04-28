@@ -1234,9 +1234,11 @@ midgard_user_quick_login (MidgardConnection *mgd, const gchar *login, const gcha
 	if (!user)
 		return NULL;
 
-	midgard_user_log_in (user);
+	if (midgard_user_log_in (user))
+		return user;
 
-	return user;
+	g_object_unref (user);
+	return NULL;
 }
 
 /* GOBJECT ROUTINES */
