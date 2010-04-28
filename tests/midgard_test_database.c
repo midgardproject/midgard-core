@@ -29,8 +29,8 @@ gboolean midgard_test_database_create(MidgardConnection *mgd)
 	gboolean class_table_created;
 	GType *all_types = g_type_children(MIDGARD_TYPE_OBJECT, &n_types);
 
-	/* Fail, if we have less than 10 classes */
-	g_assert_cmpint(n_types, >, 10);
+	/* Fail, if we have less than 2 classes */
+	g_assert_cmpint(n_types, >, 2);
 
 	/* midgard_connection_set_loglevel(mgd, "debug", NULL); */
 
