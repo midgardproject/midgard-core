@@ -615,8 +615,11 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 
 	GType *col_types = g_new (GType, type_attr->num_properties+1);
 	
-	for (i = 0; i < type_attr->num_properties; i++) {	
-		col_types[i] = type_attr->params[i]->value_type;	
+	for (i = 0; i < type_attr->num_properties; i++) {
+		if (type_attr->params[i]->value_type == G_TYPE_UINT)
+			col_types[i] = G_TYPE_INT;	
+		else
+			col_types[i] = type_attr->params[i]->value_type;	
 	}
 	/* terminate array with 0 */
 	col_types[i] = G_TYPE_NONE;
