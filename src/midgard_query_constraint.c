@@ -72,6 +72,18 @@ gboolean __query_constraint_operator_is_valid(const gchar *op, GdaSqlOperatorTyp
 }
 
 
+/**
+ * midgard_query_constraint_new:
+ * @property: #MidgardQueryProperty instance
+ * @op: constraint operator
+ * @holder: #MidgardQueryHolder instance
+ * @storage: optional #MidgardQueryStorage to use with constraint
+ * 
+ * Valid @op operators are: '=', '<', '>', '!=', '<>', '<=', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN'
+ *
+ * Returns: new #MidgardQueryConstraint instance, or %NULL on failure
+ * Since: 10.05
+ */ 
 MidgardQueryConstraint *
 midgard_query_constraint_new (MidgardQueryProperty *property, const gchar *op, 
 		MidgardQueryHolder *holder, MidgardQueryStorage *storage)
@@ -109,40 +121,106 @@ midgard_query_constraint_set_value (MidgardQueryConstraint *self, const GValue *
 	return FALSE;
 }
 
+/**
+ * midgard_query_constraint_get_storage:
+ * @self: #MidgardQueryStorage instance
+ *
+ * Returns: #MidgardQueryStorage associated with constraint or %NULL
+ * Since: 10.05
+ */  
 MidgardQueryStorage *
 midgard_query_constraint_get_storage (MidgardQueryConstraint *self)
 {
-	return NULL;
+	g_return_val_if_fail (self != NULL, NULL);
+	return self->priv->storage;
 }
 
+/**
+ * midgard_query_constraint_set_storage:
+ * @self: #MidgardQueryConstraint instance
+ * @storage: #MidgardQueryStorage to associate with @self constraint
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.05
+ */ 
 gboolean          
 midgard_query_constraint_set_storage (MidgardQueryConstraint *self, MidgardQueryStorage *storage)
 {
-	return FALSE;
+	g_return_val_if_fail (self != NULL, FALSE);
+
+	self->priv->storage = storage;
+	return TRUE;
 }
 
+/**
+ * midgard_query_constraint_get_property:
+ * @self: #MidgardQueryConstraint instance
+ *
+ * Returns: #MidgardQueryProperty associated with @self constraint, or %NULL
+ * Since: 10.05
+ */ 
 MidgardQueryProperty *
 midgard_query_constraint_get_property (MidgardQueryConstraint *self)
 {
-	return NULL;
+	g_return_val_if_fail (self != NULL, NULL);
+
+	return self->priv->property_value;
 }
 
+/**
+ * midgard_query_constraint_set_property:
+ * @self: #MidgardQueryConstraint instance
+ * @property: #MidgardQueryProperty to associate with @self constraint
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.05
+ */ 
 gboolean                
 midgard_query_constraint_set_property (MidgardQueryConstraint *self, MidgardQueryProperty *property)
 {
-	return FALSE;
+	g_return_val_if_fail (self != NULL, FALSE);
+
+	self->priv->property_value = property;
+	return TRUE;
 }
 
+/**
+ * midgard_query_constraint_get_operator:
+ * @self: #MidgardQueryConstraint instance
+ *
+ * Returns: operator type associated with @self constraint, or %NULL
+ * Since: 10.05
+ */
 const gchar *
 midgard_query_constraint_get_operator (MidgardQueryConstraint *self)
 {
-	return NULL;
+	g_return_val_if_fail (self != NULL, NULL);
+
+	return self->priv->op;
 }
 
+/**
+ * midgard_query_constraint_set_operator:
+ * @self: #MidgardQueryConstraint instance
+ * @op: operator to associate with constraint
+ * 
+ * Check midgard_query_constraint_new() for valid operator types.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.05
+ */ 
 gboolean
 midgard_query_constraint_set_operator (MidgardQueryConstraint *self, const gchar *op)
 {
-	return FALSE;
+	g_return_val_if_fail (self != NULL, FALSE);
+
+ 	GdaSqlOperatorType op_type;
+	if (!__query_constraint_operator_is_valid (op, &op_type))
+		return FALSE;
+
+        self->priv->op = g_strdup (op);
+        self->priv->op_type = op_type;
+	return TRUE;
 }
 
 /* GOBJECT ROUTINES */
