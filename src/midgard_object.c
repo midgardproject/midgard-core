@@ -2924,7 +2924,6 @@ gboolean midgard_object_approve(MidgardObject *self)
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
 
 	MidgardUser *user = midgard_connection_get_user(mgd);
-	const MidgardObject *person = midgard_user_get_person(user);
 
 	if (!user) {
 		
@@ -2932,6 +2931,8 @@ gboolean midgard_object_approve(MidgardObject *self)
 		g_object_unref(self);
 		return FALSE;
 	}
+
+	const MidgardObject *person = midgard_user_get_person(user);
 
 	if (!person) {
 		
@@ -3093,7 +3094,6 @@ gboolean midgard_object_unapprove(MidgardObject *self)
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
 
 	MidgardUser *user = midgard_connection_get_user(mgd);
-	const MidgardObject *person = midgard_user_get_person(user);
 
 	if (!user) {
 		
@@ -3101,6 +3101,8 @@ gboolean midgard_object_unapprove(MidgardObject *self)
 		g_object_unref(self);
 		return FALSE;
 	}
+
+	const MidgardObject *person = midgard_user_get_person(user);
 
 	if (!person) {
 		
