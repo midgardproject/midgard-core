@@ -543,7 +543,7 @@ gboolean __midgard_connection_open(
 
 	if(init_schema) {
 		
-		if(!g_type_from_name("midgard_language")) {
+		if(!g_type_from_name("midgard_quota")) {
 			
 			MidgardSchema *schema = g_object_new(MIDGARD_TYPE_SCHEMA, NULL);
 			gchar *path = g_build_path(G_DIR_SEPARATOR_S, config->sharedir, "MidgardObjects.xml", NULL);
