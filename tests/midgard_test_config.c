@@ -25,12 +25,19 @@ midgard_test_config_new_user_config (const gchar *name)
 	gboolean saved = FALSE;
 	gboolean read = FALSE;
 
+	const gchar *dbtype = g_getenv ("MIDGARD_TEST_DATABASE_TYPE");
+	if (!dbtype)
+		dbtype = "MySQL";
+
+	const gchar *debug_level = g_getenv ("MIDGARD_TEST_DEBUG_LEVEL");
+	if (!debug_level)
+		debug_level = "warn";
+
 	g_object_set (config, "database", CONFIG_DB_NAME, NULL);
-	g_object_set (config, "dbtype", "MySQL", NULL);
+	g_object_set (config, "dbtype", dbtype, NULL);
 	g_object_set (config, "dbuser", CONFIG_DB_NAME, NULL);
 	g_object_set (config, "dbpass", CONFIG_DB_NAME, NULL);
-	g_object_set (config, "loglevel", "debug", NULL);
-	//g_object_set (config, "dbtype", "SQLite", NULL);
+	g_object_set (config, "loglevel", debug_level, NULL);	
 	saved = midgard_config_save_file (config, name, TRUE, NULL);
 	g_assert (saved == TRUE);
 	g_object_unref (config);
