@@ -102,11 +102,6 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 		MIDGARD_OBJECT_GET_CLASS_BY_NAME("midgard_person");
 	midgard_storage_create (mgd, "midgard_person");
 
-	/* member table */
-	MidgardObjectClass *member_klass = 
-		MIDGARD_OBJECT_GET_CLASS_BY_NAME("midgard_member");
-	midgard_storage_create (mgd, "midgard_member");
-
 	sql = "SELECT lastname, firstname FROM person WHERE guid='f6b665f1984503790ed91f39b11b5392'";
 
 	model = midgard_core_query_get_model(mgd, sql);
