@@ -384,6 +384,10 @@ _midgard_metadata_dbpriv_get_property (MidgardDBObject *self, const gchar *name,
 {
 	gchar *datamodel_property = g_strconcat ("metadata_", name, NULL);
 	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (MIDGARD_METADATA (self)->priv->object);
+	
+	if (!dbobject || !dbobject->dbpriv)
+		return FALSE;
+
 	gboolean rv = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->get_property (dbobject, datamodel_property, value);
 	g_free (datamodel_property);
 
