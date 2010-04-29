@@ -383,8 +383,8 @@ gboolean
 _midgard_metadata_dbpriv_get_property (MidgardDBObject *self, const gchar *name, GValue *value)
 {
 	gchar *datamodel_property = g_strconcat ("metadata_", name, NULL);
-	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (MIDGARD_METADATA (self)->priv->object);
-	
+	MidgardDBObject *dbobject = MIDGARD_METADATA(self)->priv->object;
+
 	if (!dbobject || !dbobject->dbpriv)
 		return FALSE;
 
