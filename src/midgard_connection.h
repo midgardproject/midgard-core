@@ -87,5 +87,9 @@ gboolean		midgard_connection_reopen			(MidgardConnection *self);
 gchar 			**midgard_connection_list_auth_types		(MidgardConnection *self, guint *n_types);
 void			midgard_connection_enable_quota			(MidgardConnection *self, gboolean toggle);
 void			midgard_connection_enable_replication		(MidgardConnection *self, gboolean toggle);
+void			midgard_connection_enable_dbus			(MidgardConnection *self, gboolean toggle);
+gboolean 		midgard_connection_is_enabled_quota		(MidgardConnection *self);
+gboolean 		midgard_connection_is_enabled_replication	(MidgardConnection *self);
+gboolean 		midgard_connection_is_enabled_dbus		(MidgardConnection *self);
 
 #endif /* MIDGARD_CONNNECTION_H */

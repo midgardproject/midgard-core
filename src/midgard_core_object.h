@@ -186,12 +186,17 @@ struct _MidgardConnectionPrivate {
 	GSList *authtypes;
 	GSList *authstack;
 
-	gboolean replication;
-	gboolean quota;
-	gboolean debug;
+	gboolean enable_replication;
+	gboolean enable_quota;
+	gboolean enable_debug;
+	gboolean enable_dbus;
 };
 
-#define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL;
+#define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL
+#define MGD_CNC_QUOTA(_cnc) _cnc->priv->enable_quota
+#define MGD_CNC_REPLICATION(_cnc) _cnc->priv->enable_replication
+#define	MGD_CNC_DEBUG(_cnc) _cnc->priv->enable_debug
+#define MGD_CNC_DBUS(_cnc) _cnc->priv->enable_dbus
 
 struct _MidgardBlobPrivate {
 	MidgardObject *attachment;

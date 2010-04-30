@@ -78,9 +78,10 @@ midgard_connection_private_new (void)
 	cnc_private->timer = g_timer_new();
 	g_timer_start(cnc_private->timer);	
 
-	cnc_private->replication = FALSE;
-	cnc_private->quota = FALSE;
-	cnc_private->debug = FALSE;
+	cnc_private->enable_replication = FALSE;
+	cnc_private->enable_quota = FALSE;
+	cnc_private->enable_debug = FALSE;
+	cnc_private->enable_dbus = FALSE;
 
 	return cnc_private;
 }
@@ -863,10 +864,10 @@ gboolean midgard_connection_set_loglevel(
 	else
 		return FALSE;
 
-	self->priv->debug = FALSE;
+	MGD_CNC_DEBUG (self) = FALSE;
 
 	if (loglevel > G_LOG_LEVEL_DEBUG)
-		self->priv->debug = TRUE;
+		MGD_CNC_DEBUG (self) = TRUE;
 
 	guint loghandler = midgard_connection_get_loghandler(self);
 	if(loghandler)
@@ -1156,6 +1157,11 @@ MidgardConnection *midgard_connection_copy(MidgardConnection *self)
 
 	new_mgd->priv->authtypes = self->priv->authtypes;
 
+	MGD_CNC_QUOTA (new_mgd) = MGD_CNC_QUOTA (self);
+	MGD_CNC_DBUS (new_mgd) = MGD_CNC_DBUS (self);
+	MGD_CNC_REPLICATION (new_mgd) = MGD_CNC_REPLICATION (self);
+	MGD_CNC_DEBUG (new_mgd) = MGD_CNC_DEBUG (self);
+
 	/* Set pattern pointer. This is important (at least) for signals.
 	 * If we need to disconnect from signal at some point (e.g. indexes creation)
 	 * we should disconnect copy and original one. */
@@ -1186,7 +1192,7 @@ void
 midgard_connection_enable_quota (MidgardConnection *self, gboolean toggle)
 {
 	g_return_if_fail (self != NULL);
-	self->priv->quota = toggle;
+	self->priv->enable_quota = toggle;
 }
 
 /**
@@ -1194,9 +1200,8 @@ midgard_connection_enable_quota (MidgardConnection *self, gboolean toggle)
  * @self: #MidgardConnection instance
  * @toggle: replication enable, disable toggle
  *
- * Enable or partially disable repligard table usage.
+ * Enable or disable repligard table usage.
  * If enabled, every base operation (create, update, delete) will be recorded in repligard table.
- * If disabled, only create and delete ones will be recorded.
  *
  * Since: 10.05
  */ 
@@ -1204,5 +1209,66 @@ void
 midgard_connection_enable_replication (MidgardConnection *self, gboolean toggle)
 {
 	g_return_if_fail (self != NULL);
-	self->priv->replication = toggle;
+	self->priv->enable_replication = toggle;
+}
+
+/**
+ * midgard_connection_enable_dbus:
+ * @self: #MidgardConnection instance
+ * @toggle: dbus enable, disable toggle
+ *
+ * Enable or disable dbus messages send for basic operation
+ *
+ * Since: 10.05
+ */ 
+void
+midgard_connection_enable_dbus (MidgardConnection *self, gboolean toggle)
+{
+	g_return_if_fail (self != NULL);
+	self->priv->enable_dbus = toggle;
+}
+
+/**
+ * midgard_connection_is_enabled_quota:
+ * @self: #MidgardConnection instance
+ *
+ * Returns: %TRUE, if quota is enabled, %FALSE otherwise
+ * 
+ * Since: 10:05
+ */ 
+gboolean                
+midgard_connection_is_enabled_quota (MidgardConnection *self)
+{
+	g_return_if_fail (self != NULL);
+	return self->priv->enable_quota;
+}
+
+/**
+ * midgard_connection_is_enabled_replication:
+ * @self: #MidgardConnection instance
+ *
+ * Returns: %TRUE, if replication is enabled, %FALSE otherwise
+ * 
+ * Since: 10:05
+ */ 
+gboolean
+midgard_connection_is_enabled_replication (MidgardConnection *self)
+{
+	g_return_if_fail (self != NULL);
+	return self->priv->enable_replication;
+}
+
+/**
+ * midgard_connection_is_enabled_dbus:
+ * @self: #MidgardConnection instance
+ *
+ * Returns: %TRUE, if dbus is enabled, %FALSE otherwise
+ * 
+ * Since: 10:05
+ */ 
+gboolean                
+midgard_connection_is_enabled_dbus (MidgardConnection *self)
+{
+	g_return_if_fail (self != NULL);
+	return self->priv->enable_dbus;
 }
