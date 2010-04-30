@@ -20,6 +20,7 @@
 #include "schema.h"
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
+#include <sql-parser/gda-sql-parser.h>
 
 static GObjectClass *parent_class= NULL;
 
@@ -127,9 +128,12 @@ _midgard_dbobject_get_property (MidgardDBObject *self, const gchar *name, GValue
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (name != NULL, FALSE);
 	g_return_val_if_fail (G_IS_VALUE (value), FALSE);
-	
+
+	if (!self->dbpriv->datamodel)
+		return FALSE;
+
 	GdaDataModel *model = GDA_DATA_MODEL (self->dbpriv->datamodel);
-	if (!model)
+	if (!model || (model && !GDA_IS_DATA_MODEL (model)))
 		return FALSE;
 
 	gint col_idx = gda_data_model_get_column_index (model, name);
@@ -238,6 +242,106 @@ _midgard_dbobject_set_from_data_model (MidgardDBObject *self, GdaDataModel *mode
 	return;
 }
 
+static void
+__statement_insert_add_metadata_fields (MidgardDBObjectClass *klass, GString *colnames, GString *values)
+{
+	MidgardMetadataClass *mklass = MGD_DBCLASS_METADATA_CLASS (klass);
+	if (!mklass)
+		return;
+
+	guint i;
+	guint n_prop;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (mklass), &n_prop);
+
+	if (!pspecs)
+		return;
+
+	for (i = 0; i < n_prop; i++) {
+		const gchar *col_name = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), pspecs[i]->name);
+		g_string_append (colnames, ", ");
+		g_string_append (values, ", ");
+		g_string_append (colnames, col_name);
+		const gchar *type_name = g_type_name (pspecs[i]->value_type);
+		if (pspecs[i]->value_type == MIDGARD_TYPE_TIMESTAMP)
+			type_name = "string";
+		g_string_append_printf (values, "##%s::%s", col_name, type_name);
+	}
+
+	g_free (pspecs);
+}
+
+static void
+__initialize_statement_insert (MidgardDBObjectClass *klass)
+{
+	GString *sql = g_string_new ("INSERT INTO ");
+	guint n_props;
+	guint i;
+	const gchar *table = MGD_DBCLASS_TABLENAME (klass);
+	g_return_if_fail (table != NULL);
+
+	g_string_append (sql, table); 
+
+	GParamSpec **pspecs = midgard_core_dbobject_class_list_properties (klass, &n_props);
+	g_return_if_fail (pspecs != NULL);
+
+	GString *colnames = g_string_new ("");
+	GString *values = g_string_new ("");
+	const gchar *pk = MGD_DBCLASS_PRIMARY (klass);
+	gboolean add_coma = FALSE;
+
+	for (i = 0; i < n_props; i++) {
+		/* Ignore primary key */
+		if (pk && g_str_equal (pspecs[i]->name, pk))
+			continue;
+
+		const gchar *col_name = midgard_core_class_get_property_colname (klass, pspecs[i]->name);
+		if (add_coma) {
+			g_string_append (colnames, ", ");
+			g_string_append (values, ", ");
+		}
+
+		g_string_append (colnames, col_name);
+
+		const gchar *type_name = g_type_name (pspecs[i]->value_type);
+		if (pspecs[i]->value_type == MIDGARD_TYPE_TIMESTAMP)
+			type_name = "string";
+		g_string_append_printf (values, "##%s::%s", col_name, type_name);
+
+		add_coma = TRUE;
+	}
+
+	__statement_insert_add_metadata_fields (klass, colnames, values);
+
+	g_string_append_printf (sql, " (%s) VALUES (%s)", colnames->str, values->str);		
+
+	GdaSqlParser *parser = gda_sql_parser_new ();
+	GdaStatement *stmt;
+	GError *error = NULL;
+	stmt = gda_sql_parser_parse_string (parser, sql->str, NULL, &error);
+
+	g_string_free (sql, TRUE);
+	g_string_free (colnames, TRUE);
+	g_string_free (values, TRUE);
+
+	if (!stmt) {
+
+		g_error ("Couldn't create %s class prepared statement. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+		return;
+	}
+
+	GdaSet *params; 
+	if (!gda_statement_get_parameters (stmt, &params, &error)) {
+		g_error ("Failed to create GdaSet for %s class. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+	}
+	
+	klass->dbpriv->statement_insert = stmt;
+	klass->dbpriv->param_set_insert = params;
+	
+	return;
+}
+
 GParamSpec**
 midgard_core_dbobject_class_list_properties (MidgardDBObjectClass *klass, guint *n_props)
 {
@@ -245,7 +349,7 @@ midgard_core_dbobject_class_list_properties (MidgardDBObjectClass *klass, guint 
 
 	MgdSchemaTypeAttr *type_attr = klass->dbpriv->storage_data;
 	if (type_attr->params) {
-		*n_props = type_attr->num_properties;
+		*n_props = g_slist_length (type_attr->_properties_list);
 		return type_attr->params;
 	}
 
@@ -352,7 +456,9 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->dbpriv->add_fields_to_select_statement = _add_fields_to_select_statement;
 	klass->dbpriv->get_property = _midgard_dbobject_get_property;
 	klass->dbpriv->set_property = _midgard_dbobject_set_property;
-	klass->dbpriv->set_from_data_model = _midgard_dbobject_set_from_data_model;	
+	klass->dbpriv->set_from_data_model = _midgard_dbobject_set_from_data_model;
+	klass->dbpriv->statement_insert = NULL;
+	klass->dbpriv->set_statement_insert = __initialize_statement_insert;	
 }
 
 /* Registers the type as a fundamental GType unless already registered. */ 

@@ -46,6 +46,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_object_attachment.h"
 #include "midgard_schema_object_factory.h"
 #include "midgard_schema_object_tree.h"
+#include <sql-parser/gda-sql-parser.h>
 
 GType _midgard_attachment_type = 0;
 static gboolean signals_registered = FALSE;
@@ -1315,15 +1316,14 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement;
 		dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_property;
 		dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model;
-
+		dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_statement_insert;
 	}	
 
 	if (G_OBJECT_CLASS_TYPE(g_class) != MIDGARD_TYPE_OBJECT) {
 		__add_core_properties(dbklass->dbpriv->storage_data);
 	}
 
-	g_type_class_add_private (g_class, 
-			sizeof(MgdSchemaTypeAttr));
+	g_type_class_add_private (g_class, sizeof(MgdSchemaTypeAttr));
 	
 	/* List parent class properties so we can set current class base_index */
 	guint n_prop;
@@ -1347,7 +1347,14 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 				gobject_class, 
 				data->base_index + idx , 
 				data->params[idx-1]);
-	}  
+	}
+
+	/* Reset params spec */
+	g_free (data->params);
+	data->params = NULL;
+
+	/* Initialize persistent statement */
+	dbklass->dbpriv->set_statement_insert (dbklass);
 }
 
 static void
@@ -1361,6 +1368,7 @@ __add_core_properties (MgdSchemaTypeAttr *type_attr)
 	prop_attr->table = g_strdup (type_attr->table);
 	prop_attr->tablefield = g_strjoin (".", type_attr->table, "guid", NULL);
 	g_hash_table_insert (type_attr->prophash, g_strdup((gchar *)"guid"), prop_attr);
+	type_attr->_properties_list = g_slist_prepend (type_attr->_properties_list, (gpointer)prop_attr->name);
 	
 	return;
 }
@@ -1550,6 +1558,7 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->add_fields_to_select_statement;
 	dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_property;
 	dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_from_data_model;
+	dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_statement_insert;
 
 	if (!signals_registered && mklass) {
 		

@@ -687,6 +687,77 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	return GDA_DATA_MODEL (exec_res);	
 }
 
+#define _SET_HOLDER_VALUE \
+	gchar *pstr; 									\
+	guint puint; 									\
+	gint pint;									\
+	gfloat pfloat; 									\
+	MidgardTimestamp *mt;								\
+	gboolean pbool;									\
+	gchar *pname = pspecs[i]->name; 						\
+	switch (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type)) { 				\
+		case G_TYPE_STRING:							\
+			g_object_get (object, pname, &pstr, NULL);			\
+			if (pstr == NULL) pstr = g_strdup ("");				\
+			gda_set_set_holder_value (params, NULL, col_name, pstr);	\
+			g_free (pstr);							\
+		break;									\
+		case G_TYPE_UINT:							\
+			g_object_get (object, pname, &puint, NULL);			\
+			gda_set_set_holder_value (params, NULL, col_name, puint);	\
+		break;									\
+		case G_TYPE_INT:							\
+			g_object_get (object, pname, &pint, NULL);			\
+			gda_set_set_holder_value (params, NULL, col_name, pint);	\
+		break;									\
+		case G_TYPE_FLOAT:							\
+			g_object_get (object, pname, &pfloat, NULL);			\
+			gda_set_set_holder_value (params, NULL, col_name, pfloat);	\
+		break;									\
+		case G_TYPE_BOOLEAN:							\
+			g_object_get (object, pname, &pbool, NULL);			\
+			gda_set_set_holder_value (params, NULL, col_name, pbool);	\
+		break;									\
+		case G_TYPE_BOXED:							\
+			if (pspecs[i]->value_type == MIDGARD_TYPE_TIMESTAMP) {		\
+				g_object_get (object, pname, &mt, NULL);		\
+				pstr = midgard_timestamp_get_string (mt);		\
+				gda_set_set_holder_value (params, NULL, col_name, pstr);\
+				g_free (pstr);						\
+			}								\
+		break;									\
+		default:								\
+			g_warning ("Can not add %s parameter to statement. "		\
+					"Can not handle %s (%s) type", 			\
+					pname, g_type_name (pspecs[i]->value_type),	\
+					g_type_name (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type)));\
+		break;									\
+	}											
+
+static void 
+__add_metadata_parameters (MidgardDBObject *dbobject, MidgardDBObjectClass *klass, GdaSet *params)
+{
+	MidgardMetadataClass *mklass = MGD_DBCLASS_METADATA_CLASS (klass);
+	if (!mklass)
+		return;
+
+	guint i;
+	guint n_prop;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (mklass), &n_prop);
+
+	if (!pspecs)
+		return;
+
+	GObject *object = (GObject *) MGD_DBOBJECT_METADATA (dbobject);
+
+	for (i = 0; i < n_prop; i++) {
+		const gchar *col_name = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), pspecs[i]->name);
+		_SET_HOLDER_VALUE;
+	}
+
+	g_free (pspecs);
+}
+
 #ifdef HAVE_LIBGDA_4
 
 gboolean 
@@ -702,41 +773,43 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 		return FALSE;
 	}
 
-	const gchar *table = midgard_core_class_get_table (klass);
-	if (!table) {
-		g_warning ("Empty table for %s class", G_OBJECT_TYPE_NAME (object));
-		return FALSE;
-	}
+	GdaStatement *insert = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->statement_insert;
+	g_return_val_if_fail (insert != NULL, FALSE);
+	GdaSet *params = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->param_set_insert;
 
-	GSList *names = NULL;
-	GSList *values = NULL;
+	guint n_props;
+	guint i;	
+	GParamSpec **pspecs = midgard_core_dbobject_class_list_properties (klass, &n_props);
+	g_return_if_fail (pspecs != NULL);
+
+	const gchar *pk = midgard_reflector_object_get_property_primary (G_OBJECT_CLASS_NAME (klass));
 	GError *error = NULL;
 
-	__get_object_properties_lists (object, &names, &values);
+	for (i = 0; i < n_props; i++) {
+		/* Ignore primary key */
+		if (pk && g_str_equal (pspecs[i]->name, pk))
+			continue;
 
-	if (!names)
-		return FALSE;
-
-	/* FIXME, query stored in connection event is not up to date.
-	 * This function must be rewritten for GDaStatement and ##syntax::type */
-	if (mgd->priv->debug) {
-		const gchar *query = NULL;
-		__get_query_string (cnc, query);
-		g_debug ("CREATE DBOBJECT: %s", query); 
+		const gchar *col_name = midgard_core_class_get_property_colname (klass, pspecs[i]->name);
+		_SET_HOLDER_VALUE;
 	}
 
-	gboolean inserted = gda_insert_row_into_table_v (cnc, table, names, values, &error);
-	
-	__unset_values_list (values);
-	g_slist_free (names);	
-	g_slist_free (values);
+	__add_metadata_parameters (object, klass, params);
+
+	if (mgd->priv->debug) {
+		gchar *debug_sql = gda_connection_statement_to_sql (cnc, insert, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+		g_print ("DBObject create: %s", debug_sql);
+		g_free (debug_sql);
+	}
+
+	gboolean inserted = (gda_connection_statement_execute_non_select (cnc, insert, params, NULL, &error) == -1) ? FALSE : TRUE;
 
 	if (!inserted) {
 		g_warning ("Query failed. %s", error && error->message ? error->message : "Unknown reason");
 		return FALSE;
 	}
 
-	return TRUE;
+	return inserted;
 }
 
 #else 
