@@ -191,7 +191,7 @@ GdaDataModel *midgard_core_query_get_model(MidgardConnection *mgd, const gchar *
 		g_error_free(lerror);
 	}
 
-	if (mgd->priv->debug)
+	if (MGD_CNC_DEBUG (mgd))
 		g_debug("Model query = %s", query);
 
 	/* This is query error */
@@ -627,7 +627,7 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	exec_res = gda_connection_statement_execute_select_full (mgd->priv->connection, stmt, params,
 			GDA_STATEMENT_MODEL_RANDOM_ACCESS, col_types, &error);
 
-	if (mgd->priv->debug) {
+	if (MGD_CNC_DEBUG (mgd)) {
 		gchar *debug_query = gda_statement_serialize (stmt);
 		g_debug ("%s", debug_query);
 		g_free (debug_query);
@@ -662,7 +662,7 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	GError *error = NULL;
 	GdaObject *exec_res = gda_query_execute (query, plist, FALSE, &error);
 
-	if (mgd->priv->debug)
+	if (MGD_CNC_DEBUG (mgd))
 		g_debug("%s", gda_query_get_sql_text(query));
 
 	if (!exec_res) {
@@ -796,7 +796,7 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 
 	__add_metadata_parameters (object, klass, params);
 
-	if (mgd->priv->debug) {
+	if (MGD_CNC_DEBUG (mgd)) {
 		gchar *debug_sql = gda_connection_statement_to_sql (cnc, insert, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 		g_print ("DBObject create: %s", debug_sql);
 		g_free (debug_sql);
@@ -1090,7 +1090,7 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		g_value_unset (&value);
 	}
 
-	if (mgd->priv->debug) {
+	if (MGD_CNC_DEBUG (mgd)) {
 		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 		g_debug ("%s", debug_sql);
 		g_free (debug_sql);
@@ -1519,7 +1519,7 @@ midgard_core_query_insert_records (MidgardConnection *mgd,
 		}
 	}
 
-	if (mgd->priv->debug) {
+	if (MGD_CNC_DEBUG (mgd)) {
 		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 		g_debug ("%s", debug_sql);
 		g_free (debug_sql);

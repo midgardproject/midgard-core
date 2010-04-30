@@ -439,7 +439,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	gda_sql_statement_free (sql_stm);
 	sql_stm = NULL;
 
-	if (mgd->priv->debug) {
+	if (MGD_CNC_DEBUG (mgd)) {
 		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 		g_debug ("QuerySelect: %s", debug_sql);
 		g_free (debug_sql);

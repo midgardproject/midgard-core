@@ -30,7 +30,7 @@ gboolean midgard_quota_size_is_reached(MidgardObject *object, gint size)
 	guint limit_tmp_size = 0, tmp_size = 0;	
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 
-	if (!mgd->priv->quota)
+	if (!MGD_CNC_QUOTA (mgd))
 		return FALSE;
 
 	guint rows = 0;
@@ -100,7 +100,7 @@ guint midgard_quota_get_object_size(MidgardObject *object)
 	g_assert(object != NULL);
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 
-	if (!mgd->priv->quota)
+	if (!MGD_CNC_QUOTA (mgd))
 		return 0;
 
 	const gchar *tablename = 
@@ -141,7 +141,7 @@ gboolean midgard_quota_update(MidgardObject *object, guint32 init_size)
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 	g_assert(mgd != NULL);
 
-	if (!mgd->priv->quota)
+	if (!MGD_CNC_QUOTA (mgd))
 		return TRUE;
 
 	guint32 size = 0;
@@ -193,7 +193,7 @@ gboolean midgard_quota_create(MidgardObject *object)
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 	gchar *tmpstr;
 
-	if (!mgd->priv->quota)
+	if (!MGD_CNC_QUOTA (mgd))
 		return TRUE;
 
 	/* Bit of hack, but there's no hook to store object's size */
@@ -225,7 +225,7 @@ void midgard_quota_remove(MidgardObject *object, guint size){
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 
-	if (!mgd->priv->quota)
+	if (!MGD_CNC_QUOTA (mgd))
 		return;
 
 	GString *query;

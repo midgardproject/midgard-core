@@ -76,12 +76,16 @@ enum {
 	_SQL_QUERY_UPDATE
 };
 
-#define __dbus_send(_obj, _action) \
-	gchar *_dbus_path = g_strconcat("/mgdschema/", \
-		G_OBJECT_TYPE_NAME(G_OBJECT(_obj)), \
-		"/", _action, NULL); \
-	midgard_core_dbus_send_serialized_object(_obj, _dbus_path); \
-	g_free(_dbus_path);
+#define __dbus_send(_obj, _action) {						\
+	MidgardConnection *__mgd = MGD_OBJECT_CNC (_obj);			\
+	if (MGD_CNC_DBUS(__mgd)) {						\
+		gchar *_dbus_path = g_strconcat("/mgdschema/", 			\
+				G_OBJECT_TYPE_NAME(G_OBJECT(_obj)), 		\
+				"/", _action, NULL); 				\
+		midgard_core_dbus_send_serialized_object(_obj, _dbus_path); 	\
+		g_free(_dbus_path);						\
+	}									\
+}
 
 static GParamSpec **_midgard_object_class_paramspec()
 {
@@ -628,7 +632,7 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 	midgard_quota_update(gobj, object_init_size);  
 
 	/* Do not touch repligard table if replication is disabled */
-	if (mgd->priv->replication) {
+	if (MGD_CNC_REPLICATION (mgd)) {
 		sql = g_string_new("UPDATE repligard SET ");
 		g_string_append_printf(sql,
 				"typename='%s', object_action=%d WHERE guid='%s' ",	
@@ -978,15 +982,17 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	}
 
 	/* INSERT repligard's record */
-	query = g_string_new("INSERT INTO repligard ");
-	g_string_append_printf(query,
-			"(guid, typename, object_action) "
-			"VALUES ('%s', '%s', %d)",
-			MGD_OBJECT_GUID (object), G_OBJECT_TYPE_NAME(object), 
-			MGD_OBJECT_ACTION_CREATE);
+	if (MGD_CNC_REPLICATION (mgd)) {
+		query = g_string_new("INSERT INTO repligard ");
+		g_string_append_printf(query,
+				"(guid, typename, object_action) "
+				"VALUES ('%s', '%s', %d)",
+				MGD_OBJECT_GUID (object), G_OBJECT_TYPE_NAME(object), 
+				MGD_OBJECT_ACTION_CREATE);
 	
-	midgard_core_query_execute(MGD_OBJECT_CNC (object), query->str, FALSE);
-	g_string_free(query, TRUE);
+		midgard_core_query_execute(MGD_OBJECT_CNC (object), query->str, FALSE);
+		g_string_free(query, TRUE);
+	}
 
 	switch(replicate){
 		
@@ -2329,38 +2335,11 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 	return FALSE;	
 }
 
-/**
- * midgard_object_delete:
- * @object: #MidgardObject instance
- *
- * Delete object's record(s) from database, but object's record is not fully deleted 
- * from database. Instead, it is marked as deleted , thus it is possible to undelete 
- * object later with static method midgard_object_class_undelete().
- *
- * Use midgard_object_purge() if you need to purge object's data from database.
- * 
- * Cases to return %FALSE:
- * <itemizedlist>
- * <listitem><para>
- * Object's has no storage defined ( MGD_ERR_OBJECT_NO_STORAGE )
- * </para></listitem>
- * <listitem><para>
- * Object's property guid is empty ( MGD_ERR_INVALID_PROPERTY_VALUE )
- * </para></listitem>
- * <listitem><para>
- * There are still dependent objects in database ( MGD_ERR_HAS_DEPENDENTS )
- * </para></listitem>
- * <listitem><para>
- * Unspecified internal error ( MGD_ERR_INTERNAL ) 
- * </para></listitem>
- * </itemizedlist> 
- *  
- * Returns: %TRUE if object is successfully deleted from database, %FALSE otherwise.
- */ 
-gboolean midgard_object_delete(MidgardObject *object)
+
+gboolean _midgard_object_delete(MidgardObject *object)
 {
 	g_assert(object);
-
+	
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_delete, 0);		
 	
@@ -2381,16 +2360,9 @@ gboolean midgard_object_delete(MidgardObject *object)
 		return FALSE;
 	}
 
-	//MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
-	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_GET_CLASS (object))) {
-		MIDGARD_ERRNO_SET (MGD_OBJECT_CNC (object), MGD_ERR_NO_METADATA);
-		return FALSE;
-	}
-
 	const gchar *guid = MGD_OBJECT_GUID(object);
 	
 	if (!guid){
-
 		midgard_set_error(MGD_OBJECT_CNC(object),
 				MGD_GENERIC_ERROR,
 				MGD_ERR_INVALID_PROPERTY_VALUE, 
@@ -2398,8 +2370,7 @@ gboolean midgard_object_delete(MidgardObject *object)
 		return FALSE;
 	}
 	
-	if (midgard_object_has_dependents(object)) {
-		
+	if (midgard_object_has_dependents(object)) {		
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_HAS_DEPENDANTS);
 		return FALSE;
 	}
@@ -2437,7 +2408,6 @@ gboolean midgard_object_delete(MidgardObject *object)
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
 
 	if (qr == 0) {
-
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
 		g_value_unset(&tval);
 		
@@ -2446,8 +2416,9 @@ gboolean midgard_object_delete(MidgardObject *object)
 
 		return FALSE;
 
-	} else {
+	} 
 
+	if (MGD_CNC_REPLICATION (mgd)) {
 		sql = g_string_new("UPDATE repligard SET ");
 		g_string_append_printf(sql,
 				"object_action = %d "
@@ -2462,7 +2433,6 @@ gboolean midgard_object_delete(MidgardObject *object)
 
 	/* Set metadata properties */
 	if (metadata) {
-
 		midgard_core_metadata_set_revised (metadata, &tval);
 		GValue gval = {0, };
 		g_value_init (&gval, G_TYPE_STRING);
@@ -2475,10 +2445,51 @@ gboolean midgard_object_delete(MidgardObject *object)
 	g_value_unset(&tval);
 
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_deleted, 0);
-
 	__dbus_send(object, "delete");
 
 	return TRUE;
+}
+
+
+/**
+ * midgard_object_delete:
+ * @object: #MidgardObject instance
+ *
+ * Delete object's record(s) from database, but object's record is not fully deleted 
+ * from database. Instead, it is marked as deleted , thus it is possible to undelete 
+ * object later with midgard_schema_object_factory_object_undelete().
+ *
+ * If given object's class has no metadata defined, object will be purged.
+ *
+ * Use midgard_object_purge() if you need to purge object's data from database.
+ * 
+ * Cases to return %FALSE:
+ * <itemizedlist>
+ * <listitem><para>
+ * Object's has no storage defined ( MGD_ERR_OBJECT_NO_STORAGE )
+ * </para></listitem>
+ * <listitem><para>
+ * Object's property guid is empty ( MGD_ERR_INVALID_PROPERTY_VALUE )
+ * </para></listitem>
+ * <listitem><para>
+ * There are still dependent objects in database ( MGD_ERR_HAS_DEPENDENTS )
+ * </para></listitem>
+ * <listitem><para>
+ * Unspecified internal error ( MGD_ERR_INTERNAL ) 
+ * </para></listitem>
+ * </itemizedlist> 
+ *  
+ * Returns: %TRUE if object is successfully marked as deleted, %FALSE otherwise.
+ */ 
+gboolean
+midgard_object_delete (MidgardObject *object)
+{
+	g_return_val_if_fail (object != NULL, FALSE);
+
+	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_GET_CLASS (object))) 
+		return midgard_object_purge (object);
+
+	return midgard_object_delete (object);
 }
 
 /**
@@ -2541,6 +2552,7 @@ gboolean midgard_object_purge(MidgardObject *object)
 	}
 
 	guid = MGD_OBJECT_GUID(object);
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 		
 	if (!guid){
 
@@ -2551,16 +2563,10 @@ gboolean midgard_object_purge(MidgardObject *object)
 		return FALSE;
 	}
 
-	if (midgard_object_has_dependents(object)) {
-		
+	if (midgard_object_has_dependents(object)) {	
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_HAS_DEPENDANTS);
 		return FALSE;
-	}	
-
-	/* TODO unlink midgard_blob for midgard_attachment */
-	/* Should we delete files here? These might be shared among many attachments */
-	if (g_str_equal(G_OBJECT_TYPE_NAME(object), "midgard_attachment"))
-		g_warning("Binary file is not unlinked! midgard_blob::delete not yet implemented");
+	}
 
 	dsql = g_string_new("DELETE ");
 	g_string_append_printf(dsql, "FROM %s WHERE guid='%s' ", table, guid);
@@ -2579,23 +2585,24 @@ gboolean midgard_object_purge(MidgardObject *object)
 	
 	midgard_quota_remove(object, size);
 	
-	GValue tval = {0, };
-	g_value_init(&tval, MIDGARD_TYPE_TIMESTAMP);
-	midgard_timestamp_set_current_time(&tval);
-	gchar *timedeleted = midgard_timestamp_get_string_from_value (&tval);
+	if (MGD_CNC_REPLICATION (mgd)) {
+		GValue tval = {0, };
+		g_value_init(&tval, MIDGARD_TYPE_TIMESTAMP);
+		midgard_timestamp_set_current_time(&tval);
+		gchar *timedeleted = midgard_timestamp_get_string_from_value (&tval);	
+		dsql = g_string_new("UPDATE repligard SET ");
+		g_string_append_printf(dsql,
+				"object_action = %d, object_action_date = '%s' "
+				"WHERE typename='%s' AND guid='%s' ",	
+				MGD_OBJECT_ACTION_PURGE, timedeleted,
+				G_OBJECT_TYPE_NAME(object),
+				MGD_OBJECT_GUID(object));
 
-	dsql = g_string_new("UPDATE repligard SET ");
-	g_string_append_printf(dsql,
-			"object_action = %d, object_action_date = '%s' "
-			"WHERE typename='%s' AND guid='%s' ",	
-			MGD_OBJECT_ACTION_PURGE, timedeleted,
-			G_OBJECT_TYPE_NAME(object),
-			MGD_OBJECT_GUID(object));
-
-	rv = midgard_core_query_execute(MGD_OBJECT_CNC (object), dsql->str, FALSE);
-	g_string_free(dsql, TRUE);
-	g_free (timedeleted);	
-	g_value_unset(&tval);
+		rv = midgard_core_query_execute(MGD_OBJECT_CNC (object), dsql->str, FALSE);
+		g_string_free(dsql, TRUE);
+		g_free (timedeleted);	
+		g_value_unset(&tval);
+	}
 
 	if (rv == 0) {
 
