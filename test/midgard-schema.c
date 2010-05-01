@@ -196,9 +196,6 @@ main (int argc, char **argv)
 			"midgardusername", &mgdusername, 
 			"midgardpassword", &mgdpassword,
 			NULL);
-
-	if ((mgdusername != NULL) && (mgdpassword != NULL))
-		midgard_user_auth(mgd, mgdusername, mgdpassword, NULL, FALSE);
 		
 	/* Create basic tables first */
 	if (tablecreate)

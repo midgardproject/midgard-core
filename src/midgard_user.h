@@ -89,7 +89,6 @@ gboolean		midgard_user_log_in 		(MidgardUser *self);
 gboolean 		midgard_user_log_out 		(MidgardUser *self);
 
 /* Deprecated */
-MidgardUser 	*midgard_user_auth	(MidgardConnection *mgd, const gchar *name, const gchar *password, const gchar *sitegroup, gboolean trusted);
 gboolean 	midgard_user_set_active	(MidgardUser *user, gboolean flag);
 
 

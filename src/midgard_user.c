@@ -204,24 +204,6 @@ midgard_user_new (MidgardConnection *mgd, guint n_params, const GParameter *para
 	return self;
 }
 
-/**
- * midgard_user_auth:
- *
- * Deprecated: 9.09
- * See: midgard_user_log_in() 
- */
-MidgardUser *
-midgard_user_auth (MidgardConnection *mgd, 
-		const gchar *name, const gchar *password, 
-		const gchar *sitegroup, gboolean trusted)
-{
-	g_return_val_if_fail(mgd != NULL, NULL);
-
-	MIDGARD_ERRNO_SET(mgd, MGD_ERR_INTERNAL);
-
-	return NULL;
-}
-
 static gboolean 
 __validate_parameters (MidgardConnection *mgd, guint n_params, const GParameter *parameters, guint valid)
 {
