@@ -144,11 +144,6 @@ MidgardMetadata
 </para>
 
 @parent: 
-@dbpriv: 
-@signal_set_created: 
-@signal_set_updated: 
-@set_created: 
-@set_updated: 
 
 <!-- ##### STRUCT MidgardMetadataPrivate ##### -->
 <para>

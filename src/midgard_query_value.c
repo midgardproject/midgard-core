@@ -36,7 +36,7 @@ MidgardQueryValue *
 midgard_query_value_new (const GValue *value)
 {
 	g_return_val_if_fail (value != NULL, NULL);
-	MidgardQueryValue *self = g_object_new (MIDGARD_QUERY_VALUE_TYPE, NULL);
+	MidgardQueryValue *self = g_object_new (MIDGARD_TYPE_QUERY_VALUE, NULL);
 
 	GValue pval = {0, };
 	g_value_init (&pval, G_VALUE_TYPE (value));

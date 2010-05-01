@@ -39,7 +39,6 @@ MidgardUser
 </para>
 
 @parent: 
-@dbpriv: 
 @get_connection: 
 @get_person: 
 @log_in: 

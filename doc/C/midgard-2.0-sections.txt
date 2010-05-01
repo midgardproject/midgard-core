@@ -91,7 +91,6 @@ midgard_object_list
 midgard_object_list_children
 midgard_object_get_by_path
 midgard_object_parent
-midgard_object_undelete
 midgard_object_set_guid
 midgard_object_set_connection
 midgard_object_lock
@@ -347,7 +346,6 @@ MIDGARD_REPLICATOR_GET_CLASS
 <SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_schema</FILE>
-MgdSchema
 <TITLE>MidgardSchema</TITLE>
 MidgardSchema
 midgard_schema_init
@@ -584,7 +582,6 @@ MIDGARD_QUERY_CONSTRAINT_GET_CLASS
 <FILE>midgard_query_constraint_simple</FILE>
 <TITLE>MidgardQueryConstraintSimple</TITLE>
 MidgardQueryConstraintSimple
-MidgardQueryConstraintSimpleClass
 midgard_query_constraint_simple_list_constraints
 <SUBSECTION Standard>
 MIDGARD_QUERY_CONSTRAINT_SIMPLE
@@ -601,9 +598,7 @@ MidgardQueryConstraintGroup
 MidgardQueryConstraintGroupClass
 midgard_query_constraint_group_new
 midgard_query_constraint_group_get_group_type
-midgard_query_constraint_group_get_group_type
 midgard_query_constraint_group_add_constraint
-midgard_query_constraint_group_list_constraints
 <SUBSECTION Standard>
 MIDGARD_QUERY_CONSTRAINT_GROUP
 MIDGARD_IS_QUERY_CONSTRAINT_GROUP
@@ -660,14 +655,71 @@ MIDGARD_IS_QUERY_PROPERTY_CLASS
 </SECTION>
 
 <SECTION>
+<FILE>midgard_query_storage</FILE>
+<TITLE>MidgardQueryStorage</TITLE>
+MidgardQueryStorage
+MidgardQueryStorageClass
+midgard_query_storage_new
+<SUBSECTION Standard>
+MIDGARD_QUERY_STORAGE
+MIDGARD_IS_QUERY_STORAGE
+MIDGARD_TYPE_QUERY_STORAGE
+midgard_query_storage_get_type
+MIDGARD_QUERY_STORAGE_CLASS
+MIDGARD_QUERY_STORAGE_GET_CLASS
+MIDGARD_IS_QUERY_STORAGE_CLASS
+</SECTION>
+
+<SECTION>
+<FILE>midgard_query_executor</FILE>
+<TITLE>MidgardQueryExecutor</TITLE>
+MidgardQueryExecutor
+MidgardQueryExecutorClass
+midgard_query_executor_set_constraint
+midgard_query_executor_set_limit
+midgard_query_executor_set_offset
+midgard_query_executor_add_order
+midgard_query_executor_add_join
+midgard_query_executor_execute
+midgard_query_executor_get_results_count
+<SUBSECTION Standard>
+MIDGARD_QUERY_EXECUTOR
+MIDGARD_IS_QUERY_EXECUTOR
+MIDGARD_TYPE_QUERY_EXECUTOR
+midgard_query_executor_get_type
+MIDGARD_QUERY_EXECUTOR_CLASS
+MIDGARD_QUERY_EXECUTOR_GET_CLASS
+MIDGARD_IS_QUERY_EXECUTOR_CLASS
+</SECTION>
+
+<SECTION>
+<FILE>midgard_query_select</FILE>
+<TITLE>MidgardQuerySelect</TITLE>
+MidgardQuerySelect
+MidgardQuerySelectClass
+midgard_query_select_new
+midgard_query_select_list_objects
+midgard_query_select_toggle_read_only
+<SUBSECTION Standard>
+MIDGARD_QUERY_SELECT
+MIDGARD_IS_QUERY_SELECT
+MIDGARD_TYPE_QUERY_SELECT
+midgard_query_select_get_type
+MIDGARD_QUERY_SELECT_CLASS
+MIDGARD_QUERY_SELECT_GET_CLASS
+MIDGARD_IS_QUERY_SELECT_CLASS
+</SECTION>
+
+
+<SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
-<FILE>midgard_schema</FILE>
+<FILE>midgard_schema_object_factory</FILE>
 <TITLE>MidgardSchemaObjectFactory</TITLE>
 MidgardSchemaObjectFactory
 MidgardSchemaObjectFactoryClass
 midgard_schema_object_factory_get_object_by_guid
 midgard_schema_object_factory_get_object_by_path
-midgard_schema_object_factory_undelete
+midgard_schema_object_factory_object_undelete
 <SUBSECTION Standard>
 MIDGARD_SCHEMA_OBJECT_FACTORY
 MIDGARD_IS_SCHEMA_OBJECT_FACTORY

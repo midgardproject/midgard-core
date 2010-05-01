@@ -34,7 +34,7 @@ MidgardQueryProperty *
 midgard_query_property_new (const gchar *property, MidgardQueryStorage *storage)
 {
 	g_return_val_if_fail (property != NULL, NULL);
-	MidgardQueryProperty *self = g_object_new (MIDGARD_QUERY_PROPERTY_TYPE, NULL);
+	MidgardQueryProperty *self = g_object_new (MIDGARD_TYPE_QUERY_PROPERTY, NULL);
 
 	GValue pval = {0, };
 	g_value_init (&pval, G_TYPE_STRING);

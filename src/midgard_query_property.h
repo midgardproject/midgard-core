@@ -26,12 +26,12 @@
 G_BEGIN_DECLS
 
 /* convention macros */
-#define MIDGARD_QUERY_PROPERTY_TYPE (midgard_query_property_get_type()) 
-#define MIDGARD_QUERY_PROPERTY(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_QUERY_PROPERTY_TYPE, MidgardQueryProperty))
-#define MIDGARD_QUERY_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_QUERY_PROPERTY_TYPE, MidgardQueryPropertyClass))
-#define MIDGARD_IS_QUERY_PROPERTY(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_QUERY_PROPERTY_TYPE))
-#define MIDGARD_IS_QUERY_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_QUERY_PROPERTY_TYPE))
-#define MIDGARD_QUERY_PROPERTY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_QUERY_PROPERTY_TYPE, MidgardQueryPropertyClass))
+#define MIDGARD_TYPE_QUERY_PROPERTY (midgard_query_property_get_type()) 
+#define MIDGARD_QUERY_PROPERTY(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_PROPERTY, MidgardQueryProperty))
+#define MIDGARD_QUERY_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_QUERY_PROPERTY, MidgardQueryPropertyClass))
+#define MIDGARD_IS_QUERY_PROPERTY(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_PROPERTY))
+#define MIDGARD_IS_QUERY_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_QUERY_PROPERTY))
+#define MIDGARD_QUERY_PROPERTY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_QUERY_PROPERTY, MidgardQueryPropertyClass))
 
 typedef struct _MidgardQueryProperty MidgardQueryProperty;
 typedef struct _MidgardQueryPropertyPrivate MidgardQueryPropertyPrivate;
@@ -49,7 +49,7 @@ struct _MidgardQueryPropertyClass {
 };
 
 GType 			midgard_query_property_get_type		(void);
-MidgardQueryProperty	*midgard_query_property_new		(const gchar *propname, MidgardQueryStorage *storage);
+MidgardQueryProperty	*midgard_query_property_new		(const gchar *property, MidgardQueryStorage *storage);
 
 G_END_DECLS
 

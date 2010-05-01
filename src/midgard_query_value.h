@@ -24,12 +24,12 @@
 G_BEGIN_DECLS
 
 /* convention macros */
-#define MIDGARD_QUERY_VALUE_TYPE (midgard_query_value_get_type()) 
-#define MIDGARD_QUERY_VALUE(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_QUERY_VALUE_TYPE, MidgardQueryValue))
-#define MIDGARD_QUERY_VALUE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_QUERY_VALUE_TYPE, MidgardQueryValueClass))
-#define MIDGARD_IS_QUERY_VALUE(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_QUERY_VALUE_TYPE))
-#define MIDGARD_IS_QUERY_VALUE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_QUERY_VALUE_TYPE))
-#define MIDGARD_QUERY_VALUE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_QUERY_VALUE_TYPE, MidgardQueryValueClass))
+#define MIDGARD_TYPE_QUERY_VALUE (midgard_query_value_get_type()) 
+#define MIDGARD_QUERY_VALUE(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_VALUE, MidgardQueryValue))
+#define MIDGARD_QUERY_VALUE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_QUERY_VALUE, MidgardQueryValueClass))
+#define MIDGARD_IS_QUERY_VALUE(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_VALUE))
+#define MIDGARD_IS_QUERY_VALUE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_QUERY_VALUE))
+#define MIDGARD_QUERY_VALUE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_QUERY_VALUE, MidgardQueryValueClass))
 
 typedef struct _MidgardQueryValue MidgardQueryValue;
 typedef struct _MidgardQueryValuePrivate MidgardQueryValuePrivate;

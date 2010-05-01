@@ -209,7 +209,7 @@ midgard_replicator_export_by_guid (MidgardConnection *mgd, const gchar *guid)
 /**
  * midgard_replicator_export_purged:
  * @mgd: #MidgardConnection instance
- * @klass: #MidgardObjectClass pointer
+ * @classname: name of #MidgardObjectClass derived one
  * @startdate: optional start date 
  * @enddate: optional end date
  *
@@ -368,6 +368,8 @@ midgard_replicator_serialize_blob (MidgardObject *object)
  * @object: #MidgardObject of MIDGARD_TYPE_ATTACHMENT type
  *
  * Alias for midgard_replicator_serialize_blob().
+ *
+ * Returns: serialized object as xml data
  */ 
 gchar *
 midgard_replicator_export_blob(MidgardObject *object)

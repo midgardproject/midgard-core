@@ -18,7 +18,7 @@ DOC_MAIN_SGML_FILE=$(DOC_MODULE)-docs.sgml
 
 # Extra options to supply to gtkdoc-mkdb.
 # # e.g. MKDB_OPTIONS=--sgml-mode --output-format=xml
-MKDB_OPTIONS=--sgml-mode --output-format=xml --ignore-files="midgard_core_object.c simple_constraint.c"
+MKDB_OPTIONS=--sgml-mode --output-format=xml --name-space=midgard --ignore-files="midgard_core_object.c simple_constraint.c" 
 
 # The directory containing the source code. Relative to $(srcdir)
 DOC_SOURCE_DIR=  ../../src
@@ -47,7 +47,7 @@ GTKDOC_LIBS =  $(top_builddir)/../src/libmidgard2.la $(MIDGARD_LIBS)
 content_files = 
 
 # Images to copy into HTML directory
-HTML_IMAGES = 
+HTML_IMAGES = midgard2-architecture.png 
 
 # Extra options to supply to gtkdoc-fixref
 FIXXREF_OPTIONS=

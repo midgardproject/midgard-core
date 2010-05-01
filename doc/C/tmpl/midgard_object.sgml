@@ -321,38 +321,6 @@ MidgardObject
 @Returns: 
 
 
-<!-- ##### FUNCTION midgard_object_is_in_parent_tree ##### -->
-<para>
-
-</para>
-
-@self: 
-@rootid: 
-@id: 
-@Returns: 
-
-
-<!-- ##### FUNCTION midgard_object_is_in_tree ##### -->
-<para>
-
-</para>
-
-@self: 
-@rootid: 
-@id: 
-@Returns: 
-
-
-<!-- ##### FUNCTION midgard_object_get_tree ##### -->
-<para>
-
-</para>
-
-@object: 
-@tnodes: 
-@Returns: 
-
-
 <!-- ##### FUNCTION midgard_object_get_by_guid ##### -->
 <para>
 
@@ -369,6 +337,7 @@ MidgardObject
 </para>
 
 @object: 
+@check_dependents: 
 @Returns: 
 
 
@@ -378,36 +347,7 @@ MidgardObject
 </para>
 
 @object: 
-@Returns: 
-
-
-<!-- ##### FUNCTION midgard_object_get_parent ##### -->
-<para>
-
-</para>
-
-@self: 
-@Returns: 
-
-
-<!-- ##### FUNCTION midgard_object_list ##### -->
-<para>
-
-</para>
-
-@self: 
-@n_objects: 
-@Returns: 
-
-
-<!-- ##### FUNCTION midgard_object_list_children ##### -->
-<para>
-
-</para>
-
-@object: 
-@childname: 
-@n_objects: 
+@check_dependents: 
 @Returns: 
 
 
@@ -418,15 +358,6 @@ MidgardObject
 
 @self: 
 @path: 
-@Returns: 
-
-
-<!-- ##### FUNCTION midgard_object_parent ##### -->
-<para>
-
-</para>
-
-@self: 
 @Returns: 
 
 

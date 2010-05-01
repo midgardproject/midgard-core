@@ -288,7 +288,7 @@ midgard_schema_object_tree_is_in_tree (MidgardObject *object, MidgardObject *par
  * midgard_schema_object_tree_get_parent_name:
  * @object: #MidgardObject instance
  *
- * Returns (transfer: none): classname which, in tree is a parent one for given @object 
+ * Returns: (transfer none): classname which, in tree is a parent one for given @object 
  * Since: 10.05
  */ 
 const gchar*
@@ -549,7 +549,7 @@ midgard_schema_object_tree_list_objects (MidgardObject *object, guint *n_objects
  *
  * List all @classname objects, if exist and are tree children of given @object.
  *
- * Returns (transfer full): array of #MidgardObject objects, or %NULL.
+ * Returns: (transfer full): array of #MidgardObject objects, or %NULL.
  * Since: 10.05
  */ 
 MidgardObject**

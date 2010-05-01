@@ -1327,6 +1327,70 @@ midgard_sitegroup
 @n_objects: 
 @Returns: 
 
+<!-- ##### FUNCTION midgard_object_get_parent ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_get_tree ##### -->
+<para>
+
+</para>
+
+@object: 
+@tnodes: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_is_in_parent_tree ##### -->
+<para>
+
+</para>
+
+@self: 
+@rootid: 
+@id: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_is_in_tree ##### -->
+<para>
+
+</para>
+
+@self: 
+@rootid: 
+@id: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_list ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_objects: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_list_children ##### -->
+<para>
+
+</para>
+
+@object: 
+@childname: 
+@n_objects: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_object_parent ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
 <!-- ##### FUNCTION midgard_object_undelete ##### -->
 <para>
 
@@ -1382,6 +1446,15 @@ midgard_sitegroup
 </para>
 
 @builder: 
+
+<!-- ##### FUNCTION midgard_query_constraint_group_list_constraints ##### -->
+<para>
+
+</para>
+
+@self: 
+@n_objects: 
+@Returns: 
 
 <!-- ##### FUNCTION midgard_quota_get_sitegroup_size ##### -->
 <para>

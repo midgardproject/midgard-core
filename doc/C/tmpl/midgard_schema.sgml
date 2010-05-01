@@ -9,47 +9,56 @@ MidgardSchemaObjectFactory
 
 </para>
 
-
 <!-- ##### SECTION See_Also ##### -->
 <para>
 
 </para>
 
-
 <!-- ##### SECTION Stability_Level ##### -->
 
 
-<!-- ##### STRUCT MidgardSchemaObjectFactory ##### -->
-<para>
-
-</para>
-
-
-<!-- ##### STRUCT MidgardSchemaObjectFactoryClass ##### -->
+<!-- ##### STRUCT MidgardSchema ##### -->
 <para>
 
 </para>
 
 @parent: 
 
-<!-- ##### FUNCTION midgard_schema_object_factory_get_object_by_guid ##### -->
+<!-- ##### FUNCTION midgard_schema_init ##### -->
 <para>
 
 </para>
 
-@mgd: 
-@guid: 
-@Returns: 
-
-
-<!-- ##### FUNCTION midgard_schema_object_factory_get_object_by_path ##### -->
-<para>
-
-</para>
-
-@mgd: 
-@classname: 
+@self: 
 @path: 
+
+
+<!-- ##### FUNCTION midgard_schema_read_dir ##### -->
+<para>
+
+</para>
+
+@self: 
+@dirname: 
 @Returns: 
+
+
+<!-- ##### FUNCTION midgard_schema_type_exists ##### -->
+<para>
+
+</para>
+
+@self: 
+@classname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_schema_read_file ##### -->
+<para>
+
+</para>
+
+@self: 
+@filename: 
 
 

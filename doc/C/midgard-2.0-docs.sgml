@@ -72,6 +72,9 @@
       <xi:include href="xml/midgard_query_holder.xml"/>
       <xi:include href="xml/midgard_query_value.xml"/>
       <xi:include href="xml/midgard_query_property.xml"/>
+      <xi:include href="xml/midgard_query_storage.xml"/>
+      <xi:include href="xml/midgard_query_executor.xml"/>
+      <xi:include href="xml/midgard_query_select.xml"/>
     </chapter>
 
     <chapter id="midgard-Midgard-Schema-Reflection">
