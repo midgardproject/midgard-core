@@ -140,8 +140,8 @@ gboolean midgard_object_get_by_path(MidgardObject *self, const gchar *path);
 
 gboolean midgard_object_update(MidgardObject *self);
 gboolean midgard_object_create(MidgardObject *object);
-gboolean midgard_object_delete(MidgardObject *object);
-gboolean midgard_object_purge(MidgardObject *object);
+gboolean midgard_object_delete(MidgardObject *object, gboolean check_dependents);
+gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents);
 
 gchar * midgard_object_build_path(MidgardObject *mobj);
 

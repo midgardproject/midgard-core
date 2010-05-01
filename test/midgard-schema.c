@@ -115,7 +115,7 @@ static void _test_me(MidgardConnection *mgd, MidgardObject *object)
 		
 		g_free(guid);
 
-		if (midgard_object_delete(object)) {
+		if (midgard_object_delete(object, TRUE)) {
 
 			g_message("Object '%s' delete : OK", typename);
 

@@ -573,7 +573,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 			 * * we delete object from database */
 			if (deleted) {
 
-				ret = midgard_object_delete (dbobject);
+				ret = midgard_object_delete (dbobject, FALSE);
 				g_object_unref (dbobject);
 				return ret;
 			}
@@ -748,7 +748,7 @@ midgard_replicator_import_from_xml (MidgardConnection *mgd,  const gchar *xml, g
 					 (mgd->errnum == MGD_ERR_OBJECT_DELETED)
 					 )) {
 		
-				midgard_object_purge(dbobject);
+				midgard_object_purge(dbobject, FALSE);
 				if(dbobject)
 					g_object_unref(dbobject);
 				xmlFree(attr);

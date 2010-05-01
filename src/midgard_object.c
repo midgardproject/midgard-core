@@ -2336,7 +2336,7 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 }
 
 
-gboolean _midgard_object_delete(MidgardObject *object)
+gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents)
 {
 	g_assert(object);
 	
@@ -2370,7 +2370,7 @@ gboolean _midgard_object_delete(MidgardObject *object)
 		return FALSE;
 	}
 	
-	if (midgard_object_has_dependents(object)) {		
+	if (check_dependents && midgard_object_has_dependents(object)) {		
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_HAS_DEPENDANTS);
 		return FALSE;
 	}
@@ -2454,10 +2454,14 @@ gboolean _midgard_object_delete(MidgardObject *object)
 /**
  * midgard_object_delete:
  * @object: #MidgardObject instance
+ * @check_dependents: dependents' check toggle
  *
  * Delete object's record(s) from database, but object's record is not fully deleted 
  * from database. Instead, it is marked as deleted , thus it is possible to undelete 
  * object later with midgard_schema_object_factory_object_undelete().
+ *
+ * If @check_dependents toggle is %TRUE, parameters and attachments storage will be queried,
+ * if any of such exist and depend on deleted object.
  *
  * If given object's class has no metadata defined, object will be purged.
  *
@@ -2482,21 +2486,25 @@ gboolean _midgard_object_delete(MidgardObject *object)
  * Returns: %TRUE if object is successfully marked as deleted, %FALSE otherwise.
  */ 
 gboolean
-midgard_object_delete (MidgardObject *object)
+midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 {
 	g_return_val_if_fail (object != NULL, FALSE);
 
 	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_GET_CLASS (object))) 
-		return midgard_object_purge (object);
+		return midgard_object_purge (object, check_dependents);
 
-	return midgard_object_delete (object);
+	return midgard_object_delete (object, check_dependents);
 }
 
 /**
  * midgard_object_purge:
  * @object: #MidgardObject instance
+ * @check_dependents: dependents' check toggle
  *
  * Purge object's record(s) from database.
+ *
+ * If @check_dependents toggle is %TRUE, parameters and attachments storage will be queried,
+ * if any of such exist and depend on deleted object.
  * 
  * Object's record(s) are purged from database without any possibility to recover.
  * After successfull call, only repligard table holds information about object's state.
@@ -2524,7 +2532,7 @@ midgard_object_delete (MidgardObject *object)
  *
  * Returns: %TRUE if object has been succesfully purged from database, %FALSE otherwise.
  */ 
-gboolean midgard_object_purge(MidgardObject *object)
+gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 {
 	gint rv = 0;
 	GString *dsql;
@@ -2563,7 +2571,7 @@ gboolean midgard_object_purge(MidgardObject *object)
 		return FALSE;
 	}
 
-	if (midgard_object_has_dependents(object)) {	
+	if (check_dependents && midgard_object_has_dependents(object)) {	
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_HAS_DEPENDANTS);
 		return FALSE;
 	}

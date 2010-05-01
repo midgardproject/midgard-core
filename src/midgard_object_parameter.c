@@ -271,7 +271,7 @@ midgard_object_set_parameter (MidgardObject *self, const gchar *domain, const gc
 		if(delete_parameter){
 
 			if(midgard_object_delete(
-						MIDGARD_OBJECT(ret_object[0]))) {
+						MIDGARD_OBJECT(ret_object[0]), FALSE)) {
 				midgard_collector_remove_key(
 						domain_collector,
 						name);
@@ -596,7 +596,7 @@ gboolean midgard_core_object_parameters_delete(
 	
 	while (objects[i] != NULL ) {
 	
-		if(midgard_object_delete(MIDGARD_OBJECT(objects[i])))
+		if(midgard_object_delete(MIDGARD_OBJECT(objects[i]), FALSE))
 			rv = TRUE;
 
 		g_object_unref(objects[i]);
@@ -627,7 +627,7 @@ gboolean midgard_core_object_parameters_purge(
 	
 	while (objects[i] != NULL ) {
 	
-		if(midgard_object_purge(MIDGARD_OBJECT(objects[i])))
+		if(midgard_object_purge(MIDGARD_OBJECT(objects[i]), FALSE))
 			rv = TRUE;
 
 		g_object_unref(objects[i]);
@@ -675,7 +675,7 @@ gboolean midgard_core_object_parameters_purge_with_blob(
 		if(midgard_blob_exists(blob))
 			midgard_blob_remove_file(blob);
 		
-		midgard_object_purge(MIDGARD_OBJECT(objects[i]));
+		midgard_object_purge(MIDGARD_OBJECT(objects[i]), FALSE);
 
 		g_object_unref(blob);
 		g_object_unref(objects[i]);
