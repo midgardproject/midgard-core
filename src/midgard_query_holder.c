@@ -22,12 +22,28 @@ struct _MidgardQueryHolder {
 	GObject parent;
 };
 
+/**
+ * midgard_query_holder_get_value:
+ * @self: #MidgardQueryHolder instance
+ * @value: pointer to store returned value
+ *
+ * Since: 10.05
+ */ 
 void
 midgard_query_holder_get_value (MidgardQueryHolder *self, GValue *value)
 {
 	MIDGARD_QUERY_HOLDER_GET_INTERFACE (self)->get_value (self, value);
 }
 
+/**
+ * midgard_query_holder_set_value:
+ * @self: #MidgardQueryHolder instance
+ * @value: value to set
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
 gboolean
 midgard_query_holder_set_value (MidgardQueryHolder *self, const GValue *value)
 {

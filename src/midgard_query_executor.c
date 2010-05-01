@@ -30,23 +30,61 @@ midgard_query_executor_new (MidgardConnection *mgd, MidgardQueryStorage *storage
 	return NULL;
 }
 
+/**
+ * midgard_query_executor_set_constraint:
+ * @self: #MidgardQueryExecutor instance
+ * @constraint: #MidgardConstraintSimple instance
+ *
+ * Set constraint object which will be used for query execution
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
 gboolean
 midgard_query_executor_set_constraint (MidgardQueryExecutor *self, MidgardQueryConstraintSimple *constraint)
 {
 	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->set_constraint (self, constraint);
 }
 
+/**
+ * midgard_query_executor_set_limit:
+ * @self: #MidgardQueryExecutor instance
+ * @limit: execution limit
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
 gboolean
 midgard_query_executor_set_limit (MidgardQueryExecutor *self, guint limit)
 {
 	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->set_limit (self, limit);
 }
 
+/**
+ * midgard_query_executor_set_offset:
+ * @self: #MidgardQueryExecutor instance
+ * @offset: execution offset
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
 gboolean midgard_query_executor_set_offset (MidgardQueryExecutor *self, guint offset)
 {
 	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->set_offset (self, offset);
 }
 
+/**
+ * midgard_query_executor_add_order:
+ * @self: #MidgardQueryExecutor instance
+ * @type: execution order
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
 gboolean
 midgard_query_executor_add_order (MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type)
 {
@@ -60,12 +98,28 @@ midgard_query_executor_add_join (MidgardQueryExecutor *self, const gchar *join_t
 	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->add_join (self, join_type, left_property, right_property);
 }
 
+/**
+ * midgard_query_executor_get_results_count:
+ * @self: #MidgardQueryExecutor instance
+ *
+ * Returns: number of objects or records returned from execution
+ *
+ * Since: 10.05
+ */ 
 guint 
 midgard_query_executor_get_results_count (MidgardQueryExecutor *self)
 {
 	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->get_results_count (self);
 }
 
+/**
+ * midgard_query_executor_execute:
+ * @self: #MidgardQueryExecutor instance
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
 gboolean
 midgard_query_executor_execute (MidgardQueryExecutor *self)
 {

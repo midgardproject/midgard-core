@@ -23,6 +23,16 @@
 #include "midgard_query_holder.h"
 #include "midgard_dbobject.h"
 
+/**
+ * midgard_query_select_new:
+ * @mgd: #MidgardConnection instance
+ * @storage: #MidgardStorage instance
+ *
+ * #MidgardStorage @storage represents storage which is queried during execution
+ *
+ * Returns: new #MidgardQuerySelect instance or %NULL on failure
+ * Since: 10.05
+ */ 
 MidgardQuerySelect *
 midgard_query_select_new (MidgardConnection *mgd, MidgardQueryStorage *storage)
 {
@@ -524,6 +534,16 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 	return objects;
 }
 
+/**
+ * midgard_query_select_list_objects:
+ * @self: #MidgardQuerySelect instance
+ * @n_objects: pointer to store number of returned objects
+ *
+ * List all objects for which data has been returned during execution.
+ *
+ * Returns: newly allocated array of #MidgardDBObject
+ * Since: 10.05
+ */ 
 MidgardDBObject **
 midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 {
@@ -538,6 +558,17 @@ _midgard_query_select_toggle_read_only (MidgardQuerySelect *self, gboolean toggl
 	return;
 }
 
+/**
+ * midgard_query_select_toggle_read_only:
+ * @self: #MidgardQuerySelect instance
+ * @toggle: enables or disables read only mode
+ *
+ * This method switch #MidgardQuerySelect to read only mode.
+ * It should be enabled when returned objects will be used only to read properties.
+ * It improves performance, but it's impossible to write returned object's properties.
+ *
+ * Since: 10.05
+ */ 
 void
 midgard_query_select_toggle_read_only (MidgardQuerySelect *self, gboolean toggle)
 {

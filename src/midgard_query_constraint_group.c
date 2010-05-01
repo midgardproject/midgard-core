@@ -30,6 +30,15 @@ struct _MidgardQueryConstraintGroupPrivate {
 	GSList *constraints;
 };
 
+/**
+ * midgard_query_constraint_group_new:
+ * @type: constraints group type ('OR' or 'AND')
+ * @constraint: list of constraints to add to group or NULL
+ *
+ * Returns: #MidgardQueryConstraintGroup instance or %NULL
+ *
+ * Since: 10.05
+ */ 
 MidgardQueryConstraintGroup *
 midgard_query_constraint_group_new (const gchar *type, MidgardQueryConstraintSimple *constraint, ...)
 {
@@ -68,6 +77,14 @@ midgard_query_constraint_group_new (const gchar *type, MidgardQueryConstraintSim
 	return self;
 }
 
+/**
+ * midgard_query_constraint_group_get_group_type:
+ * @self: #MidgardQueryConstraintGroup instance
+ *
+ * Returns: group type ('OR' or 'AND')
+ *
+ * Since: 10.05
+ */ 
 const gchar *
 midgard_query_constraint_group_get_group_type (MidgardQueryConstraintGroup *self)
 {
@@ -75,25 +92,72 @@ midgard_query_constraint_group_get_group_type (MidgardQueryConstraintGroup *self
 	return (const gchar *)self->priv->type;
 }
 
+/**
+ * midgard_query_constraint_group_set_group_type:
+ * @self: #MidgardConstraintGroup instance
+ * @type: group type to set ('OR' or 'AND')
+ *
+ * Returns: %TRUE if type is set, %FALSE otherwise
+ *
+ * Since: 10.05
+ */ 
 gboolean
 midgard_query_constraint_group_set_group_type (MidgardQueryConstraintGroup *self, const gchar *type)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (type != NULL, FALSE);
+	
+	GdaSqlOperatorType op_type;
+
+	/* Validate given type. We expect type to be NULL terminated. */
+	gchar *valid_type = g_ascii_strdown (type, -1);
+	if (g_str_equal (valid_type, "and"))
+		op_type = GDA_SQL_OPERATOR_TYPE_AND;
+	else if (g_str_equal (valid_type, "or"))
+		op_type = GDA_SQL_OPERATOR_TYPE_OR;
+	else {
+		/* FIXME, handle catchable error */
+		g_warning ("Invalid group type. Expected 'AND' or 'OR'. '%s' given", type);
+		g_free (valid_type);
+		return FALSE;
+	}
+
+	g_free (self->priv->type);
+	self->priv->type = valid_type;
+	self->priv->op_type = op_type;
 
 	return TRUE;
 }
 
+/**
+ * midgard_query_constraint_group_add_constraint:
+ * @self: #MidgardQueryConstraintGroup instance
+ * @constraint: list of #MidgardQueryConstraintSimple constraint(s) to add to constraint group
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.05
+ */ 
 gboolean
 midgard_query_constraint_group_add_constraint (MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple *constraint, ...)
 {
-	return FALSE;
-}
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (constraint != NULL, FALSE);
 
-MidgardQueryConstraintSimple **
-midgard_query_constraint_group_list_constraints (MidgardQueryConstraintGroup *self, guint *n_objects)
-{
-	return FALSE;
+	gboolean retval = TRUE;
+	MidgardQueryConstraintSimple *cnstr = constraint;
+	va_list args;
+	va_start (args, constraint);
+	while (cnstr != NULL) {
+		if (!MIDGARD_IS_QUERY_CONSTRAINT_SIMPLE (cnstr)) {
+			retval = FALSE;
+			break;
+		}
+		self->priv->constraints = g_slist_append (self->priv->constraints, cnstr);
+		cnstr = va_arg (args, MidgardQueryConstraintSimple*);
+	}
+	va_end (args);
+
+	return retval;
 }
 
 /* GOBJECT ROUTINES */

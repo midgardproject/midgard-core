@@ -49,7 +49,6 @@ struct _MidgardQueryConstraintGroup {
 
 struct _MidgardQueryConstraintGroupClass {
 	GObjectClass parent;
-	MidgardQueryConstraintSimple	**(*list_constraints)	(MidgardQueryConstraintGroup *self, guint *n_objects);
 };
 
 GType 				midgard_query_constraint_group_get_type		(void);
@@ -57,7 +56,6 @@ MidgardQueryConstraintGroup  	*midgard_query_constraint_group_new 		(const gchar
 const gchar 			*midgard_query_constraint_group_get_group_type	(MidgardQueryConstraintGroup *self);
 gboolean			midgard_query_constraint_group_set_group_type		(MidgardQueryConstraintGroup *self, const gchar *type);
 gboolean			midgard_query_constraint_group_add_constraint	(MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple *constraint, ...);
-MidgardQueryConstraintSimple 	**midgard_query_constraint_group_list_constraints (MidgardQueryConstraintGroup *self, guint *n_objects);
 
 G_END_DECLS
 

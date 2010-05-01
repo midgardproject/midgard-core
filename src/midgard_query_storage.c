@@ -20,6 +20,15 @@
 #include "midgard_core_query.h"
 #include "midgard_core_object_class.h"
 
+/**
+ * midgard_query_storage_new:
+ * @classname: name of the #MidgardDBObject derived class 
+ *
+ * Initializes new object which represents #MidgardDBObject derived one's storage
+ *
+ * Returns: new #MidgardQueryStorage or %NULL on failure
+ * Since: 10.05
+ */ 
 MidgardQueryStorage*
 midgard_query_storage_new (const gchar *classname)
 {

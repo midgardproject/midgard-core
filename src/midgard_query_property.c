@@ -22,6 +22,14 @@
 #include "midgard_query_storage.h"
 #include "midgard_core_query.h"
 
+/**
+ * midgard_query_property_new:
+ * @property: name of the property
+ * @storage: optional storage for given property
+ *
+ * Returns: new #MidgardQueryProperty instance or NULL on failure
+ * Since: 10.05
+ */ 
 MidgardQueryProperty *
 midgard_query_property_new (const gchar *property, MidgardQueryStorage *storage)
 {

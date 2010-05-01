@@ -19,6 +19,15 @@
 #include "midgard_query_constraint_simple.h"
 #include "midgard_core_query.h"
 
+/**
+ * midgard_query_constraint_simple_list_constraints:
+ * @self: #MidgardQueryConstraintSimple instance
+ * @n_objects: pointer to store numer of returned objects
+ *
+ * Returns: array of #MidgardQueryConstraintSimple instances
+ *
+ * Since: 10.05
+ */
 MidgardQueryConstraintSimple**
 midgard_query_constraint_simple_list_constraints (MidgardQueryConstraintSimple *self, guint *n_objects)
 {

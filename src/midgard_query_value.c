@@ -25,8 +25,13 @@ struct _MidgardQueryValuePrivate {
 	GValue value;
 };
 
-#warning constructor and finalize missed for MidgardQueryValue
-
+/**
+ * midgard_query_value_new:
+ * @value: a #GValue value
+ *
+ * Returns: new #MidgardQueryValue or %NULL on failure
+ * Since: 10.05
+ */ 
 MidgardQueryValue *
 midgard_query_value_new (const GValue *value)
 {
@@ -83,6 +88,54 @@ midgard_query_value_init (MidgardQueryHolderIFace *iface)
        iface->set_value = __set_value;
 }
 
+static GObjectClass *parent_class= NULL;
+
+static GObject *
+_midgard_query_value_constructor (GType type,
+		guint n_construct_properties,
+		GObjectConstructParam *construct_properties)
+{
+	GObject *object = (GObject *)
+		G_OBJECT_CLASS (parent_class)->constructor (type,
+				n_construct_properties, construct_properties);
+	
+	MidgardQueryValue *self = (MidgardQueryValue *) object;
+	self->priv = g_new (MidgardQueryValuePrivate, 1);
+
+	return G_OBJECT(object);
+}
+
+static void
+_midgard_query_value_dispose (GObject *object)
+{
+	parent_class->dispose (object);
+}
+
+static void
+_midgard_query_value_finalize (GObject *object)
+{
+	MidgardQueryValue *self = MIDGARD_QUERY_VALUE (object);
+
+	if (G_IS_VALUE (&self->priv->value))
+		g_value_unset (&self->priv->value);
+
+	g_free (self->priv);
+	self->priv = NULL;
+
+	parent_class->finalize (object);
+}
+
+static void
+_midgard_query_value_class_init (MidgardQueryValueClass *klass, gpointer class_data)
+{
+	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	parent_class = g_type_class_peek_parent (klass);
+
+	object_class->constructor = _midgard_query_value_constructor;
+	object_class->dispose = _midgard_query_value_dispose;
+	object_class->finalize = _midgard_query_value_finalize;
+}
+
 GType
 midgard_query_value_get_type (void)
 {
@@ -92,7 +145,7 @@ midgard_query_value_get_type (void)
 			sizeof (MidgardQueryValueClass),
 			NULL,   /* base_init */
 			NULL,   /* base_finalize */
-			NULL,   /* class_init */
+			(GClassInitFunc) _midgard_query_value_class_init, /* class_init */
 			NULL,   /* class_finalize */
 			NULL,   /* class_data */
 			sizeof (MidgardQueryValue),
