@@ -798,7 +798,7 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 
 	if (MGD_CNC_DEBUG (mgd)) {
 		gchar *debug_sql = gda_connection_statement_to_sql (cnc, insert, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
-		g_print ("DBObject create: %s", debug_sql);
+		g_debug ("DBObject create: %s", debug_sql);
 		g_free (debug_sql);
 	}
 
