@@ -2493,7 +2493,7 @@ midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_GET_CLASS (object))) 
 		return midgard_object_purge (object, check_dependents);
 
-	return midgard_object_delete (object, check_dependents);
+	return _midgard_object_delete (object, check_dependents);
 }
 
 /**
