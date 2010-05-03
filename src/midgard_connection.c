@@ -1234,7 +1234,7 @@ midgard_connection_enable_dbus (MidgardConnection *self, gboolean toggle)
  *
  * Returns: %TRUE, if quota is enabled, %FALSE otherwise
  * 
- * Since: 10:05
+ * Since: 10.05
  */ 
 gboolean
 midgard_connection_is_enabled_quota (MidgardConnection *self)
@@ -1249,7 +1249,7 @@ midgard_connection_is_enabled_quota (MidgardConnection *self)
  *
  * Returns: %TRUE, if replication is enabled, %FALSE otherwise
  * 
- * Since: 10:05
+ * Since: 10.05
  */ 
 gboolean
 midgard_connection_is_enabled_replication (MidgardConnection *self)
@@ -1264,7 +1264,7 @@ midgard_connection_is_enabled_replication (MidgardConnection *self)
  *
  * Returns: %TRUE, if dbus is enabled, %FALSE otherwise
  * 
- * Since: 10:05
+ * Since: 10.05
  */ 
 gboolean                
 midgard_connection_is_enabled_dbus (MidgardConnection *self)
