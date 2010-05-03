@@ -347,6 +347,7 @@ MIDGARD_REPLICATOR_GET_CLASS
 <FILE>midgard_schema</FILE>
 <TITLE>MidgardSchema</TITLE>
 MidgardSchema
+MidgardSchemaClass
 midgard_schema_init
 midgard_schema_read_dir
 midgard_schema_type_exists

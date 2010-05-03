@@ -49,6 +49,7 @@
       <xi:include href="xml/midgard_quota.xml"/>
       <xi:include href="xml/midgard_error.xml"/>
       <xi:include href="xml/midgard_schema_object_tree.xml"/>
+      <xi:include href="xml/midgard_schema_object_factory.xml"/>
       <xi:include href="xml/midgard_dbobject.xml"/>    
       <xi:include href="xml/midgard_schema.xml"/>
       <xi:include href="xml/midgard_transaction.xml"/>

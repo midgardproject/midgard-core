@@ -22,6 +22,12 @@ MidgardSchemaObjectFactory
 
 </para>
 
+
+<!-- ##### STRUCT MidgardSchemaClass ##### -->
+<para>
+
+</para>
+
 @parent: 
 
 <!-- ##### FUNCTION midgard_schema_init ##### -->
