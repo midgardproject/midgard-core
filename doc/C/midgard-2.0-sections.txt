@@ -467,10 +467,6 @@ midgard_timestamp_get_type
 </SECTION>
 
 <SECTION>
-<FILE>midgard_tree</FILE>
-</SECTION>
-
-<SECTION>
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>uuid</FILE>
 midgard_is_uuid
@@ -728,4 +724,25 @@ midgard_schema_object_factory_get_type
 MIDGARD_SCHEMA_OBJECT_FACTORY_CLASS
 MIDGARD_IS_SCHEMA_OBJECT_FACTORY_CLASS
 MIDGARD_SCHEMA_OBJECT_FACTORY_GET_CLASS
+</SECTION>
+
+<SECTION>
+<INCLUDE>midgard/midgard.h</INCLUDE>
+<FILE>midgard_schema_object_tree</FILE>
+<TITLE>MidgardSchemaObjectTree</TITLE>
+MidgardSchemaObjectTree
+MidgardSchemaObjectTreeClass
+midgard_schema_object_tree_is_in_tree
+midgard_schema_object_tree_get_parent_name
+midgard_schema_object_tree_get_parent_object
+midgard_schema_object_tree_list_objects
+midgard_schema_object_tree_list_children_objects
+<SUBSECTION Standard>
+MIDGARD_SCHEMA_OBJECT_TREE
+MIDGARD_IS_SCHEMA_OBJECT_TREE
+MIDGARD_TYPE_SCHEMA_OBJECT_TREE
+midgard_schema_object_tree_get_type
+MIDGARD_SCHEMA_OBJECT_TREE_CLASS
+MIDGARD_IS_SCHEMA_OBJECT_TREE_CLASS
+MIDGARD_SCHEMA_OBJECT_TREE_GET_CLASS
 </SECTION>

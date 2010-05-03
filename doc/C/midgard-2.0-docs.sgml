@@ -48,7 +48,7 @@
       <xi:include href="xml/midgard_replicator.xml"/>
       <xi:include href="xml/midgard_quota.xml"/>
       <xi:include href="xml/midgard_error.xml"/>
-      <xi:include href="xml/midgard_object_class.xml"/>
+      <xi:include href="xml/midgard_schema_object_tree.xml"/>
       <xi:include href="xml/midgard_dbobject.xml"/>    
       <xi:include href="xml/midgard_schema.xml"/>
       <xi:include href="xml/midgard_transaction.xml"/>
@@ -107,7 +107,7 @@
     &example-helloworld;
   </part>
 
-<index>
+  <index>
     <title>Index</title>
   </index>
   <index role="deprecated">
@@ -115,6 +115,9 @@
   </index>
   <index role="10.05">
     <title>Index of new symbols in 10.05</title>
+  </index>
+  <index role="9.09">
+    <title>Index of new symbols in 9.09</title>
   </index>
 
 </book>

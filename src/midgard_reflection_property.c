@@ -75,6 +75,8 @@ midgard_reflection_property_get_type (void)
  * @klass: #MidgardDBObjectClass pointer
  *
  * Returns: newly initialized #MidgardReflectionProperty instance or %NULL on failure.
+ *
+ * Deprecated:10.05
  */ 
 MidgardReflectionProperty *
 midgard_reflection_property_new (MidgardDBObjectClass *klass)
@@ -92,6 +94,7 @@ midgard_reflection_property_new (MidgardDBObjectClass *klass)
  * @propname: property name which is registered for #MidgardDBObjectClass
  *
  * Returns: type (#GType) of the property or %NULL if property is not registered for given class.
+ * Deprecated:10.05
  */ 
 GType 
 midgard_reflection_property_get_midgard_type (MidgardReflectionProperty *self, const gchar *propname)
@@ -116,6 +119,7 @@ midgard_reflection_property_get_midgard_type (MidgardReflectionProperty *self, c
  * Checks whether property is a link.
  *
  * Returns: %TRUE if property is registered as link, %FALSE otherwise (or in case if property is not registered for given class.
+ * Deprecated:10.05
  */ 
 gboolean 
 midgard_reflection_property_is_link (MidgardReflectionProperty *self, const gchar *propname)
@@ -141,6 +145,7 @@ midgard_reflection_property_is_link (MidgardReflectionProperty *self, const gcha
  *
  * Returns: %TRUE if property is linked with another type (property of another class is defined as a link to given one).
  * %FALSE is returned if property is not linked or is not registered for given class.
+ * Deprecated:10.05
  */
 gboolean 
 midgard_reflection_property_is_linked (MidgardReflectionProperty *self, const gchar *propname)
@@ -164,6 +169,7 @@ midgard_reflection_property_is_linked (MidgardReflectionProperty *self, const gc
  *
  * Returns: The name of the class, the given property is a link to. 
  * Or %NULL if property is not a link or given property is not registered for given class.
+ * Deprecated:10.05
  */ 
 const gchar *
 midgard_reflection_property_get_link_name (MidgardReflectionProperty *self, const gchar *propname)
@@ -187,6 +193,7 @@ midgard_reflection_property_get_link_name (MidgardReflectionProperty *self, cons
  *
  * Returns: The name of the property, the given one is a link to.
  * Or %NULL if property is not a link or it's not registered for given class.
+ * Deprecated:10.05
  */ 
 const gchar *
 midgard_reflection_property_get_link_target (MidgardReflectionProperty *self, const gchar *propname)
@@ -211,6 +218,7 @@ midgard_reflection_property_get_link_target (MidgardReflectionProperty *self, co
  *
  * Returns: description of the given property or %NULL.
  *
+ * Deprecated:10.05
  */ 
 const gchar *
 midgard_reflection_property_description (MidgardReflectionProperty *self, const gchar *propname)
@@ -234,6 +242,7 @@ midgard_reflection_property_description (MidgardReflectionProperty *self, const 
  *
  * Returns the pointer to the #MidgardDBObjectClass, a given property is a link to.
  * @see midgard_reflection_property_get_link_name()
+ * Deprecated:10.05
  */ 
 const MidgardDBObjectClass *
 midgard_reflection_property_get_link_class (MidgardReflectionProperty *self, const gchar *propname)
@@ -266,6 +275,7 @@ midgard_reflection_property_get_link_class (MidgardReflectionProperty *self, con
  * Returns: value for user defined field, or NULL if none found
  *
  * Since: 9.09
+ * Deprecated:10.05
  */ 
 const gchar*
 midgard_reflection_property_get_user_value (MidgardReflectionProperty *self, const gchar *property, const gchar *name)
@@ -289,7 +299,7 @@ midgard_reflection_property_get_user_value (MidgardReflectionProperty *self, con
  *
  * Returns: %TRUE, if propery is defined private, %FALSE otherwise
  *
- * Since: 10.03
+ * Deprecated:10.05
  */ 
 gboolean
 midgard_reflection_property_is_private (MidgardReflectionProperty *self, const gchar *property)

@@ -98,6 +98,30 @@ Virtual database context
 midgard_sitegroup
 
 
+<!-- ##### SECTION ./tmpl/midgard_tree.sgml:Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_tree.sgml:See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION ./tmpl/midgard_tree.sgml:Short_Description ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/midgard_tree.sgml:Stability_Level ##### -->
+
+
+
+<!-- ##### SECTION ./tmpl/midgard_tree.sgml:Title ##### -->
+midgard_tree
+
+
 <!-- ##### MACRO MGD_TYPE_SITEGROUP ##### -->
 <para>
 
