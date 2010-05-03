@@ -195,7 +195,7 @@ void midgard_test_object_basic_delete(MidgardObjectTest *mot, gconstpointer data
 	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
 		return;
 
-	gboolean object_deleted = midgard_object_delete(object);
+	gboolean object_deleted = midgard_object_delete(object, TRUE);
 
 	MIDGARD_TEST_ERROR_OK(mgd);
 	g_assert(object_deleted == TRUE);
@@ -246,7 +246,7 @@ void midgard_test_object_basic_purge(MidgardObjectTest *mot, gconstpointer data)
 		gchar *guid;
 		g_object_get(object, "guid", &guid, NULL);
 
-		gboolean purged = midgard_object_purge(object);
+		gboolean purged = midgard_object_purge(object, TRUE);
 		g_assert(purged == TRUE);
 
 		MidgardObject *purged_object = midgard_object_new(mgd, G_OBJECT_TYPE_NAME(mot->object), NULL);
@@ -323,8 +323,8 @@ void midgard_test_object_basic_run(void)
 	const gchar *typename;
 	GType *all_types = g_type_children(MIDGARD_TYPE_OBJECT, &n_types);
 	
-	/* Fail, if we have less than 10 classes */
-	g_assert_cmpint(n_types, >, 10);
+	/* Fail, if we have less than 2 classes */
+	g_assert_cmpint(n_types, >, 2);
 
 	for(i = 0; i < n_types; i++) {
 		
@@ -350,8 +350,8 @@ void midgard_test_object_basic_create_run(void)
 	const gchar *typename;
 	GType *all_types = g_type_children(MIDGARD_TYPE_OBJECT, &n_types);
 	
-	/* Fail, if we have less than 10 classes */
-	g_assert_cmpint(n_types, >, 10);
+	/* Fail, if we have less than 2 classes */
+	g_assert_cmpint(n_types, >, 2);
 
 	MidgardUser *user = midgard_user_quick_login (mgd, "admin", "password");
 	g_assert(user != NULL);
@@ -389,8 +389,8 @@ void midgard_test_object_basic_update_run(void)
 	const gchar *typename;
 	GType *all_types = g_type_children(MIDGARD_TYPE_OBJECT, &n_types);
 	
-	/* Fail, if we have less than 10 classes */
-	g_assert_cmpint(n_types, >, 10);
+	/* Fail, if we have less than 2 classes */
+	g_assert_cmpint(n_types, >, 2);
 
 	for(i = 0; i < n_types; i++) {
 		

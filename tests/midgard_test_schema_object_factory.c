@@ -93,7 +93,7 @@ midgard_test_schema_object_factory_object_undelete (MidgardObjectTest *mot, gcon
 	g_object_get (object, "guid", &guid, NULL);
 
 	/* Delete and undelete given object */
-	gboolean object_delete = midgard_object_delete (object);
+	gboolean object_delete = midgard_object_delete (object, TRUE);
 	MIDGARD_TEST_ERROR_OK (mgd);
 	g_assert (object_delete != FALSE);
 

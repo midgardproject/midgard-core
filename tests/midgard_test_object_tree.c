@@ -94,7 +94,7 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	MIDGARD_TEST_ERROR_OK(mgd);
 	g_assert(created != FALSE);
 
-	gboolean purged = midgard_object_purge(object);
+	gboolean purged = midgard_object_purge(object, TRUE);
 	g_assert(purged != FALSE);
 	g_object_unref(object);
 
@@ -111,7 +111,7 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	MIDGARD_TEST_ERROR_OK(mgd);
 	g_assert(created != FALSE);
 
-	purged = midgard_object_purge(object);
+	purged = midgard_object_purge(object, TRUE);
 	g_assert(purged != FALSE);
 	g_object_unref(object);
 
@@ -143,7 +143,7 @@ void midgard_test_object_tree_create(MidgardObjectTest *mot, gconstpointer data)
 	g_assert(dupcreated != TRUE);	
 	g_object_unref(dupobject);
 
-	purged = midgard_object_purge(object);
+	purged = midgard_object_purge(object, TRUE);
 	g_assert(purged != FALSE);
 	g_object_unref(object);
 }
