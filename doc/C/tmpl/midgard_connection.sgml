@@ -174,3 +174,57 @@ MidgardConnection
 @Returns: 
 
 
+<!-- ##### FUNCTION midgard_connection_enable_replication ##### -->
+<para>
+
+</para>
+
+@self: 
+@toggle: 
+
+
+<!-- ##### FUNCTION midgard_connection_enable_quota ##### -->
+<para>
+
+</para>
+
+@self: 
+@toggle: 
+
+
+<!-- ##### FUNCTION midgard_connection_enable_dbus ##### -->
+<para>
+
+</para>
+
+@self: 
+@toggle: 
+
+
+<!-- ##### FUNCTION midgard_connection_is_enabled_replication ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_is_enabled_quota ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_is_enabled_dbus ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
