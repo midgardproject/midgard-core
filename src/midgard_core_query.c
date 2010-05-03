@@ -780,7 +780,7 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 	guint n_props;
 	guint i;	
 	GParamSpec **pspecs = midgard_core_dbobject_class_list_properties (klass, &n_props);
-	g_return_if_fail (pspecs != NULL);
+	g_return_val_if_fail (pspecs != NULL, FALSE);
 
 	const gchar *pk = midgard_reflector_object_get_property_primary (G_OBJECT_CLASS_NAME (klass));
 	GError *error = NULL;

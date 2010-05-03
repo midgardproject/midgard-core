@@ -1236,10 +1236,10 @@ midgard_connection_enable_dbus (MidgardConnection *self, gboolean toggle)
  * 
  * Since: 10:05
  */ 
-gboolean                
+gboolean
 midgard_connection_is_enabled_quota (MidgardConnection *self)
 {
-	g_return_if_fail (self != NULL);
+	g_return_val_if_fail (self != NULL, FALSE);
 	return self->priv->enable_quota;
 }
 
@@ -1254,7 +1254,7 @@ midgard_connection_is_enabled_quota (MidgardConnection *self)
 gboolean
 midgard_connection_is_enabled_replication (MidgardConnection *self)
 {
-	g_return_if_fail (self != NULL);
+	g_return_val_if_fail (self != NULL, FALSE);
 	return self->priv->enable_replication;
 }
 
@@ -1269,6 +1269,6 @@ midgard_connection_is_enabled_replication (MidgardConnection *self)
 gboolean                
 midgard_connection_is_enabled_dbus (MidgardConnection *self)
 {
-	g_return_if_fail (self != NULL);
+	g_return_val_if_fail (self != NULL, FALSE);
 	return self->priv->enable_dbus;
 }
