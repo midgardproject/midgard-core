@@ -54,7 +54,6 @@ midgard_connection_private_new (void)
 	cnc_private->pattern = NULL;	
 	cnc_private->config = NULL;
 	cnc_private->connected = FALSE;
-	cnc_private->free_config = FALSE;
 	cnc_private->loghandler = 0;
 	cnc_private->loglevel = 0;	
 	cnc_private->user = NULL;
@@ -139,10 +138,9 @@ static void _midgard_connection_dispose(GObject *object)
 
 	/* Free only these data which are not inherited */
 	if (!self->priv->inherited) {
-		if(self->priv->free_config) {
+		if (self->priv->config && G_IS_OBJECT (self->priv->config)) {
 			g_object_unref(self->priv->config);
 			self->priv->config = NULL;
-			self->priv->free_config = FALSE;
 		}
 
 #ifdef HAVE_LIBGDA_4
@@ -627,7 +625,6 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 		g_clear_error(&rf_error);
 
 	self->priv->config = config;
-	self->priv->free_config = TRUE;
 
 	GHashTable *hash = NULL;
 	gboolean rv = TRUE;
@@ -688,7 +685,6 @@ gboolean midgard_connection_open_from_file(
 		g_clear_error(&rf_error);
 
 	mgd->priv->config = config;
-	mgd->priv->free_config = TRUE;
 
 	GHashTable *hash = NULL;
 	gboolean rv = TRUE;
@@ -744,7 +740,6 @@ extern GHashTable *midgard_connection_open_all(gboolean userdir)
 		}
 
 		cnc->priv->config = config;
-		cnc->priv->free_config = TRUE;
 
 		if(__midgard_connection_open(cnc, &hash, TRUE)) {
 
@@ -795,9 +790,8 @@ gboolean midgard_connection_open_config(
 		MIDGARD_ERRNO_SET_STRING (self, MGD_ERR_INTERNAL, "Midgard connection already associated with configuration");
 		return FALSE;
 	}
-#warning FIXME, copy config
-	g_object_ref(config);
-	self->priv->config = config;
+
+	self->priv->config = midgard_config_copy (config);
 
 	GHashTable *hash = NULL;
 	gboolean rv = TRUE;

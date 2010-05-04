@@ -1014,6 +1014,34 @@ static void __config_struct_new(MidgardConfig *self)
 	self->confdir = __get_default_confdir();
 }
 
+static MidgardConfig*
+__config_copy (MidgardConfig *self, MidgardConfig *src)
+{
+	self->dbtype = g_strdup(src->dbtype);
+	self->mgdusername = g_strdup(src->mgdusername);
+	self->mgdpassword = g_strdup(src->mgdpassword);
+	self->host = g_strdup(src->host);
+	self->database = g_strdup(src->database);
+	self->dbport = src->dbport;	
+	self->dbuser = g_strdup(src->dbuser);
+	self->dbpass = g_strdup(src->dbpass);
+	self->dbdir = g_strdup (src->dbdir);
+	self->logfilename = g_strdup (src->logfilename);;
+	self->loglevel = g_strdup(src->loglevel);
+	self->pamfile = g_strdup (src->pamfile);
+
+	self->tablecreate = src->tablecreate;
+	self->tableupdate = src->tableupdate;
+	self->testunit = src->testunit;
+
+	self->blobdir = g_strdup(src->blobdir);
+	self->sharedir = g_strdup(src->sharedir);
+	self->vardir = g_strdup(src->vardir);
+	self->cachedir = g_strdup(src->cachedir);
+	self->confdir = g_strdup(src->confdir);
+	self->gdathreads = src->gdathreads;
+}
+
 void 
 __midgard_config_struct_free (MidgardConfig *self)
 {
@@ -1331,6 +1359,32 @@ void midgard_config_set_pamfile(MidgardConfig *self, const gchar *pamfile)
 
 	self->pamfile = g_strdup(pamfile);
 }
+
+/**
+ * midgard_config_copy:
+ * @self: #MidgardConfig instance
+ *
+ * Returns: deep copy of given #MidgardConfig object
+ * Since: 10.05
+ */ 
+MidgardConfig *
+midgard_config_copy (MidgardConfig *self) 
+{
+	MidgardConfig *copy = g_new (MidgardConfig, 1);
+	copy->priv = midgard_config_private_new ();
+	__config_copy (copy, self);
+
+	if (self->priv->configname)
+		copy->priv->configname = g_strdup (self->priv->configname);
+
+	if (copy->logfilename && self->priv->log_channel) {
+		GIOChannel *channel = g_io_channel_new_file (copy->logfilename, "a", NULL);
+		copy->priv->log_channel = channel;
+	}
+
+	return copy;
+}
+
 
 /* GOBJECT ROUTINES */
 static void

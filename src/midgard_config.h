@@ -91,6 +91,7 @@ gboolean 	midgard_config_read_data		(MidgardConfig *self, const gchar *data, GEr
 gchar 		**midgard_config_list_files		(gboolean user);
 gboolean 	midgard_config_save_file		(MidgardConfig *self, const gchar *name, gboolean user, GError **error);
 gboolean 	midgard_config_create_blobdir		(MidgardConfig *self);
+MidgardConfig	*midgard_config_copy			(MidgardConfig *self);
 
 /* API helpers, getters */
 const gchar *midgard_config_get_database_name(MidgardConfig *self);
