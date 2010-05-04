@@ -41,15 +41,6 @@
 # include <unistd.h>
 #endif
 
-#ifdef HAVE_SECURITY_PAM_APPL_H
-# include <security/pam_appl.h>
-#else
-/* Mac OS X puts PAM headers into /usr/include/pam, not /usr/include/security */
-# ifdef HAVE_PAM_PAM_APPL_H
-#  include <pam/pam_appl.h>
-# endif
-#endif
-
 /* declarations for virtual methods */
 MidgardUser     	*__midgard_user_get               (MidgardConnection *mgd, guint n_params, const GParameter *parameters);
 MidgardUser     	**__midgard_user_query            (MidgardConnection *mgd, guint n_params, const GParameter *parameters);
@@ -92,85 +83,6 @@ enum {
 	MIDGARD_USER_TYPE,
 	MIDGARD_USER_PERSON_GUID
 };
-
-/* PAM AUTH DATA */
-typedef struct {
-	const gchar *username;
-	const gchar *password;
-} midgard_auth_pam_appdata;
-
-#ifdef HAVE_LIBPAM
-
-// static gint _midgard_pam_conv(int num_msg, const struct pam_message **msg, 
-// 		struct pam_response **resp, void *appdata_ptr)
-// {
-// 	midgard_auth_pam_appdata *appdata = (midgard_auth_pam_appdata*) appdata_ptr;
-// 	int i = 0, j = 0;
-// 
-// 	if (num_msg && msg && *msg && resp && appdata_ptr) {
-// 		*resp = malloc(sizeof(struct pam_response)*num_msg);
-// 		if (*resp) {
-// 			/* Process conversation and fill in results */
-// 			for(; i < num_msg; i++) {
-// 				(*resp)[i].resp_retcode = 0;
-// 				(*resp)[i].resp = NULL;
-// 				switch((*msg)[i].msg_style) {
-// 					
-// 					case PAM_PROMPT_ECHO_ON: /* username */
-// 						(*resp)[i].resp = strdup(appdata->username);
-// 						break;
-// 					
-// 					case PAM_PROMPT_ECHO_OFF: /* password */
-// 						(*resp)[i].resp = strdup(appdata->password);
-// 						break;
-// 				}
-// 
-// 				/* If there was an error during strdup(), 
-// 				 * clean up already allocated  structures and return PAM_CONV_ERR */
-// 				if (!(*resp)[i].resp) {
-// 					for(j = i; j >= 0 ; j--) {
-// 						if ((*resp)[j].resp)
-// 							free((*resp)[j].resp);
-// 					}
-// 					free(*resp);
-// 					*resp = NULL;
-// 					g_debug("Return PAM_CONV_ERROR due to strdup() failure");
-// 					return PAM_CONV_ERR;
-// 				}
-// 			}
-// 			g_debug("Return PAM_SUCCESS");
-// 			return PAM_SUCCESS;
-// 		}
-// 	}
-// 	g_debug("Return PAM_CONV_ERROR");
-// 	return PAM_CONV_ERR;
-// }
-
-#endif /* HAVE_LIBPAM */
-
-/* PAM AUTH DATA END */
-
-static gchar *
-__string2md5hash (const gchar *str) 
-{
-	g_assert(str != NULL);
-
-	guchar mdbuf[16];
-
-	MIDGARD_MD5_CTX md5;
-	MIDGARD_MD5_Init(&md5);
-	MIDGARD_MD5_Update(&md5, (unsigned char *) str, strlen(str));
-	MIDGARD_MD5_Final(mdbuf, &md5);
-	int i;
-	
-	GString *gstr = g_string_new("");
-	
-	for (i = 0; i < 16; i++) {
-		g_string_append_printf(gstr, "%02x", mdbuf[i]);	
-	}
-
-	return g_string_free(gstr, FALSE);
-}
 
 static GObjectClass *__parent_class= NULL;
 
@@ -1053,8 +965,7 @@ static void __set_from_sql(MidgardDBObject *object,
 	
 	/* 'at_col_name' acceptable since we do not use this frequently */
 	const GValue *value;
- 	guint i = 0;
-	gboolean active = FALSE;
+ 	guint i = 0;	
 
 	/* GUID */
 	value = midgard_data_model_get_value_at_col_name (model, "guid", row);

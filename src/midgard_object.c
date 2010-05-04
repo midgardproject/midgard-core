@@ -408,8 +408,7 @@ guint _object_in_tree(MidgardObject *object)
 
 	if (_is_circular(object))
 		return OBJECT_IN_TREE_DUPLICATE;
-
-	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);	
+	
 	const gchar *upname = midgard_reflector_object_get_property_parent (classname);
 	const gchar *unique_name = midgard_reflector_object_get_property_unique (classname);
 	if (upname == NULL)
@@ -1346,8 +1345,8 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 
 	/* Note, that we start numbering from 1 , not from 0. property_id must be > 0 */
 	for (idx = 1; idx <= data->num_properties; idx++) {
-		gchar *pname = data->params[idx-1]->name;
-		/* g_print ("Installing property id %d :: %s.%s \n",
+		/*gchar *pname = data->params[idx-1]->name;
+		 g_print ("Installing property id %d :: %s.%s \n",
 				idx, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (g_class)), pname); */
 		g_object_class_install_property(
 				gobject_class, 
@@ -2647,7 +2646,6 @@ GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
 
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 
-	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);	
 	const gchar *primary_prop = 
 		midgard_reflector_object_get_property_primary(classname);
 
@@ -2732,8 +2730,7 @@ GObject **midgard_object_list_children(MidgardObject *object,
 		return NULL;
 	}
 	
-	MidgardObject *child = midgard_object_new(MGD_OBJECT_CNC (object), childcname, NULL);
-	MidgardObjectClass *child_klass = MIDGARD_OBJECT_GET_CLASS(child);
+	MidgardObject *child = midgard_object_new(MGD_OBJECT_CNC (object), childcname, NULL);	
 
 	if (midgard_reflector_object_get_property_parent(childcname) == NULL) {
 		g_object_unref(child);

@@ -52,28 +52,6 @@ midgard_query_holder_set_value (MidgardQueryHolder *self, const GValue *value)
 
 /* GOBJECT ROUTINES */
 
-static void
-__holder_get_value (MidgardQueryHolder *self, GValue *value)
-{
-	g_warning ("get_value invoked for interface. Expected Object implementation. ");
-	return;
-}
-
-static gboolean
-__holder_set_value (MidgardQueryHolder *self, const GValue *value)
-{
-	g_warning ("set_value invoked for interface. Expected Object implementation. ");
-	return FALSE;
-}
-
-static void
-query_holder_iface_init (gpointer g_iface, gpointer iface_data)
-{
-       MidgardQueryHolderIFace *iface = (MidgardQueryHolderIFace *)g_iface;
-       iface->get_value = __holder_get_value;
-       iface->set_value = __holder_set_value;
-}
-
 GType
 midgard_query_holder_get_type (void)
 {

@@ -450,95 +450,6 @@ _add_value_type (GString *str, const gchar *name, GValue *value, gboolean add_co
 
 #endif /* HAVE_LIBGDA_4 */
 
-static void __get_object_properties_lists (MidgardDBObject *object, GSList **names, GSList **values)
-{
-	g_return_if_fail (object != NULL);
-	
-	guint n_prop;
-	guint i;
-	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (object);
-	GObjectClass *klass = G_OBJECT_CLASS (dbklass);
-	GParamSpec **pspecs = g_object_class_list_properties (klass, &n_prop);
-
-	if (n_prop == 0 || !pspecs) {
-		g_warning ("%s class doesn't have registered properties", G_OBJECT_TYPE_NAME (object));
-		return;
-	}
-
-	GValue *value = NULL;
-	GType ftype;
-
-	for (i = 0; i < n_prop; i++) {
-
-		/* Do not append PK property to query */
-		MgdSchemaPropertyAttr *type_attr = midgard_core_class_get_property_attr (dbklass, pspecs[i]->name);
-		if (!type_attr || (type_attr && type_attr->is_primary))
-			continue;
-
-		ftype = G_TYPE_FUNDAMENTAL (pspecs[i]->value_type);
-		value = g_new0 (GValue, 1);
-		const gchar *pname = pspecs[i]->name;
-		const gchar *colname = midgard_core_class_get_property_colname (dbklass, pname);
-		if (!colname)
-			continue;
-
-		switch (ftype) {
-
-			case G_TYPE_STRING:
-				g_value_init (value, G_TYPE_STRING);
-				g_object_get_property (G_OBJECT (object), pname, value);
-				if (!g_value_get_string (value))
-					g_value_set_string (value, "");
-				break;
-
-			default:
-				g_value_init (value, pspecs[i]->value_type);
-				g_object_get_property (G_OBJECT (object), pname, value);
-				break;
-		}	
-			
-		*names = g_slist_prepend (*names, (gpointer) colname);
-
-		/* Append value */
-		if (G_VALUE_TYPE (value) == MGD_TYPE_TIMESTAMP) {
-
-			GValue *tval = g_new0 (GValue, 1);
-			g_value_init (tval, GDA_TYPE_TIMESTAMP);
-			g_value_transform ((const GValue *) value, tval);
-			*values = g_slist_prepend (*values, (gpointer) tval);
-			g_value_unset (value);
-			g_free (value);
-
-		} else {
-
-			*values = g_slist_prepend (*values, (gpointer) value);
-		}
-	}
-
-	/* Append metadata if exists */
-	if (dbklass->dbpriv->has_metadata) {
-		MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
-		__get_object_properties_lists (MIDGARD_DBOBJECT (metadata), names, values);
-	}
-
-	g_free (pspecs);
-
-	*names = g_slist_reverse (*names);
-	*values = g_slist_reverse (*values);
-}
-
-static void __unset_values_list (GSList *values)
-{
-	GSList *slist;
-
-	for (slist = values; slist != NULL; slist = slist->next) {
-		GValue *val = (GValue *) slist->data;
-		if (!G_VALUE_HOLDS_OBJECT (val))
-			g_value_unset (val);
-		g_free (val);
-	}
-}
-
 GdaDataModel *
 midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectClass *klass, guint n_params, const GParameter *parameters)
 {
@@ -1003,8 +914,7 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 	GString *sql = g_string_new ("UPDATE ");
 	g_string_append_printf (sql, "%s SET ", table);
 
-	MgdSchemaPropertyAttr *prop_attr = NULL;
-	gboolean bv;
+	MgdSchemaPropertyAttr *prop_attr = NULL;	
 	GValue value = {0, };
 
 	for (i = 0; i < n_prop; i++) {

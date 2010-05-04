@@ -174,12 +174,6 @@ static const gchar *rcolumns[] = {
 	NULL
 };
 
-/* RESERVED property subnodes' names */
-static const gchar *subnnames[] = {
-	"description",
-	NULL
-};
-
 static gboolean strv_contains(const char **strv, const xmlChar *str) {
         g_assert(strv != NULL);
         g_assert(str != NULL);
@@ -1673,7 +1667,6 @@ static void
 _midgard_schema_class_init (gpointer g_class, gpointer g_class_data)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);
-	MidgardSchemaClass *klass = MIDGARD_SCHEMA_CLASS (g_class);
 	
 	gobject_class->set_property = NULL;
 	gobject_class->get_property = NULL;

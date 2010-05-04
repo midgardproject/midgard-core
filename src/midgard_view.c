@@ -178,7 +178,6 @@ _midgard_view_derived_storage_exists (MidgardConnection *mgd, MidgardDBObjectCla
 	/* Should we use GdaDictDatabase&GdaDictTable here ? */
 	/* Both do not exists in GDA4 */
 	MgdSchemaTypeAttr *type_attr = midgard_core_class_get_type_attr(klass);
-	const gchar *viewname = type_attr->name;
 
 	/* Workaround for MySQL provider which returns empty result when asked for views.
 	 * This is at least what gda provider does. */

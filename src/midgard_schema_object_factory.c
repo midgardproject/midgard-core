@@ -415,7 +415,8 @@ midgard_schema_object_factory_object_undelete (MidgardConnection *mgd, const gch
 static void
 _midgard_schema_object_factory_class_init (MidgardSchemaObjectFactoryClass *klass, gpointer class_data)
 {
-	GObjectClass *object_class = G_OBJECT_CLASS (klass);
+	/* Do nothing atm */
+	return;	
 }
 
 GType midgard_schema_object_factory_get_type(void)

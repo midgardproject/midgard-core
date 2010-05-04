@@ -108,7 +108,7 @@ static void _midgard_connection_finalize(GObject *object)
 	self->priv->cnc_str = NULL;
 
 	g_timer_stop(self->priv->timer);
-	gdouble bench = g_timer_elapsed(self->priv->timer, NULL);
+	//gdouble bench = g_timer_elapsed(self->priv->timer, NULL);
 
 	if (self->priv->loghandler) {
 		/* uptime message disable for a while */

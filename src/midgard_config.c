@@ -1552,8 +1552,7 @@ _midgard_config_finalize(GObject *object)
 static void 
 _midgard_config_class_init (gpointer g_class, gpointer g_class_data)
 {
-	GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);
-	MidgardConfigClass *klass = MIDGARD_CONFIG_CLASS (g_class);
+	GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);	
 	GParamSpec *pspec;
 	
 	gobject_class->set_property = _midgard_config_set_property;

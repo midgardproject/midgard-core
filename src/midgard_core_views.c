@@ -166,8 +166,7 @@ static const gchar *__allowed_joins[] = {"left", "right", "inner", "inner left",
 static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 {
 	xmlNode *cur;
-	gchar *property_name = NULL;
-	MgdSchemaPropertyAttr *prop_attr = NULL;
+	gchar *property_name = NULL;	
 	MgdSchemaPropertyAttr *propright = NULL;
 	MgdSchemaPropertyAttr *propleft = NULL;
 

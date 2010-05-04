@@ -37,7 +37,6 @@ _action_create_callback (MidgardObject *object, gpointer ud)
 	gchar *person_guid = "";
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
-	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (mdata);
 
 	if (person) 
 		person_guid = (gchar *)MGD_OBJECT_GUID (person);			
@@ -74,7 +73,6 @@ _action_update_callback (MidgardObject *object, gpointer ud)
 	gchar *person_guid = "";
 	MidgardConnection *mgd = MGD_OBJECT_CNC(object);
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
-	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (mdata);
 
 	if (person) 
 		person_guid = (gchar *)MGD_OBJECT_GUID(person);			

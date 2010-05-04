@@ -498,7 +498,6 @@ midgard_schema_object_tree_list_objects (MidgardObject *object, guint *n_objects
 
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 
-	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);	
 	const gchar *primary_prop = 
 		midgard_reflector_object_get_property_primary(classname);
 
@@ -590,7 +589,6 @@ midgard_schema_object_tree_list_children_objects (MidgardObject *object, const g
 	}
 	
 	MidgardObject *child = midgard_object_new(MGD_OBJECT_CNC (object), childcname, NULL);
-	MidgardObjectClass *child_klass = MIDGARD_OBJECT_GET_CLASS(child);
 
 	if (midgard_reflector_object_get_property_parent(childcname) == NULL) {
 		g_object_unref(child);

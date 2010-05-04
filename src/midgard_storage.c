@@ -62,8 +62,7 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 	if(!ret)
 		return FALSE;
 	
-	/* Create midgard_user storage */
-	MidgardUserClass *user_klass = MIDGARD_USER_CLASS(G_OBJECT_CLASS (g_type_class_peek (MIDGARD_TYPE_USER)));
+	/* Create midgard_user storage */	
 	midgard_storage_create (mgd, g_type_name (MIDGARD_TYPE_USER));
 
 	GString *query = g_string_new ("SELECT id from midgard_user where guid = ");
@@ -92,34 +91,18 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 	}
 
 	/* quota table */
-	MidgardObjectClass *quota_klass = 
-		MIDGARD_OBJECT_GET_CLASS_BY_NAME("midgard_quota");
 	midgard_storage_create (mgd, "midgard_quota");
 
-	/* Those below are important for legacy authentication. Backward compatibility FIXME */
-	/* person table */
-	MidgardObjectClass *person_klass = 
-		MIDGARD_OBJECT_GET_CLASS_BY_NAME("midgard_person");
+	/* person table */	
 	midgard_storage_create (mgd, "midgard_person");
-
 	sql = "SELECT lastname, firstname FROM person WHERE guid='f6b665f1984503790ed91f39b11b5392'";
-
 	model = midgard_core_query_get_model(mgd, sql);
 
 	if(model)
 		ret_rows = gda_data_model_get_n_rows(model);
 
 	if(!model || ret_rows == 0) {
-		
-		/* midgard_person record */
-		/*
-		sql = "INSERT INTO person (guid, birthdate, homepage, email, extra, "
-			"metadata_creator, lastname, firstname, metadata_created, metadata_revision, username ) "
-			"VALUES ('f6b665f1984503790ed91f39b11b5392', '1999-05-18 14:40:01', "
-			"'http://www.midgard-project.org', 'dev@lists.midgard-project.org', "
-			"'Default administrator account for Midgard', 'f6b665f1984503790ed91f39b11b5392', "
-			"'Administrator', 'Midgard', '1999-05-18 14:40:01', 0, '')";*/
-	
+			
 		sql = "INSERT INTO person (guid, metadata_creator, lastname, firstname, metadata_created, metadata_revision) "
 			"VALUES ('f6b665f1984503790ed91f39b11b5392', 'f6b665f1984503790ed91f39b11b5392', "
 			"'Administrator', 'Midgard', '1999-05-18 14:40:01', 0 )";
