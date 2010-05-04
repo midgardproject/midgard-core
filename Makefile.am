@@ -40,7 +40,6 @@ midgard_public_h = \
 	src/midgard_dbobject.h \
 	src/midgard_defs.h \
 	src/midgard_dbus.h \
-	src/midgard.h \
 	src/midgard_key_config_common.h \
 	src/midgard_object.h \
  	src/query_builder.h \
@@ -195,7 +194,7 @@ src_libmidgard2_la_public_SOURCES = \
 pkgdatadir = $(datadir)/midgard2
 pkglibdir = $(libdir)/midgard2
 libmidgardincludedir = $(includedir)/midgard2/midgard
-libmidgardinclude_HEADERS = $(midgard_public_h) 
+libmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h 
 
 src_libmidgard2_la_SOURCES = $(src_libmidgard2_la_public_SOURCES) $(src_libmidgard2_la_core_SOURCES)
 
@@ -210,7 +209,7 @@ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
-introspection_sources = $(src_libmidgard2_la_public_SOURCES) $(libmidgardinclude_HEADERS)
+introspection_sources = $(src_libmidgard2_la_public_SOURCES) $(midgard_public_h)
 Midgard-10.05.gir: $(lib_LTLIBRARIES)
 Midgard_10_05_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0 
 Midgard_10_05_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
