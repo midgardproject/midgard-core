@@ -1453,8 +1453,9 @@ midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
                 midgard_type_info->value_table = NULL;
                 
 		GType type = g_type_register_static (MIDGARD_TYPE_OBJECT, classname, midgard_type_info, 0);
-                
-		if (g_str_equal (classname, "MidgardAttachment"))
+               
+	        /* FIXME, MidgardAttachment should be registered directly in core, instead of schema */	
+		if (g_str_equal (classname, "midgard_attachment"))
 			_midgard_attachment_type = type;
 
                 g_free (midgard_type_info);
