@@ -1509,7 +1509,10 @@ midgard_core_query_insert_records (MidgardConnection *mgd,
 	
 		if (!p)
 			g_warning ("Failed to get holder for %s column", (gchar *) cl->data);
-	
+
+		if (G_VALUE_HOLDS_STRING ((GValue *) vl->data) && !g_value_get_string ((GValue *) vl->data))
+			g_value_set_string ((GValue *) vl->data, "");
+
 		if (!gda_holder_set_value (p, (GValue *) vl->data, &error)) {
 			g_warning ("Failed to set holder's value. %s", 
 					error && error->message ? error->message : "Unknown reason");

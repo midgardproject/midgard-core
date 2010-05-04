@@ -1404,7 +1404,7 @@ __mgdschema_object_constructor (GType type,
 
 		if (prop_attr == NULL 
 				|| prop_attr->default_value == NULL 
-				|| !G_IS_VALUE(prop_attr->default_value))
+				|| !G_IS_VALUE(prop_attr->default_value)) 
 			continue;
 
 		g_object_set_property(object, pspecs[i]->name, prop_attr->default_value);
