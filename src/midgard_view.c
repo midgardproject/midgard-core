@@ -175,45 +175,46 @@ _midgard_view_derived_storage_exists (MidgardConnection *mgd, MidgardDBObjectCla
 	g_return_val_if_fail(mgd != NULL, FALSE);
 	g_return_val_if_fail(klass != NULL, FALSE);		
 
-	/* Should we use GdaDictDatabase&GdaDictTable here ? */
-	/* Both do not exists in GDA4 */
 	MgdSchemaTypeAttr *type_attr = midgard_core_class_get_type_attr(klass);
+	const gchar *viewname = type_attr->name;
 
-	/* Workaround for MySQL provider which returns empty result when asked for views.
-	 * This is at least what gda provider does. */
-	/* FIXME, once GDA4 is fully supported */
-	gboolean use_mysql = FALSE;
-	if (mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_MYSQL)
-		use_mysql = TRUE;
+	GdaMetaContext mcontext = {"_views", 1, NULL, NULL};
+	mcontext.column_names = g_new (gchar *, 1);
+	mcontext.column_names[0] = "table_name";
+	mcontext.column_values = g_new (GValue *, 1);
+	g_value_set_string ((mcontext.column_values[0] = gda_value_new (G_TYPE_STRING)), viewname);
+	GError *error = NULL;
 
-#warning "gda_connection_get_schema replacement"
-/*
-	GdaDataModel *dm_schema =
-		gda_connection_get_schema(mgd->priv->connection, 
-				use_mysql ? GDA_CONNECTION_SCHEMA_TABLES : GDA_CONNECTION_SCHEMA_VIEWS , NULL ,NULL);
-
-	if (!dm_schema) {
-
-		g_error("Failed to retrieve tables schema");
+	if (!gda_connection_update_meta_store (mgd->priv->connection, &mcontext, &error)) {
+		gda_value_free (mcontext.column_values[0]);
+		g_warning("Failed to update meta data for table '%s': %s", viewname,
+				error && error->message ? error->message : "No detail");
+		if (error)
+			g_error_free(error);
 		return TRUE;
 	}
 
-	gint rows = gda_data_model_get_n_rows(dm_schema);
-	guint j;
-	const GValue *value;	
+	GdaDataModel *dm_schema =
+		gda_connection_get_meta_store_data (mgd->priv->connection,
+				GDA_CONNECTION_META_VIEWS, NULL, 1,
+				"name", mcontext.column_values[0],
+				NULL);
 
-	for (j = 0; j < rows; j++) {
-		value = gda_data_model_get_value_at(dm_schema, 0, j);	
-		if (g_str_equal(g_value_get_string(value), viewname)) {
-	
-			g_object_unref(dm_schema);
-			return TRUE;
-		}
+	gda_value_free (mcontext.column_values[0]);
+	g_free (mcontext.column_names);
+	g_free (mcontext.column_values);
+
+	if(!dm_schema) {
+		g_error("Failed to retrieve views schema");
+		return TRUE;
 	}
 
-	g_object_unref(dm_schema);
-*/	
-	return FALSE;
+	gboolean retval = TRUE;
+	if (gda_data_model_get_n_rows (dm_schema) == 0)
+		retval = FALSE;
+	g_object_unref (dm_schema);
+
+	return retval;
 }
 
 static gboolean 
