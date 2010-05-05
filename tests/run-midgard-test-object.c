@@ -50,6 +50,10 @@ int main (int argc, char *argv[])
 	MidgardUser *user = midgard_user_quick_login (mgd_global, "admin", "password");
 	g_assert(user != NULL);
 
+	midgard_connection_enable_replication (mgd_global, TRUE);
+	midgard_connection_enable_dbus (mgd_global, TRUE);
+	midgard_connection_enable_quota (mgd_global, TRUE);
+
 	/* Lock root and its membershipp */
 	midgard_test_lock_root_objects(mgd_global, user);
 
