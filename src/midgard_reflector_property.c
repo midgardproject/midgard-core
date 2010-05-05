@@ -41,17 +41,12 @@ midgard_reflector_property_new (const gchar *classname)
 
 	MidgardDBObjectClass *dbklass = g_type_class_peek (g_type_from_name (classname));
 
-	/* TODO, not MidgardDBObject class error */
 	if (!dbklass)
 		return NULL;
 
 	g_return_val_if_fail (MIDGARD_IS_DBOBJECT_CLASS (dbklass), NULL);
 
-	GValue val = {0, };
-	g_value_init (&val, G_TYPE_STRING);
-	g_value_set_string (&val, classname);
-	MidgardReflectorProperty *self = g_object_new(MIDGARD_TYPE_REFLECTOR_PROPERTY, "dbclass", &val, NULL);
-	g_value_unset (&val);
+	MidgardReflectorProperty *self = g_object_new (MIDGARD_TYPE_REFLECTOR_PROPERTY, "dbclass", classname, NULL);
 
 	return self;
 }
@@ -411,20 +406,26 @@ enum {
 
 static GObjectClass *__parent_class = NULL;
 
+static void 
+__midgard_reflector_property_instance_init (GTypeInstance *instance, gpointer g_class)
+{
+	MidgardReflectorProperty *self = (MidgardReflectorProperty *) instance;
+	self->priv = g_new (MidgardReflectorPropertyPrivate, 1);
+	self->priv->klass = NULL;
+	self->priv->classname = NULL;
+
+	return;
+}
+
 static GObject *
 __midgard_reflector_property_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties)
-{
+{g_print ("CTOR");
 	GObject *object = (GObject *)
 		G_OBJECT_CLASS (__parent_class)->constructor (type,
 				n_construct_properties,
 				construct_properties);
-
-	MidgardReflectorProperty *self = (MidgardReflectorProperty *) object;
-	self->priv = g_new (MidgardReflectorPropertyPrivate, 1);
-	self->priv->klass = NULL;
-	self->priv->classname = NULL;
 
 	return G_OBJECT(object);
 }
@@ -473,7 +474,7 @@ __midgard_reflector_property_set_property (GObject *object, guint property_id,
 	switch (property_id) {
 
 		case MIDGARD_REFLECTOR_PROPERTY_DBCLASS:
-			dbklass = g_type_class_peek (g_type_from_name (g_value_get_string (value)));
+			dbklass = g_type_class_peek (g_type_from_name (g_value_get_string (value)));	
 			if (dbklass) {
 				self->priv->klass = dbklass;
 				self->priv->classname = G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (dbklass));
@@ -492,7 +493,7 @@ __midgard_reflector_property_class_init (MidgardDBObjectClass *klass, gpointer g
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	__parent_class = g_type_class_peek_parent (klass);
 
-	object_class->constructor = __midgard_reflector_property_constructor;
+	//object_class->constructor = __midgard_reflector_property_constructor;
 	object_class->dispose = __midgard_reflector_property_dispose;
 	object_class->finalize = __midgard_reflector_property_finalize;
 
@@ -528,7 +529,7 @@ midgard_reflector_property_get_type (void)
 			NULL,           /* class_data */
 			sizeof (MidgardReflectorProperty),
 			0,              /* n_preallocs */
-			NULL
+			(GInstanceInitFunc) __midgard_reflector_property_instance_init
 		};
 		type = g_type_register_static (G_TYPE_OBJECT, "MidgardReflectorProperty", &info, 0);
 	}
