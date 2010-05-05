@@ -782,11 +782,15 @@ gboolean midgard_connection_open_config(
 	g_assert(self != NULL);	
 	g_assert(config != NULL);
 
-	if (self->priv->config && (self->priv->config == config))
+	MidgardConfig *self_config = self->priv->config;
+
+	/* Emulate the same config pointer, as we have copy associated */
+	if (self_config 
+			&& (g_str_equal (self_config->database, config->database)
+				&& g_str_equal (self_config->dbtype, config->dbtype)
+				&& g_str_equal (self_config->host, config->host))) {
 		return TRUE;
-
-	if (self->priv->config && (self->priv->config != config)) {
-
+	} else if (self_config) {
 		MIDGARD_ERRNO_SET_STRING (self, MGD_ERR_INTERNAL, "Midgard connection already associated with configuration");
 		return FALSE;
 	}
