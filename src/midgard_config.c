@@ -1372,8 +1372,7 @@ void midgard_config_set_pamfile(MidgardConfig *self, const gchar *pamfile)
 MidgardConfig *
 midgard_config_copy (MidgardConfig *self) 
 {
-	MidgardConfig *copy = g_new (MidgardConfig, 1);
-	copy->priv = midgard_config_private_new ();
+	MidgardConfig *copy = midgard_config_new ();
 	__config_copy (copy, self);
 
 	if (self->priv->configname)
