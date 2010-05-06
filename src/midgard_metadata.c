@@ -63,6 +63,15 @@ _action_create_callback (MidgardObject *object, gpointer ud)
 	g_value_set_uint (&rev_val, 0);
 	midgard_core_metadata_set_revision (mdata, (const GValue *)&rev_val);
 	g_value_unset (&rev_val);
+
+	/* set default values */
+	mdata->priv->locker = g_strdup ("");
+	mdata->priv->approver = g_strdup ("");
+
+	if (!mdata->priv->authors)
+		mdata->priv->authors = g_strdup ("");
+	if (!mdata->priv->owner)
+		mdata->priv->owner = g_strdup ("");
 }
 
 static void 
