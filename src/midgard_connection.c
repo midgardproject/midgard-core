@@ -117,6 +117,13 @@ static void _midgard_connection_finalize(GObject *object)
 
 	g_timer_destroy(self->priv->timer);
 
+	if (!self->priv->inherited) {
+		if (self->priv->config && G_IS_OBJECT (self->priv->config)) {
+			g_object_unref(self->priv->config);
+			self->priv->config = NULL;
+		}
+	}
+
 	g_free(self->priv);
 	self->priv = NULL;
 }
@@ -138,11 +145,6 @@ static void _midgard_connection_dispose(GObject *object)
 
 	/* Free only these data which are not inherited */
 	if (!self->priv->inherited) {
-		if (self->priv->config && G_IS_OBJECT (self->priv->config)) {
-			g_object_unref(self->priv->config);
-			self->priv->config = NULL;
-		}
-
 #ifdef HAVE_LIBGDA_4
 		if(self->priv->parser != NULL)
 			g_object_unref(self->priv->parser);
