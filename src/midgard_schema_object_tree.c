@@ -329,13 +329,13 @@ midgard_schema_object_tree_get_parent_object (MidgardObject *object)
         MidgardConnection *mgd = MGD_OBJECT_CNC (self);
         MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(mobj);
 	const gchar *classname = G_OBJECT_TYPE_NAME (self);
-
+	
         const gchar *property_up = midgard_reflector_object_get_property_up (classname);
 
         if (property_up) {
 
 		fprop = g_object_class_find_property( G_OBJECT_GET_CLASS(mobj), property_up);
-		MidgardReflectorProperty *mrp = midgard_reflector_property_new (G_OBJECT_CLASS_NAME (klass));
+		MidgardReflectorProperty *mrp = midgard_reflector_property_new (classname);
 		if (midgard_reflector_property_is_link (mrp, property_up)) {
 
 			parent_class_name = midgard_reflector_property_get_link_name (mrp, property_up);
@@ -344,7 +344,7 @@ midgard_schema_object_tree_get_parent_object (MidgardObject *object)
 				pobj = midgard_object_new (mgd, parent_class_name, NULL);
 
 			g_object_unref (mrp);
-		}
+		}	
 
 		if (!pobj)
 			return NULL;
