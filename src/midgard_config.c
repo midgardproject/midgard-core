@@ -1014,7 +1014,7 @@ static void __config_struct_new(MidgardConfig *self)
 	self->confdir = __get_default_confdir();
 }
 
-static MidgardConfig*
+static void
 __config_copy (MidgardConfig *self, MidgardConfig *src)
 {
 	self->dbtype = g_strdup(src->dbtype);
@@ -1040,6 +1040,8 @@ __config_copy (MidgardConfig *self, MidgardConfig *src)
 	self->cachedir = g_strdup(src->cachedir);
 	self->confdir = g_strdup(src->confdir);
 	self->gdathreads = src->gdathreads;
+
+	return;
 }
 
 void 
