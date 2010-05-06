@@ -449,7 +449,7 @@ gboolean __midgard_connection_open(
 			const gchar *sqlite_dir[] = {"data", NULL};
 			path = midgard_core_config_build_path(sqlite_dir, NULL, TRUE);
 		} else {
-			path = dbdir;
+			path = g_strdup(dbdir);
 		}
 
 		tmpstr = g_strconcat("DB_DIR=", path, ";", "DB_NAME=", dbname, NULL);
