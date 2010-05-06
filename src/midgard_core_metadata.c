@@ -33,6 +33,7 @@
 		g_value_unset (&sval); \
 	} else { \
 		__property = g_value_dup_string (__mstrval); \
+		if (!__property) __property = g_strdup (""); \
 	} \
 }
 
