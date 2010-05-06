@@ -1384,6 +1384,8 @@ midgard_config_copy (MidgardConfig *self)
 		copy->priv->log_channel = channel;
 	}
 
+	copy->priv->dbtype = self->priv->dbtype;
+
 	return copy;
 }
 
