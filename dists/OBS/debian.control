@@ -15,7 +15,7 @@ Architecture: any
 Depends: libglib2.0-0 (>=2.12), libxml2 (>=2.6.11), libdbus-glib-1-2, dbus, midgard-libgda-4.0-4 | libgda-4.0-4 | libgda4-4, libc6, ${shlibs:Depends} 
 Conflicts:
 Replaces: libmidgard2-2009 
-Suggests: mysql-server-5.0 (>=5.0)
+Suggests: mysql-server
 Description: Midgard Content Repository - Runtime Library
  .
  Midgard2 is an Open Source Content Repository. It provides an object-oriented
