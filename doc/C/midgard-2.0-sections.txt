@@ -556,8 +556,6 @@ MIDGARD_DBUS_GET_CLASS
 MidgardQueryConstraint
 MidgardQueryConstraintClass
 midgard_query_constraint_new
-midgard_query_constraint_get_value  
-midgard_query_constraint_set_value 
 midgard_query_constraint_get_storage 
 midgard_query_constraint_set_storage 
 midgard_query_constraint_get_property

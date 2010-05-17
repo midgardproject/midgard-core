@@ -109,18 +109,6 @@ midgard_query_constraint_new (MidgardQueryProperty *property, const gchar *op,
 	return self;
 }
 
-void
-midgard_query_constraint_get_value (MidgardQueryConstraint *self, GValue *value)
-{
-	return;
-}
-
-gboolean
-midgard_query_constraint_set_value (MidgardQueryConstraint *self, const GValue *value)
-{
-	return FALSE;
-}
-
 /**
  * midgard_query_constraint_get_storage:
  * @self: #MidgardQueryStorage instance
