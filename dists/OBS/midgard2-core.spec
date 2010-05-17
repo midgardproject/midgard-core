@@ -3,7 +3,7 @@
 %define min_glib2 2.14
 %define min_libxml2 2.6
 %if 0%{?suse_version}
-%define devel_requires glib2-devel >= %{min_glib2}, libxml2-devel >= %{min_libxml2}, libgda-3_0-devel, dbus-1-devel, dbus-1-glib-devel
+%define devel_requires glib2-devel >= %{min_glib2}, libxml2-devel >= %{min_libxml2}, libgda-4_0-devel, dbus-1-devel, dbus-1-glib-devel
 %else
 %define devel_requires glib2-devel >= %{min_glib2}, libxml2-devel >= %{min_libxml2}, libgda-devel, dbus-devel, dbus-glib-devel
 %endif
@@ -109,6 +109,9 @@ exit 0
 
 
 %changelog
+* Mon May 17 2010 Jarkko Ala-Louvesniemi <jval@puv.fi> 10.05.0-2.1
+- Changed libgda-3_0-devel to libgda-4_0-devel in suse specifics
+
 * Wed Oct 28 2009 Jarkko Ala-Louvesniemi <jval@puv.fi> 9.03.99-734.1
 - Initial OBS package: merged OBS specifics from 8.09.6-3.1
 
