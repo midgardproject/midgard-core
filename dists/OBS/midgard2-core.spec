@@ -9,7 +9,7 @@
 %endif
 
 Name:           midgard2-core
-Version:        %{major_version}
+Version:        %{major_version}.1
 Release:        OBS
 Summary:        Midgard core library and tools
 
