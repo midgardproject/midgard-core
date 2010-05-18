@@ -1,3 +1,9 @@
+midgard2-core (10.05.0-2) unstable; urgency=low
+
+  * Added optify file 
+
+ -- Piotr Pokora <piotrek.pokora@gmail.com>  Tue, 18 May 2010 13:56:04 +0200
+
 midgard2-core (10.05.0-1) unstable; urgency=low
 
   * New upstream 
@@ -9,4 +15,3 @@ midgard2-core (9.09.99-1) unstable; urgency=low
   * New upstream 
 
  -- Piotr Pokora <piotrek.pokora@gmail.com>  Wed, 18 Nov 2009 12:52:04 +0200
-
