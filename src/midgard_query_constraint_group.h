@@ -52,7 +52,9 @@ struct _MidgardQueryConstraintGroupClass {
 };
 
 GType 				midgard_query_constraint_group_get_type		(void);
-MidgardQueryConstraintGroup  	*midgard_query_constraint_group_new 		(const gchar *type, MidgardQueryConstraintSimple *constraint, ...);
+MidgardQueryConstraintGroup  	*midgard_query_constraint_group_new 		(void);
+MidgardQueryConstraintGroup  	*midgard_query_constraint_group_new_valist	(const gchar *type, MidgardQueryConstraintSimple *constraint, ...);
+MidgardQueryConstraintGroup  	*midgard_query_constraint_group_new_with_constraints	(const gchar *type, MidgardQueryConstraintSimple **constraints, guint n_constraints);
 const gchar 			*midgard_query_constraint_group_get_group_type	(MidgardQueryConstraintGroup *self);
 gboolean			midgard_query_constraint_group_set_group_type		(MidgardQueryConstraintGroup *self, const gchar *type);
 gboolean			midgard_query_constraint_group_add_constraint	(MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple *constraint, ...);

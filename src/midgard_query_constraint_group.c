@@ -32,15 +32,63 @@ struct _MidgardQueryConstraintGroupPrivate {
 
 /**
  * midgard_query_constraint_group_new:
- * @type: constraints group type ('OR' or 'AND')
- * @constraint: list of constraints to add to group or NULL
+ *
+ * Create new #MidgardQueryConstraintGroup instance with default "AND" group type.
  *
  * Returns: #MidgardQueryConstraintGroup instance or %NULL
  *
- * Since: 10.05
+ * Since: 10.05.1
  */ 
 MidgardQueryConstraintGroup *
-midgard_query_constraint_group_new (const gchar *type, MidgardQueryConstraintSimple *constraint, ...)
+midgard_query_constraint_group_new (void)
+{	
+	return midgard_query_constraint_group_new_valist ("AND", NULL);
+}
+
+/**
+ * midgard_query_constraint_group_new_with_constraints:
+ * @type: constraints group type
+ * @constraints: an array of #MidgardQueryConstraintSimple constraints
+ * @n_constraints: the length of given constraints array
+ * 
+ * Returns: #MidgardQueryConstraintGroup instance or %NULL
+ *
+ * Since: 10.05.1
+ */ 
+MidgardQueryConstraintGroup *
+midgard_query_constraint_group_new_with_constraints (const gchar *type, MidgardQueryConstraintSimple **constraints, guint n_constraints)
+{
+	g_return_val_if_fail (type != NULL, NULL);
+	g_return_val_if_fail (constraints != NULL, NULL);
+
+	MidgardQueryConstraintGroup *self = midgard_query_constraint_group_new_valist (type, NULL);
+	if (!self)
+		return NULL;
+
+	if (n_constraints == 0)
+		return self;
+
+	guint i;
+	for (i = 0; i < n_constraints; i++) {
+		midgard_query_constraint_group_add_constraint (self, constraints[i], NULL);
+	}
+
+	return self;
+}
+
+/**
+ * midgard_query_constraint_group_new_valist:
+ * @type: constraints group type ('OR' or 'AND')
+ * @constraint: list of constraints to add to group or NULL
+ * 
+ * This is C convinient function. It's not designed for language bindings.
+ *
+ * Returns: #MidgardQueryConstraintGroup instance or %NULL
+ *
+ * Since: 10.05.1
+ */ 
+MidgardQueryConstraintGroup *
+midgard_query_constraint_group_new_valist (const gchar *type, MidgardQueryConstraintSimple *constraint, ...)
 {
 	g_return_val_if_fail (type != NULL, NULL);
 	g_return_val_if_fail (constraint != NULL, NULL);
