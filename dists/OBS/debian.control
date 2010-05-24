@@ -27,7 +27,7 @@ Description: Midgard Content Repository - Runtime Library
 Package: libmidgard2-dev
 Section: libdevel
 Architecture: any
-Depends: libmidgard2-2010 (>= ${source:Version})
+Depends: libmidgard2-2010 (>= ${source:Version}), libglib2.0-dev (>=2.12)
 Conflicts:
 Replaces: 
 Description: Midgard Content Repository - Development Files
