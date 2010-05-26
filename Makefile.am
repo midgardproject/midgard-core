@@ -5,19 +5,19 @@ ACLOCAL_AMFLAGS = -I m4
 DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
 
 lib_LTLIBRARIES = \
-	src/libmidgard2.la
+	src/libmidgard3.la
 
 bin_PROGRAMS = \
-	test/midgard2-schema \
-	test/midgard2-query
+	test/midgard3-schema \
+	test/midgard3-query
 
 if MIDGARD_DBUS_SUPPORT
 dbus_pkgdatadir = $(DBUS_CONF_DIR)/dbus-1/system.d
 dbus_pkgdata_DATA = midgard_dbus.conf
 endif
 
-test_midgard2_schema_SOURCES = test/midgard-schema.c 
-test_midgard2_query_SOURCES = test/midgard-query.c
+test_midgard3_schema_SOURCES = test/midgard-schema.c 
+test_midgard3_query_SOURCES = test/midgard-query.c
 
 noinst_PROGRAMS = $(TESTS)
 
@@ -29,9 +29,9 @@ dist_pkgdata_DATA = MidgardObjects.xml \
 	midgard_dbus.conf \
 	conf.d/midgard.conf.example 
 
-schemadir = $(datadir)/midgard2/schema
+schemadir = $(datadir)/midgard3/schema
 schema_DATA = schema/README.txt
-viewsdir = $(datadir)/midgard2/views
+viewsdir = $(datadir)/midgard3/views
 views_DATA = views/README-views.txt
 
 midgard_public_h = \
@@ -78,17 +78,17 @@ midgard_public_h = \
 	src/midgard_utils.h \
 	src/midgard_view.h
 
-man_MANS = man/midgard2-schema.1 \
-	man/midgard2-query.1 
+man_MANS = man/midgard3-schema.1 \
+	man/midgard3-query.1 
 
 EXTRA_DIST =  \
 	$(man_MANS) \
-	midgard2.pc.in \
+	midgard3.pc.in \
 	$(schema_DATA) \
 	$(views_DATA) 
 	m4/introspection.m4
 
-LDADD = src/libmidgard2.la
+LDADD = src/libmidgard3.la
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined
@@ -96,18 +96,18 @@ endif
 
 $(PROGRAMS): $(LDADD)
 
-src_libmidgard2_la_CPPFLAGS = \
+src_libmidgard3_la_CPPFLAGS = \
 	-I$(top_srcdir)/src -DG_LOG_DOMAIN=\"midgard-core\"
 
 AM_CFLAGS = -I$(top_srcdir)/src @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 
 
-src_libmidgard2_la_LDFLAGS = -version-info 2015:0:5 $(no_undefined)
+src_libmidgard3_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
 
 test_midgard_schema_CPPFLAGS = \
 	 -DG_LOG_DOMAIN=\"midgard-core\"
 
-src_libmidgard2_la_core_SOURCES = \
+src_libmidgard3_la_core_SOURCES = \
 	src/midgard_core_connection.h \
 	src/midgard_core_connection.c \
 	src/midgard_core_query.h \
@@ -140,7 +140,7 @@ src_libmidgard2_la_core_SOURCES = \
 	src/midgard_core_xml.h \
 	src/midgard_core_xml.c 
 
-src_libmidgard2_la_public_SOURCES = \
+src_libmidgard3_la_public_SOURCES = \
 	src/midgard.c \
 	src/midgard_key_config.c \
 	src/midgard_key_config_context.c \
@@ -191,17 +191,17 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_md5.h \
 	src/midgard_view.c
 
-pkgdatadir = $(datadir)/midgard2
-pkglibdir = $(libdir)/midgard2
-libmidgardincludedir = $(includedir)/midgard2/midgard
+pkgdatadir = $(datadir)/midgard3
+pkglibdir = $(libdir)/midgard3
+libmidgardincludedir = $(includedir)/midgard3/midgard
 libmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h 
 
-src_libmidgard2_la_SOURCES = $(src_libmidgard2_la_public_SOURCES) $(src_libmidgard2_la_core_SOURCES)
+src_libmidgard3_la_SOURCES = $(src_libmidgard3_la_public_SOURCES) $(src_libmidgard3_la_core_SOURCES)
 
-mgdschemasdir = $(datadir)/midgard2/schema
+mgdschemasdir = $(datadir)/midgard3/schema
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = midgard2.pc
+pkgconfig_DATA = midgard3.pc
 
 -include $(INTROSPECTION_MAKEFILE)
 INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir)
@@ -209,14 +209,14 @@ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
-introspection_sources = $(src_libmidgard2_la_public_SOURCES) $(midgard_public_h)
-Midgard-10.05.gir: $(lib_LTLIBRARIES)
-Midgard_10_05_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0 
-Midgard_10_05_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
-Midgard_10_05_gir_LIBS = $(lib_LTLIBRARIES) 
-Midgard_10_05_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
-Midgard_10_05_gir_PACKAGES = gobject-2.0 libxml-2.0 libgda-4.0
-INTROSPECTION_GIRS = Midgard-10.05.gir
+introspection_sources = $(src_libmidgard3_la_public_SOURCES) $(midgard_public_h)
+Midgard-3.0.gir: $(lib_LTLIBRARIES)
+Midgard_3_0_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0 
+Midgard_3_0_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
+Midgard_3_0_gir_LIBS = $(lib_LTLIBRARIES) 
+Midgard_3_0_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
+Midgard_3_0_gir_PACKAGES = gobject-2.0 libxml-2.0 libgda-4.0
+INTROSPECTION_GIRS = Midgard-3.0.gir
 INTROSPECTION_LIBS += -lxml2
 girdir = $(datadir)/gir-1.0
 gir_DATA = $(INTROSPECTION_GIRS)

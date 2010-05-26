@@ -164,11 +164,7 @@ struct _MidgardConnectionPrivate {
 	guint loglevel;
 	GData *sg_datalist;
 	MidgardSchema *schema;
-#ifdef HAVE_LIBGDA_4
 	GdaSqlParser *parser;
-#else
-	GdaClient *client;
-#endif
 	GdaConnection *connection;
 
 	const gchar *cnc_str;

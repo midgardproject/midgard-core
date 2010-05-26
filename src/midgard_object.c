@@ -615,12 +615,8 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 	gint updated;
 	gchar *where = midgard_core_query_where_guid(table, MGD_OBJECT_GUID (gobj));
 
-#ifdef HAVE_LIBGDA_4
 	updated = __insert_or_update_records(gobj, table, GDA_SQL_STATEMENT_UPDATE, (const gchar *)where);
-#else
-	updated = __insert_or_update_records(gobj, table, GDA_QUERY_TYPE_UPDATE, (const gchar *)where);
-#endif
-	
+
 	g_free(where);
 	
 	if (updated == -1) {
@@ -923,13 +919,8 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		return FALSE;
 	}	
 
-#ifdef HAVE_LIBGDA_4
-	//inserted = __insert_or_update_records(object, tablename, GDA_SQL_STATEMENT_INSERT, NULL);
 	inserted = midgard_core_query_create_dbobject_record (MIDGARD_DBOBJECT (object));
-#else
-	inserted = __insert_or_update_records(object, tablename, GDA_QUERY_TYPE_INSERT, NULL);
-#endif
-	
+
 	if (inserted == -1) {
 		_CLEAR_OBJECT_GUID (object);
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);

@@ -102,21 +102,11 @@ struct _MidgardQueryConstraintSimplePrivate {
 MidgardDBJoin	*midgard_core_dbjoin_new	(void);
 void		midgard_core_dbjoin_free	(MidgardDBJoin *mdbj);
 
-#ifdef HAVE_LIBGDA_4
 #define midgard_data_model_get_value_at(__model,__col,__row) \
 	gda_data_model_get_value_at((__model), (__col), (__row), NULL)
-#else
-#define midgard_data_model_get_value_at(__model,__col,__row) \
-	gda_data_model_get_value_at((__model), (__col), (__row))
-#endif
 
-#ifdef HAVE_LIBGDA_4
 #define midgard_data_model_get_value_at_col_name(__model,__col,__row) \
 	midgard_data_model_get_value_at (__model, gda_data_model_get_column_index (__model, __col), __row);
-#else
-#define midgard_data_model_get_value_at_col_name(__model,__col,__row) \
-	gda_data_model_get_value_at_col_name (__model, __col, __row)
-#endif
 
 #define MIDGARD_GET_UINT_FROM_VALUE(__prop, __value) \
 	if(G_VALUE_HOLDS_UINT(__value)) { \

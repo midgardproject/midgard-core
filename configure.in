@@ -10,11 +10,16 @@ dnl If the version contains user visible changes then you should
 dnl have updated the NEWS file. Remember also to test the release
 dnl before committing.
 dnl
-AC_INIT([midgard2-core],[10.05.0])
+AC_INIT([midgard2-core],[10.05.99])
 AC_PREREQ(2.50)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR(src/midgard.c)
+
+AC_SUBST(MIDGARD_ABI_MAJOR, 3)
+AC_SUBST(MIDGARD_ABI_MINOR, 0)
+AC_SUBST(MIDGARD_RELEASE_MAJOR, 2010)
+AC_SUBST(MIDGARD_RELEASE_MINOR, 11)
 
 dnl Automake is needed for the build system.
 dnl
@@ -32,10 +37,6 @@ dnl Checks for programs.
 AM_PROG_LIBTOOL
 
 dnl Checks for libraries.
-AC_MSG_CHECKING([whether to use Libgda4 (libgda3 by default)])
-AC_ARG_WITH(libgda4, [  --with-libgda4], gdamodule="libgda-4.0", gdamodule="libgda-3.0")
-gdamodule="libgda-4.0"
-AC_MSG_RESULT($gdamodule)
 
 _MIDGARD_DBUS_SUPPORT=yes
 dbus_libs="dbus-1 dbus-glib-1"
@@ -50,10 +51,7 @@ if test "$_MIDGARD_DBUS_SUPPORT" == "no"; then
 	dbus_libs=""
 fi
 
-PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 $gdamodule $dbus_libs)
-if test "$gdamodule" == "libgda-4.0"; then
-    MIDGARD_CFLAGS="${MIDGARD_CFLAGS} -DHAVE_LIBGDA_4"
-fi
+PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 libgda-4.0 $dbus_libs)
 
 DBUS_CONF_DIR="/etc"
 if test "$_MIDGARD_DBUS_SUPPORT" == "yes"; then
@@ -111,5 +109,5 @@ AC_SUBST(MIDGARD_LIBS)
 AC_SUBST(MIDGARD_CFLAGS)
 AC_SUBST(DBUS_CONF_DIR)
 
-AC_CONFIG_FILES([Makefile Doxyfile src/midgard_config_auto.h midgard2.pc])
+AC_CONFIG_FILES([Makefile src/midgard_config_auto.h midgard3.pc])
 AC_OUTPUT
