@@ -21,6 +21,6 @@ typedef enum {
 	MIDGARD_AUTHTYPE_TRUST
 } MidgardTypeAuth;
 
-#define MIDGARD_PACKAGE_NAME "midgard2"
+#define MIDGARD_PACKAGE_NAME "midgard3"
 
 #endif /* MIDGARD_DEFS_H */
