@@ -10,7 +10,7 @@ dnl If the version contains user visible changes then you should
 dnl have updated the NEWS file. Remember also to test the release
 dnl before committing.
 dnl
-AC_INIT([midgard2-core],[10.05.99])
+AC_INIT([midgard3-core],[10.05.99])
 AC_PREREQ(2.50)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
@@ -90,11 +90,11 @@ AC_MSG_RESULT($platform_win32)
 AM_CONDITIONAL(PLATFORM_WIN32, test x$platform_win32 = xyes)
 
 if test "$prefix" = "/usr"; then
-	sysconfdir="/etc/midgard2"
+	sysconfdir="/etc/midgard3"
 elif test "$prefix" = "NONE"; then
-	sysconfdir="/usr/local/etc/midgard2"
+	sysconfdir="/usr/local/etc/midgard3"
 else 
-	sysconfdir="$prefix/etc/midgard2"
+	sysconfdir="$prefix/etc/midgard3"
 fi
 
 LIBS="$LIBS $MIDGARD_LIBS"
