@@ -9,6 +9,7 @@ MidgardConnection *midgard_test_connection_open_user_config(const gchar *name, M
 void 	midgard_test_connection_run			(void);
 void 	midgard_test_connection_open 			(void);
 void 	midgard_test_connection_open_config 		(void);
+void	midgard_test_connection_close			(void);
 void 	midgard_test_connection_set_loglevel 		(void);
 void 	midgard_test_connection_get_error 		(void);
 void 	midgard_test_connection_get_error_string 	(void);
@@ -17,5 +18,7 @@ void 	midgard_test_connection_copy 			(void);
 void 	midgard_test_connection_signals_auth_changed 	(void);
 void 	midgard_test_connection_signals_error 		(void);
 void 	midgard_test_connection_signals_lost_provider	(void);
+void	midgard_test_connection_signals_connected	(void);
+void	midgard_test_connection_signals_disconnected	(void);
 
 #endif /* MIDGARD_TEST_CONNECTION_H */

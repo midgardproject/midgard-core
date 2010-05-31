@@ -91,5 +91,6 @@ void			midgard_connection_enable_dbus			(MidgardConnection *self, gboolean toggl
 gboolean 		midgard_connection_is_enabled_quota		(MidgardConnection *self);
 gboolean 		midgard_connection_is_enabled_replication	(MidgardConnection *self);
 gboolean 		midgard_connection_is_enabled_dbus		(MidgardConnection *self);
+void			midgard_connection_close			(MidgardConnection *self);
 
 #endif /* MIDGARD_CONNNECTION_H */

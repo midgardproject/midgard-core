@@ -30,6 +30,7 @@ MidgardConnectionClass
 MidgardConnectionPrivate
 midgard_connection_new
 midgard_connection_open
+midgard_connection_close
 midgard_connection_open_config
 midgard_connection_set_loglevel
 midgard_connection_get_loglevel
