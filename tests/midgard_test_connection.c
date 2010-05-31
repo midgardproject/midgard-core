@@ -108,6 +108,29 @@ midgard_test_connection_open_config (void)
 	g_object_unref (mgd);
 }
 
+void
+midgard_test_connection_close (void)
+{
+	MidgardConnection *mgd = midgard_connection_new ();
+
+	/* We should have midgard_test database created, check against it */
+	MidgardConfig *config = midgard_config_new();
+	GError *error = NULL;
+	gboolean config_read = midgard_config_read_file (config, "midgard_test", TRUE, &error);
+	g_assert (config_read == TRUE);
+	g_assert (error == NULL);
+
+	gboolean config_connection_opened = midgard_connection_open_config (mgd, config);
+	MIDGARD_TEST_ERROR_OK (mgd);
+	g_assert (config_connection_opened == TRUE);
+
+	midgard_connection_close (mgd);
+
+	gboolean config_connection_reopened = midgard_connection_open_config (mgd, config);
+	MIDGARD_TEST_ERROR_OK (mgd);
+	g_assert (config_connection_reopened == TRUE);
+}
+
 void    
 midgard_test_connection_set_loglevel (void)
 {
@@ -345,6 +368,67 @@ midgard_test_connection_signals_error (void)
 	g_assert_cmpstr (__error_name, ==, "Error_Callback");
 
 	g_object_unref (mgd);
+}
+
+#define CONN_OPEN_STR 	"Connection opened"
+#define CONN_CLOSE_STR	"Connection closed"
+
+static const gchar *__conn_open_name = NULL;
+static void __conn_open_callback (MidgardConnection *mgd, gpointer ud)
+{
+	__conn_open_name = "Connection opened";
+}
+
+void
+midgard_test_connection_signals_connected (void)
+{
+	MidgardConnection *mgd = midgard_connection_new ();
+	g_signal_connect(G_OBJECT(mgd), "connected", G_CALLBACK(__conn_open_callback), NULL);
+
+	MidgardConfig *config = midgard_config_new();
+	GError *error = NULL;
+	gboolean config_read = midgard_config_read_file (config, "midgard_test", TRUE, &error);
+	g_assert (config_read == TRUE);
+	g_assert (error == NULL);
+
+	gboolean config_connection_opened = midgard_connection_open_config (mgd, config);
+	MIDGARD_TEST_ERROR_OK (mgd);
+	g_assert (config_connection_opened == TRUE);
+	
+	/* Check string modified by callback */
+	g_assert_cmpstr (__conn_open_name, !=, NULL);
+	g_assert_cmpstr (__conn_open_name, !=, "");
+	g_assert_cmpstr (__conn_open_name, ==, CONN_OPEN_STR);
+}
+
+static const gchar *__conn_close_name = NULL;
+static void __conn_close_callback (MidgardConnection *mgd, gpointer ud)
+{
+	__conn_close_name = "Connection closed";
+}
+
+void
+midgard_test_connection_signals_disconnected (void)
+{
+	MidgardConnection *mgd = midgard_connection_new ();
+	g_signal_connect(G_OBJECT(mgd), "disconnected", G_CALLBACK(__conn_close_callback), NULL);
+
+	MidgardConfig *config = midgard_config_new();
+	GError *error = NULL;
+	gboolean config_read = midgard_config_read_file (config, "midgard_test", TRUE, &error);
+	g_assert (config_read == TRUE);
+	g_assert (error == NULL);
+
+	gboolean config_connection_opened = midgard_connection_open_config (mgd, config);
+	MIDGARD_TEST_ERROR_OK (mgd);
+	g_assert (config_connection_opened == TRUE);
+
+	midgard_connection_close (mgd);
+	
+	/* Check string modified by callback */
+	g_assert_cmpstr (__conn_close_name, !=, NULL);
+	g_assert_cmpstr (__conn_close_name, !=, "");
+	g_assert_cmpstr (__conn_close_name, ==, CONN_CLOSE_STR);
 }
 
 void    

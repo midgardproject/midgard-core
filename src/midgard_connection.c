@@ -323,6 +323,26 @@ __mysql_reconnect (MidgardConnection *mgd)
 	return FALSE;
 }
 
+
+/* Reopen connection if there's already gda connection asigned 
+ * and midgard connection is not connected. */
+#define __SELF_REOPEN(__self, __retval) { \
+	if (!__self->priv->connected) {\
+		if (__self->priv->connection \
+				&& GDA_IS_CONNECTION (__self->priv->connection)) { \
+			GError *__error = NULL; \
+			__retval = gda_connection_open (__self->priv->connection, &__error); \
+			if (__retval) \
+				g_signal_emit (__self, MIDGARD_CONNECTION_GET_CLASS (__self)->signal_id_connected, 0); \
+			else \
+				MIDGARD_ERRNO_SET_STRING (__self, MGD_ERR_NOT_CONNECTED, \
+						__error && __error->message ? __error->message : "Unknown reason"); \
+			if (__error) \
+				g_clear_error (&__error); \
+		}\
+	}\
+}
+
 /**
  * Adds a named parameter to the given libgda connection string.
  
@@ -521,6 +541,11 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
 	MIDGARD_ERRNO_SET (self, MGD_ERR_OK);
+	gboolean rv = TRUE;
+	
+	__SELF_REOPEN (self, rv);
+	if (!rv)
+		return rv;	
 
 	/* FIXME, it should be handled by GError */
 	if(self->priv->config != NULL){
@@ -550,7 +575,6 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 	self->priv->config = config;
 
 	GHashTable *hash = NULL;
-	gboolean rv = TRUE;
 
 	if(!__midgard_connection_open(self, &hash, TRUE)) {
 
@@ -582,6 +606,12 @@ gboolean midgard_connection_open_from_file(
 	g_assert(mgd != NULL);
 	g_assert (filepath != NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+	gboolean rv = TRUE;
+
+	__SELF_REOPEN (mgd, rv);
+	if (!rv) 
+		return rv;
 	
 	/* FIXME, it should be handled by GError */
 	if(mgd->priv->config != NULL){
@@ -610,7 +640,6 @@ gboolean midgard_connection_open_from_file(
 	mgd->priv->config = config;
 
 	GHashTable *hash = NULL;
-	gboolean rv = TRUE;
 
 	if(!__midgard_connection_open(mgd, &hash, TRUE)) 
 		rv = FALSE;
@@ -706,6 +735,11 @@ gboolean midgard_connection_open_config(
 	g_assert(config != NULL);
 
 	MidgardConfig *self_config = self->priv->config;
+	gboolean rv = TRUE;
+
+	__SELF_REOPEN (self, rv);
+	if (!rv) 
+		return rv;
 
 	/* Emulate the same config pointer, as we have copy associated */
 	if (self_config 
@@ -721,7 +755,6 @@ gboolean midgard_connection_open_config(
 	self->priv->config = midgard_config_copy (config);
 
 	GHashTable *hash = NULL;
-	gboolean rv = TRUE;
 
 	if(!__midgard_connection_open(self, &hash, TRUE))
 		rv = FALSE;
@@ -744,6 +777,31 @@ gboolean midgard_connection_struct_open_config(
 		return FALSE;
 	
 	return TRUE;
+}
+
+/**
+ * midgard_connection_close:
+ * @self: #MidgardConnection instance
+ *
+ * Closes connection to underlying storage. 
+ * All private and public data remains unchanged, so connection might be reopened at any time.
+ * After closing connection, 'disconnected' signal is emitted.
+ *
+ * Since: 10.05.1
+ */
+void
+midgard_connection_close (MidgardConnection *self)
+{
+	g_return_if_fail (self != NULL);
+
+	if (!self->priv->connection ||
+			(!GDA_IS_CONNECTION (self->priv->connection)))
+		return;
+
+ 	gda_connection_close_no_warning (self->priv->connection);
+	g_signal_emit (self, MIDGARD_CONNECTION_GET_CLASS (self)->signal_id_disconnected, 0);
+
+	return;
 }
 
 /**

@@ -26,12 +26,15 @@ int main (int argc, char *argv[])
 
 	g_test_add_func("/midgard_connection/open", midgard_test_connection_open);
 	g_test_add_func("/midgard_connection/open_config", midgard_test_connection_open_config);
+	g_test_add_func("/midgard_connection/close", midgard_test_connection_close);
 	g_test_add_func("/midgard_connection/set_loglevel", midgard_test_connection_set_loglevel);
 	g_test_add_func("/midgard_connection/get_error", midgard_test_connection_get_error);
 	g_test_add_func("/midgard_connection/get_error_string", midgard_test_connection_get_error_string);
 	g_test_add_func("/midgard_connection/get_user", midgard_test_connection_get_user);
 	g_test_add_func("/midgard_connection/copy", midgard_test_connection_copy);
 	g_test_add_func("/midgard_connection/signals/auth-changed", midgard_test_connection_signals_auth_changed);
+	g_test_add_func("/midgard_connection/signals/connected", midgard_test_connection_signals_connected);
+	g_test_add_func("/midgard_connection/signals/disconnected", midgard_test_connection_signals_disconnected);
 	g_test_add_func("/midgard_connection/signals/error", midgard_test_connection_signals_error);
 	g_test_add_func("/midgard_connection/signals/lost-provider", midgard_test_connection_signals_lost_provider);
 
