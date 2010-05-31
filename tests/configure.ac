@@ -20,8 +20,8 @@ AC_ARG_WITH([pkg-config],
 	AC_HELP_STRING([--with-pkg-config=PATH], [Location of the pkg-config executable]),
 	[_AP_PKGCONFIG="$withval"],
 	[AC_PATH_PROG([_AP_PKGCONFIG],["pkg-config"])])
-MIDGARD_CFLAGS=`"$_AP_PKGCONFIG" --cflags midgard3`
-MIDGARD_LIBS=`"$_AP_PKGCONFIG" --libs midgard3`
+MIDGARD_CFLAGS=`"$_AP_PKGCONFIG" --cflags midgard2`
+MIDGARD_LIBS=`"$_AP_PKGCONFIG" --libs midgard2`
 AC_SUBST([MIDGARD_CFLAGS])
 AC_SUBST([MIDGARD_LIBS])
 
