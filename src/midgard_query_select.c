@@ -540,7 +540,7 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
  *
  * List all objects for which data has been returned during execution.
  *
- * Returns: newly allocated array of #MidgardDBObject
+ * Returns: (array length=1) (array zero-terminated=1): newly allocated array of #MidgardDBObject
  * Since: 10.05
  */ 
 MidgardDBObject **
