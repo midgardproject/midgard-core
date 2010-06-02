@@ -47,5 +47,6 @@ GType midgard_schema_object_factory_get_type(void);
 MidgardObject	*midgard_schema_object_factory_get_object_by_guid 	(MidgardConnection *mgd, const gchar *guid);
 MidgardObject	*midgard_schema_object_factory_get_object_by_path 	(MidgardConnection *mgd, const gchar *classname, const gchar *path);
 gboolean	midgard_schema_object_factory_object_undelete		(MidgardConnection *mgd, const gchar *guid);
+MidgardObject	*midgard_schema_object_factory_create_object		(MidgardConnection *mgd, const gchar *classname, GValue *value);
 
 #endif /* MIDGARD_SCHEMA_OBJECT_FACTORY_H */

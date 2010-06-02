@@ -30,6 +30,28 @@ struct _MidgardQueryConstraintGroupPrivate {
 	GSList *constraints;
 };
 
+static gint
+__get_operator_type (const gchar *type)
+{
+	GdaSqlOperatorType op_type;
+
+	/* Validate given type. We expect type to be NULL terminated. */
+	gchar *valid_type = g_ascii_strdown (type, -1);
+	if (g_str_equal (valid_type, "and"))
+		op_type = GDA_SQL_OPERATOR_TYPE_AND;
+	else if (g_str_equal (valid_type, "or"))
+		op_type = GDA_SQL_OPERATOR_TYPE_OR;
+	else {
+		/* FIXME, handle catchable error */
+		g_warning ("Invalid group type. Expected 'AND' or 'OR'. '%s' given", type);
+		g_free (valid_type);
+		return -1;
+	}
+
+	g_free (valid_type);
+	return op_type;
+}
+
 /**
  * midgard_query_constraint_group_new:
  *
@@ -93,23 +115,12 @@ midgard_query_constraint_group_new_valist (const gchar *type, MidgardQueryConstr
 	g_return_val_if_fail (type != NULL, NULL);
 	g_return_val_if_fail (constraint != NULL, NULL);
 
-	GdaSqlOperatorType op_type;
-
-	/* Validate given type. We expect type to be NULL terminated. */
-	gchar *valid_type = g_ascii_strdown (type, -1);
-	if (g_str_equal (valid_type, "and"))
-		op_type = GDA_SQL_OPERATOR_TYPE_AND;
-	else if (g_str_equal (valid_type, "or"))
-		op_type = GDA_SQL_OPERATOR_TYPE_OR;
-	else {
-		/* FIXME, handle catchable error */
-		g_warning ("Invalid group type. Expected 'AND' or 'OR'. '%s' given", type);
-		g_free (valid_type);
+	GdaSqlOperatorType op_type = __get_operator_type (type);
+	if (op_type == -1)
 		return NULL;
-	}
 
 	MidgardQueryConstraintGroup *self = g_object_new (MIDGARD_TYPE_QUERY_CONSTRAINT_GROUP, NULL);
-	self->priv->type = valid_type;
+	self->priv->type = g_ascii_strdown (type, -1);
 	self->priv->op_type = op_type;
 
 	MidgardQueryConstraintSimple *cnstr = constraint;
@@ -155,23 +166,12 @@ midgard_query_constraint_group_set_group_type (MidgardQueryConstraintGroup *self
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (type != NULL, FALSE);
 	
-	GdaSqlOperatorType op_type;
-
-	/* Validate given type. We expect type to be NULL terminated. */
-	gchar *valid_type = g_ascii_strdown (type, -1);
-	if (g_str_equal (valid_type, "and"))
-		op_type = GDA_SQL_OPERATOR_TYPE_AND;
-	else if (g_str_equal (valid_type, "or"))
-		op_type = GDA_SQL_OPERATOR_TYPE_OR;
-	else {
-		/* FIXME, handle catchable error */
-		g_warning ("Invalid group type. Expected 'AND' or 'OR'. '%s' given", type);
-		g_free (valid_type);
+	GdaSqlOperatorType op_type = __get_operator_type (type);
+	if (op_type == -1)
 		return FALSE;
-	}
 
 	g_free (self->priv->type);
-	self->priv->type = valid_type;
+	self->priv->type = g_ascii_strdown (type, -1);
 	self->priv->op_type = op_type;
 
 	return TRUE;
@@ -211,6 +211,10 @@ midgard_query_constraint_group_add_constraint (MidgardQueryConstraintGroup *self
 /* GOBJECT ROUTINES */
 
 GObjectClass *parent_class = NULL;
+
+enum {
+	PROPERTY_GROUPTYPE = 1
+};
 
 MidgardQueryConstraintSimple**
 _midgard_query_constraint_group_list_constraints (MidgardQueryConstraintSimple *self, guint *n_objects)
@@ -289,6 +293,17 @@ _midgard_query_constraint_group_iface_init (MidgardQueryConstraintSimpleIFace *i
 	return;
 }
 
+static void
+__midgard_query_constraint_group_instance_init (GTypeInstance *instance, gpointer g_class)
+{
+	MidgardQueryConstraintGroup *self = (MidgardQueryConstraintGroup *) instance;
+	self->priv = g_new (MidgardQueryConstraintGroupPrivate, 1);
+	self->priv->type = NULL;
+	self->priv->op_type = -1;
+	self->priv->constraints = NULL;
+
+}
+
 static GObject *
 _midgard_query_constraint_group_constructor (GType type,
 		guint n_construct_properties,
@@ -298,11 +313,6 @@ _midgard_query_constraint_group_constructor (GType type,
 		G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_properties,
 				construct_properties);
-
-	MidgardQueryConstraintGroup *self = MIDGARD_QUERY_CONSTRAINT_GROUP (object);
-	self->priv = g_new (MidgardQueryConstraintGroupPrivate, 1);
-	self->priv->type = NULL;
-	self->priv->constraints = NULL;
 
 	return G_OBJECT(object);
 }
@@ -332,6 +342,50 @@ _midgard_query_constraint_group_finalize (GObject *object)
 }
 
 static void
+__midgard_query_constraint_group_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	MidgardQueryConstraintGroup *self = (MidgardQueryConstraintGroup *) object;
+
+	switch (property_id) {
+		
+		case PROPERTY_GROUPTYPE:
+			g_value_set_string (value, self->priv->type);
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
+static void
+__midgard_query_constraint_group_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec)
+{
+	MidgardQueryConstraintGroup *self = (MidgardQueryConstraintGroup *) (object);
+
+	GdaSqlOperatorType op_type;
+
+	switch (property_id) {
+
+		case PROPERTY_GROUPTYPE:
+			op_type = __get_operator_type (g_value_get_string (value));
+			if (op_type > -1) {
+				self->priv->op_type = op_type;
+				g_free (self->priv->type);
+				self->priv->type = g_ascii_strdown (g_value_get_string (value), -1);
+			}
+			break;
+
+  		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
+
+static void
 _midgard_query_constraint_group_class_init (MidgardQueryConstraintGroupClass *klass, gpointer class_data)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -340,6 +394,21 @@ _midgard_query_constraint_group_class_init (MidgardQueryConstraintGroupClass *kl
 	object_class->constructor = _midgard_query_constraint_group_constructor;
 	object_class->dispose = _midgard_query_constraint_group_dispose;
 	object_class->finalize = _midgard_query_constraint_group_finalize;
+
+	object_class->set_property = __midgard_query_constraint_group_set_property;
+	object_class->get_property = __midgard_query_constraint_group_get_property;
+
+	/* Properties */
+	GParamSpec *pspec = g_param_spec_string ("grouptype",
+			"",
+			"",
+			"",
+			G_PARAM_READWRITE);
+	/**
+	 * MidgardQueryConstraintGroup:grouptype:
+	 * 
+	 */  
+	g_object_class_install_property (object_class, PROPERTY_GROUPTYPE, pspec);
 }
 
 GType
@@ -356,7 +425,7 @@ midgard_query_constraint_group_get_type (void)
 			NULL,   /* class_data */
 			sizeof (MidgardQueryConstraintGroup),
 			0,      /* n_preallocs */
-			    /* instance_init */
+			__midgard_query_constraint_group_instance_init   /* instance_init */
 		};
       
 		static const GInterfaceInfo property_info = {

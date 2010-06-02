@@ -65,6 +65,7 @@ struct _MidgardQueryStoragePrivate {
 	MidgardDBObjectClass *klass;
 	gchar *table_alias;
 	const gchar *table;
+	const gchar *classname;
 };
 
 struct _MidgardQueryPropertyPrivate {

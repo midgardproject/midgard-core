@@ -410,6 +410,26 @@ midgard_schema_object_factory_object_undelete (MidgardConnection *mgd, const gch
 	return ret;
 }
 
+/**
+ * midgard_schema_object_factory_create_object:
+ * @mgd: #MidgardConnection instance
+ * @classname: name of the class created object is instance of
+ * @value: value which holds object's identifier
+ *
+ * Check midgard_object_new() for returned value and possible errors.
+ *
+ * Returns: new #MidgardObject derived instance or NULL
+ * Since: 10.05.1
+ */ 
+MidgardObject*  
+midgard_schema_object_factory_create_object(MidgardConnection *mgd, const gchar *classname, GValue *value)
+{
+	g_return_val_if_fail (mgd != NULL, NULL);
+	g_return_val_if_fail (classname != NULL, NULL);
+
+	return midgard_object_new (mgd, classname, value);
+}
+
 /* GOBJECT ROUTINES */
 
 static void

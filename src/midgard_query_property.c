@@ -34,13 +34,7 @@ MidgardQueryProperty *
 midgard_query_property_new (const gchar *property, MidgardQueryStorage *storage)
 {
 	g_return_val_if_fail (property != NULL, NULL);
-	MidgardQueryProperty *self = g_object_new (MIDGARD_TYPE_QUERY_PROPERTY, NULL);
-
-	GValue pval = {0, };
-	g_value_init (&pval, G_TYPE_STRING);
-	g_value_set_string (&pval, property);
-
-	self->priv->value = pval;
+	MidgardQueryProperty *self = g_object_new (MIDGARD_TYPE_QUERY_PROPERTY, "property", property, NULL);
 
 	if (storage != NULL)
 		self->priv->storage = storage;
@@ -82,6 +76,11 @@ __set_value (MidgardQueryHolder *self, const GValue *value)
 
 /* GOBJECT ROUTINES */
 
+enum {
+	MIDGARD_QUERY_PROPERTY_PROPNAME = 1,
+	MIDGARD_QUERY_PROPERTY_STORAGE
+};
+
 static GObjectClass *parent_class= NULL;
 
 static GObject *
@@ -97,6 +96,8 @@ _midgard_query_property_constructor (GType type,
 	self->priv = g_new (MidgardQueryPropertyPrivate, 1);	
 	self->priv->storage = NULL;
 	self->priv->klass = NULL;
+	GValue value = {0, };
+	self->priv->value = value;
 
 	return G_OBJECT(object);
 }
@@ -112,7 +113,7 @@ _midgard_query_property_finalize (GObject *object)
 {
 	MidgardQueryProperty *self = MIDGARD_QUERY_PROPERTY (object);
 
-	if (G_IS_VALUE (&self->priv->value))
+	if (self->priv && G_IS_VALUE (&self->priv->value))
 		g_value_unset (&self->priv->value);
 
 	g_free (self->priv);
@@ -120,6 +121,53 @@ _midgard_query_property_finalize (GObject *object)
 
         parent_class->finalize (object);
 }
+
+static void
+__midgard_query_property_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	MidgardQueryProperty *self = (MidgardQueryProperty *) object;
+
+	switch (property_id) {
+		
+		case MIDGARD_QUERY_PROPERTY_PROPNAME:
+			g_value_copy ((const GValue*) &self->priv->value, value);
+			break;
+
+		case MIDGARD_QUERY_PROPERTY_STORAGE:
+			g_value_set_object (value, self->priv->storage);
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
+static void
+__midgard_query_property_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec)
+{
+	MidgardQueryProperty *self = (MidgardQueryProperty *) (object);
+
+	switch (property_id) {
+
+		case MIDGARD_QUERY_PROPERTY_PROPNAME:
+			if (!G_IS_VALUE (&self->priv->value)) 
+				g_value_init (&self->priv->value, G_TYPE_STRING);
+			g_value_copy (value, &self->priv->value);
+			break;
+
+		case MIDGARD_QUERY_PROPERTY_STORAGE:
+			self->priv->storage = g_value_get_object (value);
+			break;
+
+  		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
 
 static void
 _midgard_query_property_class_init (MidgardQueryPropertyClass *klass, gpointer class_data)
@@ -130,6 +178,32 @@ _midgard_query_property_class_init (MidgardQueryPropertyClass *klass, gpointer c
 	object_class->constructor = _midgard_query_property_constructor;
 	object_class->dispose = _midgard_query_property_dispose;
 	object_class->finalize = _midgard_query_property_finalize;
+
+	object_class->set_property = __midgard_query_property_set_property;
+	object_class->get_property = __midgard_query_property_get_property;
+
+	/* Properties */
+	GParamSpec *pspec = g_param_spec_string ("property",
+			"",
+			"",
+			"",
+			G_PARAM_READWRITE);
+	/**
+	 * MidgardQueryProperty:property:
+	 * 
+	 */  
+	g_object_class_install_property (object_class, MIDGARD_QUERY_PROPERTY_PROPNAME, pspec);
+
+	pspec = g_param_spec_object ("storage",
+			"",
+			"",
+			MIDGARD_TYPE_QUERY_STORAGE,
+			G_PARAM_READWRITE);
+	/**
+	 * MidgardQueryProperty:property:
+	 * 
+	 */  
+	g_object_class_install_property (object_class, MIDGARD_QUERY_PROPERTY_STORAGE, pspec);
 }
 
 static void
