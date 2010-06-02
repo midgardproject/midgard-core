@@ -46,7 +46,7 @@ midgard_query_storage_new (const gchar *classname)
 		return NULL;
 	}
 
-	MidgardQueryStorage *self = g_object_new (MIDGARD_TYPE_QUERY_STORAGE, NULL);
+	MidgardQueryStorage *self = g_object_new (MIDGARD_TYPE_QUERY_STORAGE, "dbclass", classname, NULL);
 	self->priv->klass = klass;
 	self->priv->table = midgard_core_class_get_table (klass);
 
@@ -55,7 +55,24 @@ midgard_query_storage_new (const gchar *classname)
 
 /* GOBJECT ROUTINES */
 
+enum {
+	MIDGARD_QUERY_STORAGE_DBCLASS = 1
+};
+
+
 GObjectClass *__parent_class = NULL;
+
+static void
+__midgard_query_storage_instance_init (GTypeInstance *instance, gpointer g_class)
+{
+	MidgardQueryStorage *self = (MidgardQueryStorage *) instance;
+
+	self->priv = g_new (MidgardQueryStoragePrivate, 1);
+	self->priv->klass = NULL;
+	self->priv->table_alias = NULL;
+	self->priv->table = NULL;
+	self->priv->classname = NULL;
+}
 
 static GObject *
 __midgard_query_storage_constructor (GType type,
@@ -66,11 +83,6 @@ __midgard_query_storage_constructor (GType type,
 		G_OBJECT_CLASS (__parent_class)->constructor (type,
 				n_construct_properties,
 				construct_properties);
-
-	MIDGARD_QUERY_STORAGE (object)->priv = g_new (MidgardQueryStoragePrivate, 1);
-	MIDGARD_QUERY_STORAGE (object)->priv->klass = NULL;
-	MIDGARD_QUERY_STORAGE (object)->priv->table_alias = NULL;
-	MIDGARD_QUERY_STORAGE (object)->priv->table = NULL;
 
 	return object;
 }
@@ -95,6 +107,48 @@ __midgard_query_storage_finalize (GObject *object)
 	__parent_class->finalize (object);
 }
 
+static void
+__midgard_query_storage_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	MidgardQueryStorage *self = (MidgardQueryStorage *) object;
+
+	switch (property_id) {
+		
+		case MIDGARD_QUERY_STORAGE_DBCLASS:
+			g_value_set_string (value, self->priv->classname);
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
+static void
+__midgard_query_storage_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec)
+{
+	MidgardQueryStorage *self = (MidgardQueryStorage *) (object);
+	MidgardDBObjectClass *dbklass = NULL;
+
+	switch (property_id) {
+
+		case MIDGARD_QUERY_STORAGE_DBCLASS:
+			dbklass = g_type_class_peek (g_type_from_name (g_value_get_string (value)));
+			if (dbklass) {
+				self->priv->klass = dbklass;
+				self->priv->classname = G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (dbklass));
+				self->priv->table = midgard_core_class_get_table (dbklass);
+			}
+			break;
+
+  		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
 static void 
 __midgard_query_storage_class_init (
 		gpointer g_class, gpointer g_class_data)
@@ -105,6 +159,23 @@ __midgard_query_storage_class_init (
 	gobject_class->constructor = __midgard_query_storage_constructor;
 	gobject_class->dispose = __midgard_query_storage_dispose;
 	gobject_class->finalize = __midgard_query_storage_finalize;
+
+	gobject_class->set_property = __midgard_query_storage_set_property;
+	gobject_class->get_property = __midgard_query_storage_get_property;
+
+	/* Properties */
+	GParamSpec *pspec = g_param_spec_string ("dbclass",
+			"MidgardDBObject derived class name.",
+			"",
+			"",
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+	/**
+	 * MidgardQueryStorage:dbclass:
+	 * 
+	 * Holds the name of the class which, #MidgardQueryStorage has been initialized for.
+	 * 
+	 */  
+	g_object_class_install_property (gobject_class, MIDGARD_QUERY_STORAGE_DBCLASS, pspec);
 }
 
 GType
@@ -121,7 +192,7 @@ midgard_query_storage_get_type (void)
 			NULL,           /* class_data */
 			sizeof (MidgardQueryStorage),
 			0,              /* n_preallocs */
-			NULL /* instance init */	
+			__midgard_query_storage_instance_init /* instance init */	
 		};
 		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryStorage", &info, 0);
 	}

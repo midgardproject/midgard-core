@@ -130,15 +130,10 @@ midgard_query_executor_execute (MidgardQueryExecutor *self)
 
 static GObjectClass *parent_class= NULL;
 
-static GObject *
-_midgard_query_executor_constructor (GType type,
-		guint n_construct_properties,
-		GObjectConstructParam *construct_properties)
+static void
+__midgard_query_executor_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	GObject *object = (GObject *)
-		G_OBJECT_CLASS (parent_class)->constructor (type,
-				n_construct_properties,
-				construct_properties);
+	MidgardQueryExecutor *object = (MidgardQueryExecutor *) instance;
 
 	MIDGARD_QUERY_EXECUTOR (object)->priv = g_new (MidgardQueryExecutorPrivate, 1);
 	MIDGARD_QUERY_EXECUTOR (object)->priv->mgd = NULL;
@@ -155,6 +150,17 @@ _midgard_query_executor_constructor (GType type,
 	MIDGARD_QUERY_EXECUTOR (object)->priv->joinid = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->results_count = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->read_only = TRUE;
+}
+
+static GObject *
+_midgard_query_executor_constructor (GType type,
+		guint n_construct_properties,
+		GObjectConstructParam *construct_properties)
+{
+	GObject *object = (GObject *)
+		G_OBJECT_CLASS (parent_class)->constructor (type,
+				n_construct_properties,
+				construct_properties);
 
 	return G_OBJECT(object);
 }
@@ -249,7 +255,7 @@ midgard_query_executor_get_type (void)
 			NULL,           /* class_data */
 			sizeof (MidgardQueryExecutor),
 			0,              /* n_preallocs */
-			NULL /* instance_init */
+			__midgard_query_executor_instance_init /* instance_init */
 		};
 		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryExecutor", &info, G_TYPE_FLAG_ABSTRACT);
 	}

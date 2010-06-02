@@ -213,6 +213,13 @@ midgard_query_constraint_set_operator (MidgardQueryConstraint *self, const gchar
 
 /* GOBJECT ROUTINES */
 
+enum {
+	MIDGARD_QUERY_CONSTRAINT_PROPERTY = 1,
+	MIDGARD_QUERY_CONSTRAINT_OP,
+	MIDGARD_QUERY_CONSTRAINT_HOLDER,
+	MIDGARD_QUERY_CONSTRAINT_STORAGE
+};
+
 static GObjectClass *parent_class = NULL;
 
 MidgardQueryConstraintSimple**
@@ -378,6 +385,68 @@ _midgard_query_constraint_finalize (GObject *object)
 }
 
 static void
+__midgard_query_constraint_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	MidgardQueryConstraint *self = (MidgardQueryConstraint *) object;
+
+	switch (property_id) {
+		
+		case MIDGARD_QUERY_CONSTRAINT_PROPERTY:
+			g_value_set_object (value, self->priv->property_value);
+			break;
+
+		case MIDGARD_QUERY_CONSTRAINT_OP:
+			g_value_set_string (value, self->priv->op);
+			break;
+
+		case MIDGARD_QUERY_CONSTRAINT_HOLDER:
+			g_value_set_object (value, self->priv->holder);
+			break;
+
+		case MIDGARD_QUERY_CONSTRAINT_STORAGE:
+			g_value_set_object (value, self->priv->storage);
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
+static void
+__midgard_query_constraint_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec)
+{
+	MidgardQueryConstraint *self = (MidgardQueryConstraint *) (object);
+	MidgardDBObjectClass *dbklass = NULL;
+
+	switch (property_id) {
+
+		case MIDGARD_QUERY_CONSTRAINT_PROPERTY:
+			self->priv->property_value = g_value_get_object (value);
+			break;
+
+		case MIDGARD_QUERY_CONSTRAINT_OP:
+			g_free (self->priv->op);
+			self->priv->op = g_value_dup_string (value);
+			break;
+
+		case MIDGARD_QUERY_CONSTRAINT_HOLDER:
+			self->priv->holder = g_value_get_object (value);
+			break;
+
+		case MIDGARD_QUERY_CONSTRAINT_STORAGE:
+			self->priv->storage = g_value_get_object (value);
+			break;
+
+  		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
+static void
 _midgard_query_constraint_class_init (MidgardQueryConstraintClass *klass, gpointer class_data)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -386,6 +455,52 @@ _midgard_query_constraint_class_init (MidgardQueryConstraintClass *klass, gpoint
 	object_class->constructor = _midgard_query_constraint_constructor;
 	object_class->dispose = _midgard_query_constraint_dispose;
 	object_class->finalize = _midgard_query_constraint_finalize;
+
+	object_class->set_property = __midgard_query_constraint_set_property;
+	object_class->get_property = __midgard_query_constraint_get_property;
+
+	/* Properties */
+	GParamSpec *pspec = g_param_spec_object ("property",
+			"",
+			"",
+			MIDGARD_TYPE_QUERY_PROPERTY,
+			G_PARAM_READWRITE);
+	/**
+	 * MidgardQueryConstraint:property:
+	 * 
+	 */  
+	g_object_class_install_property (object_class, MIDGARD_QUERY_CONSTRAINT_PROPERTY, pspec);
+
+	pspec = g_param_spec_string ("operator",
+			"", "", "",
+			G_PARAM_READWRITE);
+	/**
+	 * MidgardQueryConstraint:operator:
+	 * 
+	 */  
+	g_object_class_install_property (object_class, MIDGARD_QUERY_CONSTRAINT_OP, pspec);
+
+	pspec = g_param_spec_object ("holder",
+			"",
+			"",
+			MIDGARD_TYPE_QUERY_HOLDER,
+			G_PARAM_READWRITE);
+	/**
+	 * MidgardQueryConstraint:holder:
+	 * 
+	 */  
+	g_object_class_install_property (object_class, MIDGARD_QUERY_CONSTRAINT_HOLDER, pspec);
+
+	pspec = g_param_spec_object ("storage",
+			"",
+			"",
+			MIDGARD_TYPE_QUERY_STORAGE,
+			G_PARAM_READWRITE);
+	/**
+	 * MidgardQueryConstraint:storage:
+	 * 
+	 */  
+	g_object_class_install_property (object_class, MIDGARD_QUERY_CONSTRAINT_STORAGE, pspec);
 }
 
 GType

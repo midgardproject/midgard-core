@@ -39,9 +39,8 @@ midgard_query_select_new (MidgardConnection *mgd, MidgardQueryStorage *storage)
 	g_return_val_if_fail (mgd != NULL, NULL);
 	g_return_val_if_fail (storage != NULL, NULL);
 
-	MidgardQuerySelect *self = g_object_new (MIDGARD_TYPE_QUERY_SELECT, NULL);
-	MIDGARD_QUERY_EXECUTOR (self)->priv->mgd = mgd;
-	MIDGARD_QUERY_EXECUTOR (self)->priv->storage = storage;
+	MidgardQuerySelect *self = g_object_new (MIDGARD_TYPE_QUERY_SELECT, 
+		"connection", mgd, "storage", storage, NULL);
 
 	return self;
 }
@@ -577,6 +576,11 @@ midgard_query_select_toggle_read_only (MidgardQuerySelect *self, gboolean toggle
 
 /* GOBJECT ROUTINES */
 
+enum {
+	PROPERTY_CONNECTION = 1,
+	PROPERTY_STORAGE
+};
+
 static GObjectClass *parent_class= NULL;
 
 static GObject *
@@ -608,15 +612,63 @@ _midgard_query_select_finalize (GObject *object)
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset && G_IS_OBJECT (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset))
 		g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset);
 
+	g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->mgd);
+	g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->storage);
+
 	parent_class->finalize (object);
 }
+
+static void
+__midgard_query_select_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	MidgardQuerySelect *self = (MidgardQuerySelect *) object;
+
+	switch (property_id) {
+		
+		case PROPERTY_CONNECTION:
+			/* write and constructor only */
+			break;
+
+		case PROPERTY_STORAGE:
+			/* write and constructor only */
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
+static void
+__midgard_query_select_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec)
+{
+	MidgardQuerySelect *self = (MidgardQuerySelect *) (object);
+
+	switch (property_id) {
+
+		case PROPERTY_CONNECTION:
+			MIDGARD_QUERY_EXECUTOR (self)->priv->mgd = g_object_ref (g_value_get_object (value));
+			break;
+
+		case PROPERTY_STORAGE:
+			MIDGARD_QUERY_EXECUTOR (self)->priv->storage = g_object_ref (g_value_get_object (value));
+			break;
+
+  		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
 
 static void 
 _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class_data)
 {
        	GObjectClass *object_class = G_OBJECT_CLASS (klass);
 	parent_class = g_type_class_peek_parent (klass);
-	MidgardQueryExecutorClass *executor_class = MIDGARD_QUERY_EXECUTOR_CLASS (klass);
+	MidgardQueryExecutorClass *executor_class = MIDGARD_QUERY_EXECUTOR_CLASS (klass);	
 
 	object_class->constructor = _midgard_query_select_constructor;
 	object_class->dispose = _midgard_query_select_dispose;
@@ -632,6 +684,34 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	
 	klass->list_objects = _midgard_query_select_list_objects;
 	klass->toggle_read_only = _midgard_query_select_toggle_read_only;
+
+	object_class->set_property = __midgard_query_select_set_property;
+	object_class->get_property = __midgard_query_select_get_property;
+
+	/* Properties */
+	GParamSpec *pspec = g_param_spec_object ("connection",
+			"", "", 
+			MIDGARD_TYPE_CONNECTION,
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+	/**
+	 * MidgardQuerySelect:connection:
+	 * 
+	 * Pointer for a connection, #MidgardQuerySelect has been initialized for
+	 * 
+	 */  
+	g_object_class_install_property (object_class, PROPERTY_CONNECTION, pspec);
+
+	pspec = g_param_spec_object ("storage",
+			"", "", 
+			MIDGARD_TYPE_QUERY_STORAGE,
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+	/**
+	 * MidgardQuerySelect:storage:
+	 * 
+	 * Pointer for a connection, #MidgardQuerySelect has been initialized for
+	 * 
+	 */  
+	g_object_class_install_property (object_class, PROPERTY_STORAGE, pspec);
 }
 
 GType
