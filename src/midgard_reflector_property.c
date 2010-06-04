@@ -421,7 +421,7 @@ static GObject *
 __midgard_reflector_property_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties)
-{g_print ("CTOR");
+{
 	GObject *object = (GObject *)
 		G_OBJECT_CLASS (__parent_class)->constructor (type,
 				n_construct_properties,
