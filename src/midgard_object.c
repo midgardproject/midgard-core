@@ -2071,6 +2071,20 @@ return_empty_object:
 }
 
 /**
+ * midgard_object_factory:
+ *
+ * Static constructor, provided for language bindings, in which, 
+ * midgard_object_new() can not be invoked explicitly.
+ *
+ * Since: 10.05.1
+ */
+MidgardObject *
+midgard_object_factory (MidgardConnection *mgd, const gchar *name, GValue *value)
+{
+	return midgard_object_new (mgd, name, value);
+}
+
+/**
  * midgard_object_get_parent:
  * @self: #MidgardObject instance
  *
