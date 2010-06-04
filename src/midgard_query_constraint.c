@@ -96,11 +96,8 @@ midgard_query_constraint_new (MidgardQueryProperty *property, const gchar *op,
 	if (!__query_constraint_operator_is_valid (op, &op_type)) 
 		return NULL;	
 
-	MidgardQueryConstraint *self = g_object_new (MIDGARD_TYPE_QUERY_CONSTRAINT, NULL);
-	self->priv->property_value = property;
-	self->priv->op = g_strdup (op);
-	self->priv->op_type = op_type;
-	self->priv->holder = holder;
+	MidgardQueryConstraint *self = g_object_new (MIDGARD_TYPE_QUERY_CONSTRAINT, 
+			"property", property, "operator", op, "holder", holder, NULL);
 
 	/* Allow NULL storage */
 	if (storage)
@@ -431,7 +428,8 @@ __midgard_query_constraint_set_property (GObject *object, guint property_id,
 		const GValue *value, GParamSpec *pspec)
 {
 	MidgardQueryConstraint *self = (MidgardQueryConstraint *) (object);
-	MidgardDBObjectClass *dbklass = NULL;
+	GdaSqlOperatorType op_type;
+	gchar *op; 
 
 	switch (property_id) {
 
@@ -440,8 +438,12 @@ __midgard_query_constraint_set_property (GObject *object, guint property_id,
 			break;
 
 		case MIDGARD_QUERY_CONSTRAINT_OP:
-			g_free (self->priv->op);
-			self->priv->op = g_value_dup_string (value);
+			op = (gchar *)g_value_get_string (value);
+       			if (__query_constraint_operator_is_valid (op, &op_type)) {
+				g_free (self->priv->op);
+				self->priv->op = g_strdup (op);
+				self->priv->op_type = op_type;
+			}
 			break;
 
 		case MIDGARD_QUERY_CONSTRAINT_HOLDER:

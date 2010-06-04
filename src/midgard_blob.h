@@ -60,6 +60,7 @@ struct MidgardBlob {
 
 GType 		midgard_blob_get_type		(void);
 MidgardBlob 	*midgard_blob_new		(MidgardObject *attachment, const gchar *encoding);
+MidgardBlob 	*midgard_blob_create_blob	(MidgardObject *attachment, const gchar *encoding);
 gchar 		*midgard_blob_read_content	(MidgardBlob *self, gsize *bytes_read);
 gboolean 	midgard_blob_write_content	(MidgardBlob *self, const gchar *content);
 GIOChannel 	*midgard_blob_get_handler	(MidgardBlob *self, const gchar *mode);

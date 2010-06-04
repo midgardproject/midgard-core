@@ -71,6 +71,7 @@ struct MidgardQueryBuilderClass{
 
 GType			midgard_query_builder_get_type		(void);
 MidgardQueryBuilder*	midgard_query_builder_new		(MidgardConnection *mgd, const gchar *classname);
+MidgardQueryBuilder*	midgard_query_builder_create_builder	(MidgardConnection *mgd, const gchar *classname);
 gboolean 		midgard_query_builder_add_constraint	(MidgardQueryBuilder *builder, const gchar *name, const gchar *op, const GValue *value);
 gboolean 		midgard_query_builder_add_constraint_with_property	(MidgardQueryBuilder *builder, const gchar *property_a, const gchar *op, const gchar *property_b);
 gboolean 		midgard_query_builder_begin_group	(MidgardQueryBuilder *builder, const gchar *type);

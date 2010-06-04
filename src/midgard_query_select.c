@@ -600,6 +600,17 @@ static void
 _midgard_query_select_dispose (GObject *object)
 {	
 	parent_class->dispose (object);
+	
+	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (object);
+
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->mgd) {	
+		g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->mgd);
+		MIDGARD_QUERY_EXECUTOR (self)->priv->mgd = NULL;
+	}
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->storage) {
+		g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->storage);
+		MIDGARD_QUERY_EXECUTOR (self)->priv->storage = NULL;
+	}
 }
 
 static void 
@@ -611,9 +622,6 @@ _midgard_query_select_finalize (GObject *object)
 	 * reference to it. */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset && G_IS_OBJECT (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset))
 		g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset);
-
-	g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->mgd);
-	g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->storage);
 
 	parent_class->finalize (object);
 }
@@ -645,15 +653,21 @@ __midgard_query_select_set_property (GObject *object, guint property_id,
 		const GValue *value, GParamSpec *pspec)
 {
 	MidgardQuerySelect *self = (MidgardQuerySelect *) (object);
+	GObject *mgd;
+	GObject *storage;
 
 	switch (property_id) {
 
 		case PROPERTY_CONNECTION:
-			MIDGARD_QUERY_EXECUTOR (self)->priv->mgd = g_object_ref (g_value_get_object (value));
+			if (!G_VALUE_HOLDS_OBJECT (value))
+				return;
+			MIDGARD_QUERY_EXECUTOR (self)->priv->mgd = g_value_dup_object (value);	
 			break;
 
 		case PROPERTY_STORAGE:
-			MIDGARD_QUERY_EXECUTOR (self)->priv->storage = g_object_ref (g_value_get_object (value));
+			if (!G_VALUE_HOLDS_OBJECT (value))
+				return;
+			MIDGARD_QUERY_EXECUTOR (self)->priv->storage = g_value_dup_object (value);
 			break;
 
   		default:
@@ -661,7 +675,6 @@ __midgard_query_select_set_property (GObject *object, guint property_id,
 			break;
 	}
 }
-
 
 static void 
 _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class_data)

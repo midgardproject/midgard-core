@@ -679,7 +679,7 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd,
 		
 		/* Make any gobject instance. Avoid needless type name comparison. */
 		GType object_type = g_type_from_name((const gchar *)child->name);
-		GObject *object = g_object_new(object_type, NULL);
+		GObject *object = g_object_new(object_type, "connection", mgd, NULL);
 
 		if(!object) {
 			g_error("Can not create %s instance", child->name);
@@ -688,8 +688,8 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd,
 		}
 
 		/* DBObject instance so we need to set its connection */
-		if(MIDGARD_IS_DBOBJECT(object))
-			midgard_object_set_connection(MIDGARD_OBJECT(object), mgd);
+		//if(MIDGARD_IS_DBOBJECT(object))
+		//	midgard_object_set_connection(MIDGARD_OBJECT(object), mgd);
 
 		if(child->children && !_nodes2object(G_OBJECT(object), child->children, force)) {
 			g_object_unref(object);

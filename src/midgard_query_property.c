@@ -50,7 +50,8 @@ __get_value (MidgardQueryHolder *self, GValue *value)
 
 	MidgardQueryProperty *mqp = (MidgardQueryProperty *) self;
 
-	g_value_init (value, G_VALUE_TYPE (&mqp->priv->value));
+	if (!G_VALUE_HOLDS_STRING (value))
+		g_value_init (value, G_VALUE_TYPE (&mqp->priv->value));
 	g_value_copy ((const GValue *) &mqp->priv->value, value);
 
 	return;
@@ -98,6 +99,7 @@ _midgard_query_property_constructor (GType type,
 	self->priv->klass = NULL;
 	GValue value = {0, };
 	self->priv->value = value;
+	g_value_init (&self->priv->value, G_TYPE_STRING);
 
 	return G_OBJECT(object);
 }
@@ -131,7 +133,7 @@ __midgard_query_property_get_property (GObject *object, guint property_id,
 	switch (property_id) {
 		
 		case MIDGARD_QUERY_PROPERTY_PROPNAME:
-			g_value_copy ((const GValue*) &self->priv->value, value);
+			__get_value (MIDGARD_QUERY_HOLDER (object), value);
 			break;
 
 		case MIDGARD_QUERY_PROPERTY_STORAGE:
@@ -153,9 +155,7 @@ __midgard_query_property_set_property (GObject *object, guint property_id,
 	switch (property_id) {
 
 		case MIDGARD_QUERY_PROPERTY_PROPNAME:
-			if (!G_IS_VALUE (&self->priv->value)) 
-				g_value_init (&self->priv->value, G_TYPE_STRING);
-			g_value_copy (value, &self->priv->value);
+			__set_value (MIDGARD_QUERY_HOLDER (object), (GValue *)value);
 			break;
 
 		case MIDGARD_QUERY_PROPERTY_STORAGE:

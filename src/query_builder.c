@@ -152,6 +152,21 @@ MidgardQueryBuilder *midgard_query_builder_new(
         }
 }
 
+/**
+ * midgard_query_builder_create_builder:
+ *
+ * Static constructor. Invokes midgard_query_builder_new().
+ * This function is added for language bindings, in which, that function
+ * can not be invoked explicitly.
+ *
+ * Since: 10.05.1
+ */
+MidgardQueryBuilder *
+midgard_query_builder_create_builder (MidgardConnection *mgd, const gchar *classname)
+{
+	return midgard_query_builder_new (mgd, classname);
+}
+
 void midgard_query_builder_free(MidgardQueryBuilder *builder) 
 {
 	g_assert(builder != NULL);
@@ -1023,11 +1038,11 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 	for (rows = 0; rows < ret_rows; rows++) {
 	
 		if(!nobject)
-			object = g_object_new(builder->priv->type, NULL);
+			object = g_object_new (builder->priv->type, "connection", mgd, NULL);
 		else 
 			object = *nobject;
 
-		MIDGARD_DBOBJECT(object)->dbpriv->mgd = builder->priv->mgd;
+		//MIDGARD_DBOBJECT(object)->dbpriv->mgd = builder->priv->mgd;
 				
 		if(dbklass->dbpriv->__set_from_sql != NULL) {
 			

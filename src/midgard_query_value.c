@@ -70,6 +70,9 @@ __set_value (MidgardQueryHolder *self, const GValue *value)
 
 	MidgardQueryValue *mqp = (MidgardQueryValue *) self;
 
+	if (!mqp->priv)
+		return;
+
 	if (G_IS_VALUE (&mqp->priv->value))
 		g_value_unset (&mqp->priv->value);
 
@@ -81,6 +84,10 @@ __set_value (MidgardQueryHolder *self, const GValue *value)
 
 /* GOBJECT ROUTINES */
 
+enum {
+	PROPERTY_VALUE = 1
+};
+
 static void
 midgard_query_value_init (MidgardQueryHolderIFace *iface)
 {
@@ -89,6 +96,14 @@ midgard_query_value_init (MidgardQueryHolderIFace *iface)
 }
 
 static GObjectClass *parent_class= NULL;
+
+static void
+__midgard_query_value_instance_init (GTypeInstance *instance, gpointer g_class)
+{
+	MidgardQueryValue *self = (MidgardQueryValue *) instance;
+	self->priv = g_new (MidgardQueryValuePrivate, 1);
+
+}
 
 static GObject *
 _midgard_query_value_constructor (GType type,
@@ -99,11 +114,41 @@ _midgard_query_value_constructor (GType type,
 		G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_properties, construct_properties);
 	
-	MidgardQueryValue *self = (MidgardQueryValue *) object;
-	self->priv = g_new (MidgardQueryValuePrivate, 1);
-
 	return G_OBJECT(object);
 }
+
+static void
+__midgard_query_value_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	switch (property_id) {
+		
+		case PROPERTY_VALUE:
+			__get_value (MIDGARD_QUERY_HOLDER (object), value);
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+			break;
+	}
+}
+
+static void
+__midgard_query_value_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec)
+{
+	switch (property_id) {
+
+		case PROPERTY_VALUE:
+			__set_value (MIDGARD_QUERY_HOLDER (object), value);
+			break;
+
+  		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+			break;
+	}
+}
+
 
 static void
 _midgard_query_value_dispose (GObject *object)
@@ -134,6 +179,21 @@ _midgard_query_value_class_init (MidgardQueryValueClass *klass, gpointer class_d
 	object_class->constructor = _midgard_query_value_constructor;
 	object_class->dispose = _midgard_query_value_dispose;
 	object_class->finalize = _midgard_query_value_finalize;
+
+	object_class->set_property = __midgard_query_value_set_property;
+	object_class->get_property = __midgard_query_value_get_property;
+
+	/* Properties */
+	GParamSpec *pspec = g_param_spec_gtype ("value",
+			"",
+			"",
+			G_TYPE_VALUE,
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT);
+	/**
+	 * MidgardQueryValue:value:
+	 * 
+	 */  
+	g_object_class_install_property (object_class, PROPERTY_VALUE, pspec);
 }
 
 GType
@@ -150,7 +210,7 @@ midgard_query_value_get_type (void)
 			NULL,   /* class_data */
 			sizeof (MidgardQueryValue),
 			0,      /* n_preallocs */
-			NULL    /* instance_init */
+			__midgard_query_value_instance_init    /* instance_init */
 		};
       
 		static const GInterfaceInfo value_info = {
