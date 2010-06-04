@@ -132,7 +132,8 @@ enum MidgardObjectAction
 	MGD_OBJECT_ACTION_UPDATE /**< Object has been updated >*/
 };
 
-MidgardObject *midgard_object_new(MidgardConnection *mgd, const gchar *name, GValue *value);
+MidgardObject *midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value);
+MidgardObject *midgard_object_factory (MidgardConnection *mgd, const gchar *name, GValue *value);
 
 gboolean midgard_object_get_by_id(MidgardObject *object, guint id);
 gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid);
