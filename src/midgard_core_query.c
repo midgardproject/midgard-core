@@ -3017,6 +3017,8 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 	/* case: property */
 	if (i == 1) {
 		const gchar *property_field = midgard_core_class_get_property_colname (klass, name);
+		if (!property_field)
+			g_warning ("%s doesn't seem to be registered for %s", name, G_OBJECT_CLASS_NAME (klass));
 		table_field = g_strdup_printf ("%s.%s", table_alias, property_field);
 	} else if (i < 4) {
 		/* Set all pointers we need to generate valid tables' names, aliases or joins */

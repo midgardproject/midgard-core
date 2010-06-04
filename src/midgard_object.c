@@ -2073,7 +2073,7 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 	}
 
 return_empty_object:
-	self = g_object_new(type, NULL);
+	self = g_object_new(type, "connection", mgd, NULL);
 	MGD_OBJECT_CNC (self) = mgd;
 
 	return self;

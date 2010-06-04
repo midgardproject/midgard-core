@@ -45,12 +45,10 @@ midgard_transaction_new (MidgardConnection *mgd)
 {
 	g_return_val_if_fail(mgd != NULL, NULL);
 
-	MidgardTransaction *self = g_object_new(MIDGARD_TYPE_TRANSACTION, NULL);
+	MidgardTransaction *self = g_object_new (MIDGARD_TYPE_TRANSACTION, "connection", mgd, NULL);
 
 	if (!self)
 		return NULL;
-
-	self->priv->mgd = mgd;
 
 	return self;
 }
@@ -219,6 +217,12 @@ midgard_transaction_get_name (MidgardTransaction *self)
 
 /* GOBJECT ROUTINES */
 
+static GObjectClass *__parent_class= NULL;
+
+enum {
+	PROPERTY_CONNECTION = 1
+};
+
 static void __midgard_transaction_instance_init(
 		GTypeInstance *instance, gpointer g_class)
 {
@@ -239,6 +243,17 @@ static void __midgard_transaction_instance_init(
 	self->priv->mgd = NULL;
 }
 
+static void
+__midgard_transaction_dispose (GObject *object)
+{
+	MidgardTransaction *self = MIDGARD_TRANSACTION (object);
+	if (self->priv->mgd != NULL) {
+		g_object_unref (self->priv->mgd);
+		self->priv->mgd = NULL;
+	}
+
+	__parent_class->dispose (object);
+}
 
 static void __midgard_transaction_finalize(GObject *object)
 {
@@ -253,11 +268,65 @@ static void __midgard_transaction_finalize(GObject *object)
 	self->priv = NULL;
 }
 
+static void
+__midgard_transaction_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	switch (property_id) {
+		
+		case PROPERTY_CONNECTION:
+			/* write and construct only */			
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+			break;
+	}
+}
+
+static void
+__midgard_transaction_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec)
+{
+	GObject *mgd;
+	switch (property_id) {
+
+		case PROPERTY_CONNECTION:
+			/* Add new reference to MidgardConnection object */
+			if (!G_VALUE_HOLDS_OBJECT (value))
+				return;
+			MIDGARD_TRANSACTION (object)->priv->mgd = g_value_dup_object (value);
+			break;
+
+  		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+			break;
+	}
+}
+
 static void __midgard_transaction_class_init(
 		gpointer g_class, gpointer g_class_data)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);		
 	gobject_class->finalize = __midgard_transaction_finalize;
+	gobject_class->dispose = __midgard_transaction_dispose;
+	gobject_class->set_property = __midgard_transaction_set_property;
+	gobject_class->get_property = __midgard_transaction_get_property;
+
+	__parent_class = g_type_class_peek_parent (gobject_class);
+
+	/* Properties */
+	GParamSpec *pspec = g_param_spec_object ("connection",
+			"",
+			"",
+			MIDGARD_TYPE_CONNECTION,
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+	/**
+	 * MidgardTransaction:connection:
+	 * 
+	 * Pointer to #MidgardConnection, given object has been initialized for
+	 */  
+	g_object_class_install_property (gobject_class, PROPERTY_CONNECTION, pspec);
 }
 
 GType

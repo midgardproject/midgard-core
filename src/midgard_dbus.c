@@ -208,6 +208,21 @@ midgard_dbus_new(MidgardConnection *mgd, const gchar *path, gboolean use_session
 #endif
 }
 
+/**
+ * midgard_dbus_create_dbus:
+ *
+ * Constructor. Invokes midgard_dbus_new().
+ * This function is added for language bindings, in which, midgard_dbus_new can not be 
+ * invoked explicitly.
+ *
+ * Since: 10.05.1
+ */
+MidgardDbus *
+midgard_dbus_create_dbus (MidgardConnection *mgd, const gchar *path, gboolean use_session)
+{
+	return midgard_dbus_new (mgd, path, use_session);
+}
+
 #ifdef MGD_HAVE_DBUS
 DBusGProxy*
 __get_bus_proxy(MidgardConnection *mgd, DBusGConnection *bus, const gchar *path)

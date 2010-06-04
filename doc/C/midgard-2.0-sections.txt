@@ -118,6 +118,7 @@ MidgardQueryBuilder
 MidgardQueryBuilderPrivate
 MidgardQueryBuilderClass
 midgard_query_builder_new
+midgard_query_builder_create_builder
 midgard_query_builder_add_constraint
 midgard_query_builder_add_constraint_with_property
 midgard_query_builder_begin_group
@@ -207,6 +208,7 @@ MidgardBlob
 MidgardBlobClass
 MidgardBlobPrivate
 midgard_blob_new
+midgard_blob_create_blob
 midgard_blob_read_content
 midgard_blob_write_content
 midgard_blob_get_handler
@@ -539,6 +541,7 @@ MIDGARD_VIEW_GET_CLASS
 MidgardDbus
 MidgardDbusClass
 midgard_dbus_new
+midgard_dbus_create_dbus
 midgard_dbus_send
 midgard_dbus_get_message
 <SUBSECTION Standard>

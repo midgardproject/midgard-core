@@ -98,7 +98,7 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 			const gchar *property = pspecs[i]->name;
 			const gchar *property_field = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), property);	
 
-			if (pspecs[i]->value_type == G_TYPE_OBJECT)
+			if (pspecs[i]->value_type == G_TYPE_OBJECT || !property_field)
 				continue;
 			
 			select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
@@ -258,6 +258,8 @@ __statement_insert_add_metadata_fields (MidgardDBObjectClass *klass, GString *co
 
 	for (i = 0; i < n_prop; i++) {
 		const gchar *col_name = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), pspecs[i]->name);
+		if (!col_name)
+			continue;
 		g_string_append (colnames, ", ");
 		g_string_append (values, ", ");
 		g_string_append (colnames, col_name);
@@ -368,15 +370,14 @@ midgard_core_dbobject_class_list_properties (MidgardDBObjectClass *klass, guint 
 
 /* GOBJECT ROUTINES */
 
-static GObject *
-midgard_dbobject_constructor (GType type,
-		guint n_construct_properties,
-		GObjectConstructParam *construct_properties) 
+enum {
+	PROPERTY_CONNECTION = 1
+};
+
+static void
+__midgard_dbobject_instance_init (GTypeInstance *instance, gpointer g_class)
 {
-	GObject *object = (GObject *)
-		G_OBJECT_CLASS (parent_class)->constructor (type,
-				n_construct_properties,
-				construct_properties);
+	MidgardDBObject *object = (MidgardDBObject *) instance;
 
 	MIDGARD_DBOBJECT (object)->dbpriv = g_new(MidgardDBObjectPrivate, 1);
 	MIDGARD_DBOBJECT (object)->dbpriv->mgd = NULL; /* read only */
@@ -388,6 +389,18 @@ midgard_dbobject_constructor (GType type,
 
 	MIDGARD_DBOBJECT (object)->dbpriv->storage_data =
 		MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->storage_data;
+
+}
+
+static GObject *
+midgard_dbobject_constructor (GType type,
+		guint n_construct_properties,
+		GObjectConstructParam *construct_properties) 
+{
+	GObject *object = (GObject *)
+		G_OBJECT_CLASS (parent_class)->constructor (type,
+				n_construct_properties,
+				construct_properties);
 
 	return G_OBJECT(object);
 }
@@ -405,6 +418,12 @@ midgard_dbobject_dispose (GObject *object)
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
 	if (metadata && G_IS_OBJECT (metadata)) 
 		g_object_unref (metadata);
+
+	/* Drop reference to MidgardConnection */
+	if (MIDGARD_DBOBJECT (self)->dbpriv->mgd != NULL) {
+		g_object_unref (MIDGARD_DBOBJECT (self)->dbpriv->mgd);
+		MIDGARD_DBOBJECT (self)->dbpriv->mgd = NULL;
+	}
 
 	parent_class->dispose (object);
 }
@@ -435,6 +454,42 @@ static const MidgardConnection *__get_connection(MidgardDBObject *self)
 	return self->dbpriv->mgd;
 }
 
+static void
+__midgard_dbobject_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	switch (property_id) {
+		
+		case PROPERTY_CONNECTION:
+			/* write and construct only */			
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+			break;
+	}
+}
+
+static void
+__midgard_dbobject_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec)
+{
+	GObject *mgd;
+	switch (property_id) {
+
+		case PROPERTY_CONNECTION:
+			/* Add new reference to MidgardConnection object */
+			if (!G_VALUE_HOLDS_OBJECT (value))
+				return;
+			MIDGARD_DBOBJECT (object)->dbpriv->mgd = g_value_dup_object (value);
+			break;
+
+  		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
+			break;
+	}
+}
+
 static void 
 midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 {
@@ -444,6 +499,8 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	object_class->constructor = midgard_dbobject_constructor;
 	object_class->dispose = midgard_dbobject_dispose;
 	object_class->finalize = midgard_dbobject_finalize;
+	object_class->set_property = __midgard_dbobject_set_property;
+	object_class->get_property = __midgard_dbobject_get_property;
 
 	klass->get_connection = __get_connection;
 
@@ -459,6 +516,19 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->dbpriv->set_from_data_model = _midgard_dbobject_set_from_data_model;
 	klass->dbpriv->statement_insert = NULL;
 	klass->dbpriv->set_statement_insert = __initialize_statement_insert;	
+
+	/* Properties */
+	GParamSpec *pspec = g_param_spec_object ("connection",
+			"",
+			"",
+			MIDGARD_TYPE_CONNECTION,
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+	/**
+	 * MidgardDBObject:connection:
+	 * 
+	 * Pointer to #MidgardConnection, given object has been initialized for
+	 */  
+	g_object_class_install_property (object_class, PROPERTY_CONNECTION, pspec);
 }
 
 /* Registers the type as a fundamental GType unless already registered. */ 
@@ -476,7 +546,7 @@ midgard_dbobject_get_type (void)
 			NULL,           /* class_data */
 			sizeof (MidgardDBObject),
 			0,              /* n_preallocs */  
-			NULL
+			__midgard_dbobject_instance_init
 		};
 		type = g_type_register_static (G_TYPE_OBJECT, "MidgardDBObject", &info, G_TYPE_FLAG_ABSTRACT);
 	}

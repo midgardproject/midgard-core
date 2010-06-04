@@ -194,6 +194,20 @@ MidgardBlob *midgard_blob_new (MidgardObject *attachment, const gchar *encoding)
 }
 
 /**
+ * midgard_blob_create_blob:
+ *
+ * Invokes midgard_blob_new() and it's designed for language bindings, in whic, 
+ * that function can not be invoked explicitly.
+ *
+ * Since: 10.05.1
+ */
+MidgardBlob*
+midgard_blob_create_blob (MidgardObject *attachment, const gchar *encoding)
+{
+	return midgard_blob_new (attachment, encoding);
+}
+
+/**
  * midgard_blob_read_content:
  * @self: MidgardBlob self instance
  * @bytes_read: number of bytes read
