@@ -701,6 +701,7 @@ MidgardQuerySelectClass
 midgard_query_select_new
 midgard_query_select_list_objects
 midgard_query_select_toggle_read_only
+midgard_query_select_include_deleted
 <SUBSECTION Standard>
 MIDGARD_QUERY_SELECT
 MIDGARD_IS_QUERY_SELECT
