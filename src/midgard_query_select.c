@@ -334,6 +334,17 @@ __add_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *top_oper
 	return;
 }
 
+static void
+__add_second_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *top_operation)
+{
+	GdaSqlExpr *dexpr = gda_sql_expr_new (GDA_SQL_ANY_PART (top_operation));
+	dexpr->value = gda_value_new (G_TYPE_STRING);
+	g_value_take_string (dexpr->value, g_strdup ("0<1"));
+	top_operation->operands = g_slist_append (top_operation->operands, dexpr);
+
+	return;
+}
+
 gboolean 
 _midgard_query_select_execute (MidgardQueryExecutor *self)
 {
@@ -400,18 +411,22 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	GdaSqlOperation *operation = where->cond;
 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
-	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)
-		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement (
-				MIDGARD_QUERY_EXECUTOR (self), MIDGARD_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where);
-	else 
-		__add_dummy_constraint (sss, operation); /* no constraints, add dummy WHERE 1=1 */	
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint) {
+		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement 			(MIDGARD_QUERY_EXECUTOR (self), MIDGARD_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where);
+		if (MIDGARD_QUERY_EXECUTOR (self)->priv->n_constraints = 1)
+			__add_second_dummy_constraint (sss, operation);
+	} else { 
+		/* no constraints, add dummy '1=1 AND 0<1' to satisfy top constraint group */
+		__add_dummy_constraint (sss, operation); 
+		__add_second_dummy_constraint (sss, operation); 
+	}
 
 	/* Add orders , ORDER BY t1.field... */
 	if (!__query_select_add_orders (self)) 
 		goto return_false;
 
 	/* Exclude deleted */
-	if (MGD_DBCLASS_METADATA_CLASS (klass))
+	if (MGD_DBCLASS_METADATA_CLASS (klass) && !MIDGARD_QUERY_EXECUTOR (self)->priv->include_deleted)
 		__add_exclude_deleted_constraints (sss, operation);
 
 	/* Add limit, LIMIT x */
@@ -533,6 +548,33 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 	
 	return objects;
 }
+
+static void
+_midgard_query_select_include_deleted (MidgardQuerySelect *self, gboolean toggle)
+{
+	g_return_if_fail (self != NULL);
+	MIDGARD_QUERY_EXECUTOR (self)->priv->include_deleted = toggle;
+}
+
+/**
+ * midgard_query_select_include_deleted:
+ * @self: #MidgardQuerySelect instance
+ * @toggle: toggle to include or exclude deleted objects
+ *
+ * By default, #MidgardQuerySelect ignores deleted objects.
+ * With this method, you can set deleted objects toggle, so such can be 
+ * included in execute results. This method may be called as many times 
+ * as needed, to include (@TRUE) or exclude (@FALSE) deleted objects. 
+ *
+ * Since: 10.05.1
+ */ 
+void
+midgard_query_select_include_deleted (MidgardQuerySelect *self, gboolean toggle)
+{
+	g_return_if_fail (self != NULL);
+	MIDGARD_QUERY_SELECT_GET_CLASS (self)->include_deleted (self, toggle);
+}
+
 
 /**
  * midgard_query_select_list_objects:
@@ -698,6 +740,7 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	
 	klass->list_objects = _midgard_query_select_list_objects;
 	klass->toggle_read_only = _midgard_query_select_toggle_read_only;
+	klass->include_deleted = _midgard_query_select_include_deleted;
 
 	object_class->set_property = __midgard_query_select_set_property;
 	object_class->get_property = __midgard_query_select_get_property;
