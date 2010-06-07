@@ -411,7 +411,8 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 		goto return_false;
 
 	/* Exclude deleted */
-	__add_exclude_deleted_constraints (sss, operation);
+	if (MGD_DBCLASS_METADATA_CLASS (klass))
+		__add_exclude_deleted_constraints (sss, operation);
 
 	/* Add limit, LIMIT x */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->limit > 0) {
