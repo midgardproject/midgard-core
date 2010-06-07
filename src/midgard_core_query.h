@@ -77,6 +77,7 @@ struct _MidgardQueryPropertyPrivate {
 struct _MidgardQueryExecutorPrivate {
 	MidgardConnection *mgd;
 	MidgardQueryStorage *storage;
+	guint n_constraints;
 	MidgardQueryConstraintSimple *constraint;
 	GSList *orders;
 	GSList *joins;
@@ -89,6 +90,7 @@ struct _MidgardQueryExecutorPrivate {
 	GdaSqlStatement *stmt;
 	guint results_count;
 	gboolean read_only;
+	gboolean include_deleted;
 };
 
 struct _MidgardQueryConstraintSimplePrivate {

@@ -342,6 +342,9 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	__set_expression_value (expr->value, &val);
 	g_value_unset (&val);
 	cond->operands = g_slist_append (cond->operands, expr);
+
+	/* increase executor's constraints number */
+	executor->priv->n_constraints++;
 }
 
 static void

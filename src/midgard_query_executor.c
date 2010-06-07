@@ -139,6 +139,7 @@ __midgard_query_executor_instance_init (GTypeInstance *instance, gpointer g_clas
 	MIDGARD_QUERY_EXECUTOR (object)->priv->mgd = NULL;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->storage = NULL;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->constraint = NULL;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->n_constraints = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->orders = NULL;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->joins = NULL;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->limit = -1;
@@ -150,6 +151,7 @@ __midgard_query_executor_instance_init (GTypeInstance *instance, gpointer g_clas
 	MIDGARD_QUERY_EXECUTOR (object)->priv->joinid = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->results_count = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->read_only = TRUE;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->include_deleted = TRUE;
 }
 
 static GObject *
