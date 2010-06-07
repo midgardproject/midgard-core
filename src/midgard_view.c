@@ -269,6 +269,8 @@ __midgard_view_derived_class_init(gpointer g_class, gpointer class_data)
 		mklass->dbpriv->update_storage = _midgard_view_derived_update_storage;
 		mklass->dbpriv->storage_exists = _midgard_view_derived_storage_exists;
 		mklass->dbpriv->delete_storage = _midgard_view_derived_delete_storage;
+
+		mklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__view_parent_class)->dbpriv->add_fields_to_select_statement;
 	}
 
 	g_type_class_add_private (g_class, sizeof(MgdSchemaTypeAttr));

@@ -192,15 +192,24 @@ static void __condition_append_value(GString *str,
 	if(value == NULL)
 		value = constraint->priv->value;
 
+	GdaConnection *cnc = NULL;
+	MidgardQueryBuilder *builder = constraint->priv->builder;
+	if (builder)
+		cnc = builder->priv->mgd->priv->connection;
+
 	switch(G_VALUE_TYPE(value)) {
 
 		case G_TYPE_STRING:
-			escaped =
-				gda_connection_value_to_sql_string(
-						constraint->priv->builder->priv->mgd->priv->connection,
-						value);
-			g_string_append_printf(str, "%s", escaped);
-			g_free(escaped);
+			if (cnc) {
+				escaped =
+					gda_connection_value_to_sql_string(
+							constraint->priv->builder->priv->mgd->priv->connection,
+							value);
+				g_string_append_printf(str, "%s", escaped);
+				g_free(escaped);
+			} else {
+				g_string_append_printf (str, "'%s'", g_value_get_string (value));
+			}
 			break;
 
 		case G_TYPE_UINT:

@@ -430,6 +430,9 @@ gchar *__build_static_create_view(MgdSchemaTypeAttr *type)
 	guint i = 0;
 	g_string_append(query, " WHERE ");
 
+	if (!type->joins)
+		g_string_append_printf (query, " %s.metadata_deleted = 0 ", type->table);
+
 	for (list = type->joins; list != NULL; list = list->next) {
 		
 		if(i > 0)
@@ -494,7 +497,10 @@ static void __register_view_type (MgdSchemaTypeAttr *type)
 		GString *ssf = g_string_new("");
 
 		for (i = 0; i < type->class_nprop; i++) {
-			
+		
+			if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT)
+				continue;
+
 			if (i == 0)
 				g_string_append(ssf, pspecs[i]->name);
 			else 
