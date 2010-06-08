@@ -25,7 +25,7 @@
 /**
  * midgard_query_property_new:
  * @property: name of the property
- * @storage: optional storage for given property
+ * @storage: (allow-none): optional storage for given property
  *
  * Returns: new #MidgardQueryProperty instance or NULL on failure
  * Since: 10.05
