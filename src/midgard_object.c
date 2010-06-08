@@ -1956,7 +1956,7 @@ GType midgard_object_get_type(void)
  * midgard_object_new:
  * @mgd: #MidgardConnection handler
  * @name: name of the class 
- * @value: optional value which holds id or guid of an object 
+ * @value: (allow-none): optional value which holds id or guid of an object 
  * 
  * Creates new MidgardObject object instance.
  *
@@ -2081,6 +2081,9 @@ return_empty_object:
 
 /**
  * midgard_object_factory:
+ * @mgd: #MidgardConnection instance
+ * @name: #MidgardObject derived class name
+ * @value: (allow-none): optional object identifier
  *
  * Static constructor, provided for language bindings, in which, 
  * midgard_object_new() can not be invoked explicitly.

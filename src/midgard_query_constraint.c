@@ -77,7 +77,7 @@ gboolean __query_constraint_operator_is_valid(const gchar *op, GdaSqlOperatorTyp
  * @property: #MidgardQueryProperty instance
  * @op: constraint operator
  * @holder: #MidgardQueryHolder instance
- * @storage: optional #MidgardQueryStorage to use with constraint
+ * @storage: (allow-none): optional #MidgardQueryStorage to use with constraint
  * 
  * Valid @op operators are: '=', '<', '>', '!=', '<>', '<=', '>=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN'
  *
