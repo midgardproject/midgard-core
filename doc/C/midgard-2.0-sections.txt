@@ -629,6 +629,7 @@ midgard_query_holder_get_type
 MidgardQueryValue
 MidgardQueryValueClass
 midgard_query_value_new
+midgard_query_value_create_with_value
 <SUBSECTION Standard>
 MIDGARD_QUERY_VALUE
 MIDGARD_IS_QUERY_VALUE
