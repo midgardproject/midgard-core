@@ -49,8 +49,9 @@ struct _MidgardQueryValueClass {
 	MidgardQueryValue 	*(*set_value)	(MidgardQueryValue *self, const GValue *value);
 };
 
-GType 			midgard_query_value_get_type	(void);
-MidgardQueryValue	*midgard_query_value_new	(const GValue *value);
+GType 			midgard_query_value_get_type		(void);
+MidgardQueryValue	*midgard_query_value_new		(void);
+MidgardQueryValue 	*midgard_query_value_create_with_value 	(const GValue *value);
 
 G_END_DECLS
 
