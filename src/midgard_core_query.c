@@ -314,7 +314,11 @@ _add_value_type_update (GString *str, const gchar *name, GValue *value, gboolean
 			} else {
 				g_warning ("_add_value_type_update: unhandled boxed value type (%s)", G_VALUE_TYPE_NAME (value));
 			}
-			break;	
+			break;
+
+		case G_TYPE_OBJECT:
+			/*do nothing, ignore */	
+			break;
 
 		default:
 			g_warning ("_add_value_type_update: unhandled value type (%s)", G_VALUE_TYPE_NAME (value));
@@ -889,7 +893,7 @@ midgard_core_query_insert_records (MidgardConnection *mgd,
 	GList *cl, *vl;
 
 	for (cl = cols, vl = values; cl != NULL; cl = cl->next, vl = vl->next) {
-
+	
 		_add_value_type_update (sql, (const gchar *) cl->data, (GValue *) vl->data, i > 0 ? TRUE : FALSE);
 		i++;
 	}
