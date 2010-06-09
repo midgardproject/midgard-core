@@ -1373,7 +1373,7 @@ static GObject *
 __mgdschema_object_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties)
-{
+{	
 	GObject *object = (GObject *)
 		G_OBJECT_CLASS (__mgdschema_parent_class)->constructor (type,
 				n_construct_properties,

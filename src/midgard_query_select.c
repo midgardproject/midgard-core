@@ -512,6 +512,7 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	
+	*n_objects = 0;
 	GdaDataModel *model = GDA_DATA_MODEL (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset);
 	if (!model || (model && !GDA_IS_DATA_MODEL (model)))
 		return NULL;
@@ -525,9 +526,8 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 	MidgardDBObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
 	MidgardDBObject **objects = g_new (MidgardDBObject *, rows+1);
 
-	for (i = 0; i < rows; i++) {
-		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), NULL);
-		MIDGARD_DBOBJECT(objects[i])->dbpriv->mgd = mgd;
+	for (i = 0; i < rows; i++) {	
+		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), "connection", mgd, NULL);
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->datamodel = model;
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->row = i;
 		g_object_ref (model);
