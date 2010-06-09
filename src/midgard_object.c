@@ -729,6 +729,9 @@ static GPtrArray *__get_glists(MidgardObject *object)
 		
 	for (i = 0; i < n_prop; i++) {
 
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT)
+			continue;
+
 		colname = midgard_core_class_get_property_colname(
 				MIDGARD_DBOBJECT_GET_CLASS(object), pspecs[i]->name);
 
@@ -778,6 +781,9 @@ static GPtrArray *__get_glists(MidgardObject *object)
 		
 			colname = midgard_core_class_get_property_colname(
 					MIDGARD_DBOBJECT_GET_CLASS(mdata), pspecs[i]->name);
+
+			if (!colname)
+				continue;
 
 			g_value_init(&pval, pspecs[i]->value_type);		
 			g_object_get_property(G_OBJECT(mdata), pspecs[i]->name, &pval);
