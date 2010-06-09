@@ -461,8 +461,7 @@ __midgard_dbobject_get_property (GObject *object, guint property_id,
 {
 	switch (property_id) {
 		
-		case PROPERTY_CONNECTION:
-			/* write and construct only */			
+		case PROPERTY_CONNECTION:			
 			break;
 
 		default:
@@ -527,7 +526,7 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 			"",
 			"",
 			MIDGARD_TYPE_CONNECTION,
-			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
 	/**
 	 * MidgardDBObject:connection:
 	 * 
