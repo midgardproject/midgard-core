@@ -662,6 +662,9 @@ __add_metadata_parameters (MidgardDBObject *dbobject, MidgardDBObjectClass *klas
 	GObject *object = (GObject *) MGD_DBOBJECT_METADATA (dbobject);
 
 	for (i = 0; i < n_prop; i++) {
+		/* Ignore property which holds object */
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT)
+			continue;
 		const gchar *col_name = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), pspecs[i]->name);
 		_SET_HOLDER_VALUE;
 	}
