@@ -697,8 +697,9 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 	GError *error = NULL;
 
 	for (i = 0; i < n_props; i++) {
-		/* Ignore primary key */
-		if (pk && g_str_equal (pspecs[i]->name, pk))
+		/* Ignore primary key and property of GObject type*/
+		if ((pk && g_str_equal (pspecs[i]->name, pk)) || 
+				G_TYPE_FUNDAMENTAL(pspecs[i]->value_type) == G_TYPE_OBJECT)
 			continue;
 
 		const gchar *col_name = midgard_core_class_get_property_colname (klass, pspecs[i]->name);
