@@ -89,7 +89,7 @@ __set_value (MidgardQueryHolder *self, const GValue *value)
 	MidgardQueryValue *mqp = (MidgardQueryValue *) self;
 
 	if (!mqp->priv)
-		return;
+		return FALSE;
 
 	if (G_IS_VALUE (&mqp->priv->value)) 
 		g_value_unset (&mqp->priv->value);
