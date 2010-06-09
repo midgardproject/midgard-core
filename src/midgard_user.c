@@ -108,10 +108,7 @@ midgard_user_new (MidgardConnection *mgd, guint n_params, const GParameter *para
 		return klass->get (mgd, n_params, parameters);
 	}
 
-	MidgardUser *self = g_object_new(MIDGARD_TYPE_USER, NULL);
-
-	/* Set connection pointer */
-	MGD_OBJECT_CNC (self) = mgd;
+	MidgardUser *self = g_object_new (MIDGARD_TYPE_USER, "connection", mgd, NULL);
 
 	return self;
 }
@@ -266,8 +263,7 @@ __midgard_user_get (MidgardConnection *mgd, guint n_params, const GParameter *pa
 		return NULL;
 	}
 
-	MidgardUser *self = g_object_new (MIDGARD_TYPE_USER, NULL);
-	MGD_OBJECT_CNC (self) = mgd;
+	MidgardUser *self = g_object_new (MIDGARD_TYPE_USER, "connection", mgd, NULL);
 
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql (MIDGARD_DBOBJECT (self), model, 0);
 
