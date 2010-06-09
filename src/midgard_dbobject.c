@@ -396,7 +396,7 @@ static GObject *
 midgard_dbobject_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties) 
-{
+{	
 	GObject *object = (GObject *)
 		G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_properties,
@@ -420,7 +420,8 @@ midgard_dbobject_dispose (GObject *object)
 		g_object_unref (metadata);
 
 	/* Drop reference to MidgardConnection */
-	if (MIDGARD_DBOBJECT (self)->dbpriv->mgd != NULL) {
+	MidgardConnection *mgd = MIDGARD_DBOBJECT (self)->dbpriv->mgd;
+	if (mgd != NULL && G_IS_OBJECT (mgd)) {	
 		g_object_unref (MIDGARD_DBOBJECT (self)->dbpriv->mgd);
 		MIDGARD_DBOBJECT (self)->dbpriv->mgd = NULL;
 	}
@@ -478,9 +479,13 @@ __midgard_dbobject_set_property (GObject *object, guint property_id,
 	switch (property_id) {
 
 		case PROPERTY_CONNECTION:
-			/* Add new reference to MidgardConnection object */
-			if (!G_VALUE_HOLDS_OBJECT (value))
+			if (!G_VALUE_HOLDS_OBJECT (value)) 
 				return;
+
+			if (!MIDGARD_IS_CONNECTION (g_value_get_object (value)))
+				return;
+	
+			/* Add new reference to MidgardConnection object */
 			MIDGARD_DBOBJECT (object)->dbpriv->mgd = g_value_dup_object (value);
 			break;
 
