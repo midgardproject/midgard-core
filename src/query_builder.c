@@ -1053,18 +1053,11 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 		
 			/* Compute number of metadata properties */
 			guint n_md_props = 0;
+			MidgardMetadata *mklass = (MidgardMetadata *)MGD_DBCLASS_METADATA_CLASS (dbklass);
+			if (mklass) 
+				n_md_props = g_hash_table_size (MGD_DBCLASS_STORAGE_DATA (mklass)->prophash);
 
-			if (dbklass->dbpriv->has_metadata) {
-
-				/* FIXME, provide metadata class pointer member for MidgardDBObjectClass */
-				const gchar *metadata_classname = 
-					midgard_reflector_object_get_metadata_class (G_OBJECT_CLASS_NAME (dbklass));
-				GObjectClass *metadata_class = g_type_class_peek (g_type_from_name (metadata_classname));
-				GParamSpec **pspec = g_object_class_list_properties (metadata_class, &n_md_props);
-				g_free (pspec);
-			}
-
-			guint __cols = n_md_props + 1; /* Add guid column */
+			guint __cols = n_md_props + 1; /* Add one for guid */
 
 			/* we have guid and metadata columns first */
 			for (columns = __cols; columns < ret_fields; columns++) {	
@@ -1074,7 +1067,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 					gda_data_model_get_column_title(model, columns);
 				GParamSpec *pspec =
 					g_object_class_find_property(G_OBJECT_GET_CLASS(object), coltitle);
-				
+
 				if(G_IS_VALUE(gvalue)) {
 
 					if (!pspec) {
