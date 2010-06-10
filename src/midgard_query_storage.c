@@ -40,15 +40,19 @@ midgard_query_storage_new (const gchar *classname)
 		return NULL;
 	}
 
-	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (type));
+	GObjectClass *klass = G_OBJECT_CLASS (g_type_class_peek (type));
 	if (!klass) {
 		g_warning ("Can not find %s class", classname);
 		return NULL;
 	}
 
+	g_return_val_if_fail (MIDGARD_IS_DBOBJECT_CLASS (klass), NULL);
+
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (klass);
+
 	MidgardQueryStorage *self = g_object_new (MIDGARD_TYPE_QUERY_STORAGE, "dbclass", classname, NULL);
-	self->priv->klass = klass;
-	self->priv->table = midgard_core_class_get_table (klass);
+	self->priv->klass = dbklass;
+	self->priv->table = midgard_core_class_get_table (dbklass);
 
 	return self;
 }
@@ -136,9 +140,10 @@ __midgard_query_storage_set_property (GObject *object, guint property_id,
 
 		case MIDGARD_QUERY_STORAGE_DBCLASS:
 			dbklass = g_type_class_peek (g_type_from_name (g_value_get_string (value)));
+			g_return_if_fail (MIDGARD_IS_DBOBJECT_CLASS (dbklass));
 			if (dbklass) {
 				self->priv->klass = dbklass;
-				self->priv->classname = G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (dbklass));
+				self->priv->classname = g_value_get_string (value);
 				self->priv->table = midgard_core_class_get_table (dbklass);
 			}
 			break;
