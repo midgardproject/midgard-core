@@ -151,7 +151,7 @@ __midgard_query_executor_instance_init (GTypeInstance *instance, gpointer g_clas
 	MIDGARD_QUERY_EXECUTOR (object)->priv->joinid = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->results_count = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->read_only = TRUE;
-	MIDGARD_QUERY_EXECUTOR (object)->priv->include_deleted = TRUE;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->include_deleted = FALSE;
 }
 
 static GObject *
