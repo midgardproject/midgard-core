@@ -1042,7 +1042,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 		else 
 			object = *nobject;
 
-		//MIDGARD_DBOBJECT(object)->dbpriv->mgd = builder->priv->mgd;
+		MGD_OBJECT_IN_STORAGE (object) = TRUE;	
 				
 		if(dbklass->dbpriv->__set_from_sql != NULL) {
 			
