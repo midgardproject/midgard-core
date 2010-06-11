@@ -495,16 +495,22 @@ static void __register_view_type (MgdSchemaTypeAttr *type)
 		g_free(type->sql_select_full);
 		guint i;
 		GString *ssf = g_string_new("");
+		gboolean add_coma = FALSE;
 
 		for (i = 0; i < type->class_nprop; i++) {
 		
-			if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT)
+			if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT) {
+				if (i == 1)
+					add_coma = FALSE;
 				continue;
+			}
 
-			if (i == 0)
+			if (!add_coma)
 				g_string_append(ssf, pspecs[i]->name);
 			else 
 				g_string_append_printf(ssf, ", %s", pspecs[i]->name);
+
+			add_coma = TRUE;
 
 			/* Replace tablefield for every property */
 			MgdSchemaPropertyAttr *prop_attr = g_hash_table_lookup(type->prophash, pspecs[i]->name);
