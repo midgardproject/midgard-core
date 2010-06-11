@@ -192,14 +192,15 @@ void midgard_test_object_basic_delete(MidgardObjectTest *mot, gconstpointer data
 	MidgardConnection *mgd = mot->mgd;
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS (object);
 
-	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
-		return;
-
 	gboolean object_deleted = midgard_object_delete(object, TRUE);
 
 	MIDGARD_TEST_ERROR_OK(mgd);
 	g_assert(object_deleted == TRUE);
-	
+
+	/* Do not validate metadata if there's no registered for given class */	
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass)))
+		return;
+
 	/* Check known metadata properties */
 	midgard_test_metadata_check_delete(object);
 

@@ -127,7 +127,11 @@ midgard_test_schema_object_factory_get_object_by_guid_deleted (MidgardObjectTest
 	g_object_get (G_OBJECT (object), "guid", &guid, NULL);
 
 	MidgardObject *deleted_object = midgard_schema_object_factory_get_object_by_guid (mgd, (const gchar *)guid);
-	MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OBJECT_DELETED);
+	/* Object without metadata is purged, so check purged error code */
+	if (!midgard_reflector_object_has_metadata_class (G_OBJECT_TYPE_NAME (G_OBJECT (object))))
+		MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OBJECT_PURGED)
+	else
+		MIDGARD_TEST_ERROR_ASSERT (mgd, MGD_ERR_OBJECT_DELETED);
 	g_assert (deleted_object == NULL);
 
 	g_free (guid);
