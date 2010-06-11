@@ -528,6 +528,7 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 
 	for (i = 0; i < rows; i++) {	
 		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), "connection", mgd, NULL);
+		MGD_OBJECT_IN_STORAGE (objects[i]) = TRUE;
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->datamodel = model;
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->row = i;
 		g_object_ref (model);

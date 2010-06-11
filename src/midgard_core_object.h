@@ -37,6 +37,7 @@ struct _MidgardDBObjectPrivate {
 	MidgardMetadata *metadata;
 	GdaDataModel *datamodel;
 	gint row;
+	gboolean is_in_storage;
 
 	/* GDA pointers */
 	GdaStatement *statement_insert;
@@ -62,10 +63,12 @@ struct _MidgardDBObjectPrivate {
 	void			(*set_statement_insert)	(MidgardDBObjectClass *klass);
 };
 
+#define MGD_DBOBJECT_DBPRIV(__obj) (MIDGARD_DBOBJECT(__obj)->dbpriv)
+
 #define MGD_OBJECT_GUID(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->guid
 #define MGD_OBJECT_CNC(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->mgd
+#define MGD_OBJECT_IN_STORAGE(___obj) (MGD_DBOBJECT_DBPRIV(___obj)->is_in_storage)
 
-#define MGD_DBOBJECT_DBPRIV(__obj) MIDGARD_DBOBJECT(__obj)->dbpriv
 #define MGD_DBOBJECT_HAS_METADATA(__obj) MGD_DBOBJECT_DBPRIV(__obj)->storage_data->metadata_class_name
 #define MGD_DBOBJECT_METADATA(___obj) MIDGARD_DBOBJECT(___obj)->dbpriv->metadata
 #define MGD_DBCLASS_METADATA_CLASS(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->metadata_class_ptr

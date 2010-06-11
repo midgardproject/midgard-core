@@ -386,6 +386,7 @@ __midgard_dbobject_instance_init (GTypeInstance *instance, gpointer g_class)
 	MIDGARD_DBOBJECT (object)->dbpriv->row = -1;	
 	MIDGARD_DBOBJECT (object)->dbpriv->has_metadata = FALSE;
 	MIDGARD_DBOBJECT (object)->dbpriv->metadata = NULL;
+	MIDGARD_DBOBJECT (object)->dbpriv->is_in_storage = FALSE;
 
 	MIDGARD_DBOBJECT (object)->dbpriv->storage_data =
 		MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->storage_data;

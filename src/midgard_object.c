@@ -544,7 +544,8 @@ gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid)
 		g_object_unref(dbobject);
 		return FALSE;
 	}
-	
+
+	g_free ((gchar *)MGD_OBJECT_GUID (self));	
 	MGD_OBJECT_GUID (self) = g_strdup(guid);
 
 	return TRUE;
@@ -861,7 +862,9 @@ gboolean _midgard_object_create (	MidgardObject *object,
 
 	/* Handle pure create call. If replicate is OBJECT_UPDATE_IMPORTED, then, 
 	 * object has guid already set, which is valid for unserialized object */
-	if (replicate == OBJECT_UPDATE_NONE && midgard_is_guid (MGD_OBJECT_GUID (object))) {
+	if (replicate == OBJECT_UPDATE_NONE 
+			&& midgard_is_guid (MGD_OBJECT_GUID (object)) 
+			&& MGD_OBJECT_IN_STORAGE (object)) {
 		midgard_set_error(mgd,
 				MGD_GENERIC_ERROR,
 				MGD_ERR_DUPLICATE,
@@ -1004,6 +1007,8 @@ gboolean _midgard_object_create (	MidgardObject *object,
 			/* do nothing */
 			break;
 	}
+
+	MGD_OBJECT_IN_STORAGE (object) = TRUE;
 
 	return TRUE;
 }
@@ -2633,7 +2638,6 @@ gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 	}
 
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purged, 0);
-
 	__dbus_send(object, "purge");
 
 	return TRUE;  
