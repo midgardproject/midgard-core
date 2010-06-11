@@ -513,6 +513,9 @@ guint _object_in_tree(MidgardObject *object)
  * <listitem><para>
  * object has already set guid property ( MGD_ERR_INVALID_PROPERTY_VALUE ) 
  * </para></listitem>
+ * <listitem><para>
+ * object is deleted or purged ( MGD_ERR_OBJECT_DELETED or MGD_ERR_OBJECT_PURGED ) 
+ * </para></listitem>
  * </itemizedlist>
  * 
  * Returns: %TRUE on success, %FALSE otherwise
@@ -522,6 +525,7 @@ gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid)
 	g_assert(self != NULL);
 	g_assert(guid != NULL);
 	
+	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_OK);
 	
 	if (MGD_OBJECT_GUID (self) != NULL) {
@@ -545,7 +549,12 @@ gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid)
 		return FALSE;
 	}
 
-	g_free ((gchar *)MGD_OBJECT_GUID (self));	
+	gint errcode = midgard_connection_get_error (mgd);
+	if (!dbobject && (errcode == MGD_ERR_OBJECT_DELETED || errcode == MGD_ERR_OBJECT_PURGED)) 
+	       return FALSE;	
+
+	if (MGD_OBJECT_GUID (self))
+	       g_free ((gchar *) MGD_OBJECT_GUID (self));
 	MGD_OBJECT_GUID (self) = g_strdup(guid);
 
 	return TRUE;
