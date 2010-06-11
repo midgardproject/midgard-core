@@ -85,7 +85,7 @@ struct _MgdSchemaTypeAttr {
 	GHashTable *user_values;	
 };
 
-#define MGD_TYPE_ATTR_METADATA_CLASS(__typeattr) __typeattr->metadata_class_name
+#define MGD_TYPE_ATTR_METADATA_CLASS(__typeattr) (__typeattr->metadata_class_name)
 
 /* MgdSchema storage utilities */
 MgdSchemaTypeAttr 	*midgard_schema_lookup_type		(MidgardSchema *schema, gchar *type);

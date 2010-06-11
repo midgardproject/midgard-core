@@ -100,7 +100,7 @@ guint midgard_quota_get_object_size(MidgardObject *object)
 	g_assert(object != NULL);
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 
-	if (!MGD_CNC_QUOTA (mgd))
+	if (!MGD_CNC_QUOTA (mgd) || !MGD_DBOBJECT_HAS_METADATA(object))
 		return 0;
 
 	const gchar *tablename = 
@@ -225,7 +225,7 @@ void midgard_quota_remove(MidgardObject *object, guint size){
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 
-	if (!MGD_CNC_QUOTA (mgd))
+	if (!MGD_CNC_QUOTA (mgd) || !MGD_DBOBJECT_HAS_METADATA (object))
 		return;
 
 	GString *query;
