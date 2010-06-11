@@ -641,13 +641,17 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 
 	MgdSchemaPropertyAttr *prop_attr = NULL;	
 	GValue value = {0, };
+	gboolean add_coma = FALSE;
 
 	for (i = 0; i < n_prop; i++) {
-	
+
 		/* Map property to storage field */
 		prop_attr = midgard_core_class_get_property_attr (klass, pspecs[i]->name);
-		if (!prop_attr || (prop_attr && !prop_attr->field))
+		if (!prop_attr || (prop_attr && !prop_attr->field)) {
+			if (i == 1)
+				add_coma = FALSE;
 			continue;
+		}
 
 		g_value_init (&value, pspecs[i]->value_type);
 		g_object_get_property (G_OBJECT (object), pspecs[i]->name, &value);
@@ -662,11 +666,13 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 			g_value_set_uint (&value, bv ? 1 : 0);
 		}*/
 
-		_add_value_type_update (sql, (const gchar *) prop_attr->field, &value, i > 0 ? TRUE : FALSE);
+		_add_value_type_update (sql, (const gchar *) prop_attr->field, &value, add_coma);
 		g_value_unset (&value);
+
+		add_coma = TRUE;
 	}
 
-	g_string_append_printf (sql, " WHERE %s.guid = '%s'", table, guid);  	
+	g_string_append_printf (sql, " WHERE %s.guid = '%s'", table, guid);  		
 
 	/* Create statement and set parameters */
 	GdaSqlParser *parser = (MGD_OBJECT_CNC (object))->priv->parser;
@@ -702,7 +708,7 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		prop_attr = midgard_core_class_get_property_attr (klass, pspecs[i]->name);
 		if (!prop_attr || (prop_attr && !prop_attr->field))
 			continue;
-
+	
 		const gchar *prop_field = prop_attr->field;
 
 		p = gda_set_get_holder (params, prop_field);
