@@ -64,7 +64,7 @@ __get_operator_type (const gchar *type)
 MidgardQueryConstraintGroup *
 midgard_query_constraint_group_new (void)
 {	
-	return midgard_query_constraint_group_new_valist ("AND", NULL);
+	return g_object_new (MIDGARD_TYPE_QUERY_CONSTRAINT_GROUP, "grouptype", "AND", NULL);
 }
 
 /**
