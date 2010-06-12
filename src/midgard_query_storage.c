@@ -143,7 +143,7 @@ __midgard_query_storage_set_property (GObject *object, guint property_id,
 			g_return_if_fail (MIDGARD_IS_DBOBJECT_CLASS (dbklass));
 			if (dbklass) {
 				self->priv->klass = dbklass;
-				self->priv->classname = g_value_get_string (value);
+				self->priv->classname = G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (dbklass));
 				self->priv->table = midgard_core_class_get_table (dbklass);
 			}
 			break;
