@@ -37,7 +37,7 @@ midgard_query_property_new (const gchar *property, MidgardQueryStorage *storage)
 	MidgardQueryProperty *self = g_object_new (MIDGARD_TYPE_QUERY_PROPERTY, "property", property, NULL);
 
 	if (storage != NULL)
-		self->priv->storage = storage;
+		self->priv->storage = g_object_ref (storage);
 
 	return self;
 }
@@ -84,6 +84,19 @@ enum {
 
 static GObjectClass *parent_class= NULL;
 
+static void
+_midgard_query_property_instance_init (GTypeInstance *instance, gpointer g_class)
+{
+	MidgardQueryProperty *self = (MidgardQueryProperty *)instance;
+
+	self->priv = g_new (MidgardQueryPropertyPrivate, 1);	
+	self->priv->storage = NULL;
+	self->priv->klass = NULL;
+	GValue value = {0, };
+	self->priv->value = value;
+	g_value_init (&self->priv->value, G_TYPE_STRING);
+}
+
 static GObject *
 _midgard_query_property_constructor (GType type,
 		guint n_construct_properties,
@@ -93,20 +106,19 @@ _midgard_query_property_constructor (GType type,
 		G_OBJECT_CLASS (parent_class)->constructor (type,
 				n_construct_properties, construct_properties);
 
-	MidgardQueryProperty *self = (MidgardQueryProperty *) object;
-	self->priv = g_new (MidgardQueryPropertyPrivate, 1);	
-	self->priv->storage = NULL;
-	self->priv->klass = NULL;
-	GValue value = {0, };
-	self->priv->value = value;
-	g_value_init (&self->priv->value, G_TYPE_STRING);
-
 	return G_OBJECT(object);
 }
 
 static void
 _midgard_query_property_dispose (GObject *object)
 {	
+	MidgardQueryProperty *self = (MidgardQueryProperty *) object;
+
+	if (self->priv->storage) {
+		g_object_unref (self->priv->storage);
+		self->priv->storage = NULL;
+	}
+
 	parent_class->dispose (object);
 }
 
@@ -159,7 +171,9 @@ __midgard_query_property_set_property (GObject *object, guint property_id,
 			break;
 
 		case MIDGARD_QUERY_PROPERTY_STORAGE:
-			self->priv->storage = g_value_get_object (value);
+			if (self->priv->storage)
+				g_object_unref (self->priv->storage);
+			self->priv->storage = g_value_dup_object (value);
 			break;
 
   		default:
@@ -227,7 +241,7 @@ midgard_query_property_get_type (void)
 			NULL,   /* class_data */
 			sizeof (MidgardQueryProperty),
 			0,      /* n_preallocs */
-			NULL    /* instance_init */
+			_midgard_query_property_instance_init    /* instance_init */
 		};
       
 		static const GInterfaceInfo property_info = {
