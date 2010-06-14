@@ -56,6 +56,7 @@ struct _MidgardDbus{
 GType midgard_dbus_get_type(void);
 
 MidgardDbus	*midgard_dbus_new		(MidgardConnection *mgd, const gchar *path, gboolean use_session);
+gboolean	midgard_dbus_is_enabled		(void);
 MidgardDbus	*midgard_dbus_create_dbus	(MidgardConnection *mgd, const gchar *path, gboolean use_session);
 void 		midgard_dbus_send		(MidgardConnection *mgd, const gchar *path, const gchar *message, gboolean use_session);
 const gchar 	*midgard_dbus_get_message	(MidgardDbus *self);

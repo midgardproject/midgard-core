@@ -141,6 +141,22 @@ notified_signal_handler (DBusGProxy *proxy, const char *msg, gpointer user_data)
 
 /* API */
 
+/**
+ * midgard_dbus_is_enabled:
+ *
+ * Returns: %TRUE if Midgard library is compiled with DBUS support, %FALSE otherwise
+ *
+ * Since: 10.05.1
+ */
+gboolean
+midgard_dbus_is_enabled (void)
+{
+#ifdef MGD_HAVE_DBUS
+	return TRUE;
+#endif
+	return FALSE;
+}
+
 static void __unref_object(gpointer data, GClosure *closure)
 {
 	if (data == NULL)
