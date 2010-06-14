@@ -127,8 +127,7 @@ midgard_query_constraint_group_new_valist (const gchar *type, MidgardQueryConstr
 	va_list args;
 	va_start (args, constraint);
 	while (cnstr != NULL) {
-		if (MIDGARD_IS_QUERY_CONSTRAINT_SIMPLE (cnstr))
-			self->priv->constraints = g_slist_append (self->priv->constraints, cnstr);
+		midgard_query_constraint_group_add_constraint (self, cnstr, NULL);
 		cnstr = va_arg (args, MidgardQueryConstraintSimple*);
 	}
 	va_end (args);
@@ -200,7 +199,7 @@ midgard_query_constraint_group_add_constraint (MidgardQueryConstraintGroup *self
 			retval = FALSE;
 			break;
 		}
-		self->priv->constraints = g_slist_append (self->priv->constraints, cnstr);
+		self->priv->constraints = g_slist_append (self->priv->constraints, g_object_ref (cnstr));
 		cnstr = va_arg (args, MidgardQueryConstraintSimple*);
 	}
 	va_end (args);
@@ -320,6 +319,15 @@ _midgard_query_constraint_group_constructor (GType type,
 static void
 _midgard_query_constraint_group_dispose (GObject *object)
 {
+	MidgardQueryConstraintGroup *self = MIDGARD_QUERY_CONSTRAINT_GROUP (object);
+	GSList *self_constraints = MIDGARD_QUERY_CONSTRAINT_GROUP (self)->priv->constraints;
+	GSList *l = NULL;
+	for (l = self_constraints; l != NULL; l = l->next) {
+		if (l->data) {
+			g_object_unref(l->data);
+			l->data = NULL;
+		}
+	}
 	parent_class->dispose (object);
 }
 

@@ -169,7 +169,24 @@ _midgard_query_executor_constructor (GType type,
 
 static void
 _midgard_query_executor_dispose (GObject *object)
-{	
+{
+	MidgardQueryExecutor *self = (MidgardQueryExecutor *) object;
+
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->mgd) {
+		g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->mgd);
+		MIDGARD_QUERY_EXECUTOR (self)->priv->mgd = NULL;
+	}
+	
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->storage) {
+		g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->storage);
+		MIDGARD_QUERY_EXECUTOR (self)->priv->storage = NULL;
+	}
+
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint) {
+		g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint);
+		MIDGARD_QUERY_EXECUTOR (self)->priv->constraint = NULL;
+	}
+
 	parent_class->dispose (object);
 }
 

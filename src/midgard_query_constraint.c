@@ -101,7 +101,7 @@ midgard_query_constraint_new (MidgardQueryProperty *property, const gchar *op,
 
 	/* Allow NULL storage */
 	if (storage)
-		self->priv->storage = storage;
+		self->priv->storage = g_object_ref (storage);
 	
 	return self;
 }
@@ -123,7 +123,7 @@ midgard_query_constraint_get_storage (MidgardQueryConstraint *self)
 /**
  * midgard_query_constraint_set_storage:
  * @self: #MidgardQueryConstraint instance
- * @storage: #MidgardQueryStorage to associate with @self constraint
+ * @storage: (allow-none): #MidgardQueryStorage to associate with @self constraint
  *
  * Returns: %TRUE on success, %FALSE otherwise
  * Since: 10.05
@@ -133,7 +133,16 @@ midgard_query_constraint_set_storage (MidgardQueryConstraint *self, MidgardQuery
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 
-	self->priv->storage = storage;
+	if (self->priv->storage)
+		g_object_unref (self->priv->storage);
+
+	if (!storage) {
+		self->priv->storage = NULL;
+		return TRUE;
+	}
+
+	g_return_val_if_fail (MIDGARD_IS_QUERY_STORAGE (storage), FALSE);
+	self->priv->storage = g_object_ref (storage);
 	return TRUE;
 }
 
@@ -164,8 +173,12 @@ gboolean
 midgard_query_constraint_set_property (MidgardQueryConstraint *self, MidgardQueryProperty *property)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (MIDGARD_IS_QUERY_PROPERTY (property), FALSE);
 
-	self->priv->property_value = property;
+	if (self->priv->property_value)
+		g_object_unref (self->priv->property_value);
+
+	self->priv->property_value = g_object_ref (property);
 	return TRUE;
 }
 
@@ -336,12 +349,23 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 }
 
 static void
-midgard_query_constraint_init (MidgardQueryConstraintSimpleIFace *iface)
+_midgard_query_constraint_iface_init (MidgardQueryConstraintSimpleIFace *iface)
 {
 	iface->list_constraints = _midgard_query_constraint_list_constraints;
 	iface->priv = g_new (MidgardQueryConstraintSimplePrivate, 1);
 	iface->priv->add_conditions_to_statement = _midgard_query_constraint_add_conditions_to_statement;
 	return;
+}
+
+static void
+_midgard_query_constraint_instance_init (GTypeInstance *instance, gpointer g_class)
+{
+	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (instance);
+	self->priv = g_new (MidgardQueryConstraintPrivate, 1);
+	self->priv->property_value = NULL;
+	self->priv->op = NULL;
+	self->priv->storage = NULL;
+	self->priv->holder = NULL;
 }
 
 static GObject *
@@ -354,13 +378,6 @@ _midgard_query_constraint_constructor (GType type,
 				n_construct_properties,
 				construct_properties);
 
-	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (object);
-	self->priv = g_new (MidgardQueryConstraintPrivate, 1);
-	self->priv->property_value = NULL;
-	self->priv->op = NULL;
-	self->priv->storage = NULL;
-	self->priv->holder = NULL;
-
 	return G_OBJECT(object);
 }
 
@@ -368,6 +385,22 @@ static void
 _midgard_query_constraint_dispose (GObject *object)
 {	
 	parent_class->dispose (object);
+
+	MidgardQueryConstraint *self = (MidgardQueryConstraint *) object;
+	if (self->priv->property_value) {
+		g_object_unref (self->priv->property_value);
+		self->priv->property_value = NULL;
+	}
+
+	if (self->priv->storage) {
+		g_object_unref (self->priv->storage);
+		self->priv->storage = NULL;
+	}
+
+	if (self->priv->holder) {
+		g_object_unref (self->priv->holder);
+		self->priv->holder = NULL;
+	}
 }
 
 static void
@@ -425,7 +458,7 @@ __midgard_query_constraint_set_property (GObject *object, guint property_id,
 	switch (property_id) {
 
 		case MIDGARD_QUERY_CONSTRAINT_PROPERTY:
-			self->priv->property_value = g_value_get_object (value);
+			midgard_query_constraint_set_property (self, g_value_get_object (value));
 			break;
 
 		case MIDGARD_QUERY_CONSTRAINT_OP:
@@ -438,11 +471,13 @@ __midgard_query_constraint_set_property (GObject *object, guint property_id,
 			break;
 
 		case MIDGARD_QUERY_CONSTRAINT_HOLDER:
-			self->priv->holder = g_value_get_object (value);
+			if (self->priv->holder)
+				g_object_unref (self->priv->holder);
+			self->priv->holder = g_value_dup_object (value);
 			break;
 
 		case MIDGARD_QUERY_CONSTRAINT_STORAGE:
-			self->priv->storage = g_value_get_object (value);
+			midgard_query_constraint_set_storage (self, g_value_get_object (value));
 			break;
 
   		default:
@@ -522,11 +557,11 @@ midgard_query_constraint_get_type (void)
 			NULL,   /* class_data */
 			sizeof (MidgardQueryConstraint),
 			0,      /* n_preallocs */
-			NULL    /* instance_init */
+			_midgard_query_constraint_instance_init    /* instance_init */
 		};
       
 		static const GInterfaceInfo property_info = {
-			(GInterfaceInitFunc) midgard_query_constraint_init,   
+			(GInterfaceInitFunc) _midgard_query_constraint_iface_init,   
 			NULL,	/* interface_finalize */
 			NULL	/* interface_data */
 		};
