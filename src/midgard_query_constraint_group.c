@@ -113,7 +113,6 @@ MidgardQueryConstraintGroup *
 midgard_query_constraint_group_new_valist (const gchar *type, MidgardQueryConstraintSimple *constraint, ...)
 {
 	g_return_val_if_fail (type != NULL, NULL);
-	g_return_val_if_fail (constraint != NULL, NULL);
 
 	GdaSqlOperatorType op_type = __get_operator_type (type);
 	if (op_type == -1)
