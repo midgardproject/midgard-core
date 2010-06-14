@@ -101,8 +101,8 @@ midgard_query_constraint_new (MidgardQueryProperty *property, const gchar *op,
 
 	/* Allow NULL storage */
 	if (storage)
-		self->priv->storage = g_object_ref (storage);
-	
+		midgard_query_constraint_set_storage (self, storage);
+
 	return self;
 }
 
@@ -191,6 +191,13 @@ midgard_query_constraint_set_property (MidgardQueryConstraint *self, MidgardQuer
 		g_object_unref (self->priv->property_value);
 
 	self->priv->property_value = g_object_ref (property);
+
+	/* set default storage */
+	if (!self->priv->storage) {
+		MidgardQueryProperty *_p = self->priv->property_value;
+		midgard_query_constraint_set_storage (self, _p->priv->storage);
+	}
+
 	return TRUE;
 }
 
