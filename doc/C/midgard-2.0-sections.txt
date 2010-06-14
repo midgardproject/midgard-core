@@ -541,6 +541,7 @@ MIDGARD_VIEW_GET_CLASS
 MidgardDbus
 MidgardDbusClass
 midgard_dbus_new
+midgard_dbus_is_enabled
 midgard_dbus_create_dbus
 midgard_dbus_send
 midgard_dbus_get_message
