@@ -98,9 +98,14 @@ struct _MidgardQueryConstraintSimplePrivate {
 			GdaSqlStatement *stm, GdaSqlExpr *where_expr_node);
 };
 
-#define MQE_SET_TABLE_ALIAS(executor, table) \
-	if (!table) \
-		table = g_strdup_printf ("t%d", ++executor->priv->tableid);
+#define MQE_SET_TABLE_ALIAS(__executor, __storage) \
+	if (__executor->priv->storage == __storage) {\
+		g_free (__storage->priv->table_alias) ;\
+		__storage->priv->table_alias = g_strdup_printf ("t%d", executor->priv->tableid); \
+	} else { \
+		if (!__storage->priv->table_alias) \
+			__storage->priv->table_alias = g_strdup_printf ("t%d", ++executor->priv->tableid); \
+	}
 
 MidgardDBJoin	*midgard_core_dbjoin_new	(void);
 void		midgard_core_dbjoin_free	(MidgardDBJoin *mdbj);

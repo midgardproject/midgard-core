@@ -300,10 +300,10 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 {	
 	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (constraint_simple);
 	//GdaConnection *cnc = executor->priv->mgd->priv->connection;
-	MidgardDBObjectClass *dbklass = NULL;
-       	if (self->priv->storage) {
+	MidgardDBObjectClass *dbklass = NULL;	
+       	if (self->priv->storage && (self->priv->storage != MIDGARD_QUERY_EXECUTOR (executor)->priv->storage)) {
 	       dbklass = self->priv->storage->priv->klass;
-	       MQE_SET_TABLE_ALIAS (executor, self->priv->storage->priv->table_alias);
+	       MQE_SET_TABLE_ALIAS (executor, self->priv->storage);
 	}
 	if (!dbklass)
 		dbklass = executor->priv->storage->priv->klass;

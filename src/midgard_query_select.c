@@ -273,7 +273,7 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self)
 		join->position = ++executor->priv->joinid;
 
 		/* Add right storage to targets */
-		MQE_SET_TABLE_ALIAS (executor, right_storage->priv->table_alias);
+		MQE_SET_TABLE_ALIAS (executor, right_storage);
 		gda_sql_select_from_take_new_join (from , join);
 		GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (from));
 		s_target->table_name = g_strdup (right_storage->priv->table);

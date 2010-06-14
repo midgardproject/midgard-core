@@ -2207,7 +2207,7 @@ __compute_reserved_property_constraint (Psh *holder, const gchar *token_1, const
 		const gchar *target_property = midgard_reflection_property_get_link_target (mrp, token_1);
 		holder->target_colname = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (holder->klass), target_property);
 		holder->target_table = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS (holder->klass));
-		holder->target_table_alias = g_strdup_printf ("t%d", ++holder->executor->priv->tableid);;
+		holder->target_table_alias = g_strdup_printf ("t%d", ++holder->executor->priv->tableid);
 		__add_join (holder);
 		holder->table = holder->target_table;
 		holder->table_alias = holder->target_table_alias;
@@ -2225,7 +2225,7 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 
 	/* Set table alias if it's not set */
 	if (storage)
-		MQE_SET_TABLE_ALIAS (executor, storage->priv->table_alias);
+		MQE_SET_TABLE_ALIAS (executor, storage);
 
 	gchar *table_field = NULL;
 	gchar *table_alias = executor->priv->table_alias;
