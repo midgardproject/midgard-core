@@ -372,17 +372,10 @@ __midgard_query_constraint_group_set_property (GObject *object, guint property_i
 {
 	MidgardQueryConstraintGroup *self = (MidgardQueryConstraintGroup *) (object);
 
-	GdaSqlOperatorType op_type;
-
 	switch (property_id) {
 
 		case PROPERTY_GROUPTYPE:
-			op_type = __get_operator_type (g_value_get_string (value));
-			if (op_type > -1) {
-				self->priv->op_type = op_type;
-				g_free (self->priv->type);
-				self->priv->type = g_ascii_strdown (g_value_get_string (value), -1);
-			}
+			midgard_query_constraint_group_set_group_type (self, g_value_get_string (value));
 			break;
 
   		default:
