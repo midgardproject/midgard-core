@@ -147,6 +147,51 @@ static void _midgard_connection_dispose(GObject *object)
 	}
 }
 
+/* Properties */
+enum {
+	PROPERTY_CONFIG = 1
+};
+
+static void
+_midgard_connection_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec) {
+
+	MidgardConnection *self = (MidgardConnection *) object;
+
+	switch (property_id) {
+
+		case PROPERTY_CONFIG:
+			/* Read only */
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object,property_id,pspec);
+			break;
+	}
+}
+
+static void
+_midgard_connection_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec) {
+
+	MidgardConnection *self = (MidgardConnection *) object;
+
+	switch (property_id) {
+
+		case PROPERTY_CONFIG:
+			if (!self->priv->config)
+				return;
+			MidgardConfig *config = midgard_config_copy (self->priv->config);
+			g_object_set (config, "dbuser", "", "dbpass", "", NULL);
+			g_value_set_object (value, config);
+			break;
+
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (object,property_id,pspec);
+			break;
+	}
+}
+
 static void _midgard_connection_class_init(
 		gpointer g_class, gpointer g_class_data)
 {
@@ -155,6 +200,21 @@ static void _midgard_connection_class_init(
 
 	gobject_class->finalize = _midgard_connection_finalize;
 	gobject_class->dispose = _midgard_connection_dispose;
+     	gobject_class->set_property = _midgard_connection_set_property;
+	gobject_class->get_property = _midgard_connection_get_property;
+
+	/* properties */
+	GParamSpec *pspec = g_param_spec_object ("config",
+			"Config associated with MidgardConnection",
+			"A deep copy of config with empty database username and password values.",
+			MIDGARD_TYPE_CONFIG,
+			G_PARAM_READABLE);
+	/**
+	 * MidgardConnection:config:
+	 * A deep copy of #MidgardConfig associated with #MidgardConnection.
+	 * Returned config property has empty database username and password values set. 
+	 */
+	g_object_class_install_property (gobject_class, PROPERTY_CONFIG, pspec);
 
 	/* signals */
 	/**
