@@ -70,6 +70,9 @@ midgard_connection_private_new (void)
 	cnc_private->enable_debug = FALSE;
 	cnc_private->enable_dbus = FALSE;
 
+	/* workspace */
+	cnc_private->has_workspace = TRUE;
+
 	return cnc_private;
 }
 

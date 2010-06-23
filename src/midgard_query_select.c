@@ -22,6 +22,7 @@
 #include "midgard_core_object_class.h"
 #include "midgard_query_holder.h"
 #include "midgard_dbobject.h"
+#include <sql-parser/gda-sql-parser.h>
 
 /**
  * midgard_query_select_new:
@@ -200,8 +201,28 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
 	GdaSqlStatement *sql_stm = executor->priv->stmt;
 	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;	
+	MidgardConnection *mgd = self->priv->mgd;
 	GdaSqlSelectOrder *order; 
+	GValue *value;
+	GdaSqlExpr *expr;
 	
+	/* Order by workspace id if we're in ws context */
+	if (MGD_CNC_HAS_WORKSPACE (mgd)) {
+		/* Fallback to executor table alias */
+		gchar *ws_field = g_strconcat (self->priv->table_alias, ".", MGD_WS_FIELD, NULL);
+		/* Create order */
+		order = gda_sql_select_order_new (GDA_SQL_ANY_PART (select));
+		order->asc = FALSE;
+		/* Create new value for expression */
+		value = g_new0 (GValue, 1);
+		g_value_init (value, G_TYPE_STRING);
+		g_value_take_string (value, ws_field);
+		expr = gda_sql_expr_new (GDA_SQL_ANY_PART (order));
+		expr->value = value;
+		order->expr = expr;
+		select->order_by = g_slist_append (select->order_by, order);
+	}
+
 	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->orders; l != NULL; l = l->next) {
 
 		qso *_so = (qso*) l->data;
@@ -218,12 +239,12 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 		gchar *table_field = midgard_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval));
 		g_value_unset (&rval);
 
-		GValue *value = g_new0 (GValue, 1);
+		value = g_new0 (GValue, 1);
 		g_value_init (value, G_TYPE_STRING);
 		g_value_take_string (value, table_field);
 
 		/* Set order's expression and add new one to statement orders list */
-		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (order));
+		expr = gda_sql_expr_new (GDA_SQL_ANY_PART (order));
 		expr->value = value;
 		order->expr = expr;
 		select->order_by = g_slist_append (select->order_by, order);
@@ -348,6 +369,18 @@ __add_second_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *t
 	return;
 }
 
+static void
+__add_workspace_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *top_operation, const gchar *table)
+{
+	GdaSqlExpr *dexpr = gda_sql_expr_new (GDA_SQL_ANY_PART (top_operation));
+	dexpr->value = gda_value_new (G_TYPE_STRING);
+	/* TODO WS: Replace with IN (ids) */ 
+	g_value_take_string (dexpr->value, g_strdup_printf ("%s.%s < %d", table, MGD_WS_FIELD, MGD_WS_DUMMY_ID));
+	top_operation->operands = g_slist_append (top_operation->operands, dexpr);
+
+	return;
+}
+
 gboolean 
 _midgard_query_select_execute (MidgardQueryExecutor *self)
 {
@@ -372,6 +405,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 
 	MidgardConnection *mgd = self->priv->mgd;
 	GdaConnection *cnc = mgd->priv->connection;
+	GdaSqlParser *parser = mgd->priv->parser;
 	GdaSqlStatement *sql_stm;
 	GdaSqlStatementSelect *sss;
 
@@ -424,6 +458,10 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 		__add_second_dummy_constraint (sss, operation); 
 	}
 
+	/* add workspace constraint */
+	if (MGD_CNC_HAS_WORKSPACE (mgd))
+		__add_workspace_constraint (sss, operation, s_target->as);
+
 	/* Add orders , ORDER BY t1.field... */
 	if (!__query_select_add_orders (self)) 
 		goto return_false;
@@ -466,6 +504,22 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	g_object_set (G_OBJECT (stmt), "structure", sql_stm, NULL);
 	gda_sql_statement_free (sql_stm);
 	sql_stm = NULL;
+
+	/* TODO WS: Generate query with GdaSql structures */
+	if (MGD_CNC_HAS_WORKSPACE (mgd)) {
+		gchar *old_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+		gchar *new_sql = g_strdup_printf ("SELECT * FROM \n (%s) \n AS midgard_workspace GROUP BY midgard_root_ws_id", old_sql);
+		g_free (old_sql);
+		g_object_unref (stmt);
+
+		stmt = gda_sql_parser_parse_string (parser, (const gchar *) new_sql, NULL, &error);
+		if (!stmt) {
+			g_warning ("Failed to build query: %s", error && error->message ? error->message : "Unknown reason");
+			if (error)
+				g_error_free (error);
+			goto return_false;
+		}
+	}
 
 	if (MGD_CNC_DEBUG (mgd)) {
 		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);

@@ -1242,13 +1242,53 @@ gboolean midgard_object_get_by_id(MidgardObject *object, guint id)
 	return FALSE;
 }
 
+static gboolean
+__add_workspace_columns (MidgardConnection *mgd, MidgardDBObjectClass *klass)
+{
+	/* Root workspace id */
+	const gchar *table = MGD_DBCLASS_TABLENAME (klass);
+	MidgardDBColumn *mdc = midgard_core_dbcolumn_new ();
+	mdc->table_name = table;
+	mdc->column_name = "midgard_root_ws_id";
+	mdc->index = TRUE;
+	mdc->dbtype = "int";
+	mdc->gtype = MGD_TYPE_INT;
+	mdc->unique = FALSE;
+	mdc->dvalue = "0";
+	
+	gboolean rv = midgard_core_query_add_column (mgd, mdc);
+	g_free (mdc);
+	if (!rv)
+		return FALSE;
+
+	/* Current workspace id */
+	mdc = midgard_core_dbcolumn_new ();
+	mdc->table_name = table;
+	mdc->column_name = "midgard_ws_id";
+	mdc->index = TRUE;
+	mdc->dbtype = "int";
+	mdc->gtype = MGD_TYPE_INT;
+	mdc->unique = FALSE;
+	mdc->dvalue = "0";
+	
+	rv = midgard_core_query_add_column (mgd, mdc);
+	g_free (mdc);
+	if (!rv)
+		return FALSE;
+
+	return TRUE;
+}
+
 static gboolean 
 _object_create_storage(MidgardConnection *mgd, MidgardDBObjectClass *klass)
 {
 	g_return_val_if_fail(mgd != NULL, FALSE);
 	g_return_val_if_fail(klass != NULL, FALSE);
 
-	return midgard_core_query_create_class_storage(mgd, klass);
+	if (!midgard_core_query_create_class_storage(mgd, klass))
+		return FALSE;
+
+	return __add_workspace_columns (mgd, klass);
 }
 
 static gboolean 
@@ -1257,7 +1297,10 @@ _object_update_storage(MidgardConnection *mgd, MidgardDBObjectClass *klass)
 	g_return_val_if_fail(mgd != NULL, FALSE);
 	g_return_val_if_fail(klass != NULL, FALSE);
 
-	return midgard_core_query_update_class_storage(mgd, klass);
+	if (!midgard_core_query_update_class_storage(mgd, klass))
+		return FALSE;
+
+	return __add_workspace_columns (mgd, klass);
 }
 
 static gboolean 
@@ -1284,6 +1327,45 @@ _object_delete_storage(MidgardConnection *mgd, MidgardDBObjectClass *klass)
 
 	g_warning("%s delete storage not implemented", G_OBJECT_CLASS_NAME(klass));
 	return FALSE;
+}
+
+static void
+__add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSelect *select, const gchar *table_name)
+{
+	GdaSqlSelectField *select_field;
+	GdaSqlExpr *expr;
+	GValue *val;
+	gchar *table_field;
+
+	/* Add workspace identifiers */
+
+	/* Root workspace ideintifier */
+	select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
+	select_field->as = g_strdup_printf (MGD_WS_ROOT_FIELD);
+	select->expr_list = g_slist_append (select->expr_list, select_field);
+	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
+	val = g_new0 (GValue, 1);
+	g_value_init (val, G_TYPE_STRING);
+	table_field = g_strconcat (table_name, ".", MGD_WS_ROOT_FIELD, NULL);
+	g_value_set_string (val, table_field);
+	g_free (table_field);
+	expr->value = val;
+	select_field->expr = expr;
+
+	/* Current workspace id */
+	select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
+	select_field->as = g_strdup_printf (MGD_WS_FIELD);
+	select->expr_list = g_slist_append (select->expr_list, select_field);
+	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
+	val = g_new0 (GValue, 1);
+	g_value_init (val, G_TYPE_STRING);
+	table_field = g_strconcat (table_name, ".", MGD_WS_FIELD, NULL);
+	g_value_set_string (val, table_field);
+	g_free (table_field);
+	expr->value = val;
+	select_field->expr = expr;
+
+	MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement (klass, select, table_name);
 }
 
 /* Initialize class. 
@@ -1329,7 +1411,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv->update_storage = _object_update_storage;
 		dbklass->dbpriv->storage_exists = _object_storage_exists;
 		dbklass->dbpriv->delete_storage = _object_delete_storage;
-		dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement;
+		dbklass->dbpriv->add_fields_to_select_statement = __add_fields_to_select_statement;
 		dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_property;
 		dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model;
 		dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_statement_insert;

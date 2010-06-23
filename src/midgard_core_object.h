@@ -28,6 +28,11 @@
 #include "midgard_timestamp.h"
 #include "midgard_connection.h"
 
+/* Workspaces */
+#define MGD_WS_ROOT_FIELD "midgard_root_ws_id"
+#define MGD_WS_FIELD "midgard_ws_id"
+#define MGD_WS_DUMMY_ID 7
+
 struct _MidgardDBObjectPrivate {
 
 	const gchar *guid;	
@@ -191,6 +196,11 @@ struct _MidgardConnectionPrivate {
 	gboolean enable_quota;
 	gboolean enable_debug;
 	gboolean enable_dbus;
+
+	/* workspace */
+	gboolean has_workspace;
+	gpointer workspace_tree;
+	gpointer workspace;
 };
 
 #define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL
@@ -198,6 +208,7 @@ struct _MidgardConnectionPrivate {
 #define MGD_CNC_REPLICATION(_cnc) _cnc->priv->enable_replication
 #define	MGD_CNC_DEBUG(_cnc) _cnc->priv->enable_debug
 #define MGD_CNC_DBUS(_cnc) _cnc->priv->enable_dbus
+#define MGD_CNC_HAS_WORKSPACE(_cnc) _cnc->priv->has_workspace
 
 struct _MidgardBlobPrivate {
 	MidgardObject *attachment;
