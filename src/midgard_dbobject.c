@@ -232,6 +232,8 @@ _midgard_dbobject_set_from_data_model (MidgardDBObject *self, GdaDataModel *mode
 			g_object_set_property (G_OBJECT (self), pname, pval);
 	}
 
+	g_free (pspecs);
+
 	/* Set metadata */
 	MidgardDBObject *dbobject = MIDGARD_DBOBJECT (self);
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (dbobject);
