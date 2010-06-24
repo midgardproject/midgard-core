@@ -185,25 +185,13 @@ _midgard_dbobject_set_property (MidgardDBObject *self, const gchar *name, GValue
 }
 
 void
-_midgard_dbobject_set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row)
+_midgard_dbobject_set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, gint start_field)
 {
 	g_return_if_fail (self != NULL);	
 	g_return_if_fail (model != NULL);
 	g_return_if_fail (row > -1);
 
 	GError *error = NULL;
-
-	/* First property is a guid */
-	const GValue *guid = gda_data_model_get_value_at (model, 0, row, &error);	
-	if (!guid) {
-		g_warning ("Failed to get guid value: %s", error && error->message ? error->message : "Unknown reason");
-		g_clear_error (&error);
-		return;
-	}
-	MGD_OBJECT_GUID (self) = g_value_dup_string (guid);
-
-	if (error)
-		g_clear_error (&error);
 
 	/* Set user defined properties */
 	guint n_props;
@@ -214,6 +202,12 @@ _midgard_dbobject_set_from_data_model (MidgardDBObject *self, GdaDataModel *mode
 
 	const GValue *pval;
 	for (i = 1; i < n_props; i++) {
+
+		if (!(pspecs[i]->flags & G_PARAM_WRITABLE)) {
+			g_print ("Ignoring read only property %s \n", pspecs[i]->name);
+			continue;
+		}
+
 		const gchar *pname = pspecs[i]->name;
 		gint col_idx = gda_data_model_get_column_index (model, pname);
 		if (col_idx == -1)
@@ -237,7 +231,7 @@ _midgard_dbobject_set_from_data_model (MidgardDBObject *self, GdaDataModel *mode
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (dbobject);
 	if (metadata)
 		MIDGARD_DBOBJECT_GET_CLASS (MIDGARD_DBOBJECT (metadata))->dbpriv->set_from_data_model (
-				MIDGARD_DBOBJECT (metadata), model, row);
+				MIDGARD_DBOBJECT (metadata), model, row, start_field);
 
 	return;
 }

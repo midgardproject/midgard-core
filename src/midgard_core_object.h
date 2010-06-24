@@ -54,7 +54,7 @@ struct _MidgardDBObjectPrivate {
 
 	GSList 			*(*set_from_sql)	(MidgardConnection *mgd, GType type, const gchar *sql);	
 	void 			(*__set_from_sql)	(MidgardDBObject *self, GdaDataModel *model, gint row);
-	void 			(*set_from_data_model)	(MidgardDBObject *self, GdaDataModel *model, gint row);
+	void 			(*set_from_data_model)	(MidgardDBObject *self, GdaDataModel *model, gint row, gint start_field);
 	void 			(*set_from_xml_node)	(MidgardDBObject *self, xmlNode *node);
 	MidgardConnection 	*(*get_connection) 	(MidgardDBObject *self);
 	gboolean		(*create_storage)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);

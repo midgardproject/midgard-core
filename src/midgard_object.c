@@ -1368,6 +1368,50 @@ __add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSe
 	MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement (klass, select, table_name);
 }
 
+static void
+__set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, gint start_field)
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (model != NULL);
+	g_return_if_fail (row > -1);
+
+	GError *error = NULL;
+	const GValue *value;
+
+	/* root ws id */
+	value = gda_data_model_get_value_at (model, start_field, row, &error);
+	if (!value) {
+		g_warning ("Failed to get ws_root_id: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	}
+	if (error) g_clear_error (&error);
+
+	/* ws id */
+	value = gda_data_model_get_value_at (model, ++start_field, row, &error);
+	if (!value) {
+		g_warning ("Failed to get ws_id: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	}
+	if (error) g_clear_error (&error);
+
+	/* guid */
+	value = gda_data_model_get_value_at (model, ++start_field, row, &error);
+	if (!value) {
+		g_warning ("Failed to get guid value: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	}
+	if (error) g_clear_error (&error);
+
+	g_free ((gchar *)MGD_OBJECT_GUID (self));
+	MGD_OBJECT_GUID (self) = g_value_dup_string (value);
+	
+	/* chain up */
+	MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model (self, model, row, start_field);
+}
+
 /* Initialize class. 
  * Properties setting follow data in class_data.
  */ 
@@ -1413,7 +1457,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv->delete_storage = _object_delete_storage;
 		dbklass->dbpriv->add_fields_to_select_statement = __add_fields_to_select_statement;
 		dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_property;
-		dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model;
+		dbklass->dbpriv->set_from_data_model = __set_from_data_model;
 		dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_statement_insert;
 	}	
 
