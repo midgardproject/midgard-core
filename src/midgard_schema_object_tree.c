@@ -477,14 +477,14 @@ midgard_schema_object_tree_get_parent_object (MidgardObject *object)
         return pobj;
 }
 
-/**
+/*
  * midgard_schema_object_tree_list_objects:
- * @object: #MidgardObject instance
- * @n_objects: pointer to store number of returned objects
+ * @object: (in): #MidgardObject instance
+ * @n_objects: (out): pointer to store number of returned objects
  *
  * List tree children objects, of given @object type.
  *
- * Returns: (transfer full): newly allocated array of #MidgardObject objects
+ * Returns: (element-type MidgardObject) (array length=1): newly allocated array of #MidgardObject objects
  * Since: 10.05
  */ 
 MidgardObject**

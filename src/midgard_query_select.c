@@ -634,10 +634,10 @@ midgard_query_select_include_deleted (MidgardQuerySelect *self, gboolean toggle)
 }
 
 
-/**
+/*
  * midgard_query_select_list_objects:
- * @self: #MidgardQuerySelect instance
- * @n_objects: pointer to store number of returned objects
+ * @self: (in): #MidgardQuerySelect instance
+ * @n_objects: (out): pointer to store number of returned objects
  *
  * List all objects for which data has been returned during execution.
  *
