@@ -159,12 +159,13 @@ MidgardKeyConfigFile* midgard_key_config_file_construct (GType object_type, Midg
 	}
 	if (!g_path_is_absolute (self->priv->file_path)) {
 		_inner_error_ = g_error_new (KEY_CONFIG_CONTEXT_ERROR, KEY_CONFIG_CONTEXT_ERROR_PATH_IS_NOT_ABSOLUTE, "Absolute paths are not accepted while %s is passed.", self->priv->file_path);
-		if (_inner_error_ != NULL) {
+		{
 			if (_inner_error_->domain == KEY_CONFIG_CONTEXT_ERROR) {
 				g_propagate_error (error, _inner_error_);
+				g_object_unref (self);
 				return NULL;
 			} else {
-				g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+				g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 				g_clear_error (&_inner_error_);
 				return NULL;
 			}
@@ -176,12 +177,11 @@ MidgardKeyConfigFile* midgard_key_config_file_construct (GType object_type, Midg
 		{
 			g_key_file_load_from_file (self->priv->key_file, self->priv->file_path, G_KEY_FILE_KEEP_TRANSLATIONS, &_inner_error_);
 			if (_inner_error_ != NULL) {
-				goto __catch2_g_error;
-				goto __finally2;
+				goto __catch0_g_error;
 			}
 		}
-		goto __finally2;
-		__catch2_g_error:
+		goto __finally0;
+		__catch0_g_error:
 		{
 			GError * e;
 			e = _inner_error_;
@@ -191,13 +191,14 @@ MidgardKeyConfigFile* midgard_key_config_file_construct (GType object_type, Midg
 				_g_error_free0 (e);
 			}
 		}
-		__finally2:
+		__finally0:
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == KEY_CONFIG_CONTEXT_ERROR) {
 				g_propagate_error (error, _inner_error_);
+				g_object_unref (self);
 				return NULL;
 			} else {
-				g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+				g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 				g_clear_error (&_inner_error_);
 				return NULL;
 			}
@@ -224,7 +225,7 @@ static void midgard_key_config_file_real_set_value (MidgardKeyConfig* base, cons
 
 static char* midgard_key_config_file_real_get_value (MidgardKeyConfig* base, const char* group, const char* key) {
 	MidgardKeyConfigFile * self;
-	char* result;
+	char* result = NULL;
 	GError * _inner_error_;
 	self = (MidgardKeyConfigFile*) base;
 	g_return_val_if_fail (group != NULL, NULL);
@@ -235,25 +236,29 @@ static char* midgard_key_config_file_real_get_value (MidgardKeyConfig* base, con
 		_tmp0_ = g_key_file_has_key (self->priv->key_file, group, key, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == G_KEY_FILE_ERROR) {
-				goto __catch3_g_key_file_error;
+				goto __catch1_g_key_file_error;
 			}
-			goto __finally3;
+			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
+			g_clear_error (&_inner_error_);
+			return NULL;
 		}
 		if (_tmp0_) {
 			char* _tmp1_;
 			_tmp1_ = g_key_file_get_string (self->priv->key_file, group, key, &_inner_error_);
 			if (_inner_error_ != NULL) {
 				if (_inner_error_->domain == G_KEY_FILE_ERROR) {
-					goto __catch3_g_key_file_error;
+					goto __catch1_g_key_file_error;
 				}
-				goto __finally3;
+				g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
+				g_clear_error (&_inner_error_);
+				return NULL;
 			}
 			result = _tmp1_;
 			return result;
 		}
 	}
-	goto __finally3;
-	__catch3_g_key_file_error:
+	goto __finally1;
+	__catch1_g_key_file_error:
 	{
 		GError * e;
 		e = _inner_error_;
@@ -264,9 +269,9 @@ static char* midgard_key_config_file_real_get_value (MidgardKeyConfig* base, con
 			return result;
 		}
 	}
-	__finally3:
+	__finally1:
 	if (_inner_error_ != NULL) {
-		g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
 		return NULL;
 	}
@@ -286,24 +291,24 @@ static void midgard_key_config_file_real_set_comment (MidgardKeyConfig* base, co
 	{
 		g_key_file_set_comment (self->priv->key_file, group, key, comment, &_inner_error_);
 		if (_inner_error_ != NULL) {
-			goto __catch4_g_error;
-			goto __finally4;
+			goto __catch2_g_error;
 		}
 	}
-	goto __finally4;
-	__catch4_g_error:
+	goto __finally2;
+	__catch2_g_error:
 	{
 		GError * e;
 		e = _inner_error_;
 		_inner_error_ = NULL;
 		{
-			g_warning ("midgard_key_config_file.vala:74: Failed to set comment string for key %s, group %s. Error is %s", key, group, e->message);
+			g_warning ("midgard_key_config_file.vala:74: Failed to set comment string for key " \
+"%s, group %s. Error is %s", key, group, e->message);
 			_g_error_free0 (e);
 		}
 	}
-	__finally4:
+	__finally2:
 	if (_inner_error_ != NULL) {
-		g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
 		return;
 	}
@@ -312,7 +317,7 @@ static void midgard_key_config_file_real_set_comment (MidgardKeyConfig* base, co
 
 static char* midgard_key_config_file_real_get_comment (MidgardKeyConfig* base, const char* group, const char* key) {
 	MidgardKeyConfigFile * self;
-	char* result;
+	char* result = NULL;
 	GError * _inner_error_;
 	self = (MidgardKeyConfigFile*) base;
 	g_return_val_if_fail (group != NULL, NULL);
@@ -322,16 +327,14 @@ static char* midgard_key_config_file_real_get_comment (MidgardKeyConfig* base, c
 		char* _tmp0_;
 		_tmp0_ = g_key_file_get_comment (self->priv->key_file, group, key, &_inner_error_);
 		if (_inner_error_ != NULL) {
-			goto __catch5_g_error;
-			goto __finally5;
+			goto __catch3_g_error;
 		}
 		result = _tmp0_;
 		return result;
 	}
-	goto __finally5;
-	__catch5_g_error:
+	goto __finally3;
+	__catch3_g_error:
 	{
-		/*Error object is not used within catch statement, clear it*/
 		g_clear_error (&_inner_error_);
 		_inner_error_ = NULL;
 		{
@@ -339,9 +342,9 @@ static char* midgard_key_config_file_real_get_comment (MidgardKeyConfig* base, c
 			return result;
 		}
 	}
-	__finally5:
-	if (_inner_error_ != NULL) {
-		g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+	__finally3:
+	{
+		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
 		return NULL;
 	}
@@ -350,7 +353,7 @@ static char* midgard_key_config_file_real_get_comment (MidgardKeyConfig* base, c
 
 static char** midgard_key_config_file_real_list_groups (MidgardKeyConfig* base, int* result_length1) {
 	MidgardKeyConfigFile * self;
-	char** result;
+	char** result = NULL;
 	gsize _tmp0_;
 	char** _tmp1_;
 	self = (MidgardKeyConfigFile*) base;
@@ -361,7 +364,7 @@ static char** midgard_key_config_file_real_list_groups (MidgardKeyConfig* base, 
 
 static gboolean midgard_key_config_file_real_group_exists (MidgardKeyConfig* base, const char* name) {
 	MidgardKeyConfigFile * self;
-	gboolean result;
+	gboolean result = FALSE;
 	self = (MidgardKeyConfigFile*) base;
 	g_return_val_if_fail (name != NULL, FALSE);
 	result = g_key_file_has_group (self->priv->key_file, name);
@@ -371,7 +374,7 @@ static gboolean midgard_key_config_file_real_group_exists (MidgardKeyConfig* bas
 
 static gboolean midgard_key_config_file_real_delete_group (MidgardKeyConfig* base, const char* name) {
 	MidgardKeyConfigFile * self;
-	gboolean result;
+	gboolean result = FALSE;
 	GError * _inner_error_;
 	self = (MidgardKeyConfigFile*) base;
 	g_return_val_if_fail (name != NULL, FALSE);
@@ -379,26 +382,26 @@ static gboolean midgard_key_config_file_real_delete_group (MidgardKeyConfig* bas
 	{
 		g_key_file_remove_group (self->priv->key_file, name, &_inner_error_);
 		if (_inner_error_ != NULL) {
-			goto __catch6_g_error;
-			goto __finally6;
+			goto __catch4_g_error;
 		}
 		result = TRUE;
 		return result;
 	}
-	goto __finally6;
-	__catch6_g_error:
+	goto __finally4;
+	__catch4_g_error:
 	{
 		GError * e;
 		e = _inner_error_;
 		_inner_error_ = NULL;
 		{
-			g_warning ("midgard_key_config_file.vala:99: Failed to delete group %s. Error is %s", name, e->message);
+			g_warning ("midgard_key_config_file.vala:99: Failed to delete group %s. Error is %" \
+"s", name, e->message);
 			_g_error_free0 (e);
 		}
 	}
-	__finally6:
+	__finally4:
 	if (_inner_error_ != NULL) {
-		g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
 		return FALSE;
 	}
@@ -409,7 +412,7 @@ static gboolean midgard_key_config_file_real_delete_group (MidgardKeyConfig* bas
 
 static gboolean midgard_key_config_file_real_store (MidgardKeyConfig* base) {
 	MidgardKeyConfigFile * self;
-	gboolean result;
+	gboolean result = FALSE;
 	GError * _inner_error_;
 	self = (MidgardKeyConfigFile*) base;
 	_inner_error_ = NULL;
@@ -433,16 +436,14 @@ static gboolean midgard_key_config_file_real_store (MidgardKeyConfig* base) {
 		gboolean _tmp2_;
 		_tmp2_ = (_tmp1_ = g_file_set_contents (self->priv->file_path, _tmp0_ = g_key_file_to_data (self->priv->key_file, NULL, NULL), -1, &_inner_error_), _g_free0 (_tmp0_), _tmp1_);
 		if (_inner_error_ != NULL) {
-			goto __catch7_g_error;
-			goto __finally7;
+			goto __catch5_g_error;
 		}
 		result = _tmp2_;
 		return result;
 	}
-	goto __finally7;
-	__catch7_g_error:
+	goto __finally5;
+	__catch5_g_error:
 	{
-		/*Error object is not used within catch statement, clear it*/
 		g_clear_error (&_inner_error_);
 		_inner_error_ = NULL;
 		{
@@ -450,9 +451,9 @@ static gboolean midgard_key_config_file_real_store (MidgardKeyConfig* base) {
 			return result;
 		}
 	}
-	__finally7:
-	if (_inner_error_ != NULL) {
-		g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+	__finally5:
+	{
+		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
 		return FALSE;
 	}
@@ -469,7 +470,7 @@ static glong string_get_length (const char* self) {
 
 static gboolean midgard_key_config_file_real_load_from_data (MidgardKeyConfig* base, const char* data) {
 	MidgardKeyConfigFile * self;
-	gboolean result;
+	gboolean result = FALSE;
 	GError * _inner_error_;
 	self = (MidgardKeyConfigFile*) base;
 	g_return_val_if_fail (data != NULL, FALSE);
@@ -480,18 +481,16 @@ static gboolean midgard_key_config_file_real_load_from_data (MidgardKeyConfig* b
 	}
 	{
 		gboolean _tmp0_;
-		_tmp0_ = g_key_file_load_from_data (self->priv->key_file, data, (gulong) string_get_length (data), G_KEY_FILE_KEEP_TRANSLATIONS, &_inner_error_);
+		_tmp0_ = g_key_file_load_from_data (self->priv->key_file, data, (gsize) string_get_length (data), G_KEY_FILE_KEEP_TRANSLATIONS, &_inner_error_);
 		if (_inner_error_ != NULL) {
-			goto __catch8_g_error;
-			goto __finally8;
+			goto __catch6_g_error;
 		}
 		result = _tmp0_;
 		return result;
 	}
-	goto __finally8;
-	__catch8_g_error:
+	goto __finally6;
+	__catch6_g_error:
 	{
-		/*Error object is not used within catch statement, clear it*/
 		g_clear_error (&_inner_error_);
 		_inner_error_ = NULL;
 		{
@@ -499,9 +498,9 @@ static gboolean midgard_key_config_file_real_load_from_data (MidgardKeyConfig* b
 			return result;
 		}
 	}
-	__finally8:
-	if (_inner_error_ != NULL) {
-		g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+	__finally6:
+	{
+		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
 		return FALSE;
 	}
@@ -510,7 +509,7 @@ static gboolean midgard_key_config_file_real_load_from_data (MidgardKeyConfig* b
 
 static char* midgard_key_config_file_real_to_data (MidgardKeyConfig* base) {
 	MidgardKeyConfigFile * self;
-	char* result;
+	char* result = NULL;
 	self = (MidgardKeyConfigFile*) base;
 	if (!self->priv->file_exists) {
 		result = NULL;

@@ -90,7 +90,7 @@ MidgardKeyConfigContext* midgard_key_config_context_construct (GType object_type
 
 
 static char** midgard_key_config_context_real_list_key_config (MidgardKeyConfigContext* self, int* result_length1) {
-	char** result;
+	char** result = NULL;
 	gpointer _tmp0_;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = (_tmp0_ = NULL, *result_length1 = 0, _tmp0_);

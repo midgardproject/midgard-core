@@ -27,7 +27,7 @@ namespace Midgard {
 	public abstract class KeyConfigContext : Object {
 
 		[Description(nick = "Context path", blurb = "Information about context path.")]
-		protected string? context_path { get; private set; default = null; }
+		public string? context_path { get; private set; default = null; }
 	
 		public KeyConfigContext (string? context_path) {
 		
