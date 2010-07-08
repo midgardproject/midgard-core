@@ -117,6 +117,9 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 	if(model)
 		g_object_unref(model);
 
+	/* workspace table */
+	midgard_storage_create (mgd, "MidgardWorkspace");
+
 	return TRUE;
 }
 
@@ -163,6 +166,10 @@ midgard_storage_create (MidgardConnection *mgd, const gchar *name)
 	g_return_val_if_fail (name != NULL, FALSE);
 
 	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (name));
+	if (!klass) {
+		g_warning ("Class %s is not registered as GObject derived one", name);
+		return FALSE;
+	}
 	g_return_val_if_fail(MIDGARD_IS_DBOBJECT_CLASS (klass), FALSE);
 
 	if (klass->dbpriv->create_storage == NULL)

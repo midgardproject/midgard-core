@@ -72,6 +72,7 @@ midgard_connection_private_new (void)
 
 	/* workspace */
 	cnc_private->has_workspace = TRUE;
+	cnc_private->workspace_model = NULL;
 
 	return cnc_private;
 }
@@ -109,9 +110,15 @@ static void _midgard_connection_finalize(GObject *object)
 	g_timer_destroy(self->priv->timer);
 
 	if (!self->priv->inherited) {
+		/* Free config */
 		if (self->priv->config && G_IS_OBJECT (self->priv->config)) {
 			g_object_unref(self->priv->config);
 			self->priv->config = NULL;
+		}
+		/* Free workspace model */
+		if (self->priv->workspace_model && G_IS_OBJECT (self->priv->workspace_model)) {
+			g_object_unref (self->priv->workspace_model);
+			self->priv->workspace_model = NULL;
 		}
 	}
 
@@ -564,6 +571,9 @@ gboolean __midgard_connection_open(
 
 	/* Loads available authentication types */
 	midgard_core_connection_initialize_auth_types(mgd);
+
+	/* Loads all available workspaces */
+	midgard_core_workspace_list_all (mgd);
 
 	g_signal_emit (mgd, MIDGARD_CONNECTION_GET_CLASS (mgd)->signal_id_connected, 0);
 
@@ -1211,6 +1221,8 @@ MidgardConnection *midgard_connection_copy(MidgardConnection *self)
 	/* Disconnect original connection from error callback.
 	 * Copy will be used for this. Do not duplicate callbacks invokation */
 	midgard_core_connection_disconnect_error_callback(self);
+
+#warning implement workspace_model copy 
 
 	return new_mgd;
 }
