@@ -48,7 +48,9 @@ struct _MidgardWorkspace{
 
 /* Workspace error */
 typedef enum {
-	WORKSPACE_ERROR_NAME_EXISTS
+	WORKSPACE_ERROR_NAME_EXISTS,
+	WORKSPACE_ERROR_INVALID_PATH,
+	WORKSPACE_ERROR_OBJECT_NOT_EXISTS
 } MidgardWorkspaceError;
 
 #define MIDGARD_WORKSPACE_ERROR midgard_workspace_error_quark ()
@@ -56,6 +58,7 @@ typedef enum {
 GType midgard_workspace_get_type(void);
 
 MidgardWorkspace	*midgard_workspace_new			(MidgardConnection *mgd, MidgardWorkspace *parent_workspace);
+MidgardWorkspace	*midgard_workspace_get_by_path		(MidgardConnection *mgd, const gchar *path, GError **error);
 gboolean		midgard_workspace_create 		(MidgardWorkspace *self, GError **error);
 gboolean		midgard_workspace_update		(MidgardWorkspace *self, GError **error);
 gchar			*midgard_workspace_get_path 		(MidgardWorkspace *self);

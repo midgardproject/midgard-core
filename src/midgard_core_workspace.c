@@ -47,7 +47,7 @@ midgard_core_workspace_list_all (MidgardConnection *mgd)
 	mgd->priv->workspace_model = model;
 }
 
-static gint
+gint
 midgard_core_workspace_get_col_id_by_name (MidgardConnection *mgd, const gchar *name, gint col_idx, gint up_id_check)
 {
 	g_return_val_if_fail (mgd != NULL, -1);
@@ -82,7 +82,7 @@ midgard_core_workspace_get_col_id_by_name (MidgardConnection *mgd, const gchar *
 		if (g_str_equal (name, g_value_get_string (nval))) {
 			const GValue *colval = gda_data_model_get_value_at (model, col_idx, row, NULL);
 			if (G_VALUE_HOLDS_UINT (colval))
-				return g_value_get_uint (colval);
+				return (gint) g_value_get_uint (colval);
 			return g_value_get_int (colval);
 		}
 	}
@@ -175,10 +175,14 @@ midgard_core_workspace_get_parent_names (MidgardConnection *mgd, guint up)
 		value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_NAME, up);
 		if (value) {
 			name = g_value_get_string (value);
-			list = g_slist_prepend (list, name);
+			list = g_slist_prepend (list, (gpointer) name);
 			const GValue *up_value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_UP, up);
 			if (up_value) {
-				guint up_id = g_value_get_uint (up_value);
+				guint up_id = 0;
+				if (G_VALUE_HOLDS_UINT (up_value))
+					up_id = g_value_get_uint (up_value);
+				else 
+					up_id = g_value_get_int (up_value);
 				up = up_id;
 			}
 

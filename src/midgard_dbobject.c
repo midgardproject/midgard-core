@@ -362,6 +362,31 @@ midgard_core_dbobject_class_list_properties (MidgardDBObjectClass *klass, guint 
 	return type_attr->params;
 }
 
+void 
+midgard_core_dbobject_class_set_full_select (MidgardDBObjectClass *dbklass)
+{
+	g_return_if_fail (dbklass != NULL);
+
+	MgdSchemaTypeAttr *type_attr = MIDGARD_DBOBJECT_CLASS (dbklass)->dbpriv->storage_data;
+
+	type_attr->params = midgard_core_dbobject_class_list_properties (MIDGARD_DBOBJECT_CLASS (dbklass), &type_attr->num_properties);
+	guint i;
+	const gchar *field_name;
+	GString *sql_full = g_string_new ("");
+	
+	for (i = 0; i < type_attr->num_properties; i++) {
+		field_name = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (dbklass), type_attr->params[i]->name);
+		if (i > 0)
+			g_string_append (sql_full, ", ");
+		g_string_append_printf (sql_full, "%s AS %s", field_name, type_attr->params[i]->name);
+	}
+
+	type_attr->sql_select_full = g_strdup (sql_full->str);
+	g_string_free (sql_full, TRUE);
+
+	return;
+}
+
 /* GOBJECT ROUTINES */
 
 enum {
@@ -514,7 +539,7 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->dbpriv->set_property = _midgard_dbobject_set_property;
 	klass->dbpriv->set_from_data_model = _midgard_dbobject_set_from_data_model;
 	klass->dbpriv->statement_insert = NULL;
-	klass->dbpriv->set_statement_insert = __initialize_statement_insert;	
+	klass->dbpriv->set_statement_insert = __initialize_statement_insert;
 
 	/* Properties */
 	GParamSpec *pspec = g_param_spec_object ("connection",

@@ -21,6 +21,15 @@
 #include "midgard_core_object.h"
 #include "midgard_core_query.h"
 #include "guid.h"
+#include "midgard_query_constraint_simple.h"
+#include "midgard_query_holder.h"
+#include "midgard_query_value.h"
+#include "midgard_query_property.h"
+#include "midgard_query_executor.h"
+#include "midgard_query_select.h"
+#include "midgard_query_storage.h"
+#include "midgard_query_constraint.h"
+#include "midgard_query_constraint_group.h"
 
 GQuark 
 midgard_workspace_error_quark (void)
@@ -51,6 +60,106 @@ midgard_workspace_new (MidgardConnection *mgd, MidgardWorkspace *parent_workspac
 		self = g_object_new (MIDGARD_TYPE_WORKSPACE, "connection", mgd, "parent_workspace", parent_workspace, NULL);
 
 	return self;
+}
+
+/**
+ * midgard_workspace_get_by_path:
+ * @mgd: #MidgardConnection instance
+ * @path: a path #MidgardWorkspace object should be found at (e.g. /Organization/Users/John)
+ * @error: a pointer to store returned error
+ * 
+ * Cases to return %NULL:
+ * <itemizedlist>
+ * <listitem><para>
+ * Given path is invalid ( WORKSPACE_ERROR_INVALID_PATH )
+ * </para></listitem>
+ * <listitem><para>
+ * Workspace at given path doesn't exist ( WORKSPACE_ERROR_OBJECT_NOT_EXISTS )
+ * </para></listitem>
+ * </itemizedlist>
+ *
+ * Returns: new #MidgardWorkspace instance if found, %NULL otherwise
+ * Since: 10.11
+ */
+MidgardWorkspace *
+midgard_workspace_get_by_path (MidgardConnection *mgd, const gchar *path, GError **error)
+{
+	g_return_val_if_fail (mgd != NULL, NULL);
+	g_return_val_if_fail (path != NULL, NULL);
+	g_return_val_if_fail (*path != '\0', NULL);
+	g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+	GError *err = NULL;
+	gchar **tokens = g_strsplit (path, "/", 0);
+	guint i = 0;
+	/* If path begins with slash, first element is an empty string. Ignore it. */
+	if (*tokens[0] == '\0')
+		i++;
+	gint j = i;
+	gboolean valid_path = TRUE;
+	/* Validate path */
+	while (tokens[i] != NULL) {
+		if (tokens[i] == '\0') 
+			valid_path = FALSE;
+		i++;
+	}
+
+	if (!valid_path) {
+		err = g_error_new (MIDGARD_WORKSPACE_ERROR, WORKSPACE_ERROR_INVALID_PATH, "An empty element found in given path");
+		g_propagate_error (error, err);
+		g_strfreev (tokens);
+		return NULL;
+	}
+
+	/* Check every possible workspace name */
+	gint id = 0;
+	guint up = 0;
+	const gchar *name = NULL;
+	while (tokens[j] != NULL) {
+		name = tokens[j];	
+		id = midgard_core_workspace_get_col_id_by_name (mgd, name, MGD_WORKSPACE_FIELD_IDX_ID, up);
+		if (id == -1)
+			break;
+		up = id;
+		j++;
+	}
+
+	if (id == -1) {
+		err = g_error_new (MIDGARD_WORKSPACE_ERROR, WORKSPACE_ERROR_OBJECT_NOT_EXISTS, "Workspace error doesn't exists at given path");
+		g_propagate_error (error, err);
+		g_strfreev (tokens);
+		return NULL;
+	}
+
+	MidgardQueryStorage *mqs = midgard_query_storage_new ("MidgardWorkspace");
+	/* Create value and constraint for id property */
+	GValue idval = {0, };
+	g_value_init (&idval, G_TYPE_UINT);
+	g_value_set_uint (&idval, id);
+	MidgardQueryValue *mqv_id = midgard_query_value_create_with_value (&idval);
+	MidgardQueryProperty *mqp_id = midgard_query_property_new ("id", NULL);
+	MidgardQueryConstraint *mqc_id = midgard_query_constraint_new (mqp_id, "=", MIDGARD_QUERY_HOLDER (mqv_id), NULL);
+	
+	/* Create executor */
+	MidgardQuerySelect *mqselect = midgard_query_select_new (mgd, mqs);
+	midgard_query_executor_set_constraint (MIDGARD_QUERY_EXECUTOR (mqselect), MIDGARD_QUERY_CONSTRAINT_SIMPLE (mqc_id));
+	midgard_query_executor_execute (MIDGARD_QUERY_EXECUTOR (mqselect));
+
+	guint n_objects;
+	MidgardDBObject **objects = midgard_query_select_list_objects (mqselect, &n_objects);
+
+	MidgardWorkspace *workspace = MIDGARD_WORKSPACE (objects[0]);
+
+	g_strfreev (tokens);
+	g_object_unref (mqs);
+	g_value_unset (&idval);
+	g_object_unref (mqv_id);
+	g_object_unref (mqp_id);
+	g_object_unref (mqc_id);
+	g_object_unref (mqselect);
+	g_free (objects);
+
+	return workspace;
 }
 
 /**
@@ -96,7 +205,17 @@ midgard_workspace_create (MidgardWorkspace *self, GError **error)
 	MIDGARD_DBOBJECT(self)->dbpriv->guid = (const gchar *) midgard_guid_new (mgd);
 	if (midgard_core_query_create_dbobject_record (MIDGARD_DBOBJECT (self))) {
 		/* TODO ?, emit created signal */
+		/* Refresh available workspaces model */
 		midgard_core_workspace_list_all (mgd);
+
+		/* Get id of newly created object */
+		gint id = midgard_core_workspace_get_col_id_by_name (mgd, self->priv->name, MGD_WORKSPACE_FIELD_IDX_ID, self->priv->up_id);
+		if (id < 1) {
+			g_warning ("Newly created workspace id is not unique (%d)", id);
+			/* TODO, set error and delete workspace from database */
+			return FALSE;
+		}
+		self->priv->id = id;
 		return TRUE;
 	}
 
@@ -105,6 +224,7 @@ midgard_workspace_create (MidgardWorkspace *self, GError **error)
 	MGD_OBJECT_GUID (self) = NULL;
 
 	self->priv->up_id = 0;
+	self->priv->id = 0;
 
 	/* FIXME, Set internal error */
 	return FALSE;
@@ -257,7 +377,7 @@ __midgard_workspace_get_property (GObject *object, guint property_id, GValue *va
 			break;
 
 		case PROPERTY_PATH:
-			g_value_set_string (value, midgard_workspace_get_path (self));
+			g_value_take_string (value, midgard_workspace_get_path (self));
 			break;
 
 		case PROPERTY_NAME:
@@ -361,7 +481,7 @@ static void __midgard_workspace_class_init(
 			"Local storage id which identifies up workspace",
 			"",
 			0, G_MAXUINT32, 0, G_PARAM_READABLE);
-	g_object_class_install_property (gobject_class,	PROPERTY_ID, pspec);
+	g_object_class_install_property (gobject_class,	PROPERTY_UP, pspec);
 	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_UINT;
 	prop_attr->field = g_strdup(property_name);
@@ -406,9 +526,13 @@ static void __midgard_workspace_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_exists = _workspace_storage_exists;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->delete_storage = _workspace_storage_delete;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_statement_insert;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->add_fields_to_select_statement;	
 
 	/* Initialize persistent statement */
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_insert (MIDGARD_DBOBJECT_CLASS (klass));
+
+	/* Set sql for select queries */
+	midgard_core_dbobject_class_set_full_select (MIDGARD_DBOBJECT_CLASS (klass));
 }
 
 GType 

@@ -50,7 +50,7 @@ struct _MidgardDBObjectPrivate {
 
 	/* GdaSql virtual helpers */
 	void			(*add_fields_to_select_statement)	(MidgardDBObjectClass *klass, 
-			GdaSqlStatementSelect *select, const gchar *table_name);
+			GdaSqlStatementSelect *select, const gchar *table_name);	
 
 	GSList 			*(*set_from_sql)	(MidgardConnection *mgd, GType type, const gchar *sql);	
 	void 			(*__set_from_sql)	(MidgardDBObject *self, GdaDataModel *model, gint row);
@@ -231,7 +231,8 @@ typedef enum {
 
 
 /* MidgardDBObject */
-GParamSpec **midgard_core_dbobject_class_list_properties (MidgardDBObjectClass *klass, guint *n_props); 
+GParamSpec 	**midgard_core_dbobject_class_list_properties	(MidgardDBObjectClass *klass, guint *n_props);
+void		midgard_core_dbobject_class_set_full_select	(MidgardDBObjectClass *klass);
 
 /* Object's xml */
 xmlDoc *midgard_core_object_create_xml_doc(void);

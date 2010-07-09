@@ -459,7 +459,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	}
 
 	/* add workspace constraint */
-	if (MGD_CNC_HAS_WORKSPACE (mgd))
+	if (MGD_CNC_HAS_WORKSPACE (mgd) && MIDGARD_IS_OBJECT_CLASS (klass))
 		__add_workspace_constraint (sss, operation, s_target->as);
 
 	/* Add orders , ORDER BY t1.field... */
@@ -506,7 +506,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	sql_stm = NULL;
 
 	/* TODO WS: Generate query with GdaSql structures */
-	if (MGD_CNC_HAS_WORKSPACE (mgd)) {
+	if (MGD_CNC_HAS_WORKSPACE (mgd) && MIDGARD_IS_OBJECT_CLASS (klass)) {
 		gchar *old_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 		gchar *new_sql = g_strdup_printf ("SELECT * FROM \n (%s) \n AS midgard_workspace GROUP BY midgard_root_ws_id", old_sql);
 		g_free (old_sql);
