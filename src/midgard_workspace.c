@@ -142,6 +142,7 @@ midgard_workspace_get_by_path (MidgardConnection *mgd, const gchar *path, GError
 	
 	/* Create executor */
 	MidgardQuerySelect *mqselect = midgard_query_select_new (mgd, mqs);
+	midgard_query_select_toggle_read_only (mqselect, FALSE);
 	midgard_query_executor_set_constraint (MIDGARD_QUERY_EXECUTOR (mqselect), MIDGARD_QUERY_CONSTRAINT_SIMPLE (mqc_id));
 	midgard_query_executor_execute (MIDGARD_QUERY_EXECUTOR (mqselect));
 
@@ -409,6 +410,84 @@ _workspace_storage_delete (MidgardConnection *mgd, MidgardDBObjectClass *klass)
 	return FALSE;
 }
 
+static void
+_set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, gint start_field)
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (model != NULL);
+	g_return_if_fail (row > -1);
+
+	GError *error = NULL;
+	const GValue *value;
+	MidgardWorkspace *ws = MIDGARD_WORKSPACE (self);
+
+	/* guid */
+	value = gda_data_model_get_value_at (model, MGD_WORKSPACE_FIELD_IDX_GUID, row, &error);
+	if (!value) {
+		g_warning ("Failed to get workspace guid field: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		g_free ((gchar *)MGD_OBJECT_GUID (ws));
+		if (G_VALUE_HOLDS_STRING (value))
+			MGD_OBJECT_GUID (ws) = g_value_dup_string (value);
+		else {
+			GValue strval = {0, };
+			g_value_init (&strval, G_TYPE_STRING);
+			g_value_transform (value, &strval);
+			MGD_OBJECT_GUID (ws) = g_value_dup_string (&strval);
+			g_value_unset (&strval);
+		}
+	}
+	if (error) g_clear_error (&error);
+
+	/* id */
+	value = gda_data_model_get_value_at (model, MGD_WORKSPACE_FIELD_IDX_ID, row, &error);
+	if (!value) {
+		g_warning ("Failed to get workspace id field: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		if (G_VALUE_HOLDS_UINT (value))
+			ws->priv->id = g_value_get_uint (value);
+		else { 
+			GValue intval = {0, };
+			g_value_init (&intval, G_TYPE_UINT);
+			g_value_transform (value, &intval);	
+			ws->priv->id = (guint) g_value_get_uint (&intval);
+			g_value_unset (&intval);
+		}
+	}
+	if (error) g_clear_error (&error);
+
+	/* up */
+	value = gda_data_model_get_value_at (model, MGD_WORKSPACE_FIELD_IDX_UP, row, &error);
+	if (!value) {
+		g_warning ("Failed to get workspace up field: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		if (G_VALUE_HOLDS_UINT (value))
+			ws->priv->up_id = g_value_get_uint (value);
+		else 
+			ws->priv->up_id = (guint) g_value_get_int (value);
+	}
+	if (error) g_clear_error (&error);
+
+	/* name */
+	value = gda_data_model_get_value_at (model, MGD_WORKSPACE_FIELD_IDX_NAME, row, &error);
+	if (!value) {
+		g_warning ("Failed to get workspace name field: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		g_free (ws->priv->name);
+		ws->priv->name = g_value_dup_string (value);
+	}
+	if (error) g_clear_error (&error);
+
+	return;
+}
 
 static void __midgard_workspace_class_init(
 		gpointer g_class, gpointer g_class_data)
@@ -439,22 +518,6 @@ static void __midgard_workspace_class_init(
 			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_PARENT_WS, pspec);
 	 
-	/* guid */
-	property_name = "guid";
-	pspec = g_param_spec_string (property_name,
-			"Guid which identifies workspace object.",
-			"",
-			"",
-			G_PARAM_READABLE);
-	g_object_class_install_property (gobject_class, PROPERTY_GUID, pspec);
-	prop_attr = midgard_core_schema_type_property_attr_new();
-	prop_attr->gtype = MGD_TYPE_GUID;
-	prop_attr->field = g_strdup (property_name);
-	prop_attr->table = g_strdup (MGD_WORKSPACE_TABLE);
-	prop_attr->tablefield = g_strjoin (".", MGD_WORKSPACE_TABLE, property_name, NULL);
-	g_hash_table_insert (type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
-	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, (gpointer) property_name);
-
 	/* id */
 	property_name = "id";
 	pspec = g_param_spec_uint (property_name,
@@ -488,6 +551,22 @@ static void __midgard_workspace_class_init(
 	prop_attr->table = g_strdup(MGD_WORKSPACE_TABLE);
 	prop_attr->tablefield = g_strjoin(".", MGD_WORKSPACE_TABLE, property_name, NULL);
 	g_hash_table_insert(type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, (gpointer) property_name);
+
+	/* guid */
+	property_name = "guid";
+	pspec = g_param_spec_string (property_name,
+			"Guid which identifies workspace object.",
+			"",
+			"",
+			G_PARAM_READABLE);
+	g_object_class_install_property (gobject_class, PROPERTY_GUID, pspec);
+	prop_attr = midgard_core_schema_type_property_attr_new();
+	prop_attr->gtype = MGD_TYPE_GUID;
+	prop_attr->field = g_strdup (property_name);
+	prop_attr->table = g_strdup (MGD_WORKSPACE_TABLE);
+	prop_attr->tablefield = g_strjoin (".", MGD_WORKSPACE_TABLE, property_name, NULL);
+	g_hash_table_insert (type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
 	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, (gpointer) property_name);
 
 	/* path */
@@ -527,6 +606,7 @@ static void __midgard_workspace_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->delete_storage = _workspace_storage_delete;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_statement_insert;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->add_fields_to_select_statement;	
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_data_model = _set_from_data_model;
 
 	/* Initialize persistent statement */
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_insert (MIDGARD_DBOBJECT_CLASS (klass));

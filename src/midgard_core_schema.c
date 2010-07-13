@@ -176,6 +176,8 @@ midgard_core_schema_type_attr_new (void)
 	type->class_nprop = 0;
 	type->params = NULL;
 	type->properties = NULL;
+	type->storage_params = NULL;
+	type->storage_params_count = 0;
 	type->table = NULL;
 	type->parentfield = NULL;
 	type->upfield = NULL;

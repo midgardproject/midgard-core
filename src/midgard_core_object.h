@@ -28,10 +28,7 @@
 #include "midgard_timestamp.h"
 #include "midgard_connection.h"
 
-/* Workspaces */
-#define MGD_WS_ROOT_FIELD "midgard_root_ws_id"
-#define MGD_WS_FIELD "midgard_ws_id"
-#define MGD_WS_DUMMY_ID 7
+#define MGD_WORKSPACE_DUMMY_ID 7
 
 struct _MidgardDBObjectPrivate {
 
@@ -63,6 +60,8 @@ struct _MidgardDBObjectPrivate {
 	gboolean		(*delete_storage)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
 	gboolean		(*get_property)		(MidgardDBObject *self, const gchar *name, GValue *value);
 	gboolean		(*set_property)		(MidgardDBObject *self, const gchar *name, GValue *value);
+	GParamSpec 		**(*list_properties)	(MidgardDBObjectClass *klass, guint *n_props);
+	GParamSpec 		**(*list_storage_columns)	(MidgardDBObjectClass *klass, guint *n_props);
 
 	/* GDA helpers */
 	void			(*set_statement_insert)	(MidgardDBObjectClass *klass);
@@ -200,6 +199,7 @@ struct _MidgardConnectionPrivate {
 	/* workspace */
 	gboolean has_workspace;
 	gpointer workspace_tree;
+	gboolean has_workspace_context;
 	gpointer workspace;
 	GdaDataModel *workspace_model;
 };
@@ -210,6 +210,9 @@ struct _MidgardConnectionPrivate {
 #define	MGD_CNC_DEBUG(_cnc) _cnc->priv->enable_debug
 #define MGD_CNC_DBUS(_cnc) _cnc->priv->enable_dbus
 #define MGD_CNC_HAS_WORKSPACE(_cnc) _cnc->priv->has_workspace
+#define MGD_CNC_HAS_WORKSPACE_CONTEXT(_cnc) _cnc->priv->has_workspace_context
+#define MGD_CNC_WORKSPACE(_cnc) (MidgardWorkspace *)_cnc->priv->workspace
+#define MGD_CNC_WORKSPACE_ID(_cnc) (MGD_CNC_WORKSPACE(_cnc))->priv->id
 
 struct _MidgardBlobPrivate {
 	MidgardObject *attachment;

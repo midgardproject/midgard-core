@@ -20,10 +20,14 @@
 #define MIDGARD_CORE_WORKSPACE_H
 
 #include "midgard_dbobject.h"
+#include "midgard_workspace.h"
 
 G_BEGIN_DECLS
 
 #define MGD_WORKSPACE_TABLE "midgard_workspace"
+
+#define MGD_WORKSPACE_OID_FIELD "midgard_ws_oid_id"
+#define MGD_WORKSPACE_ID_FIELD "midgard_ws_id"
 
 #define MGD_WORKSPACE_FIELD_ID          "id"
 #define MGD_WORKSPACE_FIELD_IDX_ID      0

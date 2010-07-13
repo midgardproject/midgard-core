@@ -22,7 +22,6 @@
 #include <glib.h>
 #include <glib-object.h>
 #include "midgard_defs.h"
-#include "midgard_connection.h"
 
 /* convention macros */
 #define MIDGARD_TYPE_DBOBJECT (midgard_dbobject_get_type())

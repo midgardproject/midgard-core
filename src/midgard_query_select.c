@@ -23,6 +23,7 @@
 #include "midgard_query_holder.h"
 #include "midgard_dbobject.h"
 #include <sql-parser/gda-sql-parser.h>
+#include "midgard_core_workspace.h"
 
 /**
  * midgard_query_select_new:
@@ -209,7 +210,7 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 	/* Order by workspace id if we're in ws context */
 	if (MGD_CNC_HAS_WORKSPACE (mgd)) {
 		/* Fallback to executor table alias */
-		gchar *ws_field = g_strconcat (self->priv->table_alias, ".", MGD_WS_FIELD, NULL);
+		gchar *ws_field = g_strconcat (self->priv->table_alias, ".", MGD_WORKSPACE_ID_FIELD, NULL);
 		/* Create order */
 		order = gda_sql_select_order_new (GDA_SQL_ANY_PART (select));
 		order->asc = FALSE;
@@ -375,7 +376,7 @@ __add_workspace_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *top_
 	GdaSqlExpr *dexpr = gda_sql_expr_new (GDA_SQL_ANY_PART (top_operation));
 	dexpr->value = gda_value_new (G_TYPE_STRING);
 	/* TODO WS: Replace with IN (ids) */ 
-	g_value_take_string (dexpr->value, g_strdup_printf ("%s.%s < %d", table, MGD_WS_FIELD, MGD_WS_DUMMY_ID));
+	g_value_take_string (dexpr->value, g_strdup_printf ("%s.%s < %d", table, MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_DUMMY_ID));
 	top_operation->operands = g_slist_append (top_operation->operands, dexpr);
 
 	return;
@@ -459,7 +460,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	}
 
 	/* add workspace constraint */
-	if (MGD_CNC_HAS_WORKSPACE (mgd) && MIDGARD_IS_OBJECT_CLASS (klass))
+	if (MGD_CNC_HAS_WORKSPACE (mgd) && g_type_is_a (G_OBJECT_CLASS_TYPE (klass), MIDGARD_TYPE_OBJECT))
 		__add_workspace_constraint (sss, operation, s_target->as);
 
 	/* Add orders , ORDER BY t1.field... */
@@ -506,7 +507,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	sql_stm = NULL;
 
 	/* TODO WS: Generate query with GdaSql structures */
-	if (MGD_CNC_HAS_WORKSPACE (mgd) && MIDGARD_IS_OBJECT_CLASS (klass)) {
+	if (MGD_CNC_HAS_WORKSPACE (mgd) && g_type_is_a (G_OBJECT_CLASS_TYPE (klass), MIDGARD_TYPE_OBJECT)) {
 		gchar *old_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 		gchar *new_sql = g_strdup_printf ("SELECT * FROM \n (%s) \n AS midgard_workspace GROUP BY midgard_root_ws_id", old_sql);
 		g_free (old_sql);
