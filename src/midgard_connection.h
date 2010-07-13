@@ -25,6 +25,7 @@
 
 #include "midgard_defs.h"
 #include "midgard_config.h"
+#include "midgard_workspace.h"
 
 /* convention macros */
 #define MIDGARD_TYPE_CONNECTION (midgard_connection_get_type())
@@ -92,5 +93,9 @@ gboolean 		midgard_connection_is_enabled_quota		(MidgardConnection *self);
 gboolean 		midgard_connection_is_enabled_replication	(MidgardConnection *self);
 gboolean 		midgard_connection_is_enabled_dbus		(MidgardConnection *self);
 void			midgard_connection_close			(MidgardConnection *self);
+gboolean 		midgard_connection_set_workspace		(MidgardConnection *self, MidgardWorkspace *workspace);
+gboolean		midgard_connection_set_workspace_by_path	(MidgardConnection *self, const gchar *path, GError **error); 
+gboolean 		midgard_connection_set_workspace_context	(MidgardConnection *self, MidgardWorkspace *workspace);
+gboolean		midgard_connection_set_workspace_context_by_path	(MidgardConnection *self, const gchar *path, GError **error); 
 
 #endif /* MIDGARD_CONNNECTION_H */

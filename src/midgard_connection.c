@@ -146,6 +146,10 @@ static void _midgard_connection_dispose(GObject *object)
 		gda_cnc = self->priv->connection;
 	}
 
+	if (self->priv->workspace)
+		g_object_unref (self->priv->workspace);
+	self->priv->workspace = NULL;
+
 	/* Disconnect and do not invoke error callbacks */
 	if (self->priv->error_clbk_connected)
 		midgard_core_connection_disconnect_error_callback(self);
@@ -1224,6 +1228,12 @@ MidgardConnection *midgard_connection_copy(MidgardConnection *self)
 
 #warning implement workspace_model copy 
 
+	/* Increase workspace reference count.
+	 * For example, connection might be copied to new thread, so we 
+	 * need to ensue, workspace object is valid */
+	if (self->priv->workspace)
+		new_mgd->priv->workspace = g_object_ref (self->priv->workspace);
+
 	return new_mgd;
 }
 
@@ -1322,3 +1332,140 @@ midgard_connection_is_enabled_dbus (MidgardConnection *self)
 	g_return_val_if_fail (self != NULL, FALSE);
 	return self->priv->enable_dbus;
 }
+
+/**
+ * midgard_connection_set_workspace:
+ * @self: #MidgardConnection instance
+ * @workspace: #MidgardWorkspace to set for given #MidgardConnection
+ *
+ * Limits @workspace context to the given one.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.11
+ */ 
+gboolean
+midgard_connection_set_workspace (MidgardConnection *self, MidgardWorkspace *workspace)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (workspace != NULL, FALSE);
+
+	if (self->priv->workspace)
+		g_object_unref (workspace);
+	self->priv->workspace = (gpointer) g_object_ref (workspace);
+
+	self->priv->has_workspace = TRUE;
+	self->priv->has_workspace_context = FALSE;
+
+	/* TODO WS: emit signal */
+
+	return TRUE;
+}
+
+/**
+ * midgard_connection_set_workspace_by_path:
+ * @self: #MidgardConnection instance
+ * @path: #MidgardWorkspace path to set for given #MidgardConnection
+ * @error: pointer to store returned error
+ *
+ * Limits @workspace (identified by @path) context to the given one.
+ * Check midgard_workspace_get_by_path() for possible error.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.11
+ */ 
+gboolean
+midgard_connection_set_workspace_by_path (MidgardConnection *self, const gchar *path, GError **error)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (path != NULL, FALSE);
+	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+	GError *err = NULL;
+	MidgardWorkspace *workspace = midgard_workspace_get_by_path (self, path, &err);
+
+	if (!workspace) {
+		if (err)
+			g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	if (self->priv->workspace)
+		g_object_unref (workspace);
+	self->priv->workspace = (gpointer) g_object_ref (workspace);
+
+	/* TODO WS: emit signal */
+
+	self->priv->has_workspace = TRUE;
+	self->priv->has_workspace_context = FALSE;
+
+	return TRUE;
+}
+
+/**
+ * midgard_connection_set_workspace_context:
+ * @self: #MidgardConnection instance
+ * @workspace: #MidgardWorkspace to set workspace context for given #MidgardConnection
+ *
+ * Sets @workspace context. 
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.11
+ */ 
+gboolean
+midgard_connection_set_workspace_context        (MidgardConnection *self, MidgardWorkspace *workspace)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (workspace != NULL, FALSE);
+
+	if (self->priv->workspace)
+		g_object_unref (workspace);
+	self->priv->workspace = (gpointer) g_object_ref (workspace);
+
+	self->priv->has_workspace = TRUE;
+	self->priv->has_workspace_context = TRUE;
+
+	/* TODO WS: emit signal */
+
+	return TRUE;
+}
+
+/**
+ * midgard_connection_set_workspace_by_path:
+ * @self: #MidgardConnection instance
+ * @path: #MidgardWorkspace path to set for given #MidgardConnection
+ * @error: pointer to store returned error
+ *
+ * Limits @workspace (identified by @path) context to the given one.
+ * Check midgard_workspace_get_by_path() for possible error.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.11
+ */ 
+gboolean
+midgard_connection_set_workspace_context_by_path (MidgardConnection *self, const gchar *path, GError **error)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (path != NULL, FALSE);
+	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+	GError *err = NULL;
+	MidgardWorkspace *workspace = midgard_workspace_get_by_path (self, path, &err);
+
+	if (!workspace) {
+		if (err)
+			g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	if (self->priv->workspace)
+		g_object_unref (workspace);
+	self->priv->workspace = (gpointer) g_object_ref (workspace);
+
+	/* TODO WS: emit signal */
+
+	self->priv->has_workspace = TRUE;
+	self->priv->has_workspace_context = TRUE;
+
+	return TRUE;
+}
+
