@@ -1350,7 +1350,7 @@ midgard_connection_set_workspace (MidgardConnection *self, MidgardWorkspace *wor
 	g_return_val_if_fail (workspace != NULL, FALSE);
 
 	if (self->priv->workspace)
-		g_object_unref (workspace);
+		g_object_unref (self->priv->workspace);
 	self->priv->workspace = (gpointer) g_object_ref (workspace);
 
 	self->priv->has_workspace = TRUE;
@@ -1390,7 +1390,7 @@ midgard_connection_set_workspace_by_path (MidgardConnection *self, const gchar *
 	}
 
 	if (self->priv->workspace)
-		g_object_unref (workspace);
+		g_object_unref (self->priv->workspace);
 	self->priv->workspace = (gpointer) g_object_ref (workspace);
 
 	/* TODO WS: emit signal */
@@ -1418,7 +1418,7 @@ midgard_connection_set_workspace_context        (MidgardConnection *self, Midgar
 	g_return_val_if_fail (workspace != NULL, FALSE);
 
 	if (self->priv->workspace)
-		g_object_unref (workspace);
+		g_object_unref (self->priv->workspace);
 	self->priv->workspace = (gpointer) g_object_ref (workspace);
 
 	self->priv->has_workspace = FALSE;
@@ -1458,7 +1458,7 @@ midgard_connection_set_workspace_context_by_path (MidgardConnection *self, const
 	}
 
 	if (self->priv->workspace)
-		g_object_unref (workspace);
+		g_object_unref (self->priv->workspace);
 	self->priv->workspace = (gpointer) g_object_ref (workspace);
 
 	/* TODO WS: emit signal */
