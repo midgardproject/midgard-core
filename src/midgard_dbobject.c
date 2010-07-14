@@ -40,7 +40,6 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 		return;
 
 	const gchar *property_table = NULL;
-
 	for (i = 0; i < n_prop; i++) {
 
 		const gchar *property = pspecs[i]->name;
@@ -66,9 +65,7 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 		g_free (table_field);
 		expr->value = val;
 		select_field->expr = expr;
-	}
-
-	g_free (pspecs);
+	}	
 
 	if (!klass->dbpriv->has_metadata)
 		return;
