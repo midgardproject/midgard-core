@@ -1421,7 +1421,7 @@ midgard_connection_set_workspace_context        (MidgardConnection *self, Midgar
 		g_object_unref (workspace);
 	self->priv->workspace = (gpointer) g_object_ref (workspace);
 
-	self->priv->has_workspace = TRUE;
+	self->priv->has_workspace = FALSE;
 	self->priv->has_workspace_context = TRUE;
 
 	/* TODO WS: emit signal */
@@ -1463,7 +1463,7 @@ midgard_connection_set_workspace_context_by_path (MidgardConnection *self, const
 
 	/* TODO WS: emit signal */
 
-	self->priv->has_workspace = TRUE;
+	self->priv->has_workspace = FALSE;
 	self->priv->has_workspace_context = TRUE;
 
 	return TRUE;
