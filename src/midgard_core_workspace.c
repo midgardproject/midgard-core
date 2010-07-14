@@ -159,6 +159,67 @@ midgard_core_workspace_get_value_by_id (MidgardConnection *mgd, guint col_idx, g
 	return NULL;
 }
 
+static GSList *
+_get_parent_values (MidgardConnection *mgd, guint up, guint field_idx)
+{
+	g_return_val_if_fail (mgd != NULL, NULL);
+
+	GSList *list = NULL;
+	if (up == 0)
+		return NULL;
+
+	const GValue *value = NULL;
+
+	do {
+		value = midgard_core_workspace_get_value_by_id (mgd, field_idx, up);
+		if (value) {
+			list = g_slist_prepend (list, (gpointer) value);
+			const GValue *up_value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_UP, up);
+			if (up_value) {
+				guint up_id = 0;
+				if (G_VALUE_HOLDS_UINT (up_value))
+					up_id = g_value_get_uint (up_value);
+				else 
+					up_id = g_value_get_int (up_value);
+				up = up_id;
+			}
+
+			if (up == 0)
+				break;
+		}
+
+	} while (value != NULL);
+	
+	return list;
+}
+
+GSList *
+midgard_core_workspace_get_context_ids (MidgardConnection *mgd, guint id)
+{
+	g_return_val_if_fail (mgd != NULL, NULL);
+	g_return_val_if_fail (id != 0, NULL);
+
+	const GValue *up_val = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_UP, id);
+	guint up_id = 0;
+	if (G_VALUE_HOLDS_UINT (up_val))
+		up_id = g_value_get_uint (up_val);
+	else 
+		up_id = (guint) g_value_get_int (up_val);
+
+	GSList *l = _get_parent_values (mgd, up_id, MGD_WORKSPACE_FIELD_IDX_ID);
+
+	GValue *id_val = g_new0 (GValue, 1);
+	g_value_init (id_val, G_TYPE_UINT);
+	g_value_set_uint (id_val, id);
+
+	if (l)
+		l = g_slist_reverse (l);
+
+	l = g_slist_prepend (l, (gpointer) id_val);
+
+	return l;
+}
+
 GSList *
 midgard_core_workspace_get_parent_names (MidgardConnection *mgd, guint up)
 {

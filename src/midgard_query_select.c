@@ -192,11 +192,8 @@ _midgard_query_select_add_join (MidgardQueryExecutor *self, const gchar *join_ty
 	return TRUE;
 }
 
-gboolean __query_select_add_orders (MidgardQueryExecutor *self)
+gboolean __query_select_add_orders (MidgardQueryExecutor *self, MidgardDBObjectClass *klass)
 {
-	if (!self->priv->orders)
-		return TRUE;
-
 	GSList *l = NULL;
 
 	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
@@ -208,7 +205,7 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 	GdaSqlExpr *expr;
 	
 	/* Order by workspace id if we're in ws context */
-	if (MGD_CNC_HAS_WORKSPACE (mgd)) {
+	if (MGD_CNC_HAS_WORKSPACE_CONTEXT (mgd) && g_type_is_a (G_OBJECT_CLASS_TYPE (klass), MIDGARD_TYPE_OBJECT)) {
 		/* Fallback to executor table alias */
 		gchar *ws_field = g_strconcat (self->priv->table_alias, ".", MGD_WORKSPACE_ID_FIELD, NULL);
 		/* Create order */
@@ -223,6 +220,9 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 		order->expr = expr;
 		select->order_by = g_slist_append (select->order_by, order);
 	}
+
+	if (!self->priv->orders)
+		return TRUE;
 
 	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->orders; l != NULL; l = l->next) {
 
@@ -371,12 +371,36 @@ __add_second_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *t
 }
 
 static void
-__add_workspace_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *top_operation, const gchar *table)
+__add_workspace_constraint (MidgardConnection *mgd, GdaSqlStatementSelect *select, GdaSqlOperation *top_operation, const gchar *table)
 {
+	gboolean has_ws = MGD_CNC_HAS_WORKSPACE (mgd);
+	gboolean has_ws_ctx = MGD_CNC_HAS_WORKSPACE_CONTEXT (mgd);
+	guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
+	if (!has_ws && !has_ws_ctx)
+	       return;
+
 	GdaSqlExpr *dexpr = gda_sql_expr_new (GDA_SQL_ANY_PART (top_operation));
 	dexpr->value = gda_value_new (G_TYPE_STRING);
-	/* TODO WS: Replace with IN (ids) */ 
-	g_value_take_string (dexpr->value, g_strdup_printf ("%s.%s < %d", table, MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_DUMMY_ID));
+	
+	if (has_ws)
+		g_value_take_string (dexpr->value, g_strdup_printf ("%s.%s = %d", table, MGD_WORKSPACE_ID_FIELD, ws_id));
+	else {
+		GSList *list = midgard_core_workspace_get_context_ids (mgd, ws_id);
+		GString *ws_ids = g_string_new ("");
+		GSList *l = NULL;
+		guint i = 0;
+		guint id;
+		for (l = list; l != NULL; l = l->next, i++) {
+			GValue *id_val = (GValue *) l->data;
+			if (G_VALUE_HOLDS_UINT (id_val))
+				id = g_value_get_uint (id_val);
+			else 
+				id = (guint) g_value_get_int (id_val);
+			g_string_append_printf (ws_ids, "%s %d", i > 0 ? "," : "", id);
+		}
+		g_value_take_string (dexpr->value, g_strdup_printf ("%s.%s IN (%s) ", table, MGD_WORKSPACE_ID_FIELD, g_string_free (ws_ids, FALSE)));
+		g_slist_free (list);
+	}
 	top_operation->operands = g_slist_append (top_operation->operands, dexpr);
 
 	return;
@@ -460,11 +484,11 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	}
 
 	/* add workspace constraint */
-	if (MGD_CNC_HAS_WORKSPACE (mgd) && g_type_is_a (G_OBJECT_CLASS_TYPE (klass), MIDGARD_TYPE_OBJECT))
-		__add_workspace_constraint (sss, operation, s_target->as);
+	if (g_type_is_a (G_OBJECT_CLASS_TYPE (klass), MIDGARD_TYPE_OBJECT))
+		__add_workspace_constraint (mgd, sss, operation, s_target->as);
 
 	/* Add orders , ORDER BY t1.field... */
-	if (!__query_select_add_orders (self)) 
+	if (!__query_select_add_orders (self, klass)) 
 		goto return_false;
 
 	/* Exclude deleted */
@@ -507,9 +531,9 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	sql_stm = NULL;
 
 	/* TODO WS: Generate query with GdaSql structures */
-	if (MGD_CNC_HAS_WORKSPACE (mgd) && g_type_is_a (G_OBJECT_CLASS_TYPE (klass), MIDGARD_TYPE_OBJECT)) {
+	if (g_type_is_a (G_OBJECT_CLASS_TYPE (klass), MIDGARD_TYPE_OBJECT)) {
 		gchar *old_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
-		gchar *new_sql = g_strdup_printf ("SELECT * FROM \n (%s) \n AS midgard_workspace GROUP BY midgard_root_ws_id", old_sql);
+		gchar *new_sql = g_strdup_printf ("SELECT * FROM \n (%s) \n AS midgard_workspace GROUP BY %s", old_sql, MGD_WORKSPACE_OID_FIELD);
 		g_free (old_sql);
 		g_object_unref (stmt);
 

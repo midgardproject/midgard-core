@@ -50,6 +50,7 @@ void		midgard_core_workspace_list_all			(MidgardConnection *mgd);
 gboolean	midgard_core_workspace_name_exists		(MidgardWorkspace *workspace, MidgardWorkspace *parent);
 GSList 		*midgard_core_workspace_get_parent_names	(MidgardConnection *mgd, guint up);
 gint		midgard_core_workspace_get_col_id_by_name 	(MidgardConnection *mgd, const gchar *name, gint col_idx, gint up_id_check);
+GSList 		*midgard_core_workspace_get_context_ids 	(MidgardConnection *mgd, guint id);
 
 G_END_DECLS
 
