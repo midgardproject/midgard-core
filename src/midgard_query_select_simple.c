@@ -83,7 +83,7 @@ midgard_query_select_simple_get_object (MidgardConnection *mgd, const gchar *cla
 	guint n_objects;
 	MidgardDBObject **objects = midgard_query_select_list_objects (mqselect, &n_objects);
 	MidgardDBObject *ret = NULL;
-	if (objects && n_objects == 1);
+	if (objects && n_objects == 1)
 		ret = objects[0];
 
 	g_object_unref (mqs);
