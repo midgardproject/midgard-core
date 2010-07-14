@@ -323,9 +323,6 @@ __midgard_workspace_finalize (GObject *object)
 
 	g_free (self->priv->name);
 	self->priv->name = NULL;
-
-	g_free (self->priv);
-	self->priv = NULL;
 }
 
 static void
