@@ -48,6 +48,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_schema_object_tree.h"
 #include <sql-parser/gda-sql-parser.h>
 #include "midgard_core_workspace.h"
+#include "midgard_query_select_simple.h"
 
 GType _midgard_attachment_type = 0;
 static gboolean signals_registered = FALSE;
@@ -2256,75 +2257,72 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 	g_return_val_if_fail (mgd != NULL, NULL);
 	g_return_val_if_fail (name != NULL, NULL);
 
-	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
+	MIDGARD_ERRNO_SET (mgd, MGD_ERR_INTERNAL);
 
 	GType type = g_type_from_name (name);
+	if (!type) {
+		g_warning ("'%s' is not registered GType system class", name);
+		return NULL;
+	}
+
+	if (!g_type_is_a (type, MIDGARD_TYPE_OBJECT)) {
+		g_warning ("'%s' is not MidgardObject derived class", name);
+		return NULL;
+	}
+
+	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
+
 	MidgardObject *self;
 	const gchar *field = "id";	
 
-	if (!type)
-		return NULL;
-
 	/* Empty object instance */
-	if (value == NULL || (value && G_VALUE_TYPE (value) == G_TYPE_NONE)) {	
+	if (value == NULL || (value && G_VALUE_TYPE (value) == G_TYPE_NONE))
 		goto return_empty_object;
-	} else {
-		
-		/* We have to accept both integer and unsigned integer type.
-		 * There might be no control over value passed on bindings level. */
-		if (G_VALUE_TYPE(value) != G_TYPE_STRING) {
-			if (G_VALUE_TYPE(value) != G_TYPE_UINT) {
-				if (G_VALUE_TYPE(value) != G_TYPE_INT) {
-					g_warning ("Expected value of string or integer type");
-					return NULL;
-				}
+
+	/* We have to accept both integer and unsigned integer type.
+	 * There might be no control over value passed on bindings level. */
+	if (G_VALUE_TYPE (value) != G_TYPE_STRING) {
+		if (G_VALUE_TYPE (value) != G_TYPE_UINT) {
+			if (G_VALUE_TYPE (value) != G_TYPE_INT) {
+				g_warning ("Expected value of string or integer type");
+				return NULL;
 			}
 		}
-
-		if (G_VALUE_TYPE(value) == G_TYPE_UINT) {
-			if (g_value_get_uint(value) == 0) {
-				goto return_empty_object;
-			}
-		}	
-
-		if (G_VALUE_TYPE(value) == G_TYPE_INT) {
-			if (g_value_get_int(value) < 1) {
-				goto return_empty_object;
-			}
-		}	
-
-		if (G_VALUE_TYPE(value) == G_TYPE_STRING) {
-			const gchar *guidval = g_value_get_string(value);
-			field = "guid";
-			if (!guidval || (guidval && !midgard_is_guid (guidval)))
-					goto return_empty_object;
-		}
-		
-		MidgardQueryBuilder *builder = midgard_query_builder_new(mgd, name);
-		midgard_query_builder_add_constraint(builder, field, "=", value);
-		guint n_objects;
-		GObject **objects = midgard_query_builder_execute(builder, &n_objects);
-		g_object_unref(builder);
-
-		if (!objects) {
-			MIDGARD_ERRNO_SET(mgd, MGD_ERR_NOT_EXISTS);				
-			return NULL;
-		}
-
-		self = MIDGARD_OBJECT(objects[0]);
-		g_free(objects);	
-
-		if (!self) {
-			MIDGARD_ERRNO_SET(mgd, MGD_ERR_INTERNAL);
-			return NULL;
-		}
-
-		__dbus_send(self, "get");
-		MIDGARD_DBOBJECT (self)->dbpriv->storage_data = MIDGARD_DBOBJECT_GET_CLASS(self)->dbpriv->storage_data;
-		MGD_OBJECT_CNC (self) = mgd;	
-		
-		return self;
 	}
+
+	if (G_VALUE_TYPE (value) == G_TYPE_UINT) {
+		if (g_value_get_uint (value) == 0) {
+			goto return_empty_object;
+		}
+	}	
+
+	if (G_VALUE_TYPE (value) == G_TYPE_INT) {
+		if (g_value_get_int (value) < 1) {
+			goto return_empty_object;
+		}
+	}	
+
+	if (G_VALUE_TYPE (value) == G_TYPE_STRING) {
+		const gchar *guidval = g_value_get_string (value);
+		field = "guid";
+		if (!guidval || (guidval && !midgard_is_guid (guidval)))
+			goto return_empty_object;
+	}
+
+	MidgardDBObject *dbobject = 
+		midgard_query_select_simple_get_object (mgd, name, field, "=", value, NULL);
+
+	if (!dbobject) {
+		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
+		return NULL;
+	}
+
+	self = MIDGARD_OBJECT (dbobject);
+	
+	__dbus_send(self, "get");
+	MIDGARD_DBOBJECT (self)->dbpriv->storage_data = MIDGARD_DBOBJECT_GET_CLASS(self)->dbpriv->storage_data;
+	MGD_OBJECT_CNC (self) = mgd;	
+	return self;
 
 return_empty_object:
 	self = g_object_new(type, "connection", mgd, NULL);

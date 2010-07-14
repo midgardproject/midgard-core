@@ -54,7 +54,7 @@ midgard_query_select_simple_get_object (MidgardConnection *mgd, const gchar *cla
 		query_values = g_slist_append (query_values, mqv);
 	      	MidgardQueryConstraint *mqc = midgard_query_constraint_new (mqp, op, MIDGARD_QUERY_HOLDER (mqv), NULL);
 		query_cnstrs = g_slist_append (query_cnstrs, mqc);
-
+		pname = va_arg (args, gchar *);
 	}
 	va_end (args);
 
@@ -62,14 +62,22 @@ midgard_query_select_simple_get_object (MidgardConnection *mgd, const gchar *cla
 	MidgardQuerySelect *mqselect = midgard_query_select_new (mgd, mqs);
 	midgard_query_select_toggle_read_only (mqselect, FALSE);
 
-	/* Initialize query group */
-	MidgardQueryConstraintGroup *mqcg = midgard_query_constraint_group_new ();
+	MidgardQueryConstraintSimple *mqcs = NULL;
+	MidgardQueryConstraintGroup *mqcg = NULL;
 
-	for (l = query_cnstrs; l != NULL; l = l->next) {
-		midgard_query_constraint_group_add_constraint (mqcg, MIDGARD_QUERY_CONSTRAINT_SIMPLE (l->data));
+	/* There's only one constraint, so no need to group */
+	if (g_slist_length (query_cnstrs) == 1) {
+		mqcs = (MidgardQueryConstraintSimple *) query_cnstrs->data;
+	} else {
+		/* Initialize query group */
+		midgard_query_constraint_group_new ();
+		mqcs = (MidgardQueryConstraintSimple *) mqcg;
+		for (l = query_cnstrs; l != NULL; l = l->next) {
+			midgard_query_constraint_group_add_constraint (mqcg, MIDGARD_QUERY_CONSTRAINT_SIMPLE (l->data));
+		}
 	}
 
-	midgard_query_executor_set_constraint (MIDGARD_QUERY_EXECUTOR (mqselect), MIDGARD_QUERY_CONSTRAINT_SIMPLE (mqcg));
+	midgard_query_executor_set_constraint (MIDGARD_QUERY_EXECUTOR (mqselect), MIDGARD_QUERY_CONSTRAINT_SIMPLE (mqcs));
 	midgard_query_executor_execute (MIDGARD_QUERY_EXECUTOR (mqselect));
 
 	guint n_objects;
@@ -79,7 +87,8 @@ midgard_query_select_simple_get_object (MidgardConnection *mgd, const gchar *cla
 		ret = objects[0];
 
 	g_object_unref (mqs);
-	g_object_unref (mqcg);
+	if (mqcg)
+		g_object_unref (mqcg);
 	g_object_unref (mqselect);
 	if (objects)
 		g_free (objects);
