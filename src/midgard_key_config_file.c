@@ -59,6 +59,7 @@ typedef struct _MidgardKeyConfigFileClass MidgardKeyConfigFileClass;
 typedef struct _MidgardKeyConfigFilePrivate MidgardKeyConfigFilePrivate;
 #define _g_key_file_free0(var) ((var == NULL) ? NULL : (var = (g_key_file_free (var), NULL)))
 #define _g_free0(var) (var = (g_free (var), NULL))
+#define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 #define _g_error_free0(var) ((var == NULL) ? NULL : (var = (g_error_free (var), NULL)))
 
 #define MIDGARD_TYPE_KEY_CONFIG_FILE_CONTEXT (midgard_key_config_file_context_get_type ())
@@ -115,9 +116,9 @@ typedef enum  {
 static gpointer midgard_key_config_file_parent_class = NULL;
 
 #define MIDGARD_CONFIG_EXTENSION ".mcfg"
-GType midgard_key_config_get_type (void);
-GType midgard_key_config_context_get_type (void);
-GType midgard_key_config_file_get_type (void);
+GType midgard_key_config_get_type (void) G_GNUC_CONST;
+GType midgard_key_config_context_get_type (void) G_GNUC_CONST;
+GType midgard_key_config_file_get_type (void) G_GNUC_CONST;
 #define MIDGARD_KEY_CONFIG_FILE_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), MIDGARD_TYPE_KEY_CONFIG_FILE, MidgardKeyConfigFilePrivate))
 enum  {
 	MIDGARD_KEY_CONFIG_FILE_DUMMY_PROPERTY
@@ -125,7 +126,7 @@ enum  {
 MidgardKeyConfig* midgard_key_config_construct (GType object_type, MidgardKeyConfigContext* keyctx, const char* path);
 const char* midgard_key_config_context_get_context_path (MidgardKeyConfigContext* self);
 GQuark key_config_context_error_quark (void);
-GType midgard_key_config_file_context_get_type (void);
+GType midgard_key_config_file_context_get_type (void) G_GNUC_CONST;
 MidgardKeyConfigFile* midgard_key_config_file_new (MidgardKeyConfigFileContext* keyctx, const char* path, GError** error);
 MidgardKeyConfigFile* midgard_key_config_file_construct (GType object_type, MidgardKeyConfigFileContext* keyctx, const char* path, GError** error);
 static void midgard_key_config_file_real_set_value (MidgardKeyConfig* base, const char* group, const char* key, const char* value);
@@ -162,7 +163,7 @@ MidgardKeyConfigFile* midgard_key_config_file_construct (GType object_type, Midg
 		{
 			if (_inner_error_->domain == KEY_CONFIG_CONTEXT_ERROR) {
 				g_propagate_error (error, _inner_error_);
-				g_object_unref (self);
+				_g_object_unref0 (self);
 				return NULL;
 			} else {
 				g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
@@ -195,7 +196,7 @@ MidgardKeyConfigFile* midgard_key_config_file_construct (GType object_type, Midg
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == KEY_CONFIG_CONTEXT_ERROR) {
 				g_propagate_error (error, _inner_error_);
-				g_object_unref (self);
+				_g_object_unref0 (self);
 				return NULL;
 			} else {
 				g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);

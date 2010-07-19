@@ -72,8 +72,8 @@ struct _MidgardKeyConfigClass {
 
 static gpointer midgard_key_config_parent_class = NULL;
 
-GType midgard_key_config_get_type (void);
-GType midgard_key_config_context_get_type (void);
+GType midgard_key_config_get_type (void) G_GNUC_CONST;
+GType midgard_key_config_context_get_type (void) G_GNUC_CONST;
 enum  {
 	MIDGARD_KEY_CONFIG_DUMMY_PROPERTY
 };

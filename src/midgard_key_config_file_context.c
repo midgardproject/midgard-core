@@ -47,6 +47,7 @@ typedef struct _MidgardKeyConfigContextPrivate MidgardKeyConfigContextPrivate;
 typedef struct _MidgardKeyConfigFileContext MidgardKeyConfigFileContext;
 typedef struct _MidgardKeyConfigFileContextClass MidgardKeyConfigFileContextClass;
 typedef struct _MidgardKeyConfigFileContextPrivate MidgardKeyConfigFileContextPrivate;
+#define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 #define _g_dir_close0(var) ((var == NULL) ? NULL : (var = (g_dir_close (var), NULL)))
 #define _g_error_free0(var) ((var == NULL) ? NULL : (var = (g_error_free (var), NULL)))
 #define _g_free0(var) (var = (g_free (var), NULL))
@@ -78,8 +79,8 @@ typedef enum  {
 
 static gpointer midgard_key_config_file_context_parent_class = NULL;
 
-GType midgard_key_config_context_get_type (void);
-GType midgard_key_config_file_context_get_type (void);
+GType midgard_key_config_context_get_type (void) G_GNUC_CONST;
+GType midgard_key_config_file_context_get_type (void) G_GNUC_CONST;
 enum  {
 	MIDGARD_KEY_CONFIG_FILE_CONTEXT_DUMMY_PROPERTY
 };
@@ -108,7 +109,7 @@ MidgardKeyConfigFileContext* midgard_key_config_file_context_construct (GType ob
 		{
 			if (_inner_error_->domain == KEY_CONFIG_CONTEXT_ERROR) {
 				g_propagate_error (error, _inner_error_);
-				g_object_unref (self);
+				_g_object_unref0 (self);
 				return NULL;
 			} else {
 				g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
@@ -282,9 +283,9 @@ static char** midgard_key_config_file_context_set_cfgs (MidgardKeyConfigFileCont
 				if (_inner_error_ != NULL) {
 					_g_free0 (path_wo_suffix);
 					_g_free0 (abspath);
-					_g_dir_close0 (dir);
-					_g_free0 (name);
 					cfgs = (_vala_array_free (cfgs, cfgs_length1, (GDestroyNotify) g_free), NULL);
+					_g_free0 (name);
+					_g_dir_close0 (dir);
 					g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 					g_clear_error (&_inner_error_);
 					return NULL;
@@ -296,12 +297,12 @@ static char** midgard_key_config_file_context_set_cfgs (MidgardKeyConfigFileCont
 		_g_free0 (abspath);
 	}
 	result = (_tmp9_ = cfgs, *result_length1 = cfgs_length1, _tmp9_);
-	_g_dir_close0 (dir);
 	_g_free0 (name);
+	_g_dir_close0 (dir);
 	return result;
-	_g_dir_close0 (dir);
-	_g_free0 (name);
 	cfgs = (_vala_array_free (cfgs, cfgs_length1, (GDestroyNotify) g_free), NULL);
+	_g_free0 (name);
+	_g_dir_close0 (dir);
 }
 
 
