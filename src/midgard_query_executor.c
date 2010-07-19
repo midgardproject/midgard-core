@@ -152,6 +152,7 @@ __midgard_query_executor_instance_init (GTypeInstance *instance, gpointer g_clas
 	MIDGARD_QUERY_EXECUTOR (object)->priv->results_count = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->read_only = TRUE;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->include_deleted = FALSE;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->include_deleted_targets = NULL;
 }
 
 static GObject *
@@ -209,6 +210,11 @@ _midgard_query_executor_finalize (GObject *object)
 
 	g_free (self->priv->table_alias);
 	self->priv->table_alias = NULL;
+
+	if (self->priv->include_deleted_targets) {
+		g_slist_free (self->priv->include_deleted_targets);
+		self->priv->include_deleted_targets = NULL;
+	}
 
 	g_free (self->priv);
 	self->priv = NULL;

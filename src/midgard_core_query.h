@@ -89,8 +89,9 @@ struct _MidgardQueryExecutorPrivate {
 	guint joinid;
 	GdaSqlStatement *stmt;
 	guint results_count;
-	gboolean read_only;
-	gboolean include_deleted;
+	gboolean read_only; 
+	gboolean include_deleted; /* whether to select deleted objects or not */
+	GSList *include_deleted_targets; /* particular targets to select deleted objects from */
 };
 
 struct _MidgardQueryConstraintSimplePrivate {

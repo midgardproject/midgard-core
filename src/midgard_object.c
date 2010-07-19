@@ -998,6 +998,13 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		}
 	}
 
+	/* UPDATE WS object id field using newly created id value */
+	query = g_string_new ("UPDATE ");
+	g_string_append_printf (query, " %s SET %s=%d WHERE id=%d",
+			tablename, MGD_WORKSPACE_OID_FIELD, new_id, new_id);
+	midgard_core_query_execute(MGD_OBJECT_CNC (object), query->str, FALSE);
+	g_string_free(query, TRUE);
+
 	/* INSERT repligard's record */
 	if (MGD_CNC_REPLICATION (mgd)) {
 		query = g_string_new("INSERT INTO repligard ");
