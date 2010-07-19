@@ -3,7 +3,6 @@
 src_dir=`pwd`
 configure_options="$@"
 
-libtoolize
 autoreconf -i --force
 automake
 
