@@ -43,7 +43,9 @@ struct _MidgardDBObjectPrivate {
 
 	/* GDA pointers */
 	GdaStatement *statement_insert;
-	GdaSet *param_set_insert;	
+	GdaSet *param_set_insert;
+	GdaStatement *statement_update;
+	GdaSet *param_set_update;	
 
 	/* GdaSql virtual helpers */
 	void			(*add_fields_to_select_statement)	(MidgardDBObjectClass *klass, 
@@ -65,6 +67,7 @@ struct _MidgardDBObjectPrivate {
 
 	/* GDA helpers */
 	void			(*set_statement_insert)	(MidgardDBObjectClass *klass);
+	void			(*set_statement_update)	(MidgardDBObjectClass *klass);
 };
 
 #define MGD_DBOBJECT_DBPRIV(__obj) (MIDGARD_DBOBJECT(__obj)->dbpriv)
@@ -82,8 +85,8 @@ struct _MidgardDBObjectPrivate {
 #define MGD_DBCLASS_PROPERTY_PARENT(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->property_parent
 #define MGD_DBCLASS_PROPERTY_UNIQUE(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->unique_name
 
-#define MGD_DBCLASS_PRIMARY(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->primary;
-#define MGD_DBCLASS_TABLENAME(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->table;
+#define MGD_DBCLASS_PRIMARY(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->primary
+#define MGD_DBCLASS_TABLENAME(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->table
 
 /* Private structure for private data of MgdSchema objects */
 struct _MidgardObjectPrivate{
@@ -92,7 +95,12 @@ struct _MidgardObjectPrivate{
 	gchar *imported;
 	GSList *parameters;
 	GHashTable *_params;
+	guint ws_id;
+	guint ws_object_id;
 };
+
+#define MGD_OBJECT_WS_ID(__obj) MIDGARD_OBJECT(__obj)->priv->ws_id
+#define MGD_OBJECT_WS_OID(__obj) MIDGARD_OBJECT(__obj)->priv->ws_object_id
 
 struct _MidgardObjectClassPrivate {
 	MgdSchemaTypeAttr *storage_data;

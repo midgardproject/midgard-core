@@ -1344,9 +1344,13 @@ static void _midgard_user_class_init(
 	prop_attr->field = g_strdup(property_name);
 	prop_attr->table = g_strdup(MIDGARD_USER_TABLE);
 	prop_attr->tablefield = g_strjoin(".", MIDGARD_USER_TABLE, property_name, NULL);
+	prop_attr->primaryfield = g_strdup (property_name);
+	prop_attr->is_primary = TRUE;
 	g_hash_table_insert(type_attr->prophash,
 			g_strdup((gchar *)property_name), prop_attr);
 	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
+	type_attr->primary = g_strdup (property_name);
+	type_attr->primaryfield = g_strdup (property_name);
 
 	/* LOGIN */
 	property_name = "login";
@@ -1490,6 +1494,7 @@ static void _midgard_user_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_exists = _user_storage_exists; 
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->delete_storage = _user_storage_delete;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_statement_insert;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_update = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_statement_update;
 
 	type_attr->params = midgard_core_dbobject_class_list_properties (MIDGARD_DBOBJECT_CLASS (klass), &type_attr->num_properties);	
 	guint i;
@@ -1505,8 +1510,11 @@ static void _midgard_user_class_init(
 	type_attr->sql_select_full = g_strdup (sql_full->str);
 	g_string_free (sql_full, TRUE);
 
-	 /* Initialize persistent statement */
+	/* Initialize persistent INSERT statement */
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_insert (MIDGARD_DBOBJECT_CLASS (klass));
+
+	/* Initialize persistent UPDATE statement */
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_update (MIDGARD_DBOBJECT_CLASS (klass));
 }
 
 static void _midgard_user_instance_init(
