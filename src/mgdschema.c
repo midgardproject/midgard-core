@@ -266,7 +266,8 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 			} else {
 
 				MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, (gchar *)attrval);
-				midgard_core_schema_type_attr_extend (src, type_attr);
+				if (src)
+					midgard_core_schema_type_attr_extend (src, type_attr);
 			}
 
 			xmlFree (table_name);
@@ -288,7 +289,8 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 			} else {
 
 				MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, (gchar *)attrval);
-				midgard_core_schema_type_attr_extend (src, type_attr);
+				if (src)
+					midgard_core_schema_type_attr_extend (src, type_attr);
 			}
 	
 			xmlFree(table_name);
@@ -1405,6 +1407,8 @@ static void __extend_type_foreach(gpointer key, gpointer val, gpointer userdata)
 	if (!parent_type_attr)
 		g_error("Type information for %s (%s's parent) not found", 
 				type_attr->extends, type_attr->name);
+
+	midgard_core_schema_type_attr_extend (type_attr, parent_type_attr);
 
 	/* Use parent's storage */
 	type_attr->table = g_strdup(parent_type_attr->table);

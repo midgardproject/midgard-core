@@ -212,11 +212,19 @@ midgard_core_schema_type_attr_extend (MgdSchemaTypeAttr *src, MgdSchemaTypeAttr 
 	g_return_if_fail (src != NULL);
 	g_return_if_fail (dst != NULL);
 
+	g_free (dst->parentfield);
 	dst->parentfield = src->parentfield ? g_strdup (src->parentfield) : NULL;
+	g_free (dst->upfield);
 	dst->upfield = src->upfield ? g_strdup (src->upfield) : NULL;
+	g_free ((gchar *)dst->parent);
 	dst->parent = src->parent ? g_strdup (src->parent) : NULL;
+	g_free ((gchar *)dst->primary);
 	dst->primary = src->primary ? g_strdup (src->primary) : NULL;
+	g_free ((gchar *)dst->primaryfield);
+	dst->primaryfield = src->primaryfield ? g_strdup (src->primaryfield) : NULL;
+	g_free ((gchar *)dst->property_up);
 	dst->property_up = src->property_up ? g_strdup (src->property_up) : NULL;
+	g_free ((gchar *)dst->property_parent);
 	dst->property_parent = src->property_parent ? g_strdup (src->property_parent) : NULL;
 
 	if (src->children) {
@@ -226,7 +234,9 @@ midgard_core_schema_type_attr_extend (MgdSchemaTypeAttr *src, MgdSchemaTypeAttr 
 		}
 	}
 
+	g_free ((gchar *)dst->unique_name);
 	dst->unique_name = src->unique_name ? g_strdup (src->unique_name) : NULL;
+	g_free ((gchar *)dst->metadata_class_name);
 	dst->metadata_class_name = src->metadata_class_name ? g_strdup (src->metadata_class_name) : NULL;
 	dst->metadata_class_ptr = src->metadata_class_ptr ? src->metadata_class_ptr : NULL;
 }
