@@ -1114,6 +1114,10 @@ __midgard_config_struct_free (MidgardConfig *self)
 	g_free (self->priv->configname);
 	self->priv->configname = NULL;
 
+	if (self->priv->log_channel)
+		g_io_channel_unref (self->priv->log_channel);
+	self->priv->log_channel = NULL;
+
 	g_free (self->priv);
 	self->priv = NULL;
 
