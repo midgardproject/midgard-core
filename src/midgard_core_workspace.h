@@ -21,6 +21,7 @@
 
 #include "midgard_dbobject.h"
 #include "midgard_workspace.h"
+#include "midgard_workspace_storage.h"
 
 G_BEGIN_DECLS
 
@@ -46,11 +47,17 @@ struct _MidgardWorkspacePrivate {
 	guint up_id;
 };
 
+struct _MidgardWorkspaceStorageIFacePrivate {
+	GSList	*(*list_ids)	(MidgardWorkspaceStorage *self);
+};
+
 void		midgard_core_workspace_list_all			(MidgardConnection *mgd);
 gboolean	midgard_core_workspace_name_exists		(MidgardWorkspace *workspace, MidgardWorkspace *parent);
 GSList 		*midgard_core_workspace_get_parent_names	(MidgardConnection *mgd, guint up);
-gint		midgard_core_workspace_get_col_id_by_name 	(MidgardConnection *mgd, const gchar *name, gint col_idx, gint up_id_check);
+const GValue 	*midgard_core_workspace_get_value_by_id 	(MidgardConnection *mgd, guint field_id, guint id);
+gint		midgard_core_workspace_get_col_id_by_name 	(MidgardConnection *mgd, const gchar *name, gint col_idx, gint up_id_check, guint *row_id);
 GSList 		*midgard_core_workspace_get_context_ids 	(MidgardConnection *mgd, guint id);
+gint		midgard_core_workspace_get_id_by_path		(MidgardConnection *mgd, const gchar *path, guint *row_id, GError **error);
 
 G_END_DECLS
 

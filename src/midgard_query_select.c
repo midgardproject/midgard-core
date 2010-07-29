@@ -24,6 +24,7 @@
 #include "midgard_dbobject.h"
 #include <sql-parser/gda-sql-parser.h>
 #include "midgard_core_workspace.h"
+#include "midgard_workspace_storage.h"
 
 /**
  * midgard_query_select_new:

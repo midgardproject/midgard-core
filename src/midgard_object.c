@@ -48,6 +48,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_schema_object_tree.h"
 #include <sql-parser/gda-sql-parser.h>
 #include "midgard_core_workspace.h"
+#include "midgard_workspace.h"
+#include "midgard_workspace_storage.h"
 #include "midgard_query_select_simple.h"
 
 GType _midgard_attachment_type = 0;

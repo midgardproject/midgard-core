@@ -16,7 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "midgard_workspace_storage.h"
 #include "midgard_workspace.h"
+#include "midgard_workspace_context.h"
 #include "midgard_core_workspace.h"
 #include "midgard_core_object.h"
 #include "midgard_core_query.h"
@@ -30,12 +32,6 @@
 #include "midgard_query_storage.h"
 #include "midgard_query_constraint.h"
 #include "midgard_query_constraint_group.h"
-
-GQuark 
-midgard_workspace_error_quark (void)
-{
-	return g_quark_from_static_string ("midgard_workspace_error-quark");
-}
 
 /**
  * midgard_wrokspace_new:
@@ -71,10 +67,10 @@ midgard_workspace_new (MidgardConnection *mgd, MidgardWorkspace *parent_workspac
  * Cases to return %NULL:
  * <itemizedlist>
  * <listitem><para>
- * Given path is invalid ( WORKSPACE_ERROR_INVALID_PATH )
+ * Given path is invalid ( WORKSPACE_STORAGE_ERROR_INVALID_PATH )
  * </para></listitem>
  * <listitem><para>
- * Workspace at given path doesn't exist ( WORKSPACE_ERROR_OBJECT_NOT_EXISTS )
+ * WorkspaceStorageStorage at given path doesn't exist ( WORKSPACE_STORAGE_ERROR_OBJECT_NOT_EXISTS )
  * </para></listitem>
  * </itemizedlist>
  *
@@ -90,77 +86,20 @@ midgard_workspace_get_by_path (MidgardConnection *mgd, const gchar *path, GError
 	g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
 	GError *err = NULL;
-	gchar **tokens = g_strsplit (path, "/", 0);
-	guint i = 0;
-	/* If path begins with slash, first element is an empty string. Ignore it. */
-	if (*tokens[0] == '\0')
-		i++;
-	gint j = i;
-	gboolean valid_path = TRUE;
-	/* Validate path */
-	while (tokens[i] != NULL) {
-		if (tokens[i] == '\0') 
-			valid_path = FALSE;
-		i++;
-	}
-
-	if (!valid_path) {
-		err = g_error_new (MIDGARD_WORKSPACE_ERROR, WORKSPACE_ERROR_INVALID_PATH, "An empty element found in given path");
-		g_propagate_error (error, err);
-		g_strfreev (tokens);
-		return NULL;
-	}
-
-	/* Check every possible workspace name */
 	gint id = 0;
-	guint up = 0;
-	const gchar *name = NULL;
-	while (tokens[j] != NULL) {
-		name = tokens[j];	
-		id = midgard_core_workspace_get_col_id_by_name (mgd, name, MGD_WORKSPACE_FIELD_IDX_ID, up);
-		if (id == -1)
-			break;
-		up = id;
-		j++;
-	}
+	guint row_id;
+	id = midgard_core_workspace_get_id_by_path (mgd, path, &row_id, &err);
 
 	if (id == -1) {
-		err = g_error_new (MIDGARD_WORKSPACE_ERROR, WORKSPACE_ERROR_OBJECT_NOT_EXISTS, "Workspace error doesn't exists at given path");
 		g_propagate_error (error, err);
-		g_strfreev (tokens);
 		return NULL;
 	}
 
-	MidgardQueryStorage *mqs = midgard_query_storage_new ("MidgardWorkspace");
-	/* Create value and constraint for id property */
-	GValue idval = {0, };
-	g_value_init (&idval, G_TYPE_UINT);
-	g_value_set_uint (&idval, id);
-	MidgardQueryValue *mqv_id = midgard_query_value_create_with_value (&idval);
-	MidgardQueryProperty *mqp_id = midgard_query_property_new ("id", NULL);
-	MidgardQueryConstraint *mqc_id = midgard_query_constraint_new (mqp_id, "=", MIDGARD_QUERY_HOLDER (mqv_id), NULL);
-	
-	/* Create executor */
-	MidgardQuerySelect *mqselect = midgard_query_select_new (mgd, mqs);
-	midgard_query_select_toggle_read_only (mqselect, FALSE);
-	midgard_query_executor_set_constraint (MIDGARD_QUERY_EXECUTOR (mqselect), MIDGARD_QUERY_CONSTRAINT_SIMPLE (mqc_id));
-	midgard_query_executor_execute (MIDGARD_QUERY_EXECUTOR (mqselect));
+	MidgardWorkspace *ws = midgard_workspace_new (mgd, NULL);
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (ws);
+	dbklass->dbpriv->set_from_data_model (MIDGARD_DBOBJECT (ws), mgd->priv->workspace_model, row_id, 0);
 
-	guint n_objects;
-	MidgardDBObject **objects = midgard_query_select_list_objects (mqselect, &n_objects);
-
-	MidgardWorkspace *workspace = MIDGARD_WORKSPACE (objects[0]);
-
-	g_strfreev (tokens);
-	g_object_unref (mqs);
-	g_value_unset (&idval);
-	g_object_unref (mqv_id);
-	g_object_unref (mqp_id);
-	g_object_unref (mqc_id);
-	g_object_unref (mqselect);
-	g_free (objects);
-
-	return workspace;
+	return ws;
 }
 
 /**
@@ -171,7 +110,7 @@ midgard_workspace_get_by_path (MidgardConnection *mgd, const gchar *path, GError
  * Cases to return %FALSE:
  * <itemizedlist>
  * <listitem><para>
- * workspace with such name (either root or child one) already exists ( WORKSPACE_ERROR_NAME_EXISTS )
+ * workspace with such name (either root or child one) already exists ( WORKSPACE_STORAGE_ERROR_NAME_EXISTS )
  * </para></listitem>
  * </itemizedlist>
  *
@@ -191,8 +130,9 @@ midgard_workspace_create (MidgardWorkspace *self, GError **error)
 
 	GError *er = NULL;
 	if (midgard_core_workspace_name_exists (self, self->priv->parent_ws)) {
-		er = g_error_new (MIDGARD_WORKSPACE_ERROR, WORKSPACE_ERROR_NAME_EXISTS, 
-				"Workspace at path '%s' already exists", midgard_workspace_get_path (self));
+		er = g_error_new (MIDGARD_WORKSPACE_STORAGE_ERROR, WORKSPACE_STORAGE_ERROR_NAME_EXISTS, 
+				"WorkspaceStorage at path '%s' already exists", 
+				midgard_workspace_storage_get_path (MIDGARD_WORKSPACE_STORAGE (self)));
 		g_propagate_error (error, er);
 		return FALSE;
 	}
@@ -210,7 +150,8 @@ midgard_workspace_create (MidgardWorkspace *self, GError **error)
 		midgard_core_workspace_list_all (mgd);
 
 		/* Get id of newly created object */
-		gint id = midgard_core_workspace_get_col_id_by_name (mgd, self->priv->name, MGD_WORKSPACE_FIELD_IDX_ID, self->priv->up_id);
+		guint row_id;
+		gint id = midgard_core_workspace_get_col_id_by_name (mgd, self->priv->name, MGD_WORKSPACE_FIELD_IDX_ID, self->priv->up_id, &row_id);
 		if (id < 1) {
 			g_warning ("Newly created workspace id is not unique (%d)", id);
 			/* TODO, set error and delete workspace from database */
@@ -232,22 +173,90 @@ midgard_workspace_create (MidgardWorkspace *self, GError **error)
 }
 
 /**
- * midgard_workspace_get_path:
+ * midgard_workspace_get_context:
  * @self: #MidgardWorkspace instance
  *
- * Returns: (transfer full): newly allocated string which holds a path, given workspace is at. 
- * Returned string should be freed when no longer needed.
+ * Returns: #MidgardWorkspaceContext @self is in or %NULL
  * Since: 10.11
  */
-gchar*
-midgard_workspace_get_path (MidgardWorkspace *self)
+MidgardWorkspaceContext*
+midgard_workspace_get_context (MidgardWorkspace *self)
 {
 	g_return_val_if_fail (self != NULL, NULL);
+
+	const gchar *path = midgard_workspace_storage_get_path (MIDGARD_WORKSPACE_STORAGE (self));
+	if (!path)
+		return NULL;
+
+	return midgard_workspace_context_create (MGD_OBJECT_CNC (self), path, NULL);
+}
+
+/**
+ * midgard_workspace_is_in_context:
+ * @self: #MidgardWorkspace instance
+ * @context: #MidgardWorkspaceContext to check
+ *
+ * Check whether @self is in gven #MidgardWorkspaceContext @context
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ */
+gboolean
+midgard_workspace_is_in_context (MidgardWorkspace *self, MidgardWorkspaceContext *context)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (context != NULL, FALSE);
+
+	guint elements;
+	gchar **names = midgard_workspace_context_get_workspace_names (context, &elements);
+
+	/* context has no single workspace */
+	if (elements < 1) {
+		if (names)
+			g_strfreev (names);
+		return FALSE;
+	}
+
+	/* Find workspace by name */
+	guint i = 0;
+	gchar *name = NULL;
+	while (names[i] != NULL) {
+		if (g_str_equal (names[i], self->priv->name)) {
+			name = names[i];
+			break;
+		}
+	}
+
+	/* There's no named workspace */
+	if (!name) {
+		g_strfreev (names);
+		return FALSE;
+	}
+
+	/* Get named workspace from context and check if id equals*/
+	MidgardWorkspace *tmp = midgard_workspace_context_get_workspace_by_name (context, name);
+	g_strfreev (names);
+	if (!tmp)
+		return FALSE;
+
+	guint id = tmp->priv->id;
+	g_object_unref (tmp);
+
+	if (id == self->priv->id)
+		return TRUE;
+
+	return FALSE;
+}
+
+const gchar*
+_midgard_workspace_get_path (MidgardWorkspaceStorage *ws)
+{
+	g_return_val_if_fail (ws != NULL, NULL);
+
+	MidgardWorkspace *self = MIDGARD_WORKSPACE (ws);
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
 	g_return_val_if_fail (mgd != NULL, NULL);
 
-	/* Do not cache path to avoid callbacks overhead */
 	GSList *list = midgard_core_workspace_get_parent_names (mgd, self->priv->up_id);
 	GSList *l;
 	GString *str = g_string_new ("");
@@ -259,7 +268,25 @@ midgard_workspace_get_path (MidgardWorkspace *self)
 
 	g_string_append_printf (str, "/%s", self->priv->name);
 
-	return g_string_free (str, FALSE);
+	g_free (self->priv->path);
+	self->priv->path = g_string_free (str, FALSE);
+
+	return (const gchar *) self->priv->path;
+}
+
+static GSList*
+_midgard_workspace_iface_list_ids (MidgardWorkspaceStorage *self)
+{
+	MidgardWorkspace *ws = MIDGARD_WORKSPACE (self);
+	MidgardConnection *mgd = MGD_OBJECT_CNC (ws);
+	guint id = ws->priv->id;
+	if (id == 0)
+		return NULL;
+
+	const GValue *id_val = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_ID, id);
+	GSList *list = g_slist_append (list, (gpointer) id_val);
+
+	return list;
 }
 
 /* GOBJECT ROUTINES */
@@ -275,8 +302,27 @@ enum {
 	PROPERTY_NAME
 };
 
+static void
+_midgard_workspace_iface_init (MidgardWorkspaceStorageIFace *iface)
+{
+	iface->get_path = _midgard_workspace_get_path;
+	iface->priv = g_new (MidgardWorkspaceStorageIFacePrivate, 1);
+        iface->priv->list_ids = _midgard_workspace_iface_list_ids;
+	return;
+}
+
+static void
+_midgard_workspace_iface_finalize (MidgardWorkspaceStorageIFace *iface)
+{
+	if (iface->priv)
+		g_free (iface->priv);
+	iface->priv = NULL;
+	return;
+}
+
+
 static void 
-__midgard_workspace_instance_init (GTypeInstance *instance, gpointer g_class)
+_midgard_workspace_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	MidgardWorkspace *self = (MidgardWorkspace *) instance;
 	self->priv = g_new (MidgardWorkspacePrivate, 1);
@@ -290,7 +336,7 @@ __midgard_workspace_instance_init (GTypeInstance *instance, gpointer g_class)
 }
 
 static GObject *
-__midgard_workspace_constructor (GType type,
+_midgard_workspace_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties)
 {
@@ -302,7 +348,7 @@ __midgard_workspace_constructor (GType type,
 }
 
 static void
-__midgard_workspace_dispose (GObject *object)
+_midgard_workspace_dispose (GObject *object)
 {
 	MidgardWorkspace *self = MIDGARD_WORKSPACE (object);
 	if (self->priv->parent_ws) {
@@ -314,7 +360,7 @@ __midgard_workspace_dispose (GObject *object)
 }
 
 static void 
-__midgard_workspace_finalize (GObject *object)
+_midgard_workspace_finalize (GObject *object)
 {
 	MidgardWorkspace *self = MIDGARD_WORKSPACE (object);
 
@@ -326,7 +372,7 @@ __midgard_workspace_finalize (GObject *object)
 }
 
 static void
-__midgard_workspace_set_property (GObject *object, guint property_id, const GValue *value, GParamSpec *pspec)
+_midgard_workspace_set_property (GObject *object, guint property_id, const GValue *value, GParamSpec *pspec)
 {
 	MidgardWorkspace *self = MIDGARD_WORKSPACE (object);
 
@@ -355,7 +401,7 @@ __midgard_workspace_set_property (GObject *object, guint property_id, const GVal
 }
 
 static void
-__midgard_workspace_get_property (GObject *object, guint property_id, GValue *value, GParamSpec *pspec)
+_midgard_workspace_get_property (GObject *object, guint property_id, GValue *value, GParamSpec *pspec)
 {
 	MidgardWorkspace *self = (MidgardWorkspace *) object;
 	
@@ -378,7 +424,7 @@ __midgard_workspace_get_property (GObject *object, guint property_id, GValue *va
 			break;
 
 		case PROPERTY_PATH:
-			g_value_take_string (value, midgard_workspace_get_path (self));
+			g_value_set_string (value, midgard_workspace_storage_get_path (MIDGARD_WORKSPACE_STORAGE (self)));
 			break;
 
 		case PROPERTY_NAME:
@@ -489,18 +535,18 @@ _set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, gint
 	return;
 }
 
-static void __midgard_workspace_class_init(
+static void _midgard_workspace_class_init(
 		gpointer g_class, gpointer g_class_data)
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);
 	MidgardWorkspaceClass *klass = MIDGARD_WORKSPACE_CLASS (g_class);
 	__parent_class = g_type_class_peek_parent (g_class);
 	
-	gobject_class->constructor = __midgard_workspace_constructor;
-	gobject_class->dispose = __midgard_workspace_dispose;
-	gobject_class->finalize = __midgard_workspace_finalize;
-	gobject_class->set_property = __midgard_workspace_set_property;
-	gobject_class->get_property = __midgard_workspace_get_property;
+	gobject_class->constructor = _midgard_workspace_constructor;
+	gobject_class->dispose = _midgard_workspace_dispose;
+	gobject_class->finalize = _midgard_workspace_finalize;
+	gobject_class->set_property = _midgard_workspace_set_property;
+	gobject_class->get_property = _midgard_workspace_get_property;
 
 	/* PROPERTIES */
 	MgdSchemaPropertyAttr *prop_attr;
@@ -581,7 +627,7 @@ static void __midgard_workspace_class_init(
 	/* name */
 	property_name = "name";
 	pspec = g_param_spec_string (property_name,
-			"Workspace name",
+			"WorkspaceStorageStorage name",
 			"",
 			"",
 			G_PARAM_READWRITE);
@@ -628,14 +674,22 @@ midgard_workspace_get_type(void)
 			sizeof (MidgardWorkspaceClass),
 			NULL,	/* base_init */
 			NULL,           /* base_finalize */
-			(GClassInitFunc) __midgard_workspace_class_init,
+			(GClassInitFunc) _midgard_workspace_class_init,
 			NULL,           /* class_finalize */
 			NULL,           /* class_data */
 			sizeof (MidgardWorkspace),
 			0,              /* n_preallocs */
-			__midgard_workspace_instance_init /* instance_init */
+			_midgard_workspace_instance_init /* instance_init */
 		};
+
+		static const GInterfaceInfo property_info = {
+			(GInterfaceInitFunc) _midgard_workspace_iface_init,
+			(GInterfaceFinalizeFunc) _midgard_workspace_iface_finalize,	
+			NULL    /* interface_data */
+		};
+
 		type = g_type_register_static (MIDGARD_TYPE_DBOBJECT, "MidgardWorkspace", &info, 0);
+		g_type_add_interface_static (type, MIDGARD_TYPE_WORKSPACE_STORAGE, &property_info);
 	}
 	return type;
 }

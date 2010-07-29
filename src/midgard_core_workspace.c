@@ -18,6 +18,7 @@
 
 
 #include "midgard_core_query.h"
+#include "midgard_workspace_storage.h"
 #include "midgard_workspace.h"
 #include "midgard_core_object.h"
 #include "midgard_core_workspace.h"
@@ -48,11 +49,12 @@ midgard_core_workspace_list_all (MidgardConnection *mgd)
 }
 
 gint
-midgard_core_workspace_get_col_id_by_name (MidgardConnection *mgd, const gchar *name, gint col_idx, gint up_id_check)
+midgard_core_workspace_get_col_id_by_name (MidgardConnection *mgd, const gchar *name, gint col_idx, gint up_id_check, guint *row_id)
 {
 	g_return_val_if_fail (mgd != NULL, -1);
 	g_return_val_if_fail (name != NULL, -1);
 
+	*row_id = 0;
 	guint row;
 	GdaDataModel *model = mgd->priv->workspace_model;
 	/* model is not initialized, which means there's no workspace created yet */
@@ -80,6 +82,7 @@ midgard_core_workspace_get_col_id_by_name (MidgardConnection *mgd, const gchar *
 
 		const GValue *nval = gda_data_model_get_value_at (model, MGD_WORKSPACE_FIELD_IDX_NAME, row, NULL);	
 		if (g_str_equal (name, g_value_get_string (nval))) {
+			*row_id = row;
 			const GValue *colval = gda_data_model_get_value_at (model, col_idx, row, NULL);
 			if (G_VALUE_HOLDS_UINT (colval))
 				return (gint) g_value_get_uint (colval);
@@ -93,7 +96,8 @@ midgard_core_workspace_get_col_id_by_name (MidgardConnection *mgd, const gchar *
 gint
 midgard_core_workspace_get_up_id_by_name (MidgardConnection *mgd, const gchar *name, guint up_id)
 {
-	return midgard_core_workspace_get_col_id_by_name (mgd, name, MGD_WORKSPACE_FIELD_IDX_UP, up_id);
+	guint row_id;
+	return midgard_core_workspace_get_col_id_by_name (mgd, name, MGD_WORKSPACE_FIELD_IDX_UP, up_id, &row_id);
 }
 
 gint
@@ -114,7 +118,8 @@ midgard_core_workspace_name_exists (MidgardWorkspace *workspace, MidgardWorkspac
 	if (parent) 
 		up_id = parent->priv->id;
 
-	gint exists = midgard_core_workspace_get_col_id_by_name (mgd, name, MGD_WORKSPACE_FIELD_IDX_ID, up_id);
+	guint row_id;
+	gint exists = midgard_core_workspace_get_col_id_by_name (mgd, name, MGD_WORKSPACE_FIELD_IDX_ID, up_id, &row_id);
 
 	if (exists == -1)
 		return FALSE;
@@ -122,7 +127,7 @@ midgard_core_workspace_name_exists (MidgardWorkspace *workspace, MidgardWorkspac
 	return TRUE;
 }
 
-static const GValue *
+const GValue *
 midgard_core_workspace_get_value_by_id (MidgardConnection *mgd, guint col_idx, guint id)
 {
 	g_return_val_if_fail (mgd != NULL, NULL);
@@ -254,4 +259,54 @@ midgard_core_workspace_get_parent_names (MidgardConnection *mgd, guint up)
 	} while (name != NULL);
 	
 	return list;
+}
+
+gint 
+midgard_core_workspace_get_id_by_path (MidgardConnection *mgd, const gchar *path, guint *row_id, GError **error)
+{
+	GError *err = NULL;
+	gchar **tokens = g_strsplit (path, "/", 0);
+	guint i = 0;
+	*row_id = 0;
+	/* If path begins with slash, first element is an empty string. Ignore it. */
+	if (*tokens[0] == '\0')
+		i++;
+
+	guint id = -1;
+	gint j = i;
+	gboolean valid_path = TRUE;
+	/* Validate path */
+	while (tokens[i] != NULL) {
+		if (tokens[i] == '\0') 
+			valid_path = FALSE;
+		i++;
+	}
+
+	if (!valid_path) {
+		err = g_error_new (MIDGARD_WORKSPACE_STORAGE_ERROR, WORKSPACE_STORAGE_ERROR_INVALID_PATH, "An empty element found in given path");
+		g_propagate_error (error, err);
+		g_strfreev (tokens);
+		return id;
+	}
+
+	/* Check every possible workspace_storage name */
+	id = 0;
+	guint up = 0;
+	const gchar *name = NULL;
+	while (tokens[j] != NULL) {
+		name = tokens[j];	
+		id = midgard_core_workspace_get_col_id_by_name (mgd, name, MGD_WORKSPACE_FIELD_IDX_ID, up, row_id);
+		if (id == -1)
+			break;
+		up = id;
+		j++;
+	}
+
+	if (id == -1) {
+		err = g_error_new (MIDGARD_WORKSPACE_STORAGE_ERROR, WORKSPACE_STORAGE_ERROR_OBJECT_NOT_EXISTS, "WorkspaceStorage doesn't exists at given path");
+		g_propagate_error (error, err);
+	}
+	
+	g_strfreev (tokens);
+	return id;
 }
