@@ -270,6 +270,13 @@ _midgard_workspace_context_iface_list_ids (MidgardWorkspaceStorage *self)
 	return midgard_core_workspace_get_context_ids (ctx->priv->mgd, ctx->priv->workspace_id);
 }
 
+static guint
+_midgard_workspace_context_iface_get_id (MidgardWorkspaceStorage *self)
+{
+	MidgardWorkspaceContext *ctx = MIDGARD_WORKSPACE_CONTEXT (self);
+	return ctx->priv->workspace_id;
+}
+
 /* GOBJECT ROUTINES */
 
 static GObjectClass *parent_class = NULL;
@@ -286,6 +293,7 @@ _midgard_workspace_context_iface_init (MidgardWorkspaceStorageIFace *iface)
 	iface->get_path = _midgard_workspace_context_get_path;
 	iface->priv = g_new (MidgardWorkspaceStorageIFacePrivate, 1);
 	iface->priv->list_ids = _midgard_workspace_context_iface_list_ids;
+	iface->priv->get_id = _midgard_workspace_context_iface_get_id;
 	return;
 }
 

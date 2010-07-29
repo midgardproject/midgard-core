@@ -206,6 +206,9 @@ midgard_workspace_is_in_context (MidgardWorkspace *self, MidgardWorkspaceContext
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (context != NULL, FALSE);
 
+	if (!self->priv->name)
+		return FALSE;
+
 	guint elements;
 	gchar **names = midgard_workspace_context_get_workspace_names (context, &elements);
 
@@ -224,6 +227,7 @@ midgard_workspace_is_in_context (MidgardWorkspace *self, MidgardWorkspaceContext
 			name = names[i];
 			break;
 		}
+		i++;
 	}
 
 	/* There's no named workspace */
@@ -289,6 +293,13 @@ _midgard_workspace_iface_list_ids (MidgardWorkspaceStorage *self)
 	return list;
 }
 
+static guint
+_midgard_workspace_iface_get_id (MidgardWorkspaceStorage *self)
+{
+	MidgardWorkspace *ws = MIDGARD_WORKSPACE (self);
+	return ws->priv->id;
+}
+
 /* GOBJECT ROUTINES */
 
 static GObjectClass *__parent_class= NULL;
@@ -308,6 +319,7 @@ _midgard_workspace_iface_init (MidgardWorkspaceStorageIFace *iface)
 	iface->get_path = _midgard_workspace_get_path;
 	iface->priv = g_new (MidgardWorkspaceStorageIFacePrivate, 1);
         iface->priv->list_ids = _midgard_workspace_iface_list_ids;
+	iface->priv->get_id = _midgard_workspace_iface_get_id;
 	return;
 }
 

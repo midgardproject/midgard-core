@@ -19,6 +19,7 @@
 #ifndef MIDGARD_WORKSPACE_CONTEXT_H
 #define MIDGARD_WORKSPACE_CONTEXT_H
 
+#include "midgard_defs.h"
 #include "midgard_workspace.h"
 
 G_BEGIN_DECLS
@@ -31,7 +32,6 @@ G_BEGIN_DECLS
 #define MIDGARD_IS_WORKSPACE_CONTEXT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_WORKSPACE_CONTEXT_TYPE))
 #define MIDGARD_WORKSPACE_CONTEXT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_WORKSPACE_CONTEXT_TYPE, MidgardWorkspaceContextClass))
 
-typedef struct _MidgardWorkspaceContext MidgardWorkspaceContext;
 typedef struct _MidgardWorkspaceContextPrivate MidgardWorkspaceContextPrivate;
 typedef struct _MidgardWorkspaceContextClass MidgardWorkspaceContextClass;
 

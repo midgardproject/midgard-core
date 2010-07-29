@@ -21,6 +21,7 @@
 
 #include "midgard_dbobject.h"
 #include "midgard_workspace.h"
+#include "midgard_workspace_context.h"
 #include "midgard_workspace_storage.h"
 
 G_BEGIN_DECLS
@@ -49,6 +50,7 @@ struct _MidgardWorkspacePrivate {
 
 struct _MidgardWorkspaceStorageIFacePrivate {
 	GSList	*(*list_ids)	(MidgardWorkspaceStorage *self);
+	guint	(*get_id)	(MidgardWorkspaceStorage *self);
 };
 
 void		midgard_core_workspace_list_all			(MidgardConnection *mgd);

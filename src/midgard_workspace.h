@@ -20,6 +20,8 @@
 #define MIDGARD_WORKSPACE_H
 
 #include "midgard_dbobject.h"
+#include "midgard_defs.h"
+#include "midgard_workspace_context.h"
 
 G_BEGIN_DECLS
 
@@ -31,7 +33,6 @@ G_BEGIN_DECLS
 #define MIDGARD_IS_WORKSPACE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_TYPE_WORKSPACE))
 #define MIDGARD_WORKSPACE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_WORKSPACE, MidgardWorkspaceClass))
 
-typedef struct _MidgardWorkspace MidgardWorkspace;
 typedef struct _MidgardWorkspaceClass MidgardWorkspaceClass;
 typedef struct _MidgardWorkspacePrivate MidgardWorkspacePrivate; 
 
@@ -51,6 +52,8 @@ MidgardWorkspace	*midgard_workspace_new			(MidgardConnection *mgd, MidgardWorksp
 gboolean		midgard_workspace_update		(MidgardWorkspace *self, GError **error);
 MidgardWorkspace 	**midgard_workspace_list_children	(MidgardWorkspace *self);
 MidgardWorkspace	*midgard_workspace_get_by_path		(MidgardConnection *mgd, const gchar *path, GError **error);
+MidgardWorkspaceContext *midgard_workspace_get_context		(MidgardWorkspace *self);
+gboolean		midgard_workspace_is_in_context		(MidgardWorkspace *self, MidgardWorkspaceContext *context);
 
 G_END_DECLS
 

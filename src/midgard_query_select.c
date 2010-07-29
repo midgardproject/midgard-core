@@ -250,11 +250,10 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 
 	MidgardConnection *mgd = MIDGARD_QUERY_EXECUTOR (self)->priv->mgd;
 	gboolean has_ws = MGD_CNC_HAS_WORKSPACE (mgd);
-	gboolean has_ws_ctx = MGD_CNC_HAS_WORKSPACE_CONTEXT (mgd);
-	guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
-	if (!has_ws && !has_ws_ctx)
+	if (!has_ws)
 		return;
 
+	guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
 	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
 	GdaSqlStatement *sql_stm = executor->priv->stmt;
 	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;
@@ -281,7 +280,8 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 			MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_OID_FIELD, 
 			klass_table, MGD_WORKSPACE_ID_FIELD);
 
-	GSList *list = midgard_core_workspace_get_context_ids (mgd, ws_id);
+	const MidgardWorkspaceStorage *ws = midgard_connection_get_workspace (mgd);
+	GSList *list = MIDGARD_WORKSPACE_STORAGE_GET_INTERFACE (ws)->priv->list_ids (MIDGARD_WORKSPACE_STORAGE (ws));
 	GSList *l = NULL;
 	guint i = 0;
 	guint id;
