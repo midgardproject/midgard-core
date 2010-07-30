@@ -56,7 +56,7 @@ struct _MidgardWorkspaceStorageIFacePrivate {
 void		midgard_core_workspace_list_all			(MidgardConnection *mgd);
 gboolean	midgard_core_workspace_name_exists		(MidgardWorkspace *workspace, MidgardWorkspace *parent);
 GSList 		*midgard_core_workspace_get_parent_names	(MidgardConnection *mgd, guint up);
-const GValue 	*midgard_core_workspace_get_value_by_id 	(MidgardConnection *mgd, guint field_id, guint id);
+const GValue 	*midgard_core_workspace_get_value_by_id 	(MidgardConnection *mgd, guint field_id, guint id, guint *row_id);
 gint		midgard_core_workspace_get_col_id_by_name 	(MidgardConnection *mgd, const gchar *name, gint col_idx, gint up_id_check, guint *row_id);
 GSList 		*midgard_core_workspace_get_context_ids 	(MidgardConnection *mgd, guint id);
 gint		midgard_core_workspace_get_id_by_path		(MidgardConnection *mgd, const gchar *path, guint *row_id, GError **error);

@@ -128,11 +128,14 @@ midgard_core_workspace_name_exists (MidgardWorkspace *workspace, MidgardWorkspac
 }
 
 const GValue *
-midgard_core_workspace_get_value_by_id (MidgardConnection *mgd, guint col_idx, guint id)
+midgard_core_workspace_get_value_by_id (MidgardConnection *mgd, guint col_idx, guint id, guint *row_id)
 {
 	g_return_val_if_fail (mgd != NULL, NULL);
 
 	guint row;
+	if (row_id)
+		*row_id = 0;
+
 	GdaDataModel *model = mgd->priv->workspace_model;
 	if (!model) {
 		g_critical ("Failed to get workspace name by itd id. Workspace data model is not set");
@@ -154,9 +157,12 @@ midgard_core_workspace_get_value_by_id (MidgardConnection *mgd, guint col_idx, g
 		else 
 			model_id = g_value_get_int (idval);
 
-		/* Check if the row in question holds values for parent workspace */
+		/* Check if the row in question holds id value */
 		if (id != model_id)
 			continue;
+
+		if (row_id)
+			*row_id = row;
 
 		return gda_data_model_get_value_at (model, col_idx, row, NULL);	
 	}
@@ -174,12 +180,13 @@ _get_parent_values (MidgardConnection *mgd, guint up, guint field_idx)
 		return NULL;
 
 	const GValue *value = NULL;
+	guint row_id;
 
 	do {
-		value = midgard_core_workspace_get_value_by_id (mgd, field_idx, up);
+		value = midgard_core_workspace_get_value_by_id (mgd, field_idx, up, &row_id);
 		if (value) {
 			list = g_slist_prepend (list, (gpointer) value);
-			const GValue *up_value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_UP, up);
+			const GValue *up_value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_UP, up, &row_id);
 			if (up_value) {
 				guint up_id = 0;
 				if (G_VALUE_HOLDS_UINT (up_value))
@@ -204,7 +211,8 @@ midgard_core_workspace_get_context_ids (MidgardConnection *mgd, guint id)
 	g_return_val_if_fail (mgd != NULL, NULL);
 	g_return_val_if_fail (id != 0, NULL);
 
-	const GValue *up_val = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_UP, id);
+	guint row_id;
+	const GValue *up_val = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_UP, id, &row_id);
 	guint up_id = 0;
 	if (G_VALUE_HOLDS_UINT (up_val))
 		up_id = g_value_get_uint (up_val);
@@ -236,13 +244,14 @@ midgard_core_workspace_get_parent_names (MidgardConnection *mgd, guint up)
 
 	const GValue *value = NULL;
 	const gchar *name = NULL;
+	guint row_id;
 
 	do {
-		value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_NAME, up);
+		value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_NAME, up, &row_id);
 		if (value) {
 			name = g_value_get_string (value);
 			list = g_slist_prepend (list, (gpointer) name);
-			const GValue *up_value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_UP, up);
+			const GValue *up_value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_UP, up, &row_id);
 			if (up_value) {
 				guint up_id = 0;
 				if (G_VALUE_HOLDS_UINT (up_value))
@@ -310,3 +319,4 @@ midgard_core_workspace_get_id_by_path (MidgardConnection *mgd, const gchar *path
 	g_strfreev (tokens);
 	return id;
 }
+

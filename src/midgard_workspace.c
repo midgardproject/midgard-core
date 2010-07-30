@@ -287,7 +287,8 @@ _midgard_workspace_iface_list_ids (MidgardWorkspaceStorage *self)
 	if (id == 0)
 		return NULL;
 
-	const GValue *id_val = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_ID, id);
+	guint row_id;
+	const GValue *id_val = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_ID, id, &row_id);
 	GSList *list = g_slist_append (list, (gpointer) id_val);
 
 	return list;

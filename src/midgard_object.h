@@ -151,6 +151,8 @@ gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid);
 void midgard_object_set_connection(MidgardObject *self, MidgardConnection *mgd);
 const MidgardConnection *midgard_object_get_connection(MidgardObject *self);
 
+MidgardWorkspace *midgard_object_get_workspace (MidgardObject *self);
+
 gboolean midgard_object_approve(MidgardObject *self);
 gboolean midgard_object_is_approved(MidgardObject *self);
 gboolean midgard_object_unapprove(MidgardObject *self);
