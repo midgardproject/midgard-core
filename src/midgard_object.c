@@ -62,7 +62,6 @@ static GObject *__mgdschema_object_constructor (GType type,
 static void __mgdschema_object_dispose (GObject *object);
 
 static void __add_core_properties(MgdSchemaTypeAttr *type_attr);
-static gint __insert_or_update_records(MidgardObject *object, const gchar *table, gint query_type, const gchar *where);
 
 enum {
 	MIDGARD_PROPERTY_NULL = 0,
@@ -73,11 +72,6 @@ enum {
 enum {
 	OBJECT_IN_TREE_NONE = 0,
 	OBJECT_IN_TREE_DUPLICATE,
-};
-
-enum {
-	_SQL_QUERY_CREATE = 0,
-	_SQL_QUERY_UPDATE
 };
 
 #define __dbus_send(_obj, _action) {						\
@@ -726,141 +720,6 @@ gboolean midgard_object_update(MidgardObject *self)
 	}
 
 	return rv;
-}
-
-static GPtrArray *__get_glists(MidgardObject *object) 
-{
-	GPtrArray *gparray = g_ptr_array_new();
-
-	guint n_prop, i;
-	GList *cols = NULL;
-	GList *values = NULL;
-	GValue pval = {0, };
-	const gchar *colname;
-	const gchar *classname = G_OBJECT_TYPE_NAME (object);
-
-	GParamSpec **pspecs =
-		g_object_class_list_properties(G_OBJECT_GET_CLASS(object), &n_prop);
-
-	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(object);
-		
-	for (i = 0; i < n_prop; i++) {
-
-		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT)
-			continue;
-
-		colname = midgard_core_class_get_property_colname(
-				MIDGARD_DBOBJECT_GET_CLASS(object), pspecs[i]->name);
-
-		if (colname == NULL)
-			continue;
-
-		/* FIXME, we should have boolean(s) here , not g_str_equal */
-		const gchar *pprop = 
-			midgard_reflector_object_get_property_primary(classname);
-		if (g_str_equal(pprop, pspecs[i]->name)) {
-			if (pspecs[i]->value_type == G_TYPE_UINT
-					|| pspecs[i]->value_type == G_TYPE_INT)
-				continue;
-		}
-
-		g_value_init(&pval, pspecs[i]->value_type);		
-		g_object_get_property(G_OBJECT(object), pspecs[i]->name, &pval);
-		GValue *dval = g_new0(GValue, 1);
-
-		if (G_VALUE_TYPE (&pval) == MGD_TYPE_TIMESTAMP) {
-
-			g_value_init (dval, GDA_TYPE_TIMESTAMP);
-			g_value_transform (&pval, dval);
-
-		} else { 
-
-			g_value_init(dval, pspecs[i]->value_type);
-			g_value_copy((const GValue*) &pval, dval);
-		}
-
-		values = g_list_prepend(values, (gpointer) dval);
-		cols = g_list_prepend(cols, (gpointer)colname);
-
-		g_value_unset(&pval);
-	}
-
-	g_free(pspecs);
-
-	if (MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_CLASS (klass))) {
-
-		n_prop = 0;
-		MidgardMetadata *mdata = MGD_DBOBJECT_METADATA (object);
-
-		pspecs = g_object_class_list_properties(G_OBJECT_GET_CLASS(mdata), &n_prop);
-
-		for(i = 0; i < n_prop; i++) {
-		
-			colname = midgard_core_class_get_property_colname(
-					MIDGARD_DBOBJECT_GET_CLASS(mdata), pspecs[i]->name);
-
-			if (!colname)
-				continue;
-
-			g_value_init(&pval, pspecs[i]->value_type);		
-			g_object_get_property(G_OBJECT(mdata), pspecs[i]->name, &pval);
-			GValue *dval = g_new0(GValue, 1);
-
-			if (G_VALUE_TYPE (&pval) == MGD_TYPE_TIMESTAMP) {
-	
-				g_value_init (dval, GDA_TYPE_TIMESTAMP);
-				g_value_transform (&pval, dval);
-		
-			} else { 
-				
-				g_value_init(dval, pspecs[i]->value_type);
-				g_value_copy((const GValue*) &pval, dval);
-			}
-
-			values = g_list_prepend(values, (gpointer) dval);
-			
-			cols = g_list_prepend(cols, (gpointer)colname);			
-			g_value_unset(&pval);
-		}
-
-		g_free (pspecs);
-	}
-
-	g_ptr_array_add (gparray, (gpointer) cols);
-	g_ptr_array_add (gparray, (gpointer) values);
-		
-	return gparray;
-}
-
-gint 
-__insert_or_update_records(MidgardObject *object, const gchar *tablename,  
-				gint query_type, const gchar *where)
-{
-	GPtrArray *gparray;
-	GList *l, *values;
-	gint inserted = -1;
-	
-	/* INSERT object's record */
-	gparray = __get_glists(object);
-
-	inserted =
-		midgard_core_query_insert_records(
-				MGD_OBJECT_CNC (object), tablename,
-				(GList*) g_ptr_array_index (gparray, 0),
-				(GList*) g_ptr_array_index (gparray, 1),
-				query_type, where);
-
-	g_list_free((GList*) g_ptr_array_index (gparray, 0));
-	
-	values = (GList*) g_ptr_array_index (gparray, 1);
-	for(l = values; l != NULL; l = l->next){
-		g_value_unset((GValue *) l->data);
-		g_free((GValue *) l->data);
-	}
-	g_list_free(values);
-	g_ptr_array_free (gparray, TRUE);
-
-	return inserted;
 }
 
 #define _CLEAR_OBJECT_GUID(object) \
