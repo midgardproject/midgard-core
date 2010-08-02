@@ -170,9 +170,13 @@ MidgardMetadata *
 midgard_metadata_new (MidgardDBObject *object)
 {
 	g_return_val_if_fail (object != NULL, NULL);
-	
-	MidgardMetadata *self = 
-		(MidgardMetadata *) g_object_new (MIDGARD_TYPE_METADATA, NULL);
+
+	MidgardMetadata *self = NULL;
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	if (!mgd)
+		self = g_object_new (MIDGARD_TYPE_METADATA, NULL);
+	else 
+		self = g_object_new (MIDGARD_TYPE_METADATA, "connection", mgd, NULL);
 
 	g_signal_connect (G_OBJECT (object), "action-create",
 			G_CALLBACK (_action_create_callback), self);

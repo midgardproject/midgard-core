@@ -2920,7 +2920,9 @@ void midgard_object_set_connection(MidgardObject *self, MidgardConnection *mgd)
 	if (MGD_OBJECT_CNC (self) != NULL)
 		return;
 	
-	MGD_OBJECT_CNC (self) = mgd;
+	/* Increase reference count of given MidgardConnection.
+	 * We decrease it in DBObject dispose */
+	MGD_OBJECT_CNC (self) = g_object_ref (mgd);
 }
 
 /**
