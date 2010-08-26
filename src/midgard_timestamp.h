@@ -23,6 +23,7 @@
 #include <glib-object.h>
 
 #define MIDGARD_DEFAULT_DATETIME "0001-01-01 00:00:00+0000"
+#define MIDGARD_TIMESTAMP_DEFAULT MIDGARD_DEFAULT_DATETIME
 
 typedef struct {
 	glong year;
