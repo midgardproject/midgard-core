@@ -800,7 +800,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 #define TABLE_NAME_MAPPER_PROPERTIES_DESCRIPTION "Stores names of all columns used as storage for Midgard Content Repository objects"
 
 gboolean 
-midgard_core_storage_sql_create_mapper_table (GdaConnection *cnc, GError **error)
+midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **error)
 {
 	g_return_val_if_fail (cnc != NULL, FALSE);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -981,10 +981,26 @@ midgard_core_storage_sql_create_mapper_table (GdaConnection *cnc, GError **error
 	return TRUE;
 }
 
+/**
+ * Initializes all tables required by basic SQL storage manager
+ */ 
 gboolean 
 midgard_core_storage_sql_create_base_tables (GdaConnection *cnc, GError **error)
 {
+	g_return_val_if_fail (cnc != NULL, FALSE);
+	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
+	GError *err = NULL;
+
+	if (!midgard_core_storage_sql_create_mapper_tables (cnc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	if (!midgard_core_storage_sql_create_schema_tables (cnc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
 }
 
 gint 
