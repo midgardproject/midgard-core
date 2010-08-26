@@ -37,7 +37,8 @@ struct _MgdCoreStorageSQLColumn {
 	const gchar *dvalue;
 };
 
-void midgard_core_storage_sql_column_new (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *fieldname, GType fieldtype);
+void midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *fieldname, GType fieldtype);
+void midgard_core_storage_sql_column_reset (MgdCoreStorageSQLColumn *mdc);
 
 gint midgard_core_storage_sql_query_execute (GdaConnection *cnc, const gchar *query, gboolean ignore_error, GError **error);
 

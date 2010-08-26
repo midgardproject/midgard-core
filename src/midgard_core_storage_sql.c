@@ -33,17 +33,7 @@
 void 
 midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *colname, GType coltype)
 {
-	 mdc->table_name = NULL;
-	 mdc->column_name = NULL;
-	 mdc->column_desc = NULL;
-	 mdc->dbtype = NULL;
-	 mdc->gtype = 0;
-	 mdc->index = FALSE;
-	 mdc->unique = FALSE;
-	 mdc->gvalue = NULL;
-	 mdc->primary = FALSE;
-	 mdc->dvalue = NULL;
-	 mdc->autoinc = FALSE;
+	midgard_core_storage_sql_column_reset (mdc);	
 
 	if (tablename)
 		mdc->table_name = tablename;
@@ -63,10 +53,34 @@ midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar 
 		} else if (coltype == MGD_TYPE_STRING) {
 			mdc->dbtype = COLTYPE_STRING;
 			mdc->dvalue = "";
-		}		
+		} else if (coltype == MGD_TYPE_LONGTEXT) {
+			mdc->dbtype = COLTYPE_TEXT;
+			mdc->dvalue = "";
+		}			
 	}
 
 	return;
+}
+
+/**
+ * Resets column structure.
+ */ 
+void 
+midgard_core_storage_sql_column_reset (MgdCoreStorageSQLColumn *mdc)
+{
+	 mdc->table_name = NULL;
+	 mdc->column_name = NULL;
+	 mdc->column_desc = NULL;
+	 mdc->dbtype = NULL;
+	 mdc->gtype = 0;
+	 mdc->index = FALSE;
+	 mdc->unique = FALSE;
+	 mdc->gvalue = NULL;
+	 mdc->primary = FALSE;
+	 mdc->dvalue = NULL;
+	 mdc->autoinc = FALSE;
+
+	 return;
 }
 
 gboolean 
@@ -617,6 +631,352 @@ midgard_core_storage_sql_index_remove (GdaConnection *cnc, MgdCoreStorageSQLColu
 		g_propagate_error (error, err);
 		return FALSE;
 	}
+
+	return TRUE;
+}
+
+/* SCHEMA AND MAPPER TABLES */
+
+#define COLUMN_PK_DEFAULT "id"
+
+#define TABLE_NAME_SCHEMA "midgard_schema_type"
+#define TABLE_NAME_SCHEMA_DESCRIPTION "Stores names of all GObject derived classes registered with Midgard Content Repository"
+#define TABLE_NAME_SCHEMA_PROPERTIES "midgard_schema_type_properties"
+#define TABLE_NAME_SCHEMA_PROPERTIES_DESCRIPTION "Stores names of all properties registered for Midgard Content Repository classes"
+
+gboolean 
+midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **error)
+{
+	g_return_val_if_fail (cnc != NULL, FALSE);
+	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+	GError *err = NULL;
+	const gchar *tablename = TABLE_NAME_SCHEMA;
+
+	/* Check if table exists, and silently return TRUE */
+	if (midgard_core_storage_sql_table_exists (cnc, tablename))
+		return TRUE;
+
+	/* Create table to store class info */
+	if (!midgard_core_storage_sql_table_create (cnc, tablename, TABLE_NAME_SCHEMA_DESCRIPTION, COLUMN_PK_DEFAULT, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	/* Create columns */
+	MgdCoreStorageSQLColumn mdc = { NULL, NULL };
+	const gchar *column_name = "class_name";
+
+	/* CLASS NAME */
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	mdc.unique = TRUE;
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* EXTENDS */
+	column_name = "extends";
+
+	/* CLASS NAME */
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* Create table to store properties info */
+	tablename = TABLE_NAME_SCHEMA_PROPERTIES;
+
+	/* Check if table exists, and silently return TRUE */
+	if (midgard_core_storage_sql_table_exists (cnc, tablename))
+		return TRUE;
+
+	if (!midgard_core_storage_sql_table_create (cnc, tablename, TABLE_NAME_SCHEMA_PROPERTIES_DESCRIPTION, COLUMN_PK_DEFAULT, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	/* Create columns */
+
+	/* CLASS */
+	column_name = "class";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* NAME */
+	column_name = "name";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* GTYPE NAME */
+	column_name = "gtype_name";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* DEFAULT_VALUE STRING */
+	column_name = "default_value_string";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* DEFAULT_VALUE INT */
+	column_name = "default_value_integer";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* DEFAULT_VALUE TIME */
+	column_name = "default_value_time";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MGD_TYPE_TIMESTAMP);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* DEFAULT_VALUE FLOAT */
+	column_name = "default_value_float";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_FLOAT);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* DESCRIPTION */
+	column_name = "description";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MGD_TYPE_LONGTEXT);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+#define TABLE_NAME_MAPPER "midgard_mapper_type"
+#define TABLE_NAME_MAPPER_DESCRIPTION "Stores names of all tables used as storage for Midgard Content Repository classes"
+#define TABLE_NAME_MAPPER_PROPERTIES "midgard_mapper_columns"
+#define TABLE_NAME_MAPPER_PROPERTIES_DESCRIPTION "Stores names of all columns used as storage for Midgard Content Repository objects"
+
+gboolean 
+midgard_core_storage_sql_create_mapper_table (GdaConnection *cnc, GError **error)
+{
+	g_return_val_if_fail (cnc != NULL, FALSE);
+	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+	GError *err = NULL;
+	const gchar *tablename = TABLE_NAME_MAPPER;
+
+	/* Check if table exists, and silently return TRUE */
+	if (midgard_core_storage_sql_table_exists (cnc, tablename))
+		return TRUE;
+
+	/* Create table */
+	if (!midgard_core_storage_sql_table_create (cnc, tablename, TABLE_NAME_MAPPER_DESCRIPTION, COLUMN_PK_DEFAULT, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	/* Create columns */
+	MgdCoreStorageSQLColumn mdc = { NULL, NULL };
+	const gchar *column_name = "class_name";
+
+	/* CLASS NAME */
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	mdc.unique = TRUE;
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* TABLE NAME */
+	column_name = "table_name";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* DESCRIPTION */
+	column_name = "description";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MGD_TYPE_LONGTEXT);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* Create table to store columns info */
+
+	tablename = TABLE_NAME_MAPPER_PROPERTIES;
+
+	/* Check if table exists, and silently return TRUE */
+	if (midgard_core_storage_sql_table_exists (cnc, tablename))
+		return TRUE;
+
+	if (!midgard_core_storage_sql_table_create (cnc, tablename, TABLE_NAME_MAPPER_PROPERTIES_DESCRIPTION, COLUMN_PK_DEFAULT, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	/* Create columns */
+
+	/* PROPERTY NAME */
+	column_name = "property_name";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	/* COLUMN NAME */
+	column_name = "column_name";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* TABLE */
+	column_name = "table";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* GTYPE NAME */
+	column_name = "gtype_name";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* COLUMN TYPE */
+	column_name = "column_type";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* IS PRIMARY */
+	column_name = "is_primary";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* HAS INDEX */
+	column_name = "has_index";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* IS UNIQUE */
+	column_name = "is_unique";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* IS AUTO INCREMENT */
+	column_name = "is_auto_increment";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* DESCRIPTION */
+	column_name = "description";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MGD_TYPE_LONGTEXT);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
 
 	return TRUE;
 }
