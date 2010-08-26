@@ -145,7 +145,9 @@ src_libmidgard3_la_core_SOURCES = \
 	src/midgard_core_workspace.h \
        	src/midgard_core_workspace.c \
 	src/midgard_query_select_simple.h \
-	src/midgard_query_select_simple.c 	
+	src/midgard_query_select_simple.c \
+	src/midgard_core_storage_sql.h \
+	src/midgard_core_storage_sql.c	
 
 src_libmidgard3_la_public_SOURCES = \
 	src/midgard.c \
