@@ -35,6 +35,7 @@ struct _MidgardConfigClass {
 
 GType midgard_config_get_type (void) G_GNUC_CONST;
 gboolean midgard_config_read_file (MidgardConfig* self, const char* name, gboolean user, GError** error);
+MidgardConfig* midgard_config_copy (MidgardConfig* self, MidgardConfig* src);
 MidgardConfig* midgard_config_new (void);
 MidgardConfig* midgard_config_construct (GType object_type);
 const char* midgard_config_get_authtype (MidgardConfig* self);

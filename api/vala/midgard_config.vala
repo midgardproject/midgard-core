@@ -6,25 +6,28 @@ namespace Midgard {
 	public class Config : GLib.Object {
 
 		/* private */
-		private string _authtype;
-		private string _dbname;
-		private string _dbpass;
-		private string _dbtype;
-		private string _dbuser;
-		private string _host;
-		private string _logfilename;
-		private string _loglevel;
-		private string _midgardpassword;
-		private string _midgardusername;	
-		private uint _port;
-		private string _sharedir;
-		private string _vardir;
-		private string _blobdir;
-		private string _cachedir;
-		private string _dbdir;                
-		private bool _tablecreate;
-		private bool _tableupdate;
-		private bool _testunit;
+		private string _configname = "";
+	
+		/* private property holders */
+		private string _authtype = "";
+		private string _dbname = "midgard";
+		private string _dbpass = "midgard";
+		private string _dbtype = "SQLite";
+		private string _dbuser = "midgard";
+		private string _host = "localhost";
+		private string _logfilename = "";
+		private string _loglevel = "warn";
+		private string _midgardpassword = "";
+		private string _midgardusername = "";	
+		private uint _port = 0;
+		private string _sharedir = "";
+		private string _vardir = "";
+		private string _blobdir = "";
+		private string _cachedir = "";
+		private string _dbdir = "";                
+		private bool _tablecreate = false;
+		private bool _tableupdate = false;
+		private bool _testunit = false;
 
 		/* public properties */
 	  	public string authtype {
@@ -58,7 +61,7 @@ namespace Midgard {
 		}	
 
 		public string logfilename {
-			get { return this._logfilename; }
+			get { return this._logfilename; } /* FIXME, initialize GIOChannel */
 			set { this._logfilename = value; }
 		}	
 
@@ -132,6 +135,36 @@ namespace Midgard {
 			
 			return MidgardCore.Config.read_file_at_path (name, user);
 		}*/
+
+		public Midgard.Config copy (Midgard.Config src) {
+
+			Midgard.Config dest = new Midgard.Config ();
+			dest._authtype = src._authtype;
+			dest._dbname = src._dbname;
+			dest._dbpass = src._dbpass;
+			dest._dbtype = src._dbtype;
+			dest._dbuser = src._dbuser;
+			dest._host = src._host;
+			dest._logfilename = src._logfilename;
+			dest._loglevel = src._loglevel;
+			dest._midgardpassword = src._midgardpassword;
+			dest._midgardusername = src._midgardusername;
+			dest._port = src._port;
+			dest._sharedir = src._sharedir;
+			dest._vardir = src._vardir;
+			dest._blobdir = src._blobdir;
+			dest._cachedir = src._cachedir;
+			dest._dbdir = src._dbdir;
+			dest._tablecreate = src._tablecreate;
+			dest._tableupdate = src._tableupdate;
+			dest._testunit = src._testunit;
+
+			dest._configname = src._configname;
+
+			/* FIXME, copy log file GIOChannel */
+
+			return dest;
+		}
 	}
 
 	static void main () {}
