@@ -18,6 +18,7 @@
  */
 
 #include <glib-object.h>
+#include "midgard_config.h"
 
 gboolean
-midgard_core_config_read_file (GObject *config, const gchar *name, gboolean user, GError **error);
+midgard_core_config_read_file (MidgardConfig *config, const gchar *name, gboolean user, GError **error);

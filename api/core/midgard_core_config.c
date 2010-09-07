@@ -27,7 +27,6 @@
 #include <errno.h>
 
 #include "midgard_core_config.h"
-#include "../public_headers/midgard_config.h"
 
 static gchar *__get_default_confdir(void);
 
@@ -237,7 +236,7 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
  * Returns: %TRUE when file has been read , %FALSE otherwise.
  * Since: 9.3
  */ 
-gboolean midgard_core_config_read_file(GObject *config, const gchar *filename, gboolean user, GError **error)
+gboolean midgard_core_config_read_file(MidgardConfig *config, const gchar *filename, gboolean user, GError **error)
 {
 	/*
 	gchar *fname = NULL;	

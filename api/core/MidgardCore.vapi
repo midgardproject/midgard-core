@@ -1,5 +1,5 @@
 
-[CCode (lower_case_cprefix = "midgard_core_", cheader_filename = "/home/pp/git/piotras/midgard-core/api/core/midgard_core.h")]
+[CCode (lower_case_cprefix = "midgard_core_", cheader_filename = "midgard_core.h")]
 
 namespace MidgardCore {
 	[Compact]
