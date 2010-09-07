@@ -1,0 +1,15 @@
+
+midgard_config.c and midgard_config.h generated with valac
+
+
+gcc --shared `pkg-config --cflags --libs glib-2.0` -I. midgard_config.c midgard_core_config.c
+
+midgard_config.c:19: error: redefinition of typedef ‘MidgardConfig’
+././midgard_config.h:22: note: previous declaration of ‘MidgardConfig’ was here
+midgard_config.c:20: error: redefinition of typedef ‘MidgardConfigClass’
+././midgard_config.h:23: note: previous declaration of ‘MidgardConfigClass’ was here
+midgard_config.c:21: error: redefinition of typedef ‘MidgardConfigPrivate’
+././midgard_config.h:24: note: previous declaration of ‘MidgardConfigPrivate’ was here
+midgard_config.c:25: error: redefinition of ‘struct _MidgardConfig’
+midgard_config.c:30: error: redefinition of ‘struct _MidgardConfigClass’
+
