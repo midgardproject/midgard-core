@@ -1,5 +1,7 @@
 QUIET_GEN = $(Q:@=@echo ' GEN '$@;)
 
+SUBDIRS = src
+
 ACLOCAL_AMFLAGS = -I m4
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
@@ -91,7 +93,9 @@ EXTRA_DIST =  \
 	$(views_DATA) 
 	m4/introspection.m4
 
-LDADD = src/libmidgard3.la
+LDADD = \
+	src/libmidgard3.la \
+	src/vala/libmidgard_vala.la
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined

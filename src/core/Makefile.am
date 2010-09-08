@@ -1,0 +1,4 @@
+
+AM_CFLAGS = -I$(top_srcdir)/src @MIDGARD_CFLAGS@
+AM_LDFLAGS = @MIDGARD_LIBS@
+

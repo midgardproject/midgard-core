@@ -4,7 +4,7 @@
 
 #include <glib.h>
 #include <glib-object.h>
-#include "midgard_config.h"
+#include "midgard3.h"
 #include <stdlib.h>
 #include <string.h>
 #include <midgard_core.h>
@@ -67,19 +67,13 @@ static void midgard_config_set_property (GObject * object, guint property_id, co
 void midgard_main (void);
 
 
-#line 129 "midgard_config.vala"
 gboolean midgard_config_read_file (MidgardConfig* self, const char* name, gboolean user, GError** error) {
-#line 73 "midgard_config.c"
 	gboolean result = FALSE;
 	gboolean _tmp0_;
 	GError * _inner_error_ = NULL;
-#line 129 "midgard_config.vala"
 	g_return_val_if_fail (self != NULL, FALSE);
-#line 129 "midgard_config.vala"
 	g_return_val_if_fail (name != NULL, FALSE);
-#line 131 "midgard_config.vala"
 	_tmp0_ = midgard_core_config_read_file (self, name, user, &_inner_error_);
-#line 83 "midgard_config.c"
 	if (_inner_error_ != NULL) {
 		if ((_inner_error_->domain == G_KEY_FILE_ERROR) || (_inner_error_->domain == G_FILE_ERROR)) {
 			g_propagate_error (error, _inner_error_);
@@ -91,15 +85,11 @@ gboolean midgard_config_read_file (MidgardConfig* self, const char* name, gboole
 		}
 	}
 	result = _tmp0_;
-#line 131 "midgard_config.vala"
 	return result;
-#line 97 "midgard_config.c"
 }
 
 
-#line 139 "midgard_config.vala"
 MidgardConfig* midgard_config_copy (MidgardConfig* self, MidgardConfig* src) {
-#line 103 "midgard_config.c"
 	MidgardConfig* result = NULL;
 	MidgardConfig* dest;
 	char* _tmp0_;
@@ -118,76 +108,43 @@ MidgardConfig* midgard_config_copy (MidgardConfig* self, MidgardConfig* src) {
 	char* _tmp13_;
 	char* _tmp14_;
 	char* _tmp15_;
-#line 139 "midgard_config.vala"
 	g_return_val_if_fail (self != NULL, NULL);
-#line 139 "midgard_config.vala"
 	g_return_val_if_fail (src != NULL, NULL);
-#line 141 "midgard_config.vala"
 	dest = midgard_config_new ();
-#line 142 "midgard_config.vala"
 	dest->priv->_authtype = (_tmp0_ = g_strdup (src->priv->_authtype), _g_free0 (dest->priv->_authtype), _tmp0_);
-#line 143 "midgard_config.vala"
 	dest->priv->_dbname = (_tmp1_ = g_strdup (src->priv->_dbname), _g_free0 (dest->priv->_dbname), _tmp1_);
-#line 144 "midgard_config.vala"
 	dest->priv->_dbpass = (_tmp2_ = g_strdup (src->priv->_dbpass), _g_free0 (dest->priv->_dbpass), _tmp2_);
-#line 145 "midgard_config.vala"
 	dest->priv->_dbtype = (_tmp3_ = g_strdup (src->priv->_dbtype), _g_free0 (dest->priv->_dbtype), _tmp3_);
-#line 146 "midgard_config.vala"
 	dest->priv->_dbuser = (_tmp4_ = g_strdup (src->priv->_dbuser), _g_free0 (dest->priv->_dbuser), _tmp4_);
-#line 147 "midgard_config.vala"
 	dest->priv->_host = (_tmp5_ = g_strdup (src->priv->_host), _g_free0 (dest->priv->_host), _tmp5_);
-#line 148 "midgard_config.vala"
 	dest->priv->_logfilename = (_tmp6_ = g_strdup (src->priv->_logfilename), _g_free0 (dest->priv->_logfilename), _tmp6_);
-#line 149 "midgard_config.vala"
 	dest->priv->_loglevel = (_tmp7_ = g_strdup (src->priv->_loglevel), _g_free0 (dest->priv->_loglevel), _tmp7_);
-#line 150 "midgard_config.vala"
 	dest->priv->_midgardpassword = (_tmp8_ = g_strdup (src->priv->_midgardpassword), _g_free0 (dest->priv->_midgardpassword), _tmp8_);
-#line 151 "midgard_config.vala"
 	dest->priv->_midgardusername = (_tmp9_ = g_strdup (src->priv->_midgardusername), _g_free0 (dest->priv->_midgardusername), _tmp9_);
-#line 152 "midgard_config.vala"
 	dest->priv->_port = src->priv->_port;
-#line 153 "midgard_config.vala"
 	dest->priv->_sharedir = (_tmp10_ = g_strdup (src->priv->_sharedir), _g_free0 (dest->priv->_sharedir), _tmp10_);
-#line 154 "midgard_config.vala"
 	dest->priv->_vardir = (_tmp11_ = g_strdup (src->priv->_vardir), _g_free0 (dest->priv->_vardir), _tmp11_);
-#line 155 "midgard_config.vala"
 	dest->priv->_blobdir = (_tmp12_ = g_strdup (src->priv->_blobdir), _g_free0 (dest->priv->_blobdir), _tmp12_);
-#line 156 "midgard_config.vala"
 	dest->priv->_cachedir = (_tmp13_ = g_strdup (src->priv->_cachedir), _g_free0 (dest->priv->_cachedir), _tmp13_);
-#line 157 "midgard_config.vala"
 	dest->priv->_dbdir = (_tmp14_ = g_strdup (src->priv->_dbdir), _g_free0 (dest->priv->_dbdir), _tmp14_);
-#line 158 "midgard_config.vala"
 	dest->priv->_tablecreate = src->priv->_tablecreate;
-#line 159 "midgard_config.vala"
 	dest->priv->_tableupdate = src->priv->_tableupdate;
-#line 160 "midgard_config.vala"
 	dest->priv->_testunit = src->priv->_testunit;
-#line 162 "midgard_config.vala"
 	dest->priv->_configname = (_tmp15_ = g_strdup (src->priv->_configname), _g_free0 (dest->priv->_configname), _tmp15_);
-#line 168 "midgard_config.c"
 	result = dest;
-#line 166 "midgard_config.vala"
 	return result;
-#line 172 "midgard_config.c"
 }
 
 
-#line 6 "midgard_config.vala"
 MidgardConfig* midgard_config_construct (GType object_type) {
-#line 178 "midgard_config.c"
 	MidgardConfig * self;
-#line 6 "midgard_config.vala"
 	self = (MidgardConfig*) g_object_new (object_type, NULL);
-#line 182 "midgard_config.c"
 	return self;
 }
 
 
-#line 6 "midgard_config.vala"
 MidgardConfig* midgard_config_new (void) {
-#line 6 "midgard_config.vala"
 	return midgard_config_construct (MIDGARD_TYPE_CONFIG);
-#line 191 "midgard_config.c"
 }
 
 
@@ -195,18 +152,14 @@ const char* midgard_config_get_authtype (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_authtype;
-#line 34 "midgard_config.vala"
 	return result;
-#line 201 "midgard_config.c"
 }
 
 
 void midgard_config_set_authtype (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 35 "midgard_config.vala"
 	self->priv->_authtype = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_authtype), _tmp0_);
-#line 210 "midgard_config.c"
 	g_object_notify ((GObject *) self, "authtype");
 }
 
@@ -215,18 +168,14 @@ const char* midgard_config_get_dbname (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_dbname;
-#line 39 "midgard_config.vala"
 	return result;
-#line 221 "midgard_config.c"
 }
 
 
 void midgard_config_set_dbname (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 40 "midgard_config.vala"
 	self->priv->_dbname = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_dbname), _tmp0_);
-#line 230 "midgard_config.c"
 	g_object_notify ((GObject *) self, "dbname");
 }
 
@@ -235,18 +184,14 @@ const char* midgard_config_get_dbpass (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_dbpass;
-#line 44 "midgard_config.vala"
 	return result;
-#line 241 "midgard_config.c"
 }
 
 
 void midgard_config_set_dbpass (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 45 "midgard_config.vala"
 	self->priv->_dbpass = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_dbpass), _tmp0_);
-#line 250 "midgard_config.c"
 	g_object_notify ((GObject *) self, "dbpass");
 }
 
@@ -255,18 +200,14 @@ const char* midgard_config_get_dbtype (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_dbtype;
-#line 49 "midgard_config.vala"
 	return result;
-#line 261 "midgard_config.c"
 }
 
 
 void midgard_config_set_dbtype (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 50 "midgard_config.vala"
 	self->priv->_dbtype = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_dbtype), _tmp0_);
-#line 270 "midgard_config.c"
 	g_object_notify ((GObject *) self, "dbtype");
 }
 
@@ -275,18 +216,14 @@ const char* midgard_config_get_dbuser (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_dbuser;
-#line 54 "midgard_config.vala"
 	return result;
-#line 281 "midgard_config.c"
 }
 
 
 void midgard_config_set_dbuser (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 55 "midgard_config.vala"
 	self->priv->_dbuser = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_dbuser), _tmp0_);
-#line 290 "midgard_config.c"
 	g_object_notify ((GObject *) self, "dbuser");
 }
 
@@ -295,18 +232,14 @@ const char* midgard_config_get_host (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_host;
-#line 59 "midgard_config.vala"
 	return result;
-#line 301 "midgard_config.c"
 }
 
 
 void midgard_config_set_host (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 60 "midgard_config.vala"
 	self->priv->_host = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_host), _tmp0_);
-#line 310 "midgard_config.c"
 	g_object_notify ((GObject *) self, "host");
 }
 
@@ -315,18 +248,14 @@ const char* midgard_config_get_logfilename (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_logfilename;
-#line 64 "midgard_config.vala"
 	return result;
-#line 321 "midgard_config.c"
 }
 
 
 void midgard_config_set_logfilename (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 65 "midgard_config.vala"
 	self->priv->_logfilename = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_logfilename), _tmp0_);
-#line 330 "midgard_config.c"
 	g_object_notify ((GObject *) self, "logfilename");
 }
 
@@ -335,18 +264,14 @@ const char* midgard_config_get_loglevel (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_loglevel;
-#line 69 "midgard_config.vala"
 	return result;
-#line 341 "midgard_config.c"
 }
 
 
 void midgard_config_set_loglevel (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 70 "midgard_config.vala"
 	self->priv->_loglevel = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_loglevel), _tmp0_);
-#line 350 "midgard_config.c"
 	g_object_notify ((GObject *) self, "loglevel");
 }
 
@@ -355,18 +280,14 @@ const char* midgard_config_get_midgardpassword (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_midgardpassword;
-#line 74 "midgard_config.vala"
 	return result;
-#line 361 "midgard_config.c"
 }
 
 
 void midgard_config_set_midgardpassword (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 75 "midgard_config.vala"
 	self->priv->_midgardpassword = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_midgardpassword), _tmp0_);
-#line 370 "midgard_config.c"
 	g_object_notify ((GObject *) self, "midgardpassword");
 }
 
@@ -375,18 +296,14 @@ const char* midgard_config_get_midgardusername (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_midgardusername;
-#line 79 "midgard_config.vala"
 	return result;
-#line 381 "midgard_config.c"
 }
 
 
 void midgard_config_set_midgardusername (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 80 "midgard_config.vala"
 	self->priv->_midgardusername = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_midgardusername), _tmp0_);
-#line 390 "midgard_config.c"
 	g_object_notify ((GObject *) self, "midgardusername");
 }
 
@@ -395,17 +312,13 @@ guint midgard_config_get_port (MidgardConfig* self) {
 	guint result;
 	g_return_val_if_fail (self != NULL, 0U);
 	result = self->priv->_port;
-#line 84 "midgard_config.vala"
 	return result;
-#line 401 "midgard_config.c"
 }
 
 
 void midgard_config_set_port (MidgardConfig* self, guint value) {
 	g_return_if_fail (self != NULL);
-#line 85 "midgard_config.vala"
 	self->priv->_port = value;
-#line 409 "midgard_config.c"
 	g_object_notify ((GObject *) self, "port");
 }
 
@@ -414,18 +327,14 @@ const char* midgard_config_get_sharedir (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_sharedir;
-#line 89 "midgard_config.vala"
 	return result;
-#line 420 "midgard_config.c"
 }
 
 
 void midgard_config_set_sharedir (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 90 "midgard_config.vala"
 	self->priv->_sharedir = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_sharedir), _tmp0_);
-#line 429 "midgard_config.c"
 	g_object_notify ((GObject *) self, "sharedir");
 }
 
@@ -434,18 +343,14 @@ const char* midgard_config_get_vardir (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_vardir;
-#line 94 "midgard_config.vala"
 	return result;
-#line 440 "midgard_config.c"
 }
 
 
 void midgard_config_set_vardir (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 95 "midgard_config.vala"
 	self->priv->_vardir = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_vardir), _tmp0_);
-#line 449 "midgard_config.c"
 	g_object_notify ((GObject *) self, "vardir");
 }
 
@@ -454,18 +359,14 @@ const char* midgard_config_get_blobdir (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_blobdir;
-#line 99 "midgard_config.vala"
 	return result;
-#line 460 "midgard_config.c"
 }
 
 
 void midgard_config_set_blobdir (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 100 "midgard_config.vala"
 	self->priv->_blobdir = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_blobdir), _tmp0_);
-#line 469 "midgard_config.c"
 	g_object_notify ((GObject *) self, "blobdir");
 }
 
@@ -474,18 +375,14 @@ const char* midgard_config_get_cachedir (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_cachedir;
-#line 104 "midgard_config.vala"
 	return result;
-#line 480 "midgard_config.c"
 }
 
 
 void midgard_config_set_cachedir (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 105 "midgard_config.vala"
 	self->priv->_cachedir = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_cachedir), _tmp0_);
-#line 489 "midgard_config.c"
 	g_object_notify ((GObject *) self, "cachedir");
 }
 
@@ -494,18 +391,14 @@ const char* midgard_config_get_dbdir (MidgardConfig* self) {
 	const char* result;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = self->priv->_dbdir;
-#line 109 "midgard_config.vala"
 	return result;
-#line 500 "midgard_config.c"
 }
 
 
 void midgard_config_set_dbdir (MidgardConfig* self, const char* value) {
 	char* _tmp0_;
 	g_return_if_fail (self != NULL);
-#line 110 "midgard_config.vala"
 	self->priv->_dbdir = (_tmp0_ = g_strdup (value), _g_free0 (self->priv->_dbdir), _tmp0_);
-#line 509 "midgard_config.c"
 	g_object_notify ((GObject *) self, "dbdir");
 }
 
@@ -514,17 +407,13 @@ gboolean midgard_config_get_tablecreate (MidgardConfig* self) {
 	gboolean result;
 	g_return_val_if_fail (self != NULL, FALSE);
 	result = self->priv->_tablecreate;
-#line 114 "midgard_config.vala"
 	return result;
-#line 520 "midgard_config.c"
 }
 
 
 void midgard_config_set_tablecreate (MidgardConfig* self, gboolean value) {
 	g_return_if_fail (self != NULL);
-#line 115 "midgard_config.vala"
 	self->priv->_tablecreate = value;
-#line 528 "midgard_config.c"
 	g_object_notify ((GObject *) self, "tablecreate");
 }
 
@@ -533,17 +422,13 @@ gboolean midgard_config_get_tableupdate (MidgardConfig* self) {
 	gboolean result;
 	g_return_val_if_fail (self != NULL, FALSE);
 	result = self->priv->_tableupdate;
-#line 119 "midgard_config.vala"
 	return result;
-#line 539 "midgard_config.c"
 }
 
 
 void midgard_config_set_tableupdate (MidgardConfig* self, gboolean value) {
 	g_return_if_fail (self != NULL);
-#line 120 "midgard_config.vala"
 	self->priv->_tableupdate = value;
-#line 547 "midgard_config.c"
 	g_object_notify ((GObject *) self, "tableupdate");
 }
 
@@ -552,17 +437,13 @@ gboolean midgard_config_get_testunit (MidgardConfig* self) {
 	gboolean result;
 	g_return_val_if_fail (self != NULL, FALSE);
 	result = self->priv->_testunit;
-#line 124 "midgard_config.vala"
 	return result;
-#line 558 "midgard_config.c"
 }
 
 
 void midgard_config_set_testunit (MidgardConfig* self, gboolean value) {
 	g_return_if_fail (self != NULL);
-#line 125 "midgard_config.vala"
 	self->priv->_testunit = value;
-#line 566 "midgard_config.c"
 	g_object_notify ((GObject *) self, "testunit");
 }
 
@@ -791,21 +672,14 @@ static void midgard_config_set_property (GObject * object, guint property_id, co
 }
 
 
-#line 170 "midgard_config.vala"
 void midgard_main (void) {
-#line 797 "midgard_config.c"
 }
 
 
-#line 170 "midgard_config.vala"
 int main (int argc, char ** argv) {
-#line 170 "midgard_config.vala"
 	g_type_init ();
-#line 170 "midgard_config.vala"
 	midgard_main ();
-#line 170 "midgard_config.vala"
 	return 0;
-#line 809 "midgard_config.c"
 }
 
 
