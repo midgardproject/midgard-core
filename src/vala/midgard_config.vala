@@ -19,6 +19,8 @@ namespace Midgard {
 
 		public string dbuser { get; set; }
 
+		public uint dbport { get; set; }
+
 		public string host { get; set; }
 
 		public string logfilename { get; set; }
@@ -28,8 +30,6 @@ namespace Midgard {
 		public string midgardpassword { get; set; }
 
 		public string midgardusername { get; set; }
-
-		public uint port { get; set; }
 
 		public string sharedir { get; set; }
 
@@ -53,33 +53,44 @@ namespace Midgard {
 			return MidgardCore.Config.read_file (this, name, user);
 		}
 	
-		/*public bool read_file_at_path (string path, bool user) throws GLib.KeyFileError, GLib.FileError {
-			
-			return MidgardCore.Config.read_file_at_path (name, user);
-		}*/
+		public bool read_file_at_path (string path, bool user) throws GLib.KeyFileError, GLib.FileError {
+			GLib.warning ("FIXME");
+			return false;
+			//return MidgardCore.Config.read_file_at_path (name, user);
+		}
+
+		public bool save_file (string name, bool user) throws GLib.KeyFileError, GLib.FileError {
+			GLib.warning ("FIXME");
+			return false;
+		}
+
+		public static string[]? list_files (bool user) {
+			GLib.warning ("FIXME");
+			return null;
+		}
 
 		public Midgard.Config copy () {
 
 			Midgard.Config dest = new Midgard.Config ();
-			dest._authtype = this._authtype;
-			dest._dbname = this._dbname;
-			dest._dbpass = this._dbpass;
-			dest._dbtype = this._dbtype;
-			dest._dbuser = this._dbuser;
-			dest._host = this._host;
-			dest._logfilename = this._logfilename;
-			dest._loglevel = this._loglevel;
-			dest._midgardpassword = this._midgardpassword;
-			dest._midgardusername = this._midgardusername;
-			dest._port = this._port;
-			dest._sharedir = this._sharedir;
-			dest._vardir = this._vardir;
-			dest._blobdir = this._blobdir;
-			dest._cachedir = this._cachedir;
-			dest._dbdir = this._dbdir;
-			dest._tablecreate = this._tablecreate;
-			dest._tableupdate = this._tableupdate;
-			dest._testunit = this._testunit;
+			dest.authtype = this.authtype;
+			dest.dbname = this.dbname;
+			dest.dbpass = this.dbpass;
+			dest.dbtype = this.dbtype;
+			dest.dbuser = this.dbuser;
+			dest.host = this.host;
+			dest.logfilename = this.logfilename;
+			dest.loglevel = this.loglevel;
+			dest.midgardpassword = this.midgardpassword;
+			dest.midgardusername = this.midgardusername;
+			dest.dbport = this.dbport;
+			dest.sharedir = this.sharedir;
+			dest.vardir = this.vardir;
+			dest.blobdir = this.blobdir;
+			dest.cachedir = this.cachedir;
+			dest.dbdir = this.dbdir;
+			dest.tablecreate = this.tablecreate;
+			dest.tableupdate = this.tableupdate;
+			dest.testunit = this.testunit;
 
 			dest._configname = this._configname;
 
