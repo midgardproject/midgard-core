@@ -18,7 +18,7 @@
 
 #include "midgard_blob.h"
 #include "midgard_error.h"
-#include "midgard_config.h"
+#include "midgard3.h"
 #include "midgard_core_object.h"
 #include "uuid.h"
 #include <glib/gstdio.h>
@@ -160,7 +160,7 @@ MidgardBlob *midgard_blob_new (MidgardObject *attachment, const gchar *encoding)
 
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
-	const gchar *blobdir = MIDGARD_DBOBJECT (attachment)->dbpriv->mgd->priv->config->blobdir;
+	const gchar *blobdir = midgard_config_get_blobdir (MIDGARD_DBOBJECT (attachment)->dbpriv->mgd->priv->config);
 	if(!g_file_test(blobdir,G_FILE_TEST_EXISTS)) {
 		midgard_set_error(mgd,
 				MGD_GENERIC_ERROR,

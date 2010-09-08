@@ -33,6 +33,7 @@
 #include "guid.h"
 #include "midgard_core_object_class.h"
 #include "midgard_core_connection.h"
+#include "midgard_type.h"
 
 #if HAVE_CRYPT_H
 # include <crypt.h>

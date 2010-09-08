@@ -26,6 +26,8 @@
 #include "schema.h"
 #include "midgard_core_metadata.h"
 #include "midgard_user.h"
+#include "midgard_type.h"
+#include "midgard_defs.h"
 
 void __set_from_xml_node(MidgardDBObject *object, xmlNode *node);
 

@@ -24,7 +24,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "midgard_defs.h"
-#include "midgard_config.h"
+#include "midgard3.h"
 #include "midgard_workspace.h"
 #include "midgard_workspace_storage.h"
 

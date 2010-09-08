@@ -24,6 +24,8 @@
 #include "midgard_core_query.h"
 #include "midgard_core_object_class.h"
 #include "midgard_core_object.h"
+#include "midgard_timestamp.h"
+#include "midgard_type.h"
 
 struct _MidgardCollectorPrivate{
 	const gchar *typename;

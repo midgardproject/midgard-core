@@ -18,6 +18,7 @@
 
 #include "midgard_core_object.h"
 #include "schema.h"
+#include "midgard_type.h"
 
 typedef struct {
 	GString *string;

@@ -17,6 +17,7 @@
  *   */
 
 #include "midgard_core_metadata.h"
+#include "midgard_type.h"
 
 #define __SET_METADATA_PROPERTY_STRING(__property, __mstrval) { \
 	if (!__mstrval) \

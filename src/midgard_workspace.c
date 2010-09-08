@@ -32,6 +32,7 @@
 #include "midgard_query_storage.h"
 #include "midgard_query_constraint.h"
 #include "midgard_query_constraint_group.h"
+#include "midgard_type.h"
 
 /**
  * midgard_wrokspace_new:

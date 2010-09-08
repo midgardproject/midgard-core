@@ -273,7 +273,7 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 		
 		gint statv;
 		MidgardConnection *mgd = MGD_OBJECT_CNC(object);
-		const gchar *blobdir = mgd->priv->config->blobdir;
+		const gchar *blobdir = midgard_config_get_blobdir (mgd->priv->config);
 
 	      	if (blobdir == NULL) {
 			g_warning ("NULL blobdir for current configuration");

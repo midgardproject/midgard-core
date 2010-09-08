@@ -36,7 +36,7 @@ schema_DATA = schema/README.txt
 viewsdir = $(datadir)/midgard3/views
 views_DATA = views/README-views.txt
 
-midgard_public_h = \	
+midgard_public_h = \
 	src/midgard_config_auto.h \
 	src/midgard_dbobject.h \
 	src/midgard_defs.h \
@@ -80,7 +80,8 @@ midgard_public_h = \
 	src/midgard_view.h \
 	src/midgard_workspace.h \
 	src/midgard_workspace_context.h \
-	src/midgard_workspace_storage.h
+	src/midgard_workspace_storage.h \
+	src/core/midgard3.h
 
 man_MANS = man/midgard3-schema.1 \
 	man/midgard3-query.1 
@@ -94,7 +95,9 @@ EXTRA_DIST =  \
 
 LDADD = src/libmidgard3.la 
 
-src_libmidgard3_la_LIBADD = src/vala/libmidgardvala.la
+src_libmidgard3_la_LIBADD = \
+			    src/vala/libmidgardvala.la \
+			    src/core/libmidgardcore.la
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined

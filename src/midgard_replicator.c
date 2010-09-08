@@ -648,7 +648,7 @@ static gboolean __import_blob_from_xml(	MidgardConnection *mgd,
 	}
 
 	/* FIXME, define even macro to get blobdir ( core level only ) */
-	gchar *blobdir = MIDGARD_DBOBJECT (object)->dbpriv->mgd->priv->config->blobdir;
+	gchar *blobdir = midgard_config_get_blobdir (MIDGARD_DBOBJECT (object)->dbpriv->mgd->priv->config);
 
 	if (!blobdir || (*blobdir != '/')
 			|| (stat(blobdir, &statbuf) != 0)
