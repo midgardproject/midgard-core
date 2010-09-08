@@ -53,7 +53,7 @@ namespace Midgard {
 			return MidgardCore.Config.read_file (this, name, user);
 		}
 	
-		public bool read_file_at_path (string path, bool user) throws GLib.KeyFileError, GLib.FileError {
+		public bool read_file_at_path (string path) throws GLib.KeyFileError, GLib.FileError {
 			GLib.warning ("FIXME");
 			return false;
 			//return MidgardCore.Config.read_file_at_path (name, user);
