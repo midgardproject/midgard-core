@@ -320,7 +320,7 @@ gboolean midgard_core_config_read_file(MidgardConfig *config, const gchar *filen
  * 
  * Returns: %TRUE if file has been read, %FALSE otherwise
  */
-gboolean midgard_config_read_file_at_path(MidgardConfig *self, const gchar *filepath, GError **error)
+gboolean midgard_core_config_read_file_at_path(MidgardConfig *self, const gchar *filepath, GError **error)
 {
 	/*
 	g_assert (self != NULL);
@@ -398,7 +398,7 @@ gboolean midgard_config_read_data(MidgardConfig *self, const gchar *data, GError
  * Returns: newly allocated and %NULL terminated array of file names.
  *
  */
-gchar **midgard_config_list_files(gboolean user)
+gchar **midgard_core_config_list_files(gboolean user)
 {
 	gchar *config_dir;
 /*
@@ -475,7 +475,7 @@ gchar **midgard_config_list_files(gboolean user)
  * Returns: %TRUE on success or %FALSE  ( with propper warning message ) if system wide 
  * directory doesn't exist or file can not be saved.
  */
-gboolean midgard_config_save_file(MidgardConfig *self,
+gboolean midgard_core_config_save_file(MidgardConfig *self,
 		const gchar *name, gboolean user, GError **error)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
