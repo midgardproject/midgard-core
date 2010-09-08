@@ -36,8 +36,7 @@ schema_DATA = schema/README.txt
 viewsdir = $(datadir)/midgard3/views
 views_DATA = views/README-views.txt
 
-midgard_public_h = \
-	src/midgard_config.h \
+midgard_public_h = \	
 	src/midgard_config_auto.h \
 	src/midgard_dbobject.h \
 	src/midgard_defs.h \
@@ -93,9 +92,9 @@ EXTRA_DIST =  \
 	$(views_DATA) 
 	m4/introspection.m4
 
-LDADD = \
-	src/libmidgard3.la \
-	src/vala/libmidgard_vala.la
+LDADD = src/libmidgard3.la 
+
+src_libmidgard3_la_LIBADD = src/vala/libmidgardvala.la
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined
@@ -106,7 +105,7 @@ $(PROGRAMS): $(LDADD)
 src_libmidgard3_la_CPPFLAGS = \
 	-I$(top_srcdir)/src -DG_LOG_DOMAIN=\"midgard-core\"
 
-AM_CFLAGS = -I$(top_srcdir)/src @MIDGARD_CFLAGS@
+AM_CFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/core @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 
 
 src_libmidgard3_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
@@ -164,7 +163,6 @@ src_libmidgard3_la_public_SOURCES = \
 	src/uuid.c \
 	src/guid.c \
         src/midgard_type.c \
-	src/midgard_config.c \
 	src/query_builder.c \
 	src/midgard_metadata.c \
 	src/midgard_timestamp.c \
