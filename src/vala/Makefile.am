@@ -22,7 +22,8 @@ libmidgardvala.vala.stamp: $(libmidgardvala_la_VALASOURCES)
 
 EXTRA_DIST = \
 	     $(libmidgardvala_la_VALASOURCES) \
-	     libmidgardvala.vala.stamp      
+	     libmidgardvala.vala.stamp 		\
+	     $(top_srcdir)/src/core/midgard3.h
 
 CLEANFILES = \
 	     libmidgardvala.vala.stamp \
