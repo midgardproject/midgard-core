@@ -745,7 +745,7 @@ extern GHashTable *midgard_connection_open_all(gboolean userdir)
 	GHashTable *hash = NULL;
 
 	guint n_files;
-	gchar **cfgs = midgard_config_list_files(userdir, &n_files);
+	gchar **cfgs = midgard_config_list_files(userdir, &n_files, NULL);
 	
 	if(!cfgs) 
 		return FALSE;
