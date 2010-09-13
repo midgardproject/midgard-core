@@ -112,6 +112,7 @@ AC_SUBST(DBUS_CONF_DIR)
 AC_CONFIG_FILES([Makefile 
 		 src/Makefile 
 		 src/core/Makefile 
+		 src/core/midgard_local.h
 		 src/vala/Makefile 
 		 src/midgard_config_auto.h 
 		 midgard3.pc])
