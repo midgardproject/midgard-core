@@ -140,8 +140,6 @@ src_libmidgard3_la_core_SOURCES = \
 	src/midgard_core_query_builder.c \
 	src/midgard_core_object.c \
 	src/midgard_core_object.h \
-	src/midgard_core_config.c \
-	src/midgard_core_config.h \
 	src/midgard_core_object_parameter.h \
 	src/midgard_core_schema.c \
 	src/midgard_core_views.c \
