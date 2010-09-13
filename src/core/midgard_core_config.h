@@ -36,7 +36,7 @@ typedef enum {
 gboolean	midgard_core_config_read_file		(MidgardConfig *config, const gchar *name, gboolean user, GError **error);
 gboolean        midgard_core_config_read_file_at_path	(MidgardConfig *self, const gchar *filepath, GError **error);
 gboolean        midgard_core_config_read_data           (MidgardConfig *self, const gchar *data, GError **error);
-gchar           **midgard_core_config_list_files        (gboolean user);
+gchar           **midgard_core_config_list_files        (gboolean user, guint *n_files, GError **error);
 gboolean        midgard_core_config_save_file           (MidgardConfig *self, const gchar *name, gboolean user, GError **error);
 gboolean        midgard_core_config_create_blobdir      (MidgardConfig *self);
 gchar 		*midgard_core_config_get_default_confdir();
