@@ -1,6 +1,4 @@
 /* 
- * Midgard core, API headers.
- *
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -18,14 +16,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MIDGARD_API_H_
-#define _MIDGARD_API_H_
+#ifndef MIDGARD_QUERY_SELECT_SIMPLE_H
+#define MIDGARD_QUERY_SELECT_SIMPLE_H
 
-#include <glib.h>
 #include <glib-object.h>
+#include "midgard_connection.h"
+#include "midgard_dbobject.h"
 
-#include <midgard2.h>
-#include <midgard3.h>
+G_BEGIN_DECLS
 
-#endif /* _MIDGARD_API_H_ */
+MidgardDBObject	*midgard_query_select_simple_get_object	(MidgardConnection *mgd, const gchar *classname, const gchar *property, ...); 
 
+G_END_DECLS
+
+#endif /* MIDGARD_QUERY_SELECT_SIMPLE_H */

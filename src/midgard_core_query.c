@@ -605,159 +605,52 @@ gboolean
 midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 {
 	g_return_val_if_fail (object != NULL, FALSE);
-
-	MidgardConnection *mgd = MGD_OBJECT_CNC (object);	
+	
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 	GdaConnection *cnc = mgd->priv->connection;
-	g_return_val_if_fail (cnc != NULL, FALSE);
-
-	MidgardDBObjectClass *klass = g_type_class_peek (G_OBJECT_TYPE (object));
+	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_GET_CLASS (object);
 	if (!klass) {
 		g_warning ("Can not find class pointer for %s instance", G_OBJECT_TYPE_NAME (object));
 		return FALSE;
 	}
 
-	const gchar *table = midgard_core_class_get_table (klass);
-	if (!table) {
-		g_warning ("Empty table for %s class", G_OBJECT_TYPE_NAME (object));
-		return FALSE;
-	}
+	GdaStatement *update = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->statement_update;
+	g_return_val_if_fail (update != NULL, FALSE);
+	GdaSet *params = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->param_set_update;	
 
-	guint n_prop;
-	guint i;
-	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (klass), &n_prop);
-	if (!pspecs) {
-		g_warning ("Properties not registered for %s class", G_OBJECT_TYPE_NAME (object));
-		return FALSE;
-	}
+	guint n_props;
+	guint i;	
+	GParamSpec **pspecs = midgard_core_dbobject_class_list_properties (klass, &n_props);
+	g_return_val_if_fail (pspecs != NULL, FALSE);
 
-	const gchar *guid = MGD_OBJECT_GUID (object);
-	if (!guid || (guid && *guid == '\0')) {
-		g_warning ("Can not update object with empty guid");
-		return FALSE;
-	}
-
-	GString *sql = g_string_new ("UPDATE ");
-	g_string_append_printf (sql, "%s SET ", table);
-
-	MgdSchemaPropertyAttr *prop_attr = NULL;	
-	GValue value = {0, };
-	gboolean add_coma = FALSE;
-
-	for (i = 0; i < n_prop; i++) {
-
-		/* Map property to storage field */
-		prop_attr = midgard_core_class_get_property_attr (klass, pspecs[i]->name);
-		if (!prop_attr || (prop_attr && !prop_attr->field)) {
-			if (i == 1)
-				add_coma = FALSE;
-			continue;
-		}
-
-		g_value_init (&value, pspecs[i]->value_type);
-		g_object_get_property (G_OBJECT (object), pspecs[i]->name, &value);
-	
-		/* Convert boolean to integer, it's safe for SQLite at least */
-		/*if (pspecs[i]->value_type == G_TYPE_BOOLEAN) {
-
-			bv = g_value_get_boolean (&value);
-			g_value_unset (&value);
-
-			g_value_init (&value, G_TYPE_UINT);
-			g_value_set_uint (&value, bv ? 1 : 0);
-		}*/
-
-		_add_value_type_update (sql, (const gchar *) prop_attr->field, &value, add_coma);
-		g_value_unset (&value);
-
-		add_coma = TRUE;
-	}
-
-	g_string_append_printf (sql, " WHERE %s.guid = '%s'", table, guid);  		
-
-	/* Create statement and set parameters */
-	GdaSqlParser *parser = (MGD_OBJECT_CNC (object))->priv->parser;
-	GdaStatement *stmt;
-	GdaSet *params;
-	GdaHolder *p;
+	const gchar *pk = MGD_DBCLASS_PRIMARY (klass);
 	GError *error = NULL;
 
-	stmt = gda_sql_parser_parse_string (parser, sql->str, NULL, &error);
-
-	if (!stmt || error) {
-
-		g_warning ("%s. Failed to create SQL statement for given query %s", 
-				error && error->message ? error->message : "Unknown reason", sql->str);
-		if (stmt)
-			g_object_unref (stmt);
-
-		g_clear_error (&error);
-		return FALSE;
-	}
-
-	g_string_free (sql, TRUE);
-	if (!gda_statement_get_parameters (stmt, &params, &error)) {
-	
-		g_warning ("Failed to get query parameters. %s", error && error->message ? error->message : "Unknown reason");
-		g_object_unref (stmt);
-		if (error) g_clear_error (&error);
-		return FALSE;
-	}
-
-	for (i = 0; i < n_prop; i++) {
-
-		prop_attr = midgard_core_class_get_property_attr (klass, pspecs[i]->name);
-		if (!prop_attr || (prop_attr && !prop_attr->field))
+	for (i = 0; i < n_props; i++) {
+		/* Ignore property of GObject type*/
+		if (G_TYPE_FUNDAMENTAL(pspecs[i]->value_type) == G_TYPE_OBJECT)
 			continue;
-	
-		const gchar *prop_field = prop_attr->field;
 
-		p = gda_set_get_holder (params, prop_field);
-	
-		if (!p)
-			g_warning ("%s: Failed to get holder for %s column", __FUNCTION__, (gchar *) prop_field);
-
-		/* FIXME, optimize this, we got property in previous loop */	
-		g_value_init (&value, pspecs[i]->value_type);
-		g_object_get_property (G_OBJECT (object), pspecs[i]->name, &value);
-
-		if (!gda_holder_set_value (p, &value, &error)) {
-			g_warning ("Failed to set holder's value. %s", 
-					error && error->message ? error->message : "Unknown reason");
-			g_object_unref (stmt);
-			if (error) g_clear_error (&error);
-			return FALSE;
-		}
-
-		g_value_unset (&value);
+		const gchar *col_name = midgard_core_class_get_property_colname (klass, pspecs[i]->name);
+		_SET_HOLDER_VALUE;
 	}
+
+	__add_metadata_parameters (object, klass, params);
 
 	if (MGD_CNC_DEBUG (mgd)) {
-		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
-		g_debug ("%s", debug_sql);
+		gchar *debug_sql = gda_connection_statement_to_sql (cnc, update, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+		g_debug ("DBObject update: %s", debug_sql);
 		g_free (debug_sql);
 	}
 
-	gint retval = gda_connection_statement_execute_non_select (cnc, stmt, params, NULL, &error);
+	gboolean inserted = (gda_connection_statement_execute_non_select (cnc, update, params, NULL, &error) == -1) ? FALSE : TRUE;
 
-	if (error) {
-		g_warning ("Failed to execute statement. %s", error && error->message ? error->message : "Unknown reason");
-		g_clear_error (&error);
-	}
-	
-	g_free (pspecs);
-	g_object_unref (params);
-	g_object_unref (stmt);
-
-	if (retval == -1) {
-
-		/* FIXME, provider error, handle this */
+	if (!inserted) {
+		g_warning ("Query failed. %s", error && error->message ? error->message : "Unknown reason");
 		return FALSE;
 	}
 
-	if (retval >= 0)
-		return TRUE;
-
-	return FALSE;
+	return inserted;
 
 }
 
@@ -1320,7 +1213,7 @@ gboolean __index_exists(MidgardConnection *mgd, MidgardDBColumn *mdc, const gcha
 	GdaConnection *cnc = mgd->priv->connection;
 	GdaMetaStore *store = gda_connection_get_meta_store (cnc);
 	const gchar *sql = "SELECT index_name FROM _table_indexes WHERE table_schema=##schema::string AND table_name=##tname::string";
-	gchar *dbname = mgd->priv->config->database;
+	gchar *dbname = midgard_config_get_dbname (mgd->priv->config);
 	gboolean index_exists = FALSE;
 
 	/* Database name - table_schema */

@@ -1,17 +1,5 @@
-dnl $Id$
-dnl
-dnl Process this file with autoconf to produce a configure script.
-dnl
-dnl The Midgard version number is changed from here. First edit
-dnl this file, then write a ChangeLog entry about the new version,
-dnl and finally commit the source tree and give it a tag.
-dnl
-dnl If the version contains user visible changes then you should
-dnl have updated the NEWS file. Remember also to test the release
-dnl before committing.
-dnl
+AC_PREREQ(2.59)
 AC_INIT([midgard3-core],[10.05.99])
-AC_PREREQ(2.50)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR(src/midgard.c)
@@ -21,22 +9,34 @@ AC_SUBST(MIDGARD_ABI_MINOR, 0)
 AC_SUBST(MIDGARD_RELEASE_MAJOR, 2010)
 AC_SUBST(MIDGARD_RELEASE_MINOR, 11)
 
-dnl Automake is needed for the build system.
-dnl
 AM_INIT_AUTOMAKE([-Wno-portability])
 AM_MAINTAINER_MODE
 GOBJECT_INTROSPECTION_CHECK([0.6.5])
 
-AM_PROG_LEX
-AC_PROG_YACC
-AC_PROG_CC(gcc cc)
-AM_PROG_CC_C_O
-AC_LANG(C)
 
-dnl Checks for programs.
+AC_PROG_CC
 AM_PROG_LIBTOOL
 
 dnl Checks for libraries.
+
+AC_PATH_PROG(VALAC, valac, valac)
+AC_SUBST(VALAC)
+AC_SUBST(VALAFLAGS)
+
+LIBVALA_REQUIRED=0.3.4
+
+PKG_CHECK_EXISTS(vala-0.12,
+	[
+	 PKG_CHECK_MODULES(LIBVALA, vala-0.12 >= $LIBVALA_REQUIRED)
+	 VALA_PACKAGE=vala-0.12
+	], [
+	 PKG_CHECK_MODULES(LIBVALA, vala-0.10 >= $LIBVALA_REQUIRED)
+	 VALA_PACKAGE=vala-0.10
+	])
+
+AC_SUBST(LIBVALA_CFLAGS)
+AC_SUBST(LIBVALA_LIBS)
+AC_SUBST(VALA_PACKAGE)
 
 _MIDGARD_DBUS_SUPPORT=yes
 dbus_libs="dbus-1 dbus-glib-1"
@@ -109,5 +109,10 @@ AC_SUBST(MIDGARD_LIBS)
 AC_SUBST(MIDGARD_CFLAGS)
 AC_SUBST(DBUS_CONF_DIR)
 
-AC_CONFIG_FILES([Makefile src/midgard_config_auto.h midgard3.pc])
+AC_CONFIG_FILES([Makefile 
+		 src/Makefile 
+		 src/core/Makefile 
+		 src/vala/Makefile 
+		 src/midgard_config_auto.h 
+		 midgard3.pc])
 AC_OUTPUT

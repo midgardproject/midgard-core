@@ -70,6 +70,10 @@ midgard_connection_private_new (void)
 	cnc_private->enable_debug = FALSE;
 	cnc_private->enable_dbus = FALSE;
 
+	/* workspace */
+	cnc_private->has_workspace = TRUE;
+	cnc_private->workspace_model = NULL;
+
 	return cnc_private;
 }
 
@@ -106,9 +110,15 @@ static void _midgard_connection_finalize(GObject *object)
 	g_timer_destroy(self->priv->timer);
 
 	if (!self->priv->inherited) {
+		/* Free config */
 		if (self->priv->config && G_IS_OBJECT (self->priv->config)) {
 			g_object_unref(self->priv->config);
 			self->priv->config = NULL;
+		}
+		/* Free workspace model */
+		if (self->priv->workspace_model && G_IS_OBJECT (self->priv->workspace_model)) {
+			g_object_unref (self->priv->workspace_model);
+			self->priv->workspace_model = NULL;
 		}
 	}
 
@@ -135,6 +145,10 @@ static void _midgard_connection_dispose(GObject *object)
 
 		gda_cnc = self->priv->connection;
 	}
+
+	if (self->priv->workspace)
+		g_object_unref (self->priv->workspace);
+	self->priv->workspace = NULL;
 
 	/* Disconnect and do not invoke error callbacks */
 	if (self->priv->error_clbk_connected)
@@ -449,31 +463,33 @@ gboolean __midgard_connection_open(
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
-	gchar *host, *dbname, *dbuser, *dbpass, *loglevel, *tmpstr;
+	const gchar *host, *dbname, *dbuser, *dbpass, *loglevel;
+	gchar *tmpstr;
 	guint port = 0;
 	gchar *auth = NULL;
 	MidgardConfig *config = mgd->priv->config;
-	host = config->host;
-	dbname = config->database;
-	dbuser = config->dbuser;
-	dbpass = config->dbpass;
-	loglevel = config->loglevel;
-	port = config->dbport;
-	gboolean enable_threads = config->gdathreads;
+	host = midgard_config_get_host (config);
+	dbname = midgard_config_get_dbname (config);
+	dbuser = midgard_config_get_dbuser (config);
+	dbpass = midgard_config_get_dbpass (config);
+	loglevel = midgard_config_get_loglevel (config);
+	port = midgard_config_get_dbport (config);
+	/*gboolean enable_threads = config->gdathreads;
 
-	/* Get 30% performance boost for non threaded applications */
+	// Get 30% performance boost for non threaded applications 
 	if(!enable_threads) 
-		g_setenv("LIBGDA_NO_THREADS", "yes", TRUE);
+		g_setenv("LIBGDA_NO_THREADS", "yes", TRUE); */
 
 	/* Initialize libgda */
 	gda_init ();
 
 	midgard_connection_set_loglevel(mgd, loglevel, NULL);
 
-	if(config->priv->dbtype == MIDGARD_DB_TYPE_SQLITE) {
+	/* FIXME, provide constants for DB types */
+	if (g_str_equal (midgard_config_get_dbtype (config), "SQLite")) {
 
 		gchar *path = NULL;
-		gchar *dbdir = config->dbdir;
+		const gchar *dbdir = midgard_config_get_dbdir (config);
 		if (!dbdir || *dbdir == '\0') {
 			const gchar *sqlite_dir[] = {"data", NULL};
 			path = midgard_core_config_build_path(sqlite_dir, NULL, TRUE);
@@ -484,7 +500,7 @@ gboolean __midgard_connection_open(
 		tmpstr = g_strconcat("DB_DIR=", path, ";", "DB_NAME=", dbname, NULL);
 		g_free(path);
 
-	} else if (config->priv->dbtype == MIDGARD_DB_TYPE_ORACLE) {
+	} else if (g_str_equal (midgard_config_get_dbtype (config), "Oracle")) {
 
 		GString *cnc = g_string_sized_new(100);
 		cnc_add_part(cnc, "TNSNAME", dbname, MGD_MYSQL_HOST);
@@ -519,7 +535,7 @@ gboolean __midgard_connection_open(
 
 	GError *error = NULL;
 	GdaConnection *connection = gda_connection_open_from_string(
-			config->dbtype, tmpstr, auth, GDA_CONNECTION_OPTIONS_NONE, &error);
+			midgard_config_get_dbtype (config), tmpstr, auth, GDA_CONNECTION_OPTIONS_NONE, &error);
 	g_free(auth);	
 
 	if(connection == NULL) {
@@ -546,12 +562,12 @@ gboolean __midgard_connection_open(
 	if(init_schema) {
 		
 		if(!g_type_from_name("midgard_quota")) {
-			
+				
 			MidgardSchema *schema = g_object_new(MIDGARD_TYPE_SCHEMA, NULL);
-			gchar *path = g_build_path(G_DIR_SEPARATOR_S, config->sharedir, "MidgardObjects.xml", NULL);
+			gchar *path = g_build_path(G_DIR_SEPARATOR_S, midgard_config_get_sharedir (config), "MidgardObjects.xml", NULL);
 			midgard_schema_init(schema, (const gchar *)path);
 			g_free(path);
-			midgard_schema_read_dir(schema, config->sharedir);
+			midgard_schema_read_dir(schema, midgard_config_get_sharedir (config));
 			
 			mgd->priv->schema = schema;
 		}
@@ -561,6 +577,9 @@ gboolean __midgard_connection_open(
 
 	/* Loads available authentication types */
 	midgard_core_connection_initialize_auth_types(mgd);
+
+	/* Loads all available workspaces */
+	midgard_core_workspace_list_all (mgd);
 
 	g_signal_emit (mgd, MIDGARD_CONNECTION_GET_CLASS (mgd)->signal_id_connected, 0);
 
@@ -725,7 +744,8 @@ extern GHashTable *midgard_connection_open_all(gboolean userdir)
 		g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_object_unref);
 	GHashTable *hash = NULL;
 
-	gchar **cfgs = midgard_config_list_files(userdir);
+	guint n_files;
+	gchar **cfgs = midgard_config_list_files(userdir, &n_files);
 	
 	if(!cfgs) 
 		return FALSE;
@@ -803,9 +823,9 @@ gboolean midgard_connection_open_config(
 
 	/* Emulate the same config pointer, as we have copy associated */
 	if (self_config 
-			&& (g_str_equal (self_config->database, config->database)
-				&& g_str_equal (self_config->dbtype, config->dbtype)
-				&& g_str_equal (self_config->host, config->host))) {
+			&& (g_str_equal (midgard_config_get_dbname (self_config), midgard_config_get_dbname (config))
+				&& g_str_equal (midgard_config_get_dbtype (self_config), midgard_config_get_dbtype (config))
+				&& g_str_equal (midgard_config_get_host (self_config), midgard_config_get_host (config)))) {
 		return TRUE;
 	} else if (self_config) {
 		MIDGARD_ERRNO_SET_STRING (self, MGD_ERR_INTERNAL, "Midgard connection already associated with configuration");
@@ -1062,7 +1082,6 @@ gboolean midgard_connection_reopen(MidgardConnection *self)
 		return TRUE;
 	}
 
-	guint dbtype = self->priv->config->priv->dbtype;
 	const GList *events;
 	glong errcode = 0;
 	events = gda_connection_get_events (self->priv->connection);
@@ -1082,20 +1101,13 @@ gboolean midgard_connection_reopen(MidgardConnection *self)
 		if (gda_connection_event_get_event_type (event) == GDA_CONNECTION_EVENT_ERROR) {
 
 			errcode = gda_connection_event_get_code(event);
+			
+			if (g_str_equal (midgard_config_get_dbtype (self->priv->config), "MySQL")) {
 
-			switch (dbtype) {
-
-				case MIDGARD_DB_TYPE_MYSQL:
-
-					if (errcode == 2006) { /* CR_SERVER_GONE_ERROR , we can not use it */
-						g_debug("MySQL server has gone away. Reconnect.");
-						return __mysql_reconnect(self);
-					}
-					break;
-
-				default:
-					/* do nothing */
-					break;
+				if (errcode == 2006) { /* CR_SERVER_GONE_ERROR , we can not use it */
+					g_debug("MySQL server has gone away. Reconnect.");
+					return __mysql_reconnect(self);
+				}
 			}
 		}
 	}
@@ -1209,6 +1221,14 @@ MidgardConnection *midgard_connection_copy(MidgardConnection *self)
 	 * Copy will be used for this. Do not duplicate callbacks invokation */
 	midgard_core_connection_disconnect_error_callback(self);
 
+#warning implement workspace_model copy 
+
+	/* Increase workspace reference count.
+	 * For example, connection might be copied to new thread, so we 
+	 * need to ensue, workspace object is valid */
+	if (self->priv->workspace)
+		new_mgd->priv->workspace = g_object_ref (self->priv->workspace);
+
 	return new_mgd;
 }
 
@@ -1306,4 +1326,53 @@ midgard_connection_is_enabled_dbus (MidgardConnection *self)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	return self->priv->enable_dbus;
+}
+
+/**
+ * midgard_connection_set_workspace:
+ * @self: #MidgardConnection instance
+ * @workspace: #MidgardWorkspaceStorage to set for given #MidgardConnection
+ *
+ * Actual workspace scope depends on #MidgardWorkspaceStorage implementation.
+ * For example, if #MidgardWorkspaceContext is passed as @workspace argument,
+ * Midgard environmental workspace is a tree context, which is the opposite 
+ * of #MidgardWorkspace which limits workspace scope to given one only.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.11
+ */ 
+gboolean
+midgard_connection_set_workspace (MidgardConnection *self, MidgardWorkspaceStorage *workspace)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (workspace != NULL, FALSE);
+	g_return_val_if_fail (MIDGARD_IS_WORKSPACE_STORAGE (workspace), FALSE);
+
+	if (self->priv->workspace)
+		g_object_unref (self->priv->workspace);
+	self->priv->workspace = (gpointer) g_object_ref (workspace);
+
+	self->priv->has_workspace = TRUE;
+
+	/* TODO WS: emit signal */
+
+	return TRUE;
+}
+
+/**
+ * midgard_connection_get_context:
+ * @self: #MidgardConnection instance
+ *
+ * Returns: (tranfer none): #MidgardWorkspaceStorage associated with #MidgardConnection or %NULL
+ * Since: 10.11
+ */
+const MidgardWorkspaceStorage*
+midgard_connection_get_workspace (MidgardConnection *self)
+{
+	g_return_val_if_fail (self != NULL, NULL);
+	
+	if (!self->priv->workspace)
+		return NULL;
+
+	return MIDGARD_WORKSPACE_STORAGE (self->priv->workspace);
 }

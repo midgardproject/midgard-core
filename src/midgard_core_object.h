@@ -28,6 +28,8 @@
 #include "midgard_timestamp.h"
 #include "midgard_connection.h"
 
+#define MGD_WORKSPACE_DUMMY_ID 7
+
 struct _MidgardDBObjectPrivate {
 
 	const gchar *guid;	
@@ -41,15 +43,17 @@ struct _MidgardDBObjectPrivate {
 
 	/* GDA pointers */
 	GdaStatement *statement_insert;
-	GdaSet *param_set_insert;	
+	GdaSet *param_set_insert;
+	GdaStatement *statement_update;
+	GdaSet *param_set_update;	
 
 	/* GdaSql virtual helpers */
 	void			(*add_fields_to_select_statement)	(MidgardDBObjectClass *klass, 
-			GdaSqlStatementSelect *select, const gchar *table_name);
+			GdaSqlStatementSelect *select, const gchar *table_name);	
 
 	GSList 			*(*set_from_sql)	(MidgardConnection *mgd, GType type, const gchar *sql);	
 	void 			(*__set_from_sql)	(MidgardDBObject *self, GdaDataModel *model, gint row);
-	void 			(*set_from_data_model)	(MidgardDBObject *self, GdaDataModel *model, gint row);
+	void 			(*set_from_data_model)	(MidgardDBObject *self, GdaDataModel *model, gint row, gint start_field);
 	void 			(*set_from_xml_node)	(MidgardDBObject *self, xmlNode *node);
 	MidgardConnection 	*(*get_connection) 	(MidgardDBObject *self);
 	gboolean		(*create_storage)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
@@ -58,9 +62,12 @@ struct _MidgardDBObjectPrivate {
 	gboolean		(*delete_storage)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
 	gboolean		(*get_property)		(MidgardDBObject *self, const gchar *name, GValue *value);
 	gboolean		(*set_property)		(MidgardDBObject *self, const gchar *name, GValue *value);
+	GParamSpec 		**(*list_properties)	(MidgardDBObjectClass *klass, guint *n_props);
+	GParamSpec 		**(*list_storage_columns)	(MidgardDBObjectClass *klass, guint *n_props);
 
 	/* GDA helpers */
 	void			(*set_statement_insert)	(MidgardDBObjectClass *klass);
+	void			(*set_statement_update)	(MidgardDBObjectClass *klass);
 };
 
 #define MGD_DBOBJECT_DBPRIV(__obj) (MIDGARD_DBOBJECT(__obj)->dbpriv)
@@ -78,8 +85,8 @@ struct _MidgardDBObjectPrivate {
 #define MGD_DBCLASS_PROPERTY_PARENT(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->property_parent
 #define MGD_DBCLASS_PROPERTY_UNIQUE(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->unique_name
 
-#define MGD_DBCLASS_PRIMARY(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->primary;
-#define MGD_DBCLASS_TABLENAME(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->table;
+#define MGD_DBCLASS_PRIMARY(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->primary
+#define MGD_DBCLASS_TABLENAME(__klass) MIDGARD_DBOBJECT_CLASS(__klass)->dbpriv->storage_data->table
 
 /* Private structure for private data of MgdSchema objects */
 struct _MidgardObjectPrivate{
@@ -88,7 +95,12 @@ struct _MidgardObjectPrivate{
 	gchar *imported;
 	GSList *parameters;
 	GHashTable *_params;
+	guint ws_id;
+	guint ws_object_id;
 };
+
+#define MGD_OBJECT_WS_ID(__obj) MIDGARD_OBJECT(__obj)->priv->ws_id
+#define MGD_OBJECT_WS_OID(__obj) MIDGARD_OBJECT(__obj)->priv->ws_object_id
 
 struct _MidgardObjectClassPrivate {
 	MgdSchemaTypeAttr *storage_data;
@@ -191,6 +203,11 @@ struct _MidgardConnectionPrivate {
 	gboolean enable_quota;
 	gboolean enable_debug;
 	gboolean enable_dbus;
+
+	/* workspace */
+	gboolean has_workspace;
+	gpointer workspace;
+	GdaDataModel *workspace_model;
 };
 
 #define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL
@@ -198,6 +215,9 @@ struct _MidgardConnectionPrivate {
 #define MGD_CNC_REPLICATION(_cnc) _cnc->priv->enable_replication
 #define	MGD_CNC_DEBUG(_cnc) _cnc->priv->enable_debug
 #define MGD_CNC_DBUS(_cnc) _cnc->priv->enable_dbus
+#define MGD_CNC_HAS_WORKSPACE(_cnc) _cnc->priv->has_workspace
+#define MGD_CNC_WORKSPACE(_cnc) (MidgardWorkspace *)_cnc->priv->workspace
+#define MGD_CNC_WORKSPACE_ID(_cnc) MIDGARD_WORKSPACE_STORAGE_GET_INTERFACE(MGD_CNC_WORKSPACE(_cnc))->priv->get_id(MIDGARD_WORKSPACE_STORAGE (MGD_CNC_WORKSPACE(_cnc)))
 
 struct _MidgardBlobPrivate {
 	MidgardObject *attachment;
@@ -219,7 +239,8 @@ typedef enum {
 
 
 /* MidgardDBObject */
-GParamSpec **midgard_core_dbobject_class_list_properties (MidgardDBObjectClass *klass, guint *n_props); 
+GParamSpec 	**midgard_core_dbobject_class_list_properties	(MidgardDBObjectClass *klass, guint *n_props);
+void		midgard_core_dbobject_class_set_full_select	(MidgardDBObjectClass *klass);
 
 /* Object's xml */
 xmlDoc *midgard_core_object_create_xml_doc(void);

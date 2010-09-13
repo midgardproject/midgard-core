@@ -1,5 +1,5 @@
 /* 
- * Midgard core, API headers.
+ * Midgard core, MidgardQuery classes' headers.
  *
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *
@@ -18,14 +18,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MIDGARD_API_H_
-#define _MIDGARD_API_H_
+#ifndef _MIDGARD_API_QUERY_H_
+#define _MIDGARD_API_QUERY_H_
 
-#include <glib.h>
-#include <glib-object.h>
+#include <midgard/midgard_query_constraint_simple.h>
+#include <midgard/midgard_query_holder.h>
+#include <midgard/midgard_query_value.h>
+#include <midgard/midgard_query_property.h>
+#include <midgard/midgard_query_executor.h>
+#include <midgard/midgard_query_select.h>
+#include <midgard/midgard_query_storage.h>
+#include <midgard/midgard_query_constraint.h>
+#include <midgard/midgard_query_constraint_group.h>
 
-#include <midgard2.h>
-#include <midgard3.h>
-
-#endif /* _MIDGARD_API_H_ */
+#endif /* _MIDGARD_API_QUERY_H_ */
 

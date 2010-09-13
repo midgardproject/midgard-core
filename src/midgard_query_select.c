@@ -22,6 +22,9 @@
 #include "midgard_core_object_class.h"
 #include "midgard_query_holder.h"
 #include "midgard_dbobject.h"
+#include <sql-parser/gda-sql-parser.h>
+#include "midgard_core_workspace.h"
+#include "midgard_workspace_storage.h"
 
 /**
  * midgard_query_select_new:
@@ -190,18 +193,22 @@ _midgard_query_select_add_join (MidgardQueryExecutor *self, const gchar *join_ty
 	return TRUE;
 }
 
-gboolean __query_select_add_orders (MidgardQueryExecutor *self)
+gboolean 
+__query_select_add_orders (MidgardQueryExecutor *self, MidgardDBObjectClass *klass)
 {
-	if (!self->priv->orders)
-		return TRUE;
-
 	GSList *l = NULL;
 
 	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
 	GdaSqlStatement *sql_stm = executor->priv->stmt;
 	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;	
+	MidgardConnection *mgd = self->priv->mgd;
 	GdaSqlSelectOrder *order; 
-	
+	GValue *value;
+	GdaSqlExpr *expr;
+
+	if (!self->priv->orders)
+		return TRUE;
+
 	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->orders; l != NULL; l = l->next) {
 
 		qso *_so = (qso*) l->data;
@@ -218,12 +225,12 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 		gchar *table_field = midgard_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval));
 		g_value_unset (&rval);
 
-		GValue *value = g_new0 (GValue, 1);
+		value = g_new0 (GValue, 1);
 		g_value_init (value, G_TYPE_STRING);
 		g_value_take_string (value, table_field);
 
 		/* Set order's expression and add new one to statement orders list */
-		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (order));
+		expr = gda_sql_expr_new (GDA_SQL_ANY_PART (order));
 		expr->value = value;
 		order->expr = expr;
 		select->order_by = g_slist_append (select->order_by, order);
@@ -232,8 +239,91 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 	return TRUE;
 }
 
-gboolean __query_select_add_joins (MidgardQuerySelect *self)
+static void 
+__add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operation)
 {
+	g_return_if_fail (self != NULL);
+	
+	MidgardDBObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
+	if (!g_type_is_a (G_OBJECT_CLASS_TYPE (klass), MIDGARD_TYPE_OBJECT))
+		return;
+
+	MidgardConnection *mgd = MIDGARD_QUERY_EXECUTOR (self)->priv->mgd;
+	gboolean has_ws = MGD_CNC_HAS_WORKSPACE (mgd);
+	if (!has_ws)
+		return;
+
+	guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
+	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
+	GdaSqlStatement *sql_stm = executor->priv->stmt;
+	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;
+	GdaSqlSelectFrom *from = select->from;
+	GdaSqlSelectJoin *join;
+	const gchar *klass_table = MGD_DBCLASS_TABLENAME (klass);
+
+	gchar *left_table = executor->priv->table_alias;
+	gchar *right_table = g_strdup_printf ("t%d", ++executor->priv->tableid);
+
+	join = gda_sql_select_join_new (GDA_SQL_ANY_PART (from));
+	join->type = GDA_SQL_SELECT_JOIN_INNER;
+
+	GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (join));
+	expr->value = gda_value_new (G_TYPE_STRING);
+	g_value_take_string (expr->value, g_strdup_printf ("%s.%s = %s.%s", 
+				left_table, MGD_WORKSPACE_ID_FIELD, right_table, MGD_WORKSPACE_ID_FIELD));
+
+	join->expr = expr;
+	join->position = ++executor->priv->joinid;
+
+	GString *table = g_string_new ("(SELECT DISTINCT MAX");
+	g_string_append_printf (table, "(%s) AS %s, %s FROM %s WHERE %s IN (", 
+			MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_OID_FIELD, 
+			klass_table, MGD_WORKSPACE_ID_FIELD);
+
+	const MidgardWorkspaceStorage *ws = midgard_connection_get_workspace (mgd);
+	GSList *list = MIDGARD_WORKSPACE_STORAGE_GET_INTERFACE (ws)->priv->list_ids (MIDGARD_WORKSPACE_STORAGE (ws));
+	GSList *l = NULL;
+	guint i = 0;
+	guint id;
+	for (l = list; l != NULL; l = l->next, i++) {
+		GValue *id_val = (GValue *) l->data;
+		if (G_VALUE_HOLDS_UINT (id_val))
+			id = g_value_get_uint (id_val);
+		else
+			id = (guint) g_value_get_int (id_val);
+		g_string_append_printf (table, "%s%d", i > 0 ? "," : "", id);
+	}
+	g_string_append_printf (table, ") GROUP BY %s)", MGD_WORKSPACE_OID_FIELD);
+	g_slist_free (list);
+
+	gda_sql_select_from_take_new_join (from , join);
+	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (from));
+	s_target->table_name = g_string_free (table, FALSE);
+	s_target->as = right_table;
+	gda_sql_select_from_take_new_target (from, s_target);
+	MIDGARD_QUERY_EXECUTOR (self)->priv->include_deleted_targets = 
+		g_slist_append (MIDGARD_QUERY_EXECUTOR (self)->priv->include_deleted_targets, s_target);
+
+	GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
+	GValue *tval = g_new0 (GValue, 1);
+	g_value_init (tval, G_TYPE_STRING);
+	g_value_set_string (tval, g_strdup (s_target->table_name));
+	texpr->value = tval;
+	s_target->expr = texpr;
+
+	/* Add workspace object id constraint */
+	GdaSqlExpr *ws_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
+	ws_expr->value = gda_value_new (G_TYPE_STRING);
+	g_value_take_string (ws_expr->value, g_strdup_printf ("%s.%s = %s.%s", 
+				left_table, MGD_WORKSPACE_OID_FIELD, right_table, MGD_WORKSPACE_OID_FIELD));
+	operation->operands = g_slist_append (operation->operands, ws_expr);
+}
+
+gboolean 
+__query_select_add_joins (MidgardQuerySelect *self, GdaSqlOperation *operation)
+{
+	__add_implicit_workspace_join (self, operation);
+
 	if (!MIDGARD_QUERY_EXECUTOR (self)->priv->joins)
 		return TRUE;
 
@@ -292,37 +382,55 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self)
 	return TRUE;
 }
 
-static void 
-__add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperation *operation)
+static gboolean
+__include_deleted_from_target (MidgardQueryExecutor *executor, GdaSqlSelectTarget *target)
 {
-	GSList *l = select->from->targets;
+	GSList *l = NULL;
 
-	/* We have only one target table, so create one expression and add to top operation */
-	if (g_slist_length (l) == 1) {
-
-		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
-		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
-		expr->value = gda_value_new (G_TYPE_STRING);
-		g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = 0", target->as));
-		operation->operands = g_slist_append (operation->operands, expr);
-
-		return;
+	for (l = executor->priv->include_deleted_targets; l != NULL; l = l->next) {
+		GdaSqlSelectTarget *t = (GdaSqlSelectTarget *) l->data;
+		if (target == t)
+			return TRUE;
 	}
 
-	/* Create new constraint group, (t1.deleted AND t2.deleted AND ...) */
- 	GdaSqlExpr *deleted_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
-	GdaSqlOperation *deleted_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (deleted_expr));
-	deleted_operation->operator_type = GDA_SQL_OPERATOR_TYPE_AND;
-	deleted_expr->cond = deleted_operation;
-	operation->operands = g_slist_append (operation->operands, deleted_expr);
+	return FALSE;
+}
+
+static void 
+__add_exclude_deleted_constraints (MidgardQueryExecutor *executor, GdaSqlStatementSelect *select, GdaSqlOperation *operation)
+{
+	GSList *l = select->from->targets;
+	guint list_length = g_slist_length (l);
+
+	guint i = 0;
+	GdaSqlSelectTarget *target = NULL;
+	/* Compute if there's a need to create new constraint group */
+	for (l = select->from->targets; l != NULL; l = l->next) {
+		target = (GdaSqlSelectTarget *) l->data;
+		if (__include_deleted_from_target (executor, target))
+			i++;
+	}
+
+	GdaSqlOperation *_op = operation;
+	if (list_length > 1 && ((list_length - 1 > 1))) {
+		/* Create new constraint group, (t1.deleted AND t2.deleted AND ...) */
+		GdaSqlExpr *deleted_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
+		GdaSqlOperation *deleted_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (deleted_expr));
+		deleted_operation->operator_type = GDA_SQL_OPERATOR_TYPE_AND;
+		deleted_expr->cond = deleted_operation;
+		operation->operands = g_slist_append (operation->operands, deleted_expr);
+		_op = deleted_operation;
+	}
 
 	/* Add metadata_deleted constraint for each statement's table */
 	for (l = select->from->targets; l != NULL; l = l->next) {
-		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
+		target = (GdaSqlSelectTarget *) l->data;
+		if (__include_deleted_from_target (executor, target))
+			continue;
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
         	expr->value = gda_value_new (G_TYPE_STRING);
         	g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = 0", target->as));
-        	deleted_operation->operands = g_slist_append (deleted_operation->operands, expr);
+        	_op->operands = g_slist_append (_op->operands, expr);
 	}
 }
 
@@ -372,6 +480,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 
 	MidgardConnection *mgd = self->priv->mgd;
 	GdaConnection *cnc = mgd->priv->connection;
+	GdaSqlParser *parser = mgd->priv->parser;
 	GdaSqlStatement *sql_stm;
 	GdaSqlStatementSelect *sss;
 
@@ -406,12 +515,12 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	/* Add fields for all properties registered per class (SELECT a,b,c...) */
 	klass->dbpriv->add_fields_to_select_statement (klass, sss, s_target->as);
 
-	/* Add joins, LEFT JOIN tbl2 ON... */
-	if (!__query_select_add_joins (MIDGARD_QUERY_SELECT (self))) 
-		goto return_false;
-
 	GdaSqlExpr *where = sss->where_cond;
 	GdaSqlOperation *operation = where->cond;
+
+	/* Add joins, LEFT JOIN tbl2 ON... */
+	if (!__query_select_add_joins (MIDGARD_QUERY_SELECT (self), operation)) 
+		goto return_false;
 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint) {
@@ -425,12 +534,12 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	}
 
 	/* Add orders , ORDER BY t1.field... */
-	if (!__query_select_add_orders (self)) 
+	if (!__query_select_add_orders (self, klass)) 
 		goto return_false;
 
 	/* Exclude deleted */
 	if (MGD_DBCLASS_METADATA_CLASS (klass) && !MIDGARD_QUERY_EXECUTOR (self)->priv->include_deleted)
-		__add_exclude_deleted_constraints (sss, operation);
+		__add_exclude_deleted_constraints (self, sss, operation);
 
 	/* Add limit, LIMIT x */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->limit > 0) {
@@ -543,7 +652,7 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 			MGD_OBJECT_GUID (objects[i]) = g_value_dup_string (gval);
 		} else {
 			MIDGARD_DBOBJECT_GET_CLASS (objects[i])->dbpriv->set_from_data_model (
-					MIDGARD_DBOBJECT (objects[i]), model, i);
+					MIDGARD_DBOBJECT (objects[i]), model, i, 0);
 		}
 	}
 
@@ -580,10 +689,10 @@ midgard_query_select_include_deleted (MidgardQuerySelect *self, gboolean toggle)
 }
 
 
-/**
+/*
  * midgard_query_select_list_objects:
- * @self: #MidgardQuerySelect instance
- * @n_objects: pointer to store number of returned objects
+ * @self: (in): #MidgardQuerySelect instance
+ * @n_objects: (out): pointer to store number of returned objects
  *
  * List all objects for which data has been returned during execution.
  *

@@ -24,6 +24,7 @@
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
 #include <libgda/libgda.h>
+#include "midgard_type.h"
 
 static void add_sql(MidgardCoreQueryConstraint *constraint, GString *sql) {
         g_assert(constraint);

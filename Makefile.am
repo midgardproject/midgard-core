@@ -1,4 +1,6 @@
-## Process this file with automake to produce Makefile.in
+QUIET_GEN = $(Q:@=@echo ' GEN '$@;)
+
+SUBDIRS = src
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -35,7 +37,6 @@ viewsdir = $(datadir)/midgard3/views
 views_DATA = views/README-views.txt
 
 midgard_public_h = \
-	src/midgard_config.h \
 	src/midgard_config_auto.h \
 	src/midgard_dbobject.h \
 	src/midgard_defs.h \
@@ -76,7 +77,11 @@ midgard_public_h = \
 	src/midgard_transaction.h \
 	src/midgard_user.h \
 	src/midgard_utils.h \
-	src/midgard_view.h
+	src/midgard_view.h \
+	src/midgard_workspace.h \
+	src/midgard_workspace_context.h \
+	src/midgard_workspace_storage.h \
+	src/core/midgard3.h
 
 man_MANS = man/midgard3-schema.1 \
 	man/midgard3-query.1 
@@ -88,7 +93,11 @@ EXTRA_DIST =  \
 	$(views_DATA) 
 	m4/introspection.m4
 
-LDADD = src/libmidgard3.la
+LDADD = src/libmidgard3.la 
+
+src_libmidgard3_la_LIBADD = \
+			    src/vala/libmidgardvala.la \
+			    src/core/libmidgardcore.la
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined
@@ -99,7 +108,7 @@ $(PROGRAMS): $(LDADD)
 src_libmidgard3_la_CPPFLAGS = \
 	-I$(top_srcdir)/src -DG_LOG_DOMAIN=\"midgard-core\"
 
-AM_CFLAGS = -I$(top_srcdir)/src @MIDGARD_CFLAGS@
+AM_CFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/core @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 
 
 src_libmidgard3_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
@@ -138,7 +147,13 @@ src_libmidgard3_la_core_SOURCES = \
 	src/midgard_core_views.c \
 	src/midgard_core_views.h \
 	src/midgard_core_xml.h \
-	src/midgard_core_xml.c 
+	src/midgard_core_xml.c \
+	src/midgard_core_workspace.h \
+       	src/midgard_core_workspace.c \
+	src/midgard_query_select_simple.h \
+	src/midgard_query_select_simple.c \
+	src/midgard_core_storage_sql.h \
+	src/midgard_core_storage_sql.c	
 
 src_libmidgard3_la_public_SOURCES = \
 	src/midgard.c \
@@ -151,7 +166,6 @@ src_libmidgard3_la_public_SOURCES = \
 	src/uuid.c \
 	src/guid.c \
         src/midgard_type.c \
-	src/midgard_config.c \
 	src/query_builder.c \
 	src/midgard_metadata.c \
 	src/midgard_timestamp.c \
@@ -189,7 +203,10 @@ src_libmidgard3_la_public_SOURCES = \
 	src/midgard_transaction.c \
 	src/midgard_md5.c \
 	src/midgard_md5.h \
-	src/midgard_view.c
+	src/midgard_view.c \
+	src/midgard_workspace.c \
+	src/midgard_workspace_context.c \
+	src/midgard_workspace_storage.c
 
 pkgdatadir = $(datadir)/midgard3
 pkglibdir = $(libdir)/midgard3

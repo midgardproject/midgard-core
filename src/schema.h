@@ -62,6 +62,8 @@ struct _MgdSchemaTypeAttr {
 	GHashTable *prophash;
 	GHashTable *tableshash;
 	GSList *_properties_list;
+	GParamSpec **storage_params;
+	guint storage_params_count;
 	const gchar *tables;
 	const gchar *table;
 	const gchar *parent;
