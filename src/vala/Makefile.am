@@ -7,7 +7,16 @@ BUILT_SOURCES = libmidgardvala.vala.stamp
 
 libmidgardvala_la_VALASOURCES = \
 			  midgard_config.vala \
-			  midgard_executable.vala
+			  midgard_executable.vala \
+			  midgard_namespace.vala \
+			  midgard_profiler.vala \
+			  midgard_query.vala \
+			  midgard_schema_model_reflector.vala \
+			  midgard_schema_model.vala \
+			  midgard_schema_object.vala \
+			  midgard_storage_manager_sql.vala \
+			  midgard_storage.vala \
+			  midgard_workspace.vala
 
 libmidgardvala_la_SOURCES = \
 			libmidgardvala.vala.stamp \
@@ -22,9 +31,10 @@ libmidgardvala.vala.stamp: $(libmidgardvala_la_VALASOURCES)
 
 EXTRA_DIST = \
 	     $(libmidgardvala_la_VALASOURCES) \
-	     libmidgardvala.vala.stamp 		\
-	     $(top_srcdir)/src/core/midgard3.h
+	     libmidgardvala.vala.stamp 		
 
 CLEANFILES = \
 	     libmidgardvala.vala.stamp \
-	     $(libmidgardvala_la_VALASOURCES:.vala=.c)
+	     $(libmidgardvala_la_VALASOURCES:.vala=.c) \
+	     $(top_srcdir)/src/core/midgard3.h
+		
