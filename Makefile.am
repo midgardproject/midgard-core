@@ -37,6 +37,7 @@ viewsdir = $(datadir)/midgard3/views
 views_DATA = views/README-views.txt
 
 midgard_public_h = \
+	src/midgard_config.h \
 	src/midgard_config_auto.h \
 	src/midgard_dbobject.h \
 	src/midgard_defs.h \
@@ -116,6 +117,8 @@ test_midgard_schema_CPPFLAGS = \
 src_libmidgard3_la_core_SOURCES = \
 	src/midgard_core_connection.h \
 	src/midgard_core_connection.c \
+	src/midgard_core_config.c \
+	src/midgard_core_config.h \
 	src/midgard_core_query.h \
 	src/midgard_core_query.c \
 	src/mgdschema.c \
@@ -150,6 +153,7 @@ src_libmidgard3_la_core_SOURCES = \
 
 src_libmidgard3_la_public_SOURCES = \
 	src/midgard.c \
+	src/midgard_config.c \
 	src/midgard_key_config.c \
 	src/midgard_key_config_context.c \
 	src/midgard_key_config_file.c \

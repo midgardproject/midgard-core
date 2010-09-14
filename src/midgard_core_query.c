@@ -1218,7 +1218,7 @@ gboolean __index_exists(MidgardConnection *mgd, MidgardDBColumn *mdc, const gcha
 	GdaConnection *cnc = mgd->priv->connection;
 	GdaMetaStore *store = gda_connection_get_meta_store (cnc);
 	const gchar *sql = "SELECT index_name FROM _table_indexes WHERE table_schema=##schema::string AND table_name=##tname::string";
-	gchar *dbname = midgard_config_get_dbname (mgd->priv->config);
+	gchar *dbname = mgd->priv->config->priv->database;
 	gboolean index_exists = FALSE;
 
 	/* Database name - table_schema */

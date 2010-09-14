@@ -1,6 +1,6 @@
 using GLib;
 
-namespace Midgard {
+namespace MidgardCR {
 
 	public interface Storable : GLib.Object {
 

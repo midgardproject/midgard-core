@@ -1,7 +1,7 @@
 
 using GLib;
 
-namespace Midgard {
+namespace MidgardCR {
 
 	public errordomain WorkspaceStorageError {
 	        WORKSPACE_STORAGE_ERROR_NAME_EXISTS,

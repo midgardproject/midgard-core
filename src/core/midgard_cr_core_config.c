@@ -26,9 +26,9 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#include "midgard_core_config.h"
+#include "midgard_cr_core_config.h"
 
-gchar *midgard_core_config_build_path(
+gchar *midgard_cr_core_config_build_path(
 		const gchar **dirs, const gchar *filename, gboolean user)
 {
 	gchar *filepath = NULL;
@@ -109,7 +109,7 @@ gchar *midgard_core_config_build_path(
 	return filepath;
 }
 
-void __set_dbtype (MidgardConfig *self, const gchar *tmpstr)
+void _core_config_set_dbtype (MidgardCRConfig *self, const gchar *tmpstr)
 {
 	const gchar *_dbtype = tmpstr;
 
@@ -133,10 +133,10 @@ void __set_dbtype (MidgardConfig *self, const gchar *tmpstr)
 		_dbtype = "MySQL";
 	}
 
-	midgard_config_set_dbtype (self, _dbtype);
+	midgard_cr_config_set_dbtype (self, _dbtype);
 }
 
-void __create_log_dir(const gchar *path)
+void _cr_config_create_log_dir(const gchar *path)
 {
 	if (path == NULL || *path == '\0')
 		return;
@@ -155,7 +155,7 @@ void __create_log_dir(const gchar *path)
 	}
 }
 
-static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, const gchar *filename)
+static void __set_config_from_keyfile(MidgardCRConfig *self, GKeyFile *keyfile, const gchar *filename)
 {
 	g_assert (self != NULL);
 	g_assert (keyfile != NULL);
@@ -165,109 +165,109 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 
 	/* Get database type */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Type", NULL);
-	midgard_config_set_dbtype (self, tmpstr);
+	midgard_cr_config_set_dbtype (self, tmpstr);
 	g_free (tmpstr);
 		
 	/* Get host name or IP */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Host", NULL);
-	midgard_config_set_host (self, tmpstr);
+	midgard_cr_config_set_host (self, tmpstr);
 	g_free (tmpstr);
 
 	/* Get database port */
 	guint port = g_key_file_get_integer (keyfile, "MidgardDatabase", "Port", NULL);
 	if (port > 0)
-		midgard_config_set_dbport (self, port);
+		midgard_cr_config_set_dbport (self, port);
 	else if (port < 0) 
 		g_warning ("Invalid, negative value for database port");
 
 	/* Get database name */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Name", NULL);
-	midgard_config_set_dbname (self, tmpstr);
+	midgard_cr_config_set_dbname (self, tmpstr);
 	g_free (tmpstr);
 
 	/* Get database's username */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Username", NULL);
-	midgard_config_set_dbuser (self, tmpstr);
+	midgard_cr_config_set_dbuser (self, tmpstr);
 	g_free (tmpstr);
 
 	/* Get password for database user */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Password", NULL);
-	midgard_config_set_dbpass (self, tmpstr);	
+	midgard_cr_config_set_dbpass (self, tmpstr);	
 	g_free (tmpstr);
 
 	/* Get directory for SQLite database  */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "DatabaseDir", NULL);
-	midgard_config_set_dbdir (self, tmpstr);
+	midgard_cr_config_set_dbdir (self, tmpstr);
 	g_free (tmpstr);
 
 	/* Get log filename */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Logfile", NULL);
-	midgard_config_set_logfilename (self, tmpstr);
+	midgard_cr_config_set_logfilename (self, tmpstr);
 	g_free (tmpstr);
 
 	/* Get log level */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Loglevel", NULL);
-	midgard_config_set_loglevel (self, tmpstr);
+	midgard_cr_config_set_loglevel (self, tmpstr);
 	g_free (tmpstr);
 
 	/* Get database creation mode */
 	tmpbool = g_key_file_get_boolean(keyfile, "MidgardDatabase", "TableCreate", NULL);
-	midgard_config_set_tablecreate (self, tmpbool);
+	midgard_cr_config_set_tablecreate (self, tmpbool);
 
 	/* Get database update mode */
 	tmpbool = g_key_file_get_boolean(keyfile, "MidgardDatabase", "TableUpdate", NULL);
-	midgard_config_set_tableupdate (self, tmpbool);
+	midgard_cr_config_set_tableupdate (self, tmpbool);
 
 	/* Get SG admin username */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "MidgardUsername", NULL);
-	midgard_config_set_midgardusername (self, tmpstr);
+	midgard_cr_config_set_midgardusername (self, tmpstr);
 	g_free (tmpstr);
 
 	/* Get SG admin password */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "MidgardPassword", NULL);
-	midgard_config_set_midgardpassword (self, tmpstr);
+	midgard_cr_config_set_midgardpassword (self, tmpstr);
 	g_free (tmpstr);
 
 	/* Get test mode */
 	tmpbool = g_key_file_get_boolean(keyfile, "MidgardDatabase", "TestUnit", NULL);
-	midgard_config_set_testunit (self, tmpbool);
+	midgard_cr_config_set_testunit (self, tmpbool);
 
 	/* DIRECTORIES */
 
 	/* BlobDir */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "BlobDir", NULL);
-	midgard_config_set_blobdir (self, tmpstr);
+	midgard_cr_config_set_blobdir (self, tmpstr);
 	g_free (tmpstr);
 
 	/* ShareDir  */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "ShareDir", NULL);
-	midgard_config_set_sharedir (self , tmpstr);
+	midgard_cr_config_set_sharedir (self , tmpstr);
 	g_free (tmpstr);
 
 	/* VarDir */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "VarDir", NULL);
-	midgard_config_set_vardir (self, tmpstr);
+	midgard_cr_config_set_vardir (self, tmpstr);
 	g_free (tmpstr);
 
 	/* CacheDir */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "ShareDir", NULL);
-	midgard_config_set_cachedir (self, tmpstr);
+	midgard_cr_config_set_cachedir (self, tmpstr);
 	g_free (tmpstr);
 
 	return;
 }
 
 /**
- * midgard_core_config_read_file:
- * @config: #MidgardConfig object instance
+ * midgard_cr_core_config_read_file:
+ * @config: #MidgardCRConfig object instance
  * @filename: name of the file to read 
  * @user: boolean switch for system or user's config files
  * @error: pointer to store error
  * 
- * This method reads configuration file from the given name and sets MidgardConfig object's properties.
- * Such initialized MidgardConfig instance may be reused among midgard-core and midgard-php extension 
+ * This method reads configuration file from the given name and sets MidgardCRConfig object's properties.
+ * Such initialized MidgardCRConfig instance may be reused among midgard-core and midgard-php extension 
  * for example, without any need to re-read configuration file and without  any need to re-initalize 
- * #MidgardConfig object instance. 
+ * #MidgardCRConfig object instance. 
  *
  * Set %TRUE as @user boolean value to read files from user's home directory.
  *
@@ -275,7 +275,7 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
  * Since: 9.3
  */ 
 gboolean 
-midgard_core_config_read_file (MidgardConfig *config, const gchar *filename, gboolean user, GError **error)
+midgard_cr_core_config_read_file (MidgardCRConfig *config, const gchar *filename, gboolean user, GError **error)
 {
 	gchar *fname = NULL;	
 	GKeyFile *keyfile;	
@@ -289,7 +289,7 @@ midgard_core_config_read_file (MidgardConfig *config, const gchar *filename, gbo
 				g_get_home_dir(), _umcd, "conf.d", filename, NULL);
 		g_free (_umcd);
 	} else {
-		gchar *confdir = midgard_core_config_get_default_confdir ();
+		gchar *confdir = midgard_cr_core_config_get_default_confdir ();
 		fname = g_build_path (G_DIR_SEPARATOR_S, confdir, "/", filename, NULL);
 		g_free (confdir);
 	}
@@ -332,13 +332,13 @@ midgard_core_config_read_file (MidgardConfig *config, const gchar *filename, gbo
 
 /**
  * midgard_config_read_file_at_path:
- * @self: #MidgardConfig instance
+ * @self: #MidgardCRConfig instance
  * @filepath: a path to read file from 
  * @error: a pointer to hold error  
  * 
  * Returns: %TRUE if file has been read, %FALSE otherwise
  */
-gboolean midgard_core_config_read_file_at_path(MidgardConfig *self, const gchar *filepath, GError **error)
+gboolean midgard_cr_core_config_read_file_at_path(MidgardCRConfig *self, const gchar *filepath, GError **error)
 {
 	g_assert (self != NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -359,15 +359,15 @@ gboolean midgard_core_config_read_file_at_path(MidgardConfig *self, const gchar 
 }
 
 /**
- * midgard_core_config_read_data:
- * @self: #MidgardConfig instance
+ * midgard_cr_core_config_read_data:
+ * @self: #MidgardCRConfig instance
  * @data: a NULL-terminated buffer containing the configuration
  * @error: a pointer to hold error  
  * 
  * Returns: %TRUE if data has been read, %FALSE otherwise
  */
 gboolean 
-midgard_core_config_read_data (MidgardConfig *self, const gchar *data, GError **error)
+midgard_cr_core_config_read_data (MidgardCRConfig *self, const gchar *data, GError **error)
 {
 	g_assert (self != NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -389,7 +389,7 @@ midgard_core_config_read_data (MidgardConfig *self, const gchar *data, GError **
 }
 
 /**
- * midgard_core_config_list_files:
+ * midgard_cr_core_config_list_files:
  * @user: boolean switch for system or user's config files
  *
  * List all available configuration files.
@@ -402,7 +402,7 @@ midgard_core_config_read_data (MidgardConfig *self, const gchar *data, GError **
  *
  */
 gchar **
-midgard_core_config_list_files (gboolean user, guint *n_files, GError **err)
+midgard_cr_core_config_list_files (gboolean user, guint *n_files, GError **err)
 {
 	gchar *config_dir;
 	*n_files = 0;
@@ -422,7 +422,7 @@ midgard_core_config_list_files (gboolean user, guint *n_files, GError **err)
 
 	} else {
 		
-		config_dir = midgard_core_config_get_default_confdir ();
+		config_dir = midgard_cr_core_config_get_default_confdir ();
 	}
 
 	GError *error = NULL;
@@ -464,12 +464,12 @@ midgard_core_config_list_files (gboolean user, guint *n_files, GError **err)
 
 /**
  * midgard_config_save_file:
- * @self: #MidgardConfig instance
+ * @self: #MidgardCRConfig instance
  * @name: configuration filename
  * @user: system or home directory switch
  * @error: pointer to store GError
  *
- * Saves configuration file for the given #MidgardConfig.
+ * Saves configuration file for the given #MidgardCRConfig.
  *
  * This method saves configuration file with the given name.
  * If third user parameter is set to %TRUE, then configuration file will 
@@ -481,7 +481,7 @@ midgard_core_config_list_files (gboolean user, guint *n_files, GError **err)
  * directory doesn't exist or file can not be saved.
  */
 gboolean 
-midgard_core_config_save_file (MidgardConfig *self, const gchar *name, gboolean user, GError **error)
+midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboolean user, GError **error)
 {
 	g_return_val_if_fail(self != NULL, FALSE);
 	g_return_val_if_fail(name != NULL, FALSE);
@@ -502,7 +502,7 @@ midgard_core_config_save_file (MidgardConfig *self, const gchar *name, gboolean 
 	// If user's conf.d dir doesn't exist, create it
 	if (user) {
 
-		gchar *_cnf_path = midgard_core_config_build_path(NULL, NULL, TRUE);
+		gchar *_cnf_path = midgard_cr_core_config_build_path(NULL, NULL, TRUE);
 		g_free (_cnf_path);
 
 		_umcd = g_strconcat(".", MIDGARD_CORE_PACKAGE_NAME, NULL);
@@ -554,7 +554,7 @@ midgard_core_config_save_file (MidgardConfig *self, const gchar *name, gboolean 
 
 	} else {
 	
-		gchar *confdir = midgard_core_config_get_default_confdir ();	
+		gchar *confdir = midgard_cr_core_config_get_default_confdir ();	
 		if (!g_file_test((const gchar *)confdir,
 					G_FILE_TEST_EXISTS)
 				|| (!g_file_test((const gchar *)confdir,
@@ -664,7 +664,7 @@ midgard_core_config_save_file (MidgardConfig *self, const gchar *name, gboolean 
 	return TRUE;
 }
 
-gboolean __create_base_blobdir(const gchar *path)
+gboolean _cr_config_create_base_blobdir(const gchar *path)
 {
 	if (path == NULL)
 		return FALSE;
@@ -689,7 +689,7 @@ gboolean __create_base_blobdir(const gchar *path)
 }
 
 /* recursively prepare blobdir */
-gboolean __recurse_prepare_blobdir(const gchar *parentdir, int max_depth, int depth)
+gboolean _cr_config_recurse_prepare_blobdir(const gchar *parentdir, int max_depth, int depth)
 {
 	int h;
 	
@@ -720,13 +720,13 @@ gboolean __recurse_prepare_blobdir(const gchar *parentdir, int max_depth, int de
 
 /**
  * midgard_config_create_blobdir:
- * @self: #MidgardConfig instance
+ * @self: #MidgardCRConfig instance
  *
  * Creates directories for blobs
  *
  * Returns: %TRUE on success, %FALSE otherwise.
  */
-gboolean midgard_config_create_blobdir(MidgardConfig *self)
+gboolean midgard_cr_core_config_create_blobdir(MidgardCRConfig *self)
 {
 	/*
 	g_assert (self != NULL);
@@ -740,14 +740,14 @@ gboolean midgard_config_create_blobdir(MidgardConfig *self)
 	}
 
 	//Base configured blobdir might not exist, create all remaining subdirectories within path 
-	err = __create_base_blobdir(self->priv->_blobdir);
+	err = _cr_config_create_base_blobdir(self->priv->_blobdir);
 	if (err == FALSE)
 	{
 		g_error("Failed to create configured directory %s", self->priv->_blobdir);
 	}
 	
 	// now create directories for blobs recursively 
-	err = __recurse_prepare_blobdir(self->priv->_blobdir,
+	err = _cr_config_recurse_prepare_blobdir(self->priv->_blobdir,
 	                                2, // set this to depth of the directories 
 	                                0); // let this be zero always  );
 	if (err == FALSE)
@@ -761,7 +761,7 @@ gboolean midgard_config_create_blobdir(MidgardConfig *self)
 }
 
 gchar *
-midgard_core_config_get_default_confdir (void)
+midgard_cr_core_config_get_default_confdir (void)
 {
 	gchar *confdir = NULL;
 	confdir = g_strdup (getenv ("MIDGARD_ENV_GLOBAL_CONFDIR"));

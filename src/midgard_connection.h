@@ -24,7 +24,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "midgard_defs.h"
-#include "midgard3.h"
+#include "midgard_config.h"
 
 /* convention macros */
 #define MIDGARD_TYPE_CONNECTION (midgard_connection_get_type())

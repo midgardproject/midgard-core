@@ -463,33 +463,31 @@ gboolean __midgard_connection_open(
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
-	const gchar *host, *dbname, *dbuser, *dbpass, *loglevel;
-	gchar *tmpstr;
+	gchar *host, *dbname, *dbuser, *dbpass, *loglevel, *tmpstr;
 	guint port = 0;
 	gchar *auth = NULL;
 	MidgardConfig *config = mgd->priv->config;
-	host = midgard_config_get_host (config);
-	dbname = midgard_config_get_dbname (config);
-	dbuser = midgard_config_get_dbuser (config);
-	dbpass = midgard_config_get_dbpass (config);
-	loglevel = midgard_config_get_loglevel (config);
-	port = midgard_config_get_dbport (config);
-	/*gboolean enable_threads = config->gdathreads;
+	host = config->host;
+	dbname = config->database;
+	dbuser = config->dbuser;
+	dbpass = config->dbpass;
+	loglevel = config->loglevel;
+	port = config->dbport;
+	gboolean enable_threads = config->gdathreads;
 
-	// Get 30% performance boost for non threaded applications 
+	/* Get 30% performance boost for non threaded applications */
 	if(!enable_threads) 
-		g_setenv("LIBGDA_NO_THREADS", "yes", TRUE); */
+		g_setenv("LIBGDA_NO_THREADS", "yes", TRUE);
 
 	/* Initialize libgda */
 	gda_init ();
 
 	midgard_connection_set_loglevel(mgd, loglevel, NULL);
 
-	/* FIXME, provide constants for DB types */
-	if (g_str_equal (midgard_config_get_dbtype (config), "SQLite")) {
+	if(config->priv->dbtype == MIDGARD_DB_TYPE_SQLITE) {
 
 		gchar *path = NULL;
-		const gchar *dbdir = midgard_config_get_dbdir (config);
+		gchar *dbdir = config->dbdir;
 		if (!dbdir || *dbdir == '\0') {
 			const gchar *sqlite_dir[] = {"data", NULL};
 			path = midgard_core_config_build_path(sqlite_dir, NULL, TRUE);
@@ -500,7 +498,7 @@ gboolean __midgard_connection_open(
 		tmpstr = g_strconcat("DB_DIR=", path, ";", "DB_NAME=", dbname, NULL);
 		g_free(path);
 
-	} else if (g_str_equal (midgard_config_get_dbtype (config), "Oracle")) {
+	} else if (config->priv->dbtype == MIDGARD_DB_TYPE_ORACLE) {
 
 		GString *cnc = g_string_sized_new(100);
 		cnc_add_part(cnc, "TNSNAME", dbname, MGD_MYSQL_HOST);
@@ -535,7 +533,7 @@ gboolean __midgard_connection_open(
 
 	GError *error = NULL;
 	GdaConnection *connection = gda_connection_open_from_string(
-			midgard_config_get_dbtype (config), tmpstr, auth, GDA_CONNECTION_OPTIONS_NONE, &error);
+			config->dbtype, tmpstr, auth, GDA_CONNECTION_OPTIONS_NONE, &error);
 	g_free(auth);	
 
 	if(connection == NULL) {
@@ -562,12 +560,12 @@ gboolean __midgard_connection_open(
 	if(init_schema) {
 		
 		if(!g_type_from_name("midgard_quota")) {
-				
+			
 			MidgardSchema *schema = g_object_new(MIDGARD_TYPE_SCHEMA, NULL);
-			gchar *path = g_build_path(G_DIR_SEPARATOR_S, midgard_config_get_sharedir (config), "MidgardObjects.xml", NULL);
+			gchar *path = g_build_path(G_DIR_SEPARATOR_S, config->sharedir, "MidgardObjects.xml", NULL);
 			midgard_schema_init(schema, (const gchar *)path);
 			g_free(path);
-			midgard_schema_read_dir(schema, midgard_config_get_sharedir (config));
+			midgard_schema_read_dir(schema, config->sharedir);
 			
 			mgd->priv->schema = schema;
 		}
@@ -577,9 +575,6 @@ gboolean __midgard_connection_open(
 
 	/* Loads available authentication types */
 	midgard_core_connection_initialize_auth_types(mgd);
-
-	/* Loads all available workspaces */
-	midgard_core_workspace_list_all (mgd);
 
 	g_signal_emit (mgd, MIDGARD_CONNECTION_GET_CLASS (mgd)->signal_id_connected, 0);
 
@@ -744,8 +739,7 @@ extern GHashTable *midgard_connection_open_all(gboolean userdir)
 		g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_object_unref);
 	GHashTable *hash = NULL;
 
-	guint n_files;
-	gchar **cfgs = midgard_config_list_files(userdir, &n_files, NULL);
+	gchar **cfgs = midgard_config_list_files(userdir);
 	
 	if(!cfgs) 
 		return FALSE;
@@ -823,9 +817,9 @@ gboolean midgard_connection_open_config(
 
 	/* Emulate the same config pointer, as we have copy associated */
 	if (self_config 
-			&& (g_str_equal (midgard_config_get_dbname (self_config), midgard_config_get_dbname (config))
-				&& g_str_equal (midgard_config_get_dbtype (self_config), midgard_config_get_dbtype (config))
-				&& g_str_equal (midgard_config_get_host (self_config), midgard_config_get_host (config)))) {
+			&& (g_str_equal (self_config->database, config->database)
+				&& g_str_equal (self_config->dbtype, config->dbtype)
+				&& g_str_equal (self_config->host, config->host))) {
 		return TRUE;
 	} else if (self_config) {
 		MIDGARD_ERRNO_SET_STRING (self, MGD_ERR_INTERNAL, "Midgard connection already associated with configuration");
@@ -1082,6 +1076,7 @@ gboolean midgard_connection_reopen(MidgardConnection *self)
 		return TRUE;
 	}
 
+	guint dbtype = self->priv->config->priv->dbtype;
 	const GList *events;
 	glong errcode = 0;
 	events = gda_connection_get_events (self->priv->connection);
@@ -1101,13 +1096,20 @@ gboolean midgard_connection_reopen(MidgardConnection *self)
 		if (gda_connection_event_get_event_type (event) == GDA_CONNECTION_EVENT_ERROR) {
 
 			errcode = gda_connection_event_get_code(event);
-			
-			if (g_str_equal (midgard_config_get_dbtype (self->priv->config), "MySQL")) {
 
-				if (errcode == 2006) { /* CR_SERVER_GONE_ERROR , we can not use it */
-					g_debug("MySQL server has gone away. Reconnect.");
-					return __mysql_reconnect(self);
-				}
+			switch (dbtype) {
+
+				case MIDGARD_DB_TYPE_MYSQL:
+
+					if (errcode == 2006) { /* CR_SERVER_GONE_ERROR , we can not use it */
+						g_debug("MySQL server has gone away. Reconnect.");
+						return __mysql_reconnect(self);
+					}
+					break;
+
+				default:
+					/* do nothing */
+					break;
 			}
 		}
 	}

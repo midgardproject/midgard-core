@@ -1,7 +1,7 @@
 
-using MidgardCore;
+using MidgardCRCore;
 
-namespace Midgard {
+namespace MidgardCR {
 
 	public class Config : GLib.Object {
 
@@ -43,13 +43,13 @@ namespace Midgard {
 			this.vardir = "/var/local/";
 			this.dbdir = "";
 			/* generate path to default system-wide configuration directory */
-			this._confdir = MidgardCore.Config.get_default_confdir ();
+			this._confdir = MidgardCRCore.Config.get_default_confdir ();
 		}
 
 		/* methods */
 		public bool read_file (string name, bool user) throws GLib.KeyFileError, GLib.FileError {
 			try {
-				MidgardCore.Config.read_file (this, name, user);
+				MidgardCRCore.Config.read_file (this, name, user);
 				this._configname = name;
 				return true;
 			} catch (GLib.KeyFileError e) {
@@ -61,7 +61,7 @@ namespace Midgard {
 	
 		public bool read_file_at_path (string path) throws GLib.KeyFileError, GLib.FileError {
 			try {
-				MidgardCore.Config.read_file_at_path (this, path);
+				MidgardCRCore.Config.read_file_at_path (this, path);
 				this._configname = path; /* FIXME, do we need unique string or filename? */
 				return true;
 			} catch (GLib.KeyFileError e) {
@@ -73,7 +73,7 @@ namespace Midgard {
 
 		public bool read_data (string data) throws GLib.KeyFileError, GLib.FileError {
 			try {
-				MidgardCore.Config.read_data (this, data);
+				MidgardCRCore.Config.read_data (this, data);
 				this._configname = ""; /* FIXME, do we need unique string or filename? */
 				return true;
 			} catch (GLib.KeyFileError e) {
@@ -83,7 +83,7 @@ namespace Midgard {
 
 		public bool save_file (string name, bool user) throws GLib.KeyFileError, GLib.FileError {
 			try {
-				MidgardCore.Config.save_file (this, name, user);
+				MidgardCRCore.Config.save_file (this, name, user);
 				return true;
 			} catch (GLib.KeyFileError e) {
 				throw e;
@@ -94,16 +94,16 @@ namespace Midgard {
 
 		public static string[]? list_files (bool user) throws GLib.FileError {
 			try {
-				string[] names = MidgardCore.Config.list_files (user);
+				string[] names = MidgardCRCore.Config.list_files (user);
 				return names;
 			} catch (GLib.FileError e) {
 				throw e;
 			}
 		}
 
-		public Midgard.Config copy () {
+		public MidgardCR.Config copy () {
 
-			Midgard.Config dest = new Midgard.Config ();
+			MidgardCR.Config dest = new MidgardCR.Config ();
 			dest.authtype = this.authtype;
 			dest.dbname = this.dbname;
 			dest.dbpass = this.dbpass;

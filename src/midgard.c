@@ -169,10 +169,6 @@ midgard_init()
 	MidgardMetadata *m = g_object_new (MIDGARD_TYPE_METADATA, NULL);
 	g_object_unref (m);
 
-	type = MIDGARD_TYPE_WORKSPACE;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-
 	/* Register transform function explicitly, we need own routine */
 	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_FLOAT, __transform_string_to_float);
   	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_BOOLEAN, __transform_string_to_boolean);

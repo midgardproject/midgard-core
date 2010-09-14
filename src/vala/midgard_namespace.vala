@@ -1,6 +1,6 @@
 using GLib;
 
-namespace Midgard {
+namespace MidgardCR {
 
 	public errordomain NamespaceManagerError {
 		URI_INVALID,

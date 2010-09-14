@@ -1,7 +1,7 @@
 
 using GLib;
 
-namespace Midgard {
+namespace MidgardCR {
 
 	public interface Profiler : GLib.Object {
 
