@@ -47,9 +47,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_schema_object_factory.h"
 #include "midgard_schema_object_tree.h"
 #include <sql-parser/gda-sql-parser.h>
-#include "midgard_core_workspace.h"
-#include "midgard_workspace.h"
-#include "midgard_workspace_storage.h"
 #include "midgard_query_select_simple.h"
 
 GType _midgard_attachment_type = 0;
@@ -625,13 +622,6 @@ _midgard_object_update (MidgardObject *gobj, _ObjectActionUpdate replicate)
 		}
 	}
 
-	/* Set workspace context */
-	GdaSet *params = MIDGARD_DBOBJECT_GET_CLASS (gobj)->dbpriv->param_set_update;
-	/* Workspace id */
-	gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_ID_FIELD, MGD_CNC_WORKSPACE_ID(mgd));
-	/* Workspace object id */
-	gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_OID_FIELD, MGD_OBJECT_WS_OID (gobj));
-
 	guint updated = midgard_core_query_update_dbobject_record (MIDGARD_DBOBJECT (gobj));
 	
 	if (updated == -1) {
@@ -808,13 +798,6 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		return FALSE;
 	}	
 
-	/* Set workspace context */
-	GdaSet *params = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->param_set_insert;
-	/* Workspace id */
-	gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_ID_FIELD, MGD_CNC_WORKSPACE_ID(mgd));
-	/* Workspace object id */
-	gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_OID_FIELD, MGD_OBJECT_WS_OID (object));
-
 	inserted = midgard_core_query_create_dbobject_record (MIDGARD_DBOBJECT (object));
 
 	if (inserted == -1) {
@@ -865,21 +848,6 @@ gboolean _midgard_object_create (	MidgardObject *object,
 
 			g_object_set(G_OBJECT(object), "id", new_id, NULL);
 		}
-	}
-
-	/* UPDATE object's workspace data */
-	/* If workspace object id is 0 we do fallback to self id, to keep unique
-	 * oid reference. This is typical create without workspace context */
-	MGD_OBJECT_WS_ID (object) = MGD_CNC_WORKSPACE_ID (mgd);
-	guint oid = MGD_OBJECT_WS_OID (object);
-	if (oid == 0) {
-		MGD_OBJECT_WS_OID (object) = new_id;
-		/* UPDATE WS object id field using newly created id value */
-		query = g_string_new ("UPDATE ");
-		g_string_append_printf (query, " %s SET %s=%d WHERE id=%d",
-				tablename, MGD_WORKSPACE_OID_FIELD, new_id, new_id);
-		midgard_core_query_execute(MGD_OBJECT_CNC (object), query->str, FALSE);
-		g_string_free(query, TRUE);
 	}
 
 	/* INSERT repligard's record */
@@ -1181,7 +1149,7 @@ _object_create_storage(MidgardConnection *mgd, MidgardDBObjectClass *klass)
 	if (!midgard_core_query_create_class_storage(mgd, klass))
 		return FALSE;
 
-	return __add_workspace_columns (mgd, klass);
+	return TRUE; 
 }
 
 static gboolean 

@@ -78,9 +78,6 @@ midgard_public_h = \
 	src/midgard_user.h \
 	src/midgard_utils.h \
 	src/midgard_view.h \
-	src/midgard_workspace.h \
-	src/midgard_workspace_context.h \
-	src/midgard_workspace_storage.h \
 	src/core/midgard3.h
 
 man_MANS = man/midgard3-schema.1 \
@@ -146,8 +143,6 @@ src_libmidgard3_la_core_SOURCES = \
 	src/midgard_core_views.h \
 	src/midgard_core_xml.h \
 	src/midgard_core_xml.c \
-	src/midgard_core_workspace.h \
-       	src/midgard_core_workspace.c \
 	src/midgard_query_select_simple.h \
 	src/midgard_query_select_simple.c \
 	src/midgard_core_storage_sql.h \
@@ -201,10 +196,7 @@ src_libmidgard3_la_public_SOURCES = \
 	src/midgard_transaction.c \
 	src/midgard_md5.c \
 	src/midgard_md5.h \
-	src/midgard_view.c \
-	src/midgard_workspace.c \
-	src/midgard_workspace_context.c \
-	src/midgard_workspace_storage.c
+	src/midgard_view.c 
 
 pkgdatadir = $(datadir)/midgard3
 pkglibdir = $(libdir)/midgard3

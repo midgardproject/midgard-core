@@ -32,7 +32,6 @@
 #include "midgard_view.h"
 #include "midgard_timestamp.h"
 #include "midgard_metadata.h"
-#include "midgard_workspace.h"
 
 #include <libgda/libgda.h>
 
@@ -221,10 +220,6 @@ midgard_close(void)
 		g_type_class_unref (klass);
 
 	klass = g_type_class_peek (MIDGARD_TYPE_METADATA);
-	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_WORKSPACE);
 	if (klass)
 		g_type_class_unref (klass);
 }
