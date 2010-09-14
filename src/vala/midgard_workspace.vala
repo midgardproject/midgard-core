@@ -3,7 +3,7 @@ using GLib;
 
 namespace Midgard {
 
-	errordomain WorkspaceStorageError {
+	public errordomain WorkspaceStorageError {
 	        WORKSPACE_STORAGE_ERROR_NAME_EXISTS,
         	WORKSPACE_STORAGE_ERROR_INVALID_PATH,
         	WORKSPACE_STORAGE_ERROR_OBJECT_NOT_EXISTS,

@@ -24,7 +24,7 @@ namespace Midgard {
 		public abstract StorageManager? get_manager_by_name (string name);
 	}
 
-	errordomain StorageManagerError {
+	public errordomain StorageManagerError {
 		ACCESS_DENIED
 	}
 
@@ -84,7 +84,7 @@ namespace Midgard {
 		public abstract SchemaModel? get_schema_model_by_name (string name);
 	}
 
-	errordomain StorageContentManagerError {
+	public errordomain StorageContentManagerError {
 
 		OBJECT_INVALID,
 		OBJECT_DUPLICATE,
@@ -120,7 +120,7 @@ namespace Midgard {
 		public abstract string location_get ();
 	}	
 
-	errordomain StorageModelError {
+	public errordomain StorageModelError {
 		STORAGE_INVALID,
 		STORAGE_EXISTS,
 		INTERNAL

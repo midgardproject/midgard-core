@@ -2,7 +2,7 @@ using GLib;
 
 namespace Midgard {
 
-	errordomain NamespaceManagerError {
+	public errordomain NamespaceManagerError {
 		URI_INVALID,
 		URI_EXISTS,
 		ALIAS_INVALID,

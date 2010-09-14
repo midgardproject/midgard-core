@@ -2,7 +2,7 @@ using GLib;
 
 namespace Midgard {
 
-	errordomain ValidationError {
+	public errordomain ValidationError {
 		NAME_INVALID,
 		TYPE_INVALID,
 		VALUE_INVALID,
@@ -100,7 +100,7 @@ namespace Midgard {
 		public string get_namespace () { return "foo"; }
 	}
 
-	errordomain SchemaBuilderError {
+	public errordomain SchemaBuilderError {
 		NAME_EXISTS
 	}
 
