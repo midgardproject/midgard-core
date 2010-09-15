@@ -78,6 +78,23 @@ typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
 CLEANFILES = $(dist_gir_DATA) $(typelib_DATA)
 endif
 
+dist-hook:
+	mkdir -p $(distdir)/src/vala
+	mkdir -p $(distdir)/src/core
+	mkdir -p $(distdir)/conf.d
+	mkdir -p $(distdir)/m4
+	cp conf.d/midgard.conf.example $(distdir)/conf.d
+	cp configure.in $(distdir)/
+	cp Makefile.am $(distdir)/
+	cp src/Makefile.am $(distdir)/src/
+	cp src/midgard.c $(distdir)/src/
+	cp src/midgard.h $(distdir)/src/
+	cp src/core/Makefile.am $(distdir)/src/core/
+	cp src/core/*.c $(distdir)/src/core/
+	cp src/core/*.h $(distdir)/src/core/
+	cp src/vala/*.vala $(distdir)/src/vala/
+	cp src/vala/Makefile.am $(distdir)/src/vala/
+
 doc:
 	doxygen
 
