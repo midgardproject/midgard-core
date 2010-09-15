@@ -43,18 +43,8 @@ AM_LDFLAGS = @MIDGARD_LIBS@
 src_vala_libmidgardcr_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
 
 src_vala_libmidgardcr_la_public_SOURCES = \
-				    src/vala/midgard_config.c \
-				    src/vala/midgard_profiler.c \
-				    src/vala/midgard_schema_model_reflector.c \
-				    src/vala/midgard_storage_manager_sql.c \
-				    src/vala/midgard_executable.c \
-				    src/vala/midgard_query.c \
-				    src/vala/midgard_schema_object.c \
-				    src/vala/midgard_workspace.c \
-				    src/vala/midgard_namespace.c \
-				    src/vala/midgard_schema_model.c \
-				    src/vala/midgard_storage.c
-
+				    src/midgard.c 
+ 
 pkgdatadir = $(datadir)/midgard3
 pkglibdir = $(libdir)/midgard3
 libmidgardincludedir = $(includedir)/midgard3/midgard

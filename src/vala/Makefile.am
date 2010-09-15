@@ -37,6 +37,5 @@ EXTRA_DIST = \
 
 CLEANFILES = \
 	     libmidgardcr.vala.stamp \
-	     $(libmidgardcr_la_VALASOURCES:.vala=.c) \
-	     $(midgard3_header)
+	     $(libmidgardcr_la_VALASOURCES:.vala=.c) 	
 		
