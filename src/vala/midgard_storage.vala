@@ -31,8 +31,6 @@ namespace MidgardCR {
 	public interface StorageManager : GLib.Object {
 
 		/* properties */
-		public abstract string                	name            	{ get; construct; }
-		public abstract Config                	config          	{ get; construct; }
 		public abstract StorageContentManager 	content_manager 	{ get; }
 		public abstract StorageModelManager   	model_manager   	{ get; }
 		public abstract Profiler              	profiler        	{ get; }

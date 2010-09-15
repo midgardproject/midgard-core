@@ -5,6 +5,7 @@ namespace MidgardCR {
 
 	public class SQLStorageManager : GLib.Object, StorageManager {
 
+		/* private properties */
 		private string _name = "";
 		private Config _config = null;
 		private StorageContentManager _content_manager = null;
@@ -13,15 +14,19 @@ namespace MidgardCR {
 		private StorageWorkspaceManager _workspace_manager = null;
 		private StorageModelManager _model_manager = null;
 
-		public string name {
+		/* protected properties */
+		protected GLib.Object _cnc = null; /* <protected> */
+
+		/* public properties */
+		public string name { 
 			get { return this._name; }
 			construct { this._name = value; }
 		}
 		
-		public Config config {
-			get { return _config; }
-			construct { _config = value; }
-		}	
+		public Config config { 
+			get { return this._config; }
+			construct { this._config = value; }
+		}
 
 		public StorageContentManager content_manager {
 			get { 
@@ -45,7 +50,7 @@ namespace MidgardCR {
 
 		public StorageModelManager model_manager {
 			get { return _model_manager; }
-		}
+		}	
 
 		public bool open () { return false; }
 		public bool close () { return false; }

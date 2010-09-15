@@ -55,6 +55,12 @@ namespace MidgardCR {
 
 		public WorkspaceStorage workspace { get; set; }
 		public bool workspace_create (WorkspaceStorage workspace) throws WorkspaceStorageError { return false; }
-		public bool workspace_exists (WorkspaceStorage workspace) throws WorkspaceStorageError { return false; }	
+		public bool workspace_exists (WorkspaceStorage workspace) throws WorkspaceStorageError { return false; }
+
+		public SQLWorkspaceManager (string name, Config config) {
+			Object (name: name, config: config);
+		}
+
+		construct {}	
 	}
 }

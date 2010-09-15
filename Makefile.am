@@ -6,210 +6,61 @@ ACLOCAL_AMFLAGS = -I m4
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
 
-lib_LTLIBRARIES = \
-	src/libmidgard3.la
-
-bin_PROGRAMS = \
-	test/midgard3-schema \
-	test/midgard3-query
+lib_LTLIBRARIES = src/vala/libmidgardvala.la
 
 if MIDGARD_DBUS_SUPPORT
 dbus_pkgdatadir = $(DBUS_CONF_DIR)/dbus-1/system.d
 dbus_pkgdata_DATA = midgard_dbus.conf
 endif
 
-test_midgard3_schema_SOURCES = test/midgard-schema.c 
-test_midgard3_query_SOURCES = test/midgard-query.c
+nobase_dist_sysconf_DATA = conf.d/midgard.conf.example
 
-noinst_PROGRAMS = $(TESTS)
+dist_pkgdata_DATA = \
+		    midgard_auth_types.xml \
+	    	    midgard_dbus.conf \
+	    	    conf.d/midgard.conf.example 
 
-nobase_dist_sysconf_DATA = \
-        conf.d/midgard.conf.example
-
-dist_pkgdata_DATA = MidgardObjects.xml \
-	midgard_auth_types.xml \
-	midgard_dbus.conf \
-	conf.d/midgard.conf.example 
-
-schemadir = $(datadir)/midgard3/schema
-schema_DATA = schema/README.txt
-viewsdir = $(datadir)/midgard3/views
-views_DATA = views/README-views.txt
-
-midgard_public_h = \
-	src/midgard_config.h \
-	src/midgard_config_auto.h \
-	src/midgard_dbobject.h \
-	src/midgard_defs.h \
-	src/midgard_dbus.h \
-	src/midgard_key_config_common.h \
-	src/midgard_object.h \
- 	src/query_builder.h \
- 	src/midgard_metadata.h \
-	src/midgard_timestamp.h \
-	src/uuid.h \
-	src/guid.h \
-	src/midgard_datatypes.h \
-	src/midgard_type.h \
-	src/midgard_quota.h \
-	src/midgard_reflection_property.h \
-	src/midgard_schema.h \
-	src/midgard_connection.h \
-	src/midgard_error.h \
-	src/midgard_collector.h \
-	src/midgard_object_parameter.h \
-	src/midgard_object_attachment.h \
-	src/midgard_query_constraint.h \
-	src/midgard_query_executor.h \
-	src/midgard_query_constraint_group.h \
-	src/midgard_query_holder.h \
-	src/midgard_query_value.h \
-	src/midgard_query_property.h \
-	src/midgard_query_select.h \
-	src/midgard_query_storage.h \
-	src/midgard_query_constraint_simple.h \
-	src/midgard_reflector_object.h \
-	src/midgard_reflector_property.h \
-	src/midgard_replicator.h \
-	src/midgard_schema_object_factory.h \
-	src/midgard_schema_object_tree.h \
-	src/midgard_blob.h \
-	src/midgard_storage.h \
-	src/midgard_transaction.h \
-	src/midgard_user.h \
-	src/midgard_utils.h \
-	src/midgard_view.h \
-	src/core/midgard3.h
-
-man_MANS = man/midgard3-schema.1 \
-	man/midgard3-query.1 
+midgard_public_h = src/core/midgard3.h
 
 EXTRA_DIST =  \
-	$(man_MANS) \
-	midgard3.pc.in \
-	$(schema_DATA) \
-	$(views_DATA) 
-	m4/introspection.m4
+      	      midgard3.pc.in \
+      	      m4/introspection.m4
 
-LDADD = src/libmidgard3.la 
+midgard3_public_h = src/core/midgard3.h
 
-src_libmidgard3_la_LIBADD = \
-			    src/vala/libmidgardvala.la \
-			    src/core/libmidgardcore.la
+src_vala_libmidgardvala_la_LIBADD = src/core/libmidgardcore.la
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined
 endif
 
-$(PROGRAMS): $(LDADD)
-
-src_libmidgard3_la_CPPFLAGS = \
-	-I$(top_srcdir)/src -DG_LOG_DOMAIN=\"midgard-core\"
+src_vala_libmidgardvala_la_CPPFLAGS = \
+		      	      -I$(top_srcdir)/src -DG_LOG_DOMAIN=\"MidgardCR\"
 
 AM_CFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/core @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 
 
-src_libmidgard3_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
+src_vala_libmidgardvala_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
 
-test_midgard_schema_CPPFLAGS = \
-	 -DG_LOG_DOMAIN=\"midgard-core\"
-
-src_libmidgard3_la_core_SOURCES = \
-	src/midgard_core_connection.h \
-	src/midgard_core_connection.c \
-	src/midgard_core_config.c \
-	src/midgard_core_config.h \
-	src/midgard_core_query.h \
-	src/midgard_core_query.c \
-	src/mgdschema.c \
-	src/midgard_quota.c \
-	src/query_constraint.c \
-	src/query_constraint.h \
-	src/group_constraint.c \
-	src/group_constraint.h \
-	src/query_group_constraint.h \
-	src/query_group_constraint.c \
-	src/query_order.c \
-	src/query_order.h \
-	src/schema.h \
-	src/midgard_core_metadata.c \
-	src/midgard_core_metadata.h \
-	src/midgard_core_object_class.c \
-	src/midgard_core_object_class.h \
-	src/midgard_core_query_builder.h \
-	src/midgard_core_query_builder.c \
-	src/midgard_core_object.c \
-	src/midgard_core_object.h \
-	src/midgard_core_object_parameter.h \
-	src/midgard_core_schema.c \
-	src/midgard_core_views.c \
-	src/midgard_core_views.h \
-	src/midgard_core_xml.h \
-	src/midgard_core_xml.c \
-	src/midgard_query_select_simple.h \
-	src/midgard_query_select_simple.c \
-	src/midgard_core_storage_sql.h \
-	src/midgard_core_storage_sql.c	
-
-src_libmidgard3_la_public_SOURCES = \
-	src/midgard.c \
-	src/midgard_config.c \
-	src/midgard_key_config.c \
-	src/midgard_key_config_context.c \
-	src/midgard_key_config_file.c \
-	src/midgard_key_config_file_context.c \
-	src/midgard_key_config_common.h \
-	src/midgard_object.c \
-	src/uuid.c \
-	src/guid.c \
-        src/midgard_type.c \
-	src/query_builder.c \
-	src/midgard_metadata.c \
-	src/midgard_timestamp.c \
-	src/midgard_datatypes.c \
-	src/midgard_reflection_property.c \
-	src/midgard_connection.c \
-	src/midgard_error.c \
-	src/midgard_collector.c \
-	src/midgard_dbus.h \
-	src/midgard_dbus.c \
-	src/midgard_dbus_interface.h \
-	src/midgard_object_parameter.c \
-	src/midgard_object_attachment.c \
-	src/midgard_query_constraint.c \
-	src/midgard_query_executor.c \
-	src/midgard_query_constraint_group.c \
-	src/midgard_query_holder.c \
-	src/midgard_query_property.c \
-	src/midgard_query_select.c \
-	src/midgard_query_constraint_simple.c \
-	src/midgard_query_storage.c \
-	src/midgard_query_value.c \
-	src/midgard_reflector_object.c \
-	src/midgard_reflector_property.c \
-	src/midgard_replicator.c \
-	src/midgard_user.c \
-	src/midgard_schema_object_factory.c \
-	src/midgard_schema_object_factory.h \
-	src/midgard_schema_object_tree.c \
-	src/midgard_schema_object_tree.h \
-	src/midgard_storage.c \
-	src/midgard_storage.h \
-	src/midgard_dbobject.c \
-	src/midgard_blob.c \
-	src/midgard_transaction.c \
-	src/midgard_md5.c \
-	src/midgard_md5.h \
-	src/midgard_view.c 
+src_vala_libmidgardvala_la_public_SOURCES = \
+				    src/vala/midgard_config.c \
+				    src/vala/midgard_profiler.c \
+				    src/vala/midgard_schema_model_reflector.c \
+				    src/vala/midgard_storage_manager_sql.c \
+				    src/vala/midgard_executable.c \
+				    src/vala/midgard_query.c \
+				    src/vala/midgard_schema_object.c \
+				    src/vala/midgard_workspace.c \
+				    src/vala/midgard_namespace.c \
+				    src/vala/midgard_schema_model.c \
+				    src/vala/midgard_storage.c
 
 pkgdatadir = $(datadir)/midgard3
 pkglibdir = $(libdir)/midgard3
 libmidgardincludedir = $(includedir)/midgard3/midgard
 libmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h 
 
-src_libmidgard3_la_SOURCES = $(src_libmidgard3_la_public_SOURCES) $(src_libmidgard3_la_core_SOURCES)
-
-mgdschemasdir = $(datadir)/midgard3/schema
+src_vala_libmidgardvala_la_SOURCES = $(src_vala_libmidgardvala_la_public_SOURCES)
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = midgard3.pc
@@ -220,14 +71,14 @@ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
-introspection_sources = $(src_libmidgard3_la_public_SOURCES) $(midgard_public_h)
-Midgard-3.0.gir: $(lib_LTLIBRARIES)
-Midgard_3_0_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0 
-Midgard_3_0_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
-Midgard_3_0_gir_LIBS = $(lib_LTLIBRARIES) 
-Midgard_3_0_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
-Midgard_3_0_gir_PACKAGES = gobject-2.0 libxml-2.0 libgda-4.0
-INTROSPECTION_GIRS = Midgard-3.0.gir
+introspection_sources = $(src_vala_libmidgardvala_la_public_SOURCES) $(midgard3_public_h)
+MidgardCR-3.0.gir: $(lib_LTLIBRARIES)
+MidgardCR_3_0_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0 
+MidgardCR_3_0_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
+MidgardCR_3_0_gir_LIBS = $(lib_LTLIBRARIES) 
+MidgardCR_3_0_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
+MidgardCR_3_0_gir_PACKAGES = gobject-2.0 libxml-2.0 libgda-4.0
+INTROSPECTION_GIRS = MidgardCR-3.0.gir
 INTROSPECTION_LIBS += -lxml2
 girdir = $(datadir)/gir-1.0
 gir_DATA = $(INTROSPECTION_GIRS)

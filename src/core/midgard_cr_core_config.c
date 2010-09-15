@@ -709,7 +709,7 @@ gboolean _cr_config_recurse_prepare_blobdir(const gchar *parentdir, int max_dept
 		}
 		
 		/* create subdirs */
-		gboolean err = __recurse_prepare_blobdir(dir_path, max_depth, depth + 1);
+		gboolean err = _cr_config_recurse_prepare_blobdir(dir_path, max_depth, depth + 1);
 		if (dir_path) g_free (dir_path);
 		if (err == FALSE)
 			return FALSE;
