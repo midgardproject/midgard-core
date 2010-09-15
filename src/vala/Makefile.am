@@ -21,8 +21,8 @@ libmidgardcr_la_VALASOURCES = \
 			  midgard_workspace.vala
 
 libmidgardcr_la_SOURCES = \
-			libmidgardcr.vala.stamp \
-			$(libmidgardcr_la_VALASOURCES:.vala=.c)
+			  libmidgardcr.vala.stamp \
+  			  $(libmidgardcr_la_VALASOURCES:.vala=.c)
 
 libmidgardcr_la_LDFLAGS = -module -export-dynamic
 libmidgardcr_la_LIBADD = @MIDGARD_LIBS@ 
@@ -32,10 +32,15 @@ libmidgardcr.vala.stamp: $(libmidgardcr_la_VALASOURCES)
 	touch $@
 
 EXTRA_DIST = \
-	     $(libmidgardcr_la_VALASOURCES) \
-	     libmidgardcr.vala.stamp 		
+	     $(libmidgardcr_la_VALASOURCES) 
 
 CLEANFILES = \
 	     libmidgardcr.vala.stamp \
 	     $(libmidgardcr_la_VALASOURCES:.vala=.c) 	
-		
+
+dist-hook:
+	echo $(distdir)
+	cp *.vala $(distdir)
+	cp Makefile.am $(distdir)
+
+distdir: dist-hook
