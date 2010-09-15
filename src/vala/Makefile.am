@@ -1,11 +1,13 @@
-noinst_LTLIBRARIES = libmidgardvala.la
+noinst_LTLIBRARIES = libmidgardcr.la
 
 AM_CFLAGS = -I$(top_srcdir)/src/core -I$(top_srcdir)/src @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@
 
-BUILT_SOURCES = libmidgardvala.vala.stamp
+BUILT_SOURCES = libmidgardcr.vala.stamp
 
-libmidgardvala_la_VALASOURCES = \
+midgard3_header = $(top_srcdir)/src/core/midgard3.h
+
+libmidgardcr_la_VALASOURCES = \
 			  midgard_config.vala \
 			  midgard_executable.vala \
 			  midgard_namespace.vala \
@@ -18,23 +20,23 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_storage.vala \
 			  midgard_workspace.vala
 
-libmidgardvala_la_SOURCES = \
-			libmidgardvala.vala.stamp \
-			$(libmidgardvala_la_VALASOURCES:.vala=.c)
+libmidgardcr_la_SOURCES = \
+			libmidgardcr.vala.stamp \
+			$(libmidgardcr_la_VALASOURCES:.vala=.c)
 
-libmidgardvala_la_LDFLAGS = -module -export-dynamic
-libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
+libmidgardcr_la_LDFLAGS = -module -export-dynamic
+libmidgardcr_la_LIBADD = @MIDGARD_LIBS@ 
 
-libmidgardvala.vala.stamp: $(libmidgardvala_la_VALASOURCES)
-	$(VALAC) $(VALAFLAGS)  --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(top_srcdir)/src/core/midgard3.h -C $^
+libmidgardcr.vala.stamp: $(libmidgardcr_la_VALASOURCES)
+	$(VALAC) $(VALAFLAGS)  --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgard3_header) -C $^
 	touch $@
 
 EXTRA_DIST = \
-	     $(libmidgardvala_la_VALASOURCES) \
-	     libmidgardvala.vala.stamp 		
+	     $(libmidgardcr_la_VALASOURCES) \
+	     libmidgardcr.vala.stamp 		
 
 CLEANFILES = \
-	     libmidgardvala.vala.stamp \
-	     $(libmidgardvala_la_VALASOURCES:.vala=.c) \
-	     $(top_srcdir)/src/core/midgard3.h
+	     libmidgardcr.vala.stamp \
+	     $(libmidgardcr_la_VALASOURCES:.vala=.c) \
+	     $(midgard3_header)
 		
