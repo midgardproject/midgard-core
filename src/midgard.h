@@ -24,7 +24,6 @@
 #include <glib.h>
 #include <glib-object.h>
 
-#include <midgard2.h>
 #include <midgard3.h>
 
 #endif /* _MIDGARD_API_H_ */
