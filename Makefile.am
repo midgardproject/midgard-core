@@ -57,6 +57,11 @@ src_libmidgardcr_la_SOURCES = $(src_libmidgardcr_la_public_SOURCES)
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = midgard3.pc
 
+vapidir = $(datadir)/vala/vapi
+vapi_DATA = \
+	    src/vala/MidgardCR-3.0.vapi \
+	    $(NULL)
+
 -include $(INTROSPECTION_MAKEFILE)
 INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir)
 INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)

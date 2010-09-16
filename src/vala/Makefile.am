@@ -1,3 +1,5 @@
+NULL = 
+
 noinst_LTLIBRARIES = libmidgardvala.la
 
 AM_CFLAGS = -I$(top_srcdir)/src/core -I$(top_srcdir)/src @MIDGARD_CFLAGS@
@@ -42,5 +44,6 @@ dist-hook:
 	cp *.vala $(distdir)
 	cp Makefile.am $(distdir)
 	cp Makefile.in $(distdir)
+	cp MidgardCR-3.0.vapi $(distdir)
 
 distdir: dist-hook
