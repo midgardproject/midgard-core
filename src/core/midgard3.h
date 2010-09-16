@@ -732,6 +732,7 @@ struct _MidgardCRSQLStorageManager {
 	GObject parent_instance;
 	MidgardCRSQLStorageManagerPrivate * priv;
 	GObject* _cnc;
+	GObject* _parser;
 };
 
 struct _MidgardCRSQLStorageManagerClass {
@@ -990,8 +991,8 @@ MidgardCRMetadata* midgard_cr_schema_object_get_metadata (MidgardCRSchemaObject*
 GType midgard_cr_db_object_get_type (void) G_GNUC_CONST;
 MidgardCRDBObject* midgard_cr_db_object_construct (GType object_type);
 GType midgard_cr_sql_storage_manager_get_type (void) G_GNUC_CONST;
-MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_new (void);
-MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_construct (GType object_type);
+MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_new (const char* name, MidgardCRConfig* config);
+MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_construct (GType object_type, const char* name, MidgardCRConfig* config);
 const char* midgard_cr_sql_storage_manager_get_name (MidgardCRSQLStorageManager* self);
 MidgardCRConfig* midgard_cr_sql_storage_manager_get_config (MidgardCRSQLStorageManager* self);
 gboolean midgard_cr_transaction_begin (MidgardCRTransaction* self);

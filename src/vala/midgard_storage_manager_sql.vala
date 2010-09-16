@@ -16,6 +16,7 @@ namespace MidgardCR {
 
 		/* protected properties */
 		protected GLib.Object _cnc = null; /* <protected> */
+		protected GLib.Object _parser = null;
 
 		/* public properties */
 		public string name { 
@@ -52,7 +53,22 @@ namespace MidgardCR {
 			get { return _model_manager; }
 		}	
 
-		public bool open () { return false; }
+		public SQLStorageManager (string name, Config config) {
+			Object (name: name, config: config);
+		}
+
+		public bool open () { 
+
+			/* FIXME, throw error if it's opened already */
+			try {
+				MidgardCRCore.SQLStorageManager.open (this);
+				return true;
+			} catch (MidgardCR.StorageManagerError e) {
+				throw e;
+				return false;
+			}		
+		}
+
 		public bool close () { return false; }
 
 		public StorageManager fork () { return null; }

@@ -13,4 +13,9 @@ namespace MidgardCRCore {
 		public static bool create_blobdir (MidgardCR.Config config) throws GLib.KeyFileError, GLib.FileError;
 		public static string get_default_confdir ();
 	}
+	
+	public class SQLStorageManager {
+		public static bool open (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
+		public static bool close (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
+	}
 }

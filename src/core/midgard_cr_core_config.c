@@ -28,8 +28,8 @@
 
 #include "midgard_cr_core_config.h"
 
-gchar *midgard_cr_core_config_build_path(
-		const gchar **dirs, const gchar *filename, gboolean user)
+gchar *
+midgard_cr_core_config_build_path (const gchar **dirs, const gchar *filename, gboolean user)
 {
 	gchar *filepath = NULL;
 	gchar *path = NULL;

@@ -35,10 +35,11 @@ typedef enum {
 
 gboolean	midgard_cr_core_config_read_file		(MidgardCRConfig *config, const gchar *name, gboolean user, GError **error);
 gboolean        midgard_cr_core_config_read_file_at_path	(MidgardCRConfig *self, const gchar *filepath, GError **error);
-gboolean        midgard_cr_core_config_read_data           (MidgardCRConfig *self, const gchar *data, GError **error);
-gchar           **midgard_cr_core_config_list_files        (gboolean user, guint *n_files, GError **error);
-gboolean        midgard_cr_core_config_save_file           (MidgardCRConfig *self, const gchar *name, gboolean user, GError **error);
-gboolean        midgard_cr_core_config_create_blobdir      (MidgardCRConfig *self);
-gchar 		*midgard_cr_core_config_get_default_confdir();
+gboolean        midgard_cr_core_config_read_data           	(MidgardCRConfig *self, const gchar *data, GError **error);
+gchar           **midgard_cr_core_config_list_files        	(gboolean user, guint *n_files, GError **error);
+gboolean        midgard_cr_core_config_save_file           	(MidgardCRConfig *self, const gchar *name, gboolean user, GError **error);
+gboolean        midgard_cr_core_config_create_blobdir      	(MidgardCRConfig *self);
+gchar 		*midgard_cr_core_config_get_default_confdir	();
+gchar 		*midgard_cr_core_config_build_path 		(const gchar **dirs, const gchar *filename, gboolean user);
 
 #endif /* _MIDGARD_CORE_CONFIG_H_ */
