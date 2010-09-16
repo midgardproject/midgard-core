@@ -6,7 +6,7 @@ ACLOCAL_AMFLAGS = -I m4
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
 
-lib_LTLIBRARIES = src/vala/libmidgardcr.la
+lib_LTLIBRARIES = src/libmidgardcr.la
 
 if MIDGARD_DBUS_SUPPORT
 dbus_pkgdatadir = $(DBUS_CONF_DIR)/dbus-1/system.d
@@ -28,21 +28,23 @@ EXTRA_DIST =  \
 
 midgard3_public_h = src/core/midgard3.h
 
-src_vala_libmidgardcr_la_LIBADD = src/core/libmidgardcore.la
+src_libmidgardcr_la_LIBADD = \
+			     src/core/libmidgardcore.la \
+			     src/vala/libmidgardvala.la
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined
 endif
 
-src_vala_libmidgardcr_la_CPPFLAGS = \
+src_libmidgardcr_la_CPPFLAGS = \
 		      	      -I$(top_srcdir)/src -DG_LOG_DOMAIN=\"MidgardCR\"
 
 AM_CFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/core @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 
 
-src_vala_libmidgardcr_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
+src_libmidgardcr_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
 
-src_vala_libmidgardcr_la_public_SOURCES = \
+src_libmidgardcr_la_public_SOURCES = \
 				    src/midgard.c 
  
 pkgdatadir = $(datadir)/midgard3
@@ -50,7 +52,7 @@ pkglibdir = $(libdir)/midgard3
 libmidgardincludedir = $(includedir)/midgard3/midgard
 libmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h 
 
-src_vala_libmidgardcr_la_SOURCES = $(src_vala_libmidgardcr_la_public_SOURCES)
+src_libmidgardcr_la_SOURCES = $(src_libmidgardcr_la_public_SOURCES)
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = midgard3.pc
@@ -61,7 +63,7 @@ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
-introspection_sources = $(src_vala_libmidgardcr_la_public_SOURCES) $(midgard3_public_h)
+introspection_sources = $(src_libmidgardcr_la_public_SOURCES) $(midgard3_public_h)
 MidgardCR-3.0.gir: $(lib_LTLIBRARIES)
 MidgardCR_3_0_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0 
 MidgardCR_3_0_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
