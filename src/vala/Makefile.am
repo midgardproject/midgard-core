@@ -39,8 +39,8 @@ CLEANFILES = \
 	     $(libmidgardcr_la_VALASOURCES:.vala=.c) 	
 
 dist-hook:
-	echo $(distdir)
 	cp *.vala $(distdir)
 	cp Makefile.am $(distdir)
+	cp Makefile.in $(distdir)
 
 distdir: dist-hook
