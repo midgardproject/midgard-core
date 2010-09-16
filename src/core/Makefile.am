@@ -8,3 +8,6 @@ libmidgardcore_la_SOURCES = \
 
 libmidgardcore_la_LDFLAGS = -module -export-dynamic
 libmidgardcore_la_LIBADD = @MIDGARD_LIBS@
+
+EXTRA_DIST = \
+	     MidgardCRCore.vapi
