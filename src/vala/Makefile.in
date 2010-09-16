@@ -48,17 +48,17 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-libmidgardcr_la_DEPENDENCIES =
+libmidgardvala_la_DEPENDENCIES =
 am__objects_1 = midgard_config.lo midgard_executable.lo \
 	midgard_namespace.lo midgard_profiler.lo midgard_query.lo \
 	midgard_schema_model_reflector.lo midgard_schema_model.lo \
 	midgard_schema_object.lo midgard_storage_manager_sql.lo \
 	midgard_storage.lo midgard_workspace.lo
-am_libmidgardcr_la_OBJECTS = $(am__objects_1)
-libmidgardcr_la_OBJECTS = $(am_libmidgardcr_la_OBJECTS)
-libmidgardcr_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
+am_libmidgardvala_la_OBJECTS = $(am__objects_1)
+libmidgardvala_la_OBJECTS = $(am_libmidgardvala_la_OBJECTS)
+libmidgardvala_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(libmidgardcr_la_LDFLAGS) $(LDFLAGS) -o $@
+	$(libmidgardvala_la_LDFLAGS) $(LDFLAGS) -o $@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -72,8 +72,8 @@ CCLD = $(CC)
 LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libmidgardcr_la_SOURCES)
-DIST_SOURCES = $(libmidgardcr_la_SOURCES)
+SOURCES = $(libmidgardvala_la_SOURCES)
+DIST_SOURCES = $(libmidgardvala_la_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -214,12 +214,12 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-noinst_LTLIBRARIES = libmidgardcr.la
+noinst_LTLIBRARIES = libmidgardvala.la
 AM_CFLAGS = -I$(top_srcdir)/src/core -I$(top_srcdir)/src @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@
-BUILT_SOURCES = libmidgardcr.vala.stamp
+BUILT_SOURCES = libmidgardvala.vala.stamp
 midgard3_header = $(top_srcdir)/src/core/midgard3.h
-libmidgardcr_la_VALASOURCES = \
+libmidgardvala_la_VALASOURCES = \
 			  midgard_config.vala \
 			  midgard_executable.vala \
 			  midgard_namespace.vala \
@@ -232,18 +232,18 @@ libmidgardcr_la_VALASOURCES = \
 			  midgard_storage.vala \
 			  midgard_workspace.vala
 
-libmidgardcr_la_SOURCES = \
-			  libmidgardcr.vala.stamp \
-  			  $(libmidgardcr_la_VALASOURCES:.vala=.c)
+libmidgardvala_la_SOURCES = \
+			  libmidgardvala.vala.stamp \
+  			  $(libmidgardvala_la_VALASOURCES:.vala=.c)
 
-libmidgardcr_la_LDFLAGS = -module -export-dynamic
-libmidgardcr_la_LIBADD = @MIDGARD_LIBS@ 
+libmidgardvala_la_LDFLAGS = -module -export-dynamic
+libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
 EXTRA_DIST = \
-	     $(libmidgardcr_la_VALASOURCES) 
+	     $(libmidgardvala_la_VALASOURCES) 
 
 CLEANFILES = \
-	     libmidgardcr.vala.stamp \
-	     $(libmidgardcr_la_VALASOURCES:.vala=.c) 	
+	     libmidgardvala.vala.stamp \
+	     $(libmidgardvala_la_VALASOURCES:.vala=.c) 	
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -289,8 +289,8 @@ clean-noinstLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libmidgardcr.la: $(libmidgardcr_la_OBJECTS) $(libmidgardcr_la_DEPENDENCIES) 
-	$(libmidgardcr_la_LINK)  $(libmidgardcr_la_OBJECTS) $(libmidgardcr_la_LIBADD) $(LIBS)
+libmidgardvala.la: $(libmidgardvala_la_OBJECTS) $(libmidgardvala_la_DEPENDENCIES) 
+	$(libmidgardvala_la_LINK)  $(libmidgardvala_la_OBJECTS) $(libmidgardvala_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -509,7 +509,7 @@ uninstall-am:
 	tags uninstall uninstall-am
 
 
-libmidgardcr.vala.stamp: $(libmidgardcr_la_VALASOURCES)
+libmidgardvala.vala.stamp: $(libmidgardvala_la_VALASOURCES)
 	$(VALAC) $(VALAFLAGS)  --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgard3_header) -C $^
 	touch $@
 
