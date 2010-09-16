@@ -1,0 +1,2 @@
+#!/bin/sh
+valac -X -I/usr/local/include/midgard3/midgard -X -L/usr/local/lib -X -lmidgardcr --includedir=/usr/local/include/ --pkg MidgardCR-3.0 midgardcr_test.vala midgardcr_test_config.vala 
