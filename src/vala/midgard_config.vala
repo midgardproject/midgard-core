@@ -47,58 +47,44 @@ namespace MidgardCR {
 		}
 
 		/* methods */
-		public bool read_file (string name, bool user) throws GLib.KeyFileError, GLib.FileError {
-			try {
-				MidgardCRCore.Config.read_file (this, name, user);
-				this._configname = name;
-				return true;
-			} catch (GLib.KeyFileError e) {
-				throw e;
-			} catch (GLib.FileError e) {
-				throw e;
-			} 
+		public bool read_configuration (string name, bool user) throws GLib.KeyFileError, GLib.FileError {
+			if (!MidgardCRCore.Config.read_file (this, name, user))
+				return false;
+
+			this._configname = name;
+			return true;
 		}
 	
-		public bool read_file_at_path (string path) throws GLib.KeyFileError, GLib.FileError {
-			try {
-				MidgardCRCore.Config.read_file_at_path (this, path);
-				this._configname = path; /* FIXME, do we need unique string or filename? */
+		public bool read_configuration_at_path (string path) throws GLib.KeyFileError, GLib.FileError {
+			if (MidgardCRCore.Config.read_file_at_path (this, path))
 				return true;
-			} catch (GLib.KeyFileError e) {
-				throw e;
-			} catch (GLib.FileError e) {
-				throw e;
-			} 
+			
+			return false;
 		}
 
 		public bool read_data (string data) throws GLib.KeyFileError, GLib.FileError {
-			try {
-				MidgardCRCore.Config.read_data (this, data);
-				this._configname = ""; /* FIXME, do we need unique string or filename? */
-				return true;
-			} catch (GLib.KeyFileError e) {
-				throw e;
-			} 
+			if (!MidgardCRCore.Config.read_data (this, data))
+				return false;
+
+			this._configname = ""; /* FIXME, do we need unique string or filename? */
+			return true;
 		}
 
-		public bool save_file (string name, bool user) throws GLib.KeyFileError, GLib.FileError {
-			try {
-				MidgardCRCore.Config.save_file (this, name, user);
+		public bool save_configuration (string name, bool user) throws GLib.KeyFileError, GLib.FileError {
+			bool saved = MidgardCRCore.Config.save_file (this, name, user);
+			return saved;
+		}
+
+		public bool save_configuration_at_path (string path) throws GLib.KeyFileError, GLib.FileError {
+			if (MidgardCRCore.Config.save_file_at_path (this, path))
 				return true;
-			} catch (GLib.KeyFileError e) {
-				throw e;
-			} catch (GLib.FileError e) {
-				throw e;
-			}
+
+			return false;
 		}
 
 		public static string[]? list_files (bool user) throws GLib.FileError {
-			try {
-				string[] names = MidgardCRCore.Config.list_files (user);
-				return names;
-			} catch (GLib.FileError e) {
-				throw e;
-			}
+			string[] names = MidgardCRCore.Config.list_files (user);	
+			return names;
 		}
 
 		public MidgardCR.Config copy () {
