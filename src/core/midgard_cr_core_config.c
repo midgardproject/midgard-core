@@ -483,11 +483,11 @@ midgard_cr_core_config_list_files (gboolean user, guint *n_files, GError **err)
 gboolean 
 midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboolean user, GError **error)
 {
-	g_return_val_if_fail(self != NULL, FALSE);
-	g_return_val_if_fail(name != NULL, FALSE);
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (name != NULL, FALSE);
 
 	gchar *cnfpath = NULL;
-	guint namel = strlen(name);
+	guint namel = strlen (name);
 	gchar *_umcd = NULL;
 
 	if (namel < 1) {
@@ -502,62 +502,53 @@ midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboo
 	// If user's conf.d dir doesn't exist, create it
 	if (user) {
 
-		gchar *_cnf_path = midgard_cr_core_config_build_path(NULL, NULL, TRUE);
+		gchar *_cnf_path = midgard_cr_core_config_build_path (NULL, NULL, TRUE);
 		g_free (_cnf_path);
 
-		_umcd = g_strconcat(".", MIDGARD_CORE_PACKAGE_NAME, NULL);
-		gchar *path = g_build_path(G_DIR_SEPARATOR_S,
-				g_get_home_dir(), _umcd, NULL);
+		_umcd = g_strconcat (".", MIDGARD_CORE_PACKAGE_NAME, NULL);
+		gchar *path = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir (), _umcd, NULL);
 		g_free (_umcd);
 
 		// Check if .midgard directory exists 
-		if (!g_file_test((const gchar *)path, 
-					G_FILE_TEST_EXISTS)) {
+		if (!g_file_test ((const gchar *)path, G_FILE_TEST_EXISTS)) {
 			g_mkdir(path, 0);
 			g_chmod(path, 0700);
 		}
 
-		if (!g_file_test((const gchar *)path,
-					G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) {
-
+		if (!g_file_test ((const gchar *)path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) 
 			g_warning ("%s is not a directory!", path);
 			g_free (path);
 			return FALSE;
 		}
 		g_free (path);
 
-		_umcd = g_strconcat(".", MIDGARD_CORE_PACKAGE_NAME, NULL);
-		path = g_build_path(G_DIR_SEPARATOR_S, 
-				g_get_home_dir(), _umcd, "conf.d", NULL);
+		_umcd = g_strconcat (".", MIDGARD_CORE_PACKAGE_NAME, NULL);
+		path = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), _umcd, "conf.d", NULL);
 		g_free (_umcd);
 		
 		// Check if .midgard/conf.d directory exists 
-		if (!g_file_test((const gchar *)path, 
-					G_FILE_TEST_EXISTS)) {
-			g_mkdir(path, 0);
-			g_chmod(path, 0700);
+		if (!g_file_test ((const gchar *)path, G_FILE_TEST_EXISTS)) {
+			g_mkdir (path, 0);
+			g_chmod (path, 0700);
 		}
 
-		if (!g_file_test((const gchar *)path,
-					G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) {
-
+		if (!g_file_test ((const gchar *)path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) {
 			g_warning ("%s is not a directory!", path);
 			g_free (path);
 			return FALSE;
 		}
 		g_free (path);
 
-		_umcd = g_strconcat(".", MIDGARD_CORE_PACKAGE_NAME, NULL);
+		_umcd = g_strconcat (".", MIDGARD_CORE_PACKAGE_NAME, NULL);
 		cnfpath = g_build_path (G_DIR_SEPARATOR_S,
-				g_get_home_dir(), _umcd, "conf.d", name, NULL);
+				g_get_home_dir (), _umcd, "conf.d", name, NULL);
 		g_free (_umcd);
 
 	} else {
 	
 		gchar *confdir = midgard_cr_core_config_get_default_confdir ();	
-		if (!g_file_test((const gchar *)confdir,
-					G_FILE_TEST_EXISTS)
-				|| (!g_file_test((const gchar *)confdir,
+		if (!g_file_test ((const gchar *)confdir, G_FILE_TEST_EXISTS)
+				|| (!g_file_test ((const gchar *)confdir,
 						G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR))) {
 			g_warning ("%s doesn't exist or is not a directory!", confdir);
 			g_free (confdir);
