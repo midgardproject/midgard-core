@@ -463,6 +463,90 @@ midgard_cr_core_config_list_files (gboolean user, guint *n_files, GError **err)
 }
 
 /**
+ * midgard_cr_core_config_save_at_path
+ */
+gboolean
+midgard_cr_core_config_save_at_path (MidgardCRConfig *self, const gchar *path, GError **error)
+{
+	guint n_props, i;
+	GValue pval = {0,};
+	const gchar *nick = NULL;
+	gchar *tmpstr;
+	GParamSpec **props = g_object_class_list_properties (G_OBJECT_GET_CLASS (G_OBJECT (self)), &n_props);
+
+	// It should not happen 
+	if (!props)
+		g_error("Midgard Config class has no members registered");
+
+	if (self->keyfile == NULL)
+		self->keyfile = g_key_file_new ();
+
+	for (i = 0; i < n_props; i++) {	
+		nick = g_param_spec_get_nick (props[i]);
+		g_value_init (&pval,props[i]->value_type); 
+		g_object_get_property (G_OBJECT (self), (gchar*)props[i]->name, &pval);
+
+		const gchar *keygroup = "MidgardDatabase";
+		if (g_str_equal (props[i]->name, "sharedir")
+				|| g_str_equal(props[i]->name, "vardir")
+				|| g_str_equal(props[i]->name, "cachedir")
+				|| g_str_equal(props[i]->name, "blobdir")) 
+		{	
+			keygroup = "MidgardDir";
+		}
+
+		switch (props[i]->value_type) {
+	
+			case G_TYPE_STRING:
+				tmpstr = (gchar *)g_value_get_string (&pval);
+				if (!tmpstr)
+					tmpstr = "";
+				g_key_file_set_string (self->keyfile, keygroup, nick, tmpstr);
+				break;
+
+			case G_TYPE_BOOLEAN:
+				g_key_file_set_boolean (self->keyfile, keygroup, nick, g_value_get_boolean (&pval));
+				break;
+
+			case G_TYPE_UINT:
+				g_key_file_set_integer (self->keyfile, keygroup, nick, g_value_get_uint (&pval));
+				break;
+
+		}
+		g_key_file_set_comment (self->keyfile, keygroup, nick,
+				g_param_spec_get_blurb (props[i]), NULL);
+		g_value_unset (&pval);
+	}
+
+	g_free (props);
+
+	gsize length;
+	GError *kf_error = NULL;
+	
+	gchar *content = g_key_file_to_data (self->keyfile, &length, &kf_error);
+
+	if (length < 1) {
+		if (kf_error)
+			g_propagate_error (error, kf_error);	
+		return FALSE;
+	}
+
+	if (kf_error)
+		g_clear_error (&kf_error);
+
+	gboolean saved = g_file_set_contents (path, content, length, &kf_error);
+	g_free (content);
+
+	if (!saved) {
+		if (kf_error)
+			g_propagate_error (error, kf_error);
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
+/**
  * midgard_config_save_file:
  * @self: #MidgardCRConfig instance
  * @name: configuration filename
@@ -489,6 +573,7 @@ midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboo
 	gchar *cnfpath = NULL;
 	guint namel = strlen (name);
 	gchar *_umcd = NULL;
+	gchar *path;
 
 	if (namel < 1) {
 		g_warning ("Can not save configuration file without a name");
@@ -501,12 +586,10 @@ midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboo
 	// Check configuration directory.
 	// If user's conf.d dir doesn't exist, create it
 	if (user) {
-
 		gchar *_cnf_path = midgard_cr_core_config_build_path (NULL, NULL, TRUE);
 		g_free (_cnf_path);
-
 		_umcd = g_strconcat (".", MIDGARD_CORE_PACKAGE_NAME, NULL);
-		gchar *path = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir (), _umcd, NULL);
+		path = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir (), _umcd, NULL);
 		g_free (_umcd);
 
 		// Check if .midgard directory exists 
@@ -515,13 +598,12 @@ midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboo
 			g_chmod(path, 0700);
 		}
 
-		if (!g_file_test ((const gchar *)path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) 
+		if (!g_file_test ((const gchar *)path, G_FILE_TEST_EXISTS | G_FILE_TEST_IS_DIR)) {
 			g_warning ("%s is not a directory!", path);
 			g_free (path);
 			return FALSE;
 		}
 		g_free (path);
-
 		_umcd = g_strconcat (".", MIDGARD_CORE_PACKAGE_NAME, NULL);
 		path = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir(), _umcd, "conf.d", NULL);
 		g_free (_umcd);
@@ -540,12 +622,9 @@ midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboo
 		g_free (path);
 
 		_umcd = g_strconcat (".", MIDGARD_CORE_PACKAGE_NAME, NULL);
-		cnfpath = g_build_path (G_DIR_SEPARATOR_S,
-				g_get_home_dir (), _umcd, "conf.d", name, NULL);
-		g_free (_umcd);
-
+		cnfpath = g_build_path (G_DIR_SEPARATOR_S, g_get_home_dir (), _umcd, "conf.d", name, NULL);
+		g_free (_umcd); 
 	} else {
-	
 		gchar *confdir = midgard_cr_core_config_get_default_confdir ();	
 		if (!g_file_test ((const gchar *)confdir, G_FILE_TEST_EXISTS)
 				|| (!g_file_test ((const gchar *)confdir,
@@ -554,105 +633,37 @@ midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboo
 			g_free (confdir);
 			return FALSE;
 		}
-
 		cnfpath = g_build_path (G_DIR_SEPARATOR_S, confdir, name, NULL);
 		g_free (confdir);
-
 	}
 
-	guint n_props, i;
-	GValue pval = {0,};
-	const gchar *nick = NULL;
-	gchar *tmpstr;
-	GParamSpec **props = g_object_class_list_properties(
-			G_OBJECT_GET_CLASS(G_OBJECT(self)), &n_props);
+	GError *err = NULL;
+	gboolean rv = TRUE;
 
-	// It should not happen 
-	if (!props)
-		g_error("Midgard Config class has no members registered");
-
-	for(i = 0; i < n_props; i++) {
-		
-		nick = g_param_spec_get_nick (props[i]);
-
-		g_value_init(&pval,props[i]->value_type); 
-		g_object_get_property(G_OBJECT(self), (gchar*)props[i]->name, &pval);
-
-		const gchar *keygroup = "MidgardDatabase";
-
-		if (g_str_equal(props[i]->name, "sharedir")
-				|| g_str_equal(props[i]->name, "vardir")
-				|| g_str_equal(props[i]->name, "cachedir")
-				|| g_str_equal(props[i]->name, "blobdir")) 
-		{	
-			keygroup = "MidgardDir";
-		}
-
-
-		switch(props[i]->value_type){
-	
-			case G_TYPE_STRING:
-				tmpstr = (gchar *)g_value_get_string (&pval);
-				if (!tmpstr)
-					tmpstr = "";
-				g_key_file_set_string (self->keyfile,
-						keygroup,
-						nick, tmpstr);
-				break;
-
-			case G_TYPE_BOOLEAN:
-				g_key_file_set_boolean(self->keyfile,
-						keygroup, 
-						nick, 
-						g_value_get_boolean(&pval));
-				break;
-
-			case G_TYPE_UINT:
-				g_key_file_set_integer (self->keyfile,
-						keygroup, 
-						nick, 
-						g_value_get_uint (&pval));
-				break;
-
-		}
-
-		g_key_file_set_comment(self->keyfile, keygroup, nick,
-				g_param_spec_get_blurb(props[i]), NULL);
-		g_value_unset(&pval);
-	}
-
-	g_free (props);
-
-	gsize length;
-	GError *kf_error = NULL;
-	
-	gchar *content = g_key_file_to_data (self->keyfile, &length, &kf_error);
-
-	if (length < 1) {
-	
-		if (kf_error)
-			g_propagate_error (error, kf_error);	
-	
-		return FALSE;
-	}
-
-	if (kf_error)
-		g_clear_error (&kf_error);
-
-	gboolean saved = g_file_set_contents(cnfpath, content, length, &kf_error);
-
-	g_free (content);
+	rv = midgard_cr_core_config_save_at_path (self, cnfpath, &err);	
 	g_free (cnfpath);
+	if (!rv) 
+		g_propagate_error (error, err);
+		
+	return rv;
+}
 
-	if (!saved) {
+/**
+ * midgard_cr_core_config_save_configuration_at_path:
+ */
+gboolean 
+midgard_cr_core_config_save_file_at_path (MidgardCRConfig *self, const gchar *path, GError **error)
+{
+	GError *err = NULL;
+	gboolean rv = TRUE;
 
-		if (kf_error)
-			g_propagate_error (error, kf_error);
-	
-		return FALSE;
+	rv = midgard_cr_core_config_save_at_path (self, path, &err);
+	if (!rv) {
+		g_propagate_error (error, err);
+		return rv;
 	}
 
-	return TRUE;
+	return rv;
 }
 
 gboolean _cr_config_create_base_blobdir(const gchar *path)

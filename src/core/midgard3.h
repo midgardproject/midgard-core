@@ -793,10 +793,11 @@ struct _MidgardCRSQLWorkspaceManagerClass {
 
 
 GType midgard_cr_config_get_type (void) G_GNUC_CONST;
-gboolean midgard_cr_config_read_file (MidgardCRConfig* self, const char* name, gboolean user, GError** error);
-gboolean midgard_cr_config_read_file_at_path (MidgardCRConfig* self, const char* path, GError** error);
+gboolean midgard_cr_config_read_configuration (MidgardCRConfig* self, const char* name, gboolean user, GError** error);
+gboolean midgard_cr_config_read_configuration_at_path (MidgardCRConfig* self, const char* path, GError** error);
 gboolean midgard_cr_config_read_data (MidgardCRConfig* self, const char* data, GError** error);
-gboolean midgard_cr_config_save_file (MidgardCRConfig* self, const char* name, gboolean user, GError** error);
+gboolean midgard_cr_config_save_configuration (MidgardCRConfig* self, const char* name, gboolean user, GError** error);
+gboolean midgard_cr_config_save_configuration_at_path (MidgardCRConfig* self, const char* path, GError** error);
 char** midgard_cr_config_list_files (gboolean user, int* result_length1, GError** error);
 MidgardCRConfig* midgard_cr_config_copy (MidgardCRConfig* self);
 MidgardCRConfig* midgard_cr_config_new (void);
