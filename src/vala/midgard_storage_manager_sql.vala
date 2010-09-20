@@ -61,18 +61,24 @@ namespace MidgardCR {
 		}
 
 		public bool open () { 
-
-			/* FIXME, throw error if it's opened already */
-			try {
-				MidgardCRCore.SQLStorageManager.open (this);
+			if (this._cnc != null)
 				return true;
-			} catch (MidgardCR.StorageManagerError e) {
-				throw e;
-				return false;
-			}		
+
+			if (MidgardCRCore.SQLStorageManager.open (this)) {
+				this.opened (); /* emit 'opened' signal */
+				return true;
+			}
+			
+			return false;
 		}
 
-		public bool close () { return false; }
+		public bool close () { 
+			if (!MidgardCRCore.SQLStorageManager.close (this))
+				return false;
+				
+			this.closed (); /* emit 'closed' signal */
+			return true;
+		}
 
 		public StorageManager fork () { return null; }
 		public StorageManager clone () { return null; }
