@@ -153,7 +153,23 @@ midgard_cr_core_sql_storage_manager_open (MidgardCRSQLStorageManager *self, GErr
 }
 
 gboolean 
-midgard_cr_core_sql_storage_manager_close (MidgardCRSQLStorageManager *storage_mgr, GError **error)
+midgard_cr_core_sql_storage_manager_close (MidgardCRSQLStorageManager *mngr, GError **error)
 {
-	return FALSE;
+	if (mngr->_cnc == NULL) {
+		*error = g_error_new_literal (MIDGARD_CR_STORAGE_MANAGER_ERROR, MIDGARD_CR_STORAGE_MANAGER_ERROR_NOT_OPENED, 
+				"Can not close not opened connection.");
+		return FALSE;
+	}
+
+	if (mngr->_parser) {
+		g_object_unref (mngr->_parser);
+		mngr->_parser = NULL;
+	}
+
+	if (mngr->_cnc) {
+		g_object_unref (mngr->_cnc);
+		mngr->_cnc = NULL;
+	}	
+
+	return TRUE;
 }
