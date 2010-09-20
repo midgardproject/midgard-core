@@ -82,7 +82,7 @@ namespace MidgardCR {
 			return false;
 		}
 
-		public static string[]? list_files (bool user) throws GLib.FileError {
+		public static string[]? list_configurations (bool user) throws GLib.FileError {
 			string[] names = MidgardCRCore.Config.list_files (user);	
 			return names;
 		}
