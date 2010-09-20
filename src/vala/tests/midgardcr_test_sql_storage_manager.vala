@@ -1,8 +1,5 @@
 using MidgardCR;
 
-//const string DEFAULT_CONFIGURATION = "MidgardCR_test";
-//const string DEFAULT_CONFIGURATION_PATH = "./MidgardCR_test";
-
 void midgardcr_test_add_sql_storage_manager_tests () {
 
 	/* constructor */
@@ -79,6 +76,7 @@ void midgardcr_test_add_sql_storage_manager_tests () {
 		MidgardCR.SQLStorageManager mngr = null;
 		MidgardCR.Config config = new MidgardCR.Config ();
 		bool closed = false;
+		bool opened = false;
 
 		try {
 			config.read_configuration (DEFAULT_CONFIGURATION, true);
@@ -103,6 +101,30 @@ void midgardcr_test_add_sql_storage_manager_tests () {
 			closed = false;
 		}
 		assert (closed == false);
+
+		/* SUCCESS */
+		try {
+			opened = mngr.open ();
+		} catch (StorageManagerError e) {
+			GLib.warning (e.message);
+		}
+		assert (opened == true);
+
+		/* SUCCESS */
+		try {
+			closed = mngr.close ();
+		} catch (MidgardCR.StorageManagerError e) {
+			GLib.warning (e.message);
+		}
+		assert (closed == true);
+	});
+
+	Test.add_func ("/SQLStorageManager/fork", () => {
+		GLib.print (MISS_IMPL);
+	});
+
+	Test.add_func ("/SQLStorageManager/clone", () => {
+		GLib.print (MISS_IMPL);
 	});
 }
 
