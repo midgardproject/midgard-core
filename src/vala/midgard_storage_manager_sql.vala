@@ -53,14 +53,24 @@ namespace MidgardCR {
 			get { return _model_manager; }
 		}	
 
+		/**
+		 * @param name Unique StorageManager name
+		 * @param config MidgardCR.Config to associate with manager
+                 *  
+		 */ 
 		public SQLStorageManager (string name, Config config) throws StorageManagerError {
 			if (name == "" || name == null)
 				throw new MidgardCR.StorageManagerError.NAME_INVALID ("Can not initialize SQLStorageManager with empty name");
 
 			Object (name: name, config: config);
 		}
-
-		public bool open () { 
+		
+		/**
+		 * Opens connection to database defined in MidgardCR.Config associated with StorageManager.
+		 * 
+		 * If, StorageManager opened connection already, silently returns true.
+		 */	
+		public bool open () throws MidgardCR.StorageManagerError { 
 			if (this._cnc != null)
 				return true;
 
@@ -72,7 +82,7 @@ namespace MidgardCR {
 			return false;
 		}
 
-		public bool close () { 
+		public bool close () throws MidgardCR.StorageManagerError { 
 			if (!MidgardCRCore.SQLStorageManager.close (this))
 				return false;
 				
