@@ -143,7 +143,8 @@ midgard_cr_core_sql_storage_manager_open (MidgardCRSQLStorageManager *self, GErr
 
 	GdaSqlParser *parser = gda_connection_create_parser (connection);
 	if (!parser)
-		self->_parser = G_OBJECT (gda_sql_parser_new ());
+		parser = gda_sql_parser_new ();
+	self->_parser = G_OBJECT (parser);
 	g_assert (self->_parser != NULL);
 
 	self->_cnc = G_OBJECT (connection);
