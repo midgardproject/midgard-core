@@ -6,7 +6,7 @@ namespace MidgardCR {
 	public class Config : GLib.Object {
 		public Config ();
 		public MidgardCR.Config copy ();
-		public static string[]? list_files (bool user) throws GLib.FileError;
+		public static string[]? list_configurations (bool user) throws GLib.FileError;
 		public bool read_configuration (string name, bool user) throws GLib.KeyFileError, GLib.FileError;
 		public bool read_configuration_at_path (string path) throws GLib.KeyFileError, GLib.FileError;
 		public bool read_data (string data) throws GLib.KeyFileError, GLib.FileError;
@@ -56,7 +56,7 @@ namespace MidgardCR {
 	public class SQLStorageManager : GLib.Object, MidgardCR.StorageManager {
 		protected GLib.Object _cnc;
 		protected GLib.Object _parser;
-		public SQLStorageManager (string name, MidgardCR.Config config);
+		public SQLStorageManager (string name, MidgardCR.Config config) throws MidgardCR.StorageManagerError;
 		public MidgardCR.Config config { get; construct; }
 		public string name { get; construct; }
 	}
@@ -337,6 +337,8 @@ namespace MidgardCR {
 	[CCode (cprefix = "MIDGARD_CR_STORAGE_MANAGER_ERROR_", cheader_filename = "midgard3.h")]
 	public errordomain StorageManagerError {
 		ACCESS_DENIED,
+		NAME_INVALID,
+		NOT_OPENED,
 	}
 	[CCode (cprefix = "MIDGARD_CR_STORAGE_MODEL_ERROR_", cheader_filename = "midgard3.h")]
 	public errordomain StorageModelError {
