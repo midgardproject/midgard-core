@@ -8,6 +8,7 @@ namespace MidgardCR {
 		/* private */
 		private string _configname = "";
 		private string _confdir = "";
+		private string _dbtype = "SQLite";
 
 		/* internal */
 		internal uint dbtype_id = 0;
@@ -17,7 +18,13 @@ namespace MidgardCR {
 	  	public string authtype { get; set; }
 		public string dbname { get; set; }
 		public string dbpass { get; set; }
-		public string dbtype { get; set; }
+		public string dbtype { 
+			get { return this._dbtype; }
+			set { 
+				this._dbtype = value;
+				MidgardCRCore.Config.set_dbtype_id (this, this._dbtype);
+			}
+		}
 		public string dbuser { get; set; }
 		public uint dbport { get; set; }
 		public string host { get; set; }
@@ -42,6 +49,8 @@ namespace MidgardCR {
 			this.cachedir = "/var/local/cache/midgard";
 			this.vardir = "/var/local/";
 			this.dbdir = "";
+			/* generate internal dbtype id */
+			MidgardCRCore.Config.set_dbtype_id (this, this._dbtype);
 			/* generate path to default system-wide configuration directory */
 			this._confdir = MidgardCRCore.Config.get_default_confdir ();
 		}

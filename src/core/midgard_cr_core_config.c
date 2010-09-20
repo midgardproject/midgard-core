@@ -109,7 +109,7 @@ midgard_cr_core_config_build_path (const gchar **dirs, const gchar *filename, gb
 	return filepath;
 }
 
-void _core_config_set_dbtype (MidgardCRConfig *self, const gchar *tmpstr)
+void midgard_cr_core_config_set_dbtype_id (MidgardCRConfig *self, const gchar *tmpstr)
 {
 	const gchar *_dbtype = tmpstr;
 
@@ -132,8 +132,6 @@ void _core_config_set_dbtype (MidgardCRConfig *self, const gchar *tmpstr)
 		self->dbtype_id = MIDGARD_CORE_DB_TYPE_MYSQL;
 		_dbtype = "MySQL";
 	}
-
-	midgard_cr_config_set_dbtype (self, _dbtype);
 }
 
 void _cr_config_create_log_dir(const gchar *path)

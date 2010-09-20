@@ -12,6 +12,7 @@ namespace MidgardCRCore {
 		public static bool save_file_at_path (MidgardCR.Config config, string path) throws GLib.KeyFileError, GLib.FileError;
 		public static bool create_blobdir (MidgardCR.Config config) throws GLib.KeyFileError, GLib.FileError;
 		public static string get_default_confdir ();
+		public static void set_dbtype_id (MidgardCR.Config config, string dbtype);
 	}
 	
 	public class SQLStorageManager {

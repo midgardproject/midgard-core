@@ -41,5 +41,6 @@ gboolean        midgard_cr_core_config_save_file           	(MidgardCRConfig *se
 gboolean        midgard_cr_core_config_create_blobdir      	(MidgardCRConfig *self);
 gchar 		*midgard_cr_core_config_get_default_confdir	();
 gchar 		*midgard_cr_core_config_build_path 		(const gchar **dirs, const gchar *filename, gboolean user);
+void		midgard_cr_core_config_set_dbtype_id		(MidgardCRConfig *config, const gchar *dbtype);
 
 #endif /* _MIDGARD_CORE_CONFIG_H_ */

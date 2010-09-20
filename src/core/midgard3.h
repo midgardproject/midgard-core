@@ -592,7 +592,8 @@ struct _MidgardCRSchemaBuilderClass {
 };
 
 typedef enum  {
-	MIDGARD_CR_STORAGE_MANAGER_ERROR_ACCESS_DENIED
+	MIDGARD_CR_STORAGE_MANAGER_ERROR_ACCESS_DENIED,
+	MIDGARD_CR_STORAGE_MANAGER_ERROR_NAME_INVALID
 } MidgardCRStorageManagerError;
 #define MIDGARD_CR_STORAGE_MANAGER_ERROR midgard_cr_storage_manager_error_quark ()
 typedef enum  {
@@ -798,7 +799,7 @@ gboolean midgard_cr_config_read_configuration_at_path (MidgardCRConfig* self, co
 gboolean midgard_cr_config_read_data (MidgardCRConfig* self, const char* data, GError** error);
 gboolean midgard_cr_config_save_configuration (MidgardCRConfig* self, const char* name, gboolean user, GError** error);
 gboolean midgard_cr_config_save_configuration_at_path (MidgardCRConfig* self, const char* path, GError** error);
-char** midgard_cr_config_list_files (gboolean user, int* result_length1, GError** error);
+char** midgard_cr_config_list_configurations (gboolean user, int* result_length1, GError** error);
 MidgardCRConfig* midgard_cr_config_copy (MidgardCRConfig* self);
 MidgardCRConfig* midgard_cr_config_new (void);
 MidgardCRConfig* midgard_cr_config_construct (GType object_type);
@@ -992,8 +993,8 @@ MidgardCRMetadata* midgard_cr_schema_object_get_metadata (MidgardCRSchemaObject*
 GType midgard_cr_db_object_get_type (void) G_GNUC_CONST;
 MidgardCRDBObject* midgard_cr_db_object_construct (GType object_type);
 GType midgard_cr_sql_storage_manager_get_type (void) G_GNUC_CONST;
-MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_new (const char* name, MidgardCRConfig* config);
-MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_construct (GType object_type, const char* name, MidgardCRConfig* config);
+MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_new (const char* name, MidgardCRConfig* config, GError** error);
+MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_construct (GType object_type, const char* name, MidgardCRConfig* config, GError** error);
 const char* midgard_cr_sql_storage_manager_get_name (MidgardCRSQLStorageManager* self);
 MidgardCRConfig* midgard_cr_sql_storage_manager_get_config (MidgardCRSQLStorageManager* self);
 gboolean midgard_cr_transaction_begin (MidgardCRTransaction* self);
