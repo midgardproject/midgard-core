@@ -21,7 +21,7 @@ void midgardcr_test_add_config_tests () {
    	Test.add_func ("/Config/save_configuration", () => {
 		MidgardCR.Config config = new MidgardCR.Config ();
 		config.dbtype = "SQLite";
-		config.dbname = "midgardcr_test";
+		config.dbname = "MidgardCR_TestDatabase";
 		config.dbdir = "./";
 		bool saved = true;
 
