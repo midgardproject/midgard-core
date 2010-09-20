@@ -15,9 +15,13 @@ namespace MidgardCR {
 		internal GLib.KeyFile keyfile = null;
 
 		/* public properties */
+		[Description(nick = "Authtype", blurb = "The type of authentication used")]
 	  	public string authtype { get; set; }
+		[Description(nick = "Name", blurb = "The name of database to connect to")]
 		public string dbname { get; set; }
+		[Description(nick = "Password", blurb = "Password used in database connection")]
 		public string dbpass { get; set; }
+		[Description(nick = "Type", blurb = "The type of database to use")]
 		public string dbtype { 
 			get { return this._dbtype; }
 			set { 
@@ -25,20 +29,35 @@ namespace MidgardCR {
 				MidgardCRCore.Config.set_dbtype_id (this, this._dbtype);
 			}
 		}
+		[Description(nick = "Username", blurb = "Username used in database connection")]
 		public string dbuser { get; set; }
+		[Description(nick = "Port", blurb = "Port used in database connection")]
 		public uint dbport { get; set; }
+		[Description(nick = "Host", blurb = "Database's host ")]
 		public string host { get; set; }
+		[Description(nick = "Logfile", blurb = "Location of the logfile")]
 		public string logfilename { get; set; }
+		[Description(nick = "Loglevel", blurb = "Log level")]
 		public string loglevel { get; set; }
+		[Description(nick = "MidgardPassword", blurb = "Midgard's user password")]
 		public string midgardpassword { get; set; }
+		[Description(nick = "MidgardUsername", blurb = "Midgard's user username")]		
 		public string midgardusername { get; set; }
+		[Description(nick = "ShareDir", blurb = "Directory for shared, architecture independent files")]
 		public string sharedir { get; set; }
+		[Description(nick = "VarDir", blurb = "Application specific directories (cache, storage files, etc)")]
 		public string vardir { get; set; }
+		[Description(nick = "BlobDir", blurb = "Location of the blobs directory")]
 		public string blobdir { get; set; }
+		[Description(nick = "CacheDir", blurb = "Directory to keep cache files")]
 		public string cachedir { get; set; }
+		[Description(nick = "DatabaseDir", blurb = "Database directory (e.g. for SQLite provider)")]
 		public string dbdir { get; set; }
+		[Description(nick = "TableCreate", blurb = "??")]
 		public bool tablecreate { get; set; }
+		[Description(nick = "TableUpdate", blurb = "??")]
 		public bool tableupdate { get; set; }
+		[Description(nick = "TestUnit", blurb = "??")]
 		public bool testunit { get; set; }
 
 		/* constructor */
