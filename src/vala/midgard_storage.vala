@@ -25,7 +25,8 @@ namespace MidgardCR {
 	}
 
 	public errordomain StorageManagerError {
-		ACCESS_DENIED
+		ACCESS_DENIED,
+		NAME_INVALID
 	}
 
 	public interface StorageManager : GLib.Object {

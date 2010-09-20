@@ -53,7 +53,10 @@ namespace MidgardCR {
 			get { return _model_manager; }
 		}	
 
-		public SQLStorageManager (string name, Config config) {
+		public SQLStorageManager (string name, Config config) throws StorageManagerError {
+			if (name == "" || name == null)
+				throw new MidgardCR.StorageManagerError.NAME_INVALID ("Can not initialize SQLStorageManager with empty name");
+
 			Object (name: name, config: config);
 		}
 
