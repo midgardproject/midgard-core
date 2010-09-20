@@ -25,20 +25,18 @@
 #define G_LOG_DOMAIN "midgard-core"
 #endif
 
-#include "midgard_object.h"
-#include "midgard_user.h"
-#include "midgard_blob.h"
-#include "midgard_collector.h"
-#include "midgard_view.h"
-#include "midgard_timestamp.h"
-#include "midgard_metadata.h"
+#define GETTEXT_PACKAGE "MidgardCR"
+#include <glib/gi18n-lib.h>
+
+#include "midgard_cr_core_timestamp.h"
+#include "midgard_cr_core.h"
 
 #include <libgda/libgda.h>
 
 const char *
 midgard_version()
 {
-	return MIDGARD_LIB_VERSION;
+	return MIDGARD_CORE_LIB_VERSION;
 }
 
 /* A helper funtion which is registered as string to float 

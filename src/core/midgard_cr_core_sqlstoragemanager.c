@@ -21,6 +21,7 @@
 #include "midgard_cr_core_config.h"
 #include <libgda/libgda.h>
 #include <sql-parser/gda-sql-parser.h>
+#include "midgard_cr_core_storage_sql.h"
 
 #define DEFAULT_DBNAME "midgard"
 #define DEFAULT_DBUSER "midgard"
@@ -170,6 +171,25 @@ midgard_cr_core_sql_storage_manager_close (MidgardCRSQLStorageManager *mngr, GEr
 		g_object_unref (mngr->_cnc);
 		mngr->_cnc = NULL;
 	}	
+
+	return TRUE;
+}
+
+gboolean 
+midgard_cr_core_sql_storage_manager_initialize_storage (MidgardCRSQLStorageManager *manager, GError **error)
+{
+	g_return_val_if_fail (manager != NULL, FALSE);
+	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+	g_return_val_if_fail (GDA_IS_CONNECTION (manager->_cnc), FALSE);
+	
+	GError *err = NULL;
+	GdaConnection *cnc = GDA_CONNECTION (manager->_cnc);
+	if (!midgard_core_storage_sql_create_base_tables (cnc, &err)) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_MANAGER_ERROR, MIDGARD_CR_STORAGE_MANAGER_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		return FALSE;
+	}
 
 	return TRUE;
 }

@@ -594,7 +594,8 @@ struct _MidgardCRSchemaBuilderClass {
 typedef enum  {
 	MIDGARD_CR_STORAGE_MANAGER_ERROR_ACCESS_DENIED,
 	MIDGARD_CR_STORAGE_MANAGER_ERROR_NAME_INVALID,
-	MIDGARD_CR_STORAGE_MANAGER_ERROR_NOT_OPENED
+	MIDGARD_CR_STORAGE_MANAGER_ERROR_NOT_OPENED,
+	MIDGARD_CR_STORAGE_MANAGER_ERROR_INTERNAL
 } MidgardCRStorageManagerError;
 #define MIDGARD_CR_STORAGE_MANAGER_ERROR midgard_cr_storage_manager_error_quark ()
 typedef enum  {
@@ -677,6 +678,7 @@ struct _MidgardCRStorageManagerIface {
 	GTypeInterface parent_iface;
 	gboolean (*open) (MidgardCRStorageManager* self, GError** error);
 	gboolean (*close) (MidgardCRStorageManager* self, GError** error);
+	gboolean (*initialize_storage) (MidgardCRStorageManager* self, GError** error);
 	MidgardCRStorageManager* (*fork) (MidgardCRStorageManager* self);
 	MidgardCRStorageManager* (*clone) (MidgardCRStorageManager* self);
 	MidgardCRStorageContentManager* (*get_content_manager) (MidgardCRStorageManager* self);
@@ -1009,6 +1011,7 @@ char** midgard_cr_storage_manager_pool_list_managers (MidgardCRStorageManagerPoo
 MidgardCRStorageManager* midgard_cr_storage_manager_pool_get_manager_by_name (MidgardCRStorageManagerPool* self, const char* name);
 gboolean midgard_cr_storage_manager_open (MidgardCRStorageManager* self, GError** error);
 gboolean midgard_cr_storage_manager_close (MidgardCRStorageManager* self, GError** error);
+gboolean midgard_cr_storage_manager_initialize_storage (MidgardCRStorageManager* self, GError** error);
 MidgardCRStorageManager* midgard_cr_storage_manager_fork (MidgardCRStorageManager* self);
 MidgardCRStorageManager* midgard_cr_storage_manager_clone (MidgardCRStorageManager* self);
 MidgardCRStorageContentManager* midgard_cr_storage_manager_get_content_manager (MidgardCRStorageManager* self);

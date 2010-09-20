@@ -24,7 +24,8 @@
 #include "midgard3.h"
 #include "midgard_local.h"
 
-gboolean midgard_cr_core_sql_storage_manager_open (MidgardCRSQLStorageManager *storage_mgr, GError **error);
-gboolean midgard_cr_core_sql_storage_manager_close (MidgardCRSQLStorageManager *storage_mgr, GError **error);
+gboolean midgard_cr_core_sql_storage_manager_open (MidgardCRSQLStorageManager *manager, GError **error);
+gboolean midgard_cr_core_sql_storage_manager_close (MidgardCRSQLStorageManager *manager, GError **error);
+gboolean midgard_cr_core_sql_storage_manager_iniatilize_storage (MidgardCRSQLStorageManager *manager, GError **error);
 
 #endif /* _MIDGARD_CR_CORE_SQL_STORAGE_MANAGER_H_ */

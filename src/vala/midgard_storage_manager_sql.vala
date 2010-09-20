@@ -90,6 +90,13 @@ namespace MidgardCR {
 			return true;
 		}
 
+		public bool initialize_storage () throws MidgardCR.StorageManagerError {
+			if (!MidgardCRCore.SQLStorageManager.initialize_storage (this))
+				return false;
+
+			return true;
+		}
+
 		public StorageManager fork () { return null; }
 		public StorageManager clone () { return null; }
 	}

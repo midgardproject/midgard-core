@@ -37,7 +37,7 @@ no_undefined = -no-undefined
 endif
 
 src_libmidgardcr_la_CPPFLAGS = \
-		      	      -I$(top_srcdir)/src -DG_LOG_DOMAIN=\"MidgardCR\"
+		      	      -I$(top_srcdir)/src -I$(top_srcdir)/src/core -DG_LOG_DOMAIN=\"MidgardCR\"
 
 AM_CFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/core @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 

@@ -262,6 +262,7 @@ namespace MidgardCR {
 		public abstract MidgardCR.StorageManager clone ();
 		public abstract bool close () throws MidgardCR.StorageManagerError;
 		public abstract MidgardCR.StorageManager fork ();
+		public abstract bool initialize_storage () throws MidgardCR.StorageManagerError;
 		public abstract bool open () throws MidgardCR.StorageManagerError;
 		public abstract MidgardCR.StorageContentManager content_manager { get; }
 		public abstract MidgardCR.StorageModelManager model_manager { get; }
@@ -339,6 +340,7 @@ namespace MidgardCR {
 		ACCESS_DENIED,
 		NAME_INVALID,
 		NOT_OPENED,
+		INTERNAL,
 	}
 	[CCode (cprefix = "MIDGARD_CR_STORAGE_MODEL_ERROR_", cheader_filename = "midgard3.h")]
 	public errordomain StorageModelError {

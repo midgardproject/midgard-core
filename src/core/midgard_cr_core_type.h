@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2005 Piotr Pokora <piotr.pokora@infoglob.pl>
+ * Copyright (C) 2005, 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published

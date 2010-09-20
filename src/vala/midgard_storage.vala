@@ -27,7 +27,8 @@ namespace MidgardCR {
 	public errordomain StorageManagerError {
 		ACCESS_DENIED,
 		NAME_INVALID,
-		NOT_OPENED
+		NOT_OPENED,
+		INTERNAL
 	}
 
 	public interface StorageManager : GLib.Object {
@@ -47,6 +48,8 @@ namespace MidgardCR {
 		/* connection methods */
 		public abstract bool open () throws StorageManagerError;
 		public abstract bool close () throws StorageManagerError; 
+		
+		public abstract bool initialize_storage () throws StorageManagerError;
 
 		/* FIXME, add Clonable interface ? */
 		public abstract StorageManager fork ();

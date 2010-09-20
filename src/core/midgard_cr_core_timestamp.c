@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2005 Jukka Zitting <jz@yukatan.fi>
- * Copyright (C) 2009 Piotr Pokora <piotrek.pokora@gmail.com>
+ * Copyright (C) 2009, 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -17,9 +17,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "midgard_timestamp.h"
+#include "midgard_cr_core_timestamp.h"
 #include <glib.h>
-#include "midgard_type.h"
+#include "midgard_cr_core_type.h"
 #include <libgda/gda-value.h>
 
 #define leapsecs_add(a,b) (a)

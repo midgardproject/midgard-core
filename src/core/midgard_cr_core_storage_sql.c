@@ -16,14 +16,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *   */
 
-#include "midgard_core_storage_sql.h"
-#include "midgard_type.h"
-#include "midgard_timestamp.h"
+#include "midgard_cr_core_storage_sql.h"
+#include "midgard_cr_core_type.h"
+#include "midgard_cr_core_timestamp.h"
 
 #define COLTYPE_INT 	"int"
 #define COLTYPE_DATE	"datetime"
 #define COLTYPE_STRING	"varchar(255)"
 #define COLTYPE_TEXT	"longtext"
+#define COLTYPE_FLOAT	"float"
 
 #define PROVIDER_NAME_POSTGRES	"PostgreSQL"
 
@@ -50,12 +51,16 @@ midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar 
 				|| coltype == MGD_TYPE_INT) {
 			mdc->dbtype = COLTYPE_INT;
 			mdc->dvalue = "0";
-		} else if (coltype == MGD_TYPE_STRING) {
+		} else if (coltype == MGD_TYPE_STRING
+				|| coltype == G_TYPE_STRING) {
 			mdc->dbtype = COLTYPE_STRING;
 			mdc->dvalue = "";
 		} else if (coltype == MGD_TYPE_LONGTEXT) {
 			mdc->dbtype = COLTYPE_TEXT;
 			mdc->dvalue = "";
+		} else if (coltype == G_TYPE_FLOAT) {
+			mdc->dbtype =  COLTYPE_FLOAT;
+			mdc->dvalue = "0.00";
 		}			
 	}
 
@@ -190,7 +195,7 @@ midgard_core_storage_sql_table_remove (GdaConnection *cnc, const gchar *tablenam
 		return FALSE;
 	}
 
-	gboolean update_meta =  _update_gda_meta_store (cnc, tablename, &err);
+	gboolean update_meta = _update_gda_meta_store (cnc, tablename, &err);
 	if (!update_meta)
 		g_propagate_error (error, err);
 
@@ -327,7 +332,7 @@ midgard_core_storage_sql_column_create (GdaConnection *cnc, MgdCoreStorageSQLCol
 
 	if (mdc->dbtype == NULL) {
 		/* FIXME */
-		g_warning ("NULL dbtype given. FIX error domain and code");
+		g_warning ("%s.%s NULL dbtype given. FIX error domain and code", mdc->table_name, mdc->column_name);
 		return FALSE;
 	}
 
@@ -374,11 +379,11 @@ midgard_core_storage_sql_column_create (GdaConnection *cnc, MgdCoreStorageSQLCol
 	} 
 	
 	if (!mdc->dvalue)
-		dval = g_strdup("\'\'");
+		dval = g_strdup("\'\'");	
 
 	/* Default value */
 	/* Default value not implemented in PostgreSQL 8.1 ( 28.02.2007 ) */
-	if (!mdc->autoinc && g_str_equal (provider_name, PROVIDER_NAME_POSTGRES))
+	if (!mdc->autoinc && !g_str_equal (provider_name, PROVIDER_NAME_POSTGRES))
 		gda_server_operation_set_value_at (op, dval, NULL, "/COLUMN_DEF_P/COLUMN_DEFAULT");
 	g_free(dval);
 
@@ -395,20 +400,20 @@ midgard_core_storage_sql_column_create (GdaConnection *cnc, MgdCoreStorageSQLCol
 		gda_server_operation_set_value_at(op, "true", NULL, "/COLUMN_DEF_P/COLUMN_UNIQUE");
 
 	/* TODO, either print debug message or propagate it via profiler */
-	/*	
+		
 	gchar *_sql = NULL;
-	_sql = gda_server_provider_render_operation(server, cnc, op, &error);
+	GError *_err = NULL;
+	_sql = gda_server_provider_render_operation(server, cnc, op, &_err);
 	if(_sql) {
 		g_debug("Rendering column add: %s", _sql);
-		g_clear_error(&error);
+		g_clear_error(&_err);
 	} else {
-		g_warning("Can not prepare SQL query. %s", error->message);
-		g_clear_error(&error);
+		g_warning("Can not prepare SQL query. %s", _err->message);
+		g_clear_error(&_err);
 		g_object_unref(op);
 		return FALSE;
 	}
-	*/
-
+		
 	gboolean created = gda_server_provider_perform_operation (server, cnc, op, &err);
 	g_object_unref (op);
 	if(!created) {
@@ -1001,6 +1006,8 @@ midgard_core_storage_sql_create_base_tables (GdaConnection *cnc, GError **error)
 		g_propagate_error (error, err);
 		return FALSE;
 	}
+
+	return TRUE;
 }
 
 gint 
