@@ -142,7 +142,7 @@ namespace MidgardCR {
 		/**
 		 * Default value of property for newly created objects
 		 */
-		public GLib.Value valuedefault { get; set; }
+		public string valuedefault { get; set; }
 
 		/**
 		 * Description of the property
@@ -169,10 +169,10 @@ namespace MidgardCR {
 		 *
 		 * @param name property name
 		 * @param type the type of the property 
-		 * @param value default property's value 
+		 * @param dvalue default property's value 
 		 */
-		public SchemaModelProperty (string name, string type, string value) {
-			Object (name: name, valuetypename: type, valuedefault: value);
+		public SchemaModelProperty (string name, string type, string dvalue) {
+			Object (name: name, valuetypename: type, valuedefault: dvalue);
 		} 
 
 		public Model add_model (Model model) { 

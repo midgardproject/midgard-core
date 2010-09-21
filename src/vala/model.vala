@@ -29,7 +29,7 @@ namespace MidgardCR {
 		/* properties */
 		public abstract GLib.Type   valuegtype     { get; set; }
 		public abstract string      valuetypename  { get; set; }
-		public abstract GLib.Value  valuedefault   { get; set; }
+		public abstract string	    valuedefault   { get; set; }
 		public abstract string      description     { get; set; }
 		public abstract bool        @private      { get; set; }
 	}
