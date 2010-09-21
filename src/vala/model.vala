@@ -24,12 +24,12 @@ namespace MidgardCR {
 		public abstract ModelReflector get_reflector ();
 	}
 
-	public interface ModelProperty : Model, Executable {
+	public interface ModelProperty : GLib.Object, Model, Executable {
 		
 		/* properties */
-		public abstract GLib.Type   value_gtype     { get; set; }
-		public abstract string      value_typename  { get; set; }
-		public abstract GLib.Value  value_default   { get; set; }
+		public abstract GLib.Type   valuegtype     { get; set; }
+		public abstract string      valuetypename  { get; set; }
+		public abstract GLib.Value  valuedefault   { get; set; }
 		public abstract string      description     { get; set; }
 		public abstract bool        @private      { get; set; }
 	}
