@@ -83,7 +83,31 @@ void midgardcr_test_add_schema_model_tests () {
 	});
 
 	Test.add_func ("/SchemaModel/is_valid", () => {
-		GLib.print (MISS_IMPL);
+		MidgardCR.SchemaModel model = new MidgardCR.SchemaModel (DEFAULT_CLASSNAME);
+		assert (model != null);
+		assert (model.name == DEFAULT_CLASSNAME);
+		string title = "title_property";
+		string foo = "foo_property";
+		
+		/* FAIL */
+		bool invalid_model = model.is_valid ();
+		assert(invalid_model == false);
+
+		/* SUCCESS */
+		MidgardCR.SchemaModelProperty prop_a_model = new MidgardCR.SchemaModelProperty (title, "string", "");
+		assert (prop_a_model != null);
+		MidgardCR.SchemaModelProperty prop_b_model = new MidgardCR.SchemaModelProperty (foo, "string", "");
+		assert (prop_b_model != null);
+
+		bool valid_model = model.is_valid ();
+		assert (valid_model == true);	
+
+		/* FAIL */
+		MidgardCR.SchemaModelProperty prop_c_model = new MidgardCR.SchemaModelProperty (foo, "string", "");
+		assert (prop_c_model != null);
+
+		bool invalid_model_duplicate = model.is_valid ();
+		assert (invalid_model_duplicate == false); 
 	});
 }
 
