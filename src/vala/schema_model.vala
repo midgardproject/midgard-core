@@ -100,12 +100,12 @@ namespace MidgardCR {
 				return false;
 
 			string[] names = new string[0];
-			foreach (MidgardCR.Model model in this._models) {		
+			foreach (MidgardCR.Model model in this._models) {	
 				foreach (string name in names) {
 					if (name == model.name)
 						return false;
-					names += model.name;
 				}
+				names += model.name;
 			}
 			
 			return true;
