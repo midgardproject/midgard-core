@@ -3,7 +3,7 @@ using GLib;
 
 namespace MidgardCR {
 
-	public interface Executable {
+	public interface Executable : GLib.Object {
 
 		public abstract bool execute ();
 	}
