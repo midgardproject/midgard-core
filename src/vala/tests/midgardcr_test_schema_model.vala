@@ -99,11 +99,13 @@ void midgardcr_test_add_schema_model_tests () {
 		MidgardCR.SchemaModelProperty prop_b_model = new MidgardCR.SchemaModelProperty (foo, "string", "");
 		assert (prop_b_model != null);
 
+		model.add_model (prop_a_model).add_model (prop_b_model);
 		bool valid_model = model.is_valid ();
 		assert (valid_model == true);	
 
 		/* FAIL */
 		MidgardCR.SchemaModelProperty prop_c_model = new MidgardCR.SchemaModelProperty (foo, "string", "");
+		model.add_model (prop_c_model);
 		assert (prop_c_model != null);
 
 		bool invalid_model_duplicate = model.is_valid ();
