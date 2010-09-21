@@ -31,6 +31,6 @@ namespace MidgardCR {
 		public abstract string      value_typename  { get; set; }
 		public abstract GLib.Value  value_default   { get; set; }
 		public abstract string      description     { get; set; }
-		public abstract bool        is_private      { get; set; }
+		public abstract bool        @private      { get; set; }
 	}
 }
