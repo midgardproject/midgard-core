@@ -51,7 +51,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmidgardvala_la_DEPENDENCIES =
 am__objects_1 = midgard_config.lo midgard_executable.lo \
 	midgard_namespace.lo midgard_profiler.lo midgard_query.lo \
-	midgard_schema_model_reflector.lo midgard_schema_model.lo \
+	midgard_schema_model_reflector.lo model.lo schema_model.lo \
 	midgard_schema_object.lo midgard_storage_manager_sql.lo \
 	midgard_storage.lo midgard_workspace.lo
 am_libmidgardvala_la_OBJECTS = $(am__objects_1)
@@ -245,7 +245,8 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_profiler.vala \
 			  midgard_query.vala \
 			  midgard_schema_model_reflector.vala \
-			  midgard_schema_model.vala \
+			  model.vala \
+			  schema_model.vala \
 			  midgard_schema_object.vala \
 			  midgard_storage_manager_sql.vala \
 			  midgard_storage.vala \
@@ -322,12 +323,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_namespace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_profiler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_query.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_schema_model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_schema_model_reflector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_schema_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_storage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_storage_manager_sql.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_workspace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schema_model.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
