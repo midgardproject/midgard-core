@@ -89,22 +89,37 @@ namespace MidgardCR {
 		/**
 		 * Check whether model is valid
 		 *
+		 * Conditions to mark model as invalid:
+		 * * models with duplicated names
+		 * * empty models
+		 * 
 		 * @return true if model is valid, false otherwise
 		 */
  		public bool is_valid () { 
-			return false; 
+			if (this._models == null)
+				return false;
+
+			string[] names = new string[0];
+			foreach (MidgardCR.Model model in this._models) {		
+				foreach (string name in names) {
+					if (name == model.name)
+						return false;
+					names += model.name;
+				}
+			}
+			
+			return true;
 		}	
 	}
 
 	/**
 	 * SchemaModelProperty defines property registered for class.
 	 */ 
-	public class SchemaModelProperty : GLib.Object, ModelProperty, Model, Executable {
+	public class SchemaModelProperty : GLib.Object, Model, Executable, ModelProperty {
 
 		/* private properties */
 
 		private Model[] _models = null;
-		private Model[] _parent_models = null;
 
 		/* public properties */
 	
@@ -117,17 +132,17 @@ namespace MidgardCR {
 		 * The type of the property.
 		 * Acceptable name of any type registered in GType system ('string', 'int', 'bool'...).
 		 */ 
-		public string value_typename { get; set; }
+		public string valuetypename { get; set; }
 		
 		/**
 		 * Gtype of the property
 		 */
-		public GLib.Type value_gtype { get; set; }
+		public GLib.Type valuegtype { get; set; }
 
 		/**
 		 * Default value of property for newly created objects
 		 */
-		public GLib.Value value_default { get; set; }
+		public GLib.Value valuedefault { get; set; }
 
 		/**
 		 * Description of the property
@@ -157,7 +172,7 @@ namespace MidgardCR {
 		 * @param value default property's value 
 		 */
 		public SchemaModelProperty (string name, string type, string value) {
-			Object (name: name, value_typename: type, value_default: value);
+			Object (name: name, valuetypename: type, valuedefault: value);
 		} 
 
 		public Model add_model (Model model) { 
