@@ -11,7 +11,7 @@ midgard3_header = $(top_srcdir)/src/core/midgard3.h
 
 libmidgardvala_la_VALASOURCES = \
 			  midgard_config.vala \
-			  midgard_executable.vala \
+			  executable.vala \
 			  midgard_namespace.vala \
 			  midgard_profiler.vala \
 			  midgard_query.vala \
