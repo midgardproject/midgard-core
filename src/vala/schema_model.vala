@@ -46,6 +46,7 @@ namespace MidgardCR {
 		 */	
 		public Model add_model (Model model) { 
 			this._models += model;			
+			model.parent = this;
 			return this; 
 		}
 
@@ -92,23 +93,23 @@ namespace MidgardCR {
 		 * Conditions to mark model as invalid:
 		 * * models with duplicated names
 		 * * empty models
-		 * 
-		 * @return true if model is valid, false otherwise
+		 * 	
 		 */
- 		public bool is_valid () { 
+ 		public void is_valid () throws ValidationError { 
 			if (this._models == null)
-				return false;
+				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("No models associated.");
+
+			/* TODO */
+			/* Check if name does not containt invalid characters */
 
 			string[] names = new string[0];
 			foreach (MidgardCR.Model model in this._models) {	
 				foreach (string name in names) {
 					if (name == model.name)
-						return false;
+						throw new MidgardCR.ValidationError.NAME_INVALID ("Duplicated model name found");
 				}
 				names += model.name;
-			}
-			
-			return true;
+			}	
 		}	
 	}
 
@@ -120,6 +121,8 @@ namespace MidgardCR {
 		/* private properties */
 
 		private Model[] _models = null;
+		private string _typename = null;
+		private GLib.Type _gtype = 0;
 
 		/* public properties */
 	
@@ -127,18 +130,26 @@ namespace MidgardCR {
 		 * Holds the name of property for which model is created
 		 */
 		public string name { get; set; }
-		
+	
+		/**
+		 * Gtype of the property
+		 */
+		public GLib.Type valuegtype { 
+			get { return this._gtype; } 
+		}
+	
 		/**
 		 * The type of the property.
 		 * Acceptable name of any type registered in GType system ('string', 'int', 'bool'...).
 		 */ 
-		public string valuetypename { get; set; }
+		public string valuetypename { 
+			get { return this._typename; }
+			set { 
+				this._typename = value;
+				this._set_gtype_from_name ();
+			}	
+		}
 		
-		/**
-		 * Gtype of the property
-		 */
-		public GLib.Type valuegtype { get; set; }
-
 		/**
 		 * Default value of property for newly created objects
 		 */
@@ -164,6 +175,43 @@ namespace MidgardCR {
 		 */
 		public bool @private { get; set; }
 
+		private void _set_gtype_from_name () {
+			switch (this._typename) {
+				case "string":
+				case "text":
+				case "guid":
+				case "uuid":
+					this._gtype = typeof (string);
+				break;
+
+				case "datetime":
+					this._gtype = typeof (MidgardCR.Timestamp);
+				break;
+
+				case "uint":
+					this._gtype = typeof (uint);
+				break;
+
+				case "int":
+					this._gtype = typeof (int);
+				break;
+
+				case "bool":
+				case "boolean":
+					this._gtype = typeof (bool);
+				break;
+
+				case "float":
+					this._gtype = typeof (float);
+				break;
+
+				default:
+					this._gtype = 0;
+					GLib.warning ("Unhandled '%s' value type", this._typename);
+				break;
+			}	
+		}
+		
 		/**
 		 * Creates new SchemaModelProperty for given property name
 		 *
@@ -173,21 +221,56 @@ namespace MidgardCR {
 		 */
 		public SchemaModelProperty (string name, string type, string dvalue) {
 			Object (name: name, valuetypename: type, valuedefault: dvalue);
+			this._set_gtype_from_name ();	
 		} 
-
+		
 		public Model add_model (Model model) { 
 			this._models += model;
 			return this; 
 		}
 
-		public Model? get_model_by_name (string name) { return null; }
- 		public Model add_parent_model (Model model) { return this; }
- 		public Model? get_parent_model () { return null; }
-		public Model[]? list_models () { return null; }
-		public ModelReflector get_reflector () { return null; } 
-		public bool is_valid () { return false; }
-		public bool execute () { return true; }	
-		public void set_value_gtype (GLib.Type type) { return; }	
+		public Model? get_model_by_name (string name) {
+			if (this._models[0].name == name)
+				return this._models[0];
+ 
+			return null; 
+		}
+
+		public Model[]? list_models () { 
+			return this._models; 
+		}
+
+		public ModelReflector get_reflector () { 
+			return null; 
+		}
+
+		/** 
+		 * Check if SchemaModelProperty is valid
+		 *
+		 * If it's valid, this method silently returns.
+		 * In other case, error is thrown.
+		 */
+		public void is_valid () throws ValidationError { 
+			/* type id or name is empty thus invalid */
+			if ((this.valuetypename == null)
+				|| (this.valuetypename == ""))
+				throw new MidgardCR.ValidationError.NAME_INVALID ("Property's type name is empty"); 
+			if (this.valuegtype == 0) {
+				throw new MidgardCR.ValidationError.TYPE_INVALID ("Property's type is 0");
+			}
+				
+			/* Invalid number of models associated */
+			if (this._models.length > 1)
+				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("More than one reference model set");
+	
+			/* Invalid object associated as model */
+			if (this._models != null && (!(this._models[0] is SchemaModelProperty)))
+				throw new MidgardCR.ValidationError.TYPE_INVALID ("Associated model is not a SchemaModelProperty instance");
+		}
+
+		public bool execute () { 
+			return true; 
+		}		
 	}
 
 	public errordomain SchemaBuilderError {

@@ -1,2 +1,2 @@
 #!/bin/sh
-valac -X -I/usr/local/include/midgard3/midgard -X -L/usr/local/lib -X -lmidgardcr --includedir=/usr/local/include/ --save-temps --pkg MidgardCR-3.0 midgardcr_test.vala midgardcr_test_config.vala midgardcr_test_sql_storage_manager.vala midgardcr_test_schema_model.vala 
+valac -X -I/usr/local/include/midgard3/midgard -X -L/usr/local/lib -X -lmidgardcr --includedir=/usr/local/include/ --save-temps --pkg MidgardCR-3.0 midgardcr_test.vala midgardcr_test_config.vala midgardcr_test_sql_storage_manager.vala midgardcr_test_schema_model.vala midgardcr_test_schema_model_property.vala 

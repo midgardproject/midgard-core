@@ -482,6 +482,7 @@ struct _MidgardCRQueryPropertyClass {
 
 typedef enum  {
 	MIDGARD_CR_VALIDATION_ERROR_NAME_INVALID,
+	MIDGARD_CR_VALIDATION_ERROR_NAME_DUPLICATED,
 	MIDGARD_CR_VALIDATION_ERROR_TYPE_INVALID,
 	MIDGARD_CR_VALIDATION_ERROR_VALUE_INVALID,
 	MIDGARD_CR_VALIDATION_ERROR_REFERENCE_INVALID,
@@ -523,6 +524,7 @@ struct _MidgardCRModelIface {
 	MidgardCRModel* (*get_model_by_name) (MidgardCRModel* self, const char* name);
 	MidgardCRModel** (*list_models) (MidgardCRModel* self, int* result_length1);
 	MidgardCRModelReflector* (*get_reflector) (MidgardCRModel* self);
+	void (*is_valid) (MidgardCRModel* self, GError** error);
 	MidgardCRModel* (*get_parent) (MidgardCRModel* self);
 	void (*set_parent) (MidgardCRModel* self, MidgardCRModel* value);
 	const char* (*get_namespace) (MidgardCRModel* self);
@@ -548,16 +550,15 @@ struct _MidgardCRModelPropertyReflectorIface {
 
 struct _MidgardCRModelPropertyIface {
 	GTypeInterface parent_iface;
-	GType (*get_value_gtype) (MidgardCRModelProperty* self);
-	void (*set_value_gtype) (MidgardCRModelProperty* self, GType value);
-	const char* (*get_value_typename) (MidgardCRModelProperty* self);
-	void (*set_value_typename) (MidgardCRModelProperty* self, const char* value);
-	void (*get_value_default) (MidgardCRModelProperty* self, GValue* value);
-	void (*set_value_default) (MidgardCRModelProperty* self, GValue* value);
+	GType (*get_valuegtype) (MidgardCRModelProperty* self);
+	const char* (*get_valuetypename) (MidgardCRModelProperty* self);
+	void (*set_valuetypename) (MidgardCRModelProperty* self, const char* value);
+	const char* (*get_valuedefault) (MidgardCRModelProperty* self);
+	void (*set_valuedefault) (MidgardCRModelProperty* self, const char* value);
 	const char* (*get_description) (MidgardCRModelProperty* self);
 	void (*set_description) (MidgardCRModelProperty* self, const char* value);
-	gboolean (*get_is_private) (MidgardCRModelProperty* self);
-	void (*set_is_private) (MidgardCRModelProperty* self, gboolean value);
+	gboolean (*get_private) (MidgardCRModelProperty* self);
+	void (*set_private) (MidgardCRModelProperty* self, gboolean value);
 };
 
 struct _MidgardCRSchemaModel {
@@ -919,6 +920,7 @@ MidgardCRModel* midgard_cr_model_add_model (MidgardCRModel* self, MidgardCRModel
 MidgardCRModel* midgard_cr_model_get_model_by_name (MidgardCRModel* self, const char* name);
 MidgardCRModel** midgard_cr_model_list_models (MidgardCRModel* self, int* result_length1);
 MidgardCRModelReflector* midgard_cr_model_get_reflector (MidgardCRModel* self);
+void midgard_cr_model_is_valid (MidgardCRModel* self, GError** error);
 MidgardCRModel* midgard_cr_model_get_parent (MidgardCRModel* self);
 void midgard_cr_model_set_parent (MidgardCRModel* self, MidgardCRModel* value);
 const char* midgard_cr_model_get_namespace (MidgardCRModel* self);
@@ -926,37 +928,21 @@ void midgard_cr_model_set_namespace (MidgardCRModel* self, const char* value);
 const char* midgard_cr_model_get_name (MidgardCRModel* self);
 void midgard_cr_model_set_name (MidgardCRModel* self, const char* value);
 GType midgard_cr_model_property_get_type (void) G_GNUC_CONST;
-GType midgard_cr_model_property_get_value_gtype (MidgardCRModelProperty* self);
-void midgard_cr_model_property_set_value_gtype (MidgardCRModelProperty* self, GType value);
-const char* midgard_cr_model_property_get_value_typename (MidgardCRModelProperty* self);
-void midgard_cr_model_property_set_value_typename (MidgardCRModelProperty* self, const char* value);
-void midgard_cr_model_property_get_value_default (MidgardCRModelProperty* self, GValue* result);
-void midgard_cr_model_property_set_value_default (MidgardCRModelProperty* self, GValue* value);
+GType midgard_cr_model_property_get_valuegtype (MidgardCRModelProperty* self);
+const char* midgard_cr_model_property_get_valuetypename (MidgardCRModelProperty* self);
+void midgard_cr_model_property_set_valuetypename (MidgardCRModelProperty* self, const char* value);
+const char* midgard_cr_model_property_get_valuedefault (MidgardCRModelProperty* self);
+void midgard_cr_model_property_set_valuedefault (MidgardCRModelProperty* self, const char* value);
 const char* midgard_cr_model_property_get_description (MidgardCRModelProperty* self);
 void midgard_cr_model_property_set_description (MidgardCRModelProperty* self, const char* value);
-gboolean midgard_cr_model_property_get_is_private (MidgardCRModelProperty* self);
-void midgard_cr_model_property_set_is_private (MidgardCRModelProperty* self, gboolean value);
+gboolean midgard_cr_model_property_get_private (MidgardCRModelProperty* self);
+void midgard_cr_model_property_set_private (MidgardCRModelProperty* self, gboolean value);
 GType midgard_cr_schema_model_get_type (void) G_GNUC_CONST;
-char* midgard_cr_schema_model_get_name (MidgardCRSchemaModel* self);
-MidgardCRModel* midgard_cr_schema_model_add_parent_model (MidgardCRSchemaModel* self, MidgardCRModel* model);
-MidgardCRModel* midgard_cr_schema_model_get_parent_model (MidgardCRSchemaModel* self);
-gboolean midgard_cr_schema_model_is_valid (MidgardCRSchemaModel* self);
-MidgardCRSchemaModel* midgard_cr_schema_model_new (void);
-MidgardCRSchemaModel* midgard_cr_schema_model_construct (GType object_type);
+MidgardCRSchemaModel* midgard_cr_schema_model_new (const char* name);
+MidgardCRSchemaModel* midgard_cr_schema_model_construct (GType object_type, const char* name);
 GType midgard_cr_schema_model_property_get_type (void) G_GNUC_CONST;
-char* midgard_cr_schema_model_property_get_name (MidgardCRSchemaModelProperty* self);
-MidgardCRModel* midgard_cr_schema_model_property_add_parent_model (MidgardCRSchemaModelProperty* self, MidgardCRModel* model);
-MidgardCRModel* midgard_cr_schema_model_property_get_parent_model (MidgardCRSchemaModelProperty* self);
-gboolean midgard_cr_schema_model_property_is_valid (MidgardCRSchemaModelProperty* self);
-void midgard_cr_schema_model_property_set_value_typename (MidgardCRSchemaModelProperty* self, const char* name);
-void midgard_cr_schema_model_property_set_value_gtype (MidgardCRSchemaModelProperty* self, GType type);
-void midgard_cr_schema_model_property_set_value_default (MidgardCRSchemaModelProperty* self, GValue* value);
-void midgard_cr_schema_model_property_set_private (MidgardCRSchemaModelProperty* self, gboolean toggle);
-void midgard_cr_schema_model_property_set_description (MidgardCRSchemaModelProperty* self, const char* description);
-gboolean midgard_cr_schema_model_property_set_namespace (MidgardCRSchemaModelProperty* self, const char* name);
-char* midgard_cr_schema_model_property_get_namespace (MidgardCRSchemaModelProperty* self);
-MidgardCRSchemaModelProperty* midgard_cr_schema_model_property_new (void);
-MidgardCRSchemaModelProperty* midgard_cr_schema_model_property_construct (GType object_type);
+MidgardCRSchemaModelProperty* midgard_cr_schema_model_property_new (const char* name, const char* type, const char* dvalue);
+MidgardCRSchemaModelProperty* midgard_cr_schema_model_property_construct (GType object_type, const char* name, const char* type, const char* dvalue);
 GQuark midgard_cr_schema_builder_error_quark (void);
 GType midgard_cr_schema_builder_get_type (void) G_GNUC_CONST;
 void midgard_cr_schema_builder_register_model (MidgardCRSchemaBuilder* self, MidgardCRSchemaModel* model, GError** error);

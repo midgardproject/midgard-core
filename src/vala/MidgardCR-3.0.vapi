@@ -76,26 +76,11 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SchemaModel : GLib.Object, MidgardCR.Model {
-		public SchemaModel ();
-		public MidgardCR.Model add_parent_model (MidgardCR.Model model);
-		public string get_name ();
-		public MidgardCR.Model? get_parent_model ();
-		public bool is_valid ();
+		public SchemaModel (string name);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public class SchemaModelProperty : GLib.Object, MidgardCR.Model {
-		public SchemaModelProperty ();
-		public MidgardCR.Model add_parent_model (MidgardCR.Model model);
-		public string get_name ();
-		public string get_namespace ();
-		public MidgardCR.Model? get_parent_model ();
-		public bool is_valid ();
-		public void set_description (string description);
-		public bool set_namespace (string name);
-		public void set_private (bool toggle);
-		public void set_value_default (GLib.Value value);
-		public void set_value_gtype (GLib.Type type);
-		public void set_value_typename (string name);
+	public class SchemaModelProperty : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.ModelProperty {
+		public SchemaModelProperty (string name, string type, string dvalue);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public abstract class SchemaObject : GLib.Object, MidgardCR.Storable {
@@ -127,7 +112,7 @@ namespace MidgardCR {
 		public bool has_workspace (MidgardCR.Workspace workspace);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public interface Executable {
+	public interface Executable : GLib.Object {
 		public abstract bool execute ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
@@ -135,18 +120,19 @@ namespace MidgardCR {
 		public abstract MidgardCR.Model add_model (MidgardCR.Model model);
 		public abstract MidgardCR.Model? get_model_by_name (string name);
 		public abstract MidgardCR.ModelReflector get_reflector ();
+		public abstract void is_valid () throws MidgardCR.ValidationError;
 		public abstract MidgardCR.Model[]? list_models ();
 		public abstract string name { get; set; }
 		public abstract string @namespace { get; set; }
 		public abstract MidgardCR.Model parent { get; set; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public interface ModelProperty : MidgardCR.Model, MidgardCR.Executable {
+	public interface ModelProperty : GLib.Object, MidgardCR.Model, MidgardCR.Executable {
 		public abstract string description { get; set; }
-		public abstract bool is_private { get; set; }
-		public abstract GLib.Value value_default { get; set; }
-		public abstract GLib.Type value_gtype { get; set; }
-		public abstract string value_typename { get; set; }
+		public abstract bool @private { get; set; }
+		public abstract string valuedefault { get; set; }
+		public abstract GLib.Type valuegtype { get; }
+		public abstract string valuetypename { get; set; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface ModelPropertyReflector : MidgardCR.ModelReflector {
@@ -351,6 +337,7 @@ namespace MidgardCR {
 	[CCode (cprefix = "MIDGARD_CR_VALIDATION_ERROR_", cheader_filename = "midgard3.h")]
 	public errordomain ValidationError {
 		NAME_INVALID,
+		NAME_DUPLICATED,
 		TYPE_INVALID,
 		VALUE_INVALID,
 		REFERENCE_INVALID,

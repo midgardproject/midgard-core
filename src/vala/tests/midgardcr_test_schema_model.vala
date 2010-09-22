@@ -1,7 +1,5 @@
 using MidgardCR;
 
-const string DEFAULT_CLASSNAME = "CRFoo";
-
 void midgardcr_test_add_schema_model_tests () {
 
 	/* constructor */
@@ -28,11 +26,10 @@ void midgardcr_test_add_schema_model_tests () {
 	Test.add_func ("/SchemaModel/get_model_by_name", () => {	
 		MidgardCR.SchemaModel model = new MidgardCR.SchemaModel (DEFAULT_CLASSNAME);
 		assert (model != null);
-		assert (model.name == DEFAULT_CLASSNAME);
-		string title = "title_property";
+		assert (model.name == DEFAULT_CLASSNAME);	
 
 		/* SUCCESS */
-		MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (title, "string", "");
+		MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty ("title", "string", "");
 		assert (prop_model != null);
 		
 		model.add_model (prop_model);
@@ -42,9 +39,9 @@ void midgardcr_test_add_schema_model_tests () {
 		assert (not_found_model == null);
 
 		/* SUCCESS */
-		MidgardCR.SchemaModelProperty found_model = model.get_model_by_name (title) as SchemaModelProperty;
+		MidgardCR.SchemaModelProperty found_model = model.get_model_by_name ("title") as SchemaModelProperty;
 		assert (found_model != null);
-		assert (found_model.name == title);
+		assert (found_model.name == "title");
 	});
 
 	Test.add_func ("/SchemaModel/list_models", () => {
@@ -90,8 +87,13 @@ void midgardcr_test_add_schema_model_tests () {
 		string foo = "foo_property";
 		
 		/* FAIL */
-		bool invalid_model = model.is_valid ();
-		assert(invalid_model == false);
+		bool invalid_model = false;
+		try {
+			model.is_valid ();
+		} catch (MidgardCR.ValidationError e) {
+			invalid_model = true;
+		}
+		assert(invalid_model == true);
 
 		/* SUCCESS */
 		MidgardCR.SchemaModelProperty prop_a_model = new MidgardCR.SchemaModelProperty (title, "string", "");
@@ -100,7 +102,12 @@ void midgardcr_test_add_schema_model_tests () {
 		assert (prop_b_model != null);
 
 		model.add_model (prop_a_model).add_model (prop_b_model);
-		bool valid_model = model.is_valid ();
+		bool valid_model = true;
+		try {
+			model.is_valid ();
+		} catch (MidgardCR.ValidationError e) {
+			valid_model = false;
+		}
 		assert (valid_model == true);	
 
 		/* FAIL */
@@ -108,8 +115,13 @@ void midgardcr_test_add_schema_model_tests () {
 		model.add_model (prop_c_model);
 		assert (prop_c_model != null);
 
-		bool invalid_model_duplicate = model.is_valid ();
-		assert (invalid_model_duplicate == false); 
+		bool invalid_model_duplicate = false;
+		try {
+			model.is_valid ();
+		} catch (MidgardCR.ValidationError e) {
+			invalid_model_duplicate = true;
+		}
+		assert (invalid_model_duplicate == true); 
 	});
 }
 
