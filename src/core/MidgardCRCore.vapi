@@ -22,6 +22,6 @@ namespace MidgardCRCore {
 	}
 
 	public class SchemaBuilder {
-		public static void register_types (MidgardCR.SchemaBuilder builder);
+		public static void register_types (MidgardCR.SchemaBuilder builder) throws GLib.Error;
 	}
 }
