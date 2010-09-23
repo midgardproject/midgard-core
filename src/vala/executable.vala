@@ -5,6 +5,6 @@ namespace MidgardCR {
 
 	public interface Executable : GLib.Object {
 
-		public abstract bool execute () throws GLib.Error;
+		public abstract void execute () throws GLib.Error;
 	}
 }
