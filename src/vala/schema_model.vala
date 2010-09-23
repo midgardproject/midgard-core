@@ -268,12 +268,12 @@ namespace MidgardCR {
 				throw new MidgardCR.ValidationError.TYPE_INVALID ("Associated model is not a SchemaModelProperty instance");
 
 			/* Associated model has no parent defined */
-			if (this.models != null && this.models[0].parent == null)
+			if (this._models != null && this._models[0].parent == null)
 				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("Null parent defined for associated model");
 		}
 
-		public bool execute () { 
-			return true; 
+		public void execute () { 
+			return; 
 		}		
 	}
 }
