@@ -89,6 +89,11 @@ void midgardcr_test_add_schema_model_property_tests () {
 		MidgardCR.SchemaModelProperty prop_a_model = new MidgardCR.SchemaModelProperty ("title", "string", "");
 		assert (prop_a_model != null);
 
+		MidgardCR.SchemaModel cmodel = new MidgardCR.SchemaModel (DEFAULT_CLASSNAME);
+                assert (cmodel != null);
+                assert (cmodel.name == DEFAULT_CLASSNAME);
+		prop_a_model.parent = cmodel;
+
 		model.add_model (prop_a_model);
 		bool valid_model = true;
 		try {
