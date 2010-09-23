@@ -393,9 +393,14 @@ struct _MidgardCRConfigClass {
 	GObjectClass parent_class;
 };
 
+typedef enum  {
+	MIDGARD_CR_EXECUTABLE_ERROR_INVALID_DEPENDENCE,
+	MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL
+} MidgardCRExecutableError;
+#define MIDGARD_CR_EXECUTABLE_ERROR midgard_cr_executable_error_quark ()
 struct _MidgardCRExecutableIface {
 	GTypeInterface parent_iface;
-	gboolean (*execute) (MidgardCRExecutable* self);
+	void (*execute) (MidgardCRExecutable* self, GError** error);
 };
 
 typedef enum  {
@@ -586,6 +591,12 @@ typedef enum  {
 struct _MidgardCRSchemaBuilder {
 	GObject parent_instance;
 	MidgardCRSchemaBuilderPrivate * priv;
+	MidgardCRSchemaModel** _models;
+	gint _models_length1;
+	gint __models_size_;
+	MidgardCRSchemaModel** _delayed_models;
+	gint _delayed_models_length1;
+	gint __delayed_models_size_;
 };
 
 struct _MidgardCRSchemaBuilderClass {
@@ -845,8 +856,9 @@ gboolean midgard_cr_config_get_tableupdate (MidgardCRConfig* self);
 void midgard_cr_config_set_tableupdate (MidgardCRConfig* self, gboolean value);
 gboolean midgard_cr_config_get_testunit (MidgardCRConfig* self);
 void midgard_cr_config_set_testunit (MidgardCRConfig* self, gboolean value);
+GQuark midgard_cr_executable_error_quark (void);
 GType midgard_cr_executable_get_type (void) G_GNUC_CONST;
-gboolean midgard_cr_executable_execute (MidgardCRExecutable* self);
+void midgard_cr_executable_execute (MidgardCRExecutable* self, GError** error);
 GQuark midgard_cr_namespace_manager_error_quark (void);
 GType midgard_cr_namespace_manager_get_type (void) G_GNUC_CONST;
 gboolean midgard_cr_namespace_manager_create_uri (MidgardCRNamespaceManager* self, const char* uri, const char* name, GError** error);

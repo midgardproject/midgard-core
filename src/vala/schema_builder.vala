@@ -8,7 +8,8 @@ namespace MidgardCR {
 	public class SchemaBuilder : GLib.Object, Executable {
 
 		/* private properties */
-		private SchemaModel[] _models = null;
+		internal SchemaModel[] _models = null;
+		internal SchemaModel[] _delayed_models = null;
 
 		/* private methods */
 		private void _validate_model (Model model) throws ValidationError {
@@ -29,18 +30,22 @@ namespace MidgardCR {
 			
 			this._validate_model (model);
 
-			/* Delay class registration if inheritance or reference requires this */
+			foreach (MidgardCR.Model registered_model in this._models) {
+				if (registered_model.name == model.name)
+					throw new ValidationError.NAME_DUPLICATED ("%s already registered", model.name);
+			}
 
-			/* TODO, create class entry with GParamSpec array before registering new class */
+			/* TODO Delay class registration if inheritance or reference requires this */
+
+			this._models += model;	
 		}
 
 		public void register_storage_models (StorageManager manager) throws SchemaBuilderError, ValidationError { }
 		public Storable? factory (StorageManager storage, string classname) throws SchemaBuilderError, ValidationError { return null; }
 		public SchemaModel? get_schema_model (string classname) { return null; }
 		
-		public bool execute () { 
+		public void execute () throws ExecutableError { 
 			MidgardCRCore.SchemaBuilder.register_types (this);
-			return false; 
 		}
 	}
 }

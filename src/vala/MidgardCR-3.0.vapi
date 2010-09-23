@@ -113,7 +113,7 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface Executable : GLib.Object {
-		public abstract bool execute ();
+		public abstract void execute () throws MidgardCR.ExecutableError;
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface Model : GLib.Object {
@@ -303,6 +303,11 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface WorkspaceStorage : GLib.Object {
 		public abstract string path { get; construct; }
+	}
+	[CCode (cprefix = "MIDGARD_CR_EXECUTABLE_ERROR_", cheader_filename = "midgard3.h")]
+	public errordomain ExecutableError {
+		INVALID_DEPENDENCE,
+		INTERNAL,
 	}
 	[CCode (cprefix = "MIDGARD_CR_NAMESPACE_MANAGER_ERROR_", cheader_filename = "midgard3.h")]
 	public errordomain NamespaceManagerError {

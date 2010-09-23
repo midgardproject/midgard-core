@@ -18,42 +18,26 @@
  */
 
 #include "midgard_cr_core_schema_builder.h"
+#include "midgard_cr_core_timestamp.h"
+#include "midgard_cr_core_type.h"
 
 typedef struct _MgdSchemaTypeAttr MgdSchemaTypeAttr;
 typedef struct _MgdSchemaPropertyAttr MgdSchemaPropertyAttr;
 
+static void midgard_cr_core_schema_type_attr_free (MgdSchemaTypeAttr *type);
+
 struct _MgdSchemaTypeAttr {
 	gchar *name;
 	guint base_index;
-	guint num_properties;
-	guint class_nprop;
+	guint num_properties;	
 	GParamSpec **params;
 	MgdSchemaPropertyAttr **properties;
-	GHashTable *prophash;
-	GHashTable *tableshash;
+	GHashTable *prophash;	
 	GSList *_properties_list;
-	GParamSpec **storage_params;
-	guint storage_params_count;
-	const gchar *tables;
-	const gchar *table;
-	const gchar *parent;
-	const gchar *primary;
-	const gchar *property_up;
-	const gchar *property_parent;
-      	gchar *parentfield;
-	gchar *upfield;
-	gchar *primaryfield;
 	GSList *children;
-	gchar *sql_select_full;
-	const gchar *unique_name;
 	gchar *copy_from;
 	gchar *extends;
-	GSList *joins;
-	GSList *constraints;
-	gboolean is_view;
-	gchar *sql_create_view;
 	gchar *metadata_class_name;
-	MidgardMetadataClass *metadata_class_ptr;
 	GHashTable *user_values;
 };
 
@@ -64,29 +48,233 @@ struct _MgdSchemaPropertyAttr {
 	GValue *default_value;
 	const gchar *type;
 	const gchar *name;
-	const gchar *dbtype;
-	const gchar *field;
-	gboolean dbindex;
-	const gchar *table;
-	const gchar *tablefield;
-	const gchar *upfield;
-	const gchar *parentfield;
-	const gchar *primaryfield;
 	const gchar *link;
 	const gchar *link_target;
 	gboolean is_link;
 	gboolean is_linked;
-	gboolean is_primary;
-	gboolean is_reversed;
 	gboolean is_private;
 	gboolean is_unique;
 	gchar *description;
 	GHashTable *user_values;
 };
 
+MgdSchemaTypeAttr *
+midgard_cr_core_schema_type_attr_new (void)
+{
+	MgdSchemaTypeAttr *type = g_new (MgdSchemaTypeAttr, 1);
+	type->name = NULL;
+	type->base_index = 0;
+	type->num_properties = 0;
+	type->params = NULL;
+	type->properties = NULL;
+	type->prophash = g_hash_table_new (g_str_hash, g_str_equal);
+	type->_properties_list = NULL;
+	type->children = NULL;
+	type->copy_from = NULL;
+	type->extends = NULL;
+	type->metadata_class_name = NULL;
+	type->user_values = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) midgard_cr_core_schema_type_attr_free);
+
+	return type;
+}
+
+MgdSchemaTypeAttr *
+midgard_cr_core_schema_type_new_from_model (MidgardCRModel *model)
+{
+	g_return_val_if_fail (model != NULL, NULL);
+	g_return_val_if_fail (MIDGARD_CR_IS_SCHEMA_MODEL (model), NULL);
+
+	MgdSchemaTypeAttr *type_attr = midgard_cr_core_schema_type_attr_new ();
+	type_attr->name = g_strdup (midgard_cr_model_get_name (model));
+
+	MidgardCRModel *parent = midgard_cr_model_get_parent (model);
+	if (parent) 
+		type_attr->extends = g_strdup (midgard_cr_model_get_name (parent));
+
+	return type_attr;
+}
+
+void 
+midgard_cr_core_schema_type_attr_free (MgdSchemaTypeAttr *type)
+{
+	g_assert (type != NULL);
+
+	g_free (type->name);
+	type->name = NULL;
+
+	g_hash_table_destroy(type->prophash);
+	type->prophash = NULL;
+
+	if (type->_properties_list)
+		g_slist_free (type->_properties_list);
+	type->_properties_list = NULL;
+
+	g_free (type->params);
+	g_free (type->properties);	
+
+	g_free (type->metadata_class_name);
+	type->metadata_class_name = NULL;
+
+	g_hash_table_destroy (type->user_values);
+        type->user_values = NULL;
+
+	g_free (type);
+
+	type = NULL;
+}
+
+MgdSchemaPropertyAttr *  
+midgard_cr_core_schema_type_property_attr_new (void)
+{
+	MgdSchemaPropertyAttr *prop = g_new(MgdSchemaPropertyAttr, 1); 
+
+	/* Ensure, default type is string */
+	prop->gtype = G_TYPE_NONE;
+	prop->type = NULL;
+
+	prop->name = NULL;	
+	prop->default_value = NULL;
+	prop->link = NULL;
+	prop->link_target = NULL;
+	prop->is_link = FALSE;
+	prop->is_linked = FALSE;
+	prop->is_private = FALSE;
+	prop->is_unique = FALSE;
+	prop->description = NULL;
+	prop->user_values = NULL;
+
+	return prop;
+}
+
+GType
+midgard_cr_core_schema_builder_gtype_from_name (const gchar *name)
+{
+	g_return_val_if_fail (name != NULL, 0);
+
+	if (g_str_equal (name, "string")
+			|| g_str_equal (name, "text")
+			|| g_str_equal (name, "guid")
+			|| g_str_equal (name, "uuid"))
+		return G_TYPE_STRING;
+
+	if (g_str_equal (name, "int"))
+		return G_TYPE_INT;
+
+	if (g_str_equal (name, "uint"))
+		return G_TYPE_UINT;
+
+	if (g_str_equal (name, "bool")
+			|| g_str_equal (name, "boolean"))
+		return G_TYPE_BOOLEAN;
+
+	if (g_str_equal (name, "float"))
+		return G_TYPE_FLOAT;
+
+	if (g_str_equal (name, "datetime"))
+		return MGD_TYPE_TIMESTAMP;
+
+	if (g_str_equal (name, "object"))
+		return G_TYPE_OBJECT;
+
+	return G_TYPE_NONE;
+}
+
+MgdSchemaPropertyAttr *
+midgard_cr_core_schema_type_property_new_from_model (MidgardCRModelProperty *model, MgdSchemaTypeAttr *type_attr)
+{
+	g_return_val_if_fail (model != NULL, NULL);
+	g_return_val_if_fail (MIDGARD_CR_IS_SCHEMA_MODEL_PROPERTY (model), NULL);
+
+	MgdSchemaPropertyAttr *prop_attr = midgard_cr_core_schema_type_property_attr_new ();
+	prop_attr->name = g_strdup (midgard_cr_model_get_name (MIDGARD_CR_MODEL(model)));
+
+	/* type name */
+	prop_attr->type = g_strdup (midgard_cr_model_property_get_valuetypename (model));
+	/* gtype */
+	prop_attr->gtype = midgard_cr_model_property_get_valuegtype (model);
+	/* default value */
+	if (prop_attr->gtype != G_TYPE_OBJECT) {
+		GValue sval = {0, };
+		g_value_init (&sval, G_TYPE_STRING);
+		g_value_set_string (&sval, midgard_cr_model_property_get_valuedefault (model));
+		prop_attr->default_value = g_new0 (GValue, 1);	
+		GType typeid = midgard_cr_core_schema_builder_gtype_from_name (prop_attr->type);
+		g_value_init (prop_attr->default_value, typeid);
+		g_value_transform (&sval, prop_attr->default_value);
+	}
+	/* description */
+	prop_attr->description = g_strdup (midgard_cr_model_property_get_description (model));
+	/* private */
+	prop_attr->is_private = midgard_cr_model_property_get_private (model);
+
+	/* Determine classname if property holds an object */
+	gint n_models;
+	MidgardCRModel **models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (model), &n_models);
+	
+	if (!models)
+		return;
+	MidgardCRModel *parent = midgard_cr_model_get_parent (models[0]);
+
+	if (!parent) {
+		g_warning ("NULL parent model for given '%s' SchemaModelProperty's model", prop_attr->name);
+		g_error ("Invalid model");
+	}
+
+	type_attr->extends = g_strdup (midgard_cr_model_get_name (MIDGARD_CR_MODEL (model)));	
+	g_free (models);
+}
+
+void
+midgard_core_schema_type_property_attr_free (MgdSchemaPropertyAttr *prop)
+{
+	g_assert (prop != NULL);
+	
+	g_free ((gchar *)prop->type);
+	prop->type = NULL;
+
+	g_free ((gchar *)prop->name);
+	prop->name = NULL;
+
+	g_free ((gchar *)prop->link);
+	prop->link = NULL;
+
+	g_free ((gchar *)prop->link_target);
+	prop->link_target = NULL;
+
+	g_free ((gchar *)prop->description);
+	prop->description = NULL;
+
+	g_hash_table_destroy(prop->user_values);
+	prop->user_values = NULL;
+
+	g_free (prop);
+
+	prop = NULL;
+}
+
 void 
 midgard_cr_core_schema_builder_register_types (MidgardCRSchemaBuilder *builder, GError **error)
 {
 	g_return_if_fail (builder != NULL);
 	g_return_if_fail (error == NULL || *error == NULL);
+
+	guint i = 0;
+	MidgardCRSchemaModel **models = builder->_models;
+
+	if (!models)
+		g_error_new_literal (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL, 
+				"No SchemaModel registered for execution");
+
+	GSList *model_list = NULL;
+	while (models[i] != NULL) {
+
+		MgdSchemaTypeAttr *type_attr = midgard_cr_core_schema_type_new_from_model (MIDGARD_CR_MODEL (models[i]));
+		model_list = g_slist_append (model_list, type_attr);
+
+		/* initialize property attributes */
+		
+		/* register classes in GType system */
+		
+		i++;
+	}
 }
