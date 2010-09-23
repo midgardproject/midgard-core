@@ -106,7 +106,7 @@ namespace MidgardCR {
 			foreach (MidgardCR.Model model in this._models) {	
 				foreach (string name in names) {
 					if (name == model.name)
-						throw new MidgardCR.ValidationError.NAME_INVALID ("Duplicated model name found");
+						throw new MidgardCR.ValidationError.NAME_DUPLICATED ("Duplicated model name found");
 				}
 				names += model.name;
 			}	
@@ -266,25 +266,14 @@ namespace MidgardCR {
 			/* Invalid object associated as model */
 			if (this._models != null && (!(this._models[0] is SchemaModelProperty)))
 				throw new MidgardCR.ValidationError.TYPE_INVALID ("Associated model is not a SchemaModelProperty instance");
+
+			/* Associated model has no parent defined */
+			if (this.models != null && this.models[0].parent == null)
+				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("Null parent defined for associated model");
 		}
 
 		public bool execute () { 
 			return true; 
 		}		
-	}
-
-	public errordomain SchemaBuilderError {
-		NAME_EXISTS
-	}
-
-	public class SchemaBuilder : GLib.Object, Executable {
-
-		/* methods */
-		public void register_model (SchemaModel model) throws SchemaBuilderError, ValidationError { }
-		public void register_storage_models (StorageManager manager) throws SchemaBuilderError, ValidationError { }
-		public Storable? factory (StorageManager storage, string classname) throws SchemaBuilderError, ValidationError { return null; }
-		public SchemaModel? get_schema_model (string classname) { return null; }
-		
-		public bool execute () { return false; }
 	}
 }
