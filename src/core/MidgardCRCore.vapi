@@ -20,4 +20,8 @@ namespace MidgardCRCore {
 		public static bool close (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
 		public static bool initialize_storage (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
 	}
+
+	public class SchemaBuilder {
+		public static void register_types (MidgardCR.SchemaBuilder builder);
+	}
 }
