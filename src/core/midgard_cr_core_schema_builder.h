@@ -24,6 +24,41 @@
 #include "midgard3.h"
 #include "midgard_local.h"
 
+typedef struct _MgdSchemaTypeAttr MgdSchemaTypeAttr;
+typedef struct _MgdSchemaPropertyAttr MgdSchemaPropertyAttr;
+
+struct _MgdSchemaTypeAttr {
+	gchar *name;
+	guint base_index;
+	guint num_properties;	
+	GParamSpec **params;
+	MgdSchemaPropertyAttr **properties;
+	GHashTable *prophash;	
+	GSList *_properties_list;
+	GSList *children;
+	gchar *copy_from;
+	gchar *extends;
+	gchar *metadata_class_name;
+	GHashTable *user_values;
+};
+
+struct _MgdSchemaPropertyAttr {
+	GType gtype;
+	GValue value;
+	guint8 access_flags;
+	GValue *default_value;
+	const gchar *type;
+	const gchar *name;
+	const gchar *link;
+	const gchar *link_target;
+	gboolean is_link;
+	gboolean is_linked;
+	gboolean is_private;
+	gboolean is_unique;
+	gchar *description;
+	GHashTable *user_values;
+};
+
 void midgard_cr_core_schema_builder_register_type (MidgardCRSchemaBuilder *builder, GError **error);
 
 #endif /* _MIDGARD_CR_CORE_SCHEMA_BUILDER_H_ */

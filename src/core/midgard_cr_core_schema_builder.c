@@ -21,42 +21,7 @@
 #include "midgard_cr_core_timestamp.h"
 #include "midgard_cr_core_type.h"
 
-typedef struct _MgdSchemaTypeAttr MgdSchemaTypeAttr;
-typedef struct _MgdSchemaPropertyAttr MgdSchemaPropertyAttr;
-
 static void midgard_cr_core_schema_type_attr_free (MgdSchemaTypeAttr *type);
-
-struct _MgdSchemaTypeAttr {
-	gchar *name;
-	guint base_index;
-	guint num_properties;	
-	GParamSpec **params;
-	MgdSchemaPropertyAttr **properties;
-	GHashTable *prophash;	
-	GSList *_properties_list;
-	GSList *children;
-	gchar *copy_from;
-	gchar *extends;
-	gchar *metadata_class_name;
-	GHashTable *user_values;
-};
-
-struct _MgdSchemaPropertyAttr {
-	GType gtype;
-	GValue value;
-	guint8 access_flags;
-	GValue *default_value;
-	const gchar *type;
-	const gchar *name;
-	const gchar *link;
-	const gchar *link_target;
-	gboolean is_link;
-	gboolean is_linked;
-	gboolean is_private;
-	gboolean is_unique;
-	gchar *description;
-	GHashTable *user_values;
-};
 
 MgdSchemaTypeAttr *
 midgard_cr_core_schema_type_attr_new (void)
@@ -212,7 +177,7 @@ midgard_cr_core_schema_type_property_new_from_model (MidgardCRModelProperty *mod
 	MidgardCRModel **models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (model), &n_models);
 	
 	if (!models)
-		return;
+		return prop_attr;
 	MidgardCRModel *parent = midgard_cr_model_get_parent (models[0]);
 
 	if (!parent) {
@@ -222,6 +187,8 @@ midgard_cr_core_schema_type_property_new_from_model (MidgardCRModelProperty *mod
 
 	type_attr->extends = g_strdup (midgard_cr_model_get_name (MIDGARD_CR_MODEL (model)));	
 	g_free (models);
+
+	return prop_attr;
 }
 
 void
@@ -272,9 +239,64 @@ midgard_cr_core_schema_builder_register_types (MidgardCRSchemaBuilder *builder, 
 		model_list = g_slist_append (model_list, type_attr);
 
 		/* initialize property attributes */
+		guint n_props;
+		guint j = 0;
+		MidgardCRModel **property_models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (models[i]), &n_props);
+		if (!property_models) {
+			i++;
+			continue;
+		}
 		
+		type_attr->properties = g_new (MgdSchemaPropertyAttr*, n_props+1);
+		type_attr->properties[n_props+1] = NULL;
+		type_attr->num_properties = n_props;
+		type_attr->params = g_new (GParamSpec *, n_props+1);
+
+		while (property_models[j] != NULL) {
+			MgdSchemaPropertyAttr *tmp_prop =
+				midgard_cr_core_schema_type_property_new_from_model (MIDGARD_CR_MODEL_PROPERTY (property_models[j]), type_attr);
+			GType ptype = tmp_prop->gtype;
+			const gchar *property = (const gchar *)tmp_prop->name;
+			const gchar *nick = "fixme";
+			const gchar *descr = (const gchar *) tmp_prop->description;
+
+			if (ptype == G_TYPE_STRING) {
+				type_attr->params[j] = g_param_spec_string (
+					property, nick, descr,
+					"",  G_PARAM_READWRITE);
+			} else if (ptype == MGD_TYPE_TIMESTAMP) {
+				type_attr->params[j] = g_param_spec_boxed (
+					property, nick, descr,
+					MGD_TYPE_TIMESTAMP, G_PARAM_READWRITE);
+			} else if (ptype == G_TYPE_UINT) {
+				type_attr->params[j] = g_param_spec_uint (
+					property, nick, descr,
+					0, G_MAXUINT32, 0, G_PARAM_READWRITE);
+			} else if (ptype == G_TYPE_INT) {
+				type_attr->params[j] = g_param_spec_int (
+					property, nick, descr,
+					G_MININT32, G_MAXINT32, 0, G_PARAM_READWRITE);
+			} else if (ptype == G_TYPE_FLOAT) {
+				type_attr->params[j] = g_param_spec_float (
+						property, nick, descr,
+						-G_MAXFLOAT, G_MAXFLOAT, 0, G_PARAM_READWRITE);
+			} else if (ptype == G_TYPE_BOOLEAN) {
+				type_attr->params[j] = g_param_spec_boolean (
+						property, nick, descr,
+						FALSE, G_PARAM_READWRITE);
+			} else {
+				type_attr->params[j] = g_param_spec_string (
+					property, nick, descr,
+					"", G_PARAM_READWRITE);
+			}
+	
+			type_attr->properties[j] = tmp_prop;
+
+			j++;
+		}
+
 		/* register classes in GType system */
-		
+		midgard_cr_core_schema_object_register_type (type_attr, MIDGARD_CR_TYPE_SCHEMA_OBJECT);	
 		i++;
 	}
 }
