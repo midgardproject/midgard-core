@@ -26,7 +26,7 @@ namespace MidgardCR {
 		/**
 		 * Parent model of an instance.
 		 */
-		public Model parent { get; set; }
+		public Model? parent { get; set; }
 
 		/**
 		 * Creates new SchemaModel for given classname
@@ -74,7 +74,7 @@ namespace MidgardCR {
 		 *
 		 * @return array of {@link Model} objects, or null if none associated
 		 */
-		public Model[]? list_models () { 
+		public unowned Model[]? list_models () { 
 			return this._models; 
 		}
 		
@@ -168,7 +168,7 @@ namespace MidgardCR {
 		/**
 		 * Parent model
 		 */
-		public Model parent { get; set; }
+		public Model? parent { get; set; }
 
 		/**
 		 * Marks property as private 
@@ -236,7 +236,7 @@ namespace MidgardCR {
 			return null; 
 		}
 
-		public Model[]? list_models () { 
+		public unowned Model[]? list_models () { 
 			return this._models; 
 		}
 

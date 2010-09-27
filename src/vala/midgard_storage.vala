@@ -79,12 +79,9 @@ namespace MidgardCR {
 		public abstract StorageManager   storage_manager   { get; } // FIXME: is this really needed?
 
 		/* methods */
-
 		public abstract StorageModel create_storage_model (SchemaModel schema_model, string location);
-		public abstract StorageModel[]? list_storage_models ();
-		public abstract StorageModel? get_model_by_name (string name);
-		public abstract SchemaModel[]? list_schema_models ();
-		public abstract SchemaModel? get_schema_model_by_name (string name);
+		public abstract unowned StorageModel[]? list_storage_models ();	
+		public abstract unowned SchemaModel[]? list_schema_models ();
 	}
 
 	public errordomain StorageContentManagerError {

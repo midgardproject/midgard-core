@@ -110,5 +110,11 @@ void midgardcr_test_add_schema_builder_tests () {
 		assert (tp != "");
 		assert (tp == property_value);
 	});
+
+	/* factory */
+	Test.add_func ("/SchemaBuilder/factory", () => {
+		GLib.print (MISS_IMPL);
+	});
+
 }
 

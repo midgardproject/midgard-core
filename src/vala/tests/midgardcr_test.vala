@@ -10,5 +10,6 @@ void main (string[] args) {
 	midgardcr_test_add_schema_model_tests ();
 	midgardcr_test_add_schema_model_property_tests ();
 	midgardcr_test_add_schema_builder_tests ();
+	midgardcr_test_add_sql_storage_model_manager_tests ();
 	Test.run ();
 }

@@ -22,7 +22,9 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_schema_object.vala \
 			  midgard_storage_manager_sql.vala \
 			  midgard_storage.vala \
-			  midgard_workspace.vala
+			  midgard_workspace.vala \
+			  sql_storage_model_manager.vala \
+			  $(NULL)
 
 libmidgardvala_la_SOURCES = \
 			  libmidgardvala.vala.stamp \

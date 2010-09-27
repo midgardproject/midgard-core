@@ -54,11 +54,13 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageManager : GLib.Object, MidgardCR.StorageManager {
-		protected GLib.Object _cnc;
-		protected GLib.Object _parser;
 		public SQLStorageManager (string name, MidgardCR.Config config) throws MidgardCR.StorageManagerError;
 		public MidgardCR.Config config { get; construct; }
 		public string name { get; construct; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLStorageModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
+		public SQLStorageModelManager ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLWorkspaceManager : MidgardCR.StorageWorkspaceManager, MidgardCR.SQLStorageManager {
@@ -121,10 +123,10 @@ namespace MidgardCR {
 		public abstract MidgardCR.Model? get_model_by_name (string name);
 		public abstract MidgardCR.ModelReflector get_reflector ();
 		public abstract void is_valid () throws MidgardCR.ValidationError;
-		public abstract MidgardCR.Model[]? list_models ();
+		public abstract unowned MidgardCR.Model[]? list_models ();
 		public abstract string name { get; set; }
 		public abstract string @namespace { get; set; }
-		public abstract MidgardCR.Model parent { get; set; }
+		public abstract MidgardCR.Model? parent { get; set; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface ModelProperty : GLib.Object, MidgardCR.Model, MidgardCR.Executable {
@@ -273,10 +275,8 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageModelManager : MidgardCR.Model, MidgardCR.StorageExecutor {
 		public abstract MidgardCR.StorageModel create_storage_model (MidgardCR.SchemaModel schema_model, string location);
-		public abstract MidgardCR.StorageModel? get_model_by_name (string name);
-		public abstract MidgardCR.SchemaModel? get_schema_model_by_name (string name);
-		public abstract MidgardCR.SchemaModel[]? list_schema_models ();
-		public abstract MidgardCR.StorageModel[]? list_storage_models ();
+		public abstract unowned MidgardCR.SchemaModel[]? list_schema_models ();
+		public abstract unowned MidgardCR.StorageModel[]? list_storage_models ();
 		public abstract MidgardCR.NamespaceManager namespace_manager { get; }
 		public abstract MidgardCR.StorageManager storage_manager { get; }
 	}
@@ -348,6 +348,7 @@ namespace MidgardCR {
 		REFERENCE_INVALID,
 		PARENT_INVALID,
 		LOCATION_INVALID,
+		INTERNAL,
 	}
 	[CCode (cprefix = "MIDGARD_CR_WORKSPACE_STORAGE_ERROR_", cheader_filename = "midgard3.h")]
 	public errordomain WorkspaceStorageError {

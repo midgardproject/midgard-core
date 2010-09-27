@@ -12,11 +12,11 @@ namespace MidgardCR {
 		private Profiler _profiler = null;
 		private Transaction _transaction = null;
 		private StorageWorkspaceManager _workspace_manager = null;
-		private StorageModelManager _model_manager = null;
+		private SQLStorageModelManager _model_manager = null;
 
-		/* protected properties */
-		protected GLib.Object _cnc = null; /* <protected> */
-		protected GLib.Object _parser = null;
+		/* internal properties */
+		internal GLib.Object _cnc = null; /* <protected> */
+		internal GLib.Object _parser = null;
 
 		/* public properties */
 		public string name { 
@@ -49,8 +49,14 @@ namespace MidgardCR {
 			get { return _workspace_manager; }
 		}
 
-		public StorageModelManager model_manager {
-			get { return _model_manager; }
+		public unowned StorageModelManager model_manager {
+			get { 
+				if (this._model_manager == null) {
+					this._model_manager = new MidgardCR.SQLStorageModelManager ();	
+					this._model_manager._storage_manager = this;
+				}
+				return (MidgardCR.StorageModelManager)this._model_manager; 
+			}
 		}	
 
 		/**

@@ -59,7 +59,6 @@ cnc_add_part (GString *cnc, const gchar *name, const gchar *value, const gchar *
 	}
 }
 
-
 gboolean 
 midgard_cr_core_sql_storage_manager_open (MidgardCRSQLStorageManager *self, GError **error)
 {

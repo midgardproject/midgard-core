@@ -382,6 +382,17 @@ typedef struct _MidgardCRSQLWorkspaceManager MidgardCRSQLWorkspaceManager;
 typedef struct _MidgardCRSQLWorkspaceManagerClass MidgardCRSQLWorkspaceManagerClass;
 typedef struct _MidgardCRSQLWorkspaceManagerPrivate MidgardCRSQLWorkspaceManagerPrivate;
 
+#define MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER (midgard_cr_sql_storage_model_manager_get_type ())
+#define MIDGARD_CR_SQL_STORAGE_MODEL_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER, MidgardCRSQLStorageModelManager))
+#define MIDGARD_CR_SQL_STORAGE_MODEL_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER, MidgardCRSQLStorageModelManagerClass))
+#define MIDGARD_CR_IS_SQL_STORAGE_MODEL_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER))
+#define MIDGARD_CR_IS_SQL_STORAGE_MODEL_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER))
+#define MIDGARD_CR_SQL_STORAGE_MODEL_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER, MidgardCRSQLStorageModelManagerClass))
+
+typedef struct _MidgardCRSQLStorageModelManager MidgardCRSQLStorageModelManager;
+typedef struct _MidgardCRSQLStorageModelManagerClass MidgardCRSQLStorageModelManagerClass;
+typedef struct _MidgardCRSQLStorageModelManagerPrivate MidgardCRSQLStorageModelManagerPrivate;
+
 struct _MidgardCRConfig {
 	GObject parent_instance;
 	MidgardCRConfigPrivate * priv;
@@ -492,7 +503,8 @@ typedef enum  {
 	MIDGARD_CR_VALIDATION_ERROR_VALUE_INVALID,
 	MIDGARD_CR_VALIDATION_ERROR_REFERENCE_INVALID,
 	MIDGARD_CR_VALIDATION_ERROR_PARENT_INVALID,
-	MIDGARD_CR_VALIDATION_ERROR_LOCATION_INVALID
+	MIDGARD_CR_VALIDATION_ERROR_LOCATION_INVALID,
+	MIDGARD_CR_VALIDATION_ERROR_INTERNAL
 } MidgardCRValidationError;
 #define MIDGARD_CR_VALIDATION_ERROR midgard_cr_validation_error_quark ()
 struct _MidgardCRQueryExecutorIface {
@@ -658,9 +670,7 @@ struct _MidgardCRStorageModelManagerIface {
 	GTypeInterface parent_iface;
 	MidgardCRStorageModel* (*create_storage_model) (MidgardCRStorageModelManager* self, MidgardCRSchemaModel* schema_model, const char* location);
 	MidgardCRStorageModel** (*list_storage_models) (MidgardCRStorageModelManager* self, int* result_length1);
-	MidgardCRStorageModel* (*get_model_by_name) (MidgardCRStorageModelManager* self, const char* name);
 	MidgardCRSchemaModel** (*list_schema_models) (MidgardCRStorageModelManager* self, int* result_length1);
-	MidgardCRSchemaModel* (*get_schema_model_by_name) (MidgardCRStorageModelManager* self, const char* name);
 	MidgardCRNamespaceManager* (*get_namespace_manager) (MidgardCRStorageModelManager* self);
 	MidgardCRStorageManager* (*get_storage_manager) (MidgardCRStorageModelManager* self);
 };
@@ -805,6 +815,26 @@ struct _MidgardCRSQLWorkspaceManager {
 
 struct _MidgardCRSQLWorkspaceManagerClass {
 	MidgardCRSQLStorageManagerClass parent_class;
+};
+
+struct _MidgardCRSQLStorageModelManager {
+	GObject parent_instance;
+	MidgardCRSQLStorageModelManagerPrivate * priv;
+	MidgardCRStorageManager* _storage_manager;
+	MidgardCRNamespaceManager* _ns_manager;
+	MidgardCRStorageModel** _storage_models;
+	gint _storage_models_length1;
+	gint __storage_models_size_;
+	MidgardCRSchemaModel** _schema_models;
+	gint _schema_models_length1;
+	gint __schema_models_size_;
+	MidgardCRModel** _models;
+	gint _models_length1;
+	gint __models_size_;
+};
+
+struct _MidgardCRSQLStorageModelManagerClass {
+	GObjectClass parent_class;
 };
 
 
@@ -1027,9 +1057,7 @@ void midgard_cr_storage_executor_prepare_remove (MidgardCRStorageExecutor* self,
 void midgard_cr_storage_executor_prepare_purge (MidgardCRStorageExecutor* self, GError** error);
 MidgardCRStorageModel* midgard_cr_storage_model_manager_create_storage_model (MidgardCRStorageModelManager* self, MidgardCRSchemaModel* schema_model, const char* location);
 MidgardCRStorageModel** midgard_cr_storage_model_manager_list_storage_models (MidgardCRStorageModelManager* self, int* result_length1);
-MidgardCRStorageModel* midgard_cr_storage_model_manager_get_model_by_name (MidgardCRStorageModelManager* self, const char* name);
 MidgardCRSchemaModel** midgard_cr_storage_model_manager_list_schema_models (MidgardCRStorageModelManager* self, int* result_length1);
-MidgardCRSchemaModel* midgard_cr_storage_model_manager_get_schema_model_by_name (MidgardCRStorageModelManager* self, const char* name);
 MidgardCRNamespaceManager* midgard_cr_storage_model_manager_get_namespace_manager (MidgardCRStorageModelManager* self);
 MidgardCRStorageManager* midgard_cr_storage_model_manager_get_storage_manager (MidgardCRStorageModelManager* self);
 MidgardCRStorageManager* midgard_cr_storage_content_manager_get_storage_manager (MidgardCRStorageContentManager* self);
@@ -1070,6 +1098,9 @@ gboolean midgard_cr_sql_workspace_manager_workspace_create (MidgardCRSQLWorkspac
 gboolean midgard_cr_sql_workspace_manager_workspace_exists (MidgardCRSQLWorkspaceManager* self, MidgardCRWorkspaceStorage* workspace, GError** error);
 MidgardCRSQLWorkspaceManager* midgard_cr_sql_workspace_manager_new (const char* name, MidgardCRConfig* config);
 MidgardCRSQLWorkspaceManager* midgard_cr_sql_workspace_manager_construct (GType object_type, const char* name, MidgardCRConfig* config);
+GType midgard_cr_sql_storage_model_manager_get_type (void) G_GNUC_CONST;
+MidgardCRSQLStorageModelManager* midgard_cr_sql_storage_model_manager_new (void);
+MidgardCRSQLStorageModelManager* midgard_cr_sql_storage_model_manager_construct (GType object_type);
 
 
 G_END_DECLS
