@@ -19,6 +19,7 @@
 #include "midgard_cr_core_storage_sql.h"
 #include "midgard_cr_core_type.h"
 #include "midgard_cr_core_timestamp.h"
+#include <sql-parser/gda-sql-parser.h>
 
 #define COLTYPE_INT 	"int"
 #define COLTYPE_DATE	"datetime"
@@ -644,7 +645,6 @@ midgard_core_storage_sql_index_remove (GdaConnection *cnc, MgdCoreStorageSQLColu
 
 #define COLUMN_PK_DEFAULT "id"
 
-#define TABLE_NAME_SCHEMA "midgard_schema_type"
 #define TABLE_NAME_SCHEMA_DESCRIPTION "Stores names of all GObject derived classes registered with Midgard Content Repository"
 #define TABLE_NAME_SCHEMA_PROPERTIES "midgard_schema_type_properties"
 #define TABLE_NAME_SCHEMA_PROPERTIES_DESCRIPTION "Stores names of all properties registered for Midgard Content Repository classes"
@@ -685,8 +685,6 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* EXTENDS */
 	column_name = "extends";
-
-	/* CLASS NAME */
 	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
@@ -711,8 +709,8 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 	/* Create columns */
 
 	/* CLASS */
-	column_name = "class";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
+	column_name = "class_name";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -722,7 +720,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 	midgard_core_storage_sql_column_reset (&mdc);
 
 	/* NAME */
-	column_name = "name";
+	column_name = "property_name";
 	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
@@ -787,6 +785,17 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	midgard_core_storage_sql_column_reset (&mdc);
 
+	/* PROPERTY NICK */
+	column_name = "property_nick";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
 	/* DESCRIPTION */
 	column_name = "description";
 	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MGD_TYPE_LONGTEXT);
@@ -799,7 +808,6 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 	return TRUE;
 }
 
-#define TABLE_NAME_MAPPER "midgard_mapper_type"
 #define TABLE_NAME_MAPPER_DESCRIPTION "Stores names of all tables used as storage for Midgard Content Repository classes"
 #define TABLE_NAME_MAPPER_PROPERTIES "midgard_mapper_columns"
 #define TABLE_NAME_MAPPER_PROPERTIES_DESCRIPTION "Stores names of all columns used as storage for Midgard Content Repository objects"
@@ -896,7 +904,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 	midgard_core_storage_sql_column_reset (&mdc);
 
 	/* TABLE */
-	column_name = "table";
+	column_name = "table_name";
 	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
@@ -1011,9 +1019,36 @@ midgard_core_storage_sql_create_base_tables (GdaConnection *cnc, GError **error)
 }
 
 gint 
-midgard_core_storage_sql_query_execute (GdaConnection *cnc, const gchar *query, gboolean ignore_error, GError **error)
+midgard_core_storage_sql_query_execute (GdaConnection *cnc, GdaSqlParser *parser, const gchar *query, GError **error)
 {
+	g_return_val_if_fail (cnc != NULL, -1);
+	g_return_val_if_fail (query != NULL, -1);
+	g_return_val_if_fail (error == NULL || *error == NULL, -1);
+	
+	GdaStatement *stmt;
+	GdaSqlParser *local_parser;
+	GError *err = NULL;
+	
+	if (!parser)
+		local_parser = gda_connection_create_parser (cnc);
+	if (!local_parser)
+		local_parser = gda_sql_parser_new ();
 
+	stmt = gda_sql_parser_parse_string (parser, query, NULL, &err);
+	if (err) {
+		g_propagate_error (error, err);
+		if (stmt)
+			g_object_unref (stmt);
+		return -1;
+	}
+
+	gint nr = gda_connection_statement_execute_non_select (cnc, stmt, NULL, NULL, &err);
+	g_object_unref (stmt);
+
+	if (err)
+		g_propagate_error (error, err);
+
+	return nr;
 }
 
 GdaDataModel *

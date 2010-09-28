@@ -15,7 +15,7 @@ namespace MidgardCR {
 		private SQLStorageModelManager _model_manager = null;
 
 		/* internal properties */
-		internal GLib.Object _cnc = null; /* <protected> */
+		internal GLib.Object _cnc = null; 
 		internal GLib.Object _parser = null;
 
 		/* public properties */

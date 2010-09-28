@@ -405,7 +405,9 @@ struct _MidgardCRConfigClass {
 };
 
 typedef enum  {
-	MIDGARD_CR_EXECUTABLE_ERROR_INVALID_DEPENDENCE,
+	MIDGARD_CR_EXECUTABLE_ERROR_DEPENDENCE_INVALID,
+	MIDGARD_CR_EXECUTABLE_ERROR_COMMAND_INVALID,
+	MIDGARD_CR_EXECUTABLE_ERROR_COMMAND_INVALID_DATA,
 	MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL
 } MidgardCRExecutableError;
 #define MIDGARD_CR_EXECUTABLE_ERROR midgard_cr_executable_error_quark ()
@@ -820,7 +822,7 @@ struct _MidgardCRSQLWorkspaceManagerClass {
 struct _MidgardCRSQLStorageModelManager {
 	GObject parent_instance;
 	MidgardCRSQLStorageModelManagerPrivate * priv;
-	MidgardCRStorageManager* _storage_manager;
+	MidgardCRSQLStorageManager* _storage_manager;
 	MidgardCRNamespaceManager* _ns_manager;
 	MidgardCRStorageModel** _storage_models;
 	gint _storage_models_length1;
@@ -831,6 +833,7 @@ struct _MidgardCRSQLStorageModelManager {
 	MidgardCRModel** _models;
 	gint _models_length1;
 	gint __models_size_;
+	GSList* _query_slist;
 };
 
 struct _MidgardCRSQLStorageModelManagerClass {

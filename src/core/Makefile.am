@@ -13,6 +13,7 @@ libmidgardcore_la_SOURCES = \
 			    midgard_cr_core_timestamp.c \
 			    midgard_cr_core_schema_builder.c \
 			    midgard_cr_core_schema_object.c \
+			    midgard_cr_core_sql_storage_model_manager.c \
 			    $(NULL)
 
 libmidgardcore_la_LDFLAGS = -module -export-dynamic

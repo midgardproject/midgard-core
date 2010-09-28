@@ -4,11 +4,12 @@ namespace MidgardCR {
 	public class SQLStorageModelManager : GLib.Object, Model, Executable, StorageExecutor, StorageModelManager {
 
 		/* internal properties */
-		internal StorageManager _storage_manager = null;
+		internal SQLStorageManager _storage_manager = null;
 		internal NamespaceManager _ns_manager = null;
 		internal StorageModel[] _storage_models = null;
 		internal SchemaModel[] _schema_models = null;
 		internal Model[] _models = null;
+		internal GLib.SList _query_slist = null;
 
 		/* Model properties */
 		/**
@@ -43,6 +44,13 @@ namespace MidgardCR {
 		public StorageManager storage_manager   { 
 			get { return null; } 
 		} 		
+
+		/* destructor */
+		~SQLStorageModelManager () {
+			if (this._query_slist != null) {
+				this._query_slist.foreach (GLib.free);
+			}	
+		}
 
 		/* Model methods */
 		/**
@@ -124,7 +132,7 @@ namespace MidgardCR {
 		 * Prepares create operation for all associated models.
 		 * Valid SQL query (or prepared statement) is generated 
 		 * in this method, so every model added after this method 
-		 * call will be ignored and no its data will be included in 
+		 * call will be ignored and none of its data will be included in 
 		 * executed query.
 		 */
 		public void prepare_create () throws ValidationError {
@@ -133,7 +141,8 @@ namespace MidgardCR {
 			foreach (Model model in this._models) {
 				if (this._model_in_models ((Model[])this._schema_models, model.name))
 					throw new MidgardCR.ValidationError.NAME_DUPLICATED ("%s class already exists in schema table", model.name); 
-			}		
+			}	
+			MidgardCRCore.SQLStorageModelManager.prepare_create (this);	
 		}
 
 		private void _model_exists_in_storage () throws ValidationError {
@@ -189,12 +198,20 @@ namespace MidgardCR {
 
 		/* Executable methods */
 		/**
-		 * Executes SQL query generated in one of prepare methods.
-		 * This method doesn't executes multiple queries of different types, so 
-		 * execute should be invoked for every prepare method.
+		 * Perform prepared operations.
+		 *
+		 * Executes SQL query (or queries) generated in prepare methods.
+		 * There is no need to invoke execute per every prepare method.
+		 * Any prepared query (or prepared statement) is kept and executed
+		 * in this method, so there's no limit how many SQL queries might be 
+		 * executed for underlying SQL storage engine.
 		 */
 		public void execute () throws ExecutableError {
-
+			if (this._query_slist == null 
+				|| (this._query_slist != null && this._query_slist.length() == 0))
+				throw new MidgardCR.ExecutableError.COMMAND_INVALID_DATA ("No single prepared operation found");
+			MidgardCRCore.SQLStorageModelManager.execute (this);
+			this._query_slist.foreach (GLib.free);
 		}
 
 		/* methods */

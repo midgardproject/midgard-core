@@ -306,7 +306,9 @@ namespace MidgardCR {
 	}
 	[CCode (cprefix = "MIDGARD_CR_EXECUTABLE_ERROR_", cheader_filename = "midgard3.h")]
 	public errordomain ExecutableError {
-		INVALID_DEPENDENCE,
+		DEPENDENCE_INVALID,
+		COMMAND_INVALID,
+		COMMAND_INVALID_DATA,
 		INTERNAL,
 	}
 	[CCode (cprefix = "MIDGARD_CR_NAMESPACE_MANAGER_ERROR_", cheader_filename = "midgard3.h")]

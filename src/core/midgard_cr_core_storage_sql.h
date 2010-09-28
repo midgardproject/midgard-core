@@ -21,6 +21,11 @@
 
 #include <libgda/libgda.h>
 
+#define TABLE_NAME_MAPPER "midgard_mapper_type"
+#define TABLE_NAME_MAPPER_PROPERTIES "midgard_mapper_columns"
+#define TABLE_NAME_SCHEMA "midgard_schema_type"
+#define TABLE_NAME_SCHEMA_PROPERTIES "midgard_schema_type_properties"
+
 typedef struct _MgdCoreStorageSQLColumn MgdCoreStorageSQLColumn;
 
 struct _MgdCoreStorageSQLColumn {
@@ -40,7 +45,7 @@ struct _MgdCoreStorageSQLColumn {
 void midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *fieldname, GType fieldtype);
 void midgard_core_storage_sql_column_reset (MgdCoreStorageSQLColumn *mdc);
 
-gint midgard_core_storage_sql_query_execute (GdaConnection *cnc, const gchar *query, gboolean ignore_error, GError **error);
+gint midgard_core_storage_sql_query_execute (GdaConnection *cnc, GdaSqlParser *parser, const gchar *query, GError **error);
 
 GdaDataModel *midgard_core_storage_sql_get_model (GdaConnection *cnc, const gchar *query);
 

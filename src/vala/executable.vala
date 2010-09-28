@@ -4,7 +4,9 @@ using GLib;
 namespace MidgardCR {
 
 	public errordomain ExecutableError {
-		INVALID_DEPENDENCE,
+		DEPENDENCE_INVALID,
+		COMMAND_INVALID,
+		COMMAND_INVALID_DATA,
 		INTERNAL
 	}
 
