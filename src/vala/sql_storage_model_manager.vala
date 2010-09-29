@@ -4,10 +4,10 @@ namespace MidgardCR {
 	public class SQLStorageModelManager : GLib.Object, Model, Executable, StorageExecutor, StorageModelManager {
 
 		/* internal properties */
-		internal SQLStorageManager _storage_manager = null;
+		internal unowned SQLStorageManager _storage_manager = null;
 		internal NamespaceManager _ns_manager = null;
-		internal StorageModel[] _storage_models = null;
-		internal SchemaModel[] _schema_models = null;
+		internal unowned StorageModel[] _storage_models = null;
+		internal unowned SchemaModel[] _schema_models = null;
 		internal Model[] _models = null;
 		internal GLib.SList _query_slist = null;
 
@@ -47,7 +47,8 @@ namespace MidgardCR {
 
 		/* destructor */
 		~SQLStorageModelManager () {
-			if (this._query_slist != null) {
+			if (this._query_slist != null 
+				&& this._query_slist.length () > 0) {
 				this._query_slist.foreach (GLib.free);
 			}	
 		}
@@ -68,7 +69,7 @@ namespace MidgardCR {
 		private bool _model_in_models (Model[] models, string name) {
 			if (models == null)
 				return false;
-			foreach (Model model in models) {
+			foreach (unowned Model model in models) {
 				if (model.name == name)
 					return true;
 			}
@@ -77,20 +78,18 @@ namespace MidgardCR {
 		
 		 /**
                  * Get model by given name. 
-		 * SQLStorageModelManager holds {@link SchemaModel} and {@link StorageModel} models.
-		 * First, search for SchemaModel is done, if none found, another search for 
-		 * StorageModel is done. 
-		 * In other words, given name might be the one of Schema or Storage model.
-                 * 
+		 * SQLStorageModelManager holds {@link SchemaModel} and {@link StorageModel} models,
+		 * so accepted name by the one of Schema or Storage model.
+	         * 
                  * @param name {@link Model} name to look for
                  *
                  * @return {@link Model} if found, null otherwise
                  */
-                public Model? get_model_by_name (string name) {
+                public unowned Model? get_model_by_name (string name) {
 			if (this._models == null)
                                 return null;
 
-                        foreach (Model model in this._models) {
+                        foreach (unowned Model model in this._models) {
                                 if (model.name == name)
                                         return model;
                         }
@@ -141,7 +140,7 @@ namespace MidgardCR {
 			foreach (Model model in this._models) {
 				if (this._model_in_models ((Model[])this._schema_models, model.name))
 					throw new MidgardCR.ValidationError.NAME_DUPLICATED ("%s class already exists in schema table", model.name); 
-			}	
+			}
 			MidgardCRCore.SQLStorageModelManager.prepare_create (this);	
 		}
 
@@ -211,7 +210,6 @@ namespace MidgardCR {
 				|| (this._query_slist != null && this._query_slist.length() == 0))
 				throw new MidgardCR.ExecutableError.COMMAND_INVALID_DATA ("No single prepared operation found");
 			MidgardCRCore.SQLStorageModelManager.execute (this);
-			this._query_slist.foreach (GLib.free);
 		}
 
 		/* methods */

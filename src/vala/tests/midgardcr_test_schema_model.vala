@@ -39,7 +39,7 @@ void midgardcr_test_add_schema_model_tests () {
 		assert (not_found_model == null);
 
 		/* SUCCESS */
-		MidgardCR.SchemaModelProperty found_model = model.get_model_by_name ("title") as SchemaModelProperty;
+		unowned MidgardCR.SchemaModelProperty found_model = model.get_model_by_name ("title") as SchemaModelProperty;
 		assert (found_model != null);
 		assert (found_model.name == "title");
 	});

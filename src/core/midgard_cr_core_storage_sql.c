@@ -1052,7 +1052,27 @@ midgard_core_storage_sql_query_execute (GdaConnection *cnc, GdaSqlParser *parser
 }
 
 GdaDataModel *
-midgard_core_storage_sql_get_model (GdaConnection *cnc, const gchar *query)
+midgard_core_storage_sql_get_model (GdaConnection *cnc, GdaSqlParser *parser, const gchar *query, GError **error)
 {
+	g_return_val_if_fail (cnc != NULL, NULL);
+	g_return_val_if_fail (parser != NULL, NULL);
 
+	GdaStatement *stmt = NULL;
+	GdaDataModel *model = NULL;
+	GError *err = NULL;
+	
+	stmt = gda_sql_parser_parse_string (parser, query, NULL, &err);
+	if (stmt) {
+		model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
+		g_object_unref (stmt);
+	}
+
+	if (err) {
+		g_propagate_error (error, err);
+		if (model) g_object_unref (model);
+		return NULL;
+	}
+
+	return model;
 }
+

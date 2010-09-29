@@ -23,8 +23,12 @@
 
 #define TABLE_NAME_MAPPER "midgard_mapper_type"
 #define TABLE_NAME_MAPPER_PROPERTIES "midgard_mapper_columns"
+#define TABLE_MAPPER_COLUMNS "class_name, table_name, description"
+#define TABLE_MAPPER_PROPERTIES_COLUMNS "property_name, column_name, table_name, gtype_name, column_type, is_primary, has_index, is_unique, is_auto_increment, description"
 #define TABLE_NAME_SCHEMA "midgard_schema_type"
 #define TABLE_NAME_SCHEMA_PROPERTIES "midgard_schema_type_properties"
+#define TABLE_SCHEMA_COLUMNS "class_name, extends"
+#define TABLE_SCHEMA_PROPERTIES_COLUMNS "class_name, property_name, gtype_name, default_value_string, property_nick, description"
 
 typedef struct _MgdCoreStorageSQLColumn MgdCoreStorageSQLColumn;
 
@@ -47,7 +51,7 @@ void midgard_core_storage_sql_column_reset (MgdCoreStorageSQLColumn *mdc);
 
 gint midgard_core_storage_sql_query_execute (GdaConnection *cnc, GdaSqlParser *parser, const gchar *query, GError **error);
 
-GdaDataModel *midgard_core_storage_sql_get_model (GdaConnection *cnc, const gchar *query);
+GdaDataModel *midgard_core_storage_sql_get_model (GdaConnection *cnc, GdaSqlParser *parser, const gchar *query, GError **error);
 
 gboolean midgard_core_storage_sql_table_exists (GdaConnection *cnc, const gchar *tablename);
 gboolean midgard_core_storage_sql_table_remove (GdaConnection *cnc, const gchar *tablename, GError **error);

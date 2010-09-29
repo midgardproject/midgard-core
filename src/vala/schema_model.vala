@@ -57,11 +57,11 @@ namespace MidgardCR {
 		 *
 		 * @return {@link Model} if found, null otherwise
 		 */
-		public Model? get_model_by_name (string name) { 
+		public unowned Model? get_model_by_name (string name) { 
 			if (this._models == null)
 				return null; 
 
-			foreach (Model model in this._models) {
+			foreach (unowned Model model in this._models) {
 				if (model.name == name)
 					return model;
 			}
@@ -229,7 +229,7 @@ namespace MidgardCR {
 			return this; 
 		}
 
-		public Model? get_model_by_name (string name) {
+		public unowned Model? get_model_by_name (string name) {
 			if (this._models[0].name == name)
 				return this._models[0];
  

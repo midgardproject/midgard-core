@@ -17,6 +17,8 @@ namespace MidgardCR {
 		/* internal properties */
 		internal GLib.Object _cnc = null; 
 		internal GLib.Object _parser = null;
+		internal SchemaModel[] _schema_models = null;
+		internal StorageModel[] _storage_models = null;
 
 		/* public properties */
 		public string name { 
@@ -54,6 +56,8 @@ namespace MidgardCR {
 				if (this._model_manager == null) {
 					this._model_manager = new MidgardCR.SQLStorageModelManager ();	
 					this._model_manager._storage_manager = this;
+					this._model_manager._schema_models = this._schema_models;
+					this._model_manager._storage_models = this._storage_models;
 				}
 				return (MidgardCR.StorageModelManager)this._model_manager; 
 			}

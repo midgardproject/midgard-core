@@ -29,13 +29,13 @@ _prepare_model_create_query (MidgardCRModel *model)
 
 	if (MIDGARD_CR_IS_SCHEMA_MODEL (model)) {
 		model_table = TABLE_NAME_SCHEMA;
-		model_columns = "(class_name, extends)";
+		model_columns = TABLE_SCHEMA_COLUMNS;
 	} else if (MIDGARD_CR_IS_STORAGE_MODEL (model)) {
 		model_table = TABLE_NAME_MAPPER;
-		model_columns = "(class_name, table_name, description)";
+		model_columns = TABLE_MAPPER_COLUMNS;
 	}	
 
-	g_string_append_printf (query, "%s %s VALUES (", model_table, model_columns);
+	g_string_append_printf (query, "%s (%s) VALUES (", model_table, model_columns);
 
 	if (MIDGARD_CR_IS_SCHEMA_MODEL (model)) {
 		/* Add class name */
@@ -63,13 +63,13 @@ _prepare_model_property_create_query (MidgardCRModel *model)
 
 	if (MIDGARD_CR_IS_SCHEMA_MODEL_PROPERTY (model)) {
 		model_table = TABLE_NAME_SCHEMA_PROPERTIES;
-		model_columns = "(class_name, property_name, gtype_name, default_value_string, property_nick, description)";
+		model_columns = TABLE_SCHEMA_PROPERTIES_COLUMNS;
 	} else if (MIDGARD_CR_IS_STORAGE_MODEL (model)) {
 		model_table = TABLE_NAME_MAPPER_PROPERTIES;
-		model_columns = "(property_name, column_name, table_name, gtype_name, column_type, is_primary, has_index, is_unique, is_auto_increment, description)";
+		model_columns = TABLE_MAPPER_PROPERTIES_COLUMNS;
 	}	
 
-	g_string_append_printf (query, "%s %s VALUES (", model_table, model_columns);
+	g_string_append_printf (query, "%s (%s) VALUES (", model_table, model_columns);
 
 	if (MIDGARD_CR_IS_SCHEMA_MODEL_PROPERTY (model)) {
 		/* class_name */
@@ -115,10 +115,8 @@ midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageMod
 		for (j = 0; j < n_props; j++) {
 			query = _prepare_model_property_create_query (MIDGARD_CR_MODEL (property_models[j]));
 			manager->_query_slist = g_slist_append (manager->_query_slist, query);
-		}
-		g_free (property_models);
+		}	
 	}
-	g_free (models);
 	return;
 }
 
@@ -166,4 +164,17 @@ midgard_cr_core_sql_storage_model_manager_execute (MidgardCRSQLStorageModelManag
 		/* TODO, add queries to Profiler */
 		g_print ("QUERY %s \n", query);
 	}
+	list = NULL;
+	for (list = manager->_query_slist; list != NULL; list = list->next) {
+		g_free (list->data);
+	}
+	g_slist_free (manager->_query_slist);
+	manager->_query_slist = NULL;
+	
+	err = NULL;
+	midgard_cr_core_sql_storage_manager_load_models (manager->_storage_manager, &err);
+	if (err)
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err->message ? err->message : "Unknown reason");
+	g_clear_error (&err);
 }

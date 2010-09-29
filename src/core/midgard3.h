@@ -761,6 +761,12 @@ struct _MidgardCRSQLStorageManager {
 	MidgardCRSQLStorageManagerPrivate * priv;
 	GObject* _cnc;
 	GObject* _parser;
+	MidgardCRSchemaModel** _schema_models;
+	gint _schema_models_length1;
+	gint __schema_models_size_;
+	MidgardCRStorageModel** _storage_models;
+	gint _storage_models_length1;
+	gint __storage_models_size_;
 };
 
 struct _MidgardCRSQLStorageManagerClass {

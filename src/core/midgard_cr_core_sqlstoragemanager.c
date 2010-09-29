@@ -59,6 +59,155 @@ cnc_add_part (GString *cnc, const gchar *name, const gchar *value, const gchar *
 	}
 }
 
+static void
+__list_all_schema_models (MidgardCRSQLStorageManager *self, GError **error)
+{
+	/* select all classes */
+	GString *query = g_string_new ("SELECT ");
+	g_string_append_printf (query, "%s FROM %s", TABLE_SCHEMA_COLUMNS, TABLE_NAME_SCHEMA);
+	GError *err = NULL;
+	
+	GdaDataModel *model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
+	g_string_free (query, TRUE);
+	/* internal error, return and throw error */
+	if (err) {
+		g_propagate_error (error, err);
+		return;
+	}
+	/* there's no single class defined, silently return */
+	if (!model)
+		return;
+
+	guint rows = gda_data_model_get_n_rows (model);
+	/* There's a model, but no single record selected, silently return */
+	if (rows == 0) {
+		g_object_unref(model);
+		return;
+	}
+
+	MidgardCRSchemaModel **schema_models = g_new (MidgardCRSchemaModel *, rows + 1);
+
+	const GValue *value;
+	guint i;
+	for (i = 0; i < rows; i++) {
+		/* Initialize new SchemaModel for given class name */
+		value = gda_data_model_get_typed_value_at (model, 0, i, G_TYPE_STRING, TRUE, NULL);
+		MidgardCRSchemaModel *smodel = midgard_cr_schema_model_new (g_value_get_string (value));
+		/* Set parent model if set */
+		value = gda_data_model_get_typed_value_at (model, 1, i, G_TYPE_STRING, TRUE, NULL);
+		if (value && (!g_str_equal (g_value_get_string (value), "SchemaObject"))) { /* FIXME, SchemaObject constant needed */
+			MidgardCRSchemaModel *parent = midgard_cr_schema_model_new (g_value_get_string (value));
+			midgard_cr_model_set_parent (MIDGARD_CR_MODEL (smodel), MIDGARD_CR_MODEL (parent));
+		}
+		/* Add Schema model to array */
+		schema_models[i] = smodel;
+	}
+	schema_models[i] = NULL; /* terminate with NULL */
+	self->_schema_models = schema_models;
+	self->_schema_models_length1 = i;
+	
+	/* select all properties */
+	query = g_string_new ("SELECT ");
+	g_string_append_printf (query, "%s FROM %s", TABLE_SCHEMA_PROPERTIES_COLUMNS, TABLE_NAME_SCHEMA_PROPERTIES);
+	err = NULL;
+	
+	model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
+	g_string_free (query, TRUE);
+	/* internal error, return and throw error */
+	if (err) {
+		g_propagate_error (error, err);
+		return;
+	}
+	/* there's no single property defined, silently return */
+	if (!model)
+		return;
+
+	rows = gda_data_model_get_n_rows (model);
+	/* There's a model, but no single record selected, silently return */
+	if (rows == 0) {
+		g_object_unref(model);
+		return;
+	}
+
+	guint j = 0;
+	while (self->_schema_models[j] != NULL) {
+		const gchar *classname = midgard_cr_model_get_name (MIDGARD_CR_MODEL (self->_schema_models[j]));
+		for (i = 0; i < rows; i++) {
+			/* Check property's class name */
+			value = gda_data_model_get_typed_value_at (model, 0, i, G_TYPE_STRING, TRUE, NULL);
+			if (!g_str_equal (g_value_get_string (value), classname))
+				continue;	
+			/* property_name */
+			value = gda_data_model_get_typed_value_at (model, 1, i, G_TYPE_STRING, TRUE, NULL);
+			const gchar *property_name = g_value_get_string (value);
+			/* gtype_name */
+			value = gda_data_model_get_typed_value_at (model, 2, i, G_TYPE_STRING, TRUE, NULL);
+			const gchar *gtype_name = g_value_get_string (value);
+			/* default_value_string */
+			value = gda_data_model_get_typed_value_at (model, 3, i, G_TYPE_STRING, TRUE, NULL);
+			const gchar *dvalue = g_value_get_string (value);
+			/* property_nick */
+			value = gda_data_model_get_typed_value_at (model, 4, i, G_TYPE_STRING, TRUE, NULL);
+			const gchar *property_nick = g_value_get_string (value);
+			/* description */
+			value = gda_data_model_get_typed_value_at (model, 5, i, G_TYPE_STRING, TRUE, NULL);
+			const gchar *descr = g_value_get_string (value);
+
+			MidgardCRSchemaModelProperty *property_model = 
+				midgard_cr_schema_model_property_new (property_name, gtype_name, dvalue);
+			/* FIXME, set nick */
+			midgard_cr_model_property_set_description (MIDGARD_CR_MODEL_PROPERTY (property_model), descr);
+			/* Add property model to schema model */
+			midgard_cr_model_add_model (MIDGARD_CR_MODEL (self->_schema_models[j]), MIDGARD_CR_MODEL (property_model));
+		}
+		j++;
+	}
+	
+	g_object_unref (model);
+	return;
+}
+
+static void
+__list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
+{
+	return;
+}	
+
+void
+midgard_cr_core_sql_storage_manager_load_models (MidgardCRSQLStorageManager *self, GError **error)
+{
+	guint i = 0;
+	if (self->_schema_models) {
+		while (self->_schema_models[i] != 0) {
+			g_object_unref (self->_schema_models[i]);
+		}
+		g_free (self->_schema_models);
+	}
+
+	i = 0;
+	if (self->_storage_models) {
+		while (self->_storage_models[i] != 0) {
+			g_object_unref (self->_storage_models[i]);
+		}
+		g_free (self->_storage_models);
+	}
+
+	GError *err = NULL;
+	__list_all_schema_models (self, &err);
+	if (err) {
+		g_propagate_error (error, err);
+		return;
+	}
+
+	__list_all_storage_models (self, &err);
+	if (err) {
+		g_propagate_error (error, err);
+		return;
+	}
+
+	return;
+}
+
 gboolean 
 midgard_cr_core_sql_storage_manager_open (MidgardCRSQLStorageManager *self, GError **error)
 {
@@ -148,6 +297,15 @@ midgard_cr_core_sql_storage_manager_open (MidgardCRSQLStorageManager *self, GErr
 	g_assert (self->_parser != NULL);
 
 	self->_cnc = G_OBJECT (connection);
+
+	cnc_error = NULL;
+	if (midgard_core_storage_sql_table_exists (GDA_CONNECTION (self->_cnc), TABLE_NAME_SCHEMA))
+		midgard_cr_core_sql_storage_manager_load_models (self, &cnc_error);
+	if (cnc_error) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_MANAGER_ERROR, MIDGARD_CR_STORAGE_MANAGER_ERROR_INTERNAL, 
+				"%s", cnc_error->message ? cnc_error->message : "Unknown reason");
+		g_clear_error (&cnc_error);
+	}
 
 	return TRUE;
 }

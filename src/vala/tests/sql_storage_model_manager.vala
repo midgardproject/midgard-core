@@ -76,13 +76,13 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 		/* Add Schema model to StorageModelManager */
 		model_manager.add_model (model);
-
+	
 		/* SUCCESS */
 		try {
 			model_manager.prepare_create ();
 		} catch (ValidationError e) {
 			GLib.warning (e.message);
-		}
+		}	
 	});
 
 	Test.add_func ("/SQLStorageModelManager/execute", () => {	
