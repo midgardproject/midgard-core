@@ -1076,6 +1076,11 @@ midgard_core_storage_sql_get_model (GdaConnection *cnc, GdaSqlParser *parser, co
 	return model;
 }
 
+/**
+ * Generates part of INSERT SQL query including column names.
+ * Returned string doesn't contain coma at end.
+ * For example: col1, col2, col3.
+ */ 
 gchar *
 midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
 {
@@ -1126,7 +1131,7 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
 			continue;
 		/* Schema and Storage models found, add property's column to query */
 		g_string_append_printf (query, "%s%s", 
-				add_coma ? " ," : "", midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (smodel)));
+				add_coma ? ", " : "", midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (smodel)));
 		add_coma = TRUE;
 	}
 
@@ -1134,6 +1139,11 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
 	return g_string_free (query, FALSE);
 }
 
+/**
+ * Generates part of INSERT SQL query used for VALUES.
+ * Returned strinf dosn't containt brackets and coma at end and.
+ * For example: 'string_value', 123, 'Foo'.
+ */  
 gchar *
 midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
 {
@@ -1188,25 +1198,119 @@ midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, Midgard
 		g_object_get_property (object, pname, &val);
 		switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE (&val))) {
 			case G_TYPE_STRING:
-				g_string_append_printf (query, "%s'%s'", add_coma ? " ," : "", g_value_get_string (&val));
+				g_string_append_printf (query, "%s'%s'", add_coma ? ", " : "", g_value_get_string (&val));
 				break;
 			case G_TYPE_UINT:
-				g_string_append_printf (query, "%s%d", add_coma ? " ," : "", g_value_get_uint (&val));
+				g_string_append_printf (query, "%s%d", add_coma ? ", " : "", g_value_get_uint (&val));
 				break;
 			case G_TYPE_INT:
-				g_string_append_printf (query, "%s%d", add_coma ? " ," : "", g_value_get_int (&val));
+				g_string_append_printf (query, "%s%d", add_coma ? ", " : "", g_value_get_int (&val));
 				break;
 			case G_TYPE_FLOAT:
-				g_string_append_printf (query, "%s%g", add_coma ? " ," : "", g_value_get_float (&val));
+				g_string_append_printf (query, "%s%g", add_coma ? ", " : "", g_value_get_float (&val));
 				break;
 			case G_TYPE_BOOLEAN:
-				g_string_append_printf (query, "%s%d", add_coma ? " ," : "", g_value_get_boolean (&val));
+				g_string_append_printf (query, "%s%d", add_coma ? ", " : "", g_value_get_boolean (&val));
 				break;
 			case G_TYPE_OBJECT:
-				g_warning ("%s: Please fix it! Including Object in query is not yet implemented!", __PRETTY_FUNCTION__);	
+				g_warning ("%s: Please fix it! Including Object in query is not yet implemented!", __PRETTY_FUNCTION__);
 				break;
 			case G_TYPE_BOXED:
-				g_warning ("%s: Do you think I can include Boxed type in SQL Query? Fix it!", __PRETTY_FUNCTION__);	
+				g_warning ("%s: Do you think I can include Boxed type in SQL Query? Fix it!", __PRETTY_FUNCTION__);
+				break;
+			default:
+				g_warning ("%s: Houston, we have a problem. Default case reached and no single action can be taken.", __PRETTY_FUNCTION__);
+				break;
+		}
+		add_coma = TRUE;
+	}
+
+	g_free (pspecs);
+	return g_string_free (query, FALSE);
+}
+
+/**
+ * Generates part of UPDATE SQL query including column names and values.
+ * Returned strinf dosn't containt coma at end and.
+ * For example: col1='string_value', col2=123, col3='Foo'.
+ */  
+gchar *
+midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
+{
+	g_return_val_if_fail (object != NULL, NULL);
+	g_return_val_if_fail (schema != NULL, NULL);
+	g_return_val_if_fail (storage != NULL, NULL);
+
+	MidgardCRModel *_schema = MIDGARD_CR_MODEL (schema);
+	MidgardCRModel *_storage = MIDGARD_CR_MODEL (storage);
+
+	const gchar *objectname = G_OBJECT_TYPE_NAME (object);
+	const gchar *schemaname = midgard_cr_model_get_name (_schema);
+	const gchar *storagename = midgard_cr_model_get_name (_storage);
+
+	if (!g_str_equal (objectname, schemaname)) {
+		g_warning ("Can not generate valid SQL query for %s. %s SchemaModel given", objectname, schemaname);
+		return NULL;
+	}
+
+	if (!g_str_equal (objectname, storagename)) {
+		g_warning ("Can not generate valid SQL query for %s. %s StorageModel given", objectname, storagename);
+		return NULL;
+	}
+
+	/* list properties of the class */
+	guint n_props;	
+	guint i;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_GET_CLASS (object), &n_props);
+
+	if (!pspecs) {
+		g_warning ("Can not generate valid SQL query for %s. No single property installed", objectname);
+		return NULL;
+	}
+	
+	/* Generate INSERT query VALUES part */
+	GString *query = g_string_new ("");
+	gboolean add_coma = FALSE;
+
+	for (i = 0; i < n_props; i++) {
+		const gchar *pname = pspecs[i];
+		MidgardCRModel *smodel = midgard_cr_model_get_model_by_name (_schema, pname);
+		/* No SchemaModel for given property, ignore */
+		if (!smodel)
+			continue;
+		smodel = midgard_cr_model_get_model_by_name (_storage, pname);
+		/* No StorageModel for given property, ignore */
+		if (!smodel)
+			continue;
+
+		/* Schema and Storage models found, add property's name and value to query */
+		g_string_append_printf (query, "%s%s=", 
+				add_coma ? ", " : "", midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (smodel)));
+
+		GValue val = {0, };
+		g_value_init (&val, pspecs[i]->value_type);
+		g_object_get_property (object, pname, &val);
+		switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE (&val))) {
+			case G_TYPE_STRING:
+				g_string_append_printf (query, "'%s'", g_value_get_string (&val));
+				break;
+			case G_TYPE_UINT:
+				g_string_append_printf (query, "%d", g_value_get_uint (&val));
+				break;
+			case G_TYPE_INT:
+				g_string_append_printf (query, "%d", g_value_get_int (&val));
+				break;
+			case G_TYPE_FLOAT:
+				g_string_append_printf (query, "%g", g_value_get_float (&val));
+				break;
+			case G_TYPE_BOOLEAN:
+				g_string_append_printf (query, "%d", g_value_get_boolean (&val));
+				break;
+			case G_TYPE_OBJECT:
+				g_warning ("%s: Please fix it! Including Object in query is not yet implemented!", __PRETTY_FUNCTION__);
+				break;
+			case G_TYPE_BOXED:
+				g_warning ("%s: Do you think I can include Boxed type in SQL Query? Fix it!", __PRETTY_FUNCTION__);
 				break;
 			default:
 				g_warning ("%s: Houston, we have a problem. Default case reached and no single action can be taken.", __PRETTY_FUNCTION__);
