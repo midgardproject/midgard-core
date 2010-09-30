@@ -64,7 +64,7 @@ __list_all_schema_models (MidgardCRSQLStorageManager *self, GError **error)
 {
 	/* select all classes */
 	GString *query = g_string_new ("SELECT ");
-	g_string_append_printf (query, "%s FROM %s", TABLE_SCHEMA_COLUMNS, TABLE_NAME_SCHEMA);
+	g_string_append_printf (query, "%s, id FROM %s", TABLE_SCHEMA_COLUMNS, TABLE_NAME_SCHEMA);
 	GError *err = NULL;
 	
 	GdaDataModel *model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
@@ -99,6 +99,9 @@ __list_all_schema_models (MidgardCRSQLStorageManager *self, GError **error)
 			MidgardCRSchemaModel *parent = midgard_cr_schema_model_new (g_value_get_string (value));
 			midgard_cr_model_set_parent (MIDGARD_CR_MODEL (smodel), MIDGARD_CR_MODEL (parent));
 		}
+		/* set id */
+		value = gda_data_model_get_typed_value_at (model, 2, i, G_TYPE_INT, TRUE, NULL);	
+		smodel->_id = (guint) g_value_get_int (value);
 		/* Add Schema model to array */
 		schema_models[i] = smodel;
 	}
@@ -108,7 +111,7 @@ __list_all_schema_models (MidgardCRSQLStorageManager *self, GError **error)
 	
 	/* select all properties */
 	query = g_string_new ("SELECT ");
-	g_string_append_printf (query, "%s FROM %s", TABLE_SCHEMA_PROPERTIES_COLUMNS, TABLE_NAME_SCHEMA_PROPERTIES);
+	g_string_append_printf (query, "%s, id FROM %s", TABLE_SCHEMA_PROPERTIES_COLUMNS, TABLE_NAME_SCHEMA_PROPERTIES);
 	err = NULL;
 	
 	model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
@@ -152,11 +155,17 @@ __list_all_schema_models (MidgardCRSQLStorageManager *self, GError **error)
 			/* description */
 			value = gda_data_model_get_typed_value_at (model, 5, i, G_TYPE_STRING, TRUE, NULL);
 			const gchar *descr = g_value_get_string (value);
+			/* id */
+			value = gda_data_model_get_typed_value_at (model, 6, i, G_TYPE_INT, TRUE, NULL);
+			guint id = (guint) g_value_get_int (value);
 
 			MidgardCRSchemaModelProperty *property_model = 
 				midgard_cr_schema_model_property_new (property_name, gtype_name, dvalue);
 			/* FIXME, set nick */
+			/* set description */
 			midgard_cr_model_property_set_description (MIDGARD_CR_MODEL_PROPERTY (property_model), descr);
+			/* set id */
+			property_model->_id = id;
 			/* Add property model to schema model */
 			midgard_cr_model_add_model (MIDGARD_CR_MODEL (self->_schema_models[j]), MIDGARD_CR_MODEL (property_model));
 		}
