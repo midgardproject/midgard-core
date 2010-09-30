@@ -12,7 +12,13 @@ namespace MidgardCR {
 	 */	
 	public class SchemaModel : GLib.Object, Model {
 
+		/* private properties */
+		
 		private Model[] _models = null;
+
+		/* internal properties */
+		
+		internal uint _id = 0;
 
 		/* public properties */
 		/**
@@ -123,6 +129,10 @@ namespace MidgardCR {
 		private Model[] _models = null;
 		private string _typename = null;
 		private GLib.Type _gtype = 0;
+
+		/* internal properties */
+
+		internal uint _id = 0;
 
 		/* public properties */
 	
