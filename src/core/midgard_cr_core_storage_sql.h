@@ -20,6 +20,7 @@
 #define MIDGARD_CORE_STORAGE_SQL_H
 
 #include <libgda/libgda.h>
+#include "midgard3.h"
 
 #define TABLE_NAME_MAPPER "midgard_mapper_type"
 #define TABLE_NAME_MAPPER_PROPERTIES "midgard_mapper_columns"
@@ -66,5 +67,9 @@ gboolean midgard_core_storage_sql_index_create (GdaConnection *cnc, MgdCoreStora
 gboolean midgard_core_storage_sql_index_remove (GdaConnection *cnc, MgdCoreStorageSQLColumn *mdc, GError **error);
 
 gboolean midgard_core_storage_sql_create_base_tables (GdaConnection *cnc, GError **error);
+
+gchar *midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage);
 
 #endif /* MIDGARD_CORE_STORAGE_SQL_H */
