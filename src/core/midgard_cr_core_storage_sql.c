@@ -1183,7 +1183,7 @@ midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, Midgard
 	gboolean add_coma = FALSE;
 
 	for (i = 0; i < n_props; i++) {
-		const gchar *pname = pspecs[i];
+		const gchar *pname = pspecs[i]->name;
 		MidgardCRModel *smodel = midgard_cr_model_get_model_by_name (_schema, pname);
 		/* No SchemaModel for given property, ignore */
 		if (!smodel)
@@ -1273,7 +1273,7 @@ midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRSchem
 	gboolean add_coma = FALSE;
 
 	for (i = 0; i < n_props; i++) {
-		const gchar *pname = pspecs[i];
+		const gchar *pname = pspecs[i]->name;
 		MidgardCRModel *smodel = midgard_cr_model_get_model_by_name (_schema, pname);
 		/* No SchemaModel for given property, ignore */
 		if (!smodel)
