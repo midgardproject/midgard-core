@@ -110,14 +110,11 @@ namespace MidgardCR {
 
 	/* Initialized for every given property name */
 	public interface StorageModelProperty : StorageExecutor, ModelProperty {
-	
-		/* method */
-		public abstract void set_primary (bool toggle);
-		public abstract bool is_primary ();
-		public abstract void set_index (bool toggle);
-		public abstract bool has_index ();
-		public abstract bool location_set (string location);
-		public abstract string location_get ();
+
+		/* properties */
+		public abstract string location { get; set; }
+		public abstract bool index { get; set; }
+		public abstract bool primary { get; set; }	
 	}	
 
 	public errordomain StorageModelError {
@@ -128,8 +125,8 @@ namespace MidgardCR {
 
 	/* Initialized for every given class name */
 	public interface StorageModel : Model {
-		
-		public abstract bool location_set (string location) throws StorageModelError;
-		public abstract string location_get ();
+	
+		/* properties */
+		public abstract string location { get; set; }			
 	}
 }
