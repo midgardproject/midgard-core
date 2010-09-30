@@ -9,6 +9,8 @@ namespace MidgardCR {
 		internal unowned StorageModel[] _storage_models = null;
 		internal unowned SchemaModel[] _schema_models = null;
 		internal Model[] _models = null;
+		internal SchemaModel _schema_model = null;
+		internal StorageModel sql_storage_model = null;
 		internal GLib.SList _query_slist = null;
 
 		/* Model properties */
@@ -45,6 +47,22 @@ namespace MidgardCR {
 			get { return null; } 
 		} 		
 
+		/**
+		 * Constructor
+		 */
+		public SQLStorageModelManager () {
+			Object ();
+			
+			/* Initialize SchemaModel */
+			this._schema_model = new SchemaModel ("SchemaModel");
+			//this._schema_model.add_model (new SchemaModelProperty ("name", "string", ""));
+
+			/* Initialize StorageModel */
+			//this._storage_model = new StorageModel ("SchemaModel", "midgard_schema_type");
+			//this._storage_model.add_model (new SQLStorageModelProperty ());				
+				 	
+		}
+
 		/* destructor */
 		~SQLStorageModelManager () {
 			if (this._query_slist != null 
@@ -65,18 +83,8 @@ namespace MidgardCR {
 			this._models += model;
 			return this;
 		}
-		
-		private bool _model_in_models (Model[] models, string name) {
-			if (models == null)
-				return false;
-			foreach (unowned Model model in models) {
-				if (model.name == name)
-					return true;
-			}
-			return false;
-		}
-		
-		 /**
+				
+		/**
                  * Get model by given name. 
 		 * SQLStorageModelManager holds {@link SchemaModel} and {@link StorageModel} models,
 		 * so accepted name by the one of Schema or Storage model.
@@ -86,14 +94,7 @@ namespace MidgardCR {
                  * @return {@link Model} if found, null otherwise
                  */
                 public unowned Model? get_model_by_name (string name) {
-			if (this._models == null)
-                                return null;
-
-                        foreach (unowned Model model in this._models) {
-                                if (model.name == name)
-                                        return model;
-                        }
-                        return null;
+			return this._find_model_by_name (this._models, name);
 		}
 
 		/**
@@ -110,6 +111,17 @@ namespace MidgardCR {
 		 * Always returns null
 		 */
                 public ModelReflector get_reflector () {
+			return null;
+		}
+
+		private unowned Model? _find_model_by_name (Model[] models, string name) {
+			if (models == null)
+				return null;
+
+			foreach (unowned Model model in models) {
+				if (model.name == name)
+					return model;
+			}
 			return null;
 		}
 
@@ -138,22 +150,22 @@ namespace MidgardCR {
 			this.is_valid ();
 
 			foreach (Model model in this._models) {
-				if (this._model_in_models ((Model[])this._schema_models, model.name))
+				unowned Model model_found = this._find_model_by_name ((Model[])this._schema_models, model.name);
+				if (model_found != null)
 					throw new MidgardCR.ValidationError.NAME_DUPLICATED ("%s class already exists in schema table", model.name); 
 			}
 			MidgardCRCore.SQLStorageModelManager.prepare_create (this);	
 		}
 
-		private void _model_exists_in_storage () throws ValidationError {
+		private void _model_check_in_storage () throws ValidationError {
 			bool found = false;
 			string invalid_name = "";
 			foreach (Model model in this._models) {
-				if (this._model_in_models ((Model[])this._schema_models, model.name)) {
-					found = true;
-					invalid_name = model.name;
-					break;
-				}
-				if (this._model_in_models ((Model[])this._storage_models, model.name)) {
+				unowned Model model_found = this._find_model_by_name ((Model[])this._schema_models, model.name);
+				if (model_found == null)
+					model_found = this._find_model_by_name ((Model[])this._storage_models, model.name);
+				if (model_found != null 
+					&& (((MidgardCR.SchemaModel) model_found)._id == ((MidgardCR.SchemaModel) model)._id)) {
 					found = true;
 					invalid_name = model.name;
 					break;
@@ -168,7 +180,7 @@ namespace MidgardCR {
 		 */
                 public void prepare_update () throws ValidationError {
 			this.is_valid ();
-			this._model_exists_in_storage ();
+			this._model_check_in_storage ();
 		}
 
 		/**
@@ -176,7 +188,7 @@ namespace MidgardCR {
 		 */
                 public void prepare_save () throws ValidationError {
 			this.is_valid ();
-			this._model_exists_in_storage ();
+			this._model_check_in_storage ();
 		}
 
 		/**
@@ -184,7 +196,7 @@ namespace MidgardCR {
 		 */
                 public void prepare_remove () throws ValidationError {
 			this.is_valid ();
-			this._model_exists_in_storage ();
+			this._model_check_in_storage ();
 		}
 
 		/**
@@ -192,7 +204,7 @@ namespace MidgardCR {
 		 */
                 public void prepare_purge () throws ValidationError {
 			this.is_valid ();
-			this._model_exists_in_storage ();
+			this._model_check_in_storage ();
 		}
 
 		/* Executable methods */
