@@ -98,15 +98,6 @@ namespace MidgardCR {
 		}
 		
 		/**
-		 * Get model's reflector 
-		 *
-		 * @return {@link ModelReflector} of given {@link Model}
-		 */
-		public ModelReflector get_reflector () { 
-			return null; 
-		} 
-
-		/**
 		 * Check whether model is valid
 		 *
 		 * Conditions to mark model as invalid:

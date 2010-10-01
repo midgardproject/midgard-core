@@ -167,10 +167,6 @@ namespace MidgardCR {
 			return this._models; 
 		}
 
-		public ModelReflector get_reflector () { 
-			return null; 
-		}
-
 		/** 
 		 * Check if SQLStorageModelProperty is valid
 		 *

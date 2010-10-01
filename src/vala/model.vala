@@ -23,7 +23,6 @@ namespace MidgardCR {
 		public abstract Model add_model (Model model);
 		public abstract unowned Model? get_model_by_name (string name);
 		public abstract unowned Model[]? list_models ();
-		public abstract ModelReflector get_reflector ();
 		public abstract void is_valid () throws ValidationError;
 	}
 
