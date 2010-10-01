@@ -72,7 +72,7 @@ namespace MidgardCR {
 		}
 
 		/**
-		 * Get {@SQLStorageModelProperty} model by given name.
+		 * Get {@link SQLStorageModelProperty} model by given name.
 		 * 
 		 * @param name {@link Model} name to look for
 		 *
