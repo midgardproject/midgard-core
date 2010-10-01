@@ -53,7 +53,7 @@ namespace MidgardCR
 		private GLib.Value _value;	
 	
 		/* properties */
-		string property { get; set; }
+		string propertyname { get; set; }
 		QueryStorage storage { get; set; }
 
 		public GLib.Value get_value () { return this._value; }
