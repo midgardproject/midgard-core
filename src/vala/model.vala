@@ -27,7 +27,7 @@ namespace MidgardCR {
 		public abstract void is_valid () throws ValidationError;
 	}
 
-	public interface ModelProperty : GLib.Object, Model, Executable {
+	public interface ModelProperty : GLib.Object, Model {
 		
 		/* properties */
 		public abstract GLib.Type   valuegtype     { get; }
