@@ -21,6 +21,7 @@ namespace MidgardCR {
 		internal uint _id = 0;
 
 		/* public properties */
+
 		/**
 		 * Holds the name of the class, SchemaModel is created for
 		 */
@@ -33,6 +34,18 @@ namespace MidgardCR {
 		 * Parent model of an instance.
 		 */
 		public Model? parent { get; set; }
+
+		/**
+		 * The name of parent model.
+		 */
+		public string parentname {
+			get { 
+				if (this.parent == null)
+					return "SchemaObject";
+
+				return this.parent.name;
+			}
+		}
 
 		/**
 		 * Creates new SchemaModel for given classname
