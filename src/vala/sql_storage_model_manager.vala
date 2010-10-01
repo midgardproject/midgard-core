@@ -54,13 +54,14 @@ namespace MidgardCR {
 			Object ();
 			
 			/* Initialize SchemaModel */
-			this._schema_model = new SchemaModel ("SchemaModel");
-			//this._schema_model.add_model (new SchemaModelProperty ("name", "string", ""));
+			this._schema_model = new SchemaModel ("MidgardCRSchemaModel");
+			this._schema_model.add_model (new SchemaModelProperty ("name", "string", ""));
+			this._schema_model.add_model (new SchemaModelProperty ("parentname", "string", ""));
 
 			/* Initialize StorageModel */
-			//this._storage_model = new StorageModel ("SchemaModel", "midgard_schema_type");
-			//this._storage_model.add_model (new SQLStorageModelProperty ());				
-				 	
+			this.sql_storage_model = new SQLStorageModel ("MidgardCRSchemaModel", "midgard_schema_type");
+			this.sql_storage_model.add_model (new SQLStorageModelProperty ("name", "class_name", "string"));
+			this.sql_storage_model.add_model (new SQLStorageModelProperty ("parentname", "extends", "string"));
 		}
 
 		/* destructor */

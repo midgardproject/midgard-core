@@ -1096,12 +1096,12 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
 	const gchar *storagename = midgard_cr_model_get_name (_storage);
 
 	if (!g_str_equal (objectname, schemaname)) {
-		g_warning ("Can not generate valid SQL query for %s. %s SchemaModel given", objectname, schemaname);
+		g_warning ("Can not generate valid SQL query for %s. SchemaModel of '%s' given", objectname, schemaname);
 		return NULL;
 	}
 
 	if (!g_str_equal (objectname, storagename)) {
-		g_warning ("Can not generate valid SQL query for %s. %s StorageModel given", objectname, storagename);
+		g_warning ("Can not generate valid SQL query for %s. StorageModel of '%s' given", objectname, storagename);
 		return NULL;
 	}
 
@@ -1131,7 +1131,7 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
 			continue;
 		/* Schema and Storage models found, add property's column to query */
 		g_string_append_printf (query, "%s%s", 
-				add_coma ? ", " : "", midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (smodel)));
+				add_coma ? ", " : "", midgard_cr_storage_model_property_get_location (MIDGARD_CR_SQL_STORAGE_MODEL_PROPERTY (smodel)));
 		add_coma = TRUE;
 	}
 
@@ -1141,7 +1141,7 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
 
 /**
  * Generates part of INSERT SQL query used for VALUES.
- * Returned strinf dosn't containt brackets and coma at end and.
+ * Returned strinf dosn't containt brackets and coma at end.
  * For example: 'string_value', 123, 'Foo'.
  */  
 gchar *
@@ -1159,12 +1159,12 @@ midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, Midgard
 	const gchar *storagename = midgard_cr_model_get_name (_storage);
 
 	if (!g_str_equal (objectname, schemaname)) {
-		g_warning ("Can not generate valid SQL query for %s. %s SchemaModel given", objectname, schemaname);
+		g_warning ("Can not generate valid SQL query for %s. SchemaModel of '%s' given", objectname, schemaname);
 		return NULL;
 	}
 
 	if (!g_str_equal (objectname, storagename)) {
-		g_warning ("Can not generate valid SQL query for %s. %s StorageModel given", objectname, storagename);
+		g_warning ("Can not generate valid SQL query for %s. StorageModel of '%s' given", objectname, storagename);
 		return NULL;
 	}
 
@@ -1249,12 +1249,12 @@ midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRSchem
 	const gchar *storagename = midgard_cr_model_get_name (_storage);
 
 	if (!g_str_equal (objectname, schemaname)) {
-		g_warning ("Can not generate valid SQL query for %s. %s SchemaModel given", objectname, schemaname);
+		g_warning ("Can not generate valid SQL query for %s. SchemaModel of '%s' given", objectname, schemaname);
 		return NULL;
 	}
 
 	if (!g_str_equal (objectname, storagename)) {
-		g_warning ("Can not generate valid SQL query for %s. %s StorageModel given", objectname, storagename);
+		g_warning ("Can not generate valid SQL query for %s. StorageModel of '%s' given", objectname, storagename);
 		return NULL;
 	}
 

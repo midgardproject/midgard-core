@@ -65,13 +65,11 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
 		public SQLStorageModelManager ();
+		public MidgardCR.ModelReflector get_reflector ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public class SQLStorageModelProperty : GLib.Object, MidgardCR.Model, MidgardCR.ModelProperty, MidgardCR.Executable, MidgardCR.StorageExecutor {
+	public class SQLStorageModelProperty : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.ModelProperty, MidgardCR.StorageModelProperty {
 		public SQLStorageModelProperty (string name, string location, string type);
-		public bool index { get; set; }
-		public string location { get; set; }
-		public bool primary { get; set; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLWorkspaceManager : MidgardCR.StorageWorkspaceManager, MidgardCR.SQLStorageManager {
@@ -95,6 +93,7 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SchemaModelProperty : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.ModelProperty {
 		public SchemaModelProperty (string name, string type, string dvalue);
+		public MidgardCR.ModelReflector get_reflector ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public abstract class SchemaObject : GLib.Object, MidgardCR.Storable {
@@ -133,7 +132,6 @@ namespace MidgardCR {
 	public interface Model : GLib.Object {
 		public abstract MidgardCR.Model add_model (MidgardCR.Model model);
 		public abstract unowned MidgardCR.Model? get_model_by_name (string name);
-		public abstract MidgardCR.ModelReflector get_reflector ();
 		public abstract void is_valid () throws MidgardCR.ValidationError;
 		public abstract unowned MidgardCR.Model[]? list_models ();
 		public abstract string name { get; set; }

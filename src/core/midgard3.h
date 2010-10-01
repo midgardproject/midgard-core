@@ -564,7 +564,6 @@ struct _MidgardCRModelIface {
 	MidgardCRModel* (*add_model) (MidgardCRModel* self, MidgardCRModel* model);
 	MidgardCRModel* (*get_model_by_name) (MidgardCRModel* self, const char* name);
 	MidgardCRModel** (*list_models) (MidgardCRModel* self, int* result_length1);
-	MidgardCRModelReflector* (*get_reflector) (MidgardCRModel* self);
 	void (*is_valid) (MidgardCRModel* self, GError** error);
 	MidgardCRModel* (*get_parent) (MidgardCRModel* self);
 	void (*set_parent) (MidgardCRModel* self, MidgardCRModel* value);
@@ -1015,7 +1014,6 @@ char* midgard_cr_model_property_reflector_get_description (MidgardCRModelPropert
 MidgardCRModel* midgard_cr_model_add_model (MidgardCRModel* self, MidgardCRModel* model);
 MidgardCRModel* midgard_cr_model_get_model_by_name (MidgardCRModel* self, const char* name);
 MidgardCRModel** midgard_cr_model_list_models (MidgardCRModel* self, int* result_length1);
-MidgardCRModelReflector* midgard_cr_model_get_reflector (MidgardCRModel* self);
 void midgard_cr_model_is_valid (MidgardCRModel* self, GError** error);
 MidgardCRModel* midgard_cr_model_get_parent (MidgardCRModel* self);
 void midgard_cr_model_set_parent (MidgardCRModel* self, MidgardCRModel* value);
@@ -1040,6 +1038,7 @@ const char* midgard_cr_schema_model_get_parentname (MidgardCRSchemaModel* self);
 GType midgard_cr_schema_model_property_get_type (void) G_GNUC_CONST;
 MidgardCRSchemaModelProperty* midgard_cr_schema_model_property_new (const char* name, const char* type, const char* dvalue);
 MidgardCRSchemaModelProperty* midgard_cr_schema_model_property_construct (GType object_type, const char* name, const char* type, const char* dvalue);
+MidgardCRModelReflector* midgard_cr_schema_model_property_get_reflector (MidgardCRSchemaModelProperty* self);
 GQuark midgard_cr_schema_builder_error_quark (void);
 GType midgard_cr_schema_builder_get_type (void) G_GNUC_CONST;
 void midgard_cr_schema_builder_register_model (MidgardCRSchemaBuilder* self, MidgardCRSchemaModel* model, GError** error);
@@ -1156,18 +1155,13 @@ MidgardCRSQLWorkspaceManager* midgard_cr_sql_workspace_manager_construct (GType 
 GType midgard_cr_sql_storage_model_manager_get_type (void) G_GNUC_CONST;
 MidgardCRSQLStorageModelManager* midgard_cr_sql_storage_model_manager_new (void);
 MidgardCRSQLStorageModelManager* midgard_cr_sql_storage_model_manager_construct (GType object_type);
+MidgardCRModelReflector* midgard_cr_sql_storage_model_manager_get_reflector (MidgardCRSQLStorageModelManager* self);
 GType midgard_cr_sql_storage_model_get_type (void) G_GNUC_CONST;
 MidgardCRSQLStorageModel* midgard_cr_sql_storage_model_new (const char* classname, const char* location);
 MidgardCRSQLStorageModel* midgard_cr_sql_storage_model_construct (GType object_type, const char* classname, const char* location);
 GType midgard_cr_sql_storage_model_property_get_type (void) G_GNUC_CONST;
 MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_new (const char* name, const char* location, const char* type);
 MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_construct (GType object_type, const char* name, const char* location, const char* type);
-const char* midgard_cr_sql_storage_model_property_get_location (MidgardCRSQLStorageModelProperty* self);
-void midgard_cr_sql_storage_model_property_set_location (MidgardCRSQLStorageModelProperty* self, const char* value);
-gboolean midgard_cr_sql_storage_model_property_get_index (MidgardCRSQLStorageModelProperty* self);
-void midgard_cr_sql_storage_model_property_set_index (MidgardCRSQLStorageModelProperty* self, gboolean value);
-gboolean midgard_cr_sql_storage_model_property_get_primary (MidgardCRSQLStorageModelProperty* self);
-void midgard_cr_sql_storage_model_property_set_primary (MidgardCRSQLStorageModelProperty* self, gboolean value);
 
 
 G_END_DECLS

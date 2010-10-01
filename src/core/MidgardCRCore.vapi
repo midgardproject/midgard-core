@@ -14,6 +14,11 @@ namespace MidgardCRCore {
 		public static string get_default_confdir ();
 		public static void set_dbtype_id (MidgardCR.Config config, string dbtype);
 	}
+
+	public class StorageSQL {
+		public static string create_query_insert_columns (GLib.Object object, MidgardCR.SchemaModel schema, MidgardCR.StorageModel model);
+		public static string create_query_insert_values (GLib.Object object, MidgardCR.SchemaModel schema, MidgardCR.StorageModel model);
+	}
 	
 	public class SQLStorageManager {
 		public static bool open (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
