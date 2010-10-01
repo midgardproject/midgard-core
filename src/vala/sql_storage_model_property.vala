@@ -17,7 +17,7 @@ namespace MidgardCR {
 	 * }}}
 	 *
 	 */ 
-	public class SQLStorageModelProperty : GLib.Object, Model, ModelProperty, Executable, StorageExecutor {
+	public class SQLStorageModelProperty : GLib.Object, Executable, StorageExecutor, Model, ModelProperty, StorageModelProperty {
 
 		/* private properties */
 
@@ -142,7 +142,7 @@ namespace MidgardCR {
 		 * @param typename default property's value 
 		 */
 		public SQLStorageModelProperty (string name, string location, string type) {
-			Object (name: name, location: type, valuetypename: type);
+			Object (name: name, location: location, valuetypename: type);
 			this._set_gtype_from_name ();	
 		} 
 	
