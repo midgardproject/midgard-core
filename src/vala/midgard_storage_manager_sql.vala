@@ -64,9 +64,11 @@ namespace MidgardCR {
 		}	
 
 		/**
+		 * Constructor
+		 *
 		 * @param name Unique StorageManager name
 		 * @param config MidgardCR.Config to associate with manager
-                 *  
+                 * 
 		 */ 
 		public SQLStorageManager (string name, Config config) throws StorageManagerError {
 			if (name == "" || name == null)

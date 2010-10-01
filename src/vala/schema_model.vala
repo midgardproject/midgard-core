@@ -99,7 +99,7 @@ namespace MidgardCR {
 		 * Conditions to mark model as invalid:
 		 * * models with duplicated names
 		 * * empty models
-		 * 	
+		 * 
 		 */
  		public void is_valid () throws ValidationError { 
 			if (this._models == null)

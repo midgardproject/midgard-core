@@ -228,7 +228,7 @@ namespace MidgardCR {
 		/**
 		 * Creates new StorageModel instance.
 		 * 
-		 * @param model, {@link SchemaModel) instance, which underlying 
+		 * @param model, {@link SchemaModel} instance, which underlying 
 		 * storage should be created for.
 		 * @param location, name of the table which stores data of objects of the class
 		 * represented by SchemaModel.

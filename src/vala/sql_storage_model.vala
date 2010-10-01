@@ -42,13 +42,13 @@ namespace MidgardCR {
 		 * 
 		 * Creates new SQLStorageModel object for given class name and location.
 		 *
-		 * @param classname name of the class 
-		 * @param location table name
-		 * 
 		 * Created SQLStorageModel object describes database table (location) for the class
 		 * it is initialized for. For example, data of 'MyContacts' class objects should be 
 		 * stored in table 'my_contacts_tbl'. In such case, 'MyContacts' should be classname, 
 		 * and 'my_contacts_tbl' should be location.
+		 * 
+		 * @param classname name of the class 
+		 * @param location table name
 		 */
 		public SQLStorageModel (string classname, string location) {
 			Object (name: classname, location: location);
@@ -114,7 +114,7 @@ namespace MidgardCR {
 		 * Conditions to mark model as invalid:
 		 * * models with duplicated names
 		 * * empty models
-		 * 	
+		 *
 		 */
  		public void is_valid () throws ValidationError { 
 			if (this._models == null)
