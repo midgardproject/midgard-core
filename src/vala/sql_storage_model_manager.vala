@@ -81,7 +81,7 @@ namespace MidgardCR {
 			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("valuetypename", "gtype_name", "string"));
 			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("valuedefault", "default_value_string", "string"));
 			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("nick", "property_nick", "string"));
-			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("description", "string", "string"));
+			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("description", "description", "string"));
 		}
 
 		/* destructor */

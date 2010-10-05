@@ -1131,7 +1131,7 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
 			continue;
 		/* Schema and Storage models found, add property's column to query */
 		g_string_append_printf (query, "%s%s", 
-				add_coma ? ", " : "", midgard_cr_storage_model_property_get_location (MIDGARD_CR_SQL_STORAGE_MODEL_PROPERTY (smodel)));
+				add_coma ? ", " : "", midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (smodel)));
 		add_coma = TRUE;
 	}
 
