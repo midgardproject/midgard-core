@@ -125,12 +125,12 @@ midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageMod
 		MidgardCRModel **property_models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (models[i]), &n_props);
 		for (j = 0; j < n_props; j++) {
 			columns = midgard_cr_core_storage_sql_create_query_insert_columns (
-					G_OBJECT (property_models[i]), manager->_schema_model_property, manager->sql_storage_model_property);
+					G_OBJECT (property_models[i]), manager->_class_property_model, manager->sql_storage_column_model);
 			values = midgard_cr_core_storage_sql_create_query_insert_values (
-				G_OBJECT (property_models[i]), manager->_schema_model_property, manager->sql_storage_model_property);
+				G_OBJECT (property_models[i]), manager->_class_property_model, manager->sql_storage_column_model);
 			mquery = g_string_new ("INSERT INTO ");
 			g_string_append_printf (mquery, "%s (%s) VALUES (%s) \n", 
-				midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (manager->sql_storage_model_property)),
+				midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (manager->sql_storage_column_model)),
 				columns, values);
 			g_free (columns);
 			g_free (values);

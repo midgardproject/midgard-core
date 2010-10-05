@@ -861,9 +861,9 @@ struct _MidgardCRSQLStorageModelManager {
 	gint _models_length1;
 	gint __models_size_;
 	MidgardCRSchemaModel* _schema_model;
-	MidgardCRSchemaModel* _schema_model_property;
+	MidgardCRSchemaModel* _class_property_model;
 	MidgardCRStorageModel* sql_storage_model;
-	MidgardCRStorageModel* sql_storage_model_property;
+	MidgardCRStorageModel* sql_storage_column_model;
 	GSList* _query_slist;
 };
 
