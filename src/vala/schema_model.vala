@@ -126,7 +126,7 @@ namespace MidgardCR {
 	/**
 	 * SchemaModelProperty defines property registered for class.
 	 */ 
-	public class SchemaModelProperty : GLib.Object, Model, Executable, ModelProperty {
+	public class SchemaModelProperty : GLib.Object, Model, ModelProperty {
 
 		/* private properties */
 
@@ -183,6 +183,17 @@ namespace MidgardCR {
 		 * Parent model
 		 */
 		public Model? parent { get; set; }
+
+		/**
+		 * Name of the class, property is installed.	 
+		 */
+		public string classname {
+			get {
+				if (this.parent == null)
+					return null;
+				return this.parent.name;
+			}
+		}
 
 		/**
 		 * Marks property as private 
