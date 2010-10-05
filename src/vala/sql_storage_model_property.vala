@@ -17,7 +17,7 @@ namespace MidgardCR {
 	 * }}}
 	 *
 	 */ 
-	public class SQLStorageModelProperty : GLib.Object, Executable, StorageExecutor, Model, ModelProperty, StorageModelProperty {
+	public class SQLStorageModelProperty : GLib.Object, Executable, StorageExecutor, Model, StorageModel, ModelProperty, StorageModelProperty {
 
 		/* private properties */
 

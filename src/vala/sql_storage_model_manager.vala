@@ -10,7 +10,9 @@ namespace MidgardCR {
 		internal unowned SchemaModel[] _schema_models = null;
 		internal Model[] _models = null;
 		internal SchemaModel _schema_model = null;
+		internal SchemaModel _schema_model_property = null;
 		internal StorageModel sql_storage_model = null;
+		internal StorageModel sql_storage_model_property = null;
 		internal GLib.SList _query_slist = null;
 
 		/* Model properties */
@@ -53,15 +55,33 @@ namespace MidgardCR {
 		public SQLStorageModelManager () {
 			Object ();
 			
-			/* Initialize SchemaModel */
+			/* Initialize class SchemaModel */
 			this._schema_model = new SchemaModel ("MidgardCRSchemaModel");
 			this._schema_model.add_model (new SchemaModelProperty ("name", "string", ""));
 			this._schema_model.add_model (new SchemaModelProperty ("parentname", "string", ""));
 
-			/* Initialize StorageModel */
+			/* Initialize class StorageModel */
 			this.sql_storage_model = new SQLStorageModel ("MidgardCRSchemaModel", "midgard_schema_type");
 			this.sql_storage_model.add_model (new SQLStorageModelProperty ("name", "class_name", "string"));
 			this.sql_storage_model.add_model (new SQLStorageModelProperty ("parentname", "extends", "string"));
+
+			/* Initialize property SchemaModel */
+			this._schema_model_property = new SchemaModel ("MidgardCRSchemaModelProperty");
+			this._schema_model_property.add_model (new SchemaModelProperty ("name", "string", ""));
+			this._schema_model_property.add_model (new SchemaModelProperty ("classname", "string", ""));
+			this._schema_model_property.add_model (new SchemaModelProperty ("valuetypename", "string", ""));
+			this._schema_model_property.add_model (new SchemaModelProperty ("valuedefault", "string", ""));
+			this._schema_model_property.add_model (new SchemaModelProperty ("nick", "string", ""));
+			this._schema_model_property.add_model (new SchemaModelProperty ("description", "string", ""));
+
+			/* Initialize property StorageModel */
+			this.sql_storage_model_property = new SQLStorageModel ("MidgardCRSchemaModelProperty", "midgard_schema_type_properties");
+			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("name", "property_name", "string"));
+			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("classname", "class_name", "string"));
+			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("valuetypename", "gtype_name", "string"));
+			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("valuedefault", "default_value_string", "string"));
+			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("nick", "property_nick", "string"));
+			this.sql_storage_model_property.add_model (new SQLStorageModelProperty ("description", "string", "string"));
 		}
 
 		/* destructor */

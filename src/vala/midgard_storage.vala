@@ -108,15 +108,6 @@ namespace MidgardCR {
 		public abstract QueryManager get_query_manager ();
 	} 
 
-	/* Initialized for every given property name */
-	public interface StorageModelProperty : StorageExecutor, ModelProperty {
-
-		/* properties */
-		public abstract string location { get; set; }
-		public abstract bool index { get; set; }
-		public abstract bool primary { get; set; }	
-	}	
-
 	public errordomain StorageModelError {
 		STORAGE_INVALID,
 		STORAGE_EXISTS,
@@ -129,4 +120,12 @@ namespace MidgardCR {
 		/* properties */
 		public abstract string location { get; set; }			
 	}
+
+	/* Initialized for every given property name */
+	public interface StorageModelProperty : StorageExecutor, StorageModel, ModelProperty {
+
+		/* properties */
+		public abstract bool index { get; set; }
+		public abstract bool primary { get; set; }	
+	}	
 }
