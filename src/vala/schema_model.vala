@@ -187,7 +187,7 @@ namespace MidgardCR {
 		/**
 		 * Name of the class, property is installed.	 
 		 */
-		public string classname {
+		public string? classname {
 			get {
 				if (this.parent == null)
 					return null;
@@ -263,10 +263,6 @@ namespace MidgardCR {
 
 		public unowned Model[]? list_models () { 
 			return this._models; 
-		}
-
-		public ModelReflector get_reflector () { 
-			return null; 
 		}
 
 		/** 
