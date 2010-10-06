@@ -45,8 +45,8 @@ namespace MidgardCR {
 		/**
 		 * {@link StorageManager}
 		 */
-		public StorageManager storage_manager   { 
-			get { return null; } 
+		public StorageManager storagemanager   { 
+			get { return (StorageManager)this._storage_manager; } 
 		} 		
 
 		/**
@@ -170,11 +170,19 @@ namespace MidgardCR {
 		public void prepare_create () throws ValidationError {
 			this.is_valid ();
 
+			/* Validate models */
 			foreach (Model model in this._models) {
 				unowned Model model_found = this._find_model_by_name ((Model[])this._schema_models, model.name);
 				if (model_found != null)
 					throw new MidgardCR.ValidationError.NAME_DUPLICATED ("%s class already exists in schema table", model.name); 
 			}
+
+			/* Prepare create for every StorageExecutor derived */
+			foreach (Model model in this._models) {
+				if (model is StorageExecutor)
+					((StorageExecutor)model).prepare_create ();
+			}
+			/* Prepare create for Schema models */
 			MidgardCRCore.SQLStorageModelManager.prepare_create (this);	
 		}
 

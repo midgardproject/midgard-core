@@ -10,11 +10,12 @@ namespace MidgardCR {
 	 * {@link SQLStorageModelManager} provides access to all available schema and SQL storage models.
 	 * 
 	 */ 
-	public class SQLStorageModel: GLib.Object, Model, StorageModel {
+	public class SQLStorageModel: GLib.Object, Executable, StorageExecutor, Model, StorageModel {
 		
 		/* private properties */
 
 		private Model[] _models = null;
+		internal StorageManager _storage_manager = null;
 
 		/* public properties */
 		
@@ -36,7 +37,13 @@ namespace MidgardCR {
                  * Parent model of the model.
                  */
                 public Model? parent { get; set; }
-	
+		/**
+		 * Holds reference to {@link SQLStorageManager} object 
+		 */
+		public unowned StorageManager storagemanager { 	
+			get { return this._storage_manager; }
+		}			
+
 		/**
 		 * Constructor
 		 * 
@@ -115,7 +122,8 @@ namespace MidgardCR {
 			/* Check if name does not containt invalid characters */
 
 			string[] names = new string[0];
-			foreach (MidgardCR.Model model in this._models) {	
+			foreach (MidgardCR.Model model in this._models) {
+				/* TODO, check if it's SchemaModel or StorageModel */	
 				foreach (string name in names) {
 					if (name == model.name)
 						throw new MidgardCR.ValidationError.NAME_DUPLICATED ("Duplicated model name found");
@@ -123,5 +131,35 @@ namespace MidgardCR {
 				names += model.name;
 			}	
 		}					
+
+		/* StorageExecutor methods */
+		public bool exists () {
+			return false;
+		} 
+		
+                public void prepare_create () throws ValidationError {
+
+		}
+
+                public void prepare_update () throws ValidationError {
+
+		}
+
+                public void prepare_save () throws ValidationError {
+
+		}
+
+                public void prepare_remove () throws ValidationError {
+
+		}
+
+                public void prepare_purge () throws ValidationError {
+
+		}
+
+		/* Executable methods */
+		public void execute () { 
+			return; 
+		}		
 	}
 }

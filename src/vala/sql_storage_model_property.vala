@@ -28,6 +28,7 @@ namespace MidgardCR {
 		/* internal properties */
 
 		internal uint _id = 0;
+		internal unowned StorageManager _storage_manager = null;
 
 		/* public properties */
 	
@@ -96,6 +97,13 @@ namespace MidgardCR {
 		 * Toggle to mark column as primary key 
 		 */
 		public bool primary { get; set; }
+
+		/**
+		 * {@link SQLStorageManager}
+		 */
+		public unowned StorageManager storagemanager {
+			get { return (StorageManager)this._storage_manager; }
+		}
 
 		private void _set_gtype_from_name () {
 			switch (this._typename) {

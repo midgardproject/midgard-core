@@ -76,7 +76,7 @@ namespace MidgardCR {
 
 		/* properties */
 		public abstract NamespaceManager namespace_manager { get; }
-		public abstract StorageManager   storage_manager   { get; } // FIXME: is this really needed?
+		public abstract unowned StorageManager   storagemanager   { get; } 
 
 		/* methods */
 		public abstract StorageModel create_storage_model (SchemaModel schema_model, string location);
@@ -95,7 +95,7 @@ namespace MidgardCR {
 
 		/* public abstract StorageManager storagemanager { get; construct; };  */
 
-		public abstract StorageManager get_storage_manager ();
+		public abstract unowned StorageManager storagemanager { get; }
 
 		/* per object methods */
 		public abstract bool exists (Storable object);
@@ -115,10 +115,11 @@ namespace MidgardCR {
 	}
 
 	/* Initialized for every given class name */
-	public interface StorageModel : Model {
+	public interface StorageModel : Model, StorageExecutor {
 	
 		/* properties */
-		public abstract string location { get; set; }			
+		public abstract string location { get; set; }		
+		public abstract unowned StorageManager storagemanager { get; }	
 	}
 
 	/* Initialized for every given property name */
