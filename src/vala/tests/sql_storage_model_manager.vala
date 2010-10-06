@@ -69,7 +69,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (DEFAULT_PROPERTY_NAME, "string", "");
+                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model);
@@ -123,13 +123,27 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (DEFAULT_PROPERTY_NAME, "string", "");
+                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
-                model.add_model (prop_model);
+		/* SUCCESS */
+                MidgardCR.SchemaModelProperty prop_model_a = new MidgardCR.SchemaModelProperty (ABSTRACT_PROPERTY_NAME, "string", "");
+                assert (prop_model != null);
+
+                model.add_model (prop_model).add_model (prop_model_a);
+
+		/* SQLStorageModel */
+		/* SUCCESS */
+		MidgardCR.SQLStorageModel storage_model = model_manager.create_storage_model (model, DEFAULT_TABLENAME) as MidgardCR.SQLStorageModel;
+		assert (storage_model != null);
+		MidgardCR.SQLStorageModelProperty storage_model_prop = storage_model.create_model_property (TITLE_PROPERTY_NAME, TITLE_COLUMN, "string");
+		assert (storage_model_prop != null);
+		MidgardCR.SQLStorageModelProperty storage_model_prop_a = storage_model.create_model_property (ABSTRACT_PROPERTY_NAME, ABSTRACT_COLUMN, "string");
+		assert (storage_model_prop_a != null);
+		storage_model.add_model (storage_model_prop).add_model (storage_model_prop_a);
 
 		/* Add Schema model to StorageModelManager */
-		model_manager.add_model (model);
+		model_manager.add_model (model).add_model (storage_model);
 
 		/* SUCCESS */
 		try {
@@ -143,7 +157,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 			model_manager.execute ();
 		} catch (ExecutableError e) {
 			GLib.warning (e.message);
-		}
+		}	
 	});
 }
 

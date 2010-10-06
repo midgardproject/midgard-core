@@ -359,3 +359,219 @@ midgard_cr_core_sql_storage_manager_initialize_storage (MidgardCRSQLStorageManag
 
 	return TRUE;
 }
+
+gboolean  
+midgard_cr_core_sql_storage_manager_table_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModel *storage_model)
+{
+	g_return_if_fail (manager != NULL);
+	g_return_if_fail (storage_model != NULL);
+
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	g_return_if_fail (GDA_IS_CONNECTION (cnc));
+
+	const gchar *tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (storage_model));
+
+	return midgard_core_storage_sql_table_exists (cnc, tablename);
+}
+
+void 
+midgard_cr_core_sql_storage_manager_table_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModel *storage_model, GError **error)
+{
+	g_return_if_fail (manager != NULL);
+	g_return_if_fail (storage_model != NULL);
+
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	g_return_if_fail (GDA_IS_CONNECTION (cnc));
+
+	const gchar *tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (storage_model));
+	const gchar *description = ""; /* TODO, add description property to model if needed */
+	const gchar *primary = "id";
+
+	if (midgard_core_storage_sql_table_exists (cnc, tablename))
+		return;
+
+	guint n_models;
+	guint i;
+	/* Do not free models array, it's owned by storage_model */
+	MidgardCRModel **models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (storage_model), &n_models);
+	for (i = 0; i < n_models; i++) {
+		if (midgard_cr_storage_model_property_get_primary (MIDGARD_CR_STORAGE_MODEL_PROPERTY (models[i]))) {
+			primary = midgard_cr_model_get_name (models[i]);
+			break;
+		}
+	}
+
+	GError *err = NULL;
+	if (!midgard_core_storage_sql_table_create (cnc, tablename, description, primary, &err)) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+	}
+}
+
+void 
+midgard_cr_core_sql_storage_manager_table_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModel *storage_model, GError **error)
+{
+	g_return_if_fail (manager != NULL);
+	g_return_if_fail (storage_model != NULL);
+
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	g_return_if_fail (GDA_IS_CONNECTION (cnc));
+
+	const gchar *tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (storage_model));
+
+	GError *err = NULL;
+	if (!midgard_core_storage_sql_table_remove (cnc, tablename, &err)) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+	}
+}
+
+static void
+_mdc_from_model_property (MidgardCRSQLStorageModelProperty *property_model, MgdCoreStorageSQLColumn *mdc)
+{
+	const gchar *colname = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (property_model));
+	MidgardCRModel *parent = midgard_cr_model_get_parent (MIDGARD_CR_MODEL (property_model));
+	const gchar *tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (parent));
+	GType col_type = midgard_cr_model_property_get_valuegtype (MIDGARD_CR_MODEL_PROPERTY (property_model));
+	const gchar *description = midgard_cr_model_property_get_description (MIDGARD_CR_MODEL_PROPERTY (property_model));
+
+	midgard_core_storage_sql_column_init (mdc, tablename, colname, col_type);
+	if (description != NULL)
+		mdc->column_desc = description;
+
+	return;
+}
+
+gboolean 
+midgard_cr_core_sql_storage_manager_column_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model)
+{
+	g_return_val_if_fail (manager != NULL, FALSE);
+	g_return_val_if_fail (property_model != NULL, FALSE);
+
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	g_return_val_if_fail (GDA_IS_CONNECTION (cnc), FALSE);
+
+	MgdCoreStorageSQLColumn mdc = { NULL, NULL };
+	_mdc_from_model_property (property_model, &mdc);
+
+	return midgard_core_storage_sql_column_exists (cnc, &mdc);
+}
+
+void 
+midgard_cr_core_sql_storage_manager_column_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error)
+{
+	g_return_if_fail (manager != NULL);
+	g_return_if_fail (property_model != NULL);
+	
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	g_return_if_fail (GDA_IS_CONNECTION (cnc));
+
+	MgdCoreStorageSQLColumn mdc = { NULL, NULL };
+	_mdc_from_model_property (property_model, &mdc);
+
+	GError *err = NULL;
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {	
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+	}
+
+	gboolean has_index = midgard_cr_storage_model_property_get_index (MIDGARD_CR_STORAGE_MODEL_PROPERTY (property_model));
+	if (!has_index)
+		return;
+	mdc.index = TRUE;
+
+	if (midgard_core_storage_sql_index_exists (cnc, &mdc))
+		return;
+
+	if (!midgard_core_storage_sql_index_create (cnc, &mdc, &err)) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+	}
+
+	return;
+}
+
+void 
+midgard_cr_core_sql_storage_manager_column_update (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error)
+{
+	g_return_if_fail (manager != NULL);
+	g_return_if_fail (property_model != NULL);
+	
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	g_return_if_fail (GDA_IS_CONNECTION (cnc));
+
+	MgdCoreStorageSQLColumn mdc = { NULL, NULL };
+	_mdc_from_model_property (property_model, &mdc);
+
+	GError *err = NULL;
+	if (!midgard_core_storage_sql_column_update (cnc, &mdc, &err)) {	
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+	}
+
+	gboolean has_index = midgard_cr_storage_model_property_get_index (MIDGARD_CR_STORAGE_MODEL_PROPERTY (property_model));
+	if (!has_index)
+		return;
+	mdc.index = TRUE;
+
+	if (midgard_core_storage_sql_index_exists (cnc, &mdc))
+		return;
+
+	if (!midgard_core_storage_sql_index_create (cnc, &mdc, &err)) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+	}
+
+	return;
+}
+
+void 
+midgard_cr_core_sql_storage_manager_column_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error)
+{
+	g_return_if_fail (manager != NULL);
+	g_return_if_fail (property_model != NULL);
+	
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	g_return_if_fail (GDA_IS_CONNECTION (cnc));
+
+	MgdCoreStorageSQLColumn mdc = { NULL, NULL };
+	_mdc_from_model_property (property_model, &mdc);
+
+	GError *err = NULL;
+	if (!midgard_core_storage_sql_column_update (cnc, &mdc, &err)) {	
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+	}
+
+	gboolean has_index = midgard_cr_storage_model_property_get_index (MIDGARD_CR_STORAGE_MODEL_PROPERTY (property_model));
+	if (!has_index)
+		return;
+	mdc.index = TRUE;
+
+	if (midgard_core_storage_sql_index_exists (cnc, &mdc))
+		return;
+
+	if (!midgard_core_storage_sql_index_create (cnc, &mdc, &err)) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+	}
+
+	return;
+}
+

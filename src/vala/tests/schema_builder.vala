@@ -18,7 +18,7 @@ void midgardcr_test_add_schema_builder_tests () {
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (DEFAULT_PROPERTY_NAME, "string", "");
+                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model);
@@ -53,7 +53,7 @@ void midgardcr_test_add_schema_builder_tests () {
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (DEFAULT_PROPERTY_NAME, "string", "");
+                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model);
@@ -98,7 +98,7 @@ void midgardcr_test_add_schema_builder_tests () {
 		assert (pspecs.length == 4);
 
 		/* Check if our default property is installed for default class */
-		GLib.ParamSpec pspec = o.get_class ().find_property (DEFAULT_PROPERTY_NAME);
+		GLib.ParamSpec pspec = o.get_class ().find_property (TITLE_PROPERTY_NAME);
 		assert (pspec != null);
 
 		/* Check if property setter and getter works correctly */

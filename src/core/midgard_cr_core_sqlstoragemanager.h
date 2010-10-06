@@ -28,4 +28,15 @@ gboolean midgard_cr_core_sql_storage_manager_open (MidgardCRSQLStorageManager *m
 gboolean midgard_cr_core_sql_storage_manager_close (MidgardCRSQLStorageManager *manager, GError **error);
 gboolean midgard_cr_core_sql_storage_manager_initialize_storage (MidgardCRSQLStorageManager *manager, GError **error);
 
+/* SQLStorageModel methods */ 
+gboolean midgard_cr_core_sql_storage_manager_table_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModel *storage_model);
+void midgard_cr_core_sql_storage_manager_table_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModel *storage_model, GError **error);
+void midgard_cr_core_sql_storage_manager_table_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModel *storage_model, GError **error);
+
+/* SQLStorageModelProperty methods */
+gboolean midgard_cr_core_sql_storage_manager_column_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model);
+void midgard_cr_core_sql_storage_manager_column_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error);
+void midgard_cr_core_sql_storage_manager_column_update (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error);
+void midgard_cr_core_sql_storage_manager_column_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error);
+
 #endif /* _MIDGARD_CR_CORE_SQL_STORAGE_MANAGER_H_ */

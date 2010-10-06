@@ -24,10 +24,13 @@ namespace MidgardCRCore {
 		public static bool open (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
 		public static bool close (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
 		public static bool initialize_storage (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
-	}
+		public static bool table_exists (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModel storage_model);
+		public static void table_create (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModel storage_model) throws MidgardCR.ExecutableError;
+		public static void table_remove (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModel storage_model) throws MidgardCR.ExecutableError;
+}
 
 	public class SQLStorageModelManager {
-		public static void prepare_create (MidgardCR.SQLStorageModelManager manager) throws MidgardCR.ValidationError;
+		public static void prepare_create (MidgardCR.SQLStorageModelManager manager, MidgardCR.Model model) throws MidgardCR.ValidationError;
 		public static void execute (MidgardCR.SQLStorageModelManager manager) throws MidgardCR.ExecutableError;
 	}
 

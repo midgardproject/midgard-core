@@ -59,13 +59,13 @@ namespace MidgardCR {
 		public string name { get; construct; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public class SQLStorageModel : GLib.Object, MidgardCR.Model, MidgardCR.StorageModel {
+	public class SQLStorageModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel {
 		public SQLStorageModel (string classname, string location);
+		public MidgardCR.SQLStorageModelProperty create_model_property (string name, string location, string type);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
 		public SQLStorageModelManager ();
-		public MidgardCR.ModelReflector get_reflector ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageModelProperty : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel, MidgardCR.ModelProperty, MidgardCR.StorageModelProperty {
@@ -94,8 +94,7 @@ namespace MidgardCR {
 	public class SchemaModelProperty : GLib.Object, MidgardCR.Model, MidgardCR.ModelProperty {
 		public SchemaModelProperty (string name, string type, string dvalue);
 		public void execute ();
-		public MidgardCR.ModelReflector get_reflector ();
-		public string classname { get; }
+		public string? classname { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public abstract class SchemaObject : GLib.Object, MidgardCR.Storable {
@@ -242,11 +241,11 @@ namespace MidgardCR {
 		public abstract bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool exists (MidgardCR.Storable object);
 		public abstract MidgardCR.QueryManager get_query_manager ();
-		public abstract MidgardCR.StorageManager get_storage_manager ();
 		public abstract bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public abstract MidgardCR.StorageManager storagemanager { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageExecutor : MidgardCR.Executable {
@@ -280,8 +279,9 @@ namespace MidgardCR {
 		public abstract void register_manager_type (string classname);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public interface StorageModel : MidgardCR.Model {
+	public interface StorageModel : MidgardCR.Model, MidgardCR.StorageExecutor {
 		public abstract string location { get; set; }
+		public abstract MidgardCR.StorageManager storagemanager { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageModelManager : MidgardCR.Model, MidgardCR.StorageExecutor {
@@ -289,7 +289,7 @@ namespace MidgardCR {
 		public abstract unowned MidgardCR.SchemaModel[]? list_schema_models ();
 		public abstract unowned MidgardCR.StorageModel[]? list_storage_models ();
 		public abstract MidgardCR.NamespaceManager namespace_manager { get; }
-		public abstract MidgardCR.StorageManager storage_manager { get; }
+		public abstract MidgardCR.StorageManager storagemanager { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageModelProperty : MidgardCR.StorageExecutor, MidgardCR.StorageModel, MidgardCR.ModelProperty {

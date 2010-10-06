@@ -1,7 +1,11 @@
 
 const string MISS_IMPL = "MISSING IMPLEMENTATION ";
 const string DEFAULT_CLASSNAME = "CRFoo";
-const string DEFAULT_PROPERTY_NAME = "title_property";
+const string DEFAULT_TABLENAME = "CRFoo_table";
+const string TITLE_PROPERTY_NAME = "title_property";
+const string TITLE_COLUMN = "title_col";
+const string ABSTRACT_PROPERTY_NAME = "abstract_property";
+const string ABSTRACT_COLUMN = "abstract_col";
 
 void main (string[] args) {
 	Test.init (ref args);

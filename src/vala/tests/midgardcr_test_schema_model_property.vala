@@ -4,16 +4,16 @@ void midgardcr_test_add_schema_model_property_tests () {
 
 	/* constructor */
 	Test.add_func ("/SchemaModelProperty/constructor", () => {
-		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (DEFAULT_PROPERTY_NAME, "string", "");
+		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
-		assert (model.name == DEFAULT_PROPERTY_NAME);
+		assert (model.name == TITLE_PROPERTY_NAME);
 	});
 
 	/* add model */
 	Test.add_func ("/SchemaModelProperty/add_model", () => {
-		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (DEFAULT_PROPERTY_NAME, "string", "");
+		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
-		assert (model.name == DEFAULT_PROPERTY_NAME);
+		assert (model.name == TITLE_PROPERTY_NAME);
 
 		/* SUCCESS */
 		MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty ("title", "string", "");
@@ -25,9 +25,9 @@ void midgardcr_test_add_schema_model_property_tests () {
 
 	/* get model by name */
 	Test.add_func ("/SchemaModelProperty/get_model_by_name", () => {	
-		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (DEFAULT_PROPERTY_NAME, "string", "");
+		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
-		assert (model.name == DEFAULT_PROPERTY_NAME);
+		assert (model.name == TITLE_PROPERTY_NAME);
 
 		/* SUCCESS */
 		MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty ("title", "string", "");
@@ -46,9 +46,9 @@ void midgardcr_test_add_schema_model_property_tests () {
 	});
 
 	Test.add_func ("/SchemaModelProperty/list_models", () => {
-		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (DEFAULT_PROPERTY_NAME, "string", "");
+		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
-		assert (model.name == DEFAULT_PROPERTY_NAME);
+		assert (model.name == TITLE_PROPERTY_NAME);
 		
 		/* FAIL */
 		MidgardCR.Model[] empty_models = model.list_models ();
@@ -72,9 +72,9 @@ void midgardcr_test_add_schema_model_property_tests () {
 	});
 
 	Test.add_func ("/SchemaModelProperty/is_valid", () => {
-		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (DEFAULT_PROPERTY_NAME, "string", "");
+		MidgardCR.SchemaModelProperty model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
-		assert (model.name == DEFAULT_PROPERTY_NAME);
+		assert (model.name == TITLE_PROPERTY_NAME);
 
 		/* FAIL */
 		bool invalid_model = true;

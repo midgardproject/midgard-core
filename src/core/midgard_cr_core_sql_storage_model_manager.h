@@ -24,7 +24,7 @@
 #include "midgard3.h"
 #include "midgard_local.h"
 
-void midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageModelManager *manager, GError **error);
+void midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageModelManager *manager, MidgardCRModel *model, GError **error);
 void midgard_cr_core_sql_storage_model_manager_prepare_update (MidgardCRSQLStorageModelManager *manager, GError **error);
 void midgard_cr_core_sql_storage_model_manager_prepare_save (MidgardCRSQLStorageModelManager *manager, GError **error);
 void midgard_cr_core_sql_storage_model_manager_prepare_delete (MidgardCRSQLStorageModelManager *manager, GError **error);

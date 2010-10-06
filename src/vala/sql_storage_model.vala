@@ -15,7 +15,10 @@ namespace MidgardCR {
 		/* private properties */
 
 		private Model[] _models = null;
-		internal StorageManager _storage_manager = null;
+		internal SQLStorageManager _storage_manager = null;
+		private bool _create_table = false;
+		private bool _update_table = false;
+		private bool _drop_table = false;
 
 		/* public properties */
 		
@@ -124,6 +127,8 @@ namespace MidgardCR {
 			string[] names = new string[0];
 			foreach (MidgardCR.Model model in this._models) {
 				/* TODO, check if it's SchemaModel or StorageModel */	
+				if (!(model is SQLStorageModelProperty))
+					throw new ValidationError.TYPE_INVALID ("Invalid '%s' model associated with  SQLStorageModel. Expected SQLStorageModelProperty", model.get_type().name());
 				foreach (string name in names) {
 					if (name == model.name)
 						throw new MidgardCR.ValidationError.NAME_DUPLICATED ("Duplicated model name found");
@@ -132,33 +137,69 @@ namespace MidgardCR {
 			}	
 		}					
 
+		/**
+		 * Create new {@link SQLStorageModelProperty}
+		 */
+		public SQLStorageModelProperty create_model_property (string name, string location, string type) {
+			SQLStorageModelProperty model = new SQLStorageModelProperty (name, location, type);
+			model.parent = this;
+			model._storage_manager = this._storage_manager;
+			return model;
+		}
+
 		/* StorageExecutor methods */
 		public bool exists () {
 			return false;
 		} 
 		
                 public void prepare_create () throws ValidationError {
-
+			this.is_valid ();
+			this._create_table = true;
+			/* Prepare columns to create */
+			foreach (MidgardCR.Model model in this._models) 	
+				((StorageExecutor)model).prepare_create ();
 		}
 
                 public void prepare_update () throws ValidationError {
-
+			this.is_valid ();
+			this._update_table = true;
+			/* Prepare columns to update */
+			foreach (MidgardCR.Model model in this._models) 
+				((StorageExecutor)model).prepare_update ();			
 		}
 
                 public void prepare_save () throws ValidationError {
-
+			this.is_valid ();
+			this._create_table = true;
+			this._update_table = true;
+			/* Prepare columns to update and create if do not exist */
+			foreach (MidgardCR.Model model in this._models) 
+				((StorageExecutor)model).prepare_save ();			
 		}
 
                 public void prepare_remove () throws ValidationError {
-
+			this.is_valid ();
+			this._drop_table = true;	
+			/* Ignore prepare_remove call for properties, we'll drop table anyway */	
 		}
 
                 public void prepare_purge () throws ValidationError {
-
+			this.is_valid ();
+			this._drop_table = true;
+			/* Ignore prepare_remove call for properties, we'll drop table anyway */	
 		}
 
 		/* Executable methods */
-		public void execute () { 
+		public void execute () throws ExecutableError { 
+			if (this._create_table)
+				MidgardCRCore.SQLStorageManager.table_create (this._storage_manager, this);
+
+			if (this._drop_table)
+				MidgardCRCore.SQLStorageManager.table_remove (this._storage_manager, this);
+
+			foreach (MidgardCR.Model model in this._models) {
+				((StorageExecutor)model).execute ();			
+			}
 			return; 
 		}		
 	}
