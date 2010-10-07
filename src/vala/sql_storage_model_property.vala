@@ -279,6 +279,10 @@ namespace MidgardCR {
 			foreach (weak string query in this._queries) {
                                 MidgardCRCore.SQLStorageManager.query_execute (this._storage_manager, query);
                         }
+			this._create_column = false;
+			this._update_column = false;
+			this._remove_column = false;	
+			this._queries = null;	
 		}		
 	}
 }

@@ -210,7 +210,11 @@ namespace MidgardCR {
 			foreach (MidgardCR.Model model in this._models) {
 				((StorageExecutor)model).execute ();			
 			}
-			return; 
+
+			this._create_table = false;
+			this._update_table = false;
+			this._drop_table = false;
+			this._queries = null;
 		}		
 	}
 }
