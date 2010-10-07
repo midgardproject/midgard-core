@@ -785,6 +785,10 @@ struct _MidgardCRSQLStorageManager {
 	MidgardCRStorageModel** _storage_models;
 	gint _storage_models_length1;
 	gint __storage_models_size_;
+	MidgardCRSchemaModel* _storage_model_object_model;
+	MidgardCRStorageModel* _storage_model_storage_model;
+	MidgardCRSchemaModel* _storage_model_property_object_model;
+	MidgardCRStorageModel* _storage_model_property_storage_model;
 };
 
 struct _MidgardCRSQLStorageManagerClass {
@@ -886,7 +890,7 @@ struct _MidgardCRSQLStorageModelProperty {
 	GObject parent_instance;
 	MidgardCRSQLStorageModelPropertyPrivate * priv;
 	guint _id;
-	MidgardCRStorageManager* _storage_manager;
+	MidgardCRSQLStorageManager* _storage_manager;
 };
 
 struct _MidgardCRSQLStorageModelPropertyClass {

@@ -24,11 +24,15 @@ namespace MidgardCR {
 		private Model[] _models = null;
 		private string _typename = null;
 		private GLib.Type _gtype = 0;
+		private bool _create_column = false;
+		private bool _update_column = false;
+		private bool _remove_column = false;
+		private string[] _queries = null;
 
 		/* internal properties */
 
 		internal uint _id = 0;
-		internal unowned StorageManager _storage_manager = null;
+		internal unowned SQLStorageManager _storage_manager = null;
 
 		/* public properties */
 	
@@ -178,8 +182,12 @@ namespace MidgardCR {
 		/** 
 		 * Check if SQLStorageModelProperty is valid
 		 *
-		 * If it's valid, this method silently returns.
-		 * In other case, error is thrown.
+		 * In case of invalid model, error is thrown:
+		 * 
+		 * 1. NAME_INVALID, the type of property is empty
+		 * 1. TYPE_INVALID, the GLib.Type of property is invalid
+		 * 1. REFERENCE_INVALID, more than one model is added 
+		 * 1. REFERENCE_INVALID, null parent model 
 		 */
 		public void is_valid () throws ValidationError { 
 			/* type id or name is empty thus invalid */
@@ -200,33 +208,77 @@ namespace MidgardCR {
 		}
 
 		/* StorageExecutor methods */
+		/**
+		 * Check if column exists
+		 *
+		 * @return true if column described by model exists in table, false otherwise
+		 */
 		public bool exists () {
-			return false;
+			return MidgardCRCore.SQLStorageManager.column_exists (this._storage_manager, this);
 		} 
 		
+		/**
+		 * Prepare create SQL query
+		 */
                 public void prepare_create () throws ValidationError {
-
+			this.is_valid ();
+			this._create_column = true;
+			string query = MidgardCRCore.StorageSQL.create_query_insert (this,
+                                this._storage_manager._storage_model_property_object_model, this._storage_manager._storage_model_property_storage_model);
+			this._queries += query;
 		}
 
+		/**
+		 * Prepare table alter SQL query, which updates exisiting column
+		 */ 
                 public void prepare_update () throws ValidationError {
-
+			this.is_valid ();
+			this._update_column = true;
 		}
-
+		
+		/**
+		 * Prepare both: create and update SQL queries
+		 */
                 public void prepare_save () throws ValidationError {
-
+			this.is_valid ();
+			this._create_column = true;
+			this._update_column = true;
 		}
 
+		/** 
+		 * Prepare SQL query to remove column from table
+		 */
                 public void prepare_remove () throws ValidationError {
-
+			this.is_valid ();
+			this._remove_column = true;
 		}
 
+		/**
+		 * Prepare SQL query to remove column from table
+		 */
                 public void prepare_purge () throws ValidationError {
-
+			this.is_valid ();
+			this._remove_column = true;
 		}
 
 		/* Executable methods */
+		/**
+		 * Executes SQL queries, which model has been prepared for.
+		 * Depending on prepare, it may create, update or remove column.
+		 * Also executes queries to store information about given model.
+		 */
 		public void execute () { 
-			return; 
+			/* Create column or alter table */
+			if (this._create_column)
+				MidgardCRCore.SQLStorageManager.column_create (this._storage_manager, this);
+			if (this._update_column)
+				MidgardCRCore.SQLStorageManager.column_update (this._storage_manager, this);
+			if (this._remove_column)
+				MidgardCRCore.SQLStorageManager.column_remove (this._storage_manager, this);
+			/* Store info about column */
+			foreach (weak string query in this._queries) {
+                                MidgardCRCore.SQLStorageManager.query_execute (this._storage_manager, query);
+                        }
 		}		
 	}
 }

@@ -19,6 +19,8 @@ namespace MidgardCR {
 		private bool _create_table = false;
 		private bool _update_table = false;
 		private bool _drop_table = false;
+		private SchemaModel _object_model = null;
+		private string[] _queries = null;
 
 		/* public properties */
 		
@@ -67,7 +69,7 @@ namespace MidgardCR {
 		/**
 		 * Add new property model 
 		 *
-		 * Any model added to SQLStorageModel one should be an instance
+		 * Any model added to SQLStorageModel one, should be an instance
 		 * of {@link SQLStorageModelProperty}. In any other case, model 
 		 * will be marked as invalid, during validation process.  
 		 *
@@ -155,9 +157,13 @@ namespace MidgardCR {
                 public void prepare_create () throws ValidationError {
 			this.is_valid ();
 			this._create_table = true;
+			/* Prepare table data to create */
+			this._queries += MidgardCRCore.StorageSQL.create_query_insert (this, 
+				this._storage_manager._storage_model_object_model, this._storage_manager._storage_model_storage_model);
 			/* Prepare columns to create */
-			foreach (MidgardCR.Model model in this._models) 	
+			foreach (MidgardCR.Model model in this._models) {	
 				((StorageExecutor)model).prepare_create ();
+			}
 		}
 
                 public void prepare_update () throws ValidationError {
@@ -196,6 +202,10 @@ namespace MidgardCR {
 
 			if (this._drop_table)
 				MidgardCRCore.SQLStorageManager.table_remove (this._storage_manager, this);
+
+			foreach (weak string query in this._queries) {
+				MidgardCRCore.SQLStorageManager.query_execute (this._storage_manager, query);
+			}
 
 			foreach (MidgardCR.Model model in this._models) {
 				((StorageExecutor)model).execute ();			

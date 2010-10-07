@@ -575,3 +575,30 @@ midgard_cr_core_sql_storage_manager_column_remove (MidgardCRSQLStorageManager *m
 	return;
 }
 
+/**
+ * Executes given SQL query
+ */
+gint 
+midgard_cr_core_sql_storage_manager_query_execute (MidgardCRSQLStorageManager *manager, const gchar *query, GError **error)
+{
+	g_return_val_if_fail (manager != NULL, -1);
+	g_return_val_if_fail (query != NULL, -1);
+	g_return_val_if_fail (error == NULL || *error == NULL, -1);
+
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	g_return_val_if_fail (GDA_IS_CONNECTION (cnc), -1);
+	GdaSqlParser *parser = (GdaSqlParser *) manager->_parser;
+	g_return_val_if_fail (parser != NULL, -1);
+
+	GError *err = NULL;
+	int ret = midgard_core_storage_sql_query_execute (cnc, parser, query, &err);
+	if (err) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+	}
+
+	return ret;
+}
+

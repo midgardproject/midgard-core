@@ -39,4 +39,7 @@ void midgard_cr_core_sql_storage_manager_column_create (MidgardCRSQLStorageManag
 void midgard_cr_core_sql_storage_manager_column_update (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error);
 void midgard_cr_core_sql_storage_manager_column_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error);
 
+/* QUERY */
+gint midgard_cr_core_sql_storage_manager_query_execute (MidgardCRSQLStorageManager *manager, const gchar *query, GError **error);
+
 #endif /* _MIDGARD_CR_CORE_SQL_STORAGE_MANAGER_H_ */

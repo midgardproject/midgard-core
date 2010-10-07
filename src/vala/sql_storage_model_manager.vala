@@ -169,8 +169,7 @@ namespace MidgardCR {
 
 			/* Prepare create for every StorageExecutor derived */
 			foreach (Model model in this._models) {
-				if (model is StorageExecutor) {
-					GLib.print ("PREPARE EXECUTE FOR %s:%s \n", model.get_type().name(), model.name);
+				if (model is StorageExecutor) {	
 					((StorageExecutor)model).prepare_create ();
 				} else if (model is SchemaModel) {	
 					MidgardCRCore.SQLStorageModelManager.prepare_create (this, model);

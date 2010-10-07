@@ -68,8 +68,12 @@ gboolean midgard_core_storage_sql_index_remove (GdaConnection *cnc, MgdCoreStora
 
 gboolean midgard_core_storage_sql_create_base_tables (GdaConnection *cnc, GError **error);
 
+/* INSERT */
 gchar *midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage);
 gchar *midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_insert (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage);
+/* UPDATE */
 gchar *midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage);
+/* DELETE */
 
 #endif /* MIDGARD_CORE_STORAGE_SQL_H */

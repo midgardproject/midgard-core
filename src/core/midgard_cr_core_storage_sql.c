@@ -1230,6 +1230,28 @@ midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, Midgard
 }
 
 /**
+ * Generates generic 'INSERT INTO...' SQL query for given object and models.
+ */  
+gchar *
+midgard_cr_core_storage_sql_create_query_insert (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage) 
+{
+	g_return_val_if_fail (object != NULL, NULL);
+	g_return_val_if_fail (schema != NULL, NULL);
+	g_return_val_if_fail (storage != NULL, NULL);
+
+	const gchar *tablename = midgard_cr_storage_model_get_location (storage);
+	g_return_val_if_fail (tablename != NULL, NULL);
+
+	gchar *columns = midgard_cr_core_storage_sql_create_query_insert_columns (object, schema, storage);
+	gchar *values = midgard_cr_core_storage_sql_create_query_insert_values (object, schema, storage);
+
+	GString *query = g_string_new ("INSERT INTO ");
+	g_string_append_printf (query, "%s (%s) VALUES (%s)", tablename, columns, values);
+	
+	return g_string_free (query, FALSE);
+}
+
+/**
  * Generates part of UPDATE SQL query including column names and values.
  * Returned strinf dosn't containt coma at end and.
  * For example: col1='string_value', col2=123, col3='Foo'.
