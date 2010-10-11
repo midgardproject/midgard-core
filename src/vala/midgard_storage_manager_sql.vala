@@ -9,12 +9,12 @@ namespace MidgardCR {
 		private string _name = "";
 		private Config _config = null;
 		private StorageContentManager _content_manager = null;
-		private Profiler _profiler = null;
 		private Transaction _transaction = null;
 		private StorageWorkspaceManager _workspace_manager = null;
 		private SQLStorageModelManager _model_manager = null;
 
 		/* internal properties */
+		internal SQLProfiler _profiler = null;
 		internal GLib.Object _cnc = null; 
 		internal GLib.Object _parser = null;
 		internal SchemaModel[] _schema_models = null;
@@ -44,7 +44,11 @@ namespace MidgardCR {
 		}
 
 		public Profiler profiler {
-			get { return _profiler; }
+			get { 
+				if (this._profiler == null)
+					this._profiler = new MidgardCR.SQLProfiler (); 
+				return (MidgardCR.Profiler) this._profiler;
+			}
 		}
 			
 		public Transaction transaction {

@@ -13,7 +13,8 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_config.vala \
 			  executable.vala \
 			  midgard_namespace.vala \
-			  midgard_profiler.vala \
+			  profiler.vala \
+			  sql_profiler.vala \
 			  midgard_query.vala \
 			  midgard_schema_model_reflector.vala \
 			  model.vala \
