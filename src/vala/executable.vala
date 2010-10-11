@@ -12,6 +12,9 @@ namespace MidgardCR {
 
 	public interface Executable : GLib.Object {
 
+		public abstract signal void execution_start ();
+		public abstract signal void execution_end ();
+
 		public abstract void execute () throws ExecutableError;
 	}
 }

@@ -51,7 +51,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmidgardvala_la_DEPENDENCIES =
 am__objects_1 =
 am__objects_2 = midgard_config.lo executable.lo midgard_namespace.lo \
-	midgard_profiler.lo midgard_query.lo \
+	profiler.lo sql_profiler.lo midgard_query.lo \
 	midgard_schema_model_reflector.lo model.lo schema_model.lo \
 	schema_builder.lo midgard_schema_object.lo \
 	midgard_storage_manager_sql.lo midgard_storage.lo \
@@ -246,7 +246,8 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_config.vala \
 			  executable.vala \
 			  midgard_namespace.vala \
-			  midgard_profiler.vala \
+			  profiler.vala \
+			  sql_profiler.vala \
 			  midgard_query.vala \
 			  midgard_schema_model_reflector.vala \
 			  model.vala \
@@ -330,7 +331,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/executable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_namespace.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_profiler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_query.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_schema_model_reflector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_schema_object.Plo@am__quote@
@@ -338,8 +338,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_storage_manager_sql.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_workspace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/profiler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schema_builder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schema_model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_profiler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_storage_model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_storage_model_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_storage_model_property.Plo@am__quote@

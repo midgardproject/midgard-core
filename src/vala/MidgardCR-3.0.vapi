@@ -53,6 +53,10 @@ namespace MidgardCR {
 		public QueryValue ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLProfiler : GLib.Object, MidgardCR.Profiler {
+		public SQLProfiler ();
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageManager : GLib.Object, MidgardCR.StorageManager {
 		public SQLStorageManager (string name, MidgardCR.Config config) throws MidgardCR.StorageManagerError;
 		public MidgardCR.Config config { get; construct; }
@@ -128,6 +132,8 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface Executable : GLib.Object {
 		public abstract void execute () throws MidgardCR.ExecutableError;
+		public signal void execution_end ();
+		public signal void execution_start ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface Model : GLib.Object {
@@ -172,9 +178,9 @@ namespace MidgardCR {
 	public interface Profiler : GLib.Object {
 		public abstract void enable (bool toggle);
 		public abstract void end ();
-		public abstract string get_execution_command ();
-		public abstract int get_time ();
 		public abstract void start ();
+		public abstract string command { get; }
+		public abstract double time { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface QueryConstraint : MidgardCR.QueryConstraintSimple {

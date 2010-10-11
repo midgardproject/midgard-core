@@ -7,10 +7,10 @@ namespace MidgardCR {
 
 		/* internal properties */
 
-		string _command = null;
-		bool _enabled = false;
-		bool _running = false;
-		GLib.Timer _timer = null;
+		internal string _command = null;
+		internal bool _enabled = false;
+		internal bool _running = false;
+		internal GLib.Timer _timer = null;
 
 		/* public properties */
 

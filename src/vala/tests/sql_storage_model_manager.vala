@@ -1,5 +1,16 @@
 using MidgardCR;
 
+void profiler_callback_start (SQLProfiler profiler)
+{
+	profiler.start ();
+}
+
+void profiler_callback_end (SQLProfiler profiler)
+{
+	profiler.end ();
+	GLib.print ("SQL QUERY: %s (%.04f) \n", profiler.command, profiler.time);
+}
+
 void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 	/* constructor */
@@ -144,6 +155,15 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 		/* Add Schema model to StorageModelManager */
 		model_manager.add_model (model).add_model (storage_model);
+
+		SQLProfiler profiler = (SQLProfiler) model_manager.storagemanager.profiler;
+		profiler.enable (true);
+		model_manager.execution_start.connect (() => {
+			profiler_callback_start(profiler);
+		}); 
+		model_manager.execution_end.connect (() => {
+			profiler_callback_end(profiler);
+		}); 
 
 		/* SUCCESS */
 		try {

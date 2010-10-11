@@ -15,20 +15,25 @@ namespace MidgardCR {
 		/* private properties */
 
 		private Model[] _models = null;
-		internal SQLStorageManager _storage_manager = null;
 		private bool _create_table = false;
 		private bool _update_table = false;
 		private bool _drop_table = false;
 		private SchemaModel _object_model = null;
 		private string[] _queries = null;
 
+		/* internal properties */
+
+		internal uint _id = 0;
+		internal SQLStorageManager _storage_manager = null;
+		internal SQLStorageModelManager _model_manager = null;
+	
 		/* public properties */
 		
 		/** 
 		 * SQL database' table name, to store data for objects of the class
 		 * this model is initialized for.
 		 */ 
-		public string location { get; set;}
+		public string location { get; set;}	
 
 		/**
                  * Holds the name of the class, StorageModel is initialized for.
@@ -139,6 +144,16 @@ namespace MidgardCR {
 			}	
 		}					
 
+		private void _emit_execution_start () {
+			if (this._model_manager != null)
+				this._model_manager.execution_start();
+		}
+
+		private void _emit_execution_end () {
+			if (this._model_manager != null)
+				this._model_manager.execution_end();
+		}
+
 		/**
 		 * Create new {@link SQLStorageModelProperty}
 		 */
@@ -146,6 +161,8 @@ namespace MidgardCR {
 			SQLStorageModelProperty model = new SQLStorageModelProperty (name, location, type);
 			model.parent = this;
 			model._storage_manager = this._storage_manager;
+			model.execution_start.connect (this._emit_execution_start);
+                        model.execution_end.connect (this._emit_execution_end);
 			return model;
 		}
 
@@ -169,6 +186,7 @@ namespace MidgardCR {
                 public void prepare_update () throws ValidationError {
 			this.is_valid ();
 			this._update_table = true;
+			/* No query to update table */			
 			/* Prepare columns to update */
 			foreach (MidgardCR.Model model in this._models) 
 				((StorageExecutor)model).prepare_update ();			
@@ -179,8 +197,10 @@ namespace MidgardCR {
 			this._create_table = true;
 			this._update_table = true;
 			/* Prepare columns to update and create if do not exist */
-			foreach (MidgardCR.Model model in this._models) 
-				((StorageExecutor)model).prepare_save ();			
+			foreach (MidgardCR.Model model in this._models) {
+				((StorageExecutor)model).prepare_create ();
+				((StorageExecutor)model).prepare_save ();
+			}			
 		}
 
                 public void prepare_remove () throws ValidationError {
@@ -197,6 +217,8 @@ namespace MidgardCR {
 
 		/* Executable methods */
 		public void execute () throws ExecutableError { 
+			/* emit 'execution_start' signal */
+			execution_start ();
 			if (this._create_table)
 				MidgardCRCore.SQLStorageManager.table_create (this._storage_manager, this);
 
@@ -215,6 +237,8 @@ namespace MidgardCR {
 			this._update_table = false;
 			this._drop_table = false;
 			this._queries = null;
+			/* emit 'execution_end' signal */
+			execution_end ();
 		}		
 	}
 }

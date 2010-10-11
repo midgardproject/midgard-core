@@ -1247,17 +1247,20 @@ midgard_cr_core_storage_sql_create_query_insert (GObject *object, MidgardCRSchem
 
 	GString *query = g_string_new ("INSERT INTO ");
 	g_string_append_printf (query, "%s (%s) VALUES (%s)", tablename, columns, values);
+
+	g_free (columns);
+	g_free (values);
 	
 	return g_string_free (query, FALSE);
 }
 
 /**
  * Generates part of UPDATE SQL query including column names and values.
- * Returned strinf dosn't containt coma at end and.
+ * Returned string dosn't containt coma at end and.
  * For example: col1='string_value', col2=123, col3='Foo'.
  */  
 gchar *
-midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
+midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
 {
 	g_return_val_if_fail (object != NULL, NULL);
 	g_return_val_if_fail (schema != NULL, NULL);
@@ -1343,4 +1346,35 @@ midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRSchem
 
 	g_free (pspecs);
 	return g_string_free (query, FALSE);
+}
+
+/**
+ * Generates UPDATE SQL query.
+ */  
+gchar *
+midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
+{
+	g_return_val_if_fail (object != NULL, NULL);
+	g_return_val_if_fail (schema != NULL, NULL);
+	g_return_val_if_fail (storage != NULL, NULL);
+
+	MidgardCRModel *_schema = MIDGARD_CR_MODEL (schema);
+	MidgardCRModel *_storage = MIDGARD_CR_MODEL (storage);
+
+	gchar *columns = midgard_cr_core_storage_sql_create_query_update_columns (object, schema, storage);
+	if (!columns)
+		return NULL;
+
+	const gchar *tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (storage));
+
+	/* Compute WHERE part */
+	gchar *where = g_strdup ("");
+
+	GString *query = g_string_new ("UPDATE ");
+	g_string_append_printf (query, "%s %s WHERE %s", tablename, columns, where);
+
+	g_free (columns);
+	g_free (where);
+
+	g_string_free (query, FALSE);
 }

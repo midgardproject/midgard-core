@@ -8,6 +8,8 @@
 #include <glib-object.h>
 #include <stdlib.h>
 #include <string.h>
+#include <float.h>
+#include <math.h>
 
 G_BEGIN_DECLS
 
@@ -46,6 +48,17 @@ typedef struct _MidgardCRNamespaceManagerIface MidgardCRNamespaceManagerIface;
 
 typedef struct _MidgardCRProfiler MidgardCRProfiler;
 typedef struct _MidgardCRProfilerIface MidgardCRProfilerIface;
+
+#define MIDGARD_CR_TYPE_SQL_PROFILER (midgard_cr_sql_profiler_get_type ())
+#define MIDGARD_CR_SQL_PROFILER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_PROFILER, MidgardCRSQLProfiler))
+#define MIDGARD_CR_SQL_PROFILER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_PROFILER, MidgardCRSQLProfilerClass))
+#define MIDGARD_CR_IS_SQL_PROFILER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_PROFILER))
+#define MIDGARD_CR_IS_SQL_PROFILER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_PROFILER))
+#define MIDGARD_CR_SQL_PROFILER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_PROFILER, MidgardCRSQLProfilerClass))
+
+typedef struct _MidgardCRSQLProfiler MidgardCRSQLProfiler;
+typedef struct _MidgardCRSQLProfilerClass MidgardCRSQLProfilerClass;
+typedef struct _MidgardCRSQLProfilerPrivate MidgardCRSQLProfilerPrivate;
 
 #define MIDGARD_CR_TYPE_QUERY_CONSTRAINT_SIMPLE (midgard_cr_query_constraint_simple_get_type ())
 #define MIDGARD_CR_QUERY_CONSTRAINT_SIMPLE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_QUERY_CONSTRAINT_SIMPLE, MidgardCRQueryConstraintSimple))
@@ -460,8 +473,21 @@ struct _MidgardCRProfilerIface {
 	void (*enable) (MidgardCRProfiler* self, gboolean toggle);
 	void (*start) (MidgardCRProfiler* self);
 	void (*end) (MidgardCRProfiler* self);
-	gint (*get_time) (MidgardCRProfiler* self);
-	char* (*get_execution_command) (MidgardCRProfiler* self);
+	double (*get_time) (MidgardCRProfiler* self);
+	const char* (*get_command) (MidgardCRProfiler* self);
+};
+
+struct _MidgardCRSQLProfiler {
+	GObject parent_instance;
+	MidgardCRSQLProfilerPrivate * priv;
+	char* _command;
+	gboolean _enabled;
+	gboolean _running;
+	GTimer* _timer;
+};
+
+struct _MidgardCRSQLProfilerClass {
+	GObjectClass parent_class;
 };
 
 struct _MidgardCRQueryConstraintSimpleIface {
@@ -777,6 +803,7 @@ struct _MidgardCRDBObjectClass {
 struct _MidgardCRSQLStorageManager {
 	GObject parent_instance;
 	MidgardCRSQLStorageManagerPrivate * priv;
+	MidgardCRSQLProfiler* _profiler;
 	GObject* _cnc;
 	GObject* _parser;
 	MidgardCRSchemaModel** _schema_models;
@@ -869,7 +896,9 @@ struct _MidgardCRSQLStorageModelManager {
 	MidgardCRSchemaModel* _class_property_model;
 	MidgardCRStorageModel* sql_storage_model;
 	MidgardCRStorageModel* sql_storage_column_model;
-	GSList* _query_slist;
+	char** _queries;
+	gint _queries_length1;
+	gint __queries_size_;
 };
 
 struct _MidgardCRSQLStorageModelManagerClass {
@@ -879,7 +908,9 @@ struct _MidgardCRSQLStorageModelManagerClass {
 struct _MidgardCRSQLStorageModel {
 	GObject parent_instance;
 	MidgardCRSQLStorageModelPrivate * priv;
+	guint _id;
 	MidgardCRSQLStorageManager* _storage_manager;
+	MidgardCRSQLStorageModelManager* _model_manager;
 };
 
 struct _MidgardCRSQLStorageModelClass {
@@ -961,8 +992,11 @@ GType midgard_cr_profiler_get_type (void) G_GNUC_CONST;
 void midgard_cr_profiler_enable (MidgardCRProfiler* self, gboolean toggle);
 void midgard_cr_profiler_start (MidgardCRProfiler* self);
 void midgard_cr_profiler_end (MidgardCRProfiler* self);
-gint midgard_cr_profiler_get_time (MidgardCRProfiler* self);
-char* midgard_cr_profiler_get_execution_command (MidgardCRProfiler* self);
+double midgard_cr_profiler_get_time (MidgardCRProfiler* self);
+const char* midgard_cr_profiler_get_command (MidgardCRProfiler* self);
+GType midgard_cr_sql_profiler_get_type (void) G_GNUC_CONST;
+MidgardCRSQLProfiler* midgard_cr_sql_profiler_new (void);
+MidgardCRSQLProfiler* midgard_cr_sql_profiler_construct (GType object_type);
 GType midgard_cr_query_constraint_simple_get_type (void) G_GNUC_CONST;
 MidgardCRQueryConstraintSimple** midgard_cr_query_constraint_simple_list_constraints (MidgardCRQueryConstraintSimple* self, int* result_length1);
 GType midgard_cr_query_storage_get_type (void) G_GNUC_CONST;

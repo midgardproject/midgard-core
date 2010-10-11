@@ -42,7 +42,7 @@ namespace MidgardCR {
 
 		/* signals */
 		public abstract signal void opened ();
-		public abstract signal void closed ();
+		public abstract signal void closed ();	
 		//public abstract signal void lost-provider (); 
 
 		/* connection methods */
@@ -119,7 +119,7 @@ namespace MidgardCR {
 	
 		/* properties */
 		public abstract string location { get; set; }		
-		public abstract unowned StorageManager storagemanager { get; }	
+		public abstract unowned StorageManager storagemanager { get; }
 	}
 
 	/* Initialized for every given property name */

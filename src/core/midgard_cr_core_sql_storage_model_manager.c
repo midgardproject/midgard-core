@@ -23,6 +23,7 @@
 void 
 midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageModelManager *manager, MidgardCRModel *model, GError **error)
 {
+	/* 
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (error == NULL || *error == NULL);
 
@@ -55,6 +56,7 @@ midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageMod
 		manager->_query_slist = g_slist_append (manager->_query_slist, g_string_free (mquery, FALSE));
 	}	
 	return;
+	*/
 }
 
 void 
@@ -84,6 +86,7 @@ midgard_cr_core_sql_storage_model_manager_prepare_purge (MidgardCRSQLStorageMode
 void 
 midgard_cr_core_sql_storage_model_manager_execute (MidgardCRSQLStorageModelManager *manager, GError **error)
 {
+	/*
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (error == NULL || *error == NULL);
 
@@ -98,7 +101,6 @@ midgard_cr_core_sql_storage_model_manager_execute (MidgardCRSQLStorageModelManag
 			*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
 					"%s", err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-		/* TODO, add queries to Profiler */
 		g_print ("QUERY %s \n", query);
 	}
 	list = NULL;
@@ -114,4 +116,5 @@ midgard_cr_core_sql_storage_model_manager_execute (MidgardCRSQLStorageModelManag
 		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
 				"%s", err->message ? err->message : "Unknown reason");
 	g_clear_error (&err);
+	*/
 }

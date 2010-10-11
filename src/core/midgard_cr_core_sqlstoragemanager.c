@@ -590,6 +590,14 @@ midgard_cr_core_sql_storage_manager_query_execute (MidgardCRSQLStorageManager *m
 	GdaSqlParser *parser = (GdaSqlParser *) manager->_parser;
 	g_return_val_if_fail (parser != NULL, -1);
 
+	/* Propagate command via profiler */
+	if (manager->_profiler) {
+		if (manager->_profiler->_enabled) {
+			g_free (manager->_profiler->_command);
+			manager->_profiler->_command = g_strdup (query);
+		}
+	}
+
 	GError *err = NULL;
 	int ret = midgard_core_storage_sql_query_execute (cnc, parser, query, &err);
 	if (err) {

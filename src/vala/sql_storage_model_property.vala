@@ -144,8 +144,8 @@ namespace MidgardCR {
 					GLib.warning ("Unhandled '%s' value type", this._typename);
 				break;
 			}	
-		}
-		
+		}		
+	
 		/**
 		 * Constructor 
 		 *
@@ -269,15 +269,26 @@ namespace MidgardCR {
 		 */
 		public void execute () { 
 			/* Create column or alter table */
-			if (this._create_column)
+			if (this._create_column) {
+				execution_start ();
 				MidgardCRCore.SQLStorageManager.column_create (this._storage_manager, this);
-			if (this._update_column)
+				execution_end ();
+			}
+			if (this._update_column) {
+				execution_start ();
 				MidgardCRCore.SQLStorageManager.column_update (this._storage_manager, this);
-			if (this._remove_column)
+				execution_end ();
+			}
+			if (this._remove_column) {
+				execution_start ();
 				MidgardCRCore.SQLStorageManager.column_remove (this._storage_manager, this);
+				execution_end ();
+			}
 			/* Store info about column */
 			foreach (weak string query in this._queries) {
+				execution_start ();
                                 MidgardCRCore.SQLStorageManager.query_execute (this._storage_manager, query);
+				execution_end ();
                         }
 			this._create_column = false;
 			this._update_column = false;
