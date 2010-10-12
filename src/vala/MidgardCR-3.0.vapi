@@ -45,6 +45,17 @@ namespace MidgardCR {
 		public abstract MidgardCR.Timestamp revised { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public class ObjectModel : GLib.Object, MidgardCR.Model {
+		public ObjectModel (string name);
+		public string parentname { get; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class ObjectModelProperty : GLib.Object, MidgardCR.Model, MidgardCR.ModelProperty {
+		public ObjectModelProperty (string name, string type, string dvalue);
+		public void execute ();
+		public string? classname { get; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public class QueryProperty : GLib.Object, MidgardCR.QueryValueHolder {
 		public QueryProperty ();
 	}
@@ -85,20 +96,9 @@ namespace MidgardCR {
 	public class SchemaBuilder : GLib.Object, MidgardCR.Executable {
 		public SchemaBuilder ();
 		public MidgardCR.Storable? factory (MidgardCR.StorageManager storage, string classname) throws MidgardCR.SchemaBuilderError, MidgardCR.ValidationError;
-		public MidgardCR.SchemaModel? get_schema_model (string classname);
-		public void register_model (MidgardCR.SchemaModel model) throws MidgardCR.SchemaBuilderError, MidgardCR.ValidationError;
+		public MidgardCR.ObjectModel? get_object_model (string classname);
+		public void register_model (MidgardCR.ObjectModel model) throws MidgardCR.SchemaBuilderError, MidgardCR.ValidationError;
 		public void register_storage_models (MidgardCR.StorageManager manager) throws MidgardCR.SchemaBuilderError, MidgardCR.ValidationError;
-	}
-	[CCode (cheader_filename = "midgard3.h")]
-	public class SchemaModel : GLib.Object, MidgardCR.Model {
-		public SchemaModel (string name);
-		public string parentname { get; }
-	}
-	[CCode (cheader_filename = "midgard3.h")]
-	public class SchemaModelProperty : GLib.Object, MidgardCR.Model, MidgardCR.ModelProperty {
-		public SchemaModelProperty (string name, string type, string dvalue);
-		public void execute ();
-		public string? classname { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public abstract class SchemaObject : GLib.Object, MidgardCR.Storable {
@@ -291,8 +291,8 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageModelManager : MidgardCR.Model, MidgardCR.StorageExecutor {
-		public abstract MidgardCR.StorageModel create_storage_model (MidgardCR.SchemaModel schema_model, string location);
-		public abstract unowned MidgardCR.SchemaModel[]? list_schema_models ();
+		public abstract MidgardCR.StorageModel create_storage_model (MidgardCR.ObjectModel object_model, string location);
+		public abstract unowned MidgardCR.ObjectModel[]? list_object_models ();
 		public abstract unowned MidgardCR.StorageModel[]? list_storage_models ();
 		public abstract MidgardCR.NamespaceManager namespace_manager { get; }
 		public abstract MidgardCR.StorageManager storagemanager { get; }

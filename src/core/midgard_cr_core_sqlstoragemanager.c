@@ -60,7 +60,7 @@ cnc_add_part (GString *cnc, const gchar *name, const gchar *value, const gchar *
 }
 
 static void
-__list_all_schema_models (MidgardCRSQLStorageManager *self, GError **error)
+__list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 {
 	/* select all classes */
 	GString *query = g_string_new ("SELECT ");
@@ -85,29 +85,29 @@ __list_all_schema_models (MidgardCRSQLStorageManager *self, GError **error)
 		return;
 	}
 
-	MidgardCRSchemaModel **schema_models = g_new (MidgardCRSchemaModel *, rows + 1);
+	MidgardCRObjectModel **object_models = g_new (MidgardCRObjectModel *, rows + 1);
 
 	const GValue *value;
 	guint i;
 	for (i = 0; i < rows; i++) {
-		/* Initialize new SchemaModel for given class name */
+		/* Initialize new ObjectModel for given class name */
 		value = gda_data_model_get_typed_value_at (model, 0, i, G_TYPE_STRING, TRUE, NULL);
-		MidgardCRSchemaModel *smodel = midgard_cr_schema_model_new (g_value_get_string (value));
+		MidgardCRObjectModel *smodel = midgard_cr_object_model_new (g_value_get_string (value));
 		/* Set parent model if set */
 		value = gda_data_model_get_typed_value_at (model, 1, i, G_TYPE_STRING, TRUE, NULL);
 		if (value && (!g_str_equal (g_value_get_string (value), "SchemaObject"))) { /* FIXME, SchemaObject constant needed */
-			MidgardCRSchemaModel *parent = midgard_cr_schema_model_new (g_value_get_string (value));
+			MidgardCRObjectModel *parent = midgard_cr_object_model_new (g_value_get_string (value));
 			midgard_cr_model_set_parent (MIDGARD_CR_MODEL (smodel), MIDGARD_CR_MODEL (parent));
 		}
 		/* set id */
 		value = gda_data_model_get_typed_value_at (model, 2, i, G_TYPE_INT, TRUE, NULL);	
 		smodel->_id = (guint) g_value_get_int (value);
 		/* Add Schema model to array */
-		schema_models[i] = smodel;
+		object_models[i] = smodel;
 	}
-	schema_models[i] = NULL; /* terminate with NULL */
-	self->_schema_models = schema_models;
-	self->_schema_models_length1 = i;
+	object_models[i] = NULL; /* terminate with NULL */
+	self->_object_models = object_models;
+	self->_object_models_length1 = i;
 	
 	/* select all properties */
 	query = g_string_new ("SELECT ");
@@ -133,8 +133,8 @@ __list_all_schema_models (MidgardCRSQLStorageManager *self, GError **error)
 	}
 
 	guint j = 0;
-	while (self->_schema_models[j] != NULL) {
-		const gchar *classname = midgard_cr_model_get_name (MIDGARD_CR_MODEL (self->_schema_models[j]));
+	while (self->_object_models[j] != NULL) {
+		const gchar *classname = midgard_cr_model_get_name (MIDGARD_CR_MODEL (self->_object_models[j]));
 		for (i = 0; i < rows; i++) {
 			/* Check property's class name */
 			value = gda_data_model_get_typed_value_at (model, 0, i, G_TYPE_STRING, TRUE, NULL);
@@ -159,15 +159,15 @@ __list_all_schema_models (MidgardCRSQLStorageManager *self, GError **error)
 			value = gda_data_model_get_typed_value_at (model, 6, i, G_TYPE_INT, TRUE, NULL);
 			guint id = (guint) g_value_get_int (value);
 
-			MidgardCRSchemaModelProperty *property_model = 
-				midgard_cr_schema_model_property_new (property_name, gtype_name, dvalue);
+			MidgardCRObjectModelProperty *property_model = 
+				midgard_cr_object_model_property_new (property_name, gtype_name, dvalue);
 			/* FIXME, set nick */
 			/* set description */
 			midgard_cr_model_property_set_description (MIDGARD_CR_MODEL_PROPERTY (property_model), descr);
 			/* set id */
 			property_model->_id = id;
 			/* Add property model to schema model */
-			midgard_cr_model_add_model (MIDGARD_CR_MODEL (self->_schema_models[j]), MIDGARD_CR_MODEL (property_model));
+			midgard_cr_model_add_model (MIDGARD_CR_MODEL (self->_object_models[j]), MIDGARD_CR_MODEL (property_model));
 		}
 		j++;
 	}
@@ -186,11 +186,11 @@ void
 midgard_cr_core_sql_storage_manager_load_models (MidgardCRSQLStorageManager *self, GError **error)
 {
 	guint i = 0;
-	if (self->_schema_models) {
-		while (self->_schema_models[i] != 0) {
-			g_object_unref (self->_schema_models[i]);
+	if (self->_object_models) {
+		while (self->_object_models[i] != 0) {
+			g_object_unref (self->_object_models[i]);
 		}
-		g_free (self->_schema_models);
+		g_free (self->_object_models);
 	}
 
 	i = 0;
@@ -202,7 +202,7 @@ midgard_cr_core_sql_storage_manager_load_models (MidgardCRSQLStorageManager *sel
 	}
 
 	GError *err = NULL;
-	__list_all_schema_models (self, &err);
+	__list_all_object_models (self, &err);
 	if (err) {
 		g_propagate_error (error, err);
 		return;

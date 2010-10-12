@@ -79,9 +79,9 @@ namespace MidgardCR {
 		public abstract unowned StorageManager   storagemanager   { get; } 
 
 		/* methods */
-		public abstract StorageModel create_storage_model (SchemaModel schema_model, string location);
+		public abstract StorageModel create_storage_model (ObjectModel object_model, string location);
 		public abstract unowned StorageModel[]? list_storage_models ();	
-		public abstract unowned SchemaModel[]? list_schema_models ();
+		public abstract unowned ObjectModel[]? list_object_models ();
 	}
 
 	public errordomain StorageContentManagerError {

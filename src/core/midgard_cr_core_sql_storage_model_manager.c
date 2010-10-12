@@ -28,9 +28,9 @@ midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageMod
 	g_return_if_fail (error == NULL || *error == NULL);
 
 	gchar *columns = midgard_cr_core_storage_sql_create_query_insert_columns (
-			G_OBJECT (model), manager->_schema_model, manager->sql_storage_model);
+			G_OBJECT (model), manager->_object_model, manager->sql_storage_model);
 	gchar *values = midgard_cr_core_storage_sql_create_query_insert_values (
-			G_OBJECT (model), manager->_schema_model, manager->sql_storage_model);
+			G_OBJECT (model), manager->_object_model, manager->sql_storage_model);
 	GString *mquery = g_string_new ("INSERT INTO ");
 	g_string_append_printf (mquery, "%s (%s) VALUES (%s) \n", 
 			midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (manager->sql_storage_model)),

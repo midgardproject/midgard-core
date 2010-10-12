@@ -186,27 +186,27 @@ typedef struct _MidgardCRModelPropertyReflectorIface MidgardCRModelPropertyRefle
 typedef struct _MidgardCRModelProperty MidgardCRModelProperty;
 typedef struct _MidgardCRModelPropertyIface MidgardCRModelPropertyIface;
 
-#define MIDGARD_CR_TYPE_SCHEMA_MODEL (midgard_cr_schema_model_get_type ())
-#define MIDGARD_CR_SCHEMA_MODEL(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SCHEMA_MODEL, MidgardCRSchemaModel))
-#define MIDGARD_CR_SCHEMA_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SCHEMA_MODEL, MidgardCRSchemaModelClass))
-#define MIDGARD_CR_IS_SCHEMA_MODEL(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SCHEMA_MODEL))
-#define MIDGARD_CR_IS_SCHEMA_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SCHEMA_MODEL))
-#define MIDGARD_CR_SCHEMA_MODEL_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SCHEMA_MODEL, MidgardCRSchemaModelClass))
+#define MIDGARD_CR_TYPE_OBJECT_MODEL (midgard_cr_object_model_get_type ())
+#define MIDGARD_CR_OBJECT_MODEL(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_OBJECT_MODEL, MidgardCRObjectModel))
+#define MIDGARD_CR_OBJECT_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_OBJECT_MODEL, MidgardCRObjectModelClass))
+#define MIDGARD_CR_IS_OBJECT_MODEL(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_OBJECT_MODEL))
+#define MIDGARD_CR_IS_OBJECT_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_OBJECT_MODEL))
+#define MIDGARD_CR_OBJECT_MODEL_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_OBJECT_MODEL, MidgardCRObjectModelClass))
 
-typedef struct _MidgardCRSchemaModel MidgardCRSchemaModel;
-typedef struct _MidgardCRSchemaModelClass MidgardCRSchemaModelClass;
-typedef struct _MidgardCRSchemaModelPrivate MidgardCRSchemaModelPrivate;
+typedef struct _MidgardCRObjectModel MidgardCRObjectModel;
+typedef struct _MidgardCRObjectModelClass MidgardCRObjectModelClass;
+typedef struct _MidgardCRObjectModelPrivate MidgardCRObjectModelPrivate;
 
-#define MIDGARD_CR_TYPE_SCHEMA_MODEL_PROPERTY (midgard_cr_schema_model_property_get_type ())
-#define MIDGARD_CR_SCHEMA_MODEL_PROPERTY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SCHEMA_MODEL_PROPERTY, MidgardCRSchemaModelProperty))
-#define MIDGARD_CR_SCHEMA_MODEL_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SCHEMA_MODEL_PROPERTY, MidgardCRSchemaModelPropertyClass))
-#define MIDGARD_CR_IS_SCHEMA_MODEL_PROPERTY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SCHEMA_MODEL_PROPERTY))
-#define MIDGARD_CR_IS_SCHEMA_MODEL_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SCHEMA_MODEL_PROPERTY))
-#define MIDGARD_CR_SCHEMA_MODEL_PROPERTY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SCHEMA_MODEL_PROPERTY, MidgardCRSchemaModelPropertyClass))
+#define MIDGARD_CR_TYPE_OBJECT_MODEL_PROPERTY (midgard_cr_object_model_property_get_type ())
+#define MIDGARD_CR_OBJECT_MODEL_PROPERTY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_OBJECT_MODEL_PROPERTY, MidgardCRObjectModelProperty))
+#define MIDGARD_CR_OBJECT_MODEL_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_OBJECT_MODEL_PROPERTY, MidgardCRObjectModelPropertyClass))
+#define MIDGARD_CR_IS_OBJECT_MODEL_PROPERTY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_OBJECT_MODEL_PROPERTY))
+#define MIDGARD_CR_IS_OBJECT_MODEL_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_OBJECT_MODEL_PROPERTY))
+#define MIDGARD_CR_OBJECT_MODEL_PROPERTY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_OBJECT_MODEL_PROPERTY, MidgardCRObjectModelPropertyClass))
 
-typedef struct _MidgardCRSchemaModelProperty MidgardCRSchemaModelProperty;
-typedef struct _MidgardCRSchemaModelPropertyClass MidgardCRSchemaModelPropertyClass;
-typedef struct _MidgardCRSchemaModelPropertyPrivate MidgardCRSchemaModelPropertyPrivate;
+typedef struct _MidgardCRObjectModelProperty MidgardCRObjectModelProperty;
+typedef struct _MidgardCRObjectModelPropertyClass MidgardCRObjectModelPropertyClass;
+typedef struct _MidgardCRObjectModelPropertyPrivate MidgardCRObjectModelPropertyPrivate;
 
 #define MIDGARD_CR_TYPE_SCHEMA_BUILDER (midgard_cr_schema_builder_get_type ())
 #define MIDGARD_CR_SCHEMA_BUILDER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SCHEMA_BUILDER, MidgardCRSchemaBuilder))
@@ -627,23 +627,23 @@ struct _MidgardCRModelPropertyIface {
 	void (*set_private) (MidgardCRModelProperty* self, gboolean value);
 };
 
-struct _MidgardCRSchemaModel {
+struct _MidgardCRObjectModel {
 	GObject parent_instance;
-	MidgardCRSchemaModelPrivate * priv;
+	MidgardCRObjectModelPrivate * priv;
 	guint _id;
 };
 
-struct _MidgardCRSchemaModelClass {
+struct _MidgardCRObjectModelClass {
 	GObjectClass parent_class;
 };
 
-struct _MidgardCRSchemaModelProperty {
+struct _MidgardCRObjectModelProperty {
 	GObject parent_instance;
-	MidgardCRSchemaModelPropertyPrivate * priv;
+	MidgardCRObjectModelPropertyPrivate * priv;
 	guint _id;
 };
 
-struct _MidgardCRSchemaModelPropertyClass {
+struct _MidgardCRObjectModelPropertyClass {
 	GObjectClass parent_class;
 };
 
@@ -654,10 +654,10 @@ typedef enum  {
 struct _MidgardCRSchemaBuilder {
 	GObject parent_instance;
 	MidgardCRSchemaBuilderPrivate * priv;
-	MidgardCRSchemaModel** _models;
+	MidgardCRObjectModel** _models;
 	gint _models_length1;
 	gint __models_size_;
-	MidgardCRSchemaModel** _delayed_models;
+	MidgardCRObjectModel** _delayed_models;
 	gint _delayed_models_length1;
 	gint __delayed_models_size_;
 };
@@ -714,9 +714,9 @@ struct _MidgardCRStorageModelIface {
 
 struct _MidgardCRStorageModelManagerIface {
 	GTypeInterface parent_iface;
-	MidgardCRStorageModel* (*create_storage_model) (MidgardCRStorageModelManager* self, MidgardCRSchemaModel* schema_model, const char* location);
+	MidgardCRStorageModel* (*create_storage_model) (MidgardCRStorageModelManager* self, MidgardCRObjectModel* object_model, const char* location);
 	MidgardCRStorageModel** (*list_storage_models) (MidgardCRStorageModelManager* self, int* result_length1);
-	MidgardCRSchemaModel** (*list_schema_models) (MidgardCRStorageModelManager* self, int* result_length1);
+	MidgardCRObjectModel** (*list_object_models) (MidgardCRStorageModelManager* self, int* result_length1);
 	MidgardCRNamespaceManager* (*get_namespace_manager) (MidgardCRStorageModelManager* self);
 	MidgardCRStorageManager* (*get_storagemanager) (MidgardCRStorageModelManager* self);
 };
@@ -806,15 +806,15 @@ struct _MidgardCRSQLStorageManager {
 	MidgardCRSQLProfiler* _profiler;
 	GObject* _cnc;
 	GObject* _parser;
-	MidgardCRSchemaModel** _schema_models;
-	gint _schema_models_length1;
-	gint __schema_models_size_;
+	MidgardCRObjectModel** _object_models;
+	gint _object_models_length1;
+	gint __object_models_size_;
 	MidgardCRStorageModel** _storage_models;
 	gint _storage_models_length1;
 	gint __storage_models_size_;
-	MidgardCRSchemaModel* _storage_model_object_model;
+	MidgardCRObjectModel* _storage_model_object_model;
 	MidgardCRStorageModel* _storage_model_storage_model;
-	MidgardCRSchemaModel* _storage_model_property_object_model;
+	MidgardCRObjectModel* _storage_model_property_object_model;
 	MidgardCRStorageModel* _storage_model_property_storage_model;
 };
 
@@ -886,14 +886,14 @@ struct _MidgardCRSQLStorageModelManager {
 	MidgardCRStorageModel** _storage_models;
 	gint _storage_models_length1;
 	gint __storage_models_size_;
-	MidgardCRSchemaModel** _schema_models;
-	gint _schema_models_length1;
-	gint __schema_models_size_;
+	MidgardCRObjectModel** _object_models;
+	gint _object_models_length1;
+	gint __object_models_size_;
 	MidgardCRModel** _models;
 	gint _models_length1;
 	gint __models_size_;
-	MidgardCRSchemaModel* _schema_model;
-	MidgardCRSchemaModel* _class_property_model;
+	MidgardCRObjectModel* _object_model;
+	MidgardCRObjectModel* _class_property_model;
 	MidgardCRStorageModel* sql_storage_model;
 	MidgardCRStorageModel* sql_storage_column_model;
 	char** _queries;
@@ -1072,18 +1072,18 @@ const char* midgard_cr_model_property_get_description (MidgardCRModelProperty* s
 void midgard_cr_model_property_set_description (MidgardCRModelProperty* self, const char* value);
 gboolean midgard_cr_model_property_get_private (MidgardCRModelProperty* self);
 void midgard_cr_model_property_set_private (MidgardCRModelProperty* self, gboolean value);
-GType midgard_cr_schema_model_get_type (void) G_GNUC_CONST;
-MidgardCRSchemaModel* midgard_cr_schema_model_new (const char* name);
-MidgardCRSchemaModel* midgard_cr_schema_model_construct (GType object_type, const char* name);
-const char* midgard_cr_schema_model_get_parentname (MidgardCRSchemaModel* self);
-GType midgard_cr_schema_model_property_get_type (void) G_GNUC_CONST;
-MidgardCRSchemaModelProperty* midgard_cr_schema_model_property_new (const char* name, const char* type, const char* dvalue);
-MidgardCRSchemaModelProperty* midgard_cr_schema_model_property_construct (GType object_type, const char* name, const char* type, const char* dvalue);
-void midgard_cr_schema_model_property_execute (MidgardCRSchemaModelProperty* self);
-const char* midgard_cr_schema_model_property_get_classname (MidgardCRSchemaModelProperty* self);
+GType midgard_cr_object_model_get_type (void) G_GNUC_CONST;
+MidgardCRObjectModel* midgard_cr_object_model_new (const char* name);
+MidgardCRObjectModel* midgard_cr_object_model_construct (GType object_type, const char* name);
+const char* midgard_cr_object_model_get_parentname (MidgardCRObjectModel* self);
+GType midgard_cr_object_model_property_get_type (void) G_GNUC_CONST;
+MidgardCRObjectModelProperty* midgard_cr_object_model_property_new (const char* name, const char* type, const char* dvalue);
+MidgardCRObjectModelProperty* midgard_cr_object_model_property_construct (GType object_type, const char* name, const char* type, const char* dvalue);
+void midgard_cr_object_model_property_execute (MidgardCRObjectModelProperty* self);
+const char* midgard_cr_object_model_property_get_classname (MidgardCRObjectModelProperty* self);
 GQuark midgard_cr_schema_builder_error_quark (void);
 GType midgard_cr_schema_builder_get_type (void) G_GNUC_CONST;
-void midgard_cr_schema_builder_register_model (MidgardCRSchemaBuilder* self, MidgardCRSchemaModel* model, GError** error);
+void midgard_cr_schema_builder_register_model (MidgardCRSchemaBuilder* self, MidgardCRObjectModel* model, GError** error);
 GQuark midgard_cr_storage_manager_error_quark (void);
 GQuark midgard_cr_storage_content_manager_error_quark (void);
 GType midgard_cr_query_manager_get_type (void) G_GNUC_CONST;
@@ -1097,7 +1097,7 @@ GType midgard_cr_storage_workspace_manager_get_type (void) G_GNUC_CONST;
 GType midgard_cr_storage_manager_get_type (void) G_GNUC_CONST;
 void midgard_cr_schema_builder_register_storage_models (MidgardCRSchemaBuilder* self, MidgardCRStorageManager* manager, GError** error);
 MidgardCRStorable* midgard_cr_schema_builder_factory (MidgardCRSchemaBuilder* self, MidgardCRStorageManager* storage, const char* classname, GError** error);
-MidgardCRSchemaModel* midgard_cr_schema_builder_get_schema_model (MidgardCRSchemaBuilder* self, const char* classname);
+MidgardCRObjectModel* midgard_cr_schema_builder_get_object_model (MidgardCRSchemaBuilder* self, const char* classname);
 MidgardCRSchemaBuilder* midgard_cr_schema_builder_new (void);
 MidgardCRSchemaBuilder* midgard_cr_schema_builder_construct (GType object_type);
 GType midgard_cr_timestamp_get_type (void) G_GNUC_CONST;
@@ -1150,9 +1150,9 @@ void midgard_cr_storage_executor_prepare_update (MidgardCRStorageExecutor* self,
 void midgard_cr_storage_executor_prepare_save (MidgardCRStorageExecutor* self, GError** error);
 void midgard_cr_storage_executor_prepare_remove (MidgardCRStorageExecutor* self, GError** error);
 void midgard_cr_storage_executor_prepare_purge (MidgardCRStorageExecutor* self, GError** error);
-MidgardCRStorageModel* midgard_cr_storage_model_manager_create_storage_model (MidgardCRStorageModelManager* self, MidgardCRSchemaModel* schema_model, const char* location);
+MidgardCRStorageModel* midgard_cr_storage_model_manager_create_storage_model (MidgardCRStorageModelManager* self, MidgardCRObjectModel* object_model, const char* location);
 MidgardCRStorageModel** midgard_cr_storage_model_manager_list_storage_models (MidgardCRStorageModelManager* self, int* result_length1);
-MidgardCRSchemaModel** midgard_cr_storage_model_manager_list_schema_models (MidgardCRStorageModelManager* self, int* result_length1);
+MidgardCRObjectModel** midgard_cr_storage_model_manager_list_object_models (MidgardCRStorageModelManager* self, int* result_length1);
 MidgardCRNamespaceManager* midgard_cr_storage_model_manager_get_namespace_manager (MidgardCRStorageModelManager* self);
 MidgardCRStorageManager* midgard_cr_storage_model_manager_get_storagemanager (MidgardCRStorageModelManager* self);
 gboolean midgard_cr_storage_content_manager_exists (MidgardCRStorageContentManager* self, MidgardCRStorable* object);

@@ -17,11 +17,11 @@ namespace MidgardCR {
 		internal SQLProfiler _profiler = null;
 		internal GLib.Object _cnc = null; 
 		internal GLib.Object _parser = null;
-		internal SchemaModel[] _schema_models = null;
+		internal ObjectModel[] _object_models = null;
 		internal StorageModel[] _storage_models = null;
-		internal SchemaModel _storage_model_object_model = null;
+		internal ObjectModel _storage_model_object_model = null;
 		internal StorageModel _storage_model_storage_model = null;
-		internal SchemaModel _storage_model_property_object_model = null;
+		internal ObjectModel _storage_model_property_object_model = null;
 		internal StorageModel _storage_model_property_storage_model = null;
 
 		/* public properties */
@@ -64,7 +64,7 @@ namespace MidgardCR {
 				if (this._model_manager == null) {
 					this._model_manager = new MidgardCR.SQLStorageModelManager ();	
 					this._model_manager._storage_manager = this;
-					this._model_manager._schema_models = this._schema_models;
+					this._model_manager._object_models = this._object_models;
 					this._model_manager._storage_models = this._storage_models;
 				}
 				return (MidgardCR.StorageModelManager)this._model_manager; 
@@ -85,25 +85,25 @@ namespace MidgardCR {
 			Object (name: name, config: config);
 
 			/* SQLStorageModel models */
-			this._storage_model_object_model = new SchemaModel ("MidgardCRSQLStorageModel");
-			this._storage_model_object_model.add_model (new SchemaModelProperty ("name", "string", ""));
-			this._storage_model_object_model.add_model (new SchemaModelProperty ("location", "string", ""));
-			this._storage_model_object_model.add_model (new SchemaModelProperty ("description", "text", ""));
+			this._storage_model_object_model = new ObjectModel ("MidgardCRSQLStorageModel");
+			this._storage_model_object_model.add_model (new ObjectModelProperty ("name", "string", ""));
+			this._storage_model_object_model.add_model (new ObjectModelProperty ("location", "string", ""));
+			this._storage_model_object_model.add_model (new ObjectModelProperty ("description", "text", ""));
 			this._storage_model_storage_model = new SQLStorageModel("MidgardCRSQLStorageModel", "midgard_mapper_type");
                 	this._storage_model_storage_model.add_model (new SQLStorageModelProperty ("name", "class_name", "string"));
                 	this._storage_model_storage_model.add_model (new SQLStorageModelProperty ("location", "table_name", "string"));
                 	this._storage_model_storage_model.add_model (new SQLStorageModelProperty ("description", "description", "text"));
 		
 			/* SQLStorageModelProperty models */
-			this._storage_model_property_object_model = new SchemaModel ("MidgardCRSQLStorageModelProperty");
-			this._storage_model_property_object_model.add_model (new SchemaModelProperty ("name", "string", ""));
-			this._storage_model_property_object_model.add_model (new SchemaModelProperty ("location", "string", ""));
-			this._storage_model_property_object_model.add_model (new SchemaModelProperty ("valuetypename", "string", ""));
-			this._storage_model_property_object_model.add_model (new SchemaModelProperty ("valuegtype", "string", ""));
-			this._storage_model_property_object_model.add_model (new SchemaModelProperty ("valuedefault", "string", ""));
-			this._storage_model_property_object_model.add_model (new SchemaModelProperty ("index", "string", ""));
-			this._storage_model_property_object_model.add_model (new SchemaModelProperty ("primary", "string", ""));
-			this._storage_model_property_object_model.add_model (new SchemaModelProperty ("description", "text", ""));
+			this._storage_model_property_object_model = new ObjectModel ("MidgardCRSQLStorageModelProperty");
+			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("name", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("location", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("valuetypename", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("valuegtype", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("valuedefault", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("index", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("primary", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("description", "text", ""));
 			this._storage_model_property_storage_model = new SQLStorageModel("MidgardCRSQLStorageModelProperty", "midgard_mapper_columns");
                 	this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("name", "property_name", "string"));
                 	this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("location", "column_name", "string"));

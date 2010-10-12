@@ -7,10 +7,10 @@ namespace MidgardCR {
 		internal unowned SQLStorageManager _storage_manager = null;
 		internal NamespaceManager _ns_manager = null;
 		internal unowned StorageModel[] _storage_models = null;
-		internal unowned SchemaModel[] _schema_models = null;
+		internal unowned ObjectModel[] _object_models = null;
 		internal Model[] _models = null;
-		internal SchemaModel _schema_model = null;
-		internal SchemaModel _class_property_model = null;
+		internal ObjectModel _object_model = null;
+		internal ObjectModel _class_property_model = null;
 		internal StorageModel sql_storage_model = null;
 		internal StorageModel sql_storage_column_model = null;	
 		internal string[] _queries = null;
@@ -52,27 +52,27 @@ namespace MidgardCR {
 		/* Constructor */
 		construct {
 			
-			/* Initialize class SchemaModel */
-			this._schema_model = new SchemaModel ("MidgardCRSchemaModel");
-			this._schema_model.add_model (new SchemaModelProperty ("name", "string", ""));
-			this._schema_model.add_model (new SchemaModelProperty ("parentname", "string", ""));
+			/* Initialize class ObjectModel */
+			this._object_model = new ObjectModel ("MidgardCRObjectModel");
+			this._object_model.add_model (new ObjectModelProperty ("name", "string", ""));
+			this._object_model.add_model (new ObjectModelProperty ("parentname", "string", ""));
 
 			/* Initialize class StorageModel */
-			this.sql_storage_model = new SQLStorageModel ("MidgardCRSchemaModel", "midgard_schema_type");
+			this.sql_storage_model = new SQLStorageModel ("MidgardCRObjectModel", "midgard_schema_type");
 			this.sql_storage_model.add_model (new SQLStorageModelProperty ("name", "class_name", "string"));
 			this.sql_storage_model.add_model (new SQLStorageModelProperty ("parentname", "extends", "string"));
 
-			/* Initialize property SchemaModel */
-			this._class_property_model = new SchemaModel ("MidgardCRSchemaModelProperty");
-			this._class_property_model.add_model (new SchemaModelProperty ("name", "string", ""));
-			this._class_property_model.add_model (new SchemaModelProperty ("classname", "string", ""));
-			this._class_property_model.add_model (new SchemaModelProperty ("valuetypename", "string", ""));
-			this._class_property_model.add_model (new SchemaModelProperty ("valuedefault", "string", ""));
-			this._class_property_model.add_model (new SchemaModelProperty ("nick", "string", ""));
-			this._class_property_model.add_model (new SchemaModelProperty ("description", "string", ""));
+			/* Initialize property ObjectModel */
+			this._class_property_model = new ObjectModel ("MidgardCRObjectModelProperty");
+			this._class_property_model.add_model (new ObjectModelProperty ("name", "string", ""));
+			this._class_property_model.add_model (new ObjectModelProperty ("classname", "string", ""));
+			this._class_property_model.add_model (new ObjectModelProperty ("valuetypename", "string", ""));
+			this._class_property_model.add_model (new ObjectModelProperty ("valuedefault", "string", ""));
+			this._class_property_model.add_model (new ObjectModelProperty ("nick", "string", ""));
+			this._class_property_model.add_model (new ObjectModelProperty ("description", "string", ""));
 
 			/* Initialize property StorageModel */
-			this.sql_storage_column_model = new SQLStorageModel ("MidgardCRSchemaModelProperty", "midgard_schema_type_properties");
+			this.sql_storage_column_model = new SQLStorageModel ("MidgardCRObjectModelProperty", "midgard_schema_type_properties");
 			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("name", "property_name", "string"));
 			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("classname", "class_name", "string"));
 			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("valuetypename", "gtype_name", "string"));
@@ -96,7 +96,7 @@ namespace MidgardCR {
 				
 		/**
                  * Get model by given name. 
-		 * SQLStorageModelManager holds {@link SchemaModel} and {@link StorageModel} models,
+		 * SQLStorageModelManager holds {@link ObjectModel} and {@link StorageModel} models,
 		 * so accepted name by the one of Schema or Storage model.
 	         * 
                  * @param name {@link Model} name to look for
@@ -109,7 +109,7 @@ namespace MidgardCR {
 
 		/**
 		 * List all models associated with with an instance.
-		 * See list_storage_models() and list_schema_models().
+		 * See list_storage_models() and list_object_models().
 		 *
 		 * @return array of models or null
 		 */
@@ -154,7 +154,7 @@ namespace MidgardCR {
 
 			/* Validate models */
 			foreach (Model model in this._models) {
-				unowned Model model_found = this._find_model_by_name ((Model[])this._schema_models, model.name);
+				unowned Model model_found = this._find_model_by_name ((Model[])this._object_models, model.name);
 				if (model_found != null)
 					throw new MidgardCR.ValidationError.NAME_DUPLICATED ("%s class already exists in schema table", model.name); 
 			}
@@ -163,8 +163,8 @@ namespace MidgardCR {
 			foreach (Model model in this._models) {
 				if (model is StorageExecutor) {	
 					((StorageExecutor)model).prepare_create ();
-				} else if (model is SchemaModel) {
-					string query = MidgardCRCore.StorageSQL.create_query_insert (model, this._schema_model, this.sql_storage_model);
+				} else if (model is ObjectModel) {
+					string query = MidgardCRCore.StorageSQL.create_query_insert (model, this._object_model, this.sql_storage_model);
 					this._queries += query;	
 					Model[] property_models = model.list_models();
 					foreach (Model property_model in property_models) {
@@ -180,11 +180,11 @@ namespace MidgardCR {
 			bool found = false;
 			string invalid_name = "";
 			foreach (Model model in this._models) {
-				unowned Model model_found = this._find_model_by_name ((Model[])this._schema_models, model.name);
+				unowned Model model_found = this._find_model_by_name ((Model[])this._object_models, model.name);
 				if (model_found == null)
 					model_found = this._find_model_by_name ((Model[])this._storage_models, model.name);
 				if (model_found != null 
-					&& (((MidgardCR.SchemaModel) model_found)._id == ((MidgardCR.SchemaModel) model)._id)) {
+					&& (((MidgardCR.ObjectModel) model_found)._id == ((MidgardCR.ObjectModel) model)._id)) {
 					found = true;
 					invalid_name = model.name;
 					break;
@@ -263,14 +263,14 @@ namespace MidgardCR {
 		/**
 		 * Creates new StorageModel instance.
 		 * 
-		 * @param model, {@link SchemaModel} instance, which underlying 
+		 * @param model, {@link ObjectModel} instance, which underlying 
 		 * storage should be created for.
 		 * @param location, name of the table which stores data of objects of the class
-		 * represented by SchemaModel.
+		 * represented by ObjectModel.
 		 *
 		 * @return SQLStorageModel instance 
 		 */
-		public StorageModel create_storage_model (SchemaModel model, string location) {
+		public StorageModel create_storage_model (ObjectModel model, string location) {
 			SQLStorageModel storage_model = new SQLStorageModel (model.name, location);
 			storage_model._storage_manager = this._storage_manager;
 			storage_model._model_manager = this;	
@@ -287,10 +287,10 @@ namespace MidgardCR {
 		}
 		
 		/**
-		 * List all SchemaModel models for which database entries already exist.
+		 * List all ObjectModel models for which database entries already exist.
 		 */
-		public unowned SchemaModel[]? list_schema_models () {
-			return this._schema_models;
+		public unowned ObjectModel[]? list_object_models () {
+			return this._object_models;
 		}
 	}
 }

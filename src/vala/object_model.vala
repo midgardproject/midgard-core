@@ -2,7 +2,7 @@
 namespace MidgardCR {
 
 	/**
-	 * SchemaModel defines classes which can be registered in GType system.
+	 * ObjectModel defines classes which can be registered in GType system.
 	 *
 	 * It's not related to any storage, so any class can be registered during runtime
 	 * without any need to store its definition in underlying storage.
@@ -10,7 +10,7 @@ namespace MidgardCR {
 	 * If required, class' name and properties (as the class definition with introspection data)
 	 * might be stored in storage through StorageModel implementation.
 	 */	
-	public class SchemaModel : GLib.Object, Model {
+	public class ObjectModel : GLib.Object, Model {
 
 		/* private properties */
 		
@@ -23,7 +23,7 @@ namespace MidgardCR {
 		/* public properties */
 
 		/**
-		 * Holds the name of the class, SchemaModel is created for
+		 * Holds the name of the class, ObjectModel is created for
 		 */
 		public string name { get; set; }
 		/**
@@ -48,11 +48,11 @@ namespace MidgardCR {
 		}
 
 		/**
-		 * Creates new SchemaModel for given classname
+		 * Creates new ObjectModel for given classname
 		 * 
 		 * @param name classname to create model for
 		 */
-		public SchemaModel (string name) {
+		public ObjectModel (string name) {
 			Object (name: name);
 		}
 
@@ -124,9 +124,9 @@ namespace MidgardCR {
 	}
 
 	/**
-	 * SchemaModelProperty defines property registered for class.
+	 * ObjectModelProperty defines property registered for class.
 	 */ 
-	public class SchemaModelProperty : GLib.Object, Model, ModelProperty {
+	public class ObjectModelProperty : GLib.Object, Model, ModelProperty {
 
 		/* private properties */
 
@@ -238,13 +238,13 @@ namespace MidgardCR {
 		}
 		
 		/**
-		 * Creates new SchemaModelProperty for given property name
+		 * Creates new ObjectModelProperty for given property name
 		 *
 		 * @param name property name
 		 * @param type the type of the property 
 		 * @param dvalue default property's value 
 		 */
-		public SchemaModelProperty (string name, string type, string dvalue) {
+		public ObjectModelProperty (string name, string type, string dvalue) {
 			Object (name: name, valuetypename: type, valuedefault: dvalue);
 			this._set_gtype_from_name ();	
 		} 
@@ -266,7 +266,7 @@ namespace MidgardCR {
 		}
 
 		/** 
-		 * Check if SchemaModelProperty is valid
+		 * Check if ObjectModelProperty is valid
 		 *
 		 * If it's valid, this method silently returns.
 		 * In other case, error is thrown.
@@ -285,8 +285,8 @@ namespace MidgardCR {
 				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("More than one reference model set");
 	
 			/* Invalid object associated as model */
-			if (this._models != null && (!(this._models[0] is SchemaModelProperty)))
-				throw new MidgardCR.ValidationError.TYPE_INVALID ("Associated model is not a SchemaModelProperty instance");
+			if (this._models != null && (!(this._models[0] is ObjectModelProperty)))
+				throw new MidgardCR.ValidationError.TYPE_INVALID ("Associated model is not a ObjectModelProperty instance");
 
 			/* Associated model has no parent defined */
 			if (this._models != null && this._models[0].parent == null)

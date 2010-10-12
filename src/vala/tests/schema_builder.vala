@@ -13,12 +13,12 @@ void midgardcr_test_add_schema_builder_tests () {
 		MidgardCR.SchemaBuilder builder = new MidgardCR.SchemaBuilder ();
 		assert (builder != null);
 
-		MidgardCR.SchemaModel model = new MidgardCR.SchemaModel (DEFAULT_CLASSNAME);
+		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
                 assert (model != null);
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model);
@@ -48,12 +48,12 @@ void midgardcr_test_add_schema_builder_tests () {
 		MidgardCR.SchemaBuilder builder = new MidgardCR.SchemaBuilder ();
 		assert (builder != null);
 
-		MidgardCR.SchemaModel model = new MidgardCR.SchemaModel (DEFAULT_CLASSNAME);
+		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
                 assert (model != null);
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model);

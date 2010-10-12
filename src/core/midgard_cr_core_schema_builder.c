@@ -47,7 +47,7 @@ MgdSchemaTypeAttr *
 midgard_cr_core_schema_type_new_from_model (MidgardCRModel *model)
 {
 	g_return_val_if_fail (model != NULL, NULL);
-	g_return_val_if_fail (MIDGARD_CR_IS_SCHEMA_MODEL (model), NULL);
+	g_return_val_if_fail (MIDGARD_CR_IS_OBJECT_MODEL (model), NULL);
 
 	MgdSchemaTypeAttr *type_attr = midgard_cr_core_schema_type_attr_new ();
 	type_attr->name = g_strdup (midgard_cr_model_get_name (model));
@@ -148,7 +148,7 @@ MgdSchemaPropertyAttr *
 midgard_cr_core_schema_type_property_new_from_model (MidgardCRModelProperty *model, MgdSchemaTypeAttr *type_attr)
 {
 	g_return_val_if_fail (model != NULL, NULL);
-	g_return_val_if_fail (MIDGARD_CR_IS_SCHEMA_MODEL_PROPERTY (model), NULL);
+	g_return_val_if_fail (MIDGARD_CR_IS_OBJECT_MODEL_PROPERTY (model), NULL);
 
 	MgdSchemaPropertyAttr *prop_attr = midgard_cr_core_schema_type_property_attr_new ();
 	prop_attr->name = g_strdup (midgard_cr_model_get_name (MIDGARD_CR_MODEL(model)));
@@ -181,7 +181,7 @@ midgard_cr_core_schema_type_property_new_from_model (MidgardCRModelProperty *mod
 	MidgardCRModel *parent = midgard_cr_model_get_parent (models[0]);
 
 	if (!parent) {
-		g_warning ("NULL parent model for given '%s' SchemaModelProperty's model", prop_attr->name);
+		g_warning ("NULL parent model for given '%s' ObjectModelProperty's model", prop_attr->name);
 		g_error ("Invalid model");
 	}
 
@@ -226,11 +226,11 @@ midgard_cr_core_schema_builder_register_types (MidgardCRSchemaBuilder *builder, 
 	g_return_if_fail (error == NULL || *error == NULL);
 
 	guint i = 0;
-	MidgardCRSchemaModel **models = builder->_models;
+	MidgardCRObjectModel **models = builder->_models;
 
 	if (!models)
 		g_error_new_literal (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL, 
-				"No SchemaModel registered for execution");
+				"No ObjectModel registered for execution");
 
 	GSList *model_list = NULL;
 	while (models[i] != NULL) {

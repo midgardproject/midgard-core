@@ -75,12 +75,12 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (model_manager != null);
 		assert (model_manager is MidgardCR.SQLStorageModelManager);
 
-		MidgardCR.SchemaModel model = new MidgardCR.SchemaModel (DEFAULT_CLASSNAME);
+		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
                 assert (model != null);
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model);
@@ -129,16 +129,16 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (model_manager != null);
 		assert (model_manager is MidgardCR.SQLStorageModelManager);
 
-		MidgardCR.SchemaModel model = new MidgardCR.SchemaModel (DEFAULT_CLASSNAME);
+		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
                 assert (model != null);
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.SchemaModelProperty prop_model = new MidgardCR.SchemaModelProperty (TITLE_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
 		/* SUCCESS */
-                MidgardCR.SchemaModelProperty prop_model_a = new MidgardCR.SchemaModelProperty (ABSTRACT_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectModelProperty prop_model_a = new MidgardCR.ObjectModelProperty (ABSTRACT_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model).add_model (prop_model_a);

@@ -216,16 +216,20 @@ namespace MidgardCR {
 		public bool exists () {
 			return MidgardCRCore.SQLStorageManager.column_exists (this._storage_manager, this);
 		} 
-		
+	
+		private void _prepare_create_queries () {
+			string query = MidgardCRCore.StorageSQL.create_query_insert (this,
+                                this._storage_manager._storage_model_property_object_model, this._storage_manager._storage_model_property_storage_model);
+			this._queries += query;
+		}
+	
 		/**
 		 * Prepare create SQL query
 		 */
                 public void prepare_create () throws ValidationError {
 			this.is_valid ();
 			this._create_column = true;
-			string query = MidgardCRCore.StorageSQL.create_query_insert (this,
-                                this._storage_manager._storage_model_property_object_model, this._storage_manager._storage_model_property_storage_model);
-			this._queries += query;
+			this._prepare_create_queries ();
 		}
 
 		/**
@@ -233,16 +237,17 @@ namespace MidgardCR {
 		 */ 
                 public void prepare_update () throws ValidationError {
 			this.is_valid ();
-			this._update_column = true;
+			if (this.exists () == false) {
+				this._create_column = true;
+				this._prepare_create_queries ();
+			}
 		}
 		
 		/**
 		 * Prepare both: create and update SQL queries
 		 */
                 public void prepare_save () throws ValidationError {
-			this.is_valid ();
-			this._create_column = true;
-			this._update_column = true;
+			this.prepare_update ();
 		}
 
 		/** 

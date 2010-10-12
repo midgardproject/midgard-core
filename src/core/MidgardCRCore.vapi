@@ -16,9 +16,9 @@ namespace MidgardCRCore {
 	}
 
 	public class StorageSQL {
-		public static string create_query_insert_columns (GLib.Object object, MidgardCR.SchemaModel schema, MidgardCR.StorageModel model);
-		public static string create_query_insert_values (GLib.Object object, MidgardCR.SchemaModel schema, MidgardCR.StorageModel model);
-		public static string create_query_insert (GLib.Object object, MidgardCR.SchemaModel schema, MidgardCR.StorageModel model);
+		public static string create_query_insert_columns (GLib.Object object, MidgardCR.ObjectModel schema, MidgardCR.StorageModel model);
+		public static string create_query_insert_values (GLib.Object object, MidgardCR.ObjectModel schema, MidgardCR.StorageModel model);
+		public static string create_query_insert (GLib.Object object, MidgardCR.ObjectModel schema, MidgardCR.StorageModel model);
 	}
 	
 	public class SQLStorageManager {

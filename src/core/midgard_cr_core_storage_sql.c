@@ -1082,7 +1082,7 @@ midgard_core_storage_sql_get_model (GdaConnection *cnc, GdaSqlParser *parser, co
  * For example: col1, col2, col3.
  */ 
 gchar *
-midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
+midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage)
 {
 	g_return_val_if_fail (object != NULL, NULL);
 	g_return_val_if_fail (schema != NULL, NULL);
@@ -1096,7 +1096,7 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
 	const gchar *storagename = midgard_cr_model_get_name (_storage);
 
 	if (!g_str_equal (objectname, schemaname)) {
-		g_warning ("Can not generate valid SQL query for %s. SchemaModel of '%s' given", objectname, schemaname);
+		g_warning ("Can not generate valid SQL query for %s. ObjectModel of '%s' given", objectname, schemaname);
 		return NULL;
 	}
 
@@ -1122,7 +1122,7 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
 	for (i = 0; i < n_props; i++) {
 		const gchar *pname = pspecs[i]->name;
 		MidgardCRModel *smodel = midgard_cr_model_get_model_by_name (_schema, pname);
-		/* No SchemaModel for given property, ignore */
+		/* No ObjectModel for given property, ignore */
 		if (!smodel)
 			continue;
 		smodel = midgard_cr_model_get_model_by_name (_storage, pname);
@@ -1145,7 +1145,7 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
  * For example: 'string_value', 123, 'Foo'.
  */  
 gchar *
-midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
+midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage)
 {
 	g_return_val_if_fail (object != NULL, NULL);
 	g_return_val_if_fail (schema != NULL, NULL);
@@ -1159,7 +1159,7 @@ midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, Midgard
 	const gchar *storagename = midgard_cr_model_get_name (_storage);
 
 	if (!g_str_equal (objectname, schemaname)) {
-		g_warning ("Can not generate valid SQL query for %s. SchemaModel of '%s' given", objectname, schemaname);
+		g_warning ("Can not generate valid SQL query for %s. ObjectModel of '%s' given", objectname, schemaname);
 		return NULL;
 	}
 
@@ -1185,7 +1185,7 @@ midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, Midgard
 	for (i = 0; i < n_props; i++) {
 		const gchar *pname = pspecs[i]->name;
 		MidgardCRModel *smodel = midgard_cr_model_get_model_by_name (_schema, pname);
-		/* No SchemaModel for given property, ignore */
+		/* No ObjectModel for given property, ignore */
 		if (!smodel)
 			continue;
 		smodel = midgard_cr_model_get_model_by_name (_storage, pname);
@@ -1233,7 +1233,7 @@ midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, Midgard
  * Generates generic 'INSERT INTO...' SQL query for given object and models.
  */  
 gchar *
-midgard_cr_core_storage_sql_create_query_insert (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage) 
+midgard_cr_core_storage_sql_create_query_insert (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage) 
 {
 	g_return_val_if_fail (object != NULL, NULL);
 	g_return_val_if_fail (schema != NULL, NULL);
@@ -1260,7 +1260,7 @@ midgard_cr_core_storage_sql_create_query_insert (GObject *object, MidgardCRSchem
  * For example: col1='string_value', col2=123, col3='Foo'.
  */  
 gchar *
-midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
+midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage)
 {
 	g_return_val_if_fail (object != NULL, NULL);
 	g_return_val_if_fail (schema != NULL, NULL);
@@ -1274,7 +1274,7 @@ midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, Midgar
 	const gchar *storagename = midgard_cr_model_get_name (_storage);
 
 	if (!g_str_equal (objectname, schemaname)) {
-		g_warning ("Can not generate valid SQL query for %s. SchemaModel of '%s' given", objectname, schemaname);
+		g_warning ("Can not generate valid SQL query for %s. ObjectModel of '%s' given", objectname, schemaname);
 		return NULL;
 	}
 
@@ -1300,7 +1300,7 @@ midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, Midgar
 	for (i = 0; i < n_props; i++) {
 		const gchar *pname = pspecs[i]->name;
 		MidgardCRModel *smodel = midgard_cr_model_get_model_by_name (_schema, pname);
-		/* No SchemaModel for given property, ignore */
+		/* No ObjectModel for given property, ignore */
 		if (!smodel)
 			continue;
 		smodel = midgard_cr_model_get_model_by_name (_storage, pname);
@@ -1352,7 +1352,7 @@ midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, Midgar
  * Generates UPDATE SQL query.
  */  
 gchar *
-midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRSchemaModel *schema, MidgardCRStorageModel *storage)
+midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage)
 {
 	g_return_val_if_fail (object != NULL, NULL);
 	g_return_val_if_fail (schema != NULL, NULL);

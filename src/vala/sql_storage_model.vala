@@ -18,7 +18,7 @@ namespace MidgardCR {
 		private bool _create_table = false;
 		private bool _update_table = false;
 		private bool _drop_table = false;
-		private SchemaModel _object_model = null;
+		private ObjectModel _object_model = null;
 		private string[] _queries = null;
 
 		/* internal properties */
@@ -133,7 +133,7 @@ namespace MidgardCR {
 
 			string[] names = new string[0];
 			foreach (MidgardCR.Model model in this._models) {
-				/* TODO, check if it's SchemaModel or StorageModel */	
+				/* TODO, check if it's ObjectModel or StorageModel */	
 				if (!(model is SQLStorageModelProperty))
 					throw new ValidationError.TYPE_INVALID ("Invalid '%s' model associated with  SQLStorageModel. Expected SQLStorageModelProperty", model.get_type().name());
 				foreach (string name in names) {

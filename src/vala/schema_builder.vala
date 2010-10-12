@@ -8,8 +8,8 @@ namespace MidgardCR {
 	public class SchemaBuilder : GLib.Object, Executable {
 
 		/* private properties */
-		internal SchemaModel[] _models = null;
-		internal SchemaModel[] _delayed_models = null;
+		internal ObjectModel[] _models = null;
+		internal ObjectModel[] _delayed_models = null;
 
 		/* private methods */
 		private void _validate_model (Model model) throws ValidationError {
@@ -23,7 +23,7 @@ namespace MidgardCR {
 		}
 
 		/* public methods */
-		public void register_model (SchemaModel model) throws SchemaBuilderError, ValidationError { 
+		public void register_model (ObjectModel model) throws SchemaBuilderError, ValidationError { 
 			GLib.Type typeid = GLib.Type.from_name (model.name);
 			if (typeid > 0)
 				throw new ValidationError.NAME_DUPLICATED ("%s already registered in GType system", model.name);
@@ -42,7 +42,7 @@ namespace MidgardCR {
 
 		public void register_storage_models (StorageManager manager) throws SchemaBuilderError, ValidationError { }
 		public Storable? factory (StorageManager storage, string classname) throws SchemaBuilderError, ValidationError { return null; }
-		public SchemaModel? get_schema_model (string classname) { return null; }
+		public ObjectModel? get_object_model (string classname) { return null; }
 		
 		public void execute () throws ExecutableError { 
 			MidgardCRCore.SchemaBuilder.register_types (this);
