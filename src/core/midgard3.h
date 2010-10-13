@@ -1079,7 +1079,6 @@ const char* midgard_cr_object_model_get_parentname (MidgardCRObjectModel* self);
 GType midgard_cr_object_model_property_get_type (void) G_GNUC_CONST;
 MidgardCRObjectModelProperty* midgard_cr_object_model_property_new (const char* name, const char* type, const char* dvalue);
 MidgardCRObjectModelProperty* midgard_cr_object_model_property_construct (GType object_type, const char* name, const char* type, const char* dvalue);
-void midgard_cr_object_model_property_execute (MidgardCRObjectModelProperty* self);
 const char* midgard_cr_object_model_property_get_classname (MidgardCRObjectModelProperty* self);
 GQuark midgard_cr_schema_builder_error_quark (void);
 GType midgard_cr_schema_builder_get_type (void) G_GNUC_CONST;

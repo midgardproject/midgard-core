@@ -178,7 +178,8 @@ namespace MidgardCR {
 			this._queries += MidgardCRCore.StorageSQL.create_query_insert (this, 
 				this._storage_manager._storage_model_object_model, this._storage_manager._storage_model_storage_model);
 			/* Prepare columns to create */
-			foreach (MidgardCR.Model model in this._models) {	
+			foreach (MidgardCR.Model model in this._models) {
+				GLib.print ("Prepare create %s \n", model.name);	
 				((StorageExecutor)model).prepare_create ();
 			}
 		}

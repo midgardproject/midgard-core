@@ -33,6 +33,9 @@ namespace MidgardCR {
 
 		internal uint _id = 0;
 		internal unowned SQLStorageManager _storage_manager = null;
+		internal bool _isref = false;
+		internal string _refname = null;
+		internal string _reftarget;
 
 		/* public properties */
 	
@@ -109,6 +112,18 @@ namespace MidgardCR {
 			get { return (StorageManager)this._storage_manager; }
 		}
 
+		public bool isref {
+			get { return this._isref; }
+		}
+
+		public string refname {
+			get { return this._refname; }
+		}
+
+		public string reftarget {
+			get { return this._reftarget; }
+		}
+
 		private void _set_gtype_from_name () {
 			switch (this._typename) {
 				case "string":
@@ -137,6 +152,10 @@ namespace MidgardCR {
 
 				case "float":
 					this._gtype = typeof (float);
+				break;
+
+				case "object":
+					this._gtype = typeof (Object);
 				break;
 
 				default:

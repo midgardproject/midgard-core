@@ -52,7 +52,6 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class ObjectModelProperty : GLib.Object, MidgardCR.Model, MidgardCR.ModelProperty {
 		public ObjectModelProperty (string name, string type, string dvalue);
-		public void execute ();
 		public string? classname { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]

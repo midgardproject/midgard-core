@@ -137,6 +137,9 @@ namespace MidgardCR {
 		/* internal properties */
 
 		internal uint _id = 0;
+		internal bool _isref = false;
+		internal string _refname = null;
+		internal string _reftarget = null;
 
 		/* public properties */
 	
@@ -200,6 +203,33 @@ namespace MidgardCR {
 		 */
 		public bool @private { get; set; }
 
+		/**
+		 * Tells whether property of an object is a reference to other object or its property.
+		 *
+		 * By default it's false and set to true, when another model is added ({@link add_model}).
+		 *
+		 * In case of {@link ObjectModel}, property is reference and must be the type of object.
+		 * In case of ObjectModelProperty, property is reference to given property and must be 
+		 * of the same type as added one 
+		 */
+		public bool isref {
+			get { return this._isref; }
+		}
+
+		/**
+		 * Name of the class, if property is a reference.
+		 */
+		public string refname {
+			get { return this._refname; }
+		}
+
+		/**
+		 * Name of the property, if property is a reference.
+		 */
+		public string reftarget {
+			get { return this._reftarget; }
+		}
+
 		private void _set_gtype_from_name () {
 			switch (this._typename) {
 				case "string":
@@ -253,11 +283,38 @@ namespace MidgardCR {
 			this._set_gtype_from_name ();	
 		} 
 		
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * Only one model should be added to ObjectModelProperty.
+		 *
+		 * It should be either:
+		 *
+		 *  A. Model {@link ObjectModel}
+		 *    a. property should be object type
+		 *    a. isref value is set to true
+		 *    a. refname is set to added model's name
+		 *    a. reftarget is null
+		 *  A. Model {@link ObjectModelProperty}
+		 *    a. property should be string or integer
+		 *    a. isref value is set to true
+		 *    a. refname value is set to parentname of given model
+		 *    a. reftarget is set to added model's name
+		 *
+		 * Model is invalid, if added one, is neither {@link ObjectModel} or ObjectModelProperty
+		 */
 		public Model add_model (Model model) { 
 			this._models += model;
 			return this; 
 		}
 
+		/**
+		 * {@inheritDoc}
+		 *
+		 * @return {@link ObjectModel} or {@link ObjectModelProperty} model if given name
+		 * matches the first added model's one. There's no lookup by name done, as multiple 
+		 * models are invalid in case of property model 
+		 */
 		public unowned Model? get_model_by_name (string name) {
 			if (this._models[0].name == name)
 				return this._models[0];
@@ -265,15 +322,24 @@ namespace MidgardCR {
 			return null; 
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */		
 		public unowned Model[]? list_models () { 
 			return this._models; 
 		}
 
 		/** 
-		 * Check if ObjectModelProperty is valid
+		 * {@inheritDoc}
 		 *
-		 * If it's valid, this method silently returns.
-		 * In other case, error is thrown.
+		 *  A. NAME_INVALID
+		 *    a. {@link valuetypename} is null or empty
+		 *  A. TYPE_INVALID
+		 *    a. {@link valuegtype} is 0
+		 *    a. invalid model class associated
+		 *  A. REFERENCE_INVALID
+		 *    a. more than one model associated
+		 *    a. associated model has no parent model
 		 */
 		public void is_valid () throws ValidationError { 
 			/* type id or name is empty thus invalid */
@@ -289,8 +355,10 @@ namespace MidgardCR {
 				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("More than one reference model set");
 	
 			/* Invalid object associated as model */
-			if (this._models != null && (!(this._models[0] is ObjectModelProperty)))
-				throw new MidgardCR.ValidationError.TYPE_INVALID ("Associated model is not a ObjectModelProperty instance");
+			if (this._models != null && (!(this._models[0] is ObjectModelProperty))) {
+				if (!(this._models[0] is ObjectModel))
+					throw new MidgardCR.ValidationError.TYPE_INVALID ("Invalid, associated %s model", this._models[0].get_type().name());
+			}
 
 			/* Associated model has no parent defined */
 			if (this._models != null && this._models[0].parent == null)
