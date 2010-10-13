@@ -303,7 +303,17 @@ namespace MidgardCR {
 		 *
 		 * Model is invalid, if added one, is neither {@link ObjectModel} or ObjectModelProperty
 		 */
-		public Model add_model (Model model) { 
+		public Model add_model (Model model) {
+			if (model is ObjectModel) {
+				this._isref = true;
+				this._refname = model.name;
+			} 
+			if (model is ObjectModelProperty) {
+				this._isref = true;
+				this._reftarget = model.name;
+				if (model.parent != null)
+					this._refname = ((ObjectModel)model.parent).parentname;
+			}
 			this._models += model;
 			return this; 
 		}

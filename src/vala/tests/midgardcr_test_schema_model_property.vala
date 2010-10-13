@@ -21,6 +21,16 @@ void midgardcr_test_add_object_model_property_tests () {
 		
 		MidgardCR.ObjectModelProperty new_model = model.add_model (prop_model) as MidgardCR.ObjectModelProperty;
 		assert (new_model == model);
+
+		/* FAIL */
+		bool valid = true;
+		try {
+			new_model.is_valid ();
+		} catch (MidgardCR.ValidationError e) {
+			/* Do not print any warning */
+			valid = false;
+		}
+		assert (valid == false);
 	});
 
 	/* get model by name */

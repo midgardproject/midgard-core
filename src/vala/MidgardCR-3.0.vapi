@@ -147,7 +147,10 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface ModelProperty : GLib.Object, MidgardCR.Model {
 		public abstract string description { get; set; }
+		public abstract bool isref { get; }
 		public abstract bool @private { get; set; }
+		public abstract string refname { get; }
+		public abstract string reftarget { get; }
 		public abstract string valuedefault { get; set; }
 		public abstract GLib.Type valuegtype { get; }
 		public abstract string valuetypename { get; set; }

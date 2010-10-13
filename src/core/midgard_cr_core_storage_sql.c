@@ -805,6 +805,37 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 		return FALSE;
 	}
 
+	/* IS REFERENCE */
+	column_name = "is_reference";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* REFERENCE CLASS NAME */
+	column_name = "reference_class_name";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* REFERENCE PROPERTY NAME */
+	column_name = "reference_property_name";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
 	return TRUE;
 }
 

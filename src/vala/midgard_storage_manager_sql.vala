@@ -104,6 +104,9 @@ namespace MidgardCR {
 			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("index", "string", ""));
 			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("primary", "string", ""));
 			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("description", "text", ""));
+			//this._storage_model_property_object_model.add_model (new ObjectModelProperty ("isref", "bool", ""));
+			//this._storage_model_property_object_model.add_model (new ObjectModelProperty ("refname", "string", ""));
+			//this._storage_model_property_object_model.add_model (new ObjectModelProperty ("reftarget", "string", ""));
 			this._storage_model_property_storage_model = new SQLStorageModel("MidgardCRSQLStorageModelProperty", "midgard_mapper_columns");
                 	this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("name", "property_name", "string"));
                 	this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("location", "column_name", "string"));
@@ -111,6 +114,9 @@ namespace MidgardCR {
 	               	this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("index", "has_index", "bool"));
 	               	this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("primary", "is_primary", "bool"));
                 	this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("description", "description", "text"));
+                	//this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("isref", "is_reference", "bool"));
+                	//this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("refname", "reference_class_name", "string"));
+                	//this._storage_model_property_storage_model.add_model (new SQLStorageModelProperty ("reftarget", "reference_property_name", "string"));
 		}
 		
 		/**

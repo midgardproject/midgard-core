@@ -625,6 +625,9 @@ struct _MidgardCRModelPropertyIface {
 	void (*set_description) (MidgardCRModelProperty* self, const char* value);
 	gboolean (*get_private) (MidgardCRModelProperty* self);
 	void (*set_private) (MidgardCRModelProperty* self, gboolean value);
+	gboolean (*get_isref) (MidgardCRModelProperty* self);
+	const char* (*get_refname) (MidgardCRModelProperty* self);
+	const char* (*get_reftarget) (MidgardCRModelProperty* self);
 };
 
 struct _MidgardCRObjectModel {
@@ -641,6 +644,9 @@ struct _MidgardCRObjectModelProperty {
 	GObject parent_instance;
 	MidgardCRObjectModelPropertyPrivate * priv;
 	guint _id;
+	gboolean _isref;
+	char* _refname;
+	char* _reftarget;
 };
 
 struct _MidgardCRObjectModelPropertyClass {
@@ -922,6 +928,9 @@ struct _MidgardCRSQLStorageModelProperty {
 	MidgardCRSQLStorageModelPropertyPrivate * priv;
 	guint _id;
 	MidgardCRSQLStorageManager* _storage_manager;
+	gboolean _isref;
+	char* _refname;
+	char* _reftarget;
 };
 
 struct _MidgardCRSQLStorageModelPropertyClass {
@@ -1072,6 +1081,9 @@ const char* midgard_cr_model_property_get_description (MidgardCRModelProperty* s
 void midgard_cr_model_property_set_description (MidgardCRModelProperty* self, const char* value);
 gboolean midgard_cr_model_property_get_private (MidgardCRModelProperty* self);
 void midgard_cr_model_property_set_private (MidgardCRModelProperty* self, gboolean value);
+gboolean midgard_cr_model_property_get_isref (MidgardCRModelProperty* self);
+const char* midgard_cr_model_property_get_refname (MidgardCRModelProperty* self);
+const char* midgard_cr_model_property_get_reftarget (MidgardCRModelProperty* self);
 GType midgard_cr_object_model_get_type (void) G_GNUC_CONST;
 MidgardCRObjectModel* midgard_cr_object_model_new (const char* name);
 MidgardCRObjectModel* midgard_cr_object_model_construct (GType object_type, const char* name);

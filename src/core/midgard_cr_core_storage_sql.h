@@ -29,7 +29,7 @@
 #define TABLE_NAME_SCHEMA "midgard_schema_type"
 #define TABLE_NAME_SCHEMA_PROPERTIES "midgard_schema_type_properties"
 #define TABLE_SCHEMA_COLUMNS "class_name, extends"
-#define TABLE_SCHEMA_PROPERTIES_COLUMNS "class_name, property_name, gtype_name, default_value_string, property_nick, description"
+#define TABLE_SCHEMA_PROPERTIES_COLUMNS "class_name, property_name, gtype_name, default_value_string, property_nick, description, is_reference, reference_class_name, reference_property_name"
 
 typedef struct _MgdCoreStorageSQLColumn MgdCoreStorageSQLColumn;
 
