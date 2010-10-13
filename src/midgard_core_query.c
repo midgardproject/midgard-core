@@ -550,6 +550,8 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 
 	g_object_unref (params);
 	g_object_unref (stmt);
+
+	return exec_res;
 #else 
 	GdaDict *dict = gda_dict_new ();
 	gda_dict_set_connection (dict, mgd->priv->connection);
@@ -591,8 +593,6 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	g_object_unref (query);
 	g_object_unref (dict);	
 
-#endif /* HAVE_LIBGDA_4 */
-
 	if (!GDA_IS_DATA_MODEL (exec_res)) {
 
 		g_warning ("Failed to retrieve data model from query");
@@ -600,6 +600,9 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	}
 	
 	return GDA_DATA_MODEL (exec_res);	
+
+#endif /* HAVE_LIBGDA_4 */
+
 }
 
 #define _SET_HOLDER_VALUE \
