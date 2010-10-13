@@ -296,9 +296,5 @@ namespace MidgardCR {
 			if (this._models != null && this._models[0].parent == null)
 				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("Null parent defined for associated model");
 		}
-
-		public void execute () { 
-			return; 
-		}		
 	}
 }
