@@ -185,7 +185,7 @@ namespace MidgardCR {
 		public Model? parent { get; set; }
 
 		/**
-		 * Name of the class, property is installed.	 
+		 * Name of the class, property is installed. 
 		 */
 		public string? classname {
 			get {
@@ -230,9 +230,13 @@ namespace MidgardCR {
 					this._gtype = typeof (float);
 				break;
 
+				case "object":
+					this._gtype = typeof (Object);
+				break;
+
 				default:
 					this._gtype = 0;
-					GLib.warning ("Unhandled '%s' value type", this._typename);
+					GLib.warning ("ObjectModel: unhandled '%s' value type", this._typename);
 				break;
 			}	
 		}
