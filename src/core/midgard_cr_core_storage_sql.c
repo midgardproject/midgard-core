@@ -1271,9 +1271,12 @@ midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, Midgard
 		GValue val = {0, };
 		g_value_init (&val, pspecs[i]->value_type);
 		g_object_get_property (object, pname, &val);
+		const gchar *strval = NULL;
+		/* FIXME, get default value from ObjectModel (if available) */
 		switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE (&val))) {
 			case G_TYPE_STRING:
-				g_string_append_printf (query, "%s'%s'", add_coma ? ", " : "", g_value_get_string (&val));
+				strval = g_value_get_string (&val);
+				g_string_append_printf (query, "%s'%s'", add_coma ? ", " : "", strval ? strval : "");
 				break;
 			case G_TYPE_UINT:
 				g_string_append_printf (query, "%s%d", add_coma ? ", " : "", g_value_get_uint (&val));
@@ -1390,9 +1393,11 @@ midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, Midgar
 		GValue val = {0, };
 		g_value_init (&val, pspecs[i]->value_type);
 		g_object_get_property (object, pname, &val);
+		const gchar *strval = NULL;
 		switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE (&val))) {
 			case G_TYPE_STRING:
-				g_string_append_printf (query, "'%s'", g_value_get_string (&val));
+				strval = g_value_get_string (&val);	
+				g_string_append_printf (query, "'%s'", strval ? strval : "");
 				break;
 			case G_TYPE_UINT:
 				g_string_append_printf (query, "%d", g_value_get_uint (&val));

@@ -66,7 +66,6 @@ void main () {
 		.add_model (new ObjectModelProperty ("target", "guid", ""))
 		.add_model (new ObjectModelProperty ("summary", "guid", ""))
 		.add_model (new ObjectModelProperty ("application", "string", ""));
-
 	
 	/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
 	/* Activity class requires 'midgard_activity' table */
