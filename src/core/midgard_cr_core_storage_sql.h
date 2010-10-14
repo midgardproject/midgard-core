@@ -25,7 +25,7 @@
 #define TABLE_NAME_MAPPER "midgard_mapper_type"
 #define TABLE_NAME_MAPPER_PROPERTIES "midgard_mapper_columns"
 #define TABLE_MAPPER_COLUMNS "class_name, table_name, description"
-#define TABLE_MAPPER_PROPERTIES_COLUMNS "property_name, column_name, table_name, gtype_name, column_type, is_primary, has_index, is_unique, is_auto_increment, description"
+#define TABLE_MAPPER_PROPERTIES_COLUMNS "property_name, column_name, table_name, gtype_name, column_type, is_primary, has_index, is_unique, is_auto_increment, description, is_reference, reference_class_name, reference_property_name, property_of"
 #define TABLE_NAME_SCHEMA "midgard_schema_type"
 #define TABLE_NAME_SCHEMA_PROPERTIES "midgard_schema_type_properties"
 #define TABLE_SCHEMA_COLUMNS "class_name, extends"

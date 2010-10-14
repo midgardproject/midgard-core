@@ -84,6 +84,8 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageModelProperty : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel, MidgardCR.ModelProperty, MidgardCR.StorageModelProperty {
 		public SQLStorageModelProperty (string name, string location, string type);
+		public string propertyof { get; }
+		public string tablename { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLWorkspaceManager : MidgardCR.StorageWorkspaceManager, MidgardCR.SQLStorageManager {

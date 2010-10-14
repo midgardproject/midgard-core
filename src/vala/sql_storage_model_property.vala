@@ -28,6 +28,7 @@ namespace MidgardCR {
 		private bool _update_column = false;
 		private bool _remove_column = false;
 		private string[] _queries = null;
+		private Model? _parent = null;
 
 		/* internal properties */
 
@@ -35,7 +36,9 @@ namespace MidgardCR {
 		internal unowned SQLStorageManager _storage_manager = null;
 		internal bool _isref = false;
 		internal string _refname = null;
-		internal string _reftarget;
+		internal string _reftarget = null;
+		internal string _tablename = null;
+		internal string _property_of = null;
 
 		/* public properties */
 	
@@ -81,7 +84,15 @@ namespace MidgardCR {
 		/**
 		 * Parent model
 		 */
-		public Model? parent { get; set; }
+		public Model? parent { 
+			get { 
+				return this._parent; 
+			}
+			set {
+				this._parent = value;
+				this._tablename = ((MidgardCR.SQLStorageModel)this._parent).location;
+			}
+		}
 
 		/**
 		 * Marks property as private 
@@ -123,6 +134,31 @@ namespace MidgardCR {
 		public string reftarget {
 			get { return this._reftarget; }
 		}
+
+		/**
+		 * Name of the column's table
+		 */
+		public string tablename {
+			get { return this._tablename; }
+		}
+
+		/**
+		 * Tells whether model is part of another property.
+		 * 
+		 * This is required, when object described by {@link ObjectModel}
+		 * has property of object type, and multiple values (of such object) should be stored
+		 * in one table record. 
+		 *
+		 * For example, property of Object type is a reference to another object, and referenced object's
+		 * 'name' and 'id' should be stored in one record. Instead of two separate properties, one  
+		 * is propagated as object is created.
+		 *
+		 * @see add_model
+		 */ 
+		public string propertyof {
+			get { return this._property_of; }
+		}
+		
 
 		private void _set_gtype_from_name () {
 			switch (this._typename) {
@@ -181,9 +217,17 @@ namespace MidgardCR {
 		~SQLStorageModelProperty () {
 			this._id = 0;
 		}
-			
+	
+		/**
+		 * {@inheritDoc}
+		 * 
+		 * If added model is SQLStorageModelProperty, it's 'parentof' property
+		 * is set to the value of the current instance.
+		 */		
 		public Model add_model (Model model) { 
 			this._models += model;
+			if (model is SQLStorageModelProperty)
+				((SQLStorageModelProperty)model)._property_of = this.name;
 			return this; 
 		}
 
@@ -203,10 +247,12 @@ namespace MidgardCR {
 		 *
 		 * In case of invalid model, error is thrown:
 		 * 
-		 * 1. NAME_INVALID, the type of property is empty
-		 * 1. TYPE_INVALID, the GLib.Type of property is invalid
-		 * 1. REFERENCE_INVALID, more than one model is added 
-		 * 1. REFERENCE_INVALID, null parent model 
+		 *  A. NAME_INVALID
+		 *    a. the type of property is empty
+		 *  A. TYPE_INVALID
+		 *    a. the GLib.Type of property is invalid
+		 *  A. REFERENCE_INVALID
+		 *    a. null parent model 
 		 */
 		public void is_valid () throws ValidationError { 
 			/* type id or name is empty thus invalid */
@@ -216,12 +262,7 @@ namespace MidgardCR {
 			if (this.valuegtype == 0) {
 				throw new MidgardCR.ValidationError.TYPE_INVALID ("Property's type is 0");
 			}
-				
-			/* Invalid number of models associated */
-			if (this._models.length > 1)
-				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("More than one reference model set");
-	
-			/* Associated model has no parent defined */
+						
 			if (this._models != null && this._models[0].parent == null)
 				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("Null parent defined for associated model");
 		}
@@ -245,10 +286,16 @@ namespace MidgardCR {
 		/**
 		 * Prepare create SQL query
 		 */
-                public void prepare_create () throws ValidationError {
-			this.is_valid ();
-			this._create_column = true;
-			this._prepare_create_queries ();
+                public void prepare_create () throws ValidationError {			
+			if (this.valuegtype == typeof (Object)) {
+				foreach (MidgardCR.Model model in this._models) {
+					((StorageExecutor)model).prepare_create ();
+				}
+			} else {
+				this.is_valid ();
+				this._create_column = true;
+				this._prepare_create_queries ();
+			}
 		}
 
 		/**
@@ -314,6 +361,11 @@ namespace MidgardCR {
                                 MidgardCRCore.SQLStorageManager.query_execute (this._storage_manager, query);
 				execution_end ();
                         }
+			
+			foreach (MidgardCR.Model model in this._models) {
+                                ((StorageExecutor)model).execute ();
+                        }
+		
 			this._create_column = false;
 			this._update_column = false;
 			this._remove_column = false;	

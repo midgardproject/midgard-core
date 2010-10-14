@@ -931,6 +931,8 @@ struct _MidgardCRSQLStorageModelProperty {
 	gboolean _isref;
 	char* _refname;
 	char* _reftarget;
+	char* _tablename;
+	char* _property_of;
 };
 
 struct _MidgardCRSQLStorageModelPropertyClass {
@@ -1214,6 +1216,8 @@ GType midgard_cr_sql_storage_model_property_get_type (void) G_GNUC_CONST;
 MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_create_model_property (MidgardCRSQLStorageModel* self, const char* name, const char* location, const char* type);
 MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_new (const char* name, const char* location, const char* type);
 MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_construct (GType object_type, const char* name, const char* location, const char* type);
+const char* midgard_cr_sql_storage_model_property_get_tablename (MidgardCRSQLStorageModelProperty* self);
+const char* midgard_cr_sql_storage_model_property_get_propertyof (MidgardCRSQLStorageModelProperty* self);
 
 
 G_END_DECLS

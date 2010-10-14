@@ -55,9 +55,9 @@ void main () {
 		.add_model (person_sm.create_model_property ("lastname", "lastname", "string"));
 
 	/* Define 'Activity' class */
-	ObjectModel activity_model = new ObjectModel ("Activity");
+	var activity_model = new ObjectModel ("Activity");
 	/* 'actor' property is object type, so we 'link' property with 'Person' object */
-      	ObjectModelProperty am_actor = new ObjectModelProperty ("actor", "object", "");
+      	var am_actor = new ObjectModelProperty ("actor", "object", "");
 	am_actor.add_model (person_model);
 	/* Define properties: 'verb', 'target', 'summary', 'application' */
 	activity_model
@@ -70,16 +70,20 @@ void main () {
 	
 	/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
 	/* Activity class requires 'midgard_activity' table */
-	SQLStorageModel activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLStorageModel;
+	var activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLStorageModel;
 	/* Add columns to table: 'verb', 'application', 'target', 'summary' and those required by 'actor' */
-	SQLStorageModelProperty asm_verb = activity_sm.create_model_property ("verb", "verb", "string");
+	var asm_verb = activity_sm.create_model_property ("verb", "verb", "string");
 	asm_verb.index = true;
-	SQLStorageModelProperty asm_application = activity_sm.create_model_property ("application", "application", "string");
+	var asm_application = activity_sm.create_model_property ("application", "application", "string");
 	asm_application.index = true;
+	var actor_model = activity_sm.create_model_property ("actor", "actor", "object");
+	actor_model
+		.add_model (activity_sm.create_model_property ("id", "actor_id", "int"))
+		.add_model (activity_sm.create_model_property ("guid", "actor_guid", "guid"));
 	activity_sm
 		.add_model (asm_verb)
 		.add_model (asm_application)
-		.add_model (activity_sm.create_model_property ("actor", "actor", "object"))
+		.add_model (actor_model)
 		.add_model (activity_sm.create_model_property ("target", "target", "string"))
 		.add_model (activity_sm.create_model_property ("summary", "summary", "string"));
 
@@ -105,14 +109,14 @@ void main () {
 	try {
 		model_manager.prepare_create ();
 	} catch (ValidationError e) {
-		GLib.warning (e.message);
+		GLib.error (e.message);
 	}
 
 	/* Execute all queries prepared in prepare_create() method */
 	try {
 		model_manager.execute ();
 	} catch (ExecutableError e) {
-		GLib.warning (e.message);
+		GLib.error (e.message);
 	}	
 }
 
