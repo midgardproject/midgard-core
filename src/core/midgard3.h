@@ -713,9 +713,9 @@ struct _MidgardCRStorageExecutorIface {
 
 struct _MidgardCRStorageModelIface {
 	GTypeInterface parent_iface;
+	MidgardCRStorageManager* (*get_storagemanager) (MidgardCRStorageModel* self);
 	const char* (*get_location) (MidgardCRStorageModel* self);
 	void (*set_location) (MidgardCRStorageModel* self, const char* value);
-	MidgardCRStorageManager* (*get_storagemanager) (MidgardCRStorageModel* self);
 };
 
 struct _MidgardCRStorageModelManagerIface {
@@ -822,6 +822,10 @@ struct _MidgardCRSQLStorageManager {
 	MidgardCRStorageModel* _storage_model_storage_model;
 	MidgardCRObjectModel* _storage_model_property_object_model;
 	MidgardCRStorageModel* _storage_model_property_storage_model;
+	MidgardCRObjectModel* _object_model_object_model;
+	MidgardCRStorageModel* _object_model_storage_model;
+	MidgardCRObjectModel* _object_model_property_object_model;
+	MidgardCRStorageModel* _object_model_property_storage_model;
 };
 
 struct _MidgardCRSQLStorageManagerClass {
@@ -898,10 +902,6 @@ struct _MidgardCRSQLStorageModelManager {
 	MidgardCRModel** _models;
 	gint _models_length1;
 	gint __models_size_;
-	MidgardCRObjectModel* _object_model;
-	MidgardCRObjectModel* _class_property_model;
-	MidgardCRStorageModel* sql_storage_model;
-	MidgardCRStorageModel* sql_storage_column_model;
 	char** _queries;
 	gint _queries_length1;
 	gint __queries_size_;
@@ -1177,9 +1177,9 @@ gboolean midgard_cr_storage_content_manager_purge (MidgardCRStorageContentManage
 MidgardCRQueryManager* midgard_cr_storage_content_manager_get_query_manager (MidgardCRStorageContentManager* self);
 MidgardCRStorageManager* midgard_cr_storage_content_manager_get_storagemanager (MidgardCRStorageContentManager* self);
 GQuark midgard_cr_storage_model_error_quark (void);
+MidgardCRStorageManager* midgard_cr_storage_model_get_storagemanager (MidgardCRStorageModel* self);
 const char* midgard_cr_storage_model_get_location (MidgardCRStorageModel* self);
 void midgard_cr_storage_model_set_location (MidgardCRStorageModel* self, const char* value);
-MidgardCRStorageManager* midgard_cr_storage_model_get_storagemanager (MidgardCRStorageModel* self);
 GType midgard_cr_storage_model_property_get_type (void) G_GNUC_CONST;
 gboolean midgard_cr_storage_model_property_get_index (MidgardCRStorageModelProperty* self);
 void midgard_cr_storage_model_property_set_index (MidgardCRStorageModelProperty* self, gboolean value);
@@ -1210,12 +1210,12 @@ GType midgard_cr_sql_storage_model_manager_get_type (void) G_GNUC_CONST;
 MidgardCRSQLStorageModelManager* midgard_cr_sql_storage_model_manager_new (void);
 MidgardCRSQLStorageModelManager* midgard_cr_sql_storage_model_manager_construct (GType object_type);
 GType midgard_cr_sql_storage_model_get_type (void) G_GNUC_CONST;
-MidgardCRSQLStorageModel* midgard_cr_sql_storage_model_new (const char* classname, const char* location);
-MidgardCRSQLStorageModel* midgard_cr_sql_storage_model_construct (GType object_type, const char* classname, const char* location);
+MidgardCRSQLStorageModel* midgard_cr_sql_storage_model_new (MidgardCRSQLStorageManager* manager, const char* classname, const char* location);
+MidgardCRSQLStorageModel* midgard_cr_sql_storage_model_construct (GType object_type, MidgardCRSQLStorageManager* manager, const char* classname, const char* location);
 GType midgard_cr_sql_storage_model_property_get_type (void) G_GNUC_CONST;
 MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_create_model_property (MidgardCRSQLStorageModel* self, const char* name, const char* location, const char* type);
-MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_new (const char* name, const char* location, const char* type);
-MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_construct (GType object_type, const char* name, const char* location, const char* type);
+MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_new (MidgardCRSQLStorageManager* manager, const char* name, const char* location, const char* type);
+MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_construct (GType object_type, MidgardCRSQLStorageManager* manager, const char* name, const char* location, const char* type);
 const char* midgard_cr_sql_storage_model_property_get_tablename (MidgardCRSQLStorageModelProperty* self);
 const char* midgard_cr_sql_storage_model_property_get_propertyof (MidgardCRSQLStorageModelProperty* self);
 
