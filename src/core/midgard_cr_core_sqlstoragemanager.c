@@ -108,6 +108,8 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 	object_models[i] = NULL; /* terminate with NULL */
 	self->_object_models = object_models;
 	self->_object_models_length1 = i;
+
+	g_object_unref (model);
 	
 	/* select all properties */
 	query = g_string_new ("SELECT ");
@@ -179,6 +181,62 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 static void
 __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 {
+	/* select all table models */
+	GString *query = g_string_new ("SELECT ");
+	g_string_append_printf (query, "%s, id FROM %s", TABLE_MAPPER_COLUMNS, TABLE_NAME_MAPPER);
+	GError *err = NULL;
+	
+	GdaDataModel *model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
+	g_string_free (query, TRUE);
+	/* internal error, return and throw error */
+	if (err) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_MANAGER_ERROR, MIDGARD_CR_STORAGE_MANAGER_ERROR_INTERNAL, 
+				"%s", err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		if (model)
+			g_object_unref (model);
+		return;
+	}
+	/* there's no single table defined, silently return */
+	if (!model)
+		return;
+
+	guint rows = gda_data_model_get_n_rows (model);
+	/* There's a model, but no single record selected, silently return */
+	if (rows == 0) {
+		g_object_unref(model);
+		return;
+	}
+
+	MidgardCRStorageModel **storage_models = g_new (MidgardCRStorageModel *, rows + 1);
+
+	const GValue *value;
+	const gchar *class_name;
+	guint i;
+	guint coln = 0;
+	for (i = 0; i < rows; i++) {
+		/* Initialize new StorageModel for given class name and table name */
+		value = gda_data_model_get_typed_value_at (model, coln, i, G_TYPE_STRING, TRUE, NULL);	
+		class_name = g_value_get_string (value);
+		/* Get table name */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		MidgardCRSQLStorageModel *smodel = midgard_cr_sql_storage_model_new (self, class_name, g_value_get_string (value));
+		/* Get description */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		/* FIXME, midgard_cr_model_set_description (smodel, g_value_get_string (value)); */
+		/* Get id */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);	
+		smodel->_id = (guint) g_value_get_int (value);
+		/* Add Table model to array */
+		storage_models[i] = smodel;
+		coln = 0;
+	}
+	storage_models[i] = NULL; /* terminate with NULL */
+	self->_storage_models = storage_models;
+	self->_storage_models_length1 = i;
+
+	g_object_unref (model);
+
 	return;
 }	
 
