@@ -74,8 +74,9 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel {
-		public SQLStorageModel (string classname, string location);
+		public SQLStorageModel (MidgardCR.SQLStorageManager manager, string classname, string location);
 		public MidgardCR.SQLStorageModelProperty create_model_property (string name, string location, string type);
+		public MidgardCR.StorageManager storagemanager { construct; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
@@ -83,8 +84,9 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageModelProperty : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel, MidgardCR.ModelProperty, MidgardCR.StorageModelProperty {
-		public SQLStorageModelProperty (string name, string location, string type);
+		public SQLStorageModelProperty (MidgardCR.SQLStorageManager manager, string name, string location, string type);
 		public string propertyof { get; }
+		public MidgardCR.StorageManager storagemanager { construct; }
 		public string tablename { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
@@ -290,8 +292,8 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageModel : MidgardCR.Model, MidgardCR.StorageExecutor {
+		public abstract unowned MidgardCR.StorageManager get_storagemanager ();
 		public abstract string location { get; set; }
-		public abstract MidgardCR.StorageManager storagemanager { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageModelManager : MidgardCR.Model, MidgardCR.StorageExecutor {

@@ -51,7 +51,7 @@ namespace MidgardCR {
 		 * Holds reference to {@link SQLStorageManager} object 
 		 */
 		public unowned StorageManager storagemanager { 	
-			get { return this._storage_manager; }
+			construct { this._storage_manager = (SQLStorageManager)value; }
 		}			
 
 		/**
@@ -67,8 +67,13 @@ namespace MidgardCR {
 		 * @param classname name of the class 
 		 * @param location table name
 		 */
-		public SQLStorageModel (string classname, string location) {
-			Object (name: classname, location: location);
+		public SQLStorageModel (SQLStorageManager manager, string classname, string location) {
+			Object (storagemanager: manager, name: classname, location: location);
+			this._id = 0; /* Satisfy valac */
+		}
+
+		public unowned StorageManager get_storagemanager () {
+			return this._storage_manager;
 		}
 	
 		/**
@@ -158,9 +163,8 @@ namespace MidgardCR {
 		 * Create new {@link SQLStorageModelProperty}
 		 */
 		public SQLStorageModelProperty create_model_property (string name, string location, string type) {
-			SQLStorageModelProperty model = new SQLStorageModelProperty (name, location, type);
+			SQLStorageModelProperty model = new SQLStorageModelProperty ( (SQLStorageManager)this.get_storagemanager (), name, location, type);
 			model.parent = this;
-			model._storage_manager = this._storage_manager;
 			model.execution_start.connect (this._emit_execution_start);
                         model.execution_end.connect (this._emit_execution_end);
 			return model;

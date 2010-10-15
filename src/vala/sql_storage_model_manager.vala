@@ -9,10 +9,6 @@ namespace MidgardCR {
 		internal unowned StorageModel[] _storage_models = null;
 		internal unowned ObjectModel[] _object_models = null;
 		internal Model[] _models = null;
-		internal ObjectModel _object_model = null;
-		internal ObjectModel _class_property_model = null;
-		internal StorageModel sql_storage_model = null;
-		internal StorageModel sql_storage_column_model = null;	
 		internal string[] _queries = null;
 
 		/* Model properties */
@@ -49,44 +45,6 @@ namespace MidgardCR {
 			get { return (StorageManager)this._storage_manager; } 
 		} 		
 	
-		/* Constructor */
-		construct {
-			
-			/* Initialize class ObjectModel */
-			this._object_model = new ObjectModel ("MidgardCRObjectModel");
-			this._object_model.add_model (new ObjectModelProperty ("name", "string", ""));
-			this._object_model.add_model (new ObjectModelProperty ("parentname", "string", ""));
-
-			/* Initialize class StorageModel */
-			this.sql_storage_model = new SQLStorageModel ("MidgardCRObjectModel", "midgard_schema_type");
-			this.sql_storage_model.add_model (new SQLStorageModelProperty ("name", "class_name", "string"));
-			this.sql_storage_model.add_model (new SQLStorageModelProperty ("parentname", "extends", "string"));
-
-			/* Initialize property ObjectModel */
-			this._class_property_model = new ObjectModel ("MidgardCRObjectModelProperty");
-			this._class_property_model.add_model (new ObjectModelProperty ("name", "string", ""));
-			this._class_property_model.add_model (new ObjectModelProperty ("classname", "string", ""));
-			this._class_property_model.add_model (new ObjectModelProperty ("valuetypename", "string", ""));
-			this._class_property_model.add_model (new ObjectModelProperty ("valuedefault", "string", ""));
-			this._class_property_model.add_model (new ObjectModelProperty ("nick", "string", ""));
-			this._class_property_model.add_model (new ObjectModelProperty ("description", "string", ""));
-			this._class_property_model.add_model (new ObjectModelProperty ("isref", "bool", ""));
-			this._class_property_model.add_model (new ObjectModelProperty ("refname", "string", ""));
-			this._class_property_model.add_model (new ObjectModelProperty ("reftarget", "string", ""));
-
-			/* Initialize property StorageModel */
-			this.sql_storage_column_model = new SQLStorageModel ("MidgardCRObjectModelProperty", "midgard_schema_type_properties");
-			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("name", "property_name", "string"));
-			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("classname", "class_name", "string"));
-			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("valuetypename", "gtype_name", "string"));
-			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("valuedefault", "default_value_string", "string"));
-			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("nick", "property_nick", "string"));
-			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("description", "description", "string"));
-			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("isref", "is_reference", "bool"));
-			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("refname", "reference_class_name", "string"));
-			this.sql_storage_column_model.add_model (new SQLStorageModelProperty ("reftarget", "reference_property_name", "string"));
-		}
-
 		/* Model methods */
 		/**
                  * Associate new model 
@@ -170,12 +128,17 @@ namespace MidgardCR {
 				if (model is StorageExecutor) {	
 					((StorageExecutor)model).prepare_create ();
 				} else if (model is ObjectModel) {
-					string query = MidgardCRCore.StorageSQL.create_query_insert (model, this._object_model, this.sql_storage_model);
+					string query = MidgardCRCore.StorageSQL.create_query_insert (
+						model, 
+						this._storage_manager._object_model_object_model, 
+						this._storage_manager._object_model_storage_model);
 					this._queries += query;	
 					Model[] property_models = model.list_models();
 					foreach (Model property_model in property_models) {
-						query = MidgardCRCore.StorageSQL.create_query_insert (property_model, 
-							this._class_property_model, this.sql_storage_column_model);
+						query = MidgardCRCore.StorageSQL.create_query_insert (
+							property_model, 
+							this._storage_manager._object_model_property_object_model, 
+							this._storage_manager._object_model_property_storage_model);
 						this._queries += query;
 					}
 				}
@@ -277,8 +240,7 @@ namespace MidgardCR {
 		 * @return SQLStorageModel instance 
 		 */
 		public StorageModel create_storage_model (ObjectModel model, string location) {
-			SQLStorageModel storage_model = new SQLStorageModel (model.name, location);
-			storage_model._storage_manager = this._storage_manager;
+			SQLStorageModel storage_model = new SQLStorageModel ((SQLStorageManager)this.storagemanager, model.name, location);
 			storage_model._model_manager = this;	
 			storage_model.execution_start.connect (this._emit_execution_start);
 			storage_model.execution_end.connect (this._emit_execution_end);

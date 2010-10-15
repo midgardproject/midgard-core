@@ -119,8 +119,8 @@ namespace MidgardCR {
 		/**
 		 * {@link SQLStorageManager}
 		 */
-		public unowned StorageManager storagemanager {
-			get { return (StorageManager)this._storage_manager; }
+		public unowned StorageManager storagemanager {	
+			construct { this._storage_manager = (SQLStorageManager) value; }
 		}
 
 		public bool isref {
@@ -208,14 +208,18 @@ namespace MidgardCR {
 		 * @param location the type of the property 
 		 * @param typename default property's value 
 		 */
-		public SQLStorageModelProperty (string name, string location, string type) {
-			Object (name: name, location: location, valuetypename: type);
+		public SQLStorageModelProperty (SQLStorageManager manager, string name, string location, string type) {
+			Object (storagemanager: manager, name: name, location: location, valuetypename: type);
 			this._set_gtype_from_name ();	
 		} 
 	
 		/* destructor */
 		~SQLStorageModelProperty () {
 			this._id = 0;
+		}
+
+		public unowned StorageManager get_storagemanager () {
+			return (StorageManager) this._storage_manager;
 		}
 	
 		/**
@@ -338,7 +342,7 @@ namespace MidgardCR {
 		 * Depending on prepare, it may create, update or remove column.
 		 * Also executes queries to store information about given model.
 		 */
-		public void execute () { 
+		public void execute () throws ExecutableError { 
 			/* Create column or alter table */
 			if (this._create_column) {
 				execution_start ();

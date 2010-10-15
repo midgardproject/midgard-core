@@ -119,7 +119,9 @@ namespace MidgardCR {
 	
 		/* properties */
 		public abstract string location { get; set; }		
-		public abstract unowned StorageManager storagemanager { get; }
+
+		/* methods */
+		public abstract unowned StorageManager get_storagemanager ();
 	}
 
 	/* Initialized for every given property name */

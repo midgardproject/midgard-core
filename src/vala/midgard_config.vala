@@ -68,6 +68,8 @@ namespace MidgardCR {
 			this.cachedir = "/var/local/cache/midgard";
 			this.vardir = "/var/local/";
 			this.dbdir = "";
+			this.dbtype_id = 0; /* Satisfy valac */
+			this.keyfile = null;
 			/* generate internal dbtype id */
 			MidgardCRCore.Config.set_dbtype_id (this, this._dbtype);
 			/* generate path to default system-wide configuration directory */
