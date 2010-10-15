@@ -183,7 +183,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 	Test.add_func ("/SQLStorageModelManager/execute_and_validate", () => {	
 		MidgardCR.SQLStorageManager storage_manager = null;
 		var config = new MidgardCR.Config ();	
-
+		
 		try {
 			config.read_configuration (DEFAULT_CONFIGURATION, true);
 		} catch (GLib.FileError e) {
@@ -215,39 +215,39 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 		 /* Define Person class */
 		/* SUCCESS */
-	        var person_model = new ObjectModel ("Person");
+	        var person_model = new ObjectModel (PERSON_CLASS_NAME);
 		assert (person_model != null);
         	/* Define properties: 'firstname' and 'lastname' */
         	person_model
-                	.add_model (new ObjectModelProperty ("firstname", "string", ""))
-                	.add_model (new ObjectModelProperty ("lastname", "string", ""));
+                	.add_model (new ObjectModelProperty (FIRSTNAME, "string", ""))
+                	.add_model (new ObjectModelProperty (LASTNAME, "string", ""));
 
         	/* Create new SQL StorageModel which defines 'Person' class table and all required columns */
         	/* Every 'Person' object's data will be stored in 'person' table */
 		/* SUCCESS */
-        	var person_sm = model_manager.create_storage_model (person_model, "person") as SQLStorageModel;
+        	var person_sm = model_manager.create_storage_model (person_model, PERSON_TABLE_NAME) as SQLStorageModel;
 		assert (person_sm != null);
         	/* Add two columns to 'person' table: 'firstname', 'lastname' */
         	person_sm
-                	.add_model (person_sm.create_model_property ("firstname", "firstname", "string"))
-                	.add_model (person_sm.create_model_property ("lastname", "lastname", "string"));
+                	.add_model (person_sm.create_model_property (FIRSTNAME, FIRSTNAME, "string"))
+                	.add_model (person_sm.create_model_property (LASTNAME, LASTNAME, "string"));
 
 		/* Define 'Activity' class */
 		/* SUCCESS */
-		var activity_model = new ObjectModel ("Activity");
+		var activity_model = new ObjectModel (ACTIVITY_CLASS_NAME);
 		assert (activity_model != null);
 		/* 'actor' property is object type, so we 'link' property with 'Person' object */
 		/* SUCCESS */
-      		var am_actor = new ObjectModelProperty ("actor", "object", "");
+      		var am_actor = new ObjectModelProperty (ACTOR, "object", "");
 		assert (am_actor != null);
 		am_actor.add_model (person_model);
 		/* Define properties: 'verb', 'target', 'summary', 'application' */
 		activity_model
 			.add_model (am_actor)
-			.add_model (new ObjectModelProperty ("verb", "string", ""))
-			.add_model (new ObjectModelProperty ("target", "guid", ""))
-			.add_model (new ObjectModelProperty ("summary", "guid", ""))
-			.add_model (new ObjectModelProperty ("application", "string", ""));
+			.add_model (new ObjectModelProperty (VERB, "string", ""))
+			.add_model (new ObjectModelProperty (TARGET, "guid", ""))
+			.add_model (new ObjectModelProperty (SUMMARY, "guid", ""))
+			.add_model (new ObjectModelProperty (APPLICATION, "string", ""));
 	
 		/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
 		/* Activity class requires 'midgard_activity' table */
@@ -255,15 +255,15 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		var activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLStorageModel;
 		assert (activity_sm != null);
 		/* Add columns to table: 'verb', 'application', 'target', 'summary' and those required by 'actor' */
-		var asm_verb = activity_sm.create_model_property ("verb", "verb", "string");
+		var asm_verb = activity_sm.create_model_property (VERB, VERB, "string");
 		assert (asm_verb != null);
 		asm_verb.index = true;
 
-		var asm_application = activity_sm.create_model_property ("application", "application", "string");
+		var asm_application = activity_sm.create_model_property (APPLICATION, APPLICATION, "string");
 		assert (asm_application != null);
 		asm_application.index = true;
 
-		var actor_model = activity_sm.create_model_property ("actor", "actor", "object");
+		var actor_model = activity_sm.create_model_property (ACTOR, ACTOR, "object");
 		assert (actor_model != null);
 		
 		/* Adds additional columns to store info for reference object */
@@ -274,8 +274,8 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 			.add_model (asm_verb)
 			.add_model (asm_application)
 			.add_model (actor_model)
-			.add_model (activity_sm.create_model_property ("target", "target", "string"))
-			.add_model (activity_sm.create_model_property ("summary", "summary", "string"));
+			.add_model (activity_sm.create_model_property (TARGET, TARGET, "string"))
+			.add_model (activity_sm.create_model_property (SUMMARY, SUMMARY, "string"));
 
 		/* Add Object and Storage models to StorageModelManager */
 		model_manager
@@ -334,12 +334,13 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
                 assert (model_mngr is MidgardCR.SQLStorageModelManager);
 
 		/* SUCCESS */
+		int table_n = 3; /* Default table, person and activity */
 		unowned ObjectModel[]? object_models = model_mngr.list_object_models ();
 		assert (object_models != null);
-		assert (object_models.length != 2);
+		assert (object_models.length == table_n);
 		StorageModel[]? storage_models = model_mngr.list_storage_models ();
 		assert (storage_models != null);
-		assert (storage_models.length != 2);
+		assert (storage_models.length == table_n);
 
 		/* Check if Person and Activity Object Models are available */
 		ObjectModel ds_person_model = null;
@@ -352,7 +353,42 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		}
 		assert (ds_person_model != null); 
 		assert (ds_activity_model != null);
-		
+
+		/* Check if Person and Activity table models are available */
+		SQLStorageModel ds_person_table = null;
+		SQLStorageModel ds_activity_table = null;	
+		foreach (StorageModel table_model in storage_models) {
+			if (table_model.name == PERSON_CLASS_NAME)
+				ds_person_table = (SQLStorageModel) table_model;
+			if (table_model.name == ACTIVITY_CLASS_NAME)
+				ds_activity_table = (SQLStorageModel) table_model;
+		}
+		assert (ds_person_table != null);
+		assert (ds_activity_table != null);
+		assert (ds_person_table.location == PERSON_TABLE_NAME);
+		assert (ds_activity_table.location == ACTIVITY_TABLE_NAME);		
+
+		/* Check Person object model properties */
+		var fmodel = (ObjectModelProperty) ds_person_model.get_model_by_name (FIRSTNAME);
+		assert (fmodel != null);
+		assert (fmodel.valuegtype == typeof (string));
+		assert (fmodel.valuetypename == "string");
+		var lmodel = (ObjectModelProperty) ds_person_model.get_model_by_name (LASTNAME);
+		assert (lmodel != null);
+		assert (lmodel.valuegtype == typeof (string));
+		assert (lmodel.valuetypename == "string");
+
+		/* Check Person columns */
+		var fcol = (SQLStorageModelProperty) ds_person_table.get_model_by_name (FIRSTNAME);
+		assert (fcol != null);
+		assert (fcol.location == FIRSTNAME);
+		assert (fcol.valuetypename == "string");
+		assert (fcol.valuegtype == typeof (string));
+		var lcol = (SQLStorageModelProperty) ds_person_table.get_model_by_name (LASTNAME);
+		assert (lcol != null);
+		assert (lcol.location == LASTNAME);
+		assert (lcol.valuetypename == "string");
+		assert (lcol.valuegtype == typeof (string));
 	});
 }
 

@@ -7,6 +7,19 @@ const string TITLE_COLUMN = "title_col";
 const string ABSTRACT_PROPERTY_NAME = "abstract_property";
 const string ABSTRACT_COLUMN = "abstract_col";
 
+const string PERSON_CLASS_NAME = "Person";
+const string PERSON_TABLE_NAME = "person";
+const string FIRSTNAME = "firstname";
+const string LASTNAME = "lastname";
+
+const string ACTIVITY_CLASS_NAME = "Activity";
+const string ACTIVITY_TABLE_NAME = "midgard_activity";
+const string ACTOR = "actor";
+const string VERB = "verb";
+const string TARGET = "target";
+const string SUMMARY = "summary";
+const string APPLICATION = "application";
+
 void main (string[] args) {
 	Test.init (ref args);
 	midgardcr_test_add_config_tests ();
