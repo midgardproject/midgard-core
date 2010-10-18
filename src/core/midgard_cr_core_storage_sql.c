@@ -892,7 +892,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* DESCRIPTION */
 	column_name = "description";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MGD_TYPE_LONGTEXT);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -938,7 +938,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* TABLE */
 	column_name = "table_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
