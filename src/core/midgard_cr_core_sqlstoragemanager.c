@@ -135,34 +135,57 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 	}
 
 	guint j = 0;
+	guint coln = 0;
+	GSList *pmodels = NULL;
+	const gchar *classname;
 	while (self->_object_models[j] != NULL) {
-		const gchar *classname = midgard_cr_model_get_name (MIDGARD_CR_MODEL (self->_object_models[j]));
+		classname = midgard_cr_model_get_name (MIDGARD_CR_MODEL (self->_object_models[j]));
 		for (i = 0; i < rows; i++) {
 			/* Check property's class name */
-			value = gda_data_model_get_typed_value_at (model, 0, i, G_TYPE_STRING, TRUE, NULL);
+			value = gda_data_model_get_typed_value_at (model, coln, i, G_TYPE_STRING, TRUE, NULL);
 			if (!g_str_equal (g_value_get_string (value), classname))
 				continue;	
 			/* property_name */
-			value = gda_data_model_get_typed_value_at (model, 1, i, G_TYPE_STRING, TRUE, NULL);
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 			const gchar *property_name = g_value_get_string (value);
 			/* gtype_name */
-			value = gda_data_model_get_typed_value_at (model, 2, i, G_TYPE_STRING, TRUE, NULL);
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 			const gchar *gtype_name = g_value_get_string (value);
 			/* default_value_string */
-			value = gda_data_model_get_typed_value_at (model, 3, i, G_TYPE_STRING, TRUE, NULL);
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 			const gchar *dvalue = g_value_get_string (value);
-			/* property_nick */
-			value = gda_data_model_get_typed_value_at (model, 4, i, G_TYPE_STRING, TRUE, NULL);
-			const gchar *property_nick = g_value_get_string (value);
-			/* description */
-			value = gda_data_model_get_typed_value_at (model, 5, i, G_TYPE_STRING, TRUE, NULL);
-			const gchar *descr = g_value_get_string (value);
-			/* id */
-			value = gda_data_model_get_typed_value_at (model, 6, i, G_TYPE_INT, TRUE, NULL);
-			guint id = (guint) g_value_get_int (value);
 
 			MidgardCRObjectModelProperty *property_model = 
 				midgard_cr_object_model_property_new (property_name, gtype_name, dvalue);
+
+			/* property_nick */
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+			const gchar *property_nick = g_value_get_string (value);
+			/* description */
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+			const gchar *descr = g_value_get_string (value);
+			/* is_reference */
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);	
+			gboolean isref = FALSE;
+			if (value) {
+				isref = (gboolean) g_value_get_int (value);
+				/* Add model to "delayed" list, so we'll compute more data a bit later */
+				if (isref)
+					pmodels = g_slist_prepend (pmodels, property_model);
+			}	
+			property_model->_isref = isref;
+			/* reference_class_name */
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+			g_free (property_model->_refname);
+			property_model->_refname = g_value_dup_string (value);
+			/* reference_property_name */
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+			g_free (property_model->_reftarget);
+			property_model->_reftarget = g_value_dup_string (value);
+			/* id */
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
+			guint id = (guint) g_value_get_int (value);
+
 			/* FIXME, set nick */
 			/* set description */
 			midgard_cr_model_property_set_description (MIDGARD_CR_MODEL_PROPERTY (property_model), descr);
@@ -170,9 +193,25 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 			property_model->_id = id;
 			/* Add property model to schema model */
 			midgard_cr_model_add_model (MIDGARD_CR_MODEL (self->_object_models[j]), MIDGARD_CR_MODEL (property_model));
+			coln = 0;
 		}
 		j++;
 	}
+	
+	GSList *l;
+	j = 0;
+	for (l = pmodels; l != NULL; l = l->next) {
+		MidgardCRObjectModelProperty *property_model = (MidgardCRObjectModelProperty*) l->data;
+		while (self->_object_models[j] != NULL) {
+			classname = midgard_cr_model_get_name (MIDGARD_CR_MODEL (self->_object_models[j]));
+			if (g_str_equal (property_model->_refname, classname))
+				midgard_cr_model_add_model (MIDGARD_CR_MODEL (property_model), MIDGARD_CR_MODEL (self->_object_models[j]));
+			j++;
+		}
+	}
+	
+	if (pmodels)
+		g_slist_free (pmodels);
 	
 	g_object_unref (model);
 	return;
@@ -208,7 +247,7 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 		return;
 	}
 
-	MidgardCRStorageModel **storage_models = g_new (MidgardCRStorageModel *, rows + 1);
+	MidgardCRSQLStorageModel **storage_models = g_new (MidgardCRSQLStorageModel *, rows + 1);
 
 	const GValue *value;
 	const gchar *class_name;
@@ -232,10 +271,171 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 		coln = 0;
 	}
 	storage_models[i] = NULL; /* terminate with NULL */
-	self->_storage_models = storage_models;
+	self->_storage_models = (MidgardCRStorageModel**) storage_models;
 	self->_storage_models_length1 = i;
 
 	g_object_unref (model);
+
+	/* select all columns data */
+	query = g_string_new ("SELECT ");
+	g_string_append_printf (query, "%s, id FROM %s", TABLE_MAPPER_PROPERTIES_COLUMNS, TABLE_NAME_MAPPER_PROPERTIES);
+	err = NULL;
+	
+	model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
+	g_string_free (query, TRUE);
+	/* internal error, return and throw error */
+	if (err) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_MANAGER_ERROR, MIDGARD_CR_STORAGE_MANAGER_ERROR_INTERNAL, 
+				"%s", err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		if (model)
+			g_object_unref (model);
+		return;
+	}
+	/* there's no single column, silently return */
+	if (!model) 
+		return;
+
+	rows = gda_data_model_get_n_rows (model);
+	/* There's a model, but no single record selected, silently return */
+	if (rows == 0) {
+		g_object_unref (model);
+		return;
+	}
+
+	guint j = 0;
+	const gchar *table_name = NULL;
+	const gchar *property_name = NULL;
+	const gchar *gtype_name = NULL;
+	const gchar *property_of = NULL;
+	const gchar *column_name = NULL;
+	const gchar *column_type = NULL;
+	gboolean is_primary = FALSE;
+	gboolean has_index = FALSE;
+	gboolean is_unique = FALSE;
+	gboolean is_auto_increment = FALSE;
+	const gchar *description = NULL;
+	gboolean is_reference = FALSE;
+	const gchar *reference_table_name = NULL;
+	const gchar *reference_column_name = NULL;
+	coln = 0;
+	GSList *columns = NULL;
+
+	for (i = 0; i < rows; i++) {
+		/* get property_name */
+		value = gda_data_model_get_typed_value_at (model, coln, i, G_TYPE_STRING, TRUE, NULL);
+		property_name = g_value_get_string (value);
+		/* get column_name */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		column_name = g_value_get_string (value);	
+		/* get table name */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		table_name = g_value_get_string (value);
+		/* get gtype_name */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		gtype_name = g_value_get_string (value);
+		/* get column_type */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		column_type = g_value_get_string (value);
+		/* get is_primary */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
+		if (value)
+			is_primary = (gboolean) g_value_get_int (value);
+		/* get has_index */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
+		if (value)
+			has_index = (gboolean) g_value_get_int (value);
+		/* get is_unique */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
+		if (value)
+			is_unique = (gboolean) g_value_get_int (value);
+		/* get is_auto_increment */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
+		if (value)
+			is_auto_increment = (gboolean) g_value_get_int (value);
+		/* get description */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		description = g_value_get_string (value);
+		/* get is_reference */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
+		if (value)
+			is_reference = (gboolean) g_value_get_int (value);
+		/* get reference_table_name */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		reference_table_name = g_value_get_string (value);
+		/* reference_column_name */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		reference_column_name = g_value_get_string (value);
+		/* get property_of */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		property_of = g_value_get_string (value);
+		/* id */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
+		guint id = (guint) g_value_get_int (value);
+
+		MidgardCRSQLStorageModelProperty *column_model = 
+			midgard_cr_sql_storage_model_property_new (self, property_name, column_name, gtype_name);
+		/* set tablename */
+		g_free (column_model->_tablename);
+		column_model->_tablename = g_strdup (table_name);
+		/* set primary */
+		midgard_cr_storage_model_property_set_primary (MIDGARD_CR_STORAGE_MODEL_PROPERTY (column_model), is_primary);
+		/* set index */
+		midgard_cr_storage_model_property_set_index (MIDGARD_CR_STORAGE_MODEL_PROPERTY (column_model), has_index);
+		/* set property_of */
+		g_free (column_model->_property_of);
+		column_model->_property_of = g_strdup (property_of ? property_of : "");
+		/* set id */
+		column_model->_id = id;
+
+		coln = 0;
+		/* Prepend columns to list. It's faster than append */
+		columns = g_slist_prepend (columns, column_model);
+	}
+
+	g_object_unref (model);
+
+	GSList *l = NULL;
+	while (self->_storage_models[j] != NULL) {
+		MidgardCRSQLStorageModel *table_model = MIDGARD_CR_SQL_STORAGE_MODEL (self->_storage_models[j]);
+		const gchar *model_tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (table_model));
+		for (l = columns; l != NULL; l = l->next) {
+			if (l->data == NULL)
+				continue;
+			/* Add column models to table ones */
+			MidgardCRSQLStorageModelProperty *cmodel = (MidgardCRSQLStorageModelProperty *) l->data;
+			property_of = cmodel->_property_of;
+			const gchar *column_tablename = midgard_cr_sql_storage_model_property_get_tablename (cmodel);
+			if (g_str_equal (model_tablename, column_tablename) 
+					&& *property_of == '\0') {
+				midgard_cr_model_add_model (MIDGARD_CR_MODEL (table_model), MIDGARD_CR_MODEL (cmodel));
+				l->data = NULL;
+			}
+			/* Add column models to models of object type */
+			if (g_str_equal (model_tablename, column_tablename) 
+					&& *property_of != '\0') {
+				MidgardCRSQLStorageModelProperty *column_object = 
+					MIDGARD_CR_MODEL (midgard_cr_model_get_model_by_name (MIDGARD_CR_MODEL (table_model), property_of));
+				if (!column_object) {
+					column_object = midgard_cr_sql_storage_model_property_new (self, property_of, property_of, "object");
+					midgard_cr_model_add_model (MIDGARD_CR_MODEL (table_model), MIDGARD_CR_MODEL (column_object));
+				}
+				midgard_cr_model_add_model (MIDGARD_CR_MODEL (column_object), MIDGARD_CR_MODEL (cmodel));
+				l->data = NULL;
+			}
+		}
+		j++;
+	}
+
+	for (l = columns; l != NULL; l = l->next) {	
+		if (l->data == NULL)
+			continue;	
+		MidgardCRSQLStorageModelProperty *cmodel = (MidgardCRSQLStorageModelProperty *) l->data;
+		const gchar *column_tablename = midgard_cr_sql_storage_model_property_get_tablename (cmodel);
+		g_warning ("Unhandled model for %s table \n",  column_tablename);
+	}	
+
+	g_slist_free (columns);
 
 	return;
 }	

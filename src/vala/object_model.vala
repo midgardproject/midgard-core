@@ -326,6 +326,8 @@ namespace MidgardCR {
 		 * models are invalid in case of property model 
 		 */
 		public unowned Model? get_model_by_name (string name) {
+			if (this._models == null)
+				return null;
 			if (this._models[0].name == name)
 				return this._models[0];
  

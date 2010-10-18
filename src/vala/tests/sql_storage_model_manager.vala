@@ -246,7 +246,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 			.add_model (am_actor)
 			.add_model (new ObjectModelProperty (VERB, "string", ""))
 			.add_model (new ObjectModelProperty (TARGET, "guid", ""))
-			.add_model (new ObjectModelProperty (SUMMARY, "guid", ""))
+			.add_model (new ObjectModelProperty (SUMMARY, "string", ""))
 			.add_model (new ObjectModelProperty (APPLICATION, "string", ""));
 	
 		/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
@@ -274,7 +274,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 			.add_model (asm_verb)
 			.add_model (asm_application)
 			.add_model (actor_model)
-			.add_model (activity_sm.create_model_property (TARGET, TARGET, "string"))
+			.add_model (activity_sm.create_model_property (TARGET, TARGET, "guid"))
 			.add_model (activity_sm.create_model_property (SUMMARY, SUMMARY, "string"));
 
 		/* Add Object and Storage models to StorageModelManager */
@@ -389,6 +389,65 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (lcol.location == LASTNAME);
 		assert (lcol.valuetypename == "string");
 		assert (lcol.valuegtype == typeof (string));
+
+		/* Check Activity object model properties */
+		var a_actor_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (ACTOR);
+		assert (a_actor_model != null);
+		assert (a_actor_model.valuegtype == typeof (Object));
+		assert (a_actor_model.valuetypename == "object");
+		var a_actor_person_model = (ObjectModel) a_actor_model.get_model_by_name (PERSON_CLASS_NAME);
+		assert (a_actor_person_model != null);
+		assert (a_actor_person_model is ObjectModel);
+		assert (a_actor_person_model.name == PERSON_CLASS_NAME);	
+		var a_verb_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (VERB);
+		assert (a_verb_model != null);
+		assert (a_verb_model.valuegtype == typeof (string));
+		assert (a_verb_model.valuetypename == "string");
+		var a_target_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (TARGET);
+		assert (a_target_model != null);
+		assert (a_target_model.valuegtype == typeof (string));
+		assert (a_target_model.valuetypename == "guid");
+		var a_summary_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (SUMMARY);
+		assert (a_summary_model != null);
+		assert (a_summary_model.valuegtype == typeof (string));
+		assert (a_summary_model.valuetypename == "string");
+		var a_app_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (APPLICATION);
+		assert (a_app_model != null);
+		assert (a_app_model.valuegtype == typeof (string));
+		assert (a_app_model.valuetypename == "string");
+
+		/* Check Activity columns */
+		var a_actor_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (ACTOR);
+		assert (a_actor_col != null);
+		assert (a_actor_col.location == ACTOR);
+		assert (a_actor_col.valuetypename == "object");
+		Model[] actor_columns = a_actor_col.list_models();
+		assert (actor_columns.length == 2); /* id + guid */
+		/* Check two columns, id and guid created for reference actor object */
+		var a_actor_id_col = (SQLStorageModelProperty) a_actor_col.get_model_by_name ("id");
+		assert (a_actor_id_col != null);
+		assert (a_actor_id_col.location == "actor_id");
+		assert (a_actor_id_col.valuetypename == "int"); 
+		var a_actor_guid_col = (SQLStorageModelProperty) a_actor_col.get_model_by_name ("guid");
+		assert (a_actor_guid_col != null);
+		assert (a_actor_guid_col.location == "actor_guid");	
+		assert (a_actor_guid_col.valuetypename == "guid"); 	
+		var a_verb_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (VERB);
+		assert (a_verb_col != null);
+		assert (a_verb_col.location == VERB);
+		assert (a_verb_col.valuetypename == "string");
+		var a_target_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (TARGET);
+		assert (a_target_col != null);
+		assert (a_target_col.location == TARGET);
+		assert (a_target_col.valuetypename == "guid");
+		var a_summary_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (SUMMARY);
+		assert (a_summary_col != null);
+		assert (a_summary_col.location == SUMMARY);
+		assert (a_summary_col.valuetypename == "string");
+		var a_app_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (APPLICATION);
+		assert (a_app_col != null);
+		assert (a_app_col.location == APPLICATION);
+		assert (a_app_col.valuetypename == "string"); 
 	});
 }
 

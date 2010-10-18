@@ -236,8 +236,13 @@ namespace MidgardCR {
 		}
 
 		public unowned Model? get_model_by_name (string name) {
-			if (this._models[0].name == name)
-				return this._models[0];
+			if (this._models == null)
+				return null;
+
+			foreach (unowned Model model in this._models) {
+                                if (model.name == name)
+                                        return model;
+                        }
  
 			return null; 
 		}
