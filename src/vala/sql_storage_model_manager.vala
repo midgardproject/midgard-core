@@ -1,7 +1,7 @@
 
 namespace MidgardCR {
 
-	public class SQLStorageModelManager : GLib.Object, Model, Executable, StorageExecutor, StorageModelManager {
+	public class SQLTableModelManager : GLib.Object, Model, Executable, StorageExecutor, StorageModelManager {
 
 		/* internal properties */
 		internal unowned SQLStorageManager _storage_manager = null;
@@ -13,7 +13,7 @@ namespace MidgardCR {
 
 		/* Model properties */
 		/**
-		 * SQLStorageModelManager doesn't hold parent model.
+		 * SQLTableModelManager doesn't hold parent model.
 		 */	
 		public Model? parent { 
 			get { return null; }
@@ -60,7 +60,7 @@ namespace MidgardCR {
 				
 		/**
                  * Get model by given name. 
-		 * SQLStorageModelManager holds {@link ObjectModel} and {@link StorageModel} models,
+		 * SQLTableModelManager holds {@link ObjectModel} and {@link StorageModel} models,
 		 * so accepted name by the one of Schema or Storage model.
 	         * 
                  * @param name {@link Model} name to look for
@@ -237,10 +237,10 @@ namespace MidgardCR {
 		 * @param location, name of the table which stores data of objects of the class
 		 * represented by ObjectModel.
 		 *
-		 * @return SQLStorageModel instance 
+		 * @return SQLTableModel instance 
 		 */
 		public StorageModel create_storage_model (ObjectModel model, string location) {
-			SQLStorageModel storage_model = new SQLStorageModel ((SQLStorageManager)this.storagemanager, model.name, location);
+			SQLTableModel storage_model = new SQLTableModel ((SQLStorageManager)this.storagemanager, model.name, location);
 			storage_model._model_manager = this;	
 			storage_model.execution_start.connect (this._emit_execution_start);
 			storage_model.execution_end.connect (this._emit_execution_end);

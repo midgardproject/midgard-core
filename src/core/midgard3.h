@@ -395,38 +395,38 @@ typedef struct _MidgardCRSQLWorkspaceManager MidgardCRSQLWorkspaceManager;
 typedef struct _MidgardCRSQLWorkspaceManagerClass MidgardCRSQLWorkspaceManagerClass;
 typedef struct _MidgardCRSQLWorkspaceManagerPrivate MidgardCRSQLWorkspaceManagerPrivate;
 
-#define MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER (midgard_cr_sql_storage_model_manager_get_type ())
-#define MIDGARD_CR_SQL_STORAGE_MODEL_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER, MidgardCRSQLStorageModelManager))
-#define MIDGARD_CR_SQL_STORAGE_MODEL_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER, MidgardCRSQLStorageModelManagerClass))
-#define MIDGARD_CR_IS_SQL_STORAGE_MODEL_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER))
-#define MIDGARD_CR_IS_SQL_STORAGE_MODEL_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER))
-#define MIDGARD_CR_SQL_STORAGE_MODEL_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER, MidgardCRSQLStorageModelManagerClass))
+#define MIDGARD_CR_TYPE_SQL_TABLE_MODEL_MANAGER (midgard_cr_sql_table_model_manager_get_type ())
+#define MIDGARD_CR_SQL_TABLE_MODEL_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_TABLE_MODEL_MANAGER, MidgardCRSQLTableModelManager))
+#define MIDGARD_CR_SQL_TABLE_MODEL_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_TABLE_MODEL_MANAGER, MidgardCRSQLTableModelManagerClass))
+#define MIDGARD_CR_IS_SQL_TABLE_MODEL_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_TABLE_MODEL_MANAGER))
+#define MIDGARD_CR_IS_SQL_TABLE_MODEL_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_TABLE_MODEL_MANAGER))
+#define MIDGARD_CR_SQL_TABLE_MODEL_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_TABLE_MODEL_MANAGER, MidgardCRSQLTableModelManagerClass))
 
-typedef struct _MidgardCRSQLStorageModelManager MidgardCRSQLStorageModelManager;
-typedef struct _MidgardCRSQLStorageModelManagerClass MidgardCRSQLStorageModelManagerClass;
-typedef struct _MidgardCRSQLStorageModelManagerPrivate MidgardCRSQLStorageModelManagerPrivate;
+typedef struct _MidgardCRSQLTableModelManager MidgardCRSQLTableModelManager;
+typedef struct _MidgardCRSQLTableModelManagerClass MidgardCRSQLTableModelManagerClass;
+typedef struct _MidgardCRSQLTableModelManagerPrivate MidgardCRSQLTableModelManagerPrivate;
 
-#define MIDGARD_CR_TYPE_SQL_STORAGE_MODEL (midgard_cr_sql_storage_model_get_type ())
-#define MIDGARD_CR_SQL_STORAGE_MODEL(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL, MidgardCRSQLStorageModel))
-#define MIDGARD_CR_SQL_STORAGE_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL, MidgardCRSQLStorageModelClass))
-#define MIDGARD_CR_IS_SQL_STORAGE_MODEL(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL))
-#define MIDGARD_CR_IS_SQL_STORAGE_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL))
-#define MIDGARD_CR_SQL_STORAGE_MODEL_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL, MidgardCRSQLStorageModelClass))
+#define MIDGARD_CR_TYPE_SQL_TABLE_MODEL (midgard_cr_sql_table_model_get_type ())
+#define MIDGARD_CR_SQL_TABLE_MODEL(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_TABLE_MODEL, MidgardCRSQLTableModel))
+#define MIDGARD_CR_SQL_TABLE_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_TABLE_MODEL, MidgardCRSQLTableModelClass))
+#define MIDGARD_CR_IS_SQL_TABLE_MODEL(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_TABLE_MODEL))
+#define MIDGARD_CR_IS_SQL_TABLE_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_TABLE_MODEL))
+#define MIDGARD_CR_SQL_TABLE_MODEL_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_TABLE_MODEL, MidgardCRSQLTableModelClass))
 
-typedef struct _MidgardCRSQLStorageModel MidgardCRSQLStorageModel;
-typedef struct _MidgardCRSQLStorageModelClass MidgardCRSQLStorageModelClass;
-typedef struct _MidgardCRSQLStorageModelPrivate MidgardCRSQLStorageModelPrivate;
+typedef struct _MidgardCRSQLTableModel MidgardCRSQLTableModel;
+typedef struct _MidgardCRSQLTableModelClass MidgardCRSQLTableModelClass;
+typedef struct _MidgardCRSQLTableModelPrivate MidgardCRSQLTableModelPrivate;
 
-#define MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_PROPERTY (midgard_cr_sql_storage_model_property_get_type ())
-#define MIDGARD_CR_SQL_STORAGE_MODEL_PROPERTY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_PROPERTY, MidgardCRSQLStorageModelProperty))
-#define MIDGARD_CR_SQL_STORAGE_MODEL_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_PROPERTY, MidgardCRSQLStorageModelPropertyClass))
-#define MIDGARD_CR_IS_SQL_STORAGE_MODEL_PROPERTY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_PROPERTY))
-#define MIDGARD_CR_IS_SQL_STORAGE_MODEL_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_PROPERTY))
-#define MIDGARD_CR_SQL_STORAGE_MODEL_PROPERTY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_PROPERTY, MidgardCRSQLStorageModelPropertyClass))
+#define MIDGARD_CR_TYPE_SQL_COLUMN_MODEL (midgard_cr_sql_column_model_get_type ())
+#define MIDGARD_CR_SQL_COLUMN_MODEL(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_COLUMN_MODEL, MidgardCRSQLColumnModel))
+#define MIDGARD_CR_SQL_COLUMN_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_COLUMN_MODEL, MidgardCRSQLColumnModelClass))
+#define MIDGARD_CR_IS_SQL_COLUMN_MODEL(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_COLUMN_MODEL))
+#define MIDGARD_CR_IS_SQL_COLUMN_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_COLUMN_MODEL))
+#define MIDGARD_CR_SQL_COLUMN_MODEL_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_COLUMN_MODEL, MidgardCRSQLColumnModelClass))
 
-typedef struct _MidgardCRSQLStorageModelProperty MidgardCRSQLStorageModelProperty;
-typedef struct _MidgardCRSQLStorageModelPropertyClass MidgardCRSQLStorageModelPropertyClass;
-typedef struct _MidgardCRSQLStorageModelPropertyPrivate MidgardCRSQLStorageModelPropertyPrivate;
+typedef struct _MidgardCRSQLColumnModel MidgardCRSQLColumnModel;
+typedef struct _MidgardCRSQLColumnModelClass MidgardCRSQLColumnModelClass;
+typedef struct _MidgardCRSQLColumnModelPrivate MidgardCRSQLColumnModelPrivate;
 
 struct _MidgardCRConfig {
 	GObject parent_instance;
@@ -888,9 +888,9 @@ struct _MidgardCRSQLWorkspaceManagerClass {
 	MidgardCRSQLStorageManagerClass parent_class;
 };
 
-struct _MidgardCRSQLStorageModelManager {
+struct _MidgardCRSQLTableModelManager {
 	GObject parent_instance;
-	MidgardCRSQLStorageModelManagerPrivate * priv;
+	MidgardCRSQLTableModelManagerPrivate * priv;
 	MidgardCRSQLStorageManager* _storage_manager;
 	MidgardCRNamespaceManager* _ns_manager;
 	MidgardCRStorageModel** _storage_models;
@@ -907,25 +907,25 @@ struct _MidgardCRSQLStorageModelManager {
 	gint __queries_size_;
 };
 
-struct _MidgardCRSQLStorageModelManagerClass {
+struct _MidgardCRSQLTableModelManagerClass {
 	GObjectClass parent_class;
 };
 
-struct _MidgardCRSQLStorageModel {
+struct _MidgardCRSQLTableModel {
 	GObject parent_instance;
-	MidgardCRSQLStorageModelPrivate * priv;
+	MidgardCRSQLTableModelPrivate * priv;
 	guint _id;
 	MidgardCRSQLStorageManager* _storage_manager;
-	MidgardCRSQLStorageModelManager* _model_manager;
+	MidgardCRSQLTableModelManager* _model_manager;
 };
 
-struct _MidgardCRSQLStorageModelClass {
+struct _MidgardCRSQLTableModelClass {
 	GObjectClass parent_class;
 };
 
-struct _MidgardCRSQLStorageModelProperty {
+struct _MidgardCRSQLColumnModel {
 	GObject parent_instance;
-	MidgardCRSQLStorageModelPropertyPrivate * priv;
+	MidgardCRSQLColumnModelPrivate * priv;
 	guint _id;
 	MidgardCRSQLStorageManager* _storage_manager;
 	gboolean _isref;
@@ -935,7 +935,7 @@ struct _MidgardCRSQLStorageModelProperty {
 	char* _property_of;
 };
 
-struct _MidgardCRSQLStorageModelPropertyClass {
+struct _MidgardCRSQLColumnModelClass {
 	GObjectClass parent_class;
 };
 
@@ -1206,18 +1206,18 @@ gboolean midgard_cr_sql_workspace_manager_workspace_create (MidgardCRSQLWorkspac
 gboolean midgard_cr_sql_workspace_manager_workspace_exists (MidgardCRSQLWorkspaceManager* self, MidgardCRWorkspaceStorage* workspace, GError** error);
 MidgardCRSQLWorkspaceManager* midgard_cr_sql_workspace_manager_new (const char* name, MidgardCRConfig* config);
 MidgardCRSQLWorkspaceManager* midgard_cr_sql_workspace_manager_construct (GType object_type, const char* name, MidgardCRConfig* config);
-GType midgard_cr_sql_storage_model_manager_get_type (void) G_GNUC_CONST;
-MidgardCRSQLStorageModelManager* midgard_cr_sql_storage_model_manager_new (void);
-MidgardCRSQLStorageModelManager* midgard_cr_sql_storage_model_manager_construct (GType object_type);
-GType midgard_cr_sql_storage_model_get_type (void) G_GNUC_CONST;
-MidgardCRSQLStorageModel* midgard_cr_sql_storage_model_new (MidgardCRSQLStorageManager* manager, const char* classname, const char* location);
-MidgardCRSQLStorageModel* midgard_cr_sql_storage_model_construct (GType object_type, MidgardCRSQLStorageManager* manager, const char* classname, const char* location);
-GType midgard_cr_sql_storage_model_property_get_type (void) G_GNUC_CONST;
-MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_create_model_property (MidgardCRSQLStorageModel* self, const char* name, const char* location, const char* type);
-MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_new (MidgardCRSQLStorageManager* manager, const char* name, const char* location, const char* type);
-MidgardCRSQLStorageModelProperty* midgard_cr_sql_storage_model_property_construct (GType object_type, MidgardCRSQLStorageManager* manager, const char* name, const char* location, const char* type);
-const char* midgard_cr_sql_storage_model_property_get_tablename (MidgardCRSQLStorageModelProperty* self);
-const char* midgard_cr_sql_storage_model_property_get_propertyof (MidgardCRSQLStorageModelProperty* self);
+GType midgard_cr_sql_table_model_manager_get_type (void) G_GNUC_CONST;
+MidgardCRSQLTableModelManager* midgard_cr_sql_table_model_manager_new (void);
+MidgardCRSQLTableModelManager* midgard_cr_sql_table_model_manager_construct (GType object_type);
+GType midgard_cr_sql_table_model_get_type (void) G_GNUC_CONST;
+MidgardCRSQLTableModel* midgard_cr_sql_table_model_new (MidgardCRSQLStorageManager* manager, const char* classname, const char* location);
+MidgardCRSQLTableModel* midgard_cr_sql_table_model_construct (GType object_type, MidgardCRSQLStorageManager* manager, const char* classname, const char* location);
+GType midgard_cr_sql_column_model_get_type (void) G_GNUC_CONST;
+MidgardCRSQLColumnModel* midgard_cr_sql_table_model_create_model_property (MidgardCRSQLTableModel* self, const char* name, const char* location, const char* type);
+MidgardCRSQLColumnModel* midgard_cr_sql_column_model_new (MidgardCRSQLStorageManager* manager, const char* name, const char* location, const char* type);
+MidgardCRSQLColumnModel* midgard_cr_sql_column_model_construct (GType object_type, MidgardCRSQLStorageManager* manager, const char* name, const char* location, const char* type);
+const char* midgard_cr_sql_column_model_get_tablename (MidgardCRSQLColumnModel* self);
+const char* midgard_cr_sql_column_model_get_propertyof (MidgardCRSQLColumnModel* self);
 
 
 G_END_DECLS

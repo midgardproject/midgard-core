@@ -247,7 +247,7 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 		return;
 	}
 
-	MidgardCRSQLStorageModel **storage_models = g_new (MidgardCRSQLStorageModel *, rows + 1);
+	MidgardCRSQLTableModel **storage_models = g_new (MidgardCRSQLTableModel *, rows + 1);
 
 	const GValue *value;
 	const gchar *class_name;
@@ -259,7 +259,7 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 		class_name = g_value_get_string (value);
 		/* Get table name */
 		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
-		MidgardCRSQLStorageModel *smodel = midgard_cr_sql_storage_model_new (self, class_name, g_value_get_string (value));
+		MidgardCRSQLTableModel *smodel = midgard_cr_sql_table_model_new (self, class_name, g_value_get_string (value));
 		/* Get description */
 		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 		/* FIXME, midgard_cr_model_set_description (smodel, g_value_get_string (value)); */
@@ -373,8 +373,8 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
 		guint id = (guint) g_value_get_int (value);
 
-		MidgardCRSQLStorageModelProperty *column_model = 
-			midgard_cr_sql_storage_model_property_new (self, property_name, column_name, gtype_name);
+		MidgardCRSQLColumnModel *column_model = 
+			midgard_cr_sql_column_model_new (self, property_name, column_name, gtype_name);
 		/* set tablename */
 		g_free (column_model->_tablename);
 		column_model->_tablename = g_strdup (table_name);
@@ -397,15 +397,15 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 
 	GSList *l = NULL;
 	while (self->_storage_models[j] != NULL) {
-		MidgardCRSQLStorageModel *table_model = MIDGARD_CR_SQL_STORAGE_MODEL (self->_storage_models[j]);
+		MidgardCRSQLTableModel *table_model = MIDGARD_CR_SQL_TABLE_MODEL (self->_storage_models[j]);
 		const gchar *model_tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (table_model));
 		for (l = columns; l != NULL; l = l->next) {
 			if (l->data == NULL)
 				continue;
 			/* Add column models to table ones */
-			MidgardCRSQLStorageModelProperty *cmodel = (MidgardCRSQLStorageModelProperty *) l->data;
+			MidgardCRSQLColumnModel *cmodel = (MidgardCRSQLColumnModel *) l->data;
 			property_of = cmodel->_property_of;
-			const gchar *column_tablename = midgard_cr_sql_storage_model_property_get_tablename (cmodel);
+			const gchar *column_tablename = midgard_cr_sql_column_model_get_tablename (cmodel);
 			if (g_str_equal (model_tablename, column_tablename) 
 					&& *property_of == '\0') {
 				midgard_cr_model_add_model (MIDGARD_CR_MODEL (table_model), MIDGARD_CR_MODEL (cmodel));
@@ -414,10 +414,10 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 			/* Add column models to models of object type */
 			if (g_str_equal (model_tablename, column_tablename) 
 					&& *property_of != '\0') {
-				MidgardCRSQLStorageModelProperty *column_object = 
+				MidgardCRSQLColumnModel *column_object = 
 					MIDGARD_CR_MODEL (midgard_cr_model_get_model_by_name (MIDGARD_CR_MODEL (table_model), property_of));
 				if (!column_object) {
-					column_object = midgard_cr_sql_storage_model_property_new (self, property_of, property_of, "object");
+					column_object = midgard_cr_sql_column_model_new (self, property_of, property_of, "object");
 					midgard_cr_model_add_model (MIDGARD_CR_MODEL (table_model), MIDGARD_CR_MODEL (column_object));
 				}
 				midgard_cr_model_add_model (MIDGARD_CR_MODEL (column_object), MIDGARD_CR_MODEL (cmodel));
@@ -430,8 +430,8 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 	for (l = columns; l != NULL; l = l->next) {	
 		if (l->data == NULL)
 			continue;	
-		MidgardCRSQLStorageModelProperty *cmodel = (MidgardCRSQLStorageModelProperty *) l->data;
-		const gchar *column_tablename = midgard_cr_sql_storage_model_property_get_tablename (cmodel);
+		MidgardCRSQLColumnModel *cmodel = (MidgardCRSQLColumnModel *) l->data;
+		const gchar *column_tablename = midgard_cr_sql_column_model_get_tablename (cmodel);
 		g_warning ("Unhandled model for %s table \n",  column_tablename);
 	}	
 
@@ -619,7 +619,7 @@ midgard_cr_core_sql_storage_manager_initialize_storage (MidgardCRSQLStorageManag
 }
 
 gboolean  
-midgard_cr_core_sql_storage_manager_table_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModel *storage_model)
+midgard_cr_core_sql_storage_manager_table_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLTableModel *storage_model)
 {
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (storage_model != NULL);
@@ -633,7 +633,7 @@ midgard_cr_core_sql_storage_manager_table_exists (MidgardCRSQLStorageManager *ma
 }
 
 void 
-midgard_cr_core_sql_storage_manager_table_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModel *storage_model, GError **error)
+midgard_cr_core_sql_storage_manager_table_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLTableModel *storage_model, GError **error)
 {
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (storage_model != NULL);
@@ -669,7 +669,7 @@ midgard_cr_core_sql_storage_manager_table_create (MidgardCRSQLStorageManager *ma
 }
 
 void 
-midgard_cr_core_sql_storage_manager_table_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModel *storage_model, GError **error)
+midgard_cr_core_sql_storage_manager_table_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLTableModel *storage_model, GError **error)
 {
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (storage_model != NULL);
@@ -689,7 +689,7 @@ midgard_cr_core_sql_storage_manager_table_remove (MidgardCRSQLStorageManager *ma
 }
 
 static void
-_mdc_from_model_property (MidgardCRSQLStorageModelProperty *property_model, MgdCoreStorageSQLColumn *mdc)
+_mdc_from_model_property (MidgardCRSQLColumnModel *property_model, MgdCoreStorageSQLColumn *mdc)
 {
 	const gchar *colname = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (property_model));
 	MidgardCRModel *parent = midgard_cr_model_get_parent (MIDGARD_CR_MODEL (property_model));
@@ -705,7 +705,7 @@ _mdc_from_model_property (MidgardCRSQLStorageModelProperty *property_model, MgdC
 }
 
 gboolean 
-midgard_cr_core_sql_storage_manager_column_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model)
+midgard_cr_core_sql_storage_manager_column_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLColumnModel *property_model)
 {
 	g_return_val_if_fail (manager != NULL, FALSE);
 	g_return_val_if_fail (property_model != NULL, FALSE);
@@ -720,7 +720,7 @@ midgard_cr_core_sql_storage_manager_column_exists (MidgardCRSQLStorageManager *m
 }
 
 void 
-midgard_cr_core_sql_storage_manager_column_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error)
+midgard_cr_core_sql_storage_manager_column_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLColumnModel *property_model, GError **error)
 {
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (property_model != NULL);
@@ -758,7 +758,7 @@ midgard_cr_core_sql_storage_manager_column_create (MidgardCRSQLStorageManager *m
 }
 
 void 
-midgard_cr_core_sql_storage_manager_column_update (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error)
+midgard_cr_core_sql_storage_manager_column_update (MidgardCRSQLStorageManager *manager, MidgardCRSQLColumnModel *property_model, GError **error)
 {
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (property_model != NULL);
@@ -796,7 +796,7 @@ midgard_cr_core_sql_storage_manager_column_update (MidgardCRSQLStorageManager *m
 }
 
 void 
-midgard_cr_core_sql_storage_manager_column_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLStorageModelProperty *property_model, GError **error)
+midgard_cr_core_sql_storage_manager_column_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLColumnModel *property_model, GError **error)
 {
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (property_model != NULL);

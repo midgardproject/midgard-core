@@ -4,20 +4,20 @@ namespace MidgardCR {
 	/**
 	 * Describes table column in SQL database.
 	 *
-	 * Every SQLStorageModelProperty object describes one column of one table in SQL database.
+	 * Every SQLColumnModel object describes one column of one table in SQL database.
 	 * It's required to create column or alter it in the table described by the parent model.
-	 * And most important, SQLStorageModelProperty describes the column in which, value of object's property should be stored.
+	 * And most important, SQLColumnModel describes the column in which, value of object's property should be stored.
 	 *
 	 * Let's suppose, there's 'title' property, of string type, which value shoudl be stored in 
 	 * 'title_col' column, and default value for every field should be 'Alice'.
 	 * 
 	 * {{{
-	 *   SQLStorageModelProperty model = new SQLStorageModelProperty ("title", "title_col", "string");
+	 *   SQLColumnModel model = new SQLColumnModel ("title", "title_col", "string");
 	 *   model.valuedefault = 'Alice';
 	 * }}}
 	 *
 	 */ 
-	public class SQLStorageModelProperty : GLib.Object, Executable, StorageExecutor, Model, StorageModel, ModelProperty, StorageModelProperty {
+	public class SQLColumnModel : GLib.Object, Executable, StorageExecutor, Model, StorageModel, ModelProperty, StorageModelProperty {
 
 		/* private properties */
 
@@ -90,7 +90,7 @@ namespace MidgardCR {
 			}
 			set {
 				this._parent = value;
-				this._tablename = ((MidgardCR.SQLStorageModel)this._parent).location;
+				this._tablename = ((MidgardCR.SQLTableModel)this._parent).location;
 			}
 		}
 
@@ -208,13 +208,13 @@ namespace MidgardCR {
 		 * @param location the type of the property 
 		 * @param typename default property's value 
 		 */
-		public SQLStorageModelProperty (SQLStorageManager manager, string name, string location, string type) {
+		public SQLColumnModel (SQLStorageManager manager, string name, string location, string type) {
 			Object (storagemanager: manager, name: name, location: location, valuetypename: type);
 			this._set_gtype_from_name ();	
 		} 
 	
 		/* destructor */
-		~SQLStorageModelProperty () {
+		~SQLColumnModel () {
 			this._id = 0;
 		}
 
@@ -225,13 +225,13 @@ namespace MidgardCR {
 		/**
 		 * {@inheritDoc}
 		 * 
-		 * If added model is SQLStorageModelProperty, it's 'parentof' property
+		 * If added model is SQLColumnModel, it's 'parentof' property
 		 * is set to the value of the current instance.
 		 */		
 		public Model add_model (Model model) { 
 			this._models += model;
-			if (model is SQLStorageModelProperty)
-				((SQLStorageModelProperty)model)._property_of = this.name;
+			if (model is SQLColumnModel)
+				((SQLColumnModel)model)._property_of = this.name;
 			return this; 
 		}
 
@@ -252,7 +252,7 @@ namespace MidgardCR {
 		}
 
 		/** 
-		 * Check if SQLStorageModelProperty is valid
+		 * Check if SQLColumnModel is valid
 		 *
 		 * In case of invalid model, error is thrown:
 		 * 

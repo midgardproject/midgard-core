@@ -63,6 +63,13 @@ namespace MidgardCR {
 		public QueryValue ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLColumnModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel, MidgardCR.ModelProperty, MidgardCR.StorageModelProperty {
+		public SQLColumnModel (MidgardCR.SQLStorageManager manager, string name, string location, string type);
+		public string propertyof { get; }
+		public MidgardCR.StorageManager storagemanager { construct; }
+		public string tablename { get; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLProfiler : GLib.Object, MidgardCR.Profiler {
 		public SQLProfiler ();
 	}
@@ -73,21 +80,14 @@ namespace MidgardCR {
 		public string name { get; construct; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public class SQLStorageModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel {
-		public SQLStorageModel (MidgardCR.SQLStorageManager manager, string classname, string location);
-		public MidgardCR.SQLStorageModelProperty create_model_property (string name, string location, string type);
+	public class SQLTableModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel {
+		public SQLTableModel (MidgardCR.SQLStorageManager manager, string classname, string location);
+		public MidgardCR.SQLColumnModel create_model_property (string name, string location, string type);
 		public MidgardCR.StorageManager storagemanager { construct; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public class SQLStorageModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
-		public SQLStorageModelManager ();
-	}
-	[CCode (cheader_filename = "midgard3.h")]
-	public class SQLStorageModelProperty : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel, MidgardCR.ModelProperty, MidgardCR.StorageModelProperty {
-		public SQLStorageModelProperty (MidgardCR.SQLStorageManager manager, string name, string location, string type);
-		public string propertyof { get; }
-		public MidgardCR.StorageManager storagemanager { construct; }
-		public string tablename { get; }
+	public class SQLTableModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
+		public SQLTableModelManager ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLWorkspaceManager : MidgardCR.StorageWorkspaceManager, MidgardCR.SQLStorageManager {

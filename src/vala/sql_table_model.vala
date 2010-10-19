@@ -2,15 +2,15 @@
 namespace MidgardCR {
 
 	/**
-	 * SQLStorageModel describes relation between class and it's table in SQL database.
+	 * SQLTableModel describes relation between class and it's table in SQL database.
 	 * It's name property holds the name of the class, and location holds the name of the table.
 	 *
-	 * Property and column name mapping is done with {@link SQLStorageModelProperty}. 
+	 * Property and column name mapping is done with {@link SQLColumnModel}. 
 	 * 
-	 * {@link SQLStorageModelManager} provides access to all available schema and SQL storage models.
+	 * {@link SQLTableModelManager} provides access to all available schema and SQL storage models.
 	 * 
 	 */ 
-	public class SQLStorageModel: GLib.Object, Executable, StorageExecutor, Model, StorageModel {
+	public class SQLTableModel: GLib.Object, Executable, StorageExecutor, Model, StorageModel {
 		
 		/* private properties */
 
@@ -25,7 +25,7 @@ namespace MidgardCR {
 
 		internal uint _id = 0;
 		internal SQLStorageManager _storage_manager = null;
-		internal SQLStorageModelManager _model_manager = null;
+		internal SQLTableModelManager _model_manager = null;
 	
 		/* public properties */
 		
@@ -57,9 +57,9 @@ namespace MidgardCR {
 		/**
 		 * Constructor
 		 * 
-		 * Creates new SQLStorageModel object for given class name and location.
+		 * Creates new SQLTableModel object for given class name and location.
 		 *
-		 * Created SQLStorageModel object describes database table (location) for the class
+		 * Created SQLTableModel object describes database table (location) for the class
 		 * it is initialized for. For example, data of 'MyContacts' class objects should be 
 		 * stored in table 'my_contacts_tbl'. In such case, 'MyContacts' should be classname, 
 		 * and 'my_contacts_tbl' should be location.
@@ -67,7 +67,7 @@ namespace MidgardCR {
 		 * @param classname name of the class 
 		 * @param location table name
 		 */
-		public SQLStorageModel (SQLStorageManager manager, string classname, string location) {
+		public SQLTableModel (SQLStorageManager manager, string classname, string location) {
 			Object (storagemanager: manager, name: classname, location: location);
 			this._id = 0; /* Satisfy valac */
 		}
@@ -79,8 +79,8 @@ namespace MidgardCR {
 		/**
 		 * Add new property model 
 		 *
-		 * Any model added to SQLStorageModel one, should be an instance
-		 * of {@link SQLStorageModelProperty}. In any other case, model 
+		 * Any model added to SQLTableModel one, should be an instance
+		 * of {@link SQLColumnModel}. In any other case, model 
 		 * will be marked as invalid, during validation process.  
 		 *
 		 * @param model {@link Model} to add
@@ -94,7 +94,7 @@ namespace MidgardCR {
 		}
 
 		/**
-		 * Get {@link SQLStorageModelProperty} model by given name.
+		 * Get {@link SQLColumnModel} model by given name.
 		 * 
 		 * @param name {@link Model} name to look for
 		 *
@@ -139,8 +139,8 @@ namespace MidgardCR {
 			string[] names = new string[0];
 			foreach (MidgardCR.Model model in this._models) {
 				/* TODO, check if it's ObjectModel or StorageModel */	
-				if (!(model is SQLStorageModelProperty))
-					throw new ValidationError.TYPE_INVALID ("Invalid '%s' model associated with  SQLStorageModel. Expected SQLStorageModelProperty", model.get_type().name());
+				if (!(model is SQLColumnModel))
+					throw new ValidationError.TYPE_INVALID ("Invalid '%s' model associated with  SQLTableModel. Expected SQLColumnModel", model.get_type().name());
 				foreach (string name in names) {
 					if (name == model.name)
 						throw new MidgardCR.ValidationError.NAME_DUPLICATED ("Duplicated model name found");
@@ -160,10 +160,10 @@ namespace MidgardCR {
 		}
 
 		/**
-		 * Create new {@link SQLStorageModelProperty}
+		 * Create new {@link SQLColumnModel}
 		 */
-		public SQLStorageModelProperty create_model_property (string name, string location, string type) {
-			SQLStorageModelProperty model = new SQLStorageModelProperty ( (SQLStorageManager)this.get_storagemanager (), name, location, type);
+		public SQLColumnModel create_model_property (string name, string location, string type) {
+			SQLColumnModel model = new SQLColumnModel ( (SQLStorageManager)this.get_storagemanager (), name, location, type);
 			model.parent = this;
 			model.execution_start.connect (this._emit_execution_start);
                         model.execution_end.connect (this._emit_execution_end);

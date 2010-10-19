@@ -1,4 +1,4 @@
-/* MidgardCore SQLStorageModelManager routines
+/* MidgardCore SQLTableModelManager routines
  *    
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *        
@@ -21,19 +21,19 @@
 #include "midgard_cr_core_storage_sql.h"
 
 void 
-midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageModelManager *manager, MidgardCRModel *model, GError **error)
+midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLTableModelManager *manager, MidgardCRModel *model, GError **error)
 {
 	/* 
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (error == NULL || *error == NULL);
 
 	gchar *columns = midgard_cr_core_storage_sql_create_query_insert_columns (
-			G_OBJECT (model), manager->_object_model, manager->sql_storage_model);
+			G_OBJECT (model), manager->_object_model, manager->sql_table_model);
 	gchar *values = midgard_cr_core_storage_sql_create_query_insert_values (
-			G_OBJECT (model), manager->_object_model, manager->sql_storage_model);
+			G_OBJECT (model), manager->_object_model, manager->sql_table_model);
 	GString *mquery = g_string_new ("INSERT INTO ");
 	g_string_append_printf (mquery, "%s (%s) VALUES (%s) \n", 
-			midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (manager->sql_storage_model)),
+			midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (manager->sql_table_model)),
 			columns, values);
 	g_free (columns);
 	g_free (values);
@@ -60,31 +60,31 @@ midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageMod
 }
 
 void 
-midgard_cr_core_sql_storage_model_manager_prepare_update (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_prepare_update (MidgardCRSQLTableModelManager *manager, GError **error)
 {
 
 }
 
 void 
-midgard_cr_core_sql_storage_model_manager_prepare_save (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_prepare_save (MidgardCRSQLTableModelManager *manager, GError **error)
 {
 
 }
 
 void 
-midgard_cr_core_sql_storage_model_manager_prepare_delete (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_prepare_delete (MidgardCRSQLTableModelManager *manager, GError **error)
 {
 
 }
 
 void 
-midgard_cr_core_sql_storage_model_manager_prepare_purge (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_prepare_purge (MidgardCRSQLTableModelManager *manager, GError **error)
 {
 
 }
 
 void 
-midgard_cr_core_sql_storage_model_manager_execute (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_execute (MidgardCRSQLTableModelManager *manager, GError **error)
 {
 	/*
 	g_return_if_fail (manager != NULL);

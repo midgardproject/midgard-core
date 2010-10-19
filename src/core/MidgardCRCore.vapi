@@ -25,19 +25,19 @@ namespace MidgardCRCore {
 		public static bool open (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
 		public static bool close (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
 		public static bool initialize_storage (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
-		public static bool table_exists (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModel storage_model);
-		public static void table_create (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModel storage_model) throws MidgardCR.ExecutableError;
-		public static void table_remove (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModel storage_model) throws MidgardCR.ExecutableError;
-		public static bool column_exists (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModelProperty model);
-		public static bool column_create (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModelProperty model) throws MidgardCR.ExecutableError;
-		public static bool column_update (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModelProperty model) throws MidgardCR.ExecutableError;
-		public static bool column_remove (MidgardCR.SQLStorageManager manager, MidgardCR.SQLStorageModelProperty model) throws MidgardCR.ExecutableError;
+		public static bool table_exists (MidgardCR.SQLStorageManager manager, MidgardCR.SQLTableModel storage_model);
+		public static void table_create (MidgardCR.SQLStorageManager manager, MidgardCR.SQLTableModel storage_model) throws MidgardCR.ExecutableError;
+		public static void table_remove (MidgardCR.SQLStorageManager manager, MidgardCR.SQLTableModel storage_model) throws MidgardCR.ExecutableError;
+		public static bool column_exists (MidgardCR.SQLStorageManager manager, MidgardCR.SQLColumnModel model);
+		public static bool column_create (MidgardCR.SQLStorageManager manager, MidgardCR.SQLColumnModel model) throws MidgardCR.ExecutableError;
+		public static bool column_update (MidgardCR.SQLStorageManager manager, MidgardCR.SQLColumnModel model) throws MidgardCR.ExecutableError;
+		public static bool column_remove (MidgardCR.SQLStorageManager manager, MidgardCR.SQLColumnModel model) throws MidgardCR.ExecutableError;
 		public static int query_execute (MidgardCR.SQLStorageManager manager, string query) throws MidgardCR.ExecutableError;
 }
 
-	public class SQLStorageModelManager {
-		public static void prepare_create (MidgardCR.SQLStorageModelManager manager, MidgardCR.Model model) throws MidgardCR.ValidationError;
-		public static void execute (MidgardCR.SQLStorageModelManager manager) throws MidgardCR.ExecutableError;
+	public class SQLTableModelManager {
+		public static void prepare_create (MidgardCR.SQLTableModelManager manager, MidgardCR.Model model) throws MidgardCR.ValidationError;
+		public static void execute (MidgardCR.SQLTableModelManager manager) throws MidgardCR.ExecutableError;
 	}
 
 	public class SchemaBuilder {

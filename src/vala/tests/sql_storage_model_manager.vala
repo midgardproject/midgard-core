@@ -14,8 +14,8 @@ void profiler_callback_end (SQLProfiler profiler)
 void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 	/* constructor */
-	Test.add_func ("/SQLStorageModelManager/constructor", () => {
-		MidgardCR.SQLStorageModelManager mm = new MidgardCR.SQLStorageModelManager ();
+	Test.add_func ("/SQLTableModelManager/constructor", () => {
+		MidgardCR.SQLTableModelManager mm = new MidgardCR.SQLTableModelManager ();
 		assert (mm != null);	
 	
 		MidgardCR.SQLStorageManager storage_manager = null;
@@ -39,10 +39,10 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		
 		MidgardCR.StorageModelManager model_manager = storage_manager.model_manager;
 		assert (model_manager != null);
-		assert (model_manager is MidgardCR.SQLStorageModelManager);
+		assert (model_manager is MidgardCR.SQLTableModelManager);
 	});
 
-	Test.add_func ("/SQLStorageModelManager/prepare_create", () => {	
+	Test.add_func ("/SQLTableModelManager/prepare_create", () => {	
 		MidgardCR.SQLStorageManager storage_manager = null;
 		MidgardCR.Config config = new MidgardCR.Config ();	
 
@@ -73,7 +73,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 	
 		MidgardCR.StorageModelManager model_manager = storage_manager.model_manager;
 		assert (model_manager != null);
-		assert (model_manager is MidgardCR.SQLStorageModelManager);
+		assert (model_manager is MidgardCR.SQLTableModelManager);
 
 		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
                 assert (model != null);
@@ -96,7 +96,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		}	
 	});
 
-	Test.add_func ("/SQLStorageModelManager/execute", () => {	
+	Test.add_func ("/SQLTableModelManager/execute", () => {	
 		MidgardCR.SQLStorageManager storage_manager = null;
 		MidgardCR.Config config = new MidgardCR.Config ();	
 
@@ -127,7 +127,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 	
 		MidgardCR.StorageModelManager model_manager = storage_manager.model_manager;
 		assert (model_manager != null);
-		assert (model_manager is MidgardCR.SQLStorageModelManager);
+		assert (model_manager is MidgardCR.SQLTableModelManager);
 
 		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
                 assert (model != null);
@@ -143,13 +143,13 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 
                 model.add_model (prop_model).add_model (prop_model_a);
 
-		/* SQLStorageModel */
+		/* SQLTableModel */
 		/* SUCCESS */
-		MidgardCR.SQLStorageModel storage_model = model_manager.create_storage_model (model, DEFAULT_TABLENAME) as MidgardCR.SQLStorageModel;
+		MidgardCR.SQLTableModel storage_model = model_manager.create_storage_model (model, DEFAULT_TABLENAME) as MidgardCR.SQLTableModel;
 		assert (storage_model != null);
-		MidgardCR.SQLStorageModelProperty storage_model_prop = storage_model.create_model_property (TITLE_PROPERTY_NAME, TITLE_COLUMN, "string");
+		MidgardCR.SQLColumnModel storage_model_prop = storage_model.create_model_property (TITLE_PROPERTY_NAME, TITLE_COLUMN, "string");
 		assert (storage_model_prop != null);
-		MidgardCR.SQLStorageModelProperty storage_model_prop_a = storage_model.create_model_property (ABSTRACT_PROPERTY_NAME, ABSTRACT_COLUMN, "string");
+		MidgardCR.SQLColumnModel storage_model_prop_a = storage_model.create_model_property (ABSTRACT_PROPERTY_NAME, ABSTRACT_COLUMN, "string");
 		assert (storage_model_prop_a != null);
 		storage_model.add_model (storage_model_prop).add_model (storage_model_prop_a);
 
@@ -180,7 +180,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		}	
 	});
 
-	Test.add_func ("/SQLStorageModelManager/execute_and_validate", () => {	
+	Test.add_func ("/SQLTableModelManager/execute_and_validate", () => {	
 		MidgardCR.SQLStorageManager storage_manager = null;
 		var config = new MidgardCR.Config ();	
 		
@@ -211,7 +211,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 	
 		var model_manager = storage_manager.model_manager;
 		assert (model_manager != null);
-		assert (model_manager is MidgardCR.SQLStorageModelManager);
+		assert (model_manager is MidgardCR.SQLTableModelManager);
 
 		 /* Define Person class */
 		/* SUCCESS */
@@ -225,7 +225,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
         	/* Create new SQL StorageModel which defines 'Person' class table and all required columns */
         	/* Every 'Person' object's data will be stored in 'person' table */
 		/* SUCCESS */
-        	var person_sm = model_manager.create_storage_model (person_model, PERSON_TABLE_NAME) as SQLStorageModel;
+        	var person_sm = model_manager.create_storage_model (person_model, PERSON_TABLE_NAME) as SQLTableModel;
 		assert (person_sm != null);
         	/* Add two columns to 'person' table: 'firstname', 'lastname' */
         	person_sm
@@ -252,7 +252,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
 		/* Activity class requires 'midgard_activity' table */
 		/* SUCCESS */
-		var activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLStorageModel;
+		var activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLTableModel;
 		assert (activity_sm != null);
 		/* Add columns to table: 'verb', 'application', 'target', 'summary' and those required by 'actor' */
 		var asm_verb = activity_sm.create_model_property (VERB, VERB, "string");
@@ -331,7 +331,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 		var model_mngr = s_mngr.model_manager;
                 assert (model_mngr != null);
-                assert (model_mngr is MidgardCR.SQLStorageModelManager);
+                assert (model_mngr is MidgardCR.SQLTableModelManager);
 
 		/* SUCCESS */
 		int table_n = 3; /* Default table, person and activity */
@@ -355,13 +355,13 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (ds_activity_model != null);
 
 		/* Check if Person and Activity table models are available */
-		SQLStorageModel ds_person_table = null;
-		SQLStorageModel ds_activity_table = null;	
+		SQLTableModel ds_person_table = null;
+		SQLTableModel ds_activity_table = null;	
 		foreach (StorageModel table_model in storage_models) {
 			if (table_model.name == PERSON_CLASS_NAME)
-				ds_person_table = (SQLStorageModel) table_model;
+				ds_person_table = (SQLTableModel) table_model;
 			if (table_model.name == ACTIVITY_CLASS_NAME)
-				ds_activity_table = (SQLStorageModel) table_model;
+				ds_activity_table = (SQLTableModel) table_model;
 		}
 		assert (ds_person_table != null);
 		assert (ds_activity_table != null);
@@ -379,12 +379,12 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (lmodel.valuetypename == "string");
 
 		/* Check Person columns */
-		var fcol = (SQLStorageModelProperty) ds_person_table.get_model_by_name (FIRSTNAME);
+		var fcol = (SQLColumnModel) ds_person_table.get_model_by_name (FIRSTNAME);
 		assert (fcol != null);
 		assert (fcol.location == FIRSTNAME);
 		assert (fcol.valuetypename == "string");
 		assert (fcol.valuegtype == typeof (string));
-		var lcol = (SQLStorageModelProperty) ds_person_table.get_model_by_name (LASTNAME);
+		var lcol = (SQLColumnModel) ds_person_table.get_model_by_name (LASTNAME);
 		assert (lcol != null);
 		assert (lcol.location == LASTNAME);
 		assert (lcol.valuetypename == "string");
@@ -417,34 +417,34 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (a_app_model.valuetypename == "string");
 
 		/* Check Activity columns */
-		var a_actor_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (ACTOR);
+		var a_actor_col = (SQLColumnModel) ds_activity_table.get_model_by_name (ACTOR);
 		assert (a_actor_col != null);
 		assert (a_actor_col.location == ACTOR);
 		assert (a_actor_col.valuetypename == "object");
 		Model[] actor_columns = a_actor_col.list_models();
 		assert (actor_columns.length == 2); /* id + guid */
 		/* Check two columns, id and guid created for reference actor object */
-		var a_actor_id_col = (SQLStorageModelProperty) a_actor_col.get_model_by_name ("id");
+		var a_actor_id_col = (SQLColumnModel) a_actor_col.get_model_by_name ("id");
 		assert (a_actor_id_col != null);
 		assert (a_actor_id_col.location == "actor_id");
 		assert (a_actor_id_col.valuetypename == "int"); 
-		var a_actor_guid_col = (SQLStorageModelProperty) a_actor_col.get_model_by_name ("guid");
+		var a_actor_guid_col = (SQLColumnModel) a_actor_col.get_model_by_name ("guid");
 		assert (a_actor_guid_col != null);
 		assert (a_actor_guid_col.location == "actor_guid");	
 		assert (a_actor_guid_col.valuetypename == "guid"); 	
-		var a_verb_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (VERB);
+		var a_verb_col = (SQLColumnModel) ds_activity_table.get_model_by_name (VERB);
 		assert (a_verb_col != null);
 		assert (a_verb_col.location == VERB);
 		assert (a_verb_col.valuetypename == "string");
-		var a_target_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (TARGET);
+		var a_target_col = (SQLColumnModel) ds_activity_table.get_model_by_name (TARGET);
 		assert (a_target_col != null);
 		assert (a_target_col.location == TARGET);
 		assert (a_target_col.valuetypename == "guid");
-		var a_summary_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (SUMMARY);
+		var a_summary_col = (SQLColumnModel) ds_activity_table.get_model_by_name (SUMMARY);
 		assert (a_summary_col != null);
 		assert (a_summary_col.location == SUMMARY);
 		assert (a_summary_col.valuetypename == "string");
-		var a_app_col = (SQLStorageModelProperty) ds_activity_table.get_model_by_name (APPLICATION);
+		var a_app_col = (SQLColumnModel) ds_activity_table.get_model_by_name (APPLICATION);
 		assert (a_app_col != null);
 		assert (a_app_col.location == APPLICATION);
 		assert (a_app_col.valuetypename == "string"); 

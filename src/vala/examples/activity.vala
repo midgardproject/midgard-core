@@ -48,7 +48,7 @@ void main () {
 
 	/* Create new SQL StorageModel which defines 'Person' class table and all required columns */
 	/* Every 'Person' object's data will be stored in 'person' table */
-	SQLStorageModel person_sm = model_manager.create_storage_model (person_model, "person") as SQLStorageModel;
+	SQLTableModel person_sm = model_manager.create_storage_model (person_model, "person") as SQLTableModel;
 	/* Add two columns to 'person' table: 'firstname', 'lastname' */
 	person_sm
 		.add_model (person_sm.create_model_property ("firstname", "firstname", "string"))
@@ -69,7 +69,7 @@ void main () {
 	
 	/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
 	/* Activity class requires 'midgard_activity' table */
-	var activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLStorageModel;
+	var activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLTableModel;
 	/* Add columns to table: 'verb', 'application', 'target', 'summary' and those required by 'actor' */
 	var asm_verb = activity_sm.create_model_property ("verb", "verb", "string");
 	asm_verb.index = true;
