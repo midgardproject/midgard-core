@@ -587,7 +587,7 @@ midgard_query_select_include_deleted (MidgardQuerySelect *self, gboolean toggle)
  *
  * List all objects for which data has been returned during execution.
  *
- * Returns: (element-type MidgardDBObject) (array length=1): newly allocated array of #MidgardDBObject
+ * Returns: (element-type MidgardDBObject) (array length=n_objects): newly allocated array of #MidgardDBObject
  * Since: 10.05
  */ 
 MidgardDBObject **
