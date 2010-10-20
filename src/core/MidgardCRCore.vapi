@@ -35,9 +35,9 @@ namespace MidgardCRCore {
 		public static int query_execute (MidgardCR.SQLStorageManager manager, string query) throws MidgardCR.ExecutableError;
 }
 
-	public class SQLTableModelManager {
-		public static void prepare_create (MidgardCR.SQLTableModelManager manager, MidgardCR.Model model) throws MidgardCR.ValidationError;
-		public static void execute (MidgardCR.SQLTableModelManager manager) throws MidgardCR.ExecutableError;
+	public class SQLStorageModelManager {
+		public static void prepare_create (MidgardCR.SQLStorageModelManager manager, MidgardCR.Model model) throws MidgardCR.ValidationError;
+		public static void execute (MidgardCR.SQLStorageModelManager manager) throws MidgardCR.ExecutableError;
 	}
 
 	public class SchemaBuilder {
