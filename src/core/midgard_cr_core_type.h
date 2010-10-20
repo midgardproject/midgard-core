@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef MIDGARD_TYPE_H
-#define MIDGARD_TYPE_H
+#ifndef MIDGARD_CR_CORE_TYPE_H
+#define MIDGARD_CR_CORE_TYPE_H
 
 #include <stdio.h>
 #include <string.h>
@@ -29,33 +29,11 @@
 #include <glib-object.h>
 
 /* Longtext */
-#define MGD_TYPE_LONGTEXT (midgard_longtext_get_type())
-
-GType midgard_longtext_get_type(void);
-
-
-#define MGD_TYPE_PARAM_LONGTEXT (midgard_param_longtext_get_type())
-#define MGD_IS_PARAM_SPEC_LONGTEXT(pspec)    (G_TYPE_CHECK_INSTANCE_TYPE ((pspec), MGD_TYPE_PARAM_LONGTEXT))
-#define MGD_PARAM_SPEC_LONGTEXT(pspec)       (G_TYPE_CHECK_INSTANCE_CAST ((pspec), MGD_TYPE_PARAM_LONGTEXT, MidgardParamSpecLongtext))
-
-typedef struct _MidgardParamSpecLongtext MidgardParamSpecLongtext;
-
-GType midgard_param_longtext_get_type(void);
-
-/* Timestamp */
-#define MGD_TYPE_TIMESTAMP MIDGARD_TYPE_TIMESTAMP
+#define MIDGARD_CR_CORE_TYPE_LONGTEXT (midgard_cr_core_longtext_get_type())
+GType midgard_cr_core_longtext_get_type (void);
 
 /* Guid */
-#define MGD_TYPE_GUID (midgard_guid_get_type())
+#define MIDGARD_CR_CORE_TYPE_GUID (midgard_cr_core_guid_get_type())
+GType midgard_cr_core_guid_get_type (void);
 
-GType midgard_guid_get_type(void);
-
-/* Routines */
-#define MGD_TYPE_NONE G_TYPE_NONE
-#define MGD_TYPE_STRING G_TYPE_STRING
-#define MGD_TYPE_UINT G_TYPE_UINT
-#define MGD_TYPE_FLOAT G_TYPE_FLOAT
-#define MGD_TYPE_BOOLEAN G_TYPE_BOOLEAN
-#define MGD_TYPE_INT G_TYPE_INT
-
-#endif /* MIDGARD_TYPE_H */
+#endif /* MIDGARD_CR_CORE_TYPE_H */
