@@ -173,6 +173,7 @@ midgard_cr_core_schema_type_property_new_from_model (MidgardCRModelProperty *mod
 	prop_attr->is_private = midgard_cr_model_property_get_private (model);
 
 	/* Determine classname if property holds an object */
+	/*
 	gint n_models;
 	MidgardCRModel **models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (model), &n_models);
 	
@@ -187,7 +188,7 @@ midgard_cr_core_schema_type_property_new_from_model (MidgardCRModelProperty *mod
 
 	type_attr->extends = g_strdup (midgard_cr_model_get_name (MIDGARD_CR_MODEL (model)));	
 	g_free (models);
-
+	*/
 	return prop_attr;
 }
 
@@ -248,7 +249,7 @@ midgard_cr_core_object_builder_register_types (MidgardCRObjectBuilder *builder, 
 		}
 		
 		type_attr->properties = g_new (MgdSchemaPropertyAttr*, n_props+1);
-		type_attr->properties[n_props+1] = NULL;
+		type_attr->properties[n_props] = NULL;
 		type_attr->num_properties = n_props;
 		type_attr->params = g_new (GParamSpec *, n_props+1);
 
@@ -289,7 +290,6 @@ midgard_cr_core_object_builder_register_types (MidgardCRObjectBuilder *builder, 
 					property, nick, descr,
 					"", G_PARAM_READWRITE);
 			}
-	
 			type_attr->properties[j] = tmp_prop;
 
 			j++;
