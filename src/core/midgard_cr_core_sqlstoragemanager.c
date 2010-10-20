@@ -410,13 +410,13 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 			property_of = cmodel->_property_of;
 			const gchar *column_tablename = midgard_cr_sql_column_model_get_tablename (cmodel);
 			if (g_str_equal (model_tablename, column_tablename) 
-					&& *property_of == '\0') {
+					&& (property_of && *property_of == '\0')) {
 				midgard_cr_model_add_model (MIDGARD_CR_MODEL (table_model), MIDGARD_CR_MODEL (cmodel));
 				l->data = NULL;
 			}
 			/* Add column models to models of object type */
 			if (g_str_equal (model_tablename, column_tablename) 
-					&& *property_of != '\0') {
+					&& (property_of && *property_of != '\0')) {
 				MidgardCRSQLColumnModel *column_object = 
 					MIDGARD_CR_MODEL (midgard_cr_model_get_model_by_name (MIDGARD_CR_MODEL (table_model), property_of));
 				if (!column_object) {
