@@ -368,7 +368,7 @@ namespace MidgardCR {
 		 *    a. invalid model class associated
 		 *  A. REFERENCE_INVALID
 		 *    a. more than one model associated
-		 *    a. associated model has no parent model
+		 *    a. associated ObjectModelProperty model has no parent model
 		 */
 		public void is_valid () throws ValidationError { 
 			/* type id or name is empty thus invalid */
@@ -391,7 +391,8 @@ namespace MidgardCR {
 
 			/* Associated model has no parent defined */
 			if (this._models != null && this._models[0].parent == null)
-				throw new MidgardCR.ValidationError.REFERENCE_INVALID ("Null parent defined for associated model");
+				if (this._models[0] is ObjectModelProperty)
+					throw new MidgardCR.ValidationError.REFERENCE_INVALID ("Null parent defined for associated '%s' model.", this._models[0].name);
 		}
 	}
 }
