@@ -1,3 +1,20 @@
+/* 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * 
+ * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
+ */
 
 namespace MidgardCR {
 
@@ -8,11 +25,11 @@ namespace MidgardCR {
 	 * It's required to create column or alter it in the table described by the parent model.
 	 * And most important, SQLColumnModel describes the column in which, value of object's property should be stored.
 	 *
-	 * Let's suppose, there's 'title' property, of string type, which value shoudl be stored in 
+	 * Let's suppose, there's 'title' property, of string type, which value should be stored in 
 	 * 'title_col' column, and default value for every field should be 'Alice'.
 	 * 
 	 * {{{
-	 *   SQLColumnModel model = new SQLColumnModel ("title", "title_col", "string");
+	 *   SQLColumnModel model = new SQLColumnModel (storage_manager, "title", "title_col", "string");
 	 *   model.valuedefault = 'Alice';
 	 * }}}
 	 *
@@ -151,7 +168,7 @@ namespace MidgardCR {
 		 *
 		 * For example, property of Object type is a reference to another object, and referenced object's
 		 * 'name' and 'id' should be stored in one record. Instead of two separate properties, one  
-		 * is propagated as object is created.
+		 * is propagated when object is created.
 		 *
 		 * @see add_model
 		 */ 
@@ -204,6 +221,7 @@ namespace MidgardCR {
 		/**
 		 * Constructor 
 		 *
+		 * @param manager {@link SQLStorageManager} 
 		 * @param name property name
 		 * @param location the type of the property 
 		 * @param typename default property's value 

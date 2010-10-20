@@ -1,3 +1,20 @@
+/* 
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published
+ * by the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * 
+ * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
+ */
 
 namespace MidgardCR {
 
@@ -41,7 +58,20 @@ namespace MidgardCR {
 		}
 
 		public void register_storage_models (StorageManager manager) throws SchemaBuilderError, ValidationError { }
-		public Storable? factory (StorageManager storage, string classname) throws SchemaBuilderError, ValidationError { return null; }
+
+		public Storable? factory (string classname) throws SchemaBuilderError, ValidationError { 
+			GLib.Type type_id = GLib.Type.from_name (classname);	
+			if (type_id == 0)
+				throw new ValidationError.NAME_INVALID ("%s is not registered class", classname);
+			
+			GLib.Type storable_id = GLib.Type.from_name ("MidgardCRStorable");
+			if (type_id.is_a (storable_id) == false)
+				throw new ValidationError.TYPE_INVALID ("%s is not Storable derived class", classname);
+
+			Storable obj = (Storable) GLib.Object.new (type_id);
+			return obj;	 
+		}
+
 		public ObjectModel? get_object_model (string classname) { return null; }
 		
 		public void execute () throws ExecutableError { 
