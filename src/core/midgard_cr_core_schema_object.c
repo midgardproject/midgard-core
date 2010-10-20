@@ -36,12 +36,12 @@ static void __core_schema_object_dispose (GObject *object);
  */
 #define G_MIDGARD_LOOP_HIERARCHY_START	\
 	do {	\
-		if (current_type == MIDGARD_CR_TYPE_SCHEMA_OBJECT) break; \
+		if (current_type == MIDGARD_CR_TYPE_REPOSITORY_OBJECT) break; \
 		priv = G_TYPE_INSTANCE_GET_PRIVATE (object, current_type, MgdSchemaTypeAttr);  \
 
 #define G_MIDGARD_LOOP_HIERARCHY_STOP	\
 		current_type = g_type_parent(current_type);	\
-	} while (current_type != MIDGARD_CR_TYPE_SCHEMA_OBJECT);
+	} while (current_type != MIDGARD_CR_TYPE_REPOSITORY_OBJECT);
 
 /* AB: Handle property assignments. Despite its simplicity, this is *very* important function */
 static void
@@ -136,7 +136,7 @@ __core_schema_object_dispose (GObject *object)
 }
 
 /* 
- * Finalizer for MidgardCRSchemaObject instance.
+ * Finalizer for MidgardCRRepositoryObject instance.
  * Cleans up all allocated data. As optimization, it handles all data
  * which belongs to its ancestors up to but not inluding GObject.
  * It is really makes no sense to call this function recursively
@@ -151,7 +151,7 @@ static void __core_schema_object_finalize (GObject *object)
 	if (object == NULL)
 		return;
 
-	MidgardCRSchemaObject *self = (MidgardCRSchemaObject *)object;
+	MidgardCRRepositoryObject *self = (MidgardCRRepositoryObject *)object;
 		
 	GType current_type = G_TYPE_FROM_INSTANCE(object); 
 
@@ -190,7 +190,7 @@ __core_schema_object_class_init(gpointer g_class, gpointer class_data)
 	MgdSchemaTypeAttr *data = (MgdSchemaTypeAttr *) class_data;
 
 	GObjectClass *gobject_class = G_OBJECT_CLASS(g_class);
-	MidgardCRSchemaObjectClass *mklass = (MidgardCRSchemaObjectClass *) g_class;
+	MidgardCRRepositoryObjectClass *mklass = (MidgardCRRepositoryObjectClass *) g_class;
 	guint idx;
 	
 	__core_schema_object_parent_class = g_type_class_peek_parent (g_class);
@@ -242,7 +242,7 @@ midgard_cr_core_schema_object_register_type (MgdSchemaTypeAttr *type_data, GType
 			type_data = g_new (MgdSchemaTypeAttr, 1);
 
                 /* our own class size is 0 but it should include space for a parent, therefore add it */
-                midgard_type_info->class_size = sizeof (MidgardCRSchemaObjectClass);
+                midgard_type_info->class_size = sizeof (MidgardCRRepositoryObjectClass);
                 midgard_type_info->base_init = NULL;
                 midgard_type_info->base_finalize = NULL;
                 midgard_type_info->class_init  = __core_schema_object_class_init;
@@ -250,12 +250,20 @@ midgard_cr_core_schema_object_register_type (MgdSchemaTypeAttr *type_data, GType
                 midgard_type_info->class_data = type_data;
                 /* our own instance size is 0 but it should include space for a parent,
                  * therefore add it */
-                midgard_type_info->instance_size = sizeof (MidgardCRSchemaObject);
+                midgard_type_info->instance_size = sizeof (MidgardCRRepositoryObject);
                 midgard_type_info->n_preallocs = 0;
                 midgard_type_info->instance_init = NULL;
                 midgard_type_info->value_table = NULL;
-                
+               
+		static const GInterfaceInfo property_info = {
+			NULL,	/* interface init */
+			NULL,   /* interface_finalize */
+			NULL    /* interface_data */
+		};
+
 		GType type = g_type_register_static (parent_type, classname, midgard_type_info, 0);
+		g_type_add_interface_static (type, MIDGARD_CR_TYPE_STORABLE, &property_info);
+
                 g_free (midgard_type_info);
 
 		g_type_add_class_private (type, sizeof(MgdSchemaTypeAttr));

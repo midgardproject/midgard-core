@@ -296,7 +296,7 @@ midgard_cr_core_schema_builder_register_types (MidgardCRSchemaBuilder *builder, 
 		}
 
 		/* register classes in GType system */
-		midgard_cr_core_schema_object_register_type (type_attr, MIDGARD_CR_TYPE_SCHEMA_OBJECT);	
+		midgard_cr_core_schema_object_register_type (type_attr, MIDGARD_CR_TYPE_REPOSITORY_OBJECT);	
 		i++;
 	}
 }
