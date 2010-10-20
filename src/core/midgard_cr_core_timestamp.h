@@ -39,6 +39,7 @@ typedef struct {
 } MidgardTimestamp;
 
 #define MIDGARD_TYPE_TIMESTAMP (midgard_timestamp_get_type())
+#define MGD_TYPE_TIMESTAMP MIDGARD_TYPE_TIMESTAMP
 
 GType midgard_timestamp_get_type(void);
 
