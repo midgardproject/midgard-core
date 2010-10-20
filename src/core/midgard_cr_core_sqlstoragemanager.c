@@ -418,7 +418,7 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 			if (g_str_equal (model_tablename, column_tablename) 
 					&& (property_of && *property_of != '\0')) {
 				MidgardCRSQLColumnModel *column_object = 
-					MIDGARD_CR_MODEL (midgard_cr_model_get_model_by_name (MIDGARD_CR_MODEL (table_model), property_of));
+					MIDGARD_CR_SQL_COLUMN_MODEL (midgard_cr_model_get_model_by_name (MIDGARD_CR_MODEL (table_model), property_of));
 				if (!column_object) {
 					column_object = midgard_cr_sql_column_model_new (self, property_of, property_of, "object");
 					midgard_cr_model_add_model (MIDGARD_CR_MODEL (table_model), MIDGARD_CR_MODEL (column_object));
