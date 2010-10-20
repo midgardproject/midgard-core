@@ -29,7 +29,7 @@
 #define TABLE_NAME_SCHEMA "midgard_schema_type"
 #define TABLE_NAME_SCHEMA_PROPERTIES "midgard_schema_type_properties"
 #define TABLE_SCHEMA_COLUMNS "class_name, extends"
-#define TABLE_SCHEMA_PROPERTIES_COLUMNS "class_name, property_name, gtype_name, default_value_string, property_nick, description, is_reference, reference_class_name, reference_property_name"
+#define TABLE_SCHEMA_PROPERTIES_COLUMNS "class_name, property_name, gtype_name, default_value_string, property_nick, description, is_reference, reference_class_name, reference_property_name, namespace"
 
 typedef struct _MgdCoreStorageSQLColumn MgdCoreStorageSQLColumn;
 
@@ -47,7 +47,7 @@ struct _MgdCoreStorageSQLColumn {
 	const gchar *dvalue;
 };
 
-void midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *fieldname, GType fieldtype);
+void midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *fieldname, GType fieldtype, const gchar *coltypename);
 void midgard_core_storage_sql_column_reset (MgdCoreStorageSQLColumn *mdc);
 
 gint midgard_core_storage_sql_query_execute (GdaConnection *cnc, GdaSqlParser *parser, const gchar *query, GError **error);

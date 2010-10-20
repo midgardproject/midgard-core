@@ -26,6 +26,7 @@
 #define COLTYPE_STRING	"varchar(255)"
 #define COLTYPE_TEXT	"longtext"
 #define COLTYPE_FLOAT	"float"
+#define COLTYPE_GUID	"varchar(80)"
 
 #define PROVIDER_NAME_POSTGRES	"PostgreSQL"
 
@@ -33,7 +34,7 @@
  * Initialize StorageSQLColumn with default types 
  */ 
 void 
-midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *colname, GType coltype)
+midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *colname, GType colt, const gchar *coltypename)
 {
 	midgard_core_storage_sql_column_reset (mdc);	
 
@@ -43,21 +44,34 @@ midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar 
 	if (colname)
 		mdc->column_name = colname;
 
+	GType coltype = colt;
+
+	if (coltypename) {
+		if (g_str_equal (coltypename, "text")
+				|| g_str_equal (coltypename, "longtext")) 
+			coltype = MIDGARD_CR_CORE_TYPE_LONGTEXT;
+		else if (g_str_equal (coltypename, "guid"))
+			coltype = MIDGARD_CR_CORE_TYPE_GUID;
+	}
+
 	if (coltype) {
 		mdc->gtype = coltype;
-		if (coltype == MGD_TYPE_TIMESTAMP) {
+		if (coltype == MIDGARD_CR_TYPE_TIMESTAMP) {
 			mdc->dbtype = COLTYPE_DATE;
 			mdc->dvalue = MIDGARD_TIMESTAMP_DEFAULT;
-		} else if (coltype == MGD_TYPE_BOOLEAN
-				|| coltype == MGD_TYPE_INT) {
+		} else if (coltype == G_TYPE_BOOLEAN
+				|| coltype == G_TYPE_INT
+				|| coltype == G_TYPE_UINT) {
 			mdc->dbtype = COLTYPE_INT;
 			mdc->dvalue = "0";
-		} else if (coltype == MGD_TYPE_STRING
-				|| coltype == G_TYPE_STRING) {
+		} else if (coltype == G_TYPE_STRING) {
 			mdc->dbtype = COLTYPE_STRING;
 			mdc->dvalue = "";
-		} else if (coltype == MGD_TYPE_LONGTEXT) {
+		} else if (coltype == MIDGARD_CR_CORE_TYPE_LONGTEXT) {
 			mdc->dbtype = COLTYPE_TEXT;
+			mdc->dvalue = "";
+		} else if (coltype == MIDGARD_CR_CORE_TYPE_GUID) {
+			mdc->dbtype = COLTYPE_GUID;
 			mdc->dvalue = "";
 		} else if (coltype == G_TYPE_FLOAT) {
 			mdc->dbtype =  COLTYPE_FLOAT;
@@ -367,10 +381,10 @@ midgard_core_storage_sql_column_create (GdaConnection *cnc, MgdCoreStorageSQLCol
 	gchar *dval = NULL; 
 	if(mdc->dvalue) {
 		switch(mdc->gtype) {
-			case MGD_TYPE_UINT:
-			case MGD_TYPE_INT:
-			case MGD_TYPE_FLOAT:
-			case MGD_TYPE_BOOLEAN:
+			case G_TYPE_UINT:
+			case G_TYPE_INT:
+			case G_TYPE_FLOAT:
+			case G_TYPE_BOOLEAN:
 				dval = g_strdup (mdc->dvalue);
 				break;
 			default:
@@ -673,7 +687,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 	const gchar *column_name = "class_name";
 
 	/* CLASS NAME */
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 	mdc.unique = TRUE;
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
@@ -685,7 +699,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* EXTENDS */
 	column_name = "extends";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -710,7 +724,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* CLASS */
 	column_name = "class_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -721,7 +735,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* NAME */
 	column_name = "property_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -732,7 +746,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* GTYPE NAME */
 	column_name = "gtype_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -743,7 +757,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* DEFAULT_VALUE STRING */
 	column_name = "default_value_string";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -754,7 +768,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* DEFAULT_VALUE INT */
 	column_name = "default_value_integer";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_INT, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -765,7 +779,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* DEFAULT_VALUE TIME */
 	column_name = "default_value_time";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MGD_TYPE_TIMESTAMP);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MIDGARD_CR_TYPE_TIMESTAMP, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -776,7 +790,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* DEFAULT_VALUE FLOAT */
 	column_name = "default_value_float";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_FLOAT);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_FLOAT, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -787,7 +801,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* PROPERTY NICK */
 	column_name = "property_nick";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -798,7 +812,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* DESCRIPTION */
 	column_name = "description";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MGD_TYPE_LONGTEXT);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MIDGARD_CR_CORE_TYPE_LONGTEXT, "text");
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -809,7 +823,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* IS REFERENCE */
 	column_name = "is_reference";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -820,7 +834,7 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* REFERENCE CLASS NAME */
 	column_name = "reference_class_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -831,7 +845,18 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	/* REFERENCE PROPERTY NAME */
 	column_name = "reference_property_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
+	/* REFERENCE CLASS NAME */
+	column_name = "namespace";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -869,7 +894,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 	const gchar *column_name = "class_name";
 
 	/* CLASS NAME */
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 	mdc.unique = TRUE;
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
@@ -881,7 +906,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* TABLE NAME */
 	column_name = "table_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -892,7 +917,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* DESCRIPTION */
 	column_name = "description";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, "text");
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -918,7 +943,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* PROPERTY NAME */
 	column_name = "property_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -927,7 +952,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* COLUMN NAME */
 	column_name = "column_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -938,7 +963,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* TABLE */
 	column_name = "table_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -949,7 +974,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* GTYPE NAME */
 	column_name = "gtype_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -960,7 +985,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* COLUMN TYPE */
 	column_name = "column_type";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -971,7 +996,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* IS PRIMARY */
 	column_name = "is_primary";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -982,7 +1007,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* HAS INDEX */
 	column_name = "has_index";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -993,7 +1018,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* IS UNIQUE */
 	column_name = "is_unique";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -1004,7 +1029,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* IS AUTO INCREMENT */
 	column_name = "is_auto_increment";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -1015,7 +1040,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* DESCRIPTION */
 	column_name = "description";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MGD_TYPE_LONGTEXT);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, MIDGARD_CR_CORE_TYPE_LONGTEXT, "text");
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -1026,7 +1051,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* IS REFERENCE */
 	column_name = "is_reference";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_BOOLEAN, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -1037,7 +1062,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* REFERENCE CLASS NAME */
 	column_name = "reference_table_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -1048,7 +1073,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* REFERENCE PROPERTY NAME */
 	column_name = "reference_column_name";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);
@@ -1059,7 +1084,7 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	/* PROPERTY OF */
 	column_name = "property_of";
-	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING);
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
 
 	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
 		g_propagate_error (error, err);

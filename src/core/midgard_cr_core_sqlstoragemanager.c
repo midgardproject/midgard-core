@@ -182,6 +182,9 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 			g_free (property_model->_reftarget);
 			property_model->_reftarget = g_value_dup_string (value);
+			/* namespace */
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+			midgard_cr_model_set_namespace (MIDGARD_CR_MODEL (property_model), g_value_get_string (value));
 			/* id */
 			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
 			guint id = (guint) g_value_get_int (value);
@@ -695,9 +698,10 @@ _mdc_from_model_property (MidgardCRSQLColumnModel *property_model, MgdCoreStorag
 	MidgardCRModel *parent = midgard_cr_model_get_parent (MIDGARD_CR_MODEL (property_model));
 	const gchar *tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (parent));
 	GType col_type = midgard_cr_model_property_get_valuegtype (MIDGARD_CR_MODEL_PROPERTY (property_model));
+	const gchar *col_type_name = midgard_cr_model_property_get_valuetypename (MIDGARD_CR_MODEL_PROPERTY (property_model));
 	const gchar *description = midgard_cr_model_property_get_description (MIDGARD_CR_MODEL_PROPERTY (property_model));
 
-	midgard_core_storage_sql_column_init (mdc, tablename, colname, col_type);
+	midgard_core_storage_sql_column_init (mdc, tablename, colname, col_type, col_type_name);
 	if (description != NULL)
 		mdc->column_desc = description;
 
