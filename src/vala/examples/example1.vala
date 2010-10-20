@@ -1,3 +1,12 @@
+/*
+ In this example:
+ - Create configuration and open connection using StorageManager
+ - Create ObjectModel models for Activity and Person classes
+ - Create TableModel and ColumnModel models for classes
+ - Create tables and columns for classes in SQLite database
+ - Store information about classes and their tables in database
+*/ 
+
 using MidgardCR;
 
 void profiler_callback_start (SQLProfiler profiler)
@@ -19,6 +28,7 @@ void main () {
 	Config config = new Config ();	
 	config.dbtype = "SQLite";
 	config.dbname = "ExampleDB";
+	config.dbdir = "./";
 
 	/* Create new, named StorageManager for given Config instance */
 	try {
