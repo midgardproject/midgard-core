@@ -1,4 +1,4 @@
-/* MidgardCore SchemaBuilder routines routines
+/* MidgardCore ObjectBuilder routines routines
  *    
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *        
@@ -59,6 +59,6 @@ struct _MgdSchemaPropertyAttr {
 	GHashTable *user_values;
 };
 
-void midgard_cr_core_schema_builder_register_type (MidgardCRSchemaBuilder *builder, GError **error);
+void midgard_cr_core_object_builder_register_type (MidgardCRObjectBuilder *builder, GError **error);
 
 #endif /* _MIDGARD_CR_CORE_SCHEMA_BUILDER_H_ */

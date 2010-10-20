@@ -33,16 +33,20 @@ namespace MidgardCR {
 		public string vardir { get; set; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public abstract class DBObject : GLib.Object, MidgardCR.Storable {
-		public DBObject ();
-	}
-	[CCode (cheader_filename = "midgard3.h")]
 	public abstract class Metadata : GLib.Object, MidgardCR.Storable {
 		public Metadata ();
 		public abstract uint action { get; }
 		public abstract MidgardCR.Timestamp created { get; }
 		public abstract string parent { get; construct; }
 		public abstract MidgardCR.Timestamp revised { get; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class ObjectBuilder : GLib.Object, MidgardCR.Executable {
+		public ObjectBuilder ();
+		public MidgardCR.Storable? factory (string classname) throws MidgardCR.ObjectBuilderError, MidgardCR.ValidationError;
+		public MidgardCR.ObjectModel? get_object_model (string classname);
+		public void register_model (MidgardCR.ObjectModel model) throws MidgardCR.ObjectBuilderError, MidgardCR.ValidationError;
+		public void register_storage_models (MidgardCR.StorageManager manager) throws MidgardCR.ObjectBuilderError, MidgardCR.ValidationError;
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class ObjectModel : GLib.Object, MidgardCR.Model {
@@ -63,6 +67,16 @@ namespace MidgardCR {
 		public QueryValue ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public abstract class RepositoryObject : GLib.Object, MidgardCR.Storable {
+		public RepositoryObject ();
+		public abstract GLib.Value get_property_value (string name);
+		public abstract string[]? list_all_properties ();
+		public abstract void set_property_value (string name, GLib.Value value);
+		public string guid { get; }
+		public uint id { get; }
+		public MidgardCR.Metadata metadata { get; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLColumnModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel, MidgardCR.ModelProperty, MidgardCR.StorageModelProperty {
 		public SQLColumnModel (MidgardCR.SQLStorageManager manager, string name, string location, string type);
 		public string propertyof { get; }
@@ -80,14 +94,14 @@ namespace MidgardCR {
 		public string name { get; construct; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLStorageModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
+		public SQLStorageModelManager ();
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLTableModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel {
 		public SQLTableModel (MidgardCR.SQLStorageManager manager, string classname, string location);
 		public MidgardCR.SQLColumnModel create_model_property (string name, string location, string type);
 		public MidgardCR.StorageManager storagemanager { construct; }
-	}
-	[CCode (cheader_filename = "midgard3.h")]
-	public class SQLTableModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
-		public SQLTableModelManager ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLWorkspaceManager : MidgardCR.StorageWorkspaceManager, MidgardCR.SQLStorageManager {
@@ -96,22 +110,8 @@ namespace MidgardCR {
 		public bool workspace_exists (MidgardCR.WorkspaceStorage workspace) throws MidgardCR.WorkspaceStorageError;
 	}
 	[CCode (cheader_filename = "midgard3.h")]
-	public class SchemaBuilder : GLib.Object, MidgardCR.Executable {
-		public SchemaBuilder ();
-		public MidgardCR.Storable? factory (MidgardCR.StorageManager storage, string classname) throws MidgardCR.SchemaBuilderError, MidgardCR.ValidationError;
-		public MidgardCR.ObjectModel? get_object_model (string classname);
-		public void register_model (MidgardCR.ObjectModel model) throws MidgardCR.SchemaBuilderError, MidgardCR.ValidationError;
-		public void register_storage_models (MidgardCR.StorageManager manager) throws MidgardCR.SchemaBuilderError, MidgardCR.ValidationError;
-	}
-	[CCode (cheader_filename = "midgard3.h")]
-	public abstract class SchemaObject : GLib.Object, MidgardCR.Storable {
-		public SchemaObject ();
-		public abstract GLib.Value get_property_value (string name);
-		public abstract string[]? list_all_properties ();
-		public abstract void set_property_value (string name, GLib.Value value);
-		public string guid { get; }
-		public uint id { get; }
-		public MidgardCR.Metadata metadata { get; }
+	public abstract class StorageObject : GLib.Object, MidgardCR.Storable {
+		public StorageObject ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public abstract class Timestamp : GLib.Object {
@@ -337,8 +337,8 @@ namespace MidgardCR {
 		ALIAS_INVALID,
 		ALIAS_EXISTS,
 	}
-	[CCode (cprefix = "MIDGARD_CR_SCHEMA_BUILDER_ERROR_", cheader_filename = "midgard3.h")]
-	public errordomain SchemaBuilderError {
+	[CCode (cprefix = "MIDGARD_CR_OBJECT_BUILDER_ERROR_", cheader_filename = "midgard3.h")]
+	public errordomain ObjectBuilderError {
 		NAME_EXISTS,
 	}
 	[CCode (cprefix = "MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_", cheader_filename = "midgard3.h")]

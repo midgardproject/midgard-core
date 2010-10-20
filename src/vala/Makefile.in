@@ -53,7 +53,7 @@ am__objects_1 =
 am__objects_2 = midgard_config.lo executable.lo midgard_namespace.lo \
 	profiler.lo sql_profiler.lo midgard_query.lo \
 	midgard_schema_model_reflector.lo model.lo object_model.lo \
-	schema_builder.lo midgard_schema_object.lo \
+	object_builder.lo midgard_schema_object.lo \
 	midgard_storage_manager_sql.lo midgard_storage.lo \
 	midgard_workspace.lo sql_storage_model_manager.lo \
 	sql_table_model.lo sql_column_model.lo $(am__objects_1)
@@ -251,7 +251,7 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_schema_model_reflector.vala \
 			  model.vala \
 			  object_model.vala \
-			  schema_builder.vala \
+			  object_builder.vala \
 			  midgard_schema_object.vala \
 			  midgard_storage_manager_sql.vala \
 			  midgard_storage.vala \
@@ -337,9 +337,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_storage_manager_sql.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_workspace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_builder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/profiler.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/schema_builder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_column_model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_profiler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_storage_model_manager.Plo@am__quote@

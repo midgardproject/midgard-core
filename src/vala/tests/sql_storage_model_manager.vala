@@ -2,20 +2,20 @@ using MidgardCR;
 
 void profiler_callback_start (SQLProfiler profiler)
 {
-	profiler.start ();
+	//profiler.start ();
 }
 
 void profiler_callback_end (SQLProfiler profiler)
 {
-	profiler.end ();
-	GLib.print ("SQL QUERY: %s (%.04f) \n", profiler.command, profiler.time);
+	//profiler.end ();
+	//GLib.print ("SQL QUERY: %s (%.04f) \n", profiler.command, profiler.time);
 }
 
 void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 	/* constructor */
-	Test.add_func ("/SQLTableModelManager/constructor", () => {
-		MidgardCR.SQLTableModelManager mm = new MidgardCR.SQLTableModelManager ();
+	Test.add_func ("/SQLStorageModelManager/constructor", () => {
+		MidgardCR.SQLStorageModelManager mm = new MidgardCR.SQLStorageModelManager ();
 		assert (mm != null);	
 	
 		MidgardCR.SQLStorageManager storage_manager = null;
@@ -39,10 +39,10 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		
 		MidgardCR.StorageModelManager model_manager = storage_manager.model_manager;
 		assert (model_manager != null);
-		assert (model_manager is MidgardCR.SQLTableModelManager);
+		assert (model_manager is MidgardCR.SQLStorageModelManager);
 	});
 
-	Test.add_func ("/SQLTableModelManager/prepare_create", () => {	
+	Test.add_func ("/SQLStorageModelManager/prepare_create", () => {	
 		MidgardCR.SQLStorageManager storage_manager = null;
 		MidgardCR.Config config = new MidgardCR.Config ();	
 
@@ -73,7 +73,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 	
 		MidgardCR.StorageModelManager model_manager = storage_manager.model_manager;
 		assert (model_manager != null);
-		assert (model_manager is MidgardCR.SQLTableModelManager);
+		assert (model_manager is MidgardCR.SQLStorageModelManager);
 
 		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
                 assert (model != null);
@@ -96,7 +96,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		}	
 	});
 
-	Test.add_func ("/SQLTableModelManager/execute", () => {	
+	Test.add_func ("/SQLStorageModelManager/execute", () => {	
 		MidgardCR.SQLStorageManager storage_manager = null;
 		MidgardCR.Config config = new MidgardCR.Config ();	
 
@@ -127,7 +127,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 	
 		MidgardCR.StorageModelManager model_manager = storage_manager.model_manager;
 		assert (model_manager != null);
-		assert (model_manager is MidgardCR.SQLTableModelManager);
+		assert (model_manager is MidgardCR.SQLStorageModelManager);
 
 		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
                 assert (model != null);
@@ -156,6 +156,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		/* Add Schema model to StorageModelManager */
 		model_manager.add_model (model).add_model (storage_model);
 
+		/*
 		SQLProfiler profiler = (SQLProfiler) model_manager.storagemanager.profiler;
 		profiler.enable (true);
 		model_manager.execution_start.connect (() => {
@@ -163,7 +164,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		}); 
 		model_manager.execution_end.connect (() => {
 			profiler_callback_end(profiler);
-		}); 
+		}); */
 
 		/* SUCCESS */
 		try {
@@ -180,7 +181,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		}	
 	});
 
-	Test.add_func ("/SQLTableModelManager/execute_and_validate", () => {	
+	Test.add_func ("/SQLStorageModelManager/execute_and_validate", () => {	
 		MidgardCR.SQLStorageManager storage_manager = null;
 		var config = new MidgardCR.Config ();	
 		
@@ -211,7 +212,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 	
 		var model_manager = storage_manager.model_manager;
 		assert (model_manager != null);
-		assert (model_manager is MidgardCR.SQLTableModelManager);
+		assert (model_manager is MidgardCR.SQLStorageModelManager);
 
 		 /* Define Person class */
 		/* SUCCESS */
@@ -275,7 +276,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 			.add_model (asm_application)
 			.add_model (actor_model)
 			.add_model (activity_sm.create_model_property (TARGET, TARGET, "guid"))
-			.add_model (activity_sm.create_model_property (SUMMARY, SUMMARY, "string"));
+			.add_model (activity_sm.create_model_property (SUMMARY, SUMMARY, "text"));
 
 		/* Add Object and Storage models to StorageModelManager */
 		model_manager
@@ -331,7 +332,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 		var model_mngr = s_mngr.model_manager;
                 assert (model_mngr != null);
-                assert (model_mngr is MidgardCR.SQLTableModelManager);
+                assert (model_mngr is MidgardCR.SQLStorageModelManager);
 
 		/* SUCCESS */
 		int table_n = 3; /* Default table, person and activity */
@@ -443,7 +444,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		var a_summary_col = (SQLColumnModel) ds_activity_table.get_model_by_name (SUMMARY);
 		assert (a_summary_col != null);
 		assert (a_summary_col.location == SUMMARY);
-		assert (a_summary_col.valuetypename == "string");
+		assert (a_summary_col.valuetypename == "text");
 		var a_app_col = (SQLColumnModel) ds_activity_table.get_model_by_name (APPLICATION);
 		assert (a_app_col != null);
 		assert (a_app_col.location == APPLICATION);

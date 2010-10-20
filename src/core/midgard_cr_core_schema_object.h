@@ -1,4 +1,4 @@
-/* MidgardCore SchemaBuilder routines routines
+/* MidgardCore ObjectBuilder routines routines
  *    
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *        
@@ -23,7 +23,7 @@
 #include <glib-object.h>
 #include "midgard3.h"
 #include "midgard_local.h"
-#include "midgard_cr_core_schema_builder.h"
+#include "midgard_cr_core_object_builder.h"
 
 GType midgard_cr_core_schema_object_register_type (MgdSchemaTypeAttr *type_data, GType parent_type);
 

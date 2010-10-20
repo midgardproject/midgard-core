@@ -1,4 +1,4 @@
-/* MidgardCore SchemaBuilder routines routines
+/* MidgardCore ObjectBuilder routines routines
  *    
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *        
@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "midgard_cr_core_schema_builder.h"
+#include "midgard_cr_core_object_builder.h"
 #include "midgard_cr_core_timestamp.h"
 #include "midgard_cr_core_type.h"
 
@@ -220,7 +220,7 @@ midgard_core_schema_type_property_attr_free (MgdSchemaPropertyAttr *prop)
 }
 
 void 
-midgard_cr_core_schema_builder_register_types (MidgardCRSchemaBuilder *builder, GError **error)
+midgard_cr_core_object_builder_register_types (MidgardCRObjectBuilder *builder, GError **error)
 {
 	g_return_if_fail (builder != NULL);
 	g_return_if_fail (error == NULL || *error == NULL);

@@ -40,7 +40,7 @@ namespace MidgardCRCore {
 		public static void execute (MidgardCR.SQLStorageModelManager manager) throws MidgardCR.ExecutableError;
 	}
 
-	public class SchemaBuilder {
-		public static void register_types (MidgardCR.SchemaBuilder builder) throws GLib.Error;
+	public class ObjectBuilder {
+		public static void register_types (MidgardCR.ObjectBuilder builder) throws GLib.Error;
 	}
 }

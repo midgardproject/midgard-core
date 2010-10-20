@@ -18,11 +18,11 @@
 
 namespace MidgardCR {
 
-	public errordomain SchemaBuilderError {
+	public errordomain ObjectBuilderError {
 		NAME_EXISTS
 	}
 
-	public class SchemaBuilder : GLib.Object, Executable {
+	public class ObjectBuilder : GLib.Object, Executable {
 
 		/* private properties */
 		internal ObjectModel[] _models = null;
@@ -40,7 +40,7 @@ namespace MidgardCR {
 		}
 
 		/* public methods */
-		public void register_model (ObjectModel model) throws SchemaBuilderError, ValidationError { 
+		public void register_model (ObjectModel model) throws ObjectBuilderError, ValidationError { 
 			GLib.Type typeid = GLib.Type.from_name (model.name);
 			if (typeid > 0)
 				throw new ValidationError.NAME_DUPLICATED ("%s already registered in GType system", model.name);
@@ -57,9 +57,9 @@ namespace MidgardCR {
 			this._models += model;	
 		}
 
-		public void register_storage_models (StorageManager manager) throws SchemaBuilderError, ValidationError { }
+		public void register_storage_models (StorageManager manager) throws ObjectBuilderError, ValidationError { }
 
-		public Storable? factory (string classname) throws SchemaBuilderError, ValidationError { 
+		public Storable? factory (string classname) throws ObjectBuilderError, ValidationError { 
 			GLib.Type type_id = GLib.Type.from_name (classname);	
 			if (type_id == 0)
 				throw new ValidationError.NAME_INVALID ("%s is not registered class", classname);
@@ -75,7 +75,7 @@ namespace MidgardCR {
 		public ObjectModel? get_object_model (string classname) { return null; }
 		
 		public void execute () throws ExecutableError { 
-			MidgardCRCore.SchemaBuilder.register_types (this);
+			MidgardCRCore.ObjectBuilder.register_types (this);
 		}
 	}
 }
