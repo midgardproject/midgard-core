@@ -88,6 +88,11 @@ namespace MidgardCR {
 		public SQLProfiler ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLStorageContentManager : GLib.Object, MidgardCR.StorageContentManager {
+		public SQLStorageContentManager (MidgardCR.SQLStorageManager manager);
+		public MidgardCR.StorageManager storagemanager { get; construct; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageManager : GLib.Object, MidgardCR.StorageManager {
 		public SQLStorageManager (string name, MidgardCR.Config config) throws MidgardCR.StorageManagerError;
 		public MidgardCR.Config config { get; construct; }
@@ -96,6 +101,8 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
 		public SQLStorageModelManager ();
+		public unowned MidgardCR.ObjectModel? get_object_model_by_name (string name);
+		public unowned MidgardCR.SQLTableModel? get_table_model_by_name (string name);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLTableModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel {
@@ -252,12 +259,12 @@ namespace MidgardCR {
 	public interface StorageContentManager : GLib.Object {
 		public abstract bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool exists (MidgardCR.Storable object);
-		public abstract MidgardCR.QueryManager get_query_manager ();
+		public abstract unowned MidgardCR.QueryManager get_query_manager ();
+		public abstract unowned MidgardCR.StorageManager get_storage_manager ();
 		public abstract bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public abstract MidgardCR.StorageManager storagemanager { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageExecutor : MidgardCR.Executable {

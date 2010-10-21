@@ -24,6 +24,7 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_storage_manager_sql.vala \
 			  midgard_storage.vala \
 			  midgard_workspace.vala \
+			  sql_storage_content_manager.vala \
 			  sql_storage_model_manager.vala \
 			  sql_table_model.vala \
 			  sql_column_model.vala \

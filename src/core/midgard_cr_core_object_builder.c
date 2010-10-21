@@ -39,6 +39,8 @@ midgard_cr_core_schema_type_attr_new (void)
 	type->extends = NULL;
 	type->metadata_class_name = NULL;
 	type->user_values = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) midgard_cr_core_schema_type_attr_free);
+	type->prepared_sql_statement_insert = NULL;
+	type->prepared_sql_statement_insert_params = NULL;
 
 	return type;
 }
@@ -82,6 +84,14 @@ midgard_cr_core_schema_type_attr_free (MgdSchemaTypeAttr *type)
 
 	g_hash_table_destroy (type->user_values);
         type->user_values = NULL;
+	
+	if (type->prepared_sql_statement_insert != NULL)
+		g_object_unref (type->prepared_sql_statement_insert);
+	type->prepared_sql_statement_insert = NULL;
+
+	if (type->prepared_sql_statement_insert_params != NULL)
+		g_object_unref (type->prepared_sql_statement_insert_params);
+	type->prepared_sql_statement_insert_params = NULL;
 
 	g_free (type);
 

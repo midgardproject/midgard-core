@@ -40,6 +40,10 @@ namespace MidgardCRCore {
 		public static void execute (MidgardCR.SQLStorageModelManager manager) throws MidgardCR.ExecutableError;
 	}
 
+	public class SQLStorageContentManager {
+		public static void storable_insert (MidgardCR.Storable storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
+	}
+
 	public class ObjectBuilder {
 		public static void register_types (MidgardCR.ObjectBuilder builder) throws GLib.Error;
 	}

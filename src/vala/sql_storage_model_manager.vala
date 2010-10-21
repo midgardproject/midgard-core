@@ -277,5 +277,38 @@ namespace MidgardCR {
 		public unowned ObjectModel[]? list_object_models () {
 			return this._object_models;
 		}
+
+		/**
+		 * Get SQLTableModel by name
+		 *
+		 * @param name, name of the model to find
+		 * @return {@link SQLTableModel} if found or null
+		 */
+		public unowned SQLTableModel? get_table_model_by_name (string name) {
+			if (this._storage_models == null)
+				return null;
+			foreach (StorageModel model in this._storage_models) {
+				if (model.name == name)
+					return (SQLTableModel)model;
+			}
+			return null;
+		}
+
+		/**
+		 * Get ObjectModel by name
+		 *
+		 * @param name, name of the model to find
+		 * @return {@link ObjectModel} if found or null
+		 */
+		public unowned ObjectModel? get_object_model_by_name (string name) {
+			if (this._storage_models == null)
+				return null;
+			foreach (unowned ObjectModel model in this._object_models) {
+				if (model.name == name)
+					return model;
+			}
+			return null;
+		}		
+
 	}
 }
