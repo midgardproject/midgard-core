@@ -1,7 +1,4 @@
-/* MidgardCore Config routines
- *    
- * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
- *        
+/* 
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 2 of the License, or
@@ -15,10 +12,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * 
+ * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  */
 
-#include <glib-object.h>
-#include "midgard3.h"
+using GLib;
 
-gboolean
-midgard_core_config_read_file (MidgardConfig *config, const gchar *name, gboolean user, GError **error);
+namespace MidgardCR {
+
+	public errordomain NamespaceManagerError {
+		URI_INVALID,
+		URI_EXISTS,
+		ALIAS_INVALID,
+		ALIAS_EXISTS
+	}
+
+	public interface NamespaceManager : GLib.Object {
+
+		/* methods */
+		public abstract bool create_uri (string uri, string name) throws NamespaceManagerError;
+		public abstract string[]? list_names ();
+		public abstract string get_uri_by_name (string name);
+		public abstract string get_name_by_uri (string uri);
+		public abstract bool name_exists ();
+		public abstract bool uri_exists ();
+	}
+}

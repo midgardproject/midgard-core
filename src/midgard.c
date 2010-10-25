@@ -25,21 +25,18 @@
 #define G_LOG_DOMAIN "midgard-core"
 #endif
 
-#include "midgard_object.h"
-#include "midgard_user.h"
-#include "midgard_blob.h"
-#include "midgard_collector.h"
-#include "midgard_view.h"
-#include "midgard_timestamp.h"
-#include "midgard_metadata.h"
-#include "midgard_workspace.h"
+#define GETTEXT_PACKAGE "MidgardCR"
+#include <glib/gi18n-lib.h>
+
+#include "midgard_cr_core_timestamp.h"
+#include "midgard_cr_core.h"
 
 #include <libgda/libgda.h>
 
 const char *
 midgard_version()
 {
-	return MIDGARD_LIB_VERSION;
+	return MIDGARD_CORE_LIB_VERSION;
 }
 
 /* A helper funtion which is registered as string to float 
@@ -127,52 +124,9 @@ midgard_init()
 	/* g_type_init_with_debug_flags(G_TYPE_DEBUG_OBJECTS | G_TYPE_DEBUG_NONE); */
 	gda_init ();
 
-	type = MIDGARD_TYPE_BLOB;
+	/*type = MIDGARD_TYPE_USER;
 	g_assert (type != 0);
-	g_type_class_ref (type);
-
-	type = MIDGARD_TYPE_USER;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-
-	type = MIDGARD_TYPE_CONNECTION;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-
-	type = MIDGARD_TYPE_CONFIG;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-
-	type = MIDGARD_TYPE_COLLECTOR;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-
-	type = MIDGARD_TYPE_QUERY_BUILDER;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-	
-	type = MIDGARD_TYPE_DBOBJECT;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-
-	type = MIDGARD_TYPE_OBJECT;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-
-	type = MIDGARD_TYPE_VIEW;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-
-	type = MIDGARD_TYPE_METADATA;
-	g_assert (type != 0);
-	g_type_class_ref (type);
-	/* Initialize MidgardMetadataClass */
-	MidgardMetadata *m = g_object_new (MIDGARD_TYPE_METADATA, NULL);
-	g_object_unref (m);
-
-	type = MIDGARD_TYPE_WORKSPACE;
-	g_assert (type != 0);
-	g_type_class_ref (type);
+	g_type_class_ref (type);*/
 
 	/* Register transform function explicitly, we need own routine */
 	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_FLOAT, __transform_string_to_float);
@@ -184,47 +138,7 @@ midgard_close(void)
 {
 	GObjectClass *klass;	
 	
-	klass = g_type_class_peek (MIDGARD_TYPE_BLOB);
+	/* klass = g_type_class_peek (MIDGARD_TYPE_USER);
 	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_USER);
-	if (klass)
-		g_type_class_unref (klass);
-	
-	klass = g_type_class_peek (MIDGARD_TYPE_CONNECTION);
-	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_CONFIG);
-	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_COLLECTOR);
-	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_QUERY_BUILDER);
-	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
-	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_OBJECT);
-	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_VIEW);
-	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_METADATA);
-	if (klass)
-		g_type_class_unref (klass);
-
-	klass = g_type_class_peek (MIDGARD_TYPE_WORKSPACE);
-	if (klass)
-		g_type_class_unref (klass);
+		g_type_class_unref (klass); */
 }

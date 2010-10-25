@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2005 Jukka Zitting <jz@yukatan.fi>
- * Copyright (C) 2008, 2009 Piotr Pokora <piotrek.pokora@gmail.com>
+ * Copyright (C) 2008, 2009, 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -39,6 +39,7 @@ typedef struct {
 } MidgardTimestamp;
 
 #define MIDGARD_TYPE_TIMESTAMP (midgard_timestamp_get_type())
+#define MGD_TYPE_TIMESTAMP MIDGARD_TYPE_TIMESTAMP
 
 GType midgard_timestamp_get_type(void);
 

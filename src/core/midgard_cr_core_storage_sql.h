@@ -20,6 +20,16 @@
 #define MIDGARD_CORE_STORAGE_SQL_H
 
 #include <libgda/libgda.h>
+#include "midgard3.h"
+
+#define TABLE_NAME_MAPPER "midgard_mapper_type"
+#define TABLE_NAME_MAPPER_PROPERTIES "midgard_mapper_columns"
+#define TABLE_MAPPER_COLUMNS "class_name, table_name, description"
+#define TABLE_MAPPER_PROPERTIES_COLUMNS "property_name, column_name, table_name, gtype_name, column_type, is_primary, has_index, is_unique, is_auto_increment, description, is_reference, reference_table_name, reference_column_name, property_of"
+#define TABLE_NAME_SCHEMA "midgard_schema_type"
+#define TABLE_NAME_SCHEMA_PROPERTIES "midgard_schema_type_properties"
+#define TABLE_SCHEMA_COLUMNS "class_name, extends"
+#define TABLE_SCHEMA_PROPERTIES_COLUMNS "class_name, property_name, gtype_name, default_value_string, property_nick, description, is_reference, reference_class_name, reference_property_name, namespace"
 
 typedef struct _MgdCoreStorageSQLColumn MgdCoreStorageSQLColumn;
 
@@ -37,12 +47,12 @@ struct _MgdCoreStorageSQLColumn {
 	const gchar *dvalue;
 };
 
-void midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *fieldname, GType fieldtype);
+void midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *fieldname, GType fieldtype, const gchar *coltypename);
 void midgard_core_storage_sql_column_reset (MgdCoreStorageSQLColumn *mdc);
 
-gint midgard_core_storage_sql_query_execute (GdaConnection *cnc, const gchar *query, gboolean ignore_error, GError **error);
+gint midgard_core_storage_sql_query_execute (GdaConnection *cnc, GdaSqlParser *parser, const gchar *query, GError **error);
 
-GdaDataModel *midgard_core_storage_sql_get_model (GdaConnection *cnc, const gchar *query);
+GdaDataModel *midgard_core_storage_sql_get_model (GdaConnection *cnc, GdaSqlParser *parser, const gchar *query, GError **error);
 
 gboolean midgard_core_storage_sql_table_exists (GdaConnection *cnc, const gchar *tablename);
 gboolean midgard_core_storage_sql_table_remove (GdaConnection *cnc, const gchar *tablename, GError **error);
@@ -57,5 +67,16 @@ gboolean midgard_core_storage_sql_index_create (GdaConnection *cnc, MgdCoreStora
 gboolean midgard_core_storage_sql_index_remove (GdaConnection *cnc, MgdCoreStorageSQLColumn *mdc, GError **error);
 
 gboolean midgard_core_storage_sql_create_base_tables (GdaConnection *cnc, GError **error);
+
+/* INSERT */
+gchar *midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_insert (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
+
+/* UPDATE */
+gchar *midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
+
+/* DELETE */
 
 #endif /* MIDGARD_CORE_STORAGE_SQL_H */

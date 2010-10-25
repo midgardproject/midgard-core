@@ -24,9 +24,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "midgard_defs.h"
-#include "midgard3.h"
-#include "midgard_workspace.h"
-#include "midgard_workspace_storage.h"
+#include "midgard_config.h"
 
 /* convention macros */
 #define MIDGARD_TYPE_CONNECTION (midgard_connection_get_type())
@@ -94,7 +92,5 @@ gboolean 		midgard_connection_is_enabled_quota		(MidgardConnection *self);
 gboolean 		midgard_connection_is_enabled_replication	(MidgardConnection *self);
 gboolean 		midgard_connection_is_enabled_dbus		(MidgardConnection *self);
 void			midgard_connection_close			(MidgardConnection *self);
-gboolean 		midgard_connection_set_workspace		(MidgardConnection *self, MidgardWorkspaceStorage *workspace);
-const MidgardWorkspaceStorage	*midgard_connection_get_workspace	(MidgardConnection *self);
 
 #endif /* MIDGARD_CONNNECTION_H */

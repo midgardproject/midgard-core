@@ -96,7 +96,7 @@ midgard_core_connection_initialize_auth_types (MidgardConnection *mgd)
 
 	MidgardConfig *config = mgd->priv->config;
 	g_return_if_fail (config != NULL);
-	gchar *authfile = g_build_path (G_DIR_SEPARATOR_S, midgard_config_get_sharedir (config), MGD_CORE_AUTH_FILE, NULL);
+	gchar *authfile = g_build_path (G_DIR_SEPARATOR_S, config->sharedir, MGD_CORE_AUTH_FILE, NULL);
 
 	if (!g_file_test ((const gchar *)authfile, G_FILE_TEST_IS_REGULAR))
 		g_error("%s authentication types file not found", authfile);

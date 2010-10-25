@@ -1552,8 +1552,8 @@ gboolean midgard_schema_read_dir(
 	gchar *fpfname = NULL ;
 	GDir *dir;
 	gint visible = 0;
-	gchar *lschema_dir = midgard_core_config_build_schemadir_path(dirname);
-	gchar *lview_dir = midgard_core_config_build_viewdir_path(dirname);
+	gchar *lschema_dir = ""; 
+	gchar *lview_dir = "";
 
 	if (!lschema_dir)
 		return FALSE;

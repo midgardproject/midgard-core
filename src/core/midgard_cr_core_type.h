@@ -1,7 +1,5 @@
 /* 
- * Midgard core, API headers.
- *
- * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
+ * Copyright (C) 2005, 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -18,13 +16,24 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MIDGARD_API_H_
-#define _MIDGARD_API_H_
+#ifndef MIDGARD_CR_CORE_TYPE_H
+#define MIDGARD_CR_CORE_TYPE_H
+
+#include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
+#include <assert.h>
+#include <ctype.h>
 
 #include <glib.h>
 #include <glib-object.h>
 
-#include <midgard3.h>
+/* Longtext */
+#define MIDGARD_CR_CORE_TYPE_LONGTEXT (midgard_cr_core_longtext_get_type())
+GType midgard_cr_core_longtext_get_type (void);
 
-#endif /* _MIDGARD_API_H_ */
+/* Guid */
+#define MIDGARD_CR_CORE_TYPE_GUID (midgard_cr_core_guid_get_type())
+GType midgard_cr_core_guid_get_type (void);
 
+#endif /* MIDGARD_CR_CORE_TYPE_H */

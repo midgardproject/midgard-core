@@ -1,2 +1,2 @@
 
-SUBDIRS = core vala
+SUBDIRS = vala core
