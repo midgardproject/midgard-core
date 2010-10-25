@@ -721,8 +721,10 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 		rv = FALSE;
 	}
 
-	g_hash_table_destroy(hash);
-	
+	if (hash) {
+		g_hash_table_destroy(hash);
+	}
+
 	return rv;
 }
 
