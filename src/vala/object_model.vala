@@ -81,8 +81,9 @@ namespace MidgardCR {
 		 * @return {@link Model} instance (self reference)
 		 */	
 		public Model add_model (Model model) { 
-			this._models += model;			
-			model.parent = this;
+			this._models += model;
+			if (model is ObjectModelProperty)
+				model.parent = this;
 			return this; 
 		}
 

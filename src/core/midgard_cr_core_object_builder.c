@@ -295,6 +295,17 @@ midgard_cr_core_object_builder_register_types (MidgardCRObjectBuilder *builder, 
 				type_attr->params[j] = g_param_spec_boolean (
 						property, nick, descr,
 						FALSE, G_PARAM_READWRITE);
+			} else if (ptype == G_TYPE_OBJECT) {
+				/* Determine referenced object classname*/
+				guint k;
+				guint n_o_models;
+				MidgardCRModel **o_models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (property_models[j]), &n_o_models);
+				if (!o_models)
+					g_error ("No model with ReferenceObject associated with '%s' property of Object type", property);
+				GType o_type = g_type_from_name (midgard_cr_model_get_name (MIDGARD_CR_MODEL (o_models[0])));
+				type_attr->params[j] = g_param_spec_object (
+						property, nick, descr,
+						o_type, G_PARAM_READWRITE);
 			} else {
 				type_attr->params[j] = g_param_spec_string (
 					property, nick, descr,

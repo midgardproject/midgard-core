@@ -22,6 +22,21 @@
 #include <sql-parser/gda-sql-parser.h>
 #include "src/core/midgard_cr_core_storage_sql.h"
 
+
+#define __ADD_COLS_AND_VALUES(__model, __pspec) \
+	const gchar *col_name = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (__model)); \
+		if (add_coma) { \
+			g_string_append (colnames, ", "); \
+			g_string_append (values, ", "); \
+		} \
+	       	g_string_append (colnames, col_name); \
+		const gchar *type_name = g_type_name (__pspec->value_type); \
+		if (__pspec->value_type == MIDGARD_CR_TYPE_TIMESTAMP) \
+			type_name = "string"; \
+		g_string_append_printf (values, "##%s::%s", col_name, type_name); \
+		add_coma = TRUE;
+
+
 static void
 __initialize_statement_insert (MidgardCRRepositoryObjectClass *klass, MgdSchemaTypeAttr *type_attr, MidgardCRSQLTableModel *table_model, GError **error)
 {
@@ -41,7 +56,7 @@ __initialize_statement_insert (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 	const gchar *property_name;
 	
 	for (i = 0; i < n_props; i++) {
-		property_name = pspecs[i]->name;
+		property_name = pspecs[i]->name;	
 		MidgardCRSQLColumnModel *col_model = 
 			MIDGARD_CR_SQL_COLUMN_MODEL (midgard_cr_model_get_model_by_name (MIDGARD_CR_MODEL (table_model), property_name));
 
@@ -49,18 +64,29 @@ __initialize_statement_insert (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 		if (pk && g_str_equal (property_name, pk) 
 				|| col_model == NULL)
 			continue;
-       
-		const gchar *col_name = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (col_model));
-		if (add_coma) {
-			g_string_append (colnames, ", ");
-			g_string_append (values, ", ");
+
+		/* Handle referenced object case */
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT) {
+			guint n_sub_models;
+			guint k;
+			/* Get class pointer, initialize it, it's been not referenced before */
+			GObjectClass *pklass = g_type_class_peek (pspecs[i]->value_type);
+			if (pklass == NULL)
+				pklass = g_type_class_ref (pspecs[i]->value_type);
+			/* Get all models associated with property and add those to statement */
+			MidgardCRModel **sub_models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (col_model), &n_sub_models);
+			if (sub_models && (pklass != NULL)) {
+				for (k = 0; k < n_sub_models; k++) {
+					GParamSpec *pspec = 
+						g_object_class_find_property (pklass, midgard_cr_model_get_name (MIDGARD_CR_MODEL (sub_models[k])));
+					__ADD_COLS_AND_VALUES (sub_models[k], pspec);
+				}
+				continue;
+			}
+			g_warning ("Invalid property %s of object type without proper model", property_name);
 		}
-	       	g_string_append (colnames, col_name);
-		const gchar *type_name = g_type_name (pspecs[i]->value_type);
-		if (pspecs[i]->value_type == MIDGARD_CR_TYPE_TIMESTAMP)
-			type_name = "string";
-		g_string_append_printf (values, "##%s::%s", col_name, type_name);
-		add_coma = TRUE;
+      
+	       	__ADD_COLS_AND_VALUES (col_model, pspecs[i]);	
 	}
 
 	/* FIXME, add metadata and references objects statement */
@@ -70,6 +96,7 @@ __initialize_statement_insert (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 	GdaSqlParser *parser = gda_sql_parser_new ();
 	GdaStatement *stmt;
 	GError *err = NULL;
+	g_print ("SQL: %s \n", sql->str);
 	stmt = gda_sql_parser_parse_string (parser, sql->str, NULL, &err);
 	g_string_free (sql, TRUE);
 	g_string_free (colnames, TRUE);
@@ -93,16 +120,55 @@ __initialize_statement_insert (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 }
 
 void 
-__set_parameter_value (MidgardCRRepositoryObjectClass *klass, MidgardCRStorable *object, GdaHolder *holder)
+__set_query_insert_parameters (MidgardCRStorageModel *table_model, MidgardCRRepositoryObjectClass *klass, MidgardCRStorable *object, GdaSet *set)
 {
-	const gchar *pname = gda_holder_get_id (holder);
-	GParamSpec *pspec = g_object_class_find_property (G_OBJECT_CLASS (klass), pname);
-	GValue val = {0, };
-	g_value_init (&val, pspec->value_type);
-	g_object_get_property (G_OBJECT (object), pname, &val);
-	gda_holder_set_value (holder, (const GValue*) &val, NULL);
-	g_value_unset (&val);
-}	
+	guint n_models;
+	guint i;
+	MidgardCRModel **models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (table_model), &n_models);
+	if (!models)
+		return;
+
+	const gchar *property_name;
+	for (i = 0; i < n_models; i++) {
+		guint n_sub_models;
+		guint j;
+		property_name = midgard_cr_model_get_name (MIDGARD_CR_MODEL (models[i]));
+		GParamSpec *pspec = g_object_class_find_property (G_OBJECT_CLASS (klass), property_name);
+		MidgardCRModel **sub_models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (models[i]), &n_sub_models);
+		if (sub_models) {
+			/* FIXME, handle error case */
+			GObjectClass *pklass = g_type_class_peek (pspec->value_type);
+			GObject *pobject = NULL;
+			g_object_get (G_OBJECT (object), property_name, &pobject, NULL);
+			__set_query_insert_parameters (MIDGARD_CR_STORAGE_MODEL (models[i]), 
+					MIDGARD_CR_REPOSITORY_OBJECT_CLASS (pklass), MIDGARD_CR_STORABLE (pobject) , set);
+		} else {
+			const gchar *property_name = midgard_cr_model_get_name (MIDGARD_CR_MODEL (models[i]));
+			const gchar *column_name = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (models[i]));	
+			GValue val = {0, };
+			g_value_init (&val, pspec->value_type);
+			if (object) { 
+				g_object_get_property (G_OBJECT (object), property_name, &val);
+			} else {
+				/*FIXME, get default values from model */
+				if (pspec->value_type == G_TYPE_STRING)
+					g_value_set_string (&val, "");
+				if (pspec->value_type == G_TYPE_INT)
+					g_value_set_int (&val, 1);
+			}
+
+			GdaHolder *holder = gda_set_get_holder (set, column_name);
+			GError *err = NULL;
+			gda_holder_set_value (holder, (const GValue*) &val, &err);
+			if (err) {
+				g_warning ("Failed to set %s parameter value. %s", column_name, err->message ? err->message : "Unknown reason");
+				g_clear_error (&err);
+			}
+
+			g_value_unset (&val);
+		}
+	}
+}
 
 void 
 midgard_cr_core_sql_storage_content_manager_storable_insert (
@@ -166,25 +232,22 @@ midgard_cr_core_sql_storage_content_manager_storable_insert (
 		}
 	}
 	/* Set statement parameters */
-	GSList *list;
 	GdaSet *set = type_attr->prepared_sql_statement_insert_params;
-	for (list = set->holders; list != NULL; list = list->next) {
-		GdaHolder *holder = (GdaHolder *) list->data;
-		g_print ("HAVE %s \n", gda_holder_get_id (holder));
-		__set_parameter_value (rklass, storable, holder);
-	}
+	__set_query_insert_parameters (MIDGARD_CR_STORAGE_MODEL (table_model), rklass, storable, set);
 
 	/* Execute INSERT query */
 	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
 	GdaStatement *stmt = type_attr->prepared_sql_statement_insert;
-        gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, set, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+        gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, set, GDA_STATEMENT_SQL_PRETTY, NULL, &err);
+	if (err) g_warning ("%s", err->message);
+	g_clear_error (&err);
 	g_debug ("Object create: %s", debug_sql);
 	g_free (debug_sql);
 
 	gint inserted = gda_connection_statement_execute_non_select (cnc, stmt, set, NULL, &err);
 	if (inserted == -1) {
 		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
-				"Failed to initialize prepared SQL statement INSERT for given %s class. %s ", 
+				"Failed to execute SQL statement INSERT for given '%s' object. %s ", 
 				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
 		g_clear_error (&err);
 	}	

@@ -2,6 +2,7 @@
  In this example:
  - Create configuration and open connection to database.
  - Register all classes for which, information in database exists.
+ - Create new 'Activity' instance
  - Create database record for an object
 */
 

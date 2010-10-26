@@ -335,6 +335,17 @@ typedef struct _MidgardCRStorageObject MidgardCRStorageObject;
 typedef struct _MidgardCRStorageObjectClass MidgardCRStorageObjectClass;
 typedef struct _MidgardCRStorageObjectPrivate MidgardCRStorageObjectPrivate;
 
+#define MIDGARD_CR_TYPE_REFERENCE_OBJECT (midgard_cr_reference_object_get_type ())
+#define MIDGARD_CR_REFERENCE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_REFERENCE_OBJECT, MidgardCRReferenceObject))
+#define MIDGARD_CR_REFERENCE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_REFERENCE_OBJECT, MidgardCRReferenceObjectClass))
+#define MIDGARD_CR_IS_REFERENCE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_REFERENCE_OBJECT))
+#define MIDGARD_CR_IS_REFERENCE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_REFERENCE_OBJECT))
+#define MIDGARD_CR_REFERENCE_OBJECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_REFERENCE_OBJECT, MidgardCRReferenceObjectClass))
+
+typedef struct _MidgardCRReferenceObject MidgardCRReferenceObject;
+typedef struct _MidgardCRReferenceObjectClass MidgardCRReferenceObjectClass;
+typedef struct _MidgardCRReferenceObjectPrivate MidgardCRReferenceObjectPrivate;
+
 #define MIDGARD_CR_TYPE_SQL_STORAGE_MANAGER (midgard_cr_sql_storage_manager_get_type ())
 #define MIDGARD_CR_SQL_STORAGE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MANAGER, MidgardCRSQLStorageManager))
 #define MIDGARD_CR_SQL_STORAGE_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_MANAGER, MidgardCRSQLStorageManagerClass))
@@ -817,6 +828,15 @@ struct _MidgardCRStorageObjectClass {
 	GObjectClass parent_class;
 };
 
+struct _MidgardCRReferenceObject {
+	GObject parent_instance;
+	MidgardCRReferenceObjectPrivate * priv;
+};
+
+struct _MidgardCRReferenceObjectClass {
+	GObjectClass parent_class;
+};
+
 struct _MidgardCRSQLStorageManager {
 	GObject parent_instance;
 	MidgardCRSQLStorageManagerPrivate * priv;
@@ -1152,6 +1172,14 @@ guint midgard_cr_repository_object_get_id (MidgardCRRepositoryObject* self);
 MidgardCRMetadata* midgard_cr_repository_object_get_metadata (MidgardCRRepositoryObject* self);
 GType midgard_cr_storage_object_get_type (void) G_GNUC_CONST;
 MidgardCRStorageObject* midgard_cr_storage_object_construct (GType object_type);
+GType midgard_cr_reference_object_get_type (void) G_GNUC_CONST;
+MidgardCRReferenceObject* midgard_cr_reference_object_new (void);
+MidgardCRReferenceObject* midgard_cr_reference_object_construct (GType object_type);
+const char* midgard_cr_reference_object_get_classname (MidgardCRReferenceObject* self);
+const char* midgard_cr_reference_object_get_guid (MidgardCRReferenceObject* self);
+void midgard_cr_reference_object_set_guid (MidgardCRReferenceObject* self, const char* value);
+gint midgard_cr_reference_object_get_id (MidgardCRReferenceObject* self);
+void midgard_cr_reference_object_set_id (MidgardCRReferenceObject* self, gint value);
 GType midgard_cr_sql_storage_manager_get_type (void) G_GNUC_CONST;
 MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_new (const char* name, MidgardCRConfig* config, GError** error);
 MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_construct (GType object_type, const char* name, MidgardCRConfig* config, GError** error);

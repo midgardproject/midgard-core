@@ -67,6 +67,13 @@ namespace MidgardCR {
 		public QueryValue ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public class ReferenceObject : GLib.Object {
+		public ReferenceObject ();
+		public string classname { get; construct; }
+		public string guid { get; set; }
+		public int id { get; set; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public abstract class RepositoryObject : GLib.Object, MidgardCR.Storable {
 		public RepositoryObject ();
 		public abstract GLib.Value get_property_value (string name);

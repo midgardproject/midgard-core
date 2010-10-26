@@ -28,6 +28,9 @@ namespace MidgardCR {
 		internal Model[] _models = null;
 		internal string[] _queries = null;
 
+		/* private properties */
+		private Model[]? _tmp_models = null;
+
 		/* Model properties */
 		/**
 		 * SQLStorageModelManager doesn't hold parent model.
@@ -109,6 +112,26 @@ namespace MidgardCR {
 			return null;
 		}
 
+		private void _find_object_references_rec (Model model) {
+			Model[]? property_models = model.list_models ();
+			foreach (unowned Model p_model in property_models) {
+				this._find_object_references_rec (p_model);
+				if (p_model is ObjectModel) {
+					if (this._find_model_by_name (this._models, p_model.name) == null)
+						this._tmp_models += (Model)p_model;
+				}
+			}
+		}
+
+		private void _find_references () {
+			foreach (Model model in this._models) {
+				if (model is ObjectModel)
+					this._find_object_references_rec (model);
+				this._tmp_models += model;
+			}
+			this._models = this._tmp_models;
+		}
+
 		/**
 		 * Perform all checks required to mark instance as valid.
 		 */
@@ -132,6 +155,7 @@ namespace MidgardCR {
 		 */
 		public void prepare_create () throws ValidationError {
 			this.is_valid ();
+			this._find_references ();
 
 			/* Validate models */
 			foreach (Model model in this._models) {
@@ -152,6 +176,10 @@ namespace MidgardCR {
 					this._queries += query;	
 					Model[] property_models = model.list_models();
 					foreach (Model property_model in property_models) {
+						/* Ignore reference object */
+						if (property_model is ObjectModel)
+							continue;
+						/* prepare insert query for every property */
 						query = MidgardCRCore.StorageSQL.create_query_insert (
 							property_model, 
 							this._storage_manager._object_model_property_object_model, 

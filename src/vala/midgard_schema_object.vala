@@ -68,4 +68,12 @@ namespace MidgardCR {
 	public abstract class StorageObject : GLib.Object, Storable {
 
 	}
+
+	public class ReferenceObject : GLib.Object {
+
+		/* properties */
+		public string classname { get; construct;}
+		public string guid { get; set; }
+		public int id { get; set; }
+	}
 }
