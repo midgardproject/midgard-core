@@ -143,8 +143,12 @@ __set_query_insert_parameters (MidgardCRStorageModel *table_model, MidgardCRRepo
 			__set_query_insert_parameters (MIDGARD_CR_STORAGE_MODEL (models[i]), 
 					MIDGARD_CR_REPOSITORY_OBJECT_CLASS (pklass), MIDGARD_CR_STORABLE (pobject) , set);
 		} else {
+			/* If this is primary key, exclude it from query */
+			if (midgard_cr_storage_model_property_get_primary (MIDGARD_CR_STORAGE_MODEL_PROPERTY (models[i])))
+				continue;	
+
 			const gchar *property_name = midgard_cr_model_get_name (MIDGARD_CR_MODEL (models[i]));
-			const gchar *column_name = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (models[i]));	
+			const gchar *column_name = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (models[i]));
 			GValue val = {0, };
 			g_value_init (&val, pspec->value_type);
 			if (object) { 
@@ -162,6 +166,10 @@ __set_query_insert_parameters (MidgardCRStorageModel *table_model, MidgardCRRepo
 				g_value_set_string (&val, "");
 			
 			GdaHolder *holder = gda_set_get_holder (set, column_name);
+			if (!holder) {
+				g_critical ("Can not find value holder for %s parameter", column_name);
+				continue;
+			}
 			GError *err = NULL;
 			gda_holder_set_value (holder, (const GValue*) &val, &err);
 			if (err) {

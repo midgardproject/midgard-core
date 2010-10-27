@@ -126,6 +126,7 @@ __core_schema_object_constructor (GType type, guint n_construct_properties, GObj
 			priv->properties[idx] = g_new0 (MgdSchemaPropertyAttr, 1);
 		}
 	}
+	MIDGARD_CR_REPOSITORY_OBJECT (object)->_guid = midgard_cr_core_guid_new ();
 	return object;
 }
 

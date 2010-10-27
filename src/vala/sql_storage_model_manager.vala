@@ -155,8 +155,7 @@ namespace MidgardCR {
 			if (rosmodel == null)
 				return;
 			foreach (Model pmodel in rosmodel.list_models ()) {
-				if (pmodel is SQLColumnModel)
-					GLib.print ("Adding %s to %s \n", pmodel.name, model.name);
+				if (pmodel is SQLColumnModel)	
 					model.add_model (pmodel.copy ());
 			}
 		}
