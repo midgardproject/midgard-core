@@ -154,9 +154,13 @@ __set_query_insert_parameters (MidgardCRStorageModel *table_model, MidgardCRRepo
 				if (pspec->value_type == G_TYPE_STRING)
 					g_value_set_string (&val, "");
 				if (pspec->value_type == G_TYPE_INT)
-					g_value_set_int (&val, 1);
+					g_value_set_int (&val, 0);
 			}
 
+			/* FIXME, get default value */
+			if (G_VALUE_HOLDS_STRING (&val) && (g_value_get_string (&val) == NULL))
+				g_value_set_string (&val, "");
+			
 			GdaHolder *holder = gda_set_get_holder (set, column_name);
 			GError *err = NULL;
 			gda_holder_set_value (holder, (const GValue*) &val, &err);
@@ -238,6 +242,7 @@ midgard_cr_core_sql_storage_content_manager_storable_insert (
 	/* Execute INSERT query */
 	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
 	GdaStatement *stmt = type_attr->prepared_sql_statement_insert;
+
         gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, set, GDA_STATEMENT_SQL_PRETTY, NULL, &err);
 	if (err) g_warning ("%s", err->message);
 	g_clear_error (&err);
