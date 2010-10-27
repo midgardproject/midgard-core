@@ -146,6 +146,21 @@ namespace MidgardCR {
 			return false;
 		}
 
+		private void _add_parent_model_properties (StorageModel model) {
+			if (model.parent != null)
+				return; /* TODO, add parent class storage models */
+	
+			/* There's no parent model defined so fallback to RepositoryObject storage model */
+			StorageModel rosmodel = this._storage_manager._storage_model_repository_object;
+			if (rosmodel == null)
+				return;
+			foreach (Model pmodel in rosmodel.list_models ()) {
+				if (pmodel is SQLColumnModel)
+					GLib.print ("Adding %s to %s \n", pmodel.name, model.name);
+					model.add_model (pmodel.copy ());
+			}
+		}
+
 		/**
 		 * Prepares create operation for all associated models.
 		 * Valid SQL query (or prepared statement) is generated 
@@ -161,12 +176,13 @@ namespace MidgardCR {
 			foreach (Model model in this._models) {
 				unowned Model model_found = this._find_model_by_name ((Model[])this._object_models, model.name);
 				if (model_found != null)
-					throw new MidgardCR.ValidationError.NAME_DUPLICATED ("%s class already exists in schema table", model.name); 
+					throw new MidgardCR.ValidationError.NAME_DUPLICATED ("%s class already exists in ObjectModel table", model.name);
 			}
 
 			/* Prepare create for every StorageExecutor derived */
 			foreach (Model model in this._models) {
 				if (model is StorageExecutor) {	
+					this._add_parent_model_properties ((StorageModel) model); 			 	
 					((StorageExecutor)model).prepare_create ();
 				} else if (model is ObjectModel) {
 					string query = MidgardCRCore.StorageSQL.create_query_insert (
@@ -253,8 +269,10 @@ namespace MidgardCR {
 		public void execute () throws ExecutableError {		
 			/* Execute command for every StorageExecutor derived object */
 			foreach (Model model in this._models) {
-				if (model is StorageExecutor) 
+				if (model is StorageExecutor) { 
+					GLib.print ("EXECUTE MODEL %s \n", model.name);
 					((StorageExecutor)model).execute ();
+				}
 			}
 			/* Store info about classes and properties */
                         foreach (weak string query in this._queries) {
@@ -338,5 +356,12 @@ namespace MidgardCR {
 			return null;
 		}		
 
+		/**
+		 * SQLStorageModelManager can not be copied.
+		 * @returns null
+		 */
+		public Model? copy () {
+			return null;
+		}
 	}
 }

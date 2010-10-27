@@ -260,6 +260,24 @@ namespace MidgardCR {
 			this._queries = null;
 			/* emit 'execution_end' signal */
 			execution_end ();
-		}		
+		}	
+
+		/**
+		 * {@inheritDoc}
+		 * Associated or parent models are not copied to model's copy.
+		 * Created copy is initialized for the same {@link StorageManager}.
+		 *
+		 * Properties copied:
+		 *  * name
+		 *  * location
+		 *  * namespace
+		 *
+		 * @return new SQLTableModel
+		 */
+		public Model? copy () {
+			var copy = new SQLTableModel ((SQLStorageManager) this.get_storagemanager (), this.name, this.location);
+			copy.namespace = this.namespace;
+			return (Model) copy;
+		}	
 	}
 }

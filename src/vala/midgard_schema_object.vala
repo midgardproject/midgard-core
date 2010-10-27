@@ -46,13 +46,17 @@ namespace MidgardCR {
 
 	public abstract class RepositoryObject : GLib.Object, Storable {
 
+		/* internal properties */
+		internal string _guid = null;
+		internal int _id = 0;
+
 		/* properties */
 		public string guid { 
-			get { return ""; }
+			get { return this._guid; }
 		}
 
 		public uint id { 
-			get { return 0; }
+			get { return this._id; }
 		}
 
 		public Metadata metadata { 

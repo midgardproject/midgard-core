@@ -155,6 +155,7 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface Model : GLib.Object {
 		public abstract MidgardCR.Model add_model (MidgardCR.Model model);
+		public abstract MidgardCR.Model? copy ();
 		public abstract unowned MidgardCR.Model? get_model_by_name (string name);
 		public abstract void is_valid () throws MidgardCR.ValidationError;
 		public abstract unowned MidgardCR.Model[]? list_models ();

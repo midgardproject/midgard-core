@@ -2,8 +2,8 @@
  In this example:
  - Create configuration and open connection to database.
  - Register all classes for which, information in database exists.
- - Create new 'Activity' instance
- - Create database record for an object
+ - Create new 'Activity' and 'Person' instances
+ - Create database record for both objects
 */
 
 using MidgardCR;
@@ -55,11 +55,16 @@ void main () {
 
 	var content_manager = new SQLStorageContentManager (storage_manager);
 
-	Storable person = builder.factory ("Activity");
+	Storable person = builder.factory ("Person");
 	person.set (
+		"firstname", "Alice",
+		"lastname", "Wonderland");
+	content_manager.create (person);
+
+	Storable activity = builder.factory ("Activity");
+	activity.set (
 		"verb", "http://activitystrea.ms/schema/1.0/post", 
 		"application", "MidgardCR",
 		"summary", "Initialy created");
-
-	content_manager.create (person);
+	content_manager.create (activity);
 }

@@ -95,7 +95,8 @@ void main () {
 	var actor_model = activity_sm.create_model_property ("actor", "actor", "object");
 	actor_model
 		.add_model (activity_sm.create_model_property ("id", "actor_id", "int"))
-		.add_model (activity_sm.create_model_property ("guid", "actor_guid", "guid"));
+		.add_model (activity_sm.create_model_property ("guid", "actor_guid", "guid"))
+		.add_model (activity_sm.create_model_property ("classname", "actor_classname", "string"));
 	activity_sm
 		.add_model (asm_verb)
 		.add_model (asm_application)

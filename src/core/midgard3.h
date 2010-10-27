@@ -613,6 +613,7 @@ struct _MidgardCRModelIface {
 	MidgardCRModel* (*get_model_by_name) (MidgardCRModel* self, const char* name);
 	MidgardCRModel** (*list_models) (MidgardCRModel* self, int* result_length1);
 	void (*is_valid) (MidgardCRModel* self, GError** error);
+	MidgardCRModel* (*copy) (MidgardCRModel* self);
 	MidgardCRModel* (*get_parent) (MidgardCRModel* self);
 	void (*set_parent) (MidgardCRModel* self, MidgardCRModel* value);
 	const char* (*get_namespace) (MidgardCRModel* self);
@@ -810,6 +811,8 @@ struct _MidgardCRMetadataClass {
 struct _MidgardCRRepositoryObject {
 	GObject parent_instance;
 	MidgardCRRepositoryObjectPrivate * priv;
+	char* _guid;
+	gint _id;
 };
 
 struct _MidgardCRRepositoryObjectClass {
@@ -857,6 +860,8 @@ struct _MidgardCRSQLStorageManager {
 	MidgardCRStorageModel* _object_model_storage_model;
 	MidgardCRObjectModel* _object_model_property_object_model;
 	MidgardCRStorageModel* _object_model_property_storage_model;
+	MidgardCRObjectModel* _object_model_repository_object;
+	MidgardCRStorageModel* _storage_model_repository_object;
 };
 
 struct _MidgardCRSQLStorageManagerClass {
@@ -1108,6 +1113,7 @@ MidgardCRModel* midgard_cr_model_add_model (MidgardCRModel* self, MidgardCRModel
 MidgardCRModel* midgard_cr_model_get_model_by_name (MidgardCRModel* self, const char* name);
 MidgardCRModel** midgard_cr_model_list_models (MidgardCRModel* self, int* result_length1);
 void midgard_cr_model_is_valid (MidgardCRModel* self, GError** error);
+MidgardCRModel* midgard_cr_model_copy (MidgardCRModel* self);
 MidgardCRModel* midgard_cr_model_get_parent (MidgardCRModel* self);
 void midgard_cr_model_set_parent (MidgardCRModel* self, MidgardCRModel* value);
 const char* midgard_cr_model_get_namespace (MidgardCRModel* self);

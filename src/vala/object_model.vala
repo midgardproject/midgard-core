@@ -138,6 +138,19 @@ namespace MidgardCR {
 				}
 				names += model.name;
 			}	
+		}
+
+		/**
+		 * {@inheritDoc}
+		 *
+		 * Associated models or parent model are not copied to model's copy.
+		 * @return new ObjectModel with name and namespace copied properties
+		 */
+		public Model? copy () {
+			var copy = new ObjectModel (this.name);
+			copy.namespace = this.namespace;
+
+			return (Model) copy;
 		}	
 	}
 
@@ -395,5 +408,29 @@ namespace MidgardCR {
 				if (this._models[0] is ObjectModelProperty)
 					throw new MidgardCR.ValidationError.REFERENCE_INVALID ("Null parent defined for associated '%s' model.", this._models[0].name);
 		}
+
+		/**
+		 * {@inheritDoc}
+		 *
+		 * Associated models or parent models are not copied to models' copy.
+		 * Copied properties: 
+		 *  * name
+		 *  * valuetypename
+		 *  * valuedefault
+		 *  * description
+		 *  * namespace
+		 *  * private
+		 *
+		 * @return new ObjectModelProperty with copied properties: 
+		 */
+		public Model? copy () {
+			var copy = new ObjectModelProperty (this.name, this.valuetypename, this.valuedefault);
+			copy.description = this.description;
+			copy.namespace = this.namespace;
+			copy.private = this.private;
+			
+			return (Model) copy;
+		} 
+		 
 	}
 }
