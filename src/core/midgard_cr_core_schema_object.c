@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include "midgard_cr_core_schema_object.h"
+#include "midgard_cr_core_guid.h"
 
 static GObjectClass *__core_schema_object_parent_class = NULL;
 static GObject *__core_schema_object_constructor (GType type,
