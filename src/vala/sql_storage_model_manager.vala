@@ -26,6 +26,7 @@ namespace MidgardCR {
 		internal unowned StorageModel[] _storage_models = null;
 		internal unowned ObjectModel[] _object_models = null;
 		internal Model[] _models = null;
+		internal Model[] _models_registered = null;
 		internal string[] _queries = null;
 
 		/* private properties */
@@ -88,7 +89,10 @@ namespace MidgardCR {
                  * @return {@link Model} if found, null otherwise
                  */
                 public unowned Model? get_model_by_name (string name) {
-			return this._find_model_by_name (this._models, name);
+			unowned Model model = this._find_model_by_name (this._models, name);
+			if (model == null)
+				model = this._find_model_by_name (this._models_registered, name);
+			return model;
 		}
 
 		/**
@@ -130,6 +134,7 @@ namespace MidgardCR {
 				this._tmp_models += model;
 			}
 			this._models = this._tmp_models;
+			this._tmp_models = null;
 		}
 
 		/**
@@ -268,8 +273,7 @@ namespace MidgardCR {
 		public void execute () throws ExecutableError {		
 			/* Execute command for every StorageExecutor derived object */
 			foreach (Model model in this._models) {
-				if (model is StorageExecutor) { 
-					GLib.print ("EXECUTE MODEL %s \n", model.name);
+				if (model is StorageExecutor) { 	
 					((StorageExecutor)model).execute ();
 				}
 			}
@@ -279,7 +283,16 @@ namespace MidgardCR {
                                 MidgardCRCore.SQLStorageManager.query_execute (this._storage_manager, query);
                                 execution_end ();
                         }
+			this._models_registered = this._models;
+			this._models = null;
 			this._queries = null;
+			try {
+				MidgardCRCore.SQLStorageManager.load_models (this._storage_manager);
+				this._object_models = this._storage_manager._object_models;
+                                this._storage_models = this._storage_manager._storage_models;
+			} catch (StorageManagerError e) {
+				throw new ExecutableError.INTERNAL ("%s", e.message);
+			}
 		}
 
 		private void _emit_execution_start () {

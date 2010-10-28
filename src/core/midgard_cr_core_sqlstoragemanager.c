@@ -450,6 +450,7 @@ midgard_cr_core_sql_storage_manager_load_models (MidgardCRSQLStorageManager *sel
 	if (self->_object_models) {
 		while (self->_object_models[i] != 0) {
 			g_object_unref (self->_object_models[i]);
+			i++;
 		}
 		g_free (self->_object_models);
 	}
@@ -458,6 +459,7 @@ midgard_cr_core_sql_storage_manager_load_models (MidgardCRSQLStorageManager *sel
 	if (self->_storage_models) {
 		while (self->_storage_models[i] != 0) {
 			g_object_unref (self->_storage_models[i]);
+			i++;
 		}
 		g_free (self->_storage_models);
 	}

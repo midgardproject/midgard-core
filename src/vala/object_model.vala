@@ -134,7 +134,7 @@ namespace MidgardCR {
 			foreach (MidgardCR.Model model in this._models) {	
 				foreach (string name in names) {
 					if (name == model.name)
-						throw new MidgardCR.ValidationError.NAME_DUPLICATED ("Duplicated model name found");
+						throw new MidgardCR.ValidationError.NAME_DUPLICATED ("ObjectModel: duplicated %s model found in %s model", model.name, this.name);
 				}
 				names += model.name;
 			}	

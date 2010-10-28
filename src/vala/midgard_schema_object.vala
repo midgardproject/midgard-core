@@ -59,7 +59,7 @@ namespace MidgardCR {
 			get { return this._id; }
 		}
 
-		public Metadata metadata { 
+		public Metadata? metadata { 
 			get {  return null; }	
 		}
 

@@ -239,7 +239,7 @@ midgard_cr_core_object_builder_register_types (MidgardCRObjectBuilder *builder, 
 	guint i = 0;
 	MidgardCRObjectModel **models = builder->_models;
 
-	if (!models)
+	if (models == NULL || *models == NULL)
 		g_error_new_literal (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL, 
 				"No ObjectModel registered for execution");
 

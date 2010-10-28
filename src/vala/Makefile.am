@@ -28,6 +28,8 @@ libmidgardvala_la_VALASOURCES = \
 			  sql_storage_model_manager.vala \
 			  sql_table_model.vala \
 			  sql_column_model.vala \
+			  rdf_storage_manager.vala \
+			  rdf_sql_storage_manager.vala \
 			  $(NULL)
 
 libmidgardvala_la_SOURCES = \

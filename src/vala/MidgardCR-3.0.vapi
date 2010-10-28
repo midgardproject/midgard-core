@@ -67,6 +67,11 @@ namespace MidgardCR {
 		public QueryValue ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public class RDFSQLStorageManager : MidgardCR.SQLStorageManager, MidgardCR.RDFStorageManager {
+		public RDFSQLStorageManager (string name, MidgardCR.Config config) throws MidgardCR.StorageManagerError;
+		public override bool initialize_storage () throws MidgardCR.StorageManagerError;
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public class ReferenceObject : GLib.Object {
 		public ReferenceObject ();
 		public string classname { get; construct; }
@@ -81,7 +86,7 @@ namespace MidgardCR {
 		public abstract void set_property_value (string name, GLib.Value value);
 		public string guid { get; }
 		public uint id { get; }
-		public MidgardCR.Metadata metadata { get; }
+		public MidgardCR.Metadata? metadata { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLColumnModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel, MidgardCR.ModelProperty, MidgardCR.StorageModelProperty {
@@ -102,6 +107,7 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageManager : GLib.Object, MidgardCR.StorageManager {
 		public SQLStorageManager (string name, MidgardCR.Config config) throws MidgardCR.StorageManagerError;
+		public virtual bool initialize_storage () throws MidgardCR.StorageManagerError;
 		public MidgardCR.Config config { get; construct; }
 		public string name { get; construct; }
 	}
@@ -255,6 +261,10 @@ namespace MidgardCR {
 		public abstract void set_value (GLib.Value value);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public interface RDFStorageManager : GLib.Object {
+		public abstract MidgardCR.NamespaceManager nsmanager { get; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public interface Storable : GLib.Object {
 		public signal void create ();
 		public signal void created ();
@@ -285,9 +295,9 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageManager : GLib.Object {
-		public abstract MidgardCR.StorageManager clone ();
+		public abstract MidgardCR.StorageManager? clone ();
 		public abstract bool close () throws MidgardCR.StorageManagerError;
-		public abstract MidgardCR.StorageManager fork ();
+		public abstract MidgardCR.StorageManager? fork ();
 		public abstract bool initialize_storage () throws MidgardCR.StorageManagerError;
 		public abstract bool open () throws MidgardCR.StorageManagerError;
 		public abstract MidgardCR.StorageContentManager content_manager { get; }

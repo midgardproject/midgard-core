@@ -160,7 +160,7 @@ namespace MidgardCR {
 					throw new ValidationError.TYPE_INVALID ("Invalid '%s' model associated with  SQLTableModel. Expected SQLColumnModel", model.get_type().name());
 				foreach (string name in names) {
 					if (name == model.name)
-						throw new MidgardCR.ValidationError.NAME_DUPLICATED ("Duplicated model name found");
+						throw new MidgardCR.ValidationError.NAME_DUPLICATED ("SQLTableModel: duplicated '%s' model found in '%s' model", model.name, this.name);
 				}
 				names += model.name;
 			}	

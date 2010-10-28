@@ -70,8 +70,8 @@ namespace MidgardCR {
 		public abstract bool initialize_storage () throws StorageManagerError;
 
 		/* FIXME, add Clonable interface ? */
-		public abstract StorageManager fork ();
-		public abstract StorageManager clone ();
+		public abstract StorageManager? fork ();
+		public abstract StorageManager? clone ();
 	}
 
 	public interface StorageWorkspaceManager : StorageManager {

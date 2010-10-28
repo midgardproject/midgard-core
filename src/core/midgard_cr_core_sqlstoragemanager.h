@@ -42,4 +42,8 @@ void midgard_cr_core_sql_storage_manager_column_remove (MidgardCRSQLStorageManag
 /* QUERY */
 gint midgard_cr_core_sql_storage_manager_query_execute (MidgardCRSQLStorageManager *manager, const gchar *query, GError **error);
 
+/* MODELS */
+void midgard_cr_core_sql_storage_manager_load_models (MidgardCRSQLStorageManager *self, GError **error);
+
+
 #endif /* _MIDGARD_CR_CORE_SQL_STORAGE_MANAGER_H_ */
