@@ -832,12 +832,14 @@ struct _MidgardCRRepositoryObject {
 	MidgardCRRepositoryObjectPrivate * priv;
 	char* _guid;
 	gint _id;
+	MidgardCRMetadata* _metadata;
+	GHashTable* _ns_properties;
 };
 
 struct _MidgardCRRepositoryObjectClass {
 	GObjectClass parent_class;
 	void (*set_property_value) (MidgardCRRepositoryObject* self, const char* name, GValue* value);
-	void (*get_property_value) (MidgardCRRepositoryObject* self, const char* name, GValue* result);
+	GValue* (*get_property_value) (MidgardCRRepositoryObject* self, const char* name);
 	char** (*list_all_properties) (MidgardCRRepositoryObject* self, int* result_length1);
 };
 
@@ -1210,7 +1212,7 @@ MidgardCRTimestamp* midgard_cr_metadata_get_created (MidgardCRMetadata* self);
 MidgardCRTimestamp* midgard_cr_metadata_get_revised (MidgardCRMetadata* self);
 GType midgard_cr_repository_object_get_type (void) G_GNUC_CONST;
 void midgard_cr_repository_object_set_property_value (MidgardCRRepositoryObject* self, const char* name, GValue* value);
-void midgard_cr_repository_object_get_property_value (MidgardCRRepositoryObject* self, const char* name, GValue* result);
+GValue* midgard_cr_repository_object_get_property_value (MidgardCRRepositoryObject* self, const char* name);
 char** midgard_cr_repository_object_list_all_properties (MidgardCRRepositoryObject* self, int* result_length1);
 MidgardCRRepositoryObject* midgard_cr_repository_object_construct (GType object_type);
 const char* midgard_cr_repository_object_get_guid (MidgardCRRepositoryObject* self);

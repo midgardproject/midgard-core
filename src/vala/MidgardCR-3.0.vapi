@@ -81,9 +81,9 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public abstract class RepositoryObject : GLib.Object, MidgardCR.Storable {
 		public RepositoryObject ();
-		public abstract GLib.Value get_property_value (string name);
+		public virtual GLib.Value? get_property_value (string name);
 		public abstract string[]? list_all_properties ();
-		public abstract void set_property_value (string name, GLib.Value value);
+		public virtual void set_property_value (string name, GLib.Value value);
 		public string guid { get; }
 		public uint id { get; }
 		public MidgardCR.Metadata? metadata { get; }
