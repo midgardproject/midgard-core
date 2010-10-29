@@ -1,9 +1,10 @@
 /*
  In this example:
  - Create configuration and open connection to database.
+ - Register 'Movie' class without storage
  - Register all classes for which, information in database exists.
- - Create new 'Activity' and 'Person' instances
- - Create database record for both objects
+ - Create new 'Movie' instance and set namespaced properties
+ - Create database record for movie
 */
 
 using MidgardCR;
