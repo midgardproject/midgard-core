@@ -58,7 +58,8 @@ am__objects_2 = midgard_config.lo executable.lo midgard_namespace.lo \
 	midgard_workspace.lo sql_storage_content_manager.lo \
 	sql_storage_model_manager.lo sql_table_model.lo \
 	sql_column_model.lo rdf_storage_manager.lo \
-	rdf_sql_storage_manager.lo $(am__objects_1)
+	rdf_sql_storage_manager.lo rdf_sql_content_manager.lo \
+	$(am__objects_1)
 am_libmidgardvala_la_OBJECTS = $(am__objects_2)
 libmidgardvala_la_OBJECTS = $(am_libmidgardvala_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -264,6 +265,7 @@ libmidgardvala_la_VALASOURCES = \
 			  sql_column_model.vala \
 			  rdf_storage_manager.vala \
 			  rdf_sql_storage_manager.vala \
+			  rdf_sql_content_manager.vala \
 			  $(NULL)
 
 libmidgardvala_la_SOURCES = \
@@ -345,6 +347,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_builder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/profiler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_content_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_storage_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_storage_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_column_model.Plo@am__quote@

@@ -1,10 +1,9 @@
 /*
  In this example:
  - Create configuration and open connection to database.
- - Register 'Movie' class without storage
  - Register all classes for which, information in database exists.
- - Create new 'Movie' instance and set namespaced properties
- - Create database record for movie
+ - Create new RDFGenericObject for RDF Triple 
+ - Create database record for the object
 */
 
 using MidgardCR;
@@ -39,30 +38,6 @@ void main () {
 		GLib.warning (e.message);
 	}
 
-	/* Create model for 'Movie' object */
-	var movie_model = new ObjectModel ("Movie");
-	var director_model = new ObjectModelProperty ("director", "string", "");
-	director_model.namespace = "dc";
-	var title_model = new ObjectModelProperty ("title", "string", "");
-	title_model.namespace = "foaf";
-	var price_model = new ObjectModelProperty ("price", "string", "");
-	price_model.namespace = "ns";
-	movie_model.add_model (director_model).add_model (title_model).add_model (price_model);
-
-	storage_manager.model_manager.add_model (movie_model);
-
-	try {
-		storage_manager.model_manager.prepare_create ();
-	} catch (ValidationError e) {
-		GLib.warning ("Failed to prepare create operation. %s", e.message);
-	}
-
-	try {
-		storage_manager.model_manager.execute ();
-	} catch (ExecutableError e) {
-		GLib.warning ("Execution failed. %s", e.message);
-	}
-
 	/* Initialize ObjectBuilder which is responsible to register classes from models */
 	var builder = new ObjectBuilder ();	
 
@@ -84,13 +59,20 @@ void main () {
 		GLib.error (e.message);
 	}
 
-	var content_manager = new SQLStorageContentManager (storage_manager);
+	var content_manager = new RDFSQLContentManager (storage_manager);
 
-	var movie = builder.factory ("Movie") as RepositoryObject;
-	GLib.print ("New movie identified by %s \n", movie.guid);
-	movie.set_property_value ("foaf:title", "The Book of Eli");
-	movie.set_property_value ("dc:director", "Hughes");
-	movie.set_property_value ("ns:price", 42);
+	/*
+	<http://www.midgard-project.org/people/vali>
+		foaf:name "Vali";
+    		foaf:homepage "http://www.midgard-project.org/people/vali".
+	*/
+
+	var rdf_vali = builder.factory ("RDFGenericObject") as RepositoryObject;
+	rdf_vali.set ("classname","http://www.midgard-project.org/people/vali");
+	rdf_vali.set_property_value ("foaf:name", "Vali");
+	rdf_vali.set_property_value ("foaf:homepage", "http://www.midgard-project.org/people/vali");	
 	
-	content_manager.create (movie);
+	GLib.print ("Vali generic RDF object identified by '%s' GUID \n", rdf_vali.guid);	
+	
+	content_manager.create (rdf_vali);
 }

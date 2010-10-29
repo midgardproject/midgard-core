@@ -67,6 +67,16 @@ namespace MidgardCR {
 		public QueryValue ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public class RDFSQLContentManager : MidgardCR.SQLStorageContentManager {
+		public RDFSQLContentManager (MidgardCR.SQLStorageManager manager);
+		public override bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override bool exists (MidgardCR.Storable object);
+		public override bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public class RDFSQLStorageManager : MidgardCR.SQLStorageManager, MidgardCR.RDFStorageManager {
 		public RDFSQLStorageManager (string name, MidgardCR.Config config) throws MidgardCR.StorageManagerError;
 		public override bool initialize_storage () throws MidgardCR.StorageManagerError;
@@ -82,7 +92,7 @@ namespace MidgardCR {
 	public abstract class RepositoryObject : GLib.Object, MidgardCR.Storable {
 		public RepositoryObject ();
 		public virtual GLib.Value? get_property_value (string name);
-		public abstract string[]? list_all_properties ();
+		public virtual string[]? list_all_properties ();
 		public virtual void set_property_value (string name, GLib.Value value);
 		public string guid { get; }
 		public uint id { get; }
@@ -102,6 +112,12 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageContentManager : GLib.Object, MidgardCR.StorageContentManager {
 		public SQLStorageContentManager (MidgardCR.SQLStorageManager manager);
+		public virtual bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual bool exists (MidgardCR.Storable object);
+		public virtual bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public MidgardCR.StorageManager storagemanager { get; construct; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]

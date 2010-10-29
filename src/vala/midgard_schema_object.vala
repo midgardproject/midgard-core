@@ -73,10 +73,26 @@ namespace MidgardCR {
 		}
 
 		public virtual GLib.Value? get_property_value (string name) {
-			return this._ns_properties.lookup (name);
+			GLib.Value val = this._ns_properties.lookup (name);
+			//if (val) 
+				GLib.print ("THERE IS %s VAL %s \n", name, val.type_name ());
+			//else 
+			//	GLib.print ("There IS NO VAL! \n");
+			
+			return val;
 		}
 
-		public abstract string[]? list_all_properties ();
+		public virtual string[]? list_all_properties () {
+			if (this._ns_properties == null)
+				return null;
+			
+			string[] all_props = null;
+			List<string> keys = this._ns_properties.get_keys ();
+			foreach (string element in keys) {
+				all_props += element;
+			}			
+			return all_props;	
+		}
 	}
 
 	public abstract class StorageObject : GLib.Object, Storable {
