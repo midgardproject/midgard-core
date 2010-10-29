@@ -49,6 +49,8 @@ namespace MidgardCR {
 		/* internal properties */
 		internal string _guid = null;
 		internal int _id = 0;
+		internal Metadata _metadata = null;
+		internal GLib.HashTable<string, GLib.Value?> _ns_properties = null;
 
 		/* properties */
 		public string guid { 
@@ -60,12 +62,20 @@ namespace MidgardCR {
 		}
 
 		public Metadata? metadata { 
-			get {  return null; }	
+			get {  return this._metadata; }	
 		}
 
 		/* methods */
-		public abstract void set_property_value (string name, GLib.Value value);
-		public abstract GLib.Value get_property_value (string name);
+		public virtual void set_property_value (string name, GLib.Value value) {
+			if (this._ns_properties == null)
+				this._ns_properties = new GLib.HashTable<string, GLib.Value?> (GLib.str_hash, GLib.str_equal);
+			this._ns_properties.insert(name, value);
+		}
+
+		public virtual GLib.Value? get_property_value (string name) {
+			return this._ns_properties.lookup (name);
+		}
+
 		public abstract string[]? list_all_properties ();
 	}
 
