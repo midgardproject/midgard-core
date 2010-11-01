@@ -56,27 +56,6 @@ namespace MidgardCR
 		public abstract void set_value (GLib.Value value); 
 	}	
 
-	public class QueryValue : GLib.Object, QueryValueHolder {
-
-		private GLib.Value _value;
-			
-		public GLib.Value get_value () { return this._value; }
-		public void set_value (GLib.Value value) { this._value = value; }
-	
-	}
-
-	public class QueryProperty : GLib.Object, QueryValueHolder {
-
-		private GLib.Value _value;	
-	
-		/* properties */
-		string propertyname { get; set; }
-		QueryStorage storage { get; set; }
-
-		public GLib.Value get_value () { return this._value; }
-		public void set_value (GLib.Value value) { this._value = value; }
-	}
-
 	public interface QueryExecutor : Executable {
 
 		public abstract void set_constraint (QueryConstraintSimple constraint);

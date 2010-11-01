@@ -60,11 +60,14 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class QueryProperty : GLib.Object, MidgardCR.QueryValueHolder {
-		public QueryProperty ();
+		public QueryProperty (string property, MidgardCR.QueryStorage? storage);
+		public string propertyname { get; set; }
+		public MidgardCR.QueryStorage storage { get; set; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class QueryValue : GLib.Object, MidgardCR.QueryValueHolder {
 		public QueryValue ();
+		public static MidgardCR.QueryValue create_with_value (GLib.Value value);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class RDFSQLContentManager : MidgardCR.SQLStorageContentManager {
@@ -108,6 +111,20 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLProfiler : GLib.Object, MidgardCR.Profiler {
 		public SQLProfiler ();
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLQueryConstraint : GLib.Object, MidgardCR.QueryConstraintSimple, MidgardCR.QueryConstraint {
+		public SQLQueryConstraint (MidgardCR.QueryProperty property, string op, MidgardCR.QueryValueHolder holder, MidgardCR.QueryStorage? storage);
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLQuerySelect : GLib.Object, MidgardCR.Executable, MidgardCR.QueryExecutor, MidgardCR.QuerySelect {
+		public SQLQuerySelect (MidgardCR.StorageManager manager, MidgardCR.QueryStorage storage);
+		public MidgardCR.QueryStorage storage { get; construct; }
+		public MidgardCR.StorageManager storagemanager { get; construct; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLQueryStorage : GLib.Object, MidgardCR.QueryStorage {
+		public SQLQueryStorage (string name);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageContentManager : GLib.Object, MidgardCR.StorageContentManager {

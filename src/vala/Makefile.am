@@ -24,10 +24,15 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_storage_manager_sql.vala \
 			  midgard_storage.vala \
 			  midgard_workspace.vala \
+			  query_property.vala \
+			  query_value.vala \
 			  sql_storage_content_manager.vala \
 			  sql_storage_model_manager.vala \
 			  sql_table_model.vala \
 			  sql_column_model.vala \
+			  sql_query_storage.vala \
+			  sql_query_constraint.vala \
+			  sql_query_select.vala \
 			  rdf_storage_manager.vala \
 			  rdf_sql_storage_manager.vala \
 			  rdf_sql_content_manager.vala \

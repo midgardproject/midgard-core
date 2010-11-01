@@ -55,6 +55,7 @@ void main () {
 
 	var content_manager = new SQLStorageContentManager (storage_manager);
 
+	/* Store Person and Activity */
 	Storable person = builder.factory ("Person");
 	person.set (
 		"firstname", "Alice",
@@ -67,4 +68,18 @@ void main () {
 		"application", "MidgardCR",
 		"summary", "Initialy created");
 	content_manager.create (activity);
+
+	/* Query Activity */
+	/* Select Activity object which value of 'application' property is 'MidgardCR' */
+	var query = new SQLQuerySelect (storage_manager, new SQLQueryStorage ("Activity"));
+	query.set_constraint (
+		new SQLQueryConstraint (
+			new QueryProperty ("application", null),
+			"=",
+			QueryValue.create_with_value ("MidgardCR"),
+			null )
+		);
+
+	query.validate ();		 
+	query.execute ();
 }
