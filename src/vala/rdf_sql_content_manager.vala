@@ -35,14 +35,17 @@ namespace MidgardCR {
 				string[] props = ((RepositoryObject) object).list_all_properties ();
 				var builder = new ObjectBuilder ();
 				foreach (string name in props) {
-					var pval = ((RepositoryObject) object).get_property_value (name);
+					GLib.Value pval = ((RepositoryObject) object).get_property_value (name);
+					/* TODO
+					 * Handle Object value type
+					 * Check property name if it contains full uri */
 					var rdf_prop = builder.factory ("RDFGenericObject") as RepositoryObject;
 					string[] ptokens = name.split (":", 2);
 					rdf_prop.set (
 						"objectguid", ((RepositoryObject)object).guid,
 						"property", ptokens[1],
 						"alias", ptokens[0],
-						"value", pval);
+						"value", (string) pval);
 					base.create (rdf_prop);
 					//delete rdf_prop;
 				}
