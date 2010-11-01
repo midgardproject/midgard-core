@@ -49,8 +49,9 @@ namespace MidgardCR {
 		/* internal properties */
 		internal string _guid = null;
 		internal int _id = 0;
-		internal Metadata _metadata = null;
-		internal GLib.HashTable<string, GLib.Value?> _ns_properties = null;
+		internal Metadata _metadata = null;	
+		internal GLib.List<string> _ns_properties_list = null;
+		internal GLib.List<GLib.Value?> _ns_values_list = null;
 
 		/* properties */
 		public string guid { 
@@ -67,28 +68,34 @@ namespace MidgardCR {
 
 		/* methods */
 		public virtual void set_property_value (string name, GLib.Value value) {
-			if (this._ns_properties == null)
-				this._ns_properties = new GLib.HashTable<string, GLib.Value?> (GLib.str_hash, GLib.str_equal);
-			this._ns_properties.insert(name, value);
+			if (this._ns_properties_list == null) {
+				this._ns_properties_list = new List<string> ();
+				this._ns_values_list = new List<GLib.Value?> ();
+			}
+			this._ns_properties_list.append (name);
+			this._ns_values_list.append (value);
 		}
 
 		public virtual GLib.Value? get_property_value (string name) {
-			GLib.Value val = this._ns_properties.lookup (name);
-			//if (val) 
-				GLib.print ("THERE IS %s VAL %s \n", name, val.type_name ());
-			//else 
-			//	GLib.print ("There IS NO VAL! \n");
+			if (this._ns_properties_list == null)
+				return null;
+		
+			int i = 0;
+			foreach (string element in this._ns_properties_list) {
+				if (element == name)
+					return this._ns_values_list.nth_data (i);
+				i++;
+			}			
 			
-			return val;
+			return null;
 		}
 
 		public virtual string[]? list_all_properties () {
-			if (this._ns_properties == null)
+			if (this._ns_properties_list == null)
 				return null;
 			
-			string[] all_props = null;
-			List<string> keys = this._ns_properties.get_keys ();
-			foreach (string element in keys) {
+			string[] all_props = null;	
+			foreach (string element in this._ns_properties_list) {
 				all_props += element;
 			}			
 			return all_props;	
