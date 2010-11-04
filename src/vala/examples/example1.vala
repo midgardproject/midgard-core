@@ -85,24 +85,24 @@ void main () {
 		.add_model (new ObjectModelProperty ("application", "string", ""));
 	
 	/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
-	/* Activity class requires 'midgard_activity' table */
-	var activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLTableModel;
 	/* Add columns to table: 'verb', 'application', 'target', 'summary' and those required by 'actor' */
 	var asm_verb = new SQLColumnModel (storage_manager, "verb", "verb", "string");
 	asm_verb.index = true;
 	var asm_application = new SQLColumnModel (storage_manager, "application", "application", "string");
 	asm_application.index = true;
 	var actor_model = new SQLColumnModel (storage_manager, "actor", "actor", "object");
+	/* Activity class requires 'midgard_activity' table */
+	var activity_sm = new SQLTableModel (storage_manager, "Activity", "midgard_activity") as SQLTableModel;
 	actor_model
-		.add_model (activity_sm.create_model_property ("id", "actor_id", "int"))
-		.add_model (activity_sm.create_model_property ("guid", "actor_guid", "guid"))
-		.add_model (activity_sm.create_model_property ("classname", "actor_classname", "string"));
+		.add_model (new SQLColumnModel (storage_manager, "id", "actor_id", "int"))
+		.add_model (new SQLColumnModel (storage_manager, "guid", "actor_guid", "guid"))
+		.add_model (new SQLColumnModel (storage_manager, "classname", "actor_classname", "string"));
 	activity_sm
 		.add_model (asm_verb)
 		.add_model (asm_application)
 		.add_model (actor_model)
-		.add_model (activity_sm.create_model_property ("target", "target", "string"))
-		.add_model (activity_sm.create_model_property ("summary", "summary", "string"));
+		.add_model (new SQLColumnModel (storage_manager, "target", "target", "string"))
+		.add_model (new SQLColumnModel (storage_manager, "summary", "summary", "string"));
 
 	/* Add Object and Storage models to StorageModelManager */
 	model_manager
