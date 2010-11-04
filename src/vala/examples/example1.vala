@@ -88,11 +88,11 @@ void main () {
 	/* Activity class requires 'midgard_activity' table */
 	var activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLTableModel;
 	/* Add columns to table: 'verb', 'application', 'target', 'summary' and those required by 'actor' */
-	var asm_verb = activity_sm.create_model_property ("verb", "verb", "string");
+	var asm_verb = new SQLColumnModel (storage_manager, "verb", "verb", "string");
 	asm_verb.index = true;
-	var asm_application = activity_sm.create_model_property ("application", "application", "string");
+	var asm_application = new SQLColumnModel (storage_manager, "application", "application", "string");
 	asm_application.index = true;
-	var actor_model = activity_sm.create_model_property ("actor", "actor", "object");
+	var actor_model = new SQLColumnModel (storage_manager, "actor", "actor", "object");
 	actor_model
 		.add_model (activity_sm.create_model_property ("id", "actor_id", "int"))
 		.add_model (activity_sm.create_model_property ("guid", "actor_guid", "guid"))
