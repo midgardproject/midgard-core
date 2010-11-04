@@ -36,15 +36,15 @@ void main () {
 	} catch (StorageManagerError e) {
 		GLib.warning ("Failed to initialize new SQLStorageManager");
 	}
-	
+
 	/* Open connection to underlying SQL database and "bootstrap" storage */
 	try {
 		storage_manager.open ();
 		storage_manager.initialize_storage ();
-        } catch (StorageManagerError e) {
+	} catch (StorageManagerError e) {
 		GLib.warning (e.message);
-        }
-        
+	}
+
 	/* Get ModelManager which is responsible to create all data required 
 	 * by classes and their SQL tables */
 	StorageModelManager model_manager = storage_manager.model_manager;
@@ -64,10 +64,6 @@ void main () {
 		.add_model (person_sm.create_model_property ("firstname", "firstname", "string"))
 		.add_model (person_sm.create_model_property ("lastname", "lastname", "string"));
 
-	/* Define 'Activity' class */
-	var activity_model = new ObjectModel ("Activity");
-	/* 'actor' property is object type, so we 'link' property with 'Person' object */
-      	var am_actor = new ObjectModelProperty ("actor", "object", "");
 	/* Create reference for actor property which is of object type */
 	var ref_actor = new ObjectModel ("ReferenceObject");
 	ref_actor
@@ -75,7 +71,13 @@ void main () {
 		.add_model (new ObjectModelProperty ("guid", "string", ""))
 		.add_model (new ObjectModelProperty ("classname", "string", ""));
 	ref_actor.add_model (person_model);
+
+	/* 'actor' property is object type, so we 'link' property with 'Person' object */
+	var am_actor = new ObjectModelProperty ("actor", "object", "");
 	am_actor.add_model (ref_actor);
+
+	/* Define 'Activity' class */
+	var activity_model = new ObjectModel ("Activity");
 	/* Define properties: 'verb', 'target', 'summary', 'application' */
 	activity_model
 		.add_model (am_actor)
@@ -83,20 +85,23 @@ void main () {
 		.add_model (new ObjectModelProperty ("target", "guid", ""))
 		.add_model (new ObjectModelProperty ("summary", "guid", ""))
 		.add_model (new ObjectModelProperty ("application", "string", ""));
-	
+
 	/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
 	/* Add columns to table: 'verb', 'application', 'target', 'summary' and those required by 'actor' */
 	var asm_verb = new SQLColumnModel (storage_manager, "verb", "verb", "string");
 	asm_verb.index = true;
+
 	var asm_application = new SQLColumnModel (storage_manager, "application", "application", "string");
 	asm_application.index = true;
+
 	var actor_model = new SQLColumnModel (storage_manager, "actor", "actor", "object");
-	/* Activity class requires 'midgard_activity' table */
-	var activity_sm = new SQLTableModel (storage_manager, "Activity", "midgard_activity") as SQLTableModel;
 	actor_model
 		.add_model (new SQLColumnModel (storage_manager, "id", "actor_id", "int"))
 		.add_model (new SQLColumnModel (storage_manager, "guid", "actor_guid", "guid"))
 		.add_model (new SQLColumnModel (storage_manager, "classname", "actor_classname", "string"));
+
+	/* Activity class requires 'midgard_activity' table */
+	var activity_sm = new SQLTableModel (storage_manager, "Activity", "midgard_activity") as SQLTableModel;
 	activity_sm
 		.add_model (asm_verb)
 		.add_model (asm_application)
