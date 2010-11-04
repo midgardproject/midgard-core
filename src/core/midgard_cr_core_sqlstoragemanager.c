@@ -415,7 +415,7 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 				l->data = NULL;
 			}
 			/* Add column models to models of object type */
-			if (g_str_equal (model_tablename, column_tablename) 
+			else if (g_str_equal (model_tablename, column_tablename) 
 					&& (property_of && *property_of != '\0')) {
 				MidgardCRSQLColumnModel *column_object = 
 					MIDGARD_CR_SQL_COLUMN_MODEL (midgard_cr_model_get_model_by_name (MIDGARD_CR_MODEL (table_model), property_of));
@@ -450,6 +450,7 @@ midgard_cr_core_sql_storage_manager_load_models (MidgardCRSQLStorageManager *sel
 	if (self->_object_models) {
 		while (self->_object_models[i] != 0) {
 			g_object_unref (self->_object_models[i]);
+			i++;
 		}
 		g_free (self->_object_models);
 	}
@@ -458,6 +459,7 @@ midgard_cr_core_sql_storage_manager_load_models (MidgardCRSQLStorageManager *sel
 	if (self->_storage_models) {
 		while (self->_storage_models[i] != 0) {
 			g_object_unref (self->_storage_models[i]);
+			i++;
 		}
 		g_free (self->_storage_models);
 	}

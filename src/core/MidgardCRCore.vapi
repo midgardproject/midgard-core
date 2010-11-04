@@ -33,11 +33,16 @@ namespace MidgardCRCore {
 		public static bool column_update (MidgardCR.SQLStorageManager manager, MidgardCR.SQLColumnModel model) throws MidgardCR.ExecutableError;
 		public static bool column_remove (MidgardCR.SQLStorageManager manager, MidgardCR.SQLColumnModel model) throws MidgardCR.ExecutableError;
 		public static int query_execute (MidgardCR.SQLStorageManager manager, string query) throws MidgardCR.ExecutableError;
+		public static void load_models (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
 }
 
 	public class SQLStorageModelManager {
 		public static void prepare_create (MidgardCR.SQLStorageModelManager manager, MidgardCR.Model model) throws MidgardCR.ValidationError;
 		public static void execute (MidgardCR.SQLStorageModelManager manager) throws MidgardCR.ExecutableError;
+	}
+
+	public class SQLStorageContentManager {
+		public static void storable_insert (MidgardCR.Storable storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
 	}
 
 	public class ObjectBuilder {

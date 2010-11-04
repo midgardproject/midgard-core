@@ -74,7 +74,9 @@ namespace MidgardCR {
 
 		public ObjectModel? get_object_model (string classname) { return null; }
 		
-		public void execute () throws ExecutableError { 
+		public void execute () throws ExecutableError {
+			if (this._models == null)
+				throw new ExecutableError.COMMAND_INVALID_DATA ("No models associated with builder");
 			MidgardCRCore.ObjectBuilder.register_types (this);
 		}
 	}

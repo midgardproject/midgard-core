@@ -2,15 +2,15 @@
  In this example:
  - Create configuration and open connection to database.
  - Register all classes for which, information in database exists.
- - Create new 'Activity' and 'Person' instances
- - Create database record for both objects
+ - Create new RDFGenericObject for RDF Triple 
+ - Create database record for the object
 */
 
 using MidgardCR;
 
 void main () {
 	
-	SQLStorageManager storage_manager = null;
+	RDFSQLStorageManager storage_manager = null;
 
         /* Create new Config which sets SQL database type and its name */
         Config config = new Config ();
@@ -18,9 +18,9 @@ void main () {
         config.dbname = "ExampleDB";
         config.dbdir = "./";
 
-        /* Create new, named StorageManager for given Config instance */
+        /* Create new, named RDFSQLStorageManager for given Config instance */
         try {
-                storage_manager = new SQLStorageManager ("test_manager", config);
+                storage_manager = new RDFSQLStorageManager ("rdf_test_manager", config);
         } catch (StorageManagerError e) {
                 GLib.warning ("Failed to initialize new SQLStorageManager");
         }
@@ -31,6 +31,12 @@ void main () {
         } catch (StorageManagerError e) {
                 GLib.warning (e.message);
         }
+
+	try {
+		storage_manager.initialize_storage ();
+	} catch (StorageManagerError e) {
+		GLib.warning (e.message);
+	}
 
 	/* Initialize ObjectBuilder which is responsible to register classes from models */
 	var builder = new ObjectBuilder ();	
@@ -53,33 +59,20 @@ void main () {
 		GLib.error (e.message);
 	}
 
-	var content_manager = new SQLStorageContentManager (storage_manager);
+	var content_manager = new RDFSQLContentManager (storage_manager);
 
-	/* Store Person and Activity */
-	Storable person = builder.factory ("Person");
-	person.set (
-		"firstname", "Alice",
-		"lastname", "Wonderland");
-	content_manager.create (person);
+	/*
+	<http://www.midgard-project.org/people/vali>
+		foaf:name "Vali";
+    		foaf:homepage "http://www.midgard-project.org/people/vali".
+	*/
 
-	Storable activity = builder.factory ("Activity");
-	activity.set (
-		"verb", "http://activitystrea.ms/schema/1.0/post", 
-		"application", "MidgardCR",
-		"summary", "Initialy created");
-	content_manager.create (activity);
-
-	/* Query Activity */
-	/* Select Activity object which value of 'application' property is 'MidgardCR' */
-	var query = new SQLQuerySelect (storage_manager, new SQLQueryStorage ("Activity"));
-	query.set_constraint (
-		new SQLQueryConstraint (
-			new QueryProperty ("application", null),
-			"=",
-			QueryValue.create_with_value ("MidgardCR"),
-			null )
-		);
-
-	query.validate ();		 
-	query.execute ();
+	var rdf_vali = builder.factory ("RDFGenericObject") as RepositoryObject;
+	rdf_vali.set ("classname","http://www.midgard-project.org/people/vali");
+	rdf_vali.set_property_value ("foaf:name", "Vali");
+	rdf_vali.set_property_value ("foaf:homepage", "http://www.midgard-project.org/people/vali");	
+	
+	GLib.print ("Vali generic RDF object identified by '%s' GUID \n", rdf_vali.guid);	
+	
+	content_manager.create (rdf_vali);
 }

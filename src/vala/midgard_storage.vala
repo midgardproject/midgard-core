@@ -70,8 +70,8 @@ namespace MidgardCR {
 		public abstract bool initialize_storage () throws StorageManagerError;
 
 		/* FIXME, add Clonable interface ? */
-		public abstract StorageManager fork ();
-		public abstract StorageManager clone ();
+		public abstract StorageManager? fork ();
+		public abstract StorageManager? clone ();
 	}
 
 	public interface StorageWorkspaceManager : StorageManager {
@@ -111,10 +111,6 @@ namespace MidgardCR {
 
 	public interface StorageContentManager : GLib.Object {
 
-		/* public abstract StorageManager storagemanager { get; construct; };  */
-
-		public abstract unowned StorageManager storagemanager { get; }
-
 		/* per object methods */
 		public abstract bool exists (Storable object);
 		public abstract bool create (Storable object) throws StorageContentManagerError;
@@ -123,7 +119,8 @@ namespace MidgardCR {
 		public abstract bool remove (Storable object) throws StorageContentManagerError;
 		public abstract bool purge (Storable object) throws StorageContentManagerError;
 
-		public abstract QueryManager get_query_manager ();
+		public abstract unowned QueryManager get_query_manager ();
+		public abstract unowned StorageManager get_storage_manager ();
 	} 
 
 	public errordomain StorageModelError {

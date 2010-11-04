@@ -46,6 +46,9 @@ namespace MidgardCR {
 		internal StorageModel _object_model_storage_model = null;
 		internal ObjectModel _object_model_property_object_model = null;
 		internal StorageModel _object_model_property_storage_model = null;
+		/* RepositoryObject abstract models */
+		internal ObjectModel _object_model_repository_object = null;
+		internal StorageModel _storage_model_repository_object = null;
 
 		/* public properties */
 		public string name { 
@@ -128,6 +131,8 @@ namespace MidgardCR {
                         this._object_model_property_object_model.add_model (new ObjectModelProperty ("isref", "bool", ""));
                         this._object_model_property_object_model.add_model (new ObjectModelProperty ("refname", "string", ""));
                         this._object_model_property_object_model.add_model (new ObjectModelProperty ("reftarget", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("namespace", "string", ""));
+
 
              		/* Initialize StorageModelProperty for ObjectModelProperty */
                         this._object_model_property_storage_model = new SQLTableModel (this, this._object_model_property_object_model.name, "midgard_schema_type_properties");
@@ -140,6 +145,7 @@ namespace MidgardCR {
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "isref", "is_reference", "bool"));
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "refname", "reference_class_name", "string"));
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "reftarget", "reference_property_name", "string"));
+                        this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "namespace", "namespace", "string"));
 
 			/* STORAGE MODELS  */
 			this._storage_model_object_model = new ObjectModel ("MidgardCRSQLTableModel");
@@ -179,7 +185,17 @@ namespace MidgardCR {
                 	this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "reftarget", "reference_column_name", "string"));
 			this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "propertyof", "property_of", "string"));
 
-
+			/* RepositoryObject models */
+			this._object_model_repository_object = new ObjectModel ("MidgardCRRepositoryObject");
+			this._object_model_repository_object
+				.add_model (new ObjectModelProperty ("id", "int", "0"))
+				.add_model (new ObjectModelProperty ("guid", "guid", ""));
+			this._storage_model_repository_object = new SQLTableModel (this, "MidgardCRRepositoryObject", "");
+			var id_column = new SQLColumnModel (this, "id", "mgd_id", "int");
+			id_column.primary = true;
+			this._storage_model_repository_object
+				.add_model (new SQLColumnModel (this, "guid", "mgd_guid", "guid"))
+				.add_model (id_column);
 		}
 		
 		/**
@@ -207,14 +223,14 @@ namespace MidgardCR {
 			return true;
 		}
 
-		public bool initialize_storage () throws MidgardCR.StorageManagerError {
+		public virtual bool initialize_storage () throws MidgardCR.StorageManagerError {
 			if (!MidgardCRCore.SQLStorageManager.initialize_storage (this))
 				return false;
 
 			return true;
 		}
 
-		public StorageManager fork () { return null; }
-		public StorageManager clone () { return null; }
+		public StorageManager? fork () { return null; }
+		public StorageManager? clone () { return null; }
 	}
 }

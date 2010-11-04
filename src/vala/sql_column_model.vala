@@ -398,5 +398,32 @@ namespace MidgardCR {
 			this._remove_column = false;	
 			this._queries = null;	
 		}		
+
+		/**
+		 * Associated or parent models are not copied to model's copy.
+		 * Newly created model is initialized for the same {@link StorageManager}.
+		 *
+		 * Properties copied:
+		 *  * name
+		 *  * location
+		 *  * valuetypename
+		 *  * valuedefault
+		 *  * namespace
+		 *  * primary
+		 *  * index
+		 *  * private
+		 *
+		 * @return new SQLColumnModel 
+		 */
+		public Model? copy () {
+			var copy = new SQLColumnModel ((SQLStorageManager) this.get_storagemanager (), this.name, this.location, this.valuetypename);
+			copy.valuedefault = this.valuedefault;
+			copy.namespace = this.namespace;
+			copy.primary = this.primary;
+			copy.index = this.index;
+			copy.private = this.private;
+
+			return (Model) copy;
+		}
 	}
 }

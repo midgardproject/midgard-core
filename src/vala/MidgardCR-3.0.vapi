@@ -60,21 +60,46 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class QueryProperty : GLib.Object, MidgardCR.QueryValueHolder {
-		public QueryProperty ();
+		public QueryProperty (string property, MidgardCR.QueryStorage? storage);
+		public string propertyname { get; set; }
+		public MidgardCR.QueryStorage storage { get; set; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class QueryValue : GLib.Object, MidgardCR.QueryValueHolder {
 		public QueryValue ();
+		public static MidgardCR.QueryValue create_with_value (GLib.Value value);
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class RDFSQLContentManager : MidgardCR.SQLStorageContentManager {
+		public RDFSQLContentManager (MidgardCR.SQLStorageManager manager);
+		public override bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override bool exists (MidgardCR.Storable object);
+		public override bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class RDFSQLStorageManager : MidgardCR.SQLStorageManager, MidgardCR.RDFStorageManager {
+		public RDFSQLStorageManager (string name, MidgardCR.Config config) throws MidgardCR.StorageManagerError;
+		public override bool initialize_storage () throws MidgardCR.StorageManagerError;
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class ReferenceObject : GLib.Object {
+		public ReferenceObject ();
+		public string classname { get; construct; }
+		public string guid { get; set; }
+		public int id { get; set; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public abstract class RepositoryObject : GLib.Object, MidgardCR.Storable {
 		public RepositoryObject ();
-		public abstract GLib.Value get_property_value (string name);
-		public abstract string[]? list_all_properties ();
-		public abstract void set_property_value (string name, GLib.Value value);
+		public virtual GLib.Value? get_property_value (string name);
+		public virtual string[]? list_all_properties ();
+		public virtual void set_property_value (string name, GLib.Value value);
 		public string guid { get; }
 		public uint id { get; }
-		public MidgardCR.Metadata metadata { get; }
+		public MidgardCR.Metadata? metadata { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLColumnModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel, MidgardCR.ModelProperty, MidgardCR.StorageModelProperty {
@@ -88,14 +113,42 @@ namespace MidgardCR {
 		public SQLProfiler ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLQueryConstraint : GLib.Object, MidgardCR.QueryConstraintSimple, MidgardCR.QueryConstraint {
+		public SQLQueryConstraint (MidgardCR.QueryProperty property, string op, MidgardCR.QueryValueHolder holder, MidgardCR.QueryStorage? storage);
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLQuerySelect : GLib.Object, MidgardCR.Executable, MidgardCR.QueryExecutor, MidgardCR.QuerySelect {
+		public SQLQuerySelect (MidgardCR.StorageManager manager, MidgardCR.QueryStorage storage);
+		public MidgardCR.QueryStorage storage { get; construct; }
+		public MidgardCR.StorageManager storagemanager { get; construct; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLQueryStorage : GLib.Object, MidgardCR.QueryStorage {
+		public SQLQueryStorage (string name);
+	}
+	[CCode (cheader_filename = "midgard3.h")]
+	public class SQLStorageContentManager : GLib.Object, MidgardCR.StorageContentManager {
+		public SQLStorageContentManager (MidgardCR.SQLStorageManager manager);
+		public virtual bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual bool exists (MidgardCR.Storable object);
+		public virtual bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public MidgardCR.StorageManager storagemanager { get; construct; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageManager : GLib.Object, MidgardCR.StorageManager {
 		public SQLStorageManager (string name, MidgardCR.Config config) throws MidgardCR.StorageManagerError;
+		public virtual bool initialize_storage () throws MidgardCR.StorageManagerError;
 		public MidgardCR.Config config { get; construct; }
 		public string name { get; construct; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageModelManager : GLib.Object, MidgardCR.Model, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.StorageModelManager {
 		public SQLStorageModelManager ();
+		public unowned MidgardCR.ObjectModel? get_object_model_by_name (string name);
+		public unowned MidgardCR.SQLTableModel? get_table_model_by_name (string name);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLTableModel : GLib.Object, MidgardCR.Executable, MidgardCR.StorageExecutor, MidgardCR.Model, MidgardCR.StorageModel {
@@ -141,6 +194,7 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface Model : GLib.Object {
 		public abstract MidgardCR.Model add_model (MidgardCR.Model model);
+		public abstract MidgardCR.Model? copy ();
 		public abstract unowned MidgardCR.Model? get_model_by_name (string name);
 		public abstract void is_valid () throws MidgardCR.ValidationError;
 		public abstract unowned MidgardCR.Model[]? list_models ();
@@ -240,6 +294,10 @@ namespace MidgardCR {
 		public abstract void set_value (GLib.Value value);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
+	public interface RDFStorageManager : GLib.Object {
+		public abstract MidgardCR.NamespaceManager nsmanager { get; }
+	}
+	[CCode (cheader_filename = "midgard3.h")]
 	public interface Storable : GLib.Object {
 		public signal void create ();
 		public signal void created ();
@@ -252,12 +310,12 @@ namespace MidgardCR {
 	public interface StorageContentManager : GLib.Object {
 		public abstract bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool exists (MidgardCR.Storable object);
-		public abstract MidgardCR.QueryManager get_query_manager ();
+		public abstract unowned MidgardCR.QueryManager get_query_manager ();
+		public abstract unowned MidgardCR.StorageManager get_storage_manager ();
 		public abstract bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public abstract MidgardCR.StorageManager storagemanager { get; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageExecutor : MidgardCR.Executable {
@@ -270,9 +328,9 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageManager : GLib.Object {
-		public abstract MidgardCR.StorageManager clone ();
+		public abstract MidgardCR.StorageManager? clone ();
 		public abstract bool close () throws MidgardCR.StorageManagerError;
-		public abstract MidgardCR.StorageManager fork ();
+		public abstract MidgardCR.StorageManager? fork ();
 		public abstract bool initialize_storage () throws MidgardCR.StorageManagerError;
 		public abstract bool open () throws MidgardCR.StorageManagerError;
 		public abstract MidgardCR.StorageContentManager content_manager { get; }

@@ -46,26 +46,71 @@ namespace MidgardCR {
 
 	public abstract class RepositoryObject : GLib.Object, Storable {
 
+		/* internal properties */
+		internal string _guid = null;
+		internal int _id = 0;
+		internal Metadata _metadata = null;	
+		internal GLib.List<string> _ns_properties_list = null;
+		internal GLib.List<GLib.Value?> _ns_values_list = null;
+
 		/* properties */
 		public string guid { 
-			get { return ""; }
+			get { return this._guid; }
 		}
 
 		public uint id { 
-			get { return 0; }
+			get { return this._id; }
 		}
 
-		public Metadata metadata { 
-			get {  return null; }	
+		public Metadata? metadata { 
+			get {  return this._metadata; }	
 		}
 
 		/* methods */
-		public abstract void set_property_value (string name, GLib.Value value);
-		public abstract GLib.Value get_property_value (string name);
-		public abstract string[]? list_all_properties ();
+		public virtual void set_property_value (string name, GLib.Value value) {
+			if (this._ns_properties_list == null) {
+				this._ns_properties_list = new List<string> ();
+				this._ns_values_list = new List<GLib.Value?> ();
+			}
+			this._ns_properties_list.append (name);
+			this._ns_values_list.append (value);
+		}
+
+		public virtual GLib.Value? get_property_value (string name) {
+			if (this._ns_properties_list == null)
+				return null;
+		
+			int i = 0;
+			foreach (string element in this._ns_properties_list) {
+				if (element == name)
+					return this._ns_values_list.nth_data (i);
+				i++;
+			}			
+			
+			return null;
+		}
+
+		public virtual string[]? list_all_properties () {
+			if (this._ns_properties_list == null)
+				return null;
+			
+			string[] all_props = null;	
+			foreach (string element in this._ns_properties_list) {
+				all_props += element;
+			}			
+			return all_props;	
+		}
 	}
 
 	public abstract class StorageObject : GLib.Object, Storable {
 
+	}
+
+	public class ReferenceObject : GLib.Object {
+
+		/* properties */
+		public string classname { get; construct;}
+		public string guid { get; set; }
+		public int id { get; set; }
 	}
 }

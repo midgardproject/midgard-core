@@ -18,6 +18,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 #include "midgard_cr_core_schema_object.h"
+#include "midgard_cr_core_guid.h"
 
 static GObjectClass *__core_schema_object_parent_class = NULL;
 static GObject *__core_schema_object_constructor (GType type,
@@ -126,6 +127,7 @@ __core_schema_object_constructor (GType type, guint n_construct_properties, GObj
 			priv->properties[idx] = g_new0 (MgdSchemaPropertyAttr, 1);
 		}
 	}
+	MIDGARD_CR_REPOSITORY_OBJECT (object)->_guid = midgard_cr_core_guid_new ();
 	return object;
 }
 

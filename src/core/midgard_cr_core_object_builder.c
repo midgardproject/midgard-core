@@ -39,6 +39,8 @@ midgard_cr_core_schema_type_attr_new (void)
 	type->extends = NULL;
 	type->metadata_class_name = NULL;
 	type->user_values = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) midgard_cr_core_schema_type_attr_free);
+	type->prepared_sql_statement_insert = NULL;
+	type->prepared_sql_statement_insert_params = NULL;
 
 	return type;
 }
@@ -82,6 +84,14 @@ midgard_cr_core_schema_type_attr_free (MgdSchemaTypeAttr *type)
 
 	g_hash_table_destroy (type->user_values);
         type->user_values = NULL;
+	
+	if (type->prepared_sql_statement_insert != NULL)
+		g_object_unref (type->prepared_sql_statement_insert);
+	type->prepared_sql_statement_insert = NULL;
+
+	if (type->prepared_sql_statement_insert_params != NULL)
+		g_object_unref (type->prepared_sql_statement_insert_params);
+	type->prepared_sql_statement_insert_params = NULL;
 
 	g_free (type);
 
@@ -229,7 +239,7 @@ midgard_cr_core_object_builder_register_types (MidgardCRObjectBuilder *builder, 
 	guint i = 0;
 	MidgardCRObjectModel **models = builder->_models;
 
-	if (!models)
+	if (models == NULL || *models == NULL)
 		g_error_new_literal (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL, 
 				"No ObjectModel registered for execution");
 
@@ -285,6 +295,17 @@ midgard_cr_core_object_builder_register_types (MidgardCRObjectBuilder *builder, 
 				type_attr->params[j] = g_param_spec_boolean (
 						property, nick, descr,
 						FALSE, G_PARAM_READWRITE);
+			} else if (ptype == G_TYPE_OBJECT) {
+				/* Determine referenced object classname*/
+				guint k;
+				guint n_o_models;
+				MidgardCRModel **o_models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (property_models[j]), &n_o_models);
+				if (!o_models)
+					g_error ("No model with ReferenceObject associated with '%s' property of Object type", property);
+				GType o_type = g_type_from_name (midgard_cr_model_get_name (MIDGARD_CR_MODEL (o_models[0])));
+				type_attr->params[j] = g_param_spec_object (
+						property, nick, descr,
+						o_type, G_PARAM_READWRITE);
 			} else {
 				type_attr->params[j] = g_param_spec_string (
 					property, nick, descr,

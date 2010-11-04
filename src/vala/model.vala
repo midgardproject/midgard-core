@@ -57,6 +57,11 @@ namespace MidgardCR {
 		 * Check whether model is valid
 		 */
 		public abstract void is_valid () throws ValidationError;
+
+		/**
+		 * Get model's copy
+		 */
+		public abstract Model? copy ();
 	}
 
 	public interface ModelProperty : GLib.Object, Model {

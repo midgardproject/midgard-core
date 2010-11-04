@@ -23,6 +23,7 @@
 #include <glib-object.h>
 #include "midgard3.h"
 #include "midgard_local.h"
+#include <libgda/libgda.h>
 
 typedef struct _MgdSchemaTypeAttr MgdSchemaTypeAttr;
 typedef struct _MgdSchemaPropertyAttr MgdSchemaPropertyAttr;
@@ -40,6 +41,8 @@ struct _MgdSchemaTypeAttr {
 	gchar *extends;
 	gchar *metadata_class_name;
 	GHashTable *user_values;
+	GdaStatement *prepared_sql_statement_insert;
+	GdaSet *prepared_sql_statement_insert_params;
 };
 
 struct _MgdSchemaPropertyAttr {
