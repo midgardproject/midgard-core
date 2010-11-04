@@ -68,7 +68,8 @@ void main () {
 	*/
 
 	var rdf_vali = builder.factory ("RDFGenericObject") as RepositoryObject;
-	rdf_vali.set ("classname","http://www.midgard-project.org/people/vali");
+	rdf_vali.set ("classname", "http://xmlns.com/foaf/0.1/person");
+	rdf_vali.set ("identifier","http://www.midgard-project.org/people/vali");
 	rdf_vali.set_property_value ("foaf:name", "Vali");
 	rdf_vali.set_property_value ("foaf:homepage", "http://www.midgard-project.org/people/vali");	
 	
