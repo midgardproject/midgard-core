@@ -16,6 +16,8 @@
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  */
 
+using Gee;
+
 namespace MidgardCR {
 
 	public class RDFGenericObject : GLib.Object, Storable {
@@ -92,7 +94,6 @@ namespace MidgardCR {
 			}
 
 			var retval = result.to_array();
-			delete result;
 
 			return retval;
 		}
