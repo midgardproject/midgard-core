@@ -70,11 +70,11 @@ namespace MidgardCR {
 		}
 
 		public virtual GLib.Value? get_property_value (string name) {
-			return this._ns_values_hash.get(name)
+			return this._ns_values_hash.get(name);
 		}
 
 		public virtual GLib.Value? get_property_literal (string name) {
-			return this._ns_literals_hash.get(name)
+			return this._ns_literals_hash.get(name);
 		}
 
 		public virtual string[]? list_all_properties () {
