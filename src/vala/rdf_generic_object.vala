@@ -34,7 +34,13 @@ namespace MidgardCR {
 		}
 
 		public string identifier {
-			get { return this._identifier != null ? this._identifier : "midgard:guid:" + this.guid; }
+			get {
+				if (this._identifier == null) {
+					this._identifier = "midgard:guid:" + this.guid;
+				}
+
+				return this._identifier;
+			}
 			set { this._identifier = value; } /* TODO: do we need to "denamespace" this? */
 		}
 
