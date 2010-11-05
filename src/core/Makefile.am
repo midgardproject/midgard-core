@@ -13,6 +13,16 @@ libmidgardcore_la_SOURCES = \
 			    midgard_cr_core_timestamp.c \
 			    midgard_cr_core_object_builder.c \
 			    midgard_cr_core_schema_object.c \
+			    midgard_cr_core_query_constraint.c \
+			    midgard_cr_core_query_constraint_group.c \
+			    midgard_cr_core_query_constraint_simple.c \
+			    midgard_cr_core_query_executor.c \
+			    midgard_cr_core_query_holder.c \
+			    midgard_cr_core_query_private.c \
+			    midgard_cr_core_query_property.c \
+			    midgard_cr_core_query_select.c \
+			    midgard_cr_core_query_storage.c \
+			    midgard_cr_core_query_value.c \
 			    midgard_cr_core_sql_storage_content_manager.c \
 			    midgard_cr_core_sql_storage_model_manager.c \
 			    midgard_cr_core_guid.c \

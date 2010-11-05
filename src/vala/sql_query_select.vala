@@ -22,67 +22,95 @@ namespace MidgardCR
 
 		/* internal properties */
 		internal StorageManager _storage_manager = null;
-		internal QueryStorage _query_storage = null;	
+		internal SQLQueryStorage _query_storage = null;	
+		internal Object _core_query_select = null;
 		internal QueryConstraintSimple _constraint = null;
+		internal uint _n_constraints = 0;
 		internal uint _limit = 0;
 		internal uint _offset = 0;
 		internal uint _results_count = 0;
-	
+		internal SList _orders = null;
+		internal SList _joins = null;
+		internal Object _stmt = null;
+		internal Object _resultset = null;
+		internal bool _readonly = false;
+		
 		/* public properties */
 		public StorageManager storagemanager { 
 			get { return this._storage_manager; }
 			construct { this._storage_manager = value; }
 		}
 		
-		public QueryStorage storage {
+		public SQLQueryStorage storage {
 			get { return this._query_storage; }
 			construct { this._query_storage = value; }
 		}
 
-		/* Constructor */
-		public SQLQuerySelect (StorageManager manager, QueryStorage storage) {
-			Object (storagemanager: manager, storage: storage);
+		public bool readonly { 
+			get { return this._readonly; } 
+			set { this._readonly = value; }
 		}
 
+		private void _create_core_query_select () {
+			if (this._core_query_select == null)
+				this._core_query_select = (MidgardCRCore.QuerySelect) MidgardCRCore.QuerySelect.create_static (this._storage_manager, this._query_storage);
+		}
+
+		/* Constructor */
+		public SQLQuerySelect (StorageManager manager, SQLQueryStorage storage) {
+			Object (storagemanager: manager, storage: storage);
+			this._create_core_query_select ();
+		}
+	
 		public void set_constraint (QueryConstraintSimple constraint) {
+			this._create_core_query_select ();
 			this._constraint = constraint;
 		}
 
 		public void set_limit (uint limit) {
+			this._create_core_query_select ();
 			this._limit = limit;
 		}
 
 		public void set_offset (uint offset) {
+			this._create_core_query_select ();
 			this._offset = offset;
 		}
 
 		public void add_order (QueryProperty property, string type) {
+			this._create_core_query_select ();
 			/* TODO */
 			return;
 		}
 
 		public uint get_results_count () {
+			this._create_core_query_select ();
 			return this._results_count;
 		}
 
 		public void validate () throws ValidationError {
+			this._create_core_query_select ();
 			/* TODO */
 		}
 
 		public void execute () throws ExecutableError {
+			this._create_core_query_select ();
 			/* TODO */
 		}
 
 		public void add_join (string type, QueryProperty left_property, QueryProperty right_property) {
+			this._create_core_query_select ();
 			/* TODO */
 		}
 		
 		public Storable[]? list_objects () {
+			this._create_core_query_select ();
 			/* TODO */
 			return null;
 		}
 
 		public void toggle_read_only (bool toggle) {
+			this._create_core_query_select ();
 			/* TODO */
 		}
 	}

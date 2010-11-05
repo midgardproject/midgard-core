@@ -20,6 +20,7 @@
 #include "midgard_cr_core_type.h"
 #include "midgard_cr_core_timestamp.h"
 #include <sql-parser/gda-sql-parser.h>
+#include "midgard3.h"
 
 #define COLTYPE_INT 	"int"
 #define COLTYPE_DATE	"datetime"

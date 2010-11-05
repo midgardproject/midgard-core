@@ -413,7 +413,9 @@ namespace MidgardCR {
 		 * {@inheritDoc}
 		 *
 		 * Associated models or parent models are not copied to models' copy.
+		 *
 		 * Copied properties: 
+		 *
 		 *  * name
 		 *  * valuetypename
 		 *  * valuedefault

@@ -20,11 +20,10 @@
 #define MIDGARD_CR_CORE_QUERY_EXECUTOR_H
 
 #include <glib-object.h>
-#include "midgard3.h"
+//#include "midgard_cr_core_defs.h"
 #include "midgard_cr_core_query_storage.h"
 #include "midgard_cr_core_query_constraint_simple.h"
 #include "midgard_cr_core_query_property.h"
-
 
 G_BEGIN_DECLS
 
@@ -62,7 +61,7 @@ struct _MidgardCRCoreQueryExecutor {
 };
 
 GType 			midgard_cr_core_query_executor_get_type		(void);
-MidgardCRCoreQueryExecutor	*midgard_cr_core_query_executor_new 		(MidgardCRStorageManager *manager, MidgardCRCoreQueryStorage *storage);
+MidgardCRCoreQueryExecutor	*midgard_cr_core_query_executor_new 		(GObject *manager, MidgardCRCoreQueryStorage *storage);
 gboolean		midgard_cr_core_query_executor_set_constraint	(MidgardCRCoreQueryExecutor *self, MidgardCRCoreQueryConstraintSimple *constraint);
 gboolean		midgard_cr_core_query_executor_set_limit	(MidgardCRCoreQueryExecutor *self, guint limit);
 gboolean 		midgard_cr_core_query_executor_set_offset	(MidgardCRCoreQueryExecutor *self, guint offset);

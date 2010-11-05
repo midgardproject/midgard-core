@@ -268,6 +268,7 @@ namespace MidgardCR {
 		 * Created copy is initialized for the same {@link StorageManager}.
 		 *
 		 * Properties copied:
+		 *
 		 *  * name
 		 *  * location
 		 *  * namespace

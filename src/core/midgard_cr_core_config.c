@@ -27,6 +27,7 @@
 #include <errno.h>
 
 #include "midgard_cr_core_config.h"
+#include "midgard3.h"
 
 gchar *
 midgard_cr_core_config_build_path (const gchar **dirs, const gchar *filename, gboolean user)
@@ -109,7 +110,7 @@ midgard_cr_core_config_build_path (const gchar **dirs, const gchar *filename, gb
 	return filepath;
 }
 
-void midgard_cr_core_config_set_dbtype_id (MidgardCRConfig *self, const gchar *tmpstr)
+void midgard_cr_core_config_set_dbtype_id (struct _MidgardCRConfig *self, const gchar *tmpstr)
 {
 	const gchar *_dbtype = tmpstr;
 
@@ -153,8 +154,8 @@ void _cr_config_create_log_dir(const gchar *path)
 	}
 }
 
-static void __set_config_from_keyfile(MidgardCRConfig *self, GKeyFile *keyfile, const gchar *filename)
-{
+static void __set_config_from_keyfile(struct _MidgardCRConfig *self, GKeyFile *keyfile, const gchar *filename)
+{	
 	g_assert (self != NULL);
 	g_assert (keyfile != NULL);
 
@@ -273,7 +274,7 @@ static void __set_config_from_keyfile(MidgardCRConfig *self, GKeyFile *keyfile, 
  * Since: 9.3
  */ 
 gboolean 
-midgard_cr_core_config_read_file (MidgardCRConfig *config, const gchar *filename, gboolean user, GError **error)
+midgard_cr_core_config_read_file (struct _MidgardCRConfig *config, const gchar *filename, gboolean user, GError **error)
 {
 	gchar *fname = NULL;	
 	GKeyFile *keyfile;	
@@ -336,7 +337,8 @@ midgard_cr_core_config_read_file (MidgardCRConfig *config, const gchar *filename
  * 
  * Returns: %TRUE if file has been read, %FALSE otherwise
  */
-gboolean midgard_cr_core_config_read_file_at_path(MidgardCRConfig *self, const gchar *filepath, GError **error)
+gboolean 
+midgard_cr_core_config_read_file_at_path (struct _MidgardCRConfig *self, const gchar *filepath, GError **error)
 {
 	g_assert (self != NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -365,7 +367,7 @@ gboolean midgard_cr_core_config_read_file_at_path(MidgardCRConfig *self, const g
  * Returns: %TRUE if data has been read, %FALSE otherwise
  */
 gboolean 
-midgard_cr_core_config_read_data (MidgardCRConfig *self, const gchar *data, GError **error)
+midgard_cr_core_config_read_data (struct _MidgardCRConfig *self, const gchar *data, GError **error)
 {
 	g_assert (self != NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
@@ -464,7 +466,7 @@ midgard_cr_core_config_list_files (gboolean user, guint *n_files, GError **err)
  * midgard_cr_core_config_save_at_path
  */
 gboolean
-midgard_cr_core_config_save_at_path (MidgardCRConfig *self, const gchar *path, GError **error)
+midgard_cr_core_config_save_at_path (struct _MidgardCRConfig *self, const gchar *path, GError **error)
 {
 	guint n_props, i;
 	GValue pval = {0,};
@@ -563,7 +565,7 @@ midgard_cr_core_config_save_at_path (MidgardCRConfig *self, const gchar *path, G
  * directory doesn't exist or file can not be saved.
  */
 gboolean 
-midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboolean user, GError **error)
+midgard_cr_core_config_save_file (struct _MidgardCRConfig *self, const gchar *name, gboolean user, GError **error)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (name != NULL, FALSE);
@@ -650,7 +652,7 @@ midgard_cr_core_config_save_file (MidgardCRConfig *self, const gchar *name, gboo
  * midgard_cr_core_config_save_configuration_at_path:
  */
 gboolean 
-midgard_cr_core_config_save_file_at_path (MidgardCRConfig *self, const gchar *path, GError **error)
+midgard_cr_core_config_save_file_at_path (struct _MidgardCRConfig *self, const gchar *path, GError **error)
 {
 	GError *err = NULL;
 	gboolean rv = TRUE;
@@ -726,7 +728,8 @@ gboolean _cr_config_recurse_prepare_blobdir(const gchar *parentdir, int max_dept
  *
  * Returns: %TRUE on success, %FALSE otherwise.
  */
-gboolean midgard_cr_core_config_create_blobdir(MidgardCRConfig *self)
+gboolean 
+midgard_cr_core_config_create_blobdir (struct _MidgardCRConfig *self)
 {
 	/*
 	g_assert (self != NULL);

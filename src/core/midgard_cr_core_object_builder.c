@@ -20,6 +20,7 @@
 #include "midgard_cr_core_object_builder.h"
 #include "midgard_cr_core_timestamp.h"
 #include "midgard_cr_core_type.h"
+#include "midgard3.h"
 
 static void midgard_cr_core_schema_type_attr_free (MgdSchemaTypeAttr *type);
 

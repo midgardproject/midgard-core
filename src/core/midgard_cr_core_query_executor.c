@@ -25,7 +25,7 @@ enum {
 };
 
 MidgardCRCoreQueryExecutor *
-midgard_cr_core_query_executor_new (MidgardCRStorageManager *manager, MidgardCRCoreQueryStorage *storage)
+midgard_cr_core_query_executor_new (GObject *manager, MidgardCRCoreQueryStorage *storage)
 {
 	return NULL;
 }

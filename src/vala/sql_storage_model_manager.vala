@@ -370,7 +370,7 @@ namespace MidgardCR {
 
 		/**
 		 * SQLStorageModelManager can not be copied.
-		 * @returns null
+		 * @return null
 		 */
 		public Model? copy () {
 			return null;

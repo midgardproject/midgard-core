@@ -976,6 +976,8 @@ struct _MidgardCRSQLWorkspaceManagerClass {
 struct _MidgardCRQueryProperty {
 	GObject parent_instance;
 	MidgardCRQueryPropertyPrivate * priv;
+	char* _property_name;
+	MidgardCRQueryStorage* _storage;
 };
 
 struct _MidgardCRQueryPropertyClass {
@@ -1089,11 +1091,18 @@ struct _MidgardCRSQLQuerySelect {
 	GObject parent_instance;
 	MidgardCRSQLQuerySelectPrivate * priv;
 	MidgardCRStorageManager* _storage_manager;
-	MidgardCRQueryStorage* _query_storage;
+	MidgardCRSQLQueryStorage* _query_storage;
+	GObject* _core_query_select;
 	MidgardCRQueryConstraintSimple* _constraint;
+	guint _n_constraints;
 	guint _limit;
 	guint _offset;
 	guint _results_count;
+	GSList* _orders;
+	GSList* _joins;
+	GObject* _stmt;
+	GObject* _resultset;
+	gboolean _readonly;
 };
 
 struct _MidgardCRSQLQuerySelectClass {
@@ -1439,10 +1448,12 @@ GType midgard_cr_sql_query_constraint_get_type (void) G_GNUC_CONST;
 MidgardCRSQLQueryConstraint* midgard_cr_sql_query_constraint_new (MidgardCRQueryProperty* property, const char* op, MidgardCRQueryValueHolder* holder, MidgardCRQueryStorage* storage);
 MidgardCRSQLQueryConstraint* midgard_cr_sql_query_constraint_construct (GType object_type, MidgardCRQueryProperty* property, const char* op, MidgardCRQueryValueHolder* holder, MidgardCRQueryStorage* storage);
 GType midgard_cr_sql_query_select_get_type (void) G_GNUC_CONST;
-MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_new (MidgardCRStorageManager* manager, MidgardCRQueryStorage* storage);
-MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_construct (GType object_type, MidgardCRStorageManager* manager, MidgardCRQueryStorage* storage);
+MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_new (MidgardCRStorageManager* manager, MidgardCRSQLQueryStorage* storage);
+MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_construct (GType object_type, MidgardCRStorageManager* manager, MidgardCRSQLQueryStorage* storage);
 MidgardCRStorageManager* midgard_cr_sql_query_select_get_storagemanager (MidgardCRSQLQuerySelect* self);
-MidgardCRQueryStorage* midgard_cr_sql_query_select_get_storage (MidgardCRSQLQuerySelect* self);
+MidgardCRSQLQueryStorage* midgard_cr_sql_query_select_get_storage (MidgardCRSQLQuerySelect* self);
+gboolean midgard_cr_sql_query_select_get_readonly (MidgardCRSQLQuerySelect* self);
+void midgard_cr_sql_query_select_set_readonly (MidgardCRSQLQuerySelect* self, gboolean value);
 GType midgard_cr_rdf_storage_manager_get_type (void) G_GNUC_CONST;
 MidgardCRNamespaceManager* midgard_cr_rdf_storage_manager_get_nsmanager (MidgardCRRDFStorageManager* self);
 GType midgard_cr_rdfsql_storage_manager_get_type (void) G_GNUC_CONST;

@@ -20,9 +20,9 @@ namespace MidgardCR
 {
 	public class QueryProperty : GLib.Object, QueryValueHolder {
 
-		/* private properties */
-		private string _property_name = null;
-		private QueryStorage _storage = null;	
+		/* internal properties */
+		internal string _property_name = null;
+		internal QueryStorage _storage = null;	
 	
 		/* properties */
 		public string propertyname { 

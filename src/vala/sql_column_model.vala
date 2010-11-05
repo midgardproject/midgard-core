@@ -404,6 +404,7 @@ namespace MidgardCR {
 		 * Newly created model is initialized for the same {@link StorageManager}.
 		 *
 		 * Properties copied:
+		 *
 		 *  * name
 		 *  * location
 		 *  * valuetypename

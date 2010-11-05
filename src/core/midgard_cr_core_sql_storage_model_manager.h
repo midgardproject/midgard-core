@@ -21,14 +21,16 @@
 #define _MIDGARD_CR_CORE_SQL_STORAGE_MODEL_MANAGER_H_
 
 #include <glib-object.h>
-#include "midgard3.h"
 #include "midgard_local.h"
 
-void midgard_cr_core_sql_table_model_manager_prepare_create (MidgardCRSQLStorageModelManager *manager, MidgardCRModel *model, GError **error);
-void midgard_cr_core_sql_table_model_manager_prepare_update (MidgardCRSQLStorageModelManager *manager, GError **error);
-void midgard_cr_core_sql_table_model_manager_prepare_save (MidgardCRSQLStorageModelManager *manager, GError **error);
-void midgard_cr_core_sql_table_model_manager_prepare_delete (MidgardCRSQLStorageModelManager *manager, GError **error);
-void midgard_cr_core_sql_table_model_manager_prepare_purge (MidgardCRSQLStorageModelManager *manager, GError **error);
-void midgard_cr_core_sql_table_model_manager_execute (MidgardCRSQLStorageModelManager *manager, GError **error);
+struct _MidgardCRSQLStorageModelManager;
+struct _MidgardCRModel;
+
+void midgard_cr_core_sql_table_model_manager_prepare_create (struct _MidgardCRSQLStorageModelManager *manager, struct _MidgardCRModel *model, GError **error);
+void midgard_cr_core_sql_table_model_manager_prepare_update (struct _MidgardCRSQLStorageModelManager *manager, GError **error);
+void midgard_cr_core_sql_table_model_manager_prepare_save (struct _MidgardCRSQLStorageModelManager *manager, GError **error);
+void midgard_cr_core_sql_table_model_manager_prepare_delete (struct _MidgardCRSQLStorageModelManager *manager, GError **error);
+void midgard_cr_core_sql_table_model_manager_prepare_purge (struct _MidgardCRSQLStorageModelManager *manager, GError **error);
+void midgard_cr_core_sql_table_model_manager_execute (struct _MidgardCRSQLStorageModelManager *manager, GError **error);
 
 #endif /* _MIDGARD_CR_CORE_SQL_STORAGE_MODEL_MANAGER_H_ */

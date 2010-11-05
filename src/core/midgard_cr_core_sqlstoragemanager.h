@@ -20,30 +20,34 @@
 #ifndef _MIDGARD_CR_CORE_SQL_STORAGE_MANAGER_H_
 #define _MIDGARD_CR_CORE_SQL_STORAGE_MANAGER_H_
 
-#include <glib-object.h>
-#include "midgard3.h"
 #include "midgard_local.h"
+#include <glib.h>
 
-gboolean midgard_cr_core_sql_storage_manager_open (MidgardCRSQLStorageManager *manager, GError **error);
-gboolean midgard_cr_core_sql_storage_manager_close (MidgardCRSQLStorageManager *manager, GError **error);
-gboolean midgard_cr_core_sql_storage_manager_initialize_storage (MidgardCRSQLStorageManager *manager, GError **error);
+struct _MidgardCRSQLTableModel;
+struct _MidgardCRStorageManager;
+struct _MidgardCRSQLStorageManager;
+struct _MidgardCRSQLColumnModel;
+
+gboolean midgard_cr_core_sql_storage_manager_open (struct _MidgardCRSQLStorageManager *manager, GError **error);
+gboolean midgard_cr_core_sql_storage_manager_close (struct _MidgardCRSQLStorageManager *manager, GError **error);
+gboolean midgard_cr_core_sql_storage_manager_initialize_storage (struct _MidgardCRSQLStorageManager *manager, GError **error);
 
 /* SQLTableModel methods */ 
-gboolean midgard_cr_core_sql_storage_manager_table_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLTableModel *storage_model);
-void midgard_cr_core_sql_storage_manager_table_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLTableModel *storage_model, GError **error);
-void midgard_cr_core_sql_storage_manager_table_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLTableModel *storage_model, GError **error);
+gboolean midgard_cr_core_sql_storage_manager_table_exists (struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRSQLTableModel *storage_model);
+void midgard_cr_core_sql_storage_manager_table_create (struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRSQLTableModel *storage_model, GError **error);
+void midgard_cr_core_sql_storage_manager_table_remove (struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRSQLTableModel *storage_model, GError **error);
 
 /* SQLColumnModel methods */
-gboolean midgard_cr_core_sql_storage_manager_column_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLColumnModel *property_model);
-void midgard_cr_core_sql_storage_manager_column_create (MidgardCRSQLStorageManager *manager, MidgardCRSQLColumnModel *property_model, GError **error);
-void midgard_cr_core_sql_storage_manager_column_update (MidgardCRSQLStorageManager *manager, MidgardCRSQLColumnModel *property_model, GError **error);
-void midgard_cr_core_sql_storage_manager_column_remove (MidgardCRSQLStorageManager *manager, MidgardCRSQLColumnModel *property_model, GError **error);
+gboolean midgard_cr_core_sql_storage_manager_column_exists (struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRSQLColumnModel *property_model);
+void midgard_cr_core_sql_storage_manager_column_create (struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRSQLColumnModel *property_model, GError **error);
+void midgard_cr_core_sql_storage_manager_column_update (struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRSQLColumnModel *property_model, GError **error);
+void midgard_cr_core_sql_storage_manager_column_remove (struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRSQLColumnModel *property_model, GError **error);
 
 /* QUERY */
-gint midgard_cr_core_sql_storage_manager_query_execute (MidgardCRSQLStorageManager *manager, const gchar *query, GError **error);
+gint midgard_cr_core_sql_storage_manager_query_execute (struct _MidgardCRSQLStorageManager *manager, const gchar *query, GError **error);
 
 /* MODELS */
-void midgard_cr_core_sql_storage_manager_load_models (MidgardCRSQLStorageManager *self, GError **error);
+void midgard_cr_core_sql_storage_manager_load_models (struct _MidgardCRSQLStorageManager *self, GError **error);
 
 
 #endif /* _MIDGARD_CR_CORE_SQL_STORAGE_MANAGER_H_ */

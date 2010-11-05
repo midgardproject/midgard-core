@@ -48,4 +48,13 @@ namespace MidgardCRCore {
 	public class ObjectBuilder {
 		public static void register_types (MidgardCR.ObjectBuilder builder) throws GLib.Error;
 	}
+
+	/* Query classes */
+	public class QueryStorage : GLib.Object {
+		//public static MidgardCRCore.QueryStorage new (string classname); 
+	}
+
+	public class QuerySelect : GLib.Object {
+		public static MidgardCRCore.QuerySelect create_static (MidgardCR.StorageManager manager, MidgardCR.SQLQueryStorage storage);
+	}
 }

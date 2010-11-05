@@ -20,7 +20,7 @@
 #define MIDGARD_CORE_STORAGE_SQL_H
 
 #include <libgda/libgda.h>
-#include "midgard3.h"
+
 
 #define TABLE_NAME_MAPPER "midgard_mapper_type"
 #define TABLE_NAME_MAPPER_PROPERTIES "midgard_mapper_columns"
@@ -47,6 +47,9 @@ struct _MgdCoreStorageSQLColumn {
 	const gchar *dvalue;
 };
 
+struct _MidgardCRStorageModel;
+struct _MidgardCRObjectModel;
+
 void midgard_core_storage_sql_column_init (MgdCoreStorageSQLColumn *mdc, const gchar *tablename, const gchar *fieldname, GType fieldtype, const gchar *coltypename);
 void midgard_core_storage_sql_column_reset (MgdCoreStorageSQLColumn *mdc);
 
@@ -69,13 +72,13 @@ gboolean midgard_core_storage_sql_index_remove (GdaConnection *cnc, MgdCoreStora
 gboolean midgard_core_storage_sql_create_base_tables (GdaConnection *cnc, GError **error);
 
 /* INSERT */
-gchar *midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
-gchar *midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
-gchar *midgard_cr_core_storage_sql_create_query_insert (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, struct _MidgardCRObjectModel *schema, struct _MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, struct _MidgardCRObjectModel *schema, struct _MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_insert (GObject *object, struct _MidgardCRObjectModel *schema, struct _MidgardCRStorageModel *storage);
 
 /* UPDATE */
-gchar *midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
-gchar *midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRObjectModel *schema, MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, struct _MidgardCRObjectModel *schema, struct _MidgardCRStorageModel *storage);
+gchar *midgard_cr_core_storage_sql_create_query_update (GObject *object, struct _MidgardCRObjectModel *schema, struct _MidgardCRStorageModel *storage);
 
 /* DELETE */
 

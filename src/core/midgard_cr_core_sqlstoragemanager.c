@@ -22,6 +22,7 @@
 #include <libgda/libgda.h>
 #include <sql-parser/gda-sql-parser.h>
 #include "midgard_cr_core_storage_sql.h"
+#include "midgard3.h"
 
 #define DEFAULT_DBNAME "midgard"
 #define DEFAULT_DBUSER "midgard"

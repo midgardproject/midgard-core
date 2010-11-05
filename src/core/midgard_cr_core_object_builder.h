@@ -21,7 +21,6 @@
 #define _MIDGARD_CR_CORE_SCHEMA_BUILDER_H_
 
 #include <glib-object.h>
-#include "midgard3.h"
 #include "midgard_local.h"
 #include <libgda/libgda.h>
 
@@ -62,6 +61,8 @@ struct _MgdSchemaPropertyAttr {
 	GHashTable *user_values;
 };
 
-void midgard_cr_core_object_builder_register_type (MidgardCRObjectBuilder *builder, GError **error);
+struct _MidgardCRObjectBuilder;
+
+void midgard_cr_core_object_builder_register_type (struct _MidgardCRObjectBuilder *builder, GError **error);
 
 #endif /* _MIDGARD_CR_CORE_SCHEMA_BUILDER_H_ */

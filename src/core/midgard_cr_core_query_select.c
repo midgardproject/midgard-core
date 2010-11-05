@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "midgard3.h"
 #include "midgard_cr_core_query_select.h"
 #include "midgard_cr_core_query_private.h"
 #include "midgard_cr_core_query_holder.h"
 #include <sql-parser/gda-sql-parser.h>
+#include "midgard3.h"
 
 /**
  * midgard_cr_core_query_select_new:
@@ -33,15 +33,21 @@
  * Since: 10.05
  */ 
 MidgardCRCoreQuerySelect *
-midgard_cr_core_query_select_new (MidgardCRStorageManager *manager, MidgardCRCoreQueryStorage *storage)
+midgard_cr_core_query_select_new (MidgardCRSQLStorageManager *manager, MidgardCRSQLQueryStorage *storage)
 {
 	g_return_val_if_fail (manager != NULL, NULL);
 	g_return_val_if_fail (storage != NULL, NULL);
 
 	MidgardCRCoreQuerySelect *self = g_object_new (MIDGARD_CR_CORE_TYPE_QUERY_SELECT, 
-		"manager", manager, "storage", storage, NULL);
+		"manager", MIDGARD_CR_STORAGE_MANAGER (manager), "storage", storage, NULL);
 
 	return self;
+}
+
+MidgardCRCoreQuerySelect *
+midgard_cr_core_query_select_create_static (MidgardCRSQLStorageManager *manager, MidgardCRSQLQueryStorage *storage)
+{
+	return midgard_cr_core_query_select_new (manager, storage);
 }
 
 gboolean

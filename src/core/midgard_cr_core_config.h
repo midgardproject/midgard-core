@@ -21,7 +21,6 @@
 #define _MIDGARD_CORE_CONFIG_H_
 
 #include <glib-object.h>
-#include "midgard3.h"
 #include "midgard_local.h"
 
 typedef enum {
@@ -33,14 +32,16 @@ typedef enum {
 	MIDGARD_CORE_DB_TYPE_ORACLE
 } MidgardCoreDBType;
 
-gboolean	midgard_cr_core_config_read_file		(MidgardCRConfig *config, const gchar *name, gboolean user, GError **error);
-gboolean        midgard_cr_core_config_read_file_at_path	(MidgardCRConfig *self, const gchar *filepath, GError **error);
-gboolean        midgard_cr_core_config_read_data           	(MidgardCRConfig *self, const gchar *data, GError **error);
+struct _MidgardCRConfig;
+
+gboolean	midgard_cr_core_config_read_file		(struct _MidgardCRConfig *config, const gchar *name, gboolean user, GError **error);
+gboolean        midgard_cr_core_config_read_file_at_path	(struct _MidgardCRConfig *self, const gchar *filepath, GError **error);
+gboolean        midgard_cr_core_config_read_data           	(struct _MidgardCRConfig *self, const gchar *data, GError **error);
 gchar           **midgard_cr_core_config_list_files        	(gboolean user, guint *n_files, GError **error);
-gboolean        midgard_cr_core_config_save_file           	(MidgardCRConfig *self, const gchar *name, gboolean user, GError **error);
-gboolean        midgard_cr_core_config_create_blobdir      	(MidgardCRConfig *self);
+gboolean        midgard_cr_core_config_save_file           	(struct _MidgardCRConfig *self, const gchar *name, gboolean user, GError **error);
+gboolean        midgard_cr_core_config_create_blobdir      	(struct _MidgardCRConfig *self);
 gchar 		*midgard_cr_core_config_get_default_confdir	();
 gchar 		*midgard_cr_core_config_build_path 		(const gchar **dirs, const gchar *filename, gboolean user);
-void		midgard_cr_core_config_set_dbtype_id		(MidgardCRConfig *config, const gchar *dbtype);
+void		midgard_cr_core_config_set_dbtype_id		(struct _MidgardCRConfig *config, const gchar *dbtype);
 
 #endif /* _MIDGARD_CORE_CONFIG_H_ */
