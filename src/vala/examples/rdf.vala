@@ -31,13 +31,13 @@ void main()
 
 	/* Store data */
 	var mgd = new RDFGenericObject("owl:Thing");
-	mgd.set_identifier("http://www.midgard-project.org/");
+	mgd.identifier = "http://www.midgard-project.org/";
 
 	mgd.set_property_value("http://xmlns.com/foaf/0.1/topic", "http://www.midgard-project.org/rdf/topics/content_repository");
 	content_manager.create(mgd);
 
 	var rdf_vali = new RDFGenericObject("http://xmlns.com/foaf/0.1/Person");
-	rdf_vali.set_identifier("http://www.midgard-project.org/people/vali");
+	rdf_vali.identifier = "http://www.midgard-project.org/people/vali";
 
 	rdf_vali.set_property_value  ("foaf:currentProject", "http://www.midgard-project.org/");
 	rdf_vali.set_property_literal("foaf:myersBriggs",    "INTJ");

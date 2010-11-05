@@ -33,6 +33,7 @@ libmidgardvala_la_VALASOURCES = \
 			  sql_query_storage.vala \
 			  sql_query_constraint.vala \
 			  sql_query_select.vala \
+			  rdf_generic_object.vala \
 			  rdf_storage_manager.vala \
 			  rdf_sql_storage_manager.vala \
 			  rdf_sql_content_manager.vala \
