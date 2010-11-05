@@ -81,7 +81,7 @@ namespace MidgardCR {
 			var v_keys = this._ns_values_hash.keys;
 			var l_keys = this._ns_literals_hash.keys;
 
-			HashSet<string> result = new HashSet<string>;
+			HashSet<string> result = new HashSet<string> ();
 
 			foreach (string k in v_keys) {
 				result.add(k);
