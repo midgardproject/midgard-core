@@ -26,6 +26,7 @@ AC_SUBST(VALAC)
 AC_SUBST(VALAFLAGS)
 
 LIBVALA_REQUIRED=0.9.7
+LIBGEE_REQUIRED=0.5
 
 PKG_CHECK_EXISTS(vala-0.12,
 	[
@@ -38,6 +39,10 @@ PKG_CHECK_EXISTS(vala-0.12,
 AC_SUBST(LIBVALA_CFLAGS)
 AC_SUBST(LIBVALA_LIBS)
 AC_SUBST(VALA_PACKAGE)
+
+PKG_CHECK_MODULES(LIBGEE, gee-1.0 >= $LIBGEE_REQUIRED)
+AC_SUBST(LIBGEE_CFLAGS)
+AC_SUBST(LIBGEE_LIBS)
 
 _MIDGARD_DBUS_SUPPORT=yes
 dbus_libs="dbus-1 dbus-glib-1"
@@ -52,7 +57,7 @@ if test "$_MIDGARD_DBUS_SUPPORT" == "no"; then
 	dbus_libs=""
 fi
 
-PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 libgda-4.0 $dbus_libs)
+PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 libgda-4.0 gee-1.0 $dbus_libs)
 
 DBUS_CONF_DIR="/etc"
 if test "$_MIDGARD_DBUS_SUPPORT" == "yes"; then
