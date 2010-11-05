@@ -25,8 +25,8 @@ namespace MidgardCR {
 		internal string _identifier = null;
 		internal string _classname = null;
 		internal int _id = 0;
-		internal GLib.List<string> _ns_properties_list = null;
-		internal GLib.List<GLib.Value?> _ns_values_list = null;
+		internal GLib.HashMap<string, GLib.Value?> _ns_values_hash = null;
+		internal GLib.HashMap<string, string> _ns_literals_hash = null;
 
 		/* properties */
 		public string guid {
@@ -55,47 +55,46 @@ namespace MidgardCR {
 		/* constructor */
 		public RDFGenericObject (string classname) {
 			this._classname = classname;
+
+			this._ns_values_hash = new HashMap<string, GLib.Value?> ();
+			this._ns_literals_hash = new HashMap<string,string> ();
 		}
 
 		/* methods */
 		public virtual void set_property_value (string name, GLib.Value value) {
-			if (this._ns_properties_list == null) {
-				this._ns_properties_list = new List<string> ();
-				this._ns_values_list = new List<GLib.Value?> ();
-			}
-			this._ns_properties_list.append (name);
-			this._ns_values_list.append (value);
+			this._ns_values_hash.set (name,value);
 		}
 
 		public virtual void set_property_literal (string name, GLib.Value value) {
+			this._ns_literals_hash.set (name,value);
 		}
 
 		public virtual GLib.Value? get_property_value (string name) {
-			if (this._ns_properties_list == null)
-				return null;
-
-			int i = 0;
-			foreach (string element in this._ns_properties_list) {
-				if (element == name)
-					return this._ns_values_list.nth_data (i);
-				i++;
-			}
-
-			return null;
+			return this._ns_values_hash.get(name)
 		}
 
 		public virtual GLib.Value? get_property_literal (string name) {
+			return this._ns_literals_hash.get(name)
 		}
 
 		public virtual string[]? list_all_properties () {
-			if (this._ns_properties_list == null)
-				return null;
+			var v_keys = this._ns_values_hash.keys;
+			var l_keys = this._ns_literals_hash.keys;
 
-			string[] all_props = null;
-			foreach (string element in this._ns_properties_list) {
-				all_props += element;
+			HashSet<string> result = new HashSet<string>;
+
+			foreach (string k in v_keys) {
+				result.add(k);
 			}
-			return all_props;
+
+			foreach (string k in l_keys) {
+				result.add(k);
+			}
+
+			var retval = result.to_array();
+			delete result;
+
+			return retval;
 		}
 	}
 
