@@ -25,8 +25,8 @@ namespace MidgardCR {
 		internal string _identifier = null;
 		internal string _classname = null;
 		internal int _id = 0;
-		internal GLib.HashMap<string, GLib.Value?> _ns_values_hash = null;
-		internal GLib.HashMap<string, string> _ns_literals_hash = null;
+		internal Gee.HashMap<string, GLib.Value?> _ns_values_hash = null;
+		internal Gee.HashMap<string, string> _ns_literals_hash = null;
 
 		/* properties */
 		public string guid {
@@ -56,8 +56,8 @@ namespace MidgardCR {
 		public RDFGenericObject (string classname) {
 			this._classname = classname;
 
-			this._ns_values_hash = new HashMap<string, GLib.Value?> ();
-			this._ns_literals_hash = new HashMap<string,string> ();
+			this._ns_values_hash = new Gee.HashMap<string, GLib.Value?> ();
+			this._ns_literals_hash = new Gee.HashMap<string,string> ();
 		}
 
 		/* methods */
@@ -81,7 +81,7 @@ namespace MidgardCR {
 			var v_keys = this._ns_values_hash.keys;
 			var l_keys = this._ns_literals_hash.keys;
 
-			HashSet<string> result = new HashSet<string> ();
+			Gee.HashSet<string> result = new Gee.HashSet<string> ();
 
 			foreach (string k in v_keys) {
 				result.add(k);
