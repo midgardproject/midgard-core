@@ -47,6 +47,7 @@ typedef struct _MidgardKeyConfigContextPrivate MidgardKeyConfigContextPrivate;
 typedef struct _MidgardKeyConfigFileContext MidgardKeyConfigFileContext;
 typedef struct _MidgardKeyConfigFileContextClass MidgardKeyConfigFileContextClass;
 typedef struct _MidgardKeyConfigFileContextPrivate MidgardKeyConfigFileContextPrivate;
+#define _g_object_unref0(var) ((var == NULL) ? NULL : (var = (g_object_unref (var), NULL)))
 #define _g_dir_close0(var) ((var == NULL) ? NULL : (var = (g_dir_close (var), NULL)))
 #define _g_error_free0(var) ((var == NULL) ? NULL : (var = (g_error_free (var), NULL)))
 #define _g_free0(var) (var = (g_free (var), NULL))
@@ -78,8 +79,8 @@ typedef enum  {
 
 static gpointer midgard_key_config_file_context_parent_class = NULL;
 
-GType midgard_key_config_context_get_type (void);
-GType midgard_key_config_file_context_get_type (void);
+GType midgard_key_config_context_get_type (void) G_GNUC_CONST;
+GType midgard_key_config_file_context_get_type (void) G_GNUC_CONST;
 enum  {
 	MIDGARD_KEY_CONFIG_FILE_CONTEXT_DUMMY_PROPERTY
 };
@@ -105,12 +106,13 @@ MidgardKeyConfigFileContext* midgard_key_config_file_context_construct (GType ob
 	_inner_error_ = NULL;
 	if (!g_path_is_absolute (context_path)) {
 		_inner_error_ = g_error_new (KEY_CONFIG_CONTEXT_ERROR, KEY_CONFIG_CONTEXT_ERROR_PATH_IS_NOT_ABSOLUTE, "Expected absolute path. %s given", context_path);
-		if (_inner_error_ != NULL) {
+		{
 			if (_inner_error_->domain == KEY_CONFIG_CONTEXT_ERROR) {
 				g_propagate_error (error, _inner_error_);
+				_g_object_unref0 (self);
 				return NULL;
 			} else {
-				g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+				g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 				g_clear_error (&_inner_error_);
 				return NULL;
 			}
@@ -137,7 +139,7 @@ static void _vala_array_add1 (char*** array, int* length, int* size, char* value
 
 
 static char* string_substring (const char* self, glong offset, glong len) {
-	char* result;
+	char* result = NULL;
 	glong string_length;
 	const char* start;
 	g_return_val_if_fail (self != NULL, NULL);
@@ -169,12 +171,12 @@ static void _vala_array_add2 (char*** array, int* length, int* size, char* value
 
 
 static char** midgard_key_config_file_context_set_cfgs (MidgardKeyConfigFileContext* self, const char* path, gint i, int* result_length1) {
-	char** result;
+	char** result = NULL;
 	GError * _inner_error_;
 	GDir* dir;
 	char* name;
 	char** _tmp2_;
-	gint cfgs_size;
+	gint _cfgs_size_;
 	gint cfgs_length1;
 	char** cfgs;
 	char** _tmp9_;
@@ -188,32 +190,36 @@ static char** midgard_key_config_file_context_set_cfgs (MidgardKeyConfigFileCont
 		_tmp0_ = g_dir_open (path, 0, &_inner_error_);
 		if (_inner_error_ != NULL) {
 			if (_inner_error_->domain == G_FILE_ERROR) {
-				goto __catch0_g_file_error;
+				goto __catch7_g_file_error;
 			}
-			goto __finally0;
+			_g_dir_close0 (dir);
+			g_critical ("file %s: line %d: unexpected error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
+			g_clear_error (&_inner_error_);
+			return NULL;
 		}
 		dir = (_tmp1_ = _tmp0_, _g_dir_close0 (dir), _tmp1_);
 	}
-	goto __finally0;
-	__catch0_g_file_error:
+	goto __finally7;
+	__catch7_g_file_error:
 	{
 		GError * e;
 		e = _inner_error_;
 		_inner_error_ = NULL;
 		{
-			g_warning ("midgard_key_config_file_context.vala:45: Can not open context path %s. %s", path, e->message);
+			g_warning ("midgard_key_config_file_context.vala:45: Can not open context path %s." \
+" %s", path, e->message);
 			_g_error_free0 (e);
 		}
 	}
-	__finally0:
+	__finally7:
 	if (_inner_error_ != NULL) {
 		_g_dir_close0 (dir);
-		g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+		g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 		g_clear_error (&_inner_error_);
 		return NULL;
 	}
 	name = NULL;
-	cfgs = (_tmp2_ = g_new0 (char*, 0 + 1), cfgs_length1 = 0, cfgs_size = cfgs_length1, _tmp2_);
+	cfgs = (_tmp2_ = g_new0 (char*, 0 + 1), cfgs_length1 = 0, _cfgs_size_ = cfgs_length1, _tmp2_);
 	while (TRUE) {
 		char* _tmp3_;
 		char* abspath;
@@ -223,11 +229,11 @@ static char** midgard_key_config_file_context_set_cfgs (MidgardKeyConfigFileCont
 		abspath = g_build_filename (path, name, NULL);
 		if (g_file_test (abspath, G_FILE_TEST_IS_DIR)) {
 			char** _tmp5_;
-			gint children_size;
+			gint _children_size_;
 			gint children_length1;
 			gint _tmp4_;
 			char** children;
-			children = (_tmp5_ = midgard_key_config_file_context_set_cfgs (self, abspath, i, &_tmp4_), children_length1 = _tmp4_, children_size = children_length1, _tmp5_);
+			children = (_tmp5_ = midgard_key_config_file_context_set_cfgs (self, abspath, i, &_tmp4_), children_length1 = _tmp4_, _children_size_ = children_length1, _tmp5_);
 			{
 				char** child_collection;
 				int child_collection_length1;
@@ -238,7 +244,7 @@ static char** midgard_key_config_file_context_set_cfgs (MidgardKeyConfigFileCont
 					const char* child;
 					child = child_collection[child_it];
 					{
-						_vala_array_add1 (&cfgs, &cfgs_length1, &cfgs_size, g_strdup (child));
+						_vala_array_add1 (&cfgs, &cfgs_length1, &_cfgs_size_, g_strdup (child));
 					}
 				}
 			}
@@ -254,36 +260,33 @@ static char** midgard_key_config_file_context_set_cfgs (MidgardKeyConfigFileCont
 					char* _tmp8_;
 					regex = (_tmp7_ = g_regex_new (_tmp6_ = g_regex_escape_string (midgard_key_config_context_get_context_path ((MidgardKeyConfigContext*) self), -1), 0, 0, &_inner_error_), _g_free0 (_tmp6_), _tmp7_);
 					if (_inner_error_ != NULL) {
-						goto __catch1_g_error;
-						goto __finally1;
+						goto __catch8_g_error;
 					}
-					_tmp8_ = g_regex_replace_literal (regex, path_wo_suffix, (glong) (-1), 0, "", 0, &_inner_error_);
+					_tmp8_ = g_regex_replace_literal (regex, path_wo_suffix, (gssize) (-1), 0, "", 0, &_inner_error_);
 					if (_inner_error_ != NULL) {
 						_g_regex_unref0 (regex);
-						goto __catch1_g_error;
-						goto __finally1;
+						goto __catch8_g_error;
 					}
-					_vala_array_add2 (&cfgs, &cfgs_length1, &cfgs_size, _tmp8_);
+					_vala_array_add2 (&cfgs, &cfgs_length1, &_cfgs_size_, _tmp8_);
 					_g_regex_unref0 (regex);
 				}
-				goto __finally1;
-				__catch1_g_error:
+				goto __finally8;
+				__catch8_g_error:
 				{
-					/*Error object is not used within catch statement, clear it*/
 					g_clear_error (&_inner_error_);
 					_inner_error_ = NULL;
 					{
 						g_warning ("midgard_key_config_file_context.vala:70: Weird path '%s', not added.", abspath);
 					}
 				}
-				__finally1:
+				__finally8:
 				if (_inner_error_ != NULL) {
 					_g_free0 (path_wo_suffix);
 					_g_free0 (abspath);
-					_g_dir_close0 (dir);
-					_g_free0 (name);
 					cfgs = (_vala_array_free (cfgs, cfgs_length1, (GDestroyNotify) g_free), NULL);
-					g_critical ("file %s: line %d: uncaught error: %s", __FILE__, __LINE__, _inner_error_->message);
+					_g_free0 (name);
+					_g_dir_close0 (dir);
+					g_critical ("file %s: line %d: uncaught error: %s (%s, %d)", __FILE__, __LINE__, _inner_error_->message, g_quark_to_string (_inner_error_->domain), _inner_error_->code);
 					g_clear_error (&_inner_error_);
 					return NULL;
 				}
@@ -294,18 +297,18 @@ static char** midgard_key_config_file_context_set_cfgs (MidgardKeyConfigFileCont
 		_g_free0 (abspath);
 	}
 	result = (_tmp9_ = cfgs, *result_length1 = cfgs_length1, _tmp9_);
-	_g_dir_close0 (dir);
 	_g_free0 (name);
+	_g_dir_close0 (dir);
 	return result;
-	_g_dir_close0 (dir);
-	_g_free0 (name);
 	cfgs = (_vala_array_free (cfgs, cfgs_length1, (GDestroyNotify) g_free), NULL);
+	_g_free0 (name);
+	_g_dir_close0 (dir);
 }
 
 
 static char** midgard_key_config_file_context_real_list_key_config (MidgardKeyConfigContext* base, int* result_length1) {
 	MidgardKeyConfigFileContext * self;
-	char** result;
+	char** result = NULL;
 	gint _tmp0_;
 	char** _tmp1_;
 	self = (MidgardKeyConfigFileContext*) base;

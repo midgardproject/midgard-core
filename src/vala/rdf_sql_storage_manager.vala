@@ -46,22 +46,24 @@ namespace MidgardCR {
 			base (name, config);
 			
 			/* initialize generic RDF object and table models */ 
-			this._rdf_object_model = new ObjectModel ("RDFGenericObject");
+			this._rdf_object_model = new ObjectModel ("RDFTripleObject");
 			this._rdf_object_model
 				.add_model (new ObjectModelProperty ("identifier", "string", ""))
 				.add_model (new ObjectModelProperty ("classname", "string", ""))
 				.add_model (new ObjectModelProperty ("objectguid", "guid", ""))
 				.add_model (new ObjectModelProperty ("property", "string", ""))
-				.add_model (new ObjectModelProperty ("alias", "string", ""))
+/*				.add_model (new ObjectModelProperty ("alias", "string", ""))*/
+				.add_model (new ObjectModelProperty ("literal", "string", ""))
 				.add_model (new ObjectModelProperty ("value", "string", ""));
 
-			this._rdf_table_model = new SQLTableModel ((SQLStorageManager) this, "RDFGenericObject", "rdf_generic_object");
+			this._rdf_table_model = new SQLTableModel ((SQLStorageManager) this, "RDFTripleObject", "rdf_triple_object");
 			this._rdf_table_model
 				.add_model (new SQLColumnModel ((SQLStorageManager) this, "identifier", "identifier", "string"))
 				.add_model (new SQLColumnModel ((SQLStorageManager) this, "classname", "class_name", "string"))
 				.add_model (new SQLColumnModel ((SQLStorageManager) this, "objectguid", "object_guid", "guid"))
 				.add_model (new SQLColumnModel ((SQLStorageManager) this, "property", "property_name", "string"))
-				.add_model (new SQLColumnModel ((SQLStorageManager) this, "alias", "property_alias", "string"))
+/*				.add_model (new SQLColumnModel ((SQLStorageManager) this, "alias", "property_alias", "string"))*/
+				.add_model (new SQLColumnModel ((SQLStorageManager) this, "literal", "property_literal", "string"))
 				.add_model (new SQLColumnModel ((SQLStorageManager) this, "value", "property_value", "string"));
 		}
 

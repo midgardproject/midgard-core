@@ -29,27 +29,27 @@ namespace MidgardCR {
 			return false;
 		}	
 
-		public override bool create (Storable object) throws StorageContentManagerError {
+		public override bool create (Storable object) throws StorageContentManagerError
+		{
 			base.create (object);
-			if (object is RepositoryObject) {
-				string[] props = ((RepositoryObject) object).list_all_properties ();
+
+			if (object is RDFGenericObject) {
 				var builder = new ObjectBuilder ();
-				foreach (string name in props) {
-					GLib.Value pval = ((RepositoryObject) object).get_property_value (name);
-					/* TODO
-					 * Handle Object value type
-					 * Check property name if it contains full uri */
-					var rdf_prop = builder.factory ("RDFGenericObject") as RepositoryObject;
-					string[] ptokens = name.split (":", 2);
-					rdf_prop.set (
-						"objectguid", ((RepositoryObject)object).guid,
-						"property", ptokens[1],
-						"alias", ptokens[0],
-						"value", (string) pval);
+
+				var rdf_object = (RDFGenericObject) object;
+				foreach (string name in rdf_object.list_all_properties()) {
+					/* TODO: convert property-name to canonical form */
+					var rdf_prop = builder.factory ("RDFTripleObject") as RepositoryObject;
+					rdf_prop.set(
+						"objectguid", rdf_object.guid,
+						"identifier", rdf_object.identifier,
+						"classname",  rdf_object.classname,
+						"property",   name,
+						"literal",    (string) rdf_object.get_property_literal(name),
+						"value",      (string) rdf_object.get_property_value(name)
+					);
 					base.create (rdf_prop);
-					//delete rdf_prop;
 				}
-				//delete (Object)builder; 
 			}
 			return true;
 		}	

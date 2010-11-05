@@ -72,8 +72,8 @@ struct _MidgardKeyConfigClass {
 
 static gpointer midgard_key_config_parent_class = NULL;
 
-GType midgard_key_config_get_type (void);
-GType midgard_key_config_context_get_type (void);
+GType midgard_key_config_get_type (void) G_GNUC_CONST;
+GType midgard_key_config_context_get_type (void) G_GNUC_CONST;
 enum  {
 	MIDGARD_KEY_CONFIG_DUMMY_PROPERTY
 };
@@ -135,7 +135,7 @@ void midgard_key_config_set_value (MidgardKeyConfig* self, const char* group, co
 
 
 static char* midgard_key_config_real_get_value (MidgardKeyConfig* self, const char* group, const char* key) {
-	char* result;
+	char* result = NULL;
 	char* value;
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (group != NULL, NULL);
@@ -166,7 +166,7 @@ void midgard_key_config_set_comment (MidgardKeyConfig* self, const char* group, 
 
 
 static char* midgard_key_config_real_get_comment (MidgardKeyConfig* self, const char* group, const char* key) {
-	char* result;
+	char* result = NULL;
 	char* comment;
 	g_return_val_if_fail (self != NULL, NULL);
 	g_return_val_if_fail (group != NULL, NULL);
@@ -183,7 +183,7 @@ char* midgard_key_config_get_comment (MidgardKeyConfig* self, const char* group,
 
 
 static char** midgard_key_config_real_list_groups (MidgardKeyConfig* self, int* result_length1) {
-	char** result;
+	char** result = NULL;
 	gpointer _tmp0_;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = (_tmp0_ = NULL, *result_length1 = 0, _tmp0_);
@@ -197,7 +197,7 @@ char** midgard_key_config_list_groups (MidgardKeyConfig* self, int* result_lengt
 
 
 static gboolean midgard_key_config_real_group_exists (MidgardKeyConfig* self, const char* name) {
-	gboolean result;
+	gboolean result = FALSE;
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (name != NULL, FALSE);
 	result = FALSE;
@@ -211,7 +211,7 @@ gboolean midgard_key_config_group_exists (MidgardKeyConfig* self, const char* na
 
 
 static gboolean midgard_key_config_real_delete_group (MidgardKeyConfig* self, const char* name) {
-	gboolean result;
+	gboolean result = FALSE;
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (name != NULL, FALSE);
 	result = FALSE;
@@ -225,7 +225,7 @@ gboolean midgard_key_config_delete_group (MidgardKeyConfig* self, const char* na
 
 
 static gboolean midgard_key_config_real_store (MidgardKeyConfig* self) {
-	gboolean result;
+	gboolean result = FALSE;
 	g_return_val_if_fail (self != NULL, FALSE);
 	result = FALSE;
 	return result;
@@ -238,7 +238,7 @@ gboolean midgard_key_config_store (MidgardKeyConfig* self) {
 
 
 static gboolean midgard_key_config_real_load_from_data (MidgardKeyConfig* self, const char* data) {
-	gboolean result;
+	gboolean result = FALSE;
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (data != NULL, FALSE);
 	result = FALSE;
@@ -252,7 +252,7 @@ gboolean midgard_key_config_load_from_data (MidgardKeyConfig* self, const char* 
 
 
 static char* midgard_key_config_real_to_data (MidgardKeyConfig* self) {
-	char* result;
+	char* result = NULL;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = NULL;
 	return result;

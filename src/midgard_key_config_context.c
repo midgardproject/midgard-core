@@ -59,7 +59,7 @@ struct _MidgardKeyConfigContextPrivate {
 static gpointer midgard_key_config_context_parent_class = NULL;
 
 GQuark key_config_context_error_quark (void);
-GType midgard_key_config_context_get_type (void);
+GType midgard_key_config_context_get_type (void) G_GNUC_CONST;
 #define MIDGARD_KEY_CONFIG_CONTEXT_GET_PRIVATE(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), MIDGARD_TYPE_KEY_CONFIG_CONTEXT, MidgardKeyConfigContextPrivate))
 enum  {
 	MIDGARD_KEY_CONFIG_CONTEXT_DUMMY_PROPERTY,
@@ -90,7 +90,7 @@ MidgardKeyConfigContext* midgard_key_config_context_construct (GType object_type
 
 
 static char** midgard_key_config_context_real_list_key_config (MidgardKeyConfigContext* self, int* result_length1) {
-	char** result;
+	char** result = NULL;
 	gpointer _tmp0_;
 	g_return_val_if_fail (self != NULL, NULL);
 	result = (_tmp0_ = NULL, *result_length1 = 0, _tmp0_);

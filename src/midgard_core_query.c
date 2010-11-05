@@ -877,7 +877,7 @@ midgard_core_query_insert_records (MidgardConnection *mgd,
 }
 
 
-gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
+gboolean midgard_core_table_exists(MidgardConnection *mgd, const gchar *tablename)
 {
 	GdaMetaContext mcontext = {"_tables", 1, NULL, NULL};
         mcontext.column_names = g_new (gchar *, 1);
@@ -917,11 +917,6 @@ gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
 	return retval;
 }
 
-gboolean midgard_core_table_exists(MidgardConnection *mgd, const gchar *tablename)
-{
-	        return __table_exists(mgd, tablename);
-}
-
 /* Add primary fieldname *only* when it's integer type, otherwise set to NULL */
 gboolean midgard_core_query_create_table(MidgardConnection *mgd, 
 		const gchar *descr, const gchar *tablename, const gchar *primary)
@@ -932,7 +927,7 @@ gboolean midgard_core_query_create_table(MidgardConnection *mgd,
 	g_assert(mgd != NULL);
 	g_assert(tablename != NULL);
 
-	if(__table_exists(mgd, tablename)) {
+	if(midgard_core_table_exists(mgd, tablename)) {
 		
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO,
 				"Table %s exists. Skipping create: OK", tablename);
@@ -1623,7 +1618,7 @@ gboolean midgard_core_query_update_class_storage(MidgardConnection *mgd, Midgard
 
 	guint n_prop, i = 0;
 
-	if(!__table_exists(mgd, tablename)) {
+	if(!midgard_core_table_exists(mgd, tablename)) {
 		
 		g_warning("Table %s doesn't exist. Can not update", tablename);
 		return FALSE;
@@ -1762,7 +1757,7 @@ gboolean midgard_core_query_create_class_storage(
 	guint n_prop;
 	guint i = 0;
 
-	if(__table_exists(mgd, tablename)) {
+	if(midgard_core_table_exists(mgd, tablename)) {
 
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_INFO,
 				"Table %s exists. Skipping create: OK", tablename);
