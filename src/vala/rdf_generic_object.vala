@@ -65,7 +65,7 @@ namespace MidgardCR {
 			this._ns_values_hash.set (name,value);
 		}
 
-		public virtual void set_property_literal (string name, GLib.Value value) {
+		public virtual void set_property_literal (string name, string value) {
 			this._ns_literals_hash.set (name,value);
 		}
 
