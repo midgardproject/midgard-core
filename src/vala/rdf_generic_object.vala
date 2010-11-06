@@ -27,8 +27,8 @@ namespace MidgardCR {
 		internal string _identifier = null;
 		internal string _classname = null;
 		internal int _id = 0;
-		internal Gee.HashMap<string, GLib.Value?> _ns_values_hash = null;
-		internal Gee.HashMap<string, string> _ns_literals_hash = null;
+		internal HashTable<string, GLib.Value?> _ns_values_hash = null;
+		internal HashTable<string, string> _ns_literals_hash = null;
 
 		/* properties */
 		public string guid {
@@ -48,6 +48,7 @@ namespace MidgardCR {
 
 		public string classname {
 			get { return this._classname; }
+			construct { this._classname = value; }
 		}
 
 		public uint id {
@@ -56,46 +57,46 @@ namespace MidgardCR {
 
 		/* constructor */
 		public RDFGenericObject (string classname) {
-			this._classname = classname;
-
-			this._ns_values_hash = new Gee.HashMap<string, GLib.Value?> ();
-			this._ns_literals_hash = new Gee.HashMap<string,string> ();
+			Object (classname: classname);	
 		}
+		
+		construct {
+			this._ns_values_hash = new HashTable <string, GLib.Value?>(str_hash, str_equal);
+			this._ns_literals_hash = new HashTable <string, string>(str_hash, str_equal);
+		}			
 
 		/* methods */
 		public virtual void set_property_value (string name, GLib.Value value) {
-			this._ns_values_hash.set (name,value);
+			this._ns_values_hash.insert (name,value);
 		}
 
 		public virtual void set_property_literal (string name, string value) {
-			this._ns_literals_hash.set (name,value);
+			this._ns_literals_hash.insert (name,value);
 		}
 
 		public virtual GLib.Value? get_property_value (string name) {
-			return this._ns_values_hash.get(name);
+			return this._ns_values_hash.lookup (name);
 		}
 
 		public virtual GLib.Value? get_property_literal (string name) {
-			return this._ns_literals_hash.get(name);
+			return this._ns_literals_hash.lookup (name);
 		}
 
 		public virtual string[]? list_all_properties () {
-			var v_keys = this._ns_values_hash.keys;
-			var l_keys = this._ns_literals_hash.keys;
+			HashTable <weak string, string> tmphash = new HashTable<weak string, string> (str_hash, str_equal);
+			foreach (string element in this._ns_values_hash.get_keys ()) {
+				tmphash.insert (element, null);
+			}	
+			
+			foreach (string element in this._ns_literals_hash.get_keys ()) {
+				tmphash.insert (element, null);
+			}	
 
-			Gee.HashSet<string> result = new Gee.HashSet<string> ();
+			string[] propnames = null;
+			foreach (string el in tmphash.get_keys ())
+				propnames += el;
 
-			foreach (string k in v_keys) {
-				result.add(k);
-			}
-
-			foreach (string k in l_keys) {
-				result.add(k);
-			}
-
-			var retval = result.to_array();
-
-			return retval;
+			return propnames;	
 		}
 	}
 
