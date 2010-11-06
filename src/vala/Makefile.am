@@ -47,7 +47,7 @@ libmidgardvala_la_LDFLAGS = -module -export-dynamic
 libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
 
 libmidgardvala.vala.stamp: $(libmidgardvala_la_VALASOURCES)
-	$(VALAC) $(VALAFLAGS) --pkg gee-1.0 --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgard3_header) -C $^
+	$(VALAC) $(VALAFLAGS)  --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgard3_header) -C $^
 	touch $@
 
 EXTRA_DIST = \
