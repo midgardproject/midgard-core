@@ -46,7 +46,7 @@ void main()
 	content_manager.create(rdf_vali);
 
 	/* Query Data */
-	var query = new SQLRDFQuerySelect(storage_manager, new SQLRDFQueryStorage("foaf:Person"));
+	/*var query = new SQLRDFQuerySelect(storage_manager, new SQLRDFQueryStorage("foaf:Person"));
 	query.set_constraint(new QueryConstraint(
 		new QueryProperty("http://xmlns.com/foaf/0.1/currentProject", null),
 		"=",
@@ -60,7 +60,7 @@ void main()
 	GLib.print("These people work on midgard!\n");
 	foreach (RDFGenericObject rdf_obj in query.list_objects()) {
 		GLib.print("\t%s\n", rdf_obj.get_property_value("foaf:name"));
-	}
+	}*/
 }
 
 /* ================= */
@@ -81,6 +81,7 @@ RDFSQLStorageManager getStorageManager()
 
 	/* Register models in builder and validate models */
 	var model_manager = storage_manager.model_manager;
+	var builder = new MidgardCR.ObjectBuilder ();
 
 	foreach (ObjectModel model in model_manager.list_object_models())
 		builder.register_model(model);
