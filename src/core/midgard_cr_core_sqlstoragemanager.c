@@ -60,6 +60,18 @@ cnc_add_part (GString *cnc, const gchar *name, const gchar *value, const gchar *
 	}
 }
 
+static MidgardCRModel *
+__find_model_by_name (MidgardCRModel **models, const gchar *name)
+{
+	guint i = 0;
+	while (models[i] != NULL) {
+		if (g_str_equal (midgard_cr_model_get_name (models[i]), name))
+			return models[i];
+		i++;
+	}
+	return NULL;
+}
+
 static void
 __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 {
@@ -137,11 +149,13 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 
 	guint j = 0;
 	guint coln = 0;
-	GSList *pmodels = NULL;
 	const gchar *classname;
+	MidgardCRObjectPropertyModel *property_model;
+	MidgardCRObjectModelReference *reference_object_model = NULL;
 	while (self->_object_models[j] != NULL) {
 		classname = midgard_cr_model_get_name (MIDGARD_CR_MODEL (self->_object_models[j]));
 		for (i = 0; i < rows; i++) {
+			property_model = NULL;
 			/* Check property's class name */
 			value = gda_data_model_get_typed_value_at (model, coln, i, G_TYPE_STRING, TRUE, NULL);
 			if (!g_str_equal (g_value_get_string (value), classname))
@@ -155,10 +169,6 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 			/* default_value_string */
 			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 			const gchar *dvalue = g_value_get_string (value);
-
-			MidgardCRObjectModelProperty *property_model = 
-				midgard_cr_object_model_property_new (property_name, gtype_name, dvalue);
-
 			/* property_nick */
 			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 			const gchar *property_nick = g_value_get_string (value);
@@ -166,23 +176,37 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 			const gchar *descr = g_value_get_string (value);
 			/* is_reference */
-			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);	
-			gboolean isref = FALSE;
-			if (value) {
-				isref = (gboolean) g_value_get_int (value);
-				/* Add model to "delayed" list, so we'll compute more data a bit later */
-				if (isref)
-					pmodels = g_slist_prepend (pmodels, property_model);
-			}	
-			property_model->_isref = isref;
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
+			gboolean isref = (gboolean) g_value_get_int (value);
+			/* reference holder */
+			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+			const gchar *reference_holder_name = g_value_get_string (value);
 			/* reference_class_name */
 			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
-			g_free (property_model->_refname);
-			property_model->_refname = g_value_dup_string (value);
+			const gchar *reference_class_name = g_value_get_string (value);
 			/* reference_property_name */
 			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
-			g_free (property_model->_reftarget);
-			property_model->_reftarget = g_value_dup_string (value);
+			const gchar *reference_property_name = g_value_get_string (value);
+			if (isref) {
+				/* Object reference case */
+				if (reference_holder_name != NULL 
+						&& *reference_holder_name != '\0') { 
+					if (reference_class_name == NULL
+							|| (reference_class_name && *reference_class_name == '\0'))
+					       g_error ("Empty referenced class name for '%s' reference and '%s' property", 
+						       reference_holder_name, property_name);
+			 		MidgardCRObjectModel *ro_model = __find_model_by_name (self->_object_models, reference_class_name);
+					if (ro_model == NULL)
+						g_error ("Referenced '%s' ObjectModel not found.", reference_class_name);		
+					reference_object_model = 
+						(MidgardCRObjectModel *)midgard_cr_object_model_reference_new (reference_holder_name);
+					property_model = midgard_cr_object_property_reference_new (
+							property_name, ro_model, reference_object_model);
+				}
+			}
+			/* Create ObjectPropertyModel */
+			if (property_model == NULL)
+				property_model = midgard_cr_object_property_model_new (property_name, gtype_name, dvalue);
 			/* namespace */
 			value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 			midgard_cr_model_set_namespace (MIDGARD_CR_MODEL (property_model), g_value_get_string (value));
@@ -201,22 +225,7 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 		}
 		j++;
 	}
-	
-	GSList *l;
-	j = 0;
-	for (l = pmodels; l != NULL; l = l->next) {
-		MidgardCRObjectModelProperty *property_model = (MidgardCRObjectModelProperty*) l->data;
-		while (self->_object_models[j] != NULL) {
-			classname = midgard_cr_model_get_name (MIDGARD_CR_MODEL (self->_object_models[j]));
-			if (g_str_equal (property_model->_refname, classname))
-				midgard_cr_model_add_model (MIDGARD_CR_MODEL (property_model), MIDGARD_CR_MODEL (self->_object_models[j]));
-			j++;
-		}
-	}
-	
-	if (pmodels)
-		g_slist_free (pmodels);
-	
+
 	g_object_unref (model);
 	return;
 }
@@ -320,6 +329,7 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 	gboolean is_auto_increment = FALSE;
 	const gchar *description = NULL;
 	gboolean is_reference = FALSE;
+	const gchar *reference_holder = NULL;
 	const gchar *reference_table_name = NULL;
 	const gchar *reference_column_name = NULL;
 	coln = 0;
@@ -364,6 +374,9 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_INT, TRUE, NULL);
 		if (value)
 			is_reference = (gboolean) g_value_get_int (value);
+		/* get reference_holder */
+		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
+		reference_holder = g_value_get_string (value);
 		/* get reference_table_name */
 		value = gda_data_model_get_typed_value_at (model, ++coln, i, G_TYPE_STRING, TRUE, NULL);
 		reference_table_name = g_value_get_string (value);

@@ -833,6 +833,17 @@ midgard_core_storage_sql_create_schema_tables (GdaConnection *cnc, GError **erro
 
 	midgard_core_storage_sql_column_reset (&mdc);
 
+	/* REFERENCE HOLDER */
+	column_name = "reference_holder";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
 	/* REFERENCE CLASS NAME */
 	column_name = "reference_class_name";
 	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
@@ -1061,6 +1072,17 @@ midgard_core_storage_sql_create_mapper_tables (GdaConnection *cnc, GError **erro
 
 	midgard_core_storage_sql_column_reset (&mdc);
 
+	/* REFERENCE HOLDER */
+	column_name = "reference_holder";
+	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
+
+	if (!midgard_core_storage_sql_column_create (cnc, &mdc, &err)) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+
+	midgard_core_storage_sql_column_reset (&mdc);
+
 	/* REFERENCE CLASS NAME */
 	column_name = "reference_table_name";
 	midgard_core_storage_sql_column_init (&mdc, tablename, column_name, G_TYPE_STRING, NULL);
@@ -1193,15 +1215,19 @@ midgard_cr_core_storage_sql_create_query_insert_columns (GObject *object, Midgar
 	MidgardCRModel *_storage = MIDGARD_CR_MODEL (storage);
 
 	const gchar *objectname = G_OBJECT_TYPE_NAME (object);
-	const gchar *schemaname = midgard_cr_model_get_name (_schema);
+	const gchar *modelname = midgard_cr_model_get_name (_schema);
 	const gchar *storagename = midgard_cr_model_get_name (_storage);
 
-	if (!g_str_equal (objectname, schemaname)) {
-		g_warning ("Can not generate valid SQL query for %s. ObjectModel of '%s' given", objectname, schemaname);
+	GType object_type = g_type_from_name (objectname);
+	GType model_type = g_type_from_name (modelname);
+	GType storage_type = g_type_from_name (storagename);
+
+	if (!g_type_is_a (object_type, model_type)) {
+		g_warning ("Can not generate valid SQL query for %s. ObjectModel of '%s' given", objectname, modelname);
 		return NULL;
 	}
 
-	if (!g_str_equal (objectname, storagename)) {
+	if (!g_type_is_a (object_type, storage_type)) {
 		g_warning ("Can not generate valid SQL query for %s. StorageModel of '%s' given", objectname, storagename);
 		return NULL;
 	}
@@ -1256,15 +1282,19 @@ midgard_cr_core_storage_sql_create_query_insert_values (GObject *object, Midgard
 	MidgardCRModel *_storage = MIDGARD_CR_MODEL (storage);
 
 	const gchar *objectname = G_OBJECT_TYPE_NAME (object);
-	const gchar *schemaname = midgard_cr_model_get_name (_schema);
+	const gchar *modelname = midgard_cr_model_get_name (_schema);
 	const gchar *storagename = midgard_cr_model_get_name (_storage);
 
-	if (!g_str_equal (objectname, schemaname)) {
-		g_warning ("Can not generate valid SQL query for %s. ObjectModel of '%s' given", objectname, schemaname);
+	GType object_type = g_type_from_name (objectname);
+	GType model_type = g_type_from_name (modelname);
+	GType storage_type = g_type_from_name (storagename);
+
+	if (!g_type_is_a (object_type, model_type)) {
+		g_warning ("Can not generate valid SQL query for %s. ObjectModel of '%s' given", objectname, modelname);
 		return NULL;
 	}
 
-	if (!g_str_equal (objectname, storagename)) {
+	if (!g_type_is_a (object_type, storage_type)) {
 		g_warning ("Can not generate valid SQL query for %s. StorageModel of '%s' given", objectname, storagename);
 		return NULL;
 	}
@@ -1374,15 +1404,19 @@ midgard_cr_core_storage_sql_create_query_update_columns (GObject *object, Midgar
 	MidgardCRModel *_storage = MIDGARD_CR_MODEL (storage);
 
 	const gchar *objectname = G_OBJECT_TYPE_NAME (object);
-	const gchar *schemaname = midgard_cr_model_get_name (_schema);
+	const gchar *modelname = midgard_cr_model_get_name (_schema);
 	const gchar *storagename = midgard_cr_model_get_name (_storage);
 
-	if (!g_str_equal (objectname, schemaname)) {
-		g_warning ("Can not generate valid SQL query for %s. ObjectModel of '%s' given", objectname, schemaname);
+	GType object_type = g_type_from_name (objectname);
+	GType model_type = g_type_from_name (modelname);
+	GType storage_type = g_type_from_name (storagename);
+
+	if (!g_type_is_a (object_type, model_type)) {
+		g_warning ("Can not generate valid SQL query for %s. ObjectModel of '%s' given", objectname, modelname);
 		return NULL;
 	}
 
-	if (!g_str_equal (objectname, storagename)) {
+	if (!g_type_is_a (object_type, storage_type)) {
 		g_warning ("Can not generate valid SQL query for %s. StorageModel of '%s' given", objectname, storagename);
 		return NULL;
 	}

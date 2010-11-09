@@ -33,7 +33,7 @@ namespace MidgardCR {
 		
 		/* properties */
 		public abstract Model?       parent    { get; set; }
-		public abstract string      @namespace       { get; set;  }
+		public abstract string?      @namespace       { get; set;  }
 		public abstract string      name            { get; set;  }
 
 		/* methods */
@@ -96,16 +96,22 @@ namespace MidgardCR {
 		/**
 		 * Tells whether ModelProperty is reference
 		 */
-		public abstract bool	isref { get; }
+		public abstract bool isref { get; }
+
+		/** 
+		 * The name of {@link ReferenceObject} derived class, which 
+		 * is an opaque holder for reference object.
+		 */
+		public abstract string? reference { get; }
 
 		/**
-  		 * The name of reference.
+  		 * The name of reference object.
 		 */
-		public abstract string 	refname { get; }
+		public abstract string?	refname { get; }
 
 		/**
-		 * The name of reference's target
+		 * The name of reference's target property
 		 */
-		public abstract string 	reftarget { get; }
+		public abstract string?	reftarget { get; }
 	}
 }

@@ -19,6 +19,7 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_schema_model_reflector.vala \
 			  model.vala \
 			  object_model.vala \
+			  object_property_model.vala \
 			  object_builder.vala \
 			  midgard_schema_object.vala \
 			  midgard_storage_manager_sql.vala \

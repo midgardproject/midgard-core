@@ -53,14 +53,16 @@ am__objects_1 =
 am__objects_2 = midgard_config.lo executable.lo midgard_namespace.lo \
 	profiler.lo sql_profiler.lo midgard_query.lo \
 	midgard_schema_model_reflector.lo model.lo object_model.lo \
-	object_builder.lo midgard_schema_object.lo \
-	midgard_storage_manager_sql.lo midgard_storage.lo \
-	midgard_workspace.lo query_property.lo query_value.lo \
-	sql_storage_content_manager.lo sql_storage_model_manager.lo \
-	sql_table_model.lo sql_column_model.lo sql_query_storage.lo \
+	object_property_model.lo object_builder.lo \
+	midgard_schema_object.lo midgard_storage_manager_sql.lo \
+	midgard_storage.lo midgard_workspace.lo query_property.lo \
+	query_value.lo sql_storage_content_manager.lo \
+	sql_storage_model_manager.lo sql_table_model.lo \
+	sql_column_model.lo sql_query_storage.lo \
 	sql_query_constraint.lo sql_query_select.lo \
-	rdf_storage_manager.lo rdf_sql_storage_manager.lo \
-	rdf_sql_content_manager.lo $(am__objects_1)
+	rdf_generic_object.lo rdf_storage_manager.lo \
+	rdf_sql_storage_manager.lo rdf_sql_content_manager.lo \
+	$(am__objects_1)
 am_libmidgardvala_la_OBJECTS = $(am__objects_2)
 libmidgardvala_la_OBJECTS = $(am_libmidgardvala_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -255,6 +257,7 @@ libmidgardvala_la_VALASOURCES = \
 			  midgard_schema_model_reflector.vala \
 			  model.vala \
 			  object_model.vala \
+			  object_property_model.vala \
 			  object_builder.vala \
 			  midgard_schema_object.vala \
 			  midgard_storage_manager_sql.vala \
@@ -269,6 +272,7 @@ libmidgardvala_la_VALASOURCES = \
 			  sql_query_storage.vala \
 			  sql_query_constraint.vala \
 			  sql_query_select.vala \
+			  rdf_generic_object.vala \
 			  rdf_storage_manager.vala \
 			  rdf_sql_storage_manager.vala \
 			  rdf_sql_content_manager.vala \
@@ -352,9 +356,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_builder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_property_model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/profiler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_property.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_value.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_generic_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_content_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_storage_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_storage_manager.Plo@am__quote@

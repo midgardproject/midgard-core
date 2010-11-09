@@ -52,6 +52,7 @@ namespace MidgardCR {
 		internal uint _id = 0;
 		internal unowned SQLStorageManager _storage_manager = null;
 		internal bool _isref = false;
+		internal string _reference = null;
 		internal string _refname = null;
 		internal string _reftarget = null;
 		internal string _tablename = null;
@@ -96,7 +97,7 @@ namespace MidgardCR {
 		/**
 		 * Property's namespace. Set if required, in any case namepsace can be null;
 		 */ 
-		public string @namespace { get; set; }
+		public string? @namespace { get; set; }
 
 		/**
 		 * Parent model
@@ -144,11 +145,15 @@ namespace MidgardCR {
 			get { return this._isref; }
 		}
 
-		public string refname {
+		public string? reference {
+			get { return this._reference; }
+		}
+
+		public string? refname {
 			get { return this._refname; }
 		}
 
-		public string reftarget {
+		public string? reftarget {
 			get { return this._reftarget; }
 		}
 

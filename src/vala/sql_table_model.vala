@@ -59,7 +59,7 @@ namespace MidgardCR {
                 /**
                  * Holds the namespace of model's class
                  */
-                public string @namespace { get; set; }
+                public string? @namespace { get; set; }
                 /**
                  * Parent model of the model.
                  */

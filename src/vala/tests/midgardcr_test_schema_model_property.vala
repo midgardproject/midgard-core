@@ -3,23 +3,23 @@ using MidgardCR;
 void midgardcr_test_add_object_model_property_tests () {
 
 	/* constructor */
-	Test.add_func ("/ObjectModelProperty/constructor", () => {
-		MidgardCR.ObjectModelProperty model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
+	Test.add_func ("/ObjectPropertyModel/constructor", () => {
+		MidgardCR.ObjectPropertyModel model = new MidgardCR.ObjectPropertyModel (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
 		assert (model.name == TITLE_PROPERTY_NAME);
 	});
 
 	/* add model */
-	Test.add_func ("/ObjectModelProperty/add_model", () => {
-		MidgardCR.ObjectModelProperty model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
+	Test.add_func ("/ObjectPropertyModel/add_model", () => {
+		MidgardCR.ObjectPropertyModel model = new MidgardCR.ObjectPropertyModel (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
 		assert (model.name == TITLE_PROPERTY_NAME);
 
 		/* SUCCESS */
-		MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty ("title", "string", "");
+		MidgardCR.ObjectPropertyModel prop_model = new MidgardCR.ObjectPropertyModel ("title", "string", "");
 		assert (prop_model != null);
 		
-		MidgardCR.ObjectModelProperty new_model = model.add_model (prop_model) as MidgardCR.ObjectModelProperty;
+		MidgardCR.ObjectPropertyModel new_model = model.add_model (prop_model) as MidgardCR.ObjectPropertyModel;
 		assert (new_model == model);
 
 		/* FAIL */
@@ -34,29 +34,29 @@ void midgardcr_test_add_object_model_property_tests () {
 	});
 
 	/* get model by name */
-	Test.add_func ("/ObjectModelProperty/get_model_by_name", () => {	
-		MidgardCR.ObjectModelProperty model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
+	Test.add_func ("/ObjectPropertyModel/get_model_by_name", () => {	
+		MidgardCR.ObjectPropertyModel model = new MidgardCR.ObjectPropertyModel (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
 		assert (model.name == TITLE_PROPERTY_NAME);
 
 		/* SUCCESS */
-		MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty ("title", "string", "");
+		MidgardCR.ObjectPropertyModel prop_model = new MidgardCR.ObjectPropertyModel ("title", "string", "");
 		assert (prop_model != null);
 		
 		model.add_model (prop_model);
 
 		/* FAIL */
-		MidgardCR.ObjectModelProperty not_found_model = model.get_model_by_name ("notexists") as ObjectModelProperty;
+		MidgardCR.ObjectPropertyModel not_found_model = model.get_model_by_name ("notexists") as ObjectPropertyModel;
 		assert (not_found_model == null);
 
 		/* SUCCESS */
-		MidgardCR.ObjectModelProperty found_model = model.get_model_by_name ("title") as ObjectModelProperty;
+		MidgardCR.ObjectPropertyModel found_model = model.get_model_by_name ("title") as ObjectPropertyModel;
 		assert (found_model != null);
 		assert (found_model.name == "title");
 	});
 
-	Test.add_func ("/ObjectModelProperty/list_models", () => {
-		MidgardCR.ObjectModelProperty model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
+	Test.add_func ("/ObjectPropertyModel/list_models", () => {
+		MidgardCR.ObjectPropertyModel model = new MidgardCR.ObjectPropertyModel (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
 		assert (model.name == TITLE_PROPERTY_NAME);
 		
@@ -65,7 +65,7 @@ void midgardcr_test_add_object_model_property_tests () {
 		assert (empty_models == null);
 
 		/* SUCCESS */
-		MidgardCR.ObjectModelProperty prop_a_model = new MidgardCR.ObjectModelProperty ("title", "string", "");
+		MidgardCR.ObjectPropertyModel prop_a_model = new MidgardCR.ObjectPropertyModel ("title", "string", "");
 		assert (prop_a_model != null);
 		
 		model.add_model (prop_a_model);
@@ -77,12 +77,12 @@ void midgardcr_test_add_object_model_property_tests () {
 		assert (models[0].name == "title"); 
 	});
 
-	Test.add_func ("/ObjectModelProperty/get_reflector", () => {
+	Test.add_func ("/ObjectPropertyModel/get_reflector", () => {
 		GLib.print (MISS_IMPL);
 	});
 
-	Test.add_func ("/ObjectModelProperty/is_valid", () => {
-		MidgardCR.ObjectModelProperty model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
+	Test.add_func ("/ObjectPropertyModel/is_valid", () => {
+		MidgardCR.ObjectPropertyModel model = new MidgardCR.ObjectPropertyModel (TITLE_PROPERTY_NAME, "string", "");
 		assert (model != null);
 		assert (model.name == TITLE_PROPERTY_NAME);
 
@@ -96,7 +96,7 @@ void midgardcr_test_add_object_model_property_tests () {
 		assert (invalid_model == true);
 
 		/* SUCCESS */
-		MidgardCR.ObjectModelProperty prop_a_model = new MidgardCR.ObjectModelProperty ("title", "string", "");
+		MidgardCR.ObjectPropertyModel prop_a_model = new MidgardCR.ObjectPropertyModel ("title", "string", "");
 		assert (prop_a_model != null);
 
 		MidgardCR.ObjectModel cmodel = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
@@ -114,7 +114,7 @@ void midgardcr_test_add_object_model_property_tests () {
 		assert (valid_model == true);	
 
 		/* FAIL */
-		MidgardCR.ObjectModelProperty prop_c_model = new MidgardCR.ObjectModelProperty ("foo", "string", "");
+		MidgardCR.ObjectPropertyModel prop_c_model = new MidgardCR.ObjectPropertyModel ("foo", "string", "");
 		model.add_model (prop_c_model);
 		assert (prop_c_model != null);
 

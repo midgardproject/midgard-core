@@ -41,7 +41,7 @@ namespace MidgardCR {
 		internal StorageModel _storage_model_storage_model = null;
 		internal ObjectModel _storage_model_property_object_model = null;
 		internal StorageModel _storage_model_property_storage_model = null;
-		/* ObjectModel, ObjectModelProperty */
+		/* ObjectModel, ObjectPropertyModel */
 		internal ObjectModel _object_model_object_model = null;
 		internal StorageModel _object_model_storage_model = null;
 		internal ObjectModel _object_model_property_object_model = null;
@@ -113,28 +113,28 @@ namespace MidgardCR {
 			/* OBJECT MODEL  */
 			  /* Initialize ObjectModel for ObjectModel */
                         this._object_model_object_model = new ObjectModel ("MidgardCRObjectModel");
-                        this._object_model_object_model.add_model (new ObjectModelProperty ("name", "string", ""));
-                        this._object_model_object_model.add_model (new ObjectModelProperty ("parentname", "string", ""));
+                        this._object_model_object_model.add_model (new ObjectPropertyModel ("name", "string", ""));
+                        this._object_model_object_model.add_model (new ObjectPropertyModel ("parentname", "string", ""));
                         /* Initialize StorageModel for ObjectModel */
                         this._object_model_storage_model = new SQLTableModel (this, this._object_model_object_model.name, "midgard_schema_type");
                         this._object_model_storage_model.add_model (new SQLColumnModel (this, "name", "class_name", "string"));
                         this._object_model_storage_model.add_model (new SQLColumnModel (this, "parentname", "extends", "string"));
 
 			/* Initialize property ObjectModel */
-                        this._object_model_property_object_model = new ObjectModel ("MidgardCRObjectModelProperty");
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("name", "string", ""));
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("classname", "string", ""));
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("valuetypename", "string", ""));
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("valuedefault", "string", ""));
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("nick", "string", ""));
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("description", "string", ""));
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("isref", "bool", ""));
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("refname", "string", ""));
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("reftarget", "string", ""));
-                        this._object_model_property_object_model.add_model (new ObjectModelProperty ("namespace", "string", ""));
+                        this._object_model_property_object_model = new ObjectModel ("MidgardCRObjectPropertyModel");
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("name", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("classname", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("valuetypename", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("valuedefault", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("nick", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("description", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("isref", "bool", ""));
+			this._object_model_property_object_model.add_model (new ObjectPropertyModel ("reference", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("refname", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("reftarget", "string", ""));
+                        this._object_model_property_object_model.add_model (new ObjectPropertyModel ("namespace", "string", ""));
 
-
-             		/* Initialize StorageModelProperty for ObjectModelProperty */
+             		/* Initialize StorageModelProperty for ObjectPropertyModel */
                         this._object_model_property_storage_model = new SQLTableModel (this, this._object_model_property_object_model.name, "midgard_schema_type_properties");
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "name", "property_name", "string"));
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "classname", "class_name", "string"));
@@ -143,15 +143,16 @@ namespace MidgardCR {
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "nick", "property_nick", "string"));
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "description", "description", "string"));
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "isref", "is_reference", "bool"));
+			this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "reference", "reference_holder", "string"));
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "refname", "reference_class_name", "string"));
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "reftarget", "reference_property_name", "string"));
                         this._object_model_property_storage_model.add_model (new SQLColumnModel (this, "namespace", "namespace", "string"));
 
 			/* STORAGE MODELS  */
 			this._storage_model_object_model = new ObjectModel ("MidgardCRSQLTableModel");
-			this._storage_model_object_model.add_model (new ObjectModelProperty ("name", "string", ""));
-			this._storage_model_object_model.add_model (new ObjectModelProperty ("location", "string", ""));
-			this._storage_model_object_model.add_model (new ObjectModelProperty ("description", "text", ""));
+			this._storage_model_object_model.add_model (new ObjectPropertyModel ("name", "string", ""));
+			this._storage_model_object_model.add_model (new ObjectPropertyModel ("location", "string", ""));
+			this._storage_model_object_model.add_model (new ObjectPropertyModel ("description", "text", ""));
 			this._storage_model_storage_model = new SQLTableModel(this, "MidgardCRSQLTableModel", "midgard_mapper_type");
                 	this._storage_model_storage_model.add_model (new SQLColumnModel (this, "name", "class_name", "string"));
                 	this._storage_model_storage_model.add_model (new SQLColumnModel (this, "location", "table_name", "string"));
@@ -159,19 +160,20 @@ namespace MidgardCR {
 		
 			/* SQLColumnModel models */
 			this._storage_model_property_object_model = new ObjectModel ("MidgardCRSQLColumnModel");
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("name", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("location", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("valuetypename", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("valuegtype", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("valuedefault", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("index", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("primary", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("description", "text", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("tablename", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("isref", "bool", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("refname", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("reftarget", "string", ""));
-			this._storage_model_property_object_model.add_model (new ObjectModelProperty ("propertyof", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("name", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("location", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("valuetypename", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("valuegtype", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("valuedefault", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("index", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("primary", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("description", "text", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("tablename", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("isref", "bool", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("reference", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("refname", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("reftarget", "string", ""));
+			this._storage_model_property_object_model.add_model (new ObjectPropertyModel ("propertyof", "string", ""));
 			this._storage_model_property_storage_model = new SQLTableModel(this, "MidgardCRSQLColumnModel", "midgard_mapper_columns");
                 	this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "name", "property_name", "string"));
                 	this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "location", "column_name", "string"));
@@ -181,6 +183,7 @@ namespace MidgardCR {
                 	this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "description", "description", "text"));
 			this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "tablename", "table_name", "string"));
                 	this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "isref", "is_reference", "bool"));
+			this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "reference", "reference_holder", "string"));
                 	this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "refname", "reference_table_name", "string"));
                 	this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "reftarget", "reference_column_name", "string"));
 			this._storage_model_property_storage_model.add_model (new SQLColumnModel (this, "propertyof", "property_of", "string"));
@@ -188,8 +191,8 @@ namespace MidgardCR {
 			/* RepositoryObject models */
 			this._object_model_repository_object = new ObjectModel ("MidgardCRRepositoryObject");
 			this._object_model_repository_object
-				.add_model (new ObjectModelProperty ("id", "int", "0"))
-				.add_model (new ObjectModelProperty ("guid", "guid", ""));
+				.add_model (new ObjectPropertyModel ("id", "int", "0"))
+				.add_model (new ObjectPropertyModel ("guid", "guid", ""));
 			this._storage_model_repository_object = new SQLTableModel (this, "MidgardCRRepositoryObject", "");
 			var id_column = new SQLColumnModel (this, "id", "mgd_id", "int");
 			id_column.primary = true;

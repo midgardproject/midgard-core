@@ -58,29 +58,27 @@ void main () {
 
 	/* Create new SQL TableModel which defines 'Person' class table and all required columns */
 	/* Every 'Person' object's data will be stored in 'person' table */
-	SQLTableModel person_sm = model_manager.create_storage_model (person_model, "person") as SQLTableModel;
+	SQLTableModel person_sm = new SQLTableModel (storage_manager, "Person", "person");
 	/* Add two columns to 'person' table: 'firstname', 'lastname' */
 	person_sm
-		.add_model (person_sm.create_model_property ("firstname", "firstname", "string"))
-		.add_model (person_sm.create_model_property ("lastname", "lastname", "string"));
+		.add_model (new SQLColumnModel (storage_manager, "firstname", "firstname", "string"))
+		.add_model (new SQLColumnModel (storage_manager, "lastname", "lastname", "string"));
 
-	/* Create reference for actor property which is of object type */
-	var ref_actor = new ObjectModel ("ReferenceObject");
-	ref_actor
-		.add_model (new ObjectModelProperty ("id", "int", "0"))
-		.add_model (new ObjectModelProperty ("guid", "string", ""))
-		.add_model (new ObjectModelProperty ("classname", "string", ""));
-	ref_actor.add_model (person_model);
+	/* ObjectModel actor_ref_model = new ObjectModelReference ("ReferenceObject");
+	actor_ref_model
+		.add_model (new ObjectModelPropertyInt ("id", "0"))
+		.add_model (new ObjectModelPropertyString ("guid", ""));
 
-	/* 'actor' property is object type, so we 'link' property with 'Person' object */
-	var am_actor = new ObjectModelProperty ("actor", "object", "");
-	am_actor.add_model (ref_actor);
+	//Create reference to 'Person' object for 'actor' property which is of 'ReferenceObject' type 
+	var am_actor = new ObjectModelPropertyReference ("actor", person_model, actor_ref_model); */
+
+	//am_actor.set_reference_model (ref_actor);
 
 	/* Define 'Activity' class */
 	var activity_model = new ObjectModel ("Activity");
 	/* Define properties: 'verb', 'target', 'summary', 'application' */
 	activity_model
-		.add_model (am_actor)
+		//.add_model (am_actor)
 		.add_model (new ObjectModelProperty ("verb", "string", ""))
 		.add_model (new ObjectModelProperty ("target", "guid", ""))
 		.add_model (new ObjectModelProperty ("summary", "guid", ""))
@@ -94,18 +92,18 @@ void main () {
 	var asm_application = new SQLColumnModel (storage_manager, "application", "application", "string");
 	asm_application.index = true;
 
-	var actor_model = new SQLColumnModel (storage_manager, "actor", "actor", "object");
-	actor_model
-		.add_model (new SQLColumnModel (storage_manager, "id", "actor_id", "int"))
-		.add_model (new SQLColumnModel (storage_manager, "guid", "actor_guid", "guid"))
-		.add_model (new SQLColumnModel (storage_manager, "classname", "actor_classname", "string"));
+	//var actor_model = new SQLColumnModel (storage_manager, "actor", "actor", "object");
+	//actor_model
+	//	.add_model (new SQLColumnModel (storage_manager, "id", "actor_id", "int"))
+	//	.add_model (new SQLColumnModel (storage_manager, "guid", "actor_guid", "guid"))
+	//	.add_model (new SQLColumnModel (storage_manager, "classname", "actor_classname", "string"));
 
 	/* Activity class requires 'midgard_activity' table */
 	var activity_sm = new SQLTableModel (storage_manager, "Activity", "midgard_activity") as SQLTableModel;
 	activity_sm
 		.add_model (asm_verb)
 		.add_model (asm_application)
-		.add_model (actor_model)
+		//.add_model (actor_model)
 		.add_model (new SQLColumnModel (storage_manager, "target", "target", "string"))
 		.add_model (new SQLColumnModel (storage_manager, "summary", "summary", "string"));
 

@@ -48,13 +48,13 @@ namespace MidgardCR {
 			/* initialize generic RDF object and table models */ 
 			this._rdf_object_model = new ObjectModel ("RDFTripleObject");
 			this._rdf_object_model
-				.add_model (new ObjectModelProperty ("identifier", "string", ""))
-				.add_model (new ObjectModelProperty ("classname", "string", ""))
-				.add_model (new ObjectModelProperty ("objectguid", "guid", ""))
-				.add_model (new ObjectModelProperty ("property", "string", ""))
-/*				.add_model (new ObjectModelProperty ("alias", "string", ""))*/
-				.add_model (new ObjectModelProperty ("literal", "string", ""))
-				.add_model (new ObjectModelProperty ("value", "string", ""));
+				.add_model (new ObjectPropertyModel ("identifier", "string", ""))
+				.add_model (new ObjectPropertyModel ("classname", "string", ""))
+				.add_model (new ObjectPropertyModel ("objectguid", "guid", ""))
+				.add_model (new ObjectPropertyModel ("property", "string", ""))
+/*				.add_model (new ObjectPropertyModel ("alias", "string", ""))*/
+				.add_model (new ObjectPropertyModel ("literal", "string", ""))
+				.add_model (new ObjectPropertyModel ("value", "string", ""));
 
 			this._rdf_table_model = new SQLTableModel ((SQLStorageManager) this, "RDFTripleObject", "rdf_triple_object");
 			this._rdf_table_model

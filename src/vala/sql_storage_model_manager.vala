@@ -44,7 +44,7 @@ namespace MidgardCR {
 		/**
 		 * Namespace of the manager (if required)
 		 */
-                public string @namespace { get; set;  }
+                public string? @namespace { get; set;  }
 
 		/**
 		 * Name of the manager (if required)
@@ -189,6 +189,9 @@ namespace MidgardCR {
 					this._add_parent_model_properties ((StorageModel) model); 			 	
 					((StorageExecutor)model).prepare_create ();
 				} else if (model is ObjectModel) {
+					/* FIXME, Any ReferenceObject should not be added to model manager */
+					if (model is ObjectModelReference)
+						continue;
 					string query = MidgardCRCore.StorageSQL.create_query_insert (
 						model, 
 						this._storage_manager._object_model_object_model, 

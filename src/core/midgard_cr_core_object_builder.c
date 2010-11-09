@@ -159,7 +159,7 @@ MgdSchemaPropertyAttr *
 midgard_cr_core_schema_type_property_new_from_model (MidgardCRModelProperty *model, MgdSchemaTypeAttr *type_attr)
 {
 	g_return_val_if_fail (model != NULL, NULL);
-	g_return_val_if_fail (MIDGARD_CR_IS_OBJECT_MODEL_PROPERTY (model), NULL);
+	g_return_val_if_fail (MIDGARD_CR_IS_OBJECT_PROPERTY_MODEL (model), NULL);
 
 	MgdSchemaPropertyAttr *prop_attr = midgard_cr_core_schema_type_property_attr_new ();
 	prop_attr->name = g_strdup (midgard_cr_model_get_name (MIDGARD_CR_MODEL(model)));

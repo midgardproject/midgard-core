@@ -54,7 +54,12 @@ namespace MidgardCRCore {
 		//public static MidgardCRCore.QueryStorage new (string classname); 
 	}
 
-	public class QuerySelect : GLib.Object {
+	public class QueryExecutor: GLib.Object {
+		public virtual bool execute();
+	}
+
+	public class QuerySelect : MidgardCRCore.QueryExecutor {
 		public static MidgardCRCore.QuerySelect create_static (MidgardCR.StorageManager manager, MidgardCR.SQLQueryStorage storage);
+		//public void execute () throws MidgardCR.ExecutableError;
 	}
 }

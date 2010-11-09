@@ -80,7 +80,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectPropertyModel prop_model = new MidgardCR.ObjectPropertyModel (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model);
@@ -134,11 +134,11 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectPropertyModel prop_model = new MidgardCR.ObjectPropertyModel (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
 		/* SUCCESS */
-                MidgardCR.ObjectModelProperty prop_model_a = new MidgardCR.ObjectModelProperty (ABSTRACT_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectPropertyModel prop_model_a = new MidgardCR.ObjectPropertyModel (ABSTRACT_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model).add_model (prop_model_a);
@@ -220,8 +220,8 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (person_model != null);
         	/* Define properties: 'firstname' and 'lastname' */
         	person_model
-                	.add_model (new ObjectModelProperty (FIRSTNAME, "string", ""))
-                	.add_model (new ObjectModelProperty (LASTNAME, "string", ""));
+                	.add_model (new ObjectPropertyModel (FIRSTNAME, "string", ""))
+                	.add_model (new ObjectPropertyModel (LASTNAME, "string", ""));
 
         	/* Create new SQL StorageModel which defines 'Person' class table and all required columns */
         	/* Every 'Person' object's data will be stored in 'person' table */
@@ -239,16 +239,16 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (activity_model != null);
 		/* 'actor' property is object type, so we 'link' property with 'Person' object */
 		/* SUCCESS */
-      		var am_actor = new ObjectModelProperty (ACTOR, "object", "");
-		assert (am_actor != null);
-		am_actor.add_model (person_model);
+      		var am_ref_actor = new ObjectModelReference ("ReferenceObject");
+		assert (am_ref_actor != null);
+		var am_actor = new ObjectPropertyReference ("actor", person_model, am_ref_actor);
 		/* Define properties: 'verb', 'target', 'summary', 'application' */
 		activity_model
 			.add_model (am_actor)
-			.add_model (new ObjectModelProperty (VERB, "string", ""))
-			.add_model (new ObjectModelProperty (TARGET, "guid", ""))
-			.add_model (new ObjectModelProperty (SUMMARY, "string", ""))
-			.add_model (new ObjectModelProperty (APPLICATION, "string", ""));
+			.add_model (new ObjectPropertyModel (VERB, "string", ""))
+			.add_model (new ObjectPropertyModel (TARGET, "guid", ""))
+			.add_model (new ObjectPropertyModel (SUMMARY, "string", ""))
+			.add_model (new ObjectPropertyModel (APPLICATION, "string", ""));
 	
 		/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
 		/* Activity class requires 'midgard_activity' table */
@@ -370,11 +370,11 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (ds_activity_table.location == ACTIVITY_TABLE_NAME);		
 
 		/* Check Person object model properties */
-		var fmodel = (ObjectModelProperty) ds_person_model.get_model_by_name (FIRSTNAME);
+		var fmodel = (ObjectPropertyModel) ds_person_model.get_model_by_name (FIRSTNAME);
 		assert (fmodel != null);
 		assert (fmodel.valuegtype == typeof (string));
 		assert (fmodel.valuetypename == "string");
-		var lmodel = (ObjectModelProperty) ds_person_model.get_model_by_name (LASTNAME);
+		var lmodel = (ObjectPropertyModel) ds_person_model.get_model_by_name (LASTNAME);
 		assert (lmodel != null);
 		assert (lmodel.valuegtype == typeof (string));
 		assert (lmodel.valuetypename == "string");
@@ -392,27 +392,28 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (lcol.valuegtype == typeof (string));
 
 		/* Check Activity object model properties */
-		var a_actor_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (ACTOR);
+		var a_actor_model = (ObjectPropertyModel) ds_activity_model.get_model_by_name (ACTOR);
 		assert (a_actor_model != null);
+		assert (a_actor_model is ObjectPropertyReference);
 		assert (a_actor_model.valuegtype == typeof (Object));
 		assert (a_actor_model.valuetypename == "object");
-		var a_actor_person_model = (ObjectModel) a_actor_model.get_model_by_name (PERSON_CLASS_NAME);
-		assert (a_actor_person_model != null);
-		assert (a_actor_person_model is ObjectModel);
-		assert (a_actor_person_model.name == PERSON_CLASS_NAME);	
-		var a_verb_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (VERB);
+		var a_actor_reference_model = (ObjectModel) a_actor_model.get_model_by_name ("ReferenceObject");
+		assert (a_actor_reference_model != null);
+		assert (a_actor_reference_model is ObjectModelReference);
+		assert (a_actor_reference_model.name == "ReferenceObject");	
+		var a_verb_model = (ObjectPropertyModel) ds_activity_model.get_model_by_name (VERB);
 		assert (a_verb_model != null);
 		assert (a_verb_model.valuegtype == typeof (string));
 		assert (a_verb_model.valuetypename == "string");
-		var a_target_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (TARGET);
+		var a_target_model = (ObjectPropertyModel) ds_activity_model.get_model_by_name (TARGET);
 		assert (a_target_model != null);
 		assert (a_target_model.valuegtype == typeof (string));
 		assert (a_target_model.valuetypename == "guid");
-		var a_summary_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (SUMMARY);
+		var a_summary_model = (ObjectPropertyModel) ds_activity_model.get_model_by_name (SUMMARY);
 		assert (a_summary_model != null);
 		assert (a_summary_model.valuegtype == typeof (string));
 		assert (a_summary_model.valuetypename == "string");
-		var a_app_model = (ObjectModelProperty) ds_activity_model.get_model_by_name (APPLICATION);
+		var a_app_model = (ObjectPropertyModel) ds_activity_model.get_model_by_name (APPLICATION);
 		assert (a_app_model != null);
 		assert (a_app_model.valuegtype == typeof (string));
 		assert (a_app_model.valuetypename == "string");

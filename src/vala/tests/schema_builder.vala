@@ -18,7 +18,7 @@ void midgardcr_test_add_schema_builder_tests () {
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectPropertyModel prop_model = new MidgardCR.ObjectPropertyModel (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model);
@@ -53,7 +53,7 @@ void midgardcr_test_add_schema_builder_tests () {
                 assert (model.name == DEFAULT_CLASSNAME);
 
                 /* SUCCESS */
-                MidgardCR.ObjectModelProperty prop_model = new MidgardCR.ObjectModelProperty (TITLE_PROPERTY_NAME, "string", "");
+                MidgardCR.ObjectPropertyModel prop_model = new MidgardCR.ObjectPropertyModel (TITLE_PROPERTY_NAME, "string", "");
                 assert (prop_model != null);
 
                 model.add_model (prop_model);

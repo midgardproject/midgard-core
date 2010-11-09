@@ -16,8 +16,6 @@
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  */
 
-using Gee;
-
 namespace MidgardCR {
 
 	public class RDFGenericObject : GLib.Object, Storable {

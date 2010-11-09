@@ -23,7 +23,7 @@ namespace MidgardCR
 		/* internal properties */
 		internal StorageManager _storage_manager = null;
 		internal SQLQueryStorage _query_storage = null;	
-		internal Object _core_query_select = null;
+		internal GLib.Object _core_query_select = null;
 		internal QueryConstraintSimple _constraint = null;
 		internal uint _n_constraints = 0;
 		internal uint _limit = 0;
@@ -95,6 +95,7 @@ namespace MidgardCR
 
 		public void execute () throws ExecutableError {
 			this._create_core_query_select ();
+			((MidgardCRCore.QueryExecutor)this._core_query_select).execute ();
 			/* TODO */
 		}
 
