@@ -53,8 +53,8 @@ void main () {
 	ObjectModel person_model = new ObjectModel ("Person");	
 	/* Define properties: 'firstname' and 'lastname' */
 	person_model
-		.add_model (new ObjectModelProperty ("firstname", "string", ""))
-		.add_model (new ObjectModelProperty ("lastname", "string", ""));
+		.add_model (new ObjectPropertyModel ("firstname", "string", ""))
+		.add_model (new ObjectPropertyModel ("lastname", "string", ""));
 
 	/* Create new SQL TableModel which defines 'Person' class table and all required columns */
 	/* Every 'Person' object's data will be stored in 'person' table */
@@ -64,25 +64,25 @@ void main () {
 		.add_model (new SQLColumnModel (storage_manager, "firstname", "firstname", "string"))
 		.add_model (new SQLColumnModel (storage_manager, "lastname", "lastname", "string"));
 
-	/* ObjectModel actor_ref_model = new ObjectModelReference ("ReferenceObject");
+	ObjectModel actor_ref_model = new ObjectModelReference ("ReferenceObject");
 	actor_ref_model
-		.add_model (new ObjectModelPropertyInt ("id", "0"))
-		.add_model (new ObjectModelPropertyString ("guid", ""));
+		.add_model (new ObjectPropertyInt ("id", "0"))
+		.add_model (new ObjectPropertyString ("guid", ""));
 
-	//Create reference to 'Person' object for 'actor' property which is of 'ReferenceObject' type 
-	var am_actor = new ObjectModelPropertyReference ("actor", person_model, actor_ref_model); */
-
-	//am_actor.set_reference_model (ref_actor);
+	/* Create reference to 'Person' object for 'actor' property which is of 'ReferenceObject' type. 
+	 * In other words, 'actor' property holds 'ReferenceObject' instance, which holds identifiers of
+	 * 'Person' object associated with 'Activity' one */
+	var am_actor = new ObjectPropertyReference ("actor", person_model, (MidgardCR.ObjectModelReference) actor_ref_model); 
 
 	/* Define 'Activity' class */
 	var activity_model = new ObjectModel ("Activity");
 	/* Define properties: 'verb', 'target', 'summary', 'application' */
 	activity_model
-		//.add_model (am_actor)
-		.add_model (new ObjectModelProperty ("verb", "string", ""))
-		.add_model (new ObjectModelProperty ("target", "guid", ""))
-		.add_model (new ObjectModelProperty ("summary", "guid", ""))
-		.add_model (new ObjectModelProperty ("application", "string", ""));
+		.add_model (am_actor)
+		.add_model (new ObjectPropertyModel ("verb", "string", ""))
+		.add_model (new ObjectPropertyModel ("target", "guid", ""))
+		.add_model (new ObjectPropertyModel ("summary", "guid", ""))
+		.add_model (new ObjectPropertyModel ("application", "string", ""));
 
 	/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
 	/* Add columns to table: 'verb', 'application', 'target', 'summary' and those required by 'actor' */
@@ -92,18 +92,18 @@ void main () {
 	var asm_application = new SQLColumnModel (storage_manager, "application", "application", "string");
 	asm_application.index = true;
 
-	//var actor_model = new SQLColumnModel (storage_manager, "actor", "actor", "object");
-	//actor_model
-	//	.add_model (new SQLColumnModel (storage_manager, "id", "actor_id", "int"))
-	//	.add_model (new SQLColumnModel (storage_manager, "guid", "actor_guid", "guid"))
-	//	.add_model (new SQLColumnModel (storage_manager, "classname", "actor_classname", "string"));
+	var actor_model = new SQLColumnModel (storage_manager, "actor", "actor", "object");
+	actor_model
+		.add_model (new SQLColumnModel (storage_manager, "id", "actor_id", "int"))
+		.add_model (new SQLColumnModel (storage_manager, "guid", "actor_guid", "guid"))
+		.add_model (new SQLColumnModel (storage_manager, "classname", "actor_classname", "string"));
 
 	/* Activity class requires 'midgard_activity' table */
 	var activity_sm = new SQLTableModel (storage_manager, "Activity", "midgard_activity") as SQLTableModel;
 	activity_sm
 		.add_model (asm_verb)
 		.add_model (asm_application)
-		//.add_model (actor_model)
+		.add_model (actor_model)
 		.add_model (new SQLColumnModel (storage_manager, "target", "target", "string"))
 		.add_model (new SQLColumnModel (storage_manager, "summary", "summary", "string"));
 

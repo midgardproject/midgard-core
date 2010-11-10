@@ -53,7 +53,7 @@ namespace MidgardCR
 
 		private void _create_core_query_select () {
 			if (this._core_query_select == null)
-				this._core_query_select = (MidgardCRCore.QuerySelect) MidgardCRCore.QuerySelect.create_static (this._storage_manager, this._query_storage);
+				this._core_query_select = (MidgardCRCore.QuerySelect) MidgardCRCore.QuerySelect.create_static (this._storage_manager, (MidgardCRCore.QueryStorage) this._query_storage._core_query_storage);
 		}
 
 		/* Constructor */
@@ -61,7 +61,11 @@ namespace MidgardCR
 			Object (storagemanager: manager, storage: storage);
 			this._create_core_query_select ();
 		}
-	
+		
+		public static SQLQuerySelect create_query_select (StorageManager manager, SQLQueryStorage storage) {
+			return new SQLQuerySelect (manager, storage);
+		}
+
 		public void set_constraint (QueryConstraintSimple constraint) {
 			this._create_core_query_select ();
 			this._constraint = constraint;
@@ -96,7 +100,6 @@ namespace MidgardCR
 		public void execute () throws ExecutableError {
 			this._create_core_query_select ();
 			((MidgardCRCore.QueryExecutor)this._core_query_select).execute ();
-			/* TODO */
 		}
 
 		public void add_join (string type, QueryProperty left_property, QueryProperty right_property) {

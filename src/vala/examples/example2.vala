@@ -9,6 +9,8 @@
 using MidgardCR;
 
 void main () {
+
+	GLib.Log.set_always_fatal (GLib.LogLevelFlags.LEVEL_CRITICAL);
 	
 	SQLStorageManager storage_manager = null;
 

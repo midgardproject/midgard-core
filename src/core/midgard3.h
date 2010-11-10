@@ -1267,10 +1267,10 @@ struct _MidgardCRSQLColumnModel {
 	guint _id;
 	MidgardCRSQLStorageManager* _storage_manager;
 	gboolean _isref;
+	char* _tablename;
 	char* _reference;
 	char* _refname;
 	char* _reftarget;
-	char* _tablename;
 	char* _property_of;
 };
 
@@ -1282,6 +1282,7 @@ struct _MidgardCRSQLQueryStorage {
 	GObject parent_instance;
 	MidgardCRSQLQueryStoragePrivate * priv;
 	char* _classname;
+	GObject* _core_query_storage;
 };
 
 struct _MidgardCRSQLQueryStorageClass {
@@ -1719,6 +1720,7 @@ MidgardCRSQLQueryConstraint* midgard_cr_sql_query_constraint_construct (GType ob
 GType midgard_cr_sql_query_select_get_type (void) G_GNUC_CONST;
 MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_new (MidgardCRStorageManager* manager, MidgardCRSQLQueryStorage* storage);
 MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_construct (GType object_type, MidgardCRStorageManager* manager, MidgardCRSQLQueryStorage* storage);
+MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_create_query_select (MidgardCRStorageManager* manager, MidgardCRSQLQueryStorage* storage);
 MidgardCRStorageManager* midgard_cr_sql_query_select_get_storagemanager (MidgardCRSQLQuerySelect* self);
 MidgardCRSQLQueryStorage* midgard_cr_sql_query_select_get_storage (MidgardCRSQLQuerySelect* self);
 gboolean midgard_cr_sql_query_select_get_readonly (MidgardCRSQLQuerySelect* self);

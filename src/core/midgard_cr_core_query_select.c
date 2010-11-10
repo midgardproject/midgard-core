@@ -33,7 +33,7 @@
  * Since: 10.05
  */ 
 MidgardCRCoreQuerySelect *
-midgard_cr_core_query_select_new (MidgardCRSQLStorageManager *manager, MidgardCRSQLQueryStorage *storage)
+midgard_cr_core_query_select_new (MidgardCRSQLStorageManager *manager, MidgardCRCoreQueryStorage *storage)
 {
 	g_return_val_if_fail (manager != NULL, NULL);
 	g_return_val_if_fail (storage != NULL, NULL);
@@ -45,7 +45,7 @@ midgard_cr_core_query_select_new (MidgardCRSQLStorageManager *manager, MidgardCR
 }
 
 MidgardCRCoreQuerySelect *
-midgard_cr_core_query_select_create_static (MidgardCRSQLStorageManager *manager, MidgardCRSQLQueryStorage *storage)
+midgard_cr_core_query_select_create_static (MidgardCRSQLStorageManager *manager, MidgardCRCoreQueryStorage *storage)
 {
 	return midgard_cr_core_query_select_new (manager, storage);
 }
@@ -376,21 +376,59 @@ __add_second_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *t
 	return;
 }
 
+static void
+__add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *table_name, MidgardCRStorageModel *storage_model, GError **error)
+{
+	guint n_models;
+        guint i;
+        GdaSqlSelectField *select_field;
+        GdaSqlExpr *expr;
+        GValue *val;
+        gchar *table_field;
+
+	MidgardCRModel **models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (storage_model), &n_models); 
+	if (!models) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL, 
+				"'%s' sql table model doesn't contain any column model.", 
+				midgard_cr_model_get_name (MIDGARD_CR_MODEL (storage_model)));
+		return;
+	}
+	
+	const gchar *property_table = table_name;
+	for (i = 0; i < n_models; i++) {
+		const gchar *property = midgard_cr_model_get_name (models[i]);
+		const gchar *property_field = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (models[i]));
+		select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
+		select_field->as = g_strdup (property);
+		select->expr_list = g_slist_append (select->expr_list, select_field);
+		expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
+		val = g_new0 (GValue, 1);
+		g_value_init (val, G_TYPE_STRING);
+		table_field = g_strconcat (property_table, ".", property_field, NULL);
+		g_value_set_string (val, table_field);
+		g_free (table_field);
+		expr->value = val;
+		select_field->expr = expr;
+	}
+
+	return;
+}
+
 gboolean 
-_midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self)
+_midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError **error)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
-	
-	GError *error = NULL;
+	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
 	if (!MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage) {
 		/* FIXME, handle error */
 		g_warning ("Missed QueryStorage associated with QuerySelect");
 		return FALSE;
 	}
-	
-	/*MidgardCRCoreDBObjectClass *klass = self->priv->storage->priv->klass;
-	if (!klass->dbpriv->add_fields_to_select_statement) {
+
+	GError *err = NULL;
+	GObjectClass *klass = self->priv->storage->priv->klass;
+	/* if (!klass->dbpriv->add_fields_to_select_statement) {
 		// FIXME, handle error 
 		g_warning ("Missed private DBObjectClass' fields to statement helper");
 		return FALSE;
@@ -399,6 +437,11 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self)
 	g_object_ref (self);
 
 	MidgardCRSQLStorageManager *mgd = (MidgardCRSQLStorageManager *) self->priv->storage_manager;
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	MidgardCRSQLStorageModelManager *model_manager = 
+		(MidgardCRSQLStorageModelManager *) midgard_cr_storage_manager_get_model_manager (MIDGARD_CR_STORAGE_MANAGER (mgd));
+	MidgardCRSQLTableModel *table_model = 
+		midgard_cr_sql_storage_model_manager_get_table_model_by_name (model_manager, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (klass)));
 	GdaConnection *cnc = (GdaConnection *) mgd->_cnc;
 	GdaSqlParser *parser = (GdaSqlParser *) mgd->_parser;
 	GdaSqlStatement *sql_stm;
@@ -418,9 +461,8 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self)
 	gda_sql_statement_select_take_where_cond (sql_stm, base_where);
 
 	/* Create targets (FROM) */
-	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (sss->from));
-	g_warning ("GET TABLE NAME FROM MODEL \n");
-	//s_target->table_name = g_strdup (midgard_cr_core_core_class_get_table (klass));
+	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (sss->from));	
+	s_target->table_name = g_strdup (midgard_cr_storage_model_get_location ((MIDGARD_CR_STORAGE_MODEL (table_model))));
 	s_target->as = g_strdup_printf ("t%d", ++MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->tableid);
 	MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->table_alias = g_strdup (s_target->as);
 	gda_sql_select_from_take_new_target (sss->from, s_target);
@@ -435,6 +477,10 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self)
 
 	/* Add fields for all properties registered per class (SELECT a,b,c...) */
 	//klass->dbpriv->add_fields_to_select_statement (klass, sss, s_target->as);
+	__add_fields_to_select_statement (sss, s_target->as, MIDGARD_CR_STORAGE_MODEL (table_model), &err);
+	if (err)
+		goto return_false;
+
 
 	GdaSqlExpr *where = sss->where_cond;
 	GdaSqlOperation *operation = where->cond;
@@ -483,9 +529,7 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self)
 	}
 
 	/* Check structure */
-	GError *err = NULL;
 	if (!gda_sql_statement_check_structure (sql_stm, &err)) {
-		g_propagate_error (&error, err);
 		goto return_false;
 	} 
 
@@ -502,15 +546,14 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self)
 	//}
 
 	/* execute statement */
-	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &error);
+	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
 
-	if (!model && !error)
+	if (!model && !err)
 		goto return_false;
 
-	if (error) {
-		/* FIXME, set domain error code */
-		g_warning ("Execute error - %s", error->message);
-		g_error_free (error);
+	if (err) {
+		if (model) 
+			g_object_unref (model);
 		goto return_false;
 	}
 	
@@ -523,6 +566,11 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self)
 	return TRUE;
 
 return_false:
+	if (err) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL, 
+				"SQL query execution failed. %s ", err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+	}
 	if (sql_stm)
 		gda_sql_statement_free (sql_stm);
 	g_object_unref (self);

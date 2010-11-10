@@ -49,7 +49,7 @@ struct _MidgardCRCoreQueryExecutorClass {
 	gboolean	(*add_order)			(MidgardCRCoreQueryExecutor *self, MidgardCRCoreQueryProperty *property, const gchar *type);
 	gboolean        (*add_join)			(MidgardCRCoreQueryExecutor *self, const gchar *join_type, 
 								MidgardCRCoreQueryProperty *left_property, MidgardCRCoreQueryProperty *right_property);
-	gboolean	(*execute)			(MidgardCRCoreQueryExecutor *self);
+	gboolean	(*execute)			(MidgardCRCoreQueryExecutor *self, GError **error);
 	guint 		(*get_results_count)		(MidgardCRCoreQueryExecutor *self);
 };
 
@@ -67,7 +67,7 @@ gboolean		midgard_cr_core_query_executor_set_limit	(MidgardCRCoreQueryExecutor *
 gboolean 		midgard_cr_core_query_executor_set_offset	(MidgardCRCoreQueryExecutor *self, guint offset);
 gboolean		midgard_cr_core_query_executor_add_order	(MidgardCRCoreQueryExecutor *self, MidgardCRCoreQueryProperty *property, const gchar *type);
 gboolean		midgard_cr_core_query_executor_add_join		(MidgardCRCoreQueryExecutor *self, const gchar *join_type, MidgardCRCoreQueryProperty *left_property, MidgardCRCoreQueryProperty *right_property);
-gboolean		midgard_cr_core_query_executor_execute		(MidgardCRCoreQueryExecutor *self);
+gboolean		midgard_cr_core_query_executor_execute		(MidgardCRCoreQueryExecutor *self, GError **error);
 guint 			midgard_cr_core_query_executor_get_results_count	(MidgardCRCoreQueryExecutor *self);
 
 G_END_DECLS

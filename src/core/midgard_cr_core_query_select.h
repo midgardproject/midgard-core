@@ -53,8 +53,8 @@ struct _MidgardCRSQLQueryStorage;
 struct _MidgardCRSQLStorable;
 
 GType 			midgard_cr_core_query_select_get_type		(void);
-MidgardCRCoreQuerySelect	*midgard_cr_core_query_select_new 		(struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRSQLQueryStorage *storage);
-MidgardCRCoreQuerySelect	*midgard_cr_core_query_create_static 		(struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRSQLQueryStorage *storage);
+MidgardCRCoreQuerySelect	*midgard_cr_core_query_select_new 		(struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRCoreQueryStorage *storage);
+MidgardCRCoreQuerySelect	*midgard_cr_core_query_create_static 		(struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRCoreQueryStorage *storage);
 struct _MidgardCRStorable			**midgard_cr_core_query_select_list_objects	(MidgardCRCoreQuerySelect *self, guint *n_objects);
 void			midgard_cr_core_query_select_toggle_read_only	(MidgardCRCoreQuerySelect *self, gboolean toggle);	
 void			midgard_cr_core_query_select_include_deleted	(MidgardCRCoreQuerySelect *self, gboolean toggle);

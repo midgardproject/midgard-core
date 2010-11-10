@@ -181,7 +181,13 @@ namespace MidgardCR {
 		 * @param name name of the class 
 		 */
 		public ObjectModelReference (string name) {
-			base (name);
+			/* Add 'MidgardCR' prefix as C namespace */
+			string real_classname = null;
+			if ("MidgardCR" in name)
+				real_classname = name;
+			else 
+				real_classname = "MidgardCR" + name;
+			base (real_classname);
 		}
 
 		/**

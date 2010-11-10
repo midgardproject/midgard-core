@@ -52,10 +52,10 @@ namespace MidgardCR {
 		internal uint _id = 0;
 		internal unowned SQLStorageManager _storage_manager = null;
 		internal bool _isref = false;
+		internal string _tablename = null;
 		internal string _reference = null;
 		internal string _refname = null;
 		internal string _reftarget = null;
-		internal string _tablename = null;
 		internal string _property_of = null;
 
 		/* public properties */
@@ -103,13 +103,8 @@ namespace MidgardCR {
 		 * Parent model
 		 */
 		public Model? parent { 
-			get { 
-				return this._parent; 
-			}
-			set {
-				this._parent = value;
-				this._tablename = ((MidgardCR.SQLTableModel)this._parent).location;
-			}
+			get { return this._parent; }
+			set { this._parent = value; }
 		}
 
 		/**
@@ -161,7 +156,13 @@ namespace MidgardCR {
 		 * Name of the column's table
 		 */
 		public string tablename {
-			get { return this._tablename; }
+			get { 
+				if (this._parent is SQLColumnModel)
+					return ((SQLColumnModel)this._parent).tablename;
+				if (this._parent is SQLTableModel)
+					return ((StorageModel)this._parent).location;		
+				return this._tablename;	
+			}
 		}
 
 		/**
@@ -248,13 +249,15 @@ namespace MidgardCR {
 		/**
 		 * {@inheritDoc}
 		 * 
-		 * If added model is SQLColumnModel, it's 'parentof' property
+		 * If added model is SQLColumnModel, it's 'propertyof' property
 		 * is set to the value of the current instance.
 		 */		
 		public Model add_model (Model model) { 
 			this._models += model;
-			if (model is SQLColumnModel)
+			if (model is SQLColumnModel) {
 				((SQLColumnModel)model)._property_of = this.name;
+				model.parent = this;
+			}
 			return this; 
 		}
 
@@ -318,8 +321,8 @@ namespace MidgardCR {
 		/**
 		 * Prepare create SQL query
 		 */
-                public void prepare_create () throws ValidationError {			
-			if (this.valuegtype == typeof (Object)) {
+                public void prepare_create () throws ValidationError {		
+			if (this.valuegtype == typeof (Object)) {	
 				foreach (MidgardCR.Model model in this._models) {
 					((StorageExecutor)model).prepare_create ();
 				}

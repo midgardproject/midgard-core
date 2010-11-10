@@ -303,7 +303,14 @@ midgard_cr_core_object_builder_register_types (MidgardCRObjectBuilder *builder, 
 				MidgardCRModel **o_models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (property_models[j]), &n_o_models);
 				if (!o_models)
 					g_error ("No model with ReferenceObject associated with '%s' property of Object type", property);
+				MidgardCRModel *ref_model = o_models[0]; 
+				if (!MIDGARD_CR_IS_OBJECT_MODEL_REFERENCE (ref_model))
+					g_error ("Property '%s' of object type doesn't hold reference object model", property);
+				GType tmp = MIDGARD_CR_TYPE_REFERENCE_OBJECT;
 				GType o_type = g_type_from_name (midgard_cr_model_get_name (MIDGARD_CR_MODEL (o_models[0])));
+				if (o_type != tmp)
+					if (g_type_is_a (o_type, tmp))
+						g_error ("'%s' is not '%s' derived type", g_type_name (o_type), g_type_name (tmp));	
 				type_attr->params[j] = g_param_spec_object (
 						property, nick, descr,
 						o_type, G_PARAM_READWRITE);

@@ -77,7 +77,7 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 {
 	/* select all classes */
 	GString *query = g_string_new ("SELECT ");
-	g_string_append_printf (query, "%s, id FROM %s", TABLE_SCHEMA_COLUMNS, TABLE_NAME_SCHEMA);
+	g_string_append_printf (query, "%s, mgd_id FROM %s", TABLE_SCHEMA_COLUMNS, TABLE_NAME_SCHEMA);
 	GError *err = NULL;
 	
 	GdaDataModel *model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
@@ -126,7 +126,7 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 	
 	/* select all properties */
 	query = g_string_new ("SELECT ");
-	g_string_append_printf (query, "%s, id FROM %s", TABLE_SCHEMA_PROPERTIES_COLUMNS, TABLE_NAME_SCHEMA_PROPERTIES);
+	g_string_append_printf (query, "%s, mgd_id FROM %s", TABLE_SCHEMA_PROPERTIES_COLUMNS, TABLE_NAME_SCHEMA_PROPERTIES);
 	err = NULL;
 	
 	model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
@@ -195,13 +195,13 @@ __list_all_object_models (MidgardCRSQLStorageManager *self, GError **error)
 							|| (reference_class_name && *reference_class_name == '\0'))
 					       g_error ("Empty referenced class name for '%s' reference and '%s' property", 
 						       reference_holder_name, property_name);
-			 		MidgardCRObjectModel *ro_model = __find_model_by_name (self->_object_models, reference_class_name);
+			 		MidgardCRModel *ro_model = __find_model_by_name ((MidgardCRModel**) self->_object_models, reference_class_name);
 					if (ro_model == NULL)
 						g_error ("Referenced '%s' ObjectModel not found.", reference_class_name);		
 					reference_object_model = 
-						(MidgardCRObjectModel *)midgard_cr_object_model_reference_new (reference_holder_name);
-					property_model = midgard_cr_object_property_reference_new (
-							property_name, ro_model, reference_object_model);
+						(MidgardCRObjectModelReference *)midgard_cr_object_model_reference_new (reference_holder_name);
+					property_model = (MidgardCRObjectPropertyModel*) midgard_cr_object_property_reference_new (
+							property_name, (MidgardCRObjectModel *) ro_model, reference_object_model);
 				}
 			}
 			/* Create ObjectPropertyModel */
@@ -235,7 +235,7 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 {
 	/* select all table models */
 	GString *query = g_string_new ("SELECT ");
-	g_string_append_printf (query, "%s, id FROM %s", TABLE_MAPPER_COLUMNS, TABLE_NAME_MAPPER);
+	g_string_append_printf (query, "%s, mgd_id FROM %s", TABLE_MAPPER_COLUMNS, TABLE_NAME_MAPPER);
 	GError *err = NULL;
 	
 	GdaDataModel *model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
@@ -291,7 +291,7 @@ __list_all_storage_models (MidgardCRSQLStorageManager *self, GError **error)
 
 	/* select all columns data */
 	query = g_string_new ("SELECT ");
-	g_string_append_printf (query, "%s, id FROM %s", TABLE_MAPPER_PROPERTIES_COLUMNS, TABLE_NAME_MAPPER_PROPERTIES);
+	g_string_append_printf (query, "%s, mgd_id FROM %s", TABLE_MAPPER_PROPERTIES_COLUMNS, TABLE_NAME_MAPPER_PROPERTIES);
 	err = NULL;
 	
 	model = midgard_core_storage_sql_get_model (GDA_CONNECTION (self->_cnc), (GdaSqlParser *)self->_parser, query->str, &err);
@@ -707,11 +707,20 @@ midgard_cr_core_sql_storage_manager_table_remove (MidgardCRSQLStorageManager *ma
 	}
 }
 
+static MidgardCRModel* 
+_get_table_model (MidgardCRSQLColumnModel *model)
+{
+	MidgardCRModel *parent = midgard_cr_model_get_parent (MIDGARD_CR_MODEL (model));
+	if (parent && MIDGARD_CR_IS_SQL_TABLE_MODEL (parent))
+		return MIDGARD_CR_MODEL (parent);
+	return _get_table_model (MIDGARD_CR_SQL_COLUMN_MODEL (parent));
+}
+
 static void
 _mdc_from_model_property (MidgardCRSQLColumnModel *property_model, MgdCoreStorageSQLColumn *mdc)
 {
 	const gchar *colname = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (property_model));
-	MidgardCRModel *parent = midgard_cr_model_get_parent (MIDGARD_CR_MODEL (property_model));
+	MidgardCRModel *parent = _get_table_model (property_model);
 	const gchar *tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (parent));
 	GType col_type = midgard_cr_model_property_get_valuegtype (MIDGARD_CR_MODEL_PROPERTY (property_model));
 	const gchar *col_type_name = midgard_cr_model_property_get_valuetypename (MIDGARD_CR_MODEL_PROPERTY (property_model));

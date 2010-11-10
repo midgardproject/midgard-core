@@ -175,6 +175,7 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLQuerySelect : GLib.Object, MidgardCR.Executable, MidgardCR.QueryExecutor, MidgardCR.QuerySelect {
 		public SQLQuerySelect (MidgardCR.StorageManager manager, MidgardCR.SQLQueryStorage storage);
+		public static MidgardCR.SQLQuerySelect create_query_select (MidgardCR.StorageManager manager, MidgardCR.SQLQueryStorage storage);
 		public bool readonly { get; set; }
 		public MidgardCR.SQLQueryStorage storage { get; construct; }
 		public MidgardCR.StorageManager storagemanager { get; construct; }

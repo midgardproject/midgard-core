@@ -22,11 +22,15 @@ namespace MidgardCR
 		
 		/* internal properties */
 		internal string _classname = null;
+		internal GLib.Object _core_query_storage = null;
 	
 		/* properties */
 		public string classname { 
 			get { return this._classname; }
-			set { this._classname = value; }
+			set { 
+				this._classname = value; 
+				this._core_query_storage = new MidgardCRCore.QueryStorage (this._classname);
+			}
 		}
 
 		/* constructor */

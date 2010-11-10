@@ -121,9 +121,9 @@ midgard_cr_core_query_executor_get_results_count (MidgardCRCoreQueryExecutor *se
  * Since: 10.05
  */ 
 gboolean
-midgard_cr_core_query_executor_execute (MidgardCRCoreQueryExecutor *self)
+midgard_cr_core_query_executor_execute (MidgardCRCoreQueryExecutor *self, GError **error)
 {
-	return MIDGARD_CR_CORE_QUERY_EXECUTOR_GET_CLASS (self)->execute (self);
+	return MIDGARD_CR_CORE_QUERY_EXECUTOR_GET_CLASS (self)->execute (self, error);
 }
 
 /* GOBJECT ROUTINES */

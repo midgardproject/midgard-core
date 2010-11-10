@@ -658,7 +658,7 @@ midgard_core_storage_sql_index_remove (GdaConnection *cnc, MgdCoreStorageSQLColu
 
 /* SCHEMA AND MAPPER TABLES */
 
-#define COLUMN_PK_DEFAULT "id"
+#define COLUMN_PK_DEFAULT "mgd_id"
 
 #define TABLE_NAME_SCHEMA_DESCRIPTION "Stores names of all GObject derived classes registered with Midgard Content Repository"
 #define TABLE_NAME_SCHEMA_PROPERTIES "midgard_schema_type_properties"
