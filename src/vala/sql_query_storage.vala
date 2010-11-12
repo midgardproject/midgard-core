@@ -22,7 +22,7 @@ namespace MidgardCR
 		
 		/* internal properties */
 		internal string _classname = null;
-		internal GLib.Object _core_query_storage = null;
+		internal GLib.Object? _core_query_storage = null;
 	
 		/* properties */
 		public string classname { 

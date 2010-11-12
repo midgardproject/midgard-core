@@ -120,7 +120,7 @@ __initialize_statement_insert (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 }
 
 void 
-__set_query_insert_parameters (MidgardCRStorageModel *table_model, MidgardCRRepositoryObjectClass *klass, MidgardCRStorable *object, GdaSet *set)
+__set_query_insert_parameters (MidgardCRStorageModel *table_model, GObjectClass *klass, GObject *object, GdaSet *set)
 {
 	guint n_models;
 	guint i;
@@ -133,15 +133,14 @@ __set_query_insert_parameters (MidgardCRStorageModel *table_model, MidgardCRRepo
 		guint n_sub_models;
 		guint j;
 		property_name = midgard_cr_model_get_name (MIDGARD_CR_MODEL (models[i]));
-		GParamSpec *pspec = g_object_class_find_property (G_OBJECT_CLASS (klass), property_name);
+		GParamSpec *pspec = g_object_class_find_property (klass, property_name);
 		MidgardCRModel **sub_models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (models[i]), &n_sub_models);
 		if (sub_models) {
 			/* FIXME, handle error case */
 			GObjectClass *pklass = g_type_class_peek (pspec->value_type);
 			GObject *pobject = NULL;
 			g_object_get (G_OBJECT (object), property_name, &pobject, NULL);
-			__set_query_insert_parameters (MIDGARD_CR_STORAGE_MODEL (models[i]), 
-					MIDGARD_CR_REPOSITORY_OBJECT_CLASS (pklass), MIDGARD_CR_STORABLE (pobject) , set);
+			__set_query_insert_parameters (MIDGARD_CR_STORAGE_MODEL (models[i]), G_OBJECT_CLASS (pklass), pobject, set);
 		} else {
 			/* If this is primary key, exclude it from query */
 			if (midgard_cr_storage_model_property_get_primary (MIDGARD_CR_STORAGE_MODEL_PROPERTY (models[i])))
@@ -245,7 +244,7 @@ midgard_cr_core_sql_storage_content_manager_storable_insert (
 	}
 	/* Set statement parameters */
 	GdaSet *set = type_attr->prepared_sql_statement_insert_params;
-	__set_query_insert_parameters (MIDGARD_CR_STORAGE_MODEL (table_model), rklass, storable, set);
+	__set_query_insert_parameters (MIDGARD_CR_STORAGE_MODEL (table_model), G_OBJECT_CLASS (rklass), G_OBJECT (storable), set);
 
 	/* Execute INSERT query */
 	GdaConnection *cnc = (GdaConnection *) manager->_cnc;

@@ -55,8 +55,42 @@ namespace MidgardCRCore {
 		public QueryStorage (string classname); 
 	}
 
+	public interface QueryHolder : GLib.Object {
+		public void get_value (GLib.Value value);
+		public bool set_value (GLib.Value value);
+	}
+
+	public class QueryProperty : GLib.Object, MidgardCRCore.QueryHolder {
+		[CCode (has_construct_function = false)]
+		public QueryProperty (string property, MidgardCRCore.QueryStorage? storage);
+		[NoAccessorMethod]
+		public string property { owned get; set; }
+		[NoAccessorMethod]
+		public MidgardCRCore.QueryStorage storage { owned get; set; }
+	}
+
+	public class QueryValue : GLib.Object, MidgardCRCore.QueryHolder {
+		[CCode (has_construct_function = false)]
+		public QueryValue ();
+		public static unowned MidgardCRCore.QueryValue create_with_value (GLib.Value value);
+		//[NoWrapper]
+		//public virtual void get_value (GLib.Value value);
+		//[NoWrapper]
+		//public virtual unowned MidgardCRCore.QueryValue set_value (GLib.Value value);
+	}
+
+	public interface QueryConstraintSimple : GLib.Object {
+		public unowned QueryConstraintSimple[]? list_constraints ();
+	}
+
+	public class QueryConstraint : GLib.Object, MidgardCRCore.QueryConstraintSimple {
+		[CCode (has_construct_function = false)]
+		public QueryConstraint (MidgardCRCore.QueryProperty property, string op, MidgardCRCore.QueryHolder holder, MidgardCRCore.QueryStorage? storage);
+	}
+
 	public class QueryExecutor: GLib.Object {
 		public virtual bool execute() throws MidgardCR.ExecutableError;
+		public virtual bool set_constraint (MidgardCRCore.QueryConstraintSimple constraint);
 	}
 
 	public class QuerySelect : MidgardCRCore.QueryExecutor {

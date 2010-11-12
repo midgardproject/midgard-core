@@ -22,25 +22,33 @@ namespace MidgardCR
 
 		/* internal properties */
 		internal string _property_name = null;
-		internal QueryStorage _storage = null;	
+		internal SQLQueryStorage _storage = null;
+		internal GLib.Object? _core_query_holder = null;
 	
 		/* properties */
-		public string propertyname { 
+		public string propertyname {
+			/* FIXME, set and get using underlying core object */ 
 			get { return this._property_name; }
 			set { this._property_name = value; }
 		}
 
-		public QueryStorage storage { 
+		public SQLQueryStorage storage { 
+			/* FIXME, set and get using underlying core object */
 			get { return this._storage; }
 			set { this._storage = value; }
 		}
 
 		/* constructor */
-		public QueryProperty (string property, QueryStorage? storage) {
-			Object (propertyname: property);
-			if (storage != null)
-				this._storage = storage;
+		public QueryProperty (string property, SQLQueryStorage? storage) {
+			Object (propertyname: property, storage: storage);
+			MidgardCRCore.QueryStorage _core_storage = storage != null ? storage._core_query_storage as MidgardCRCore.QueryStorage : null;
+			this._core_query_holder = new MidgardCRCore.QueryProperty (property, _core_storage);	
 		}	
+
+		/* static constructor */
+		public static QueryProperty create_property (string property, SQLQueryStorage? storage) {
+			return new QueryProperty (property, storage);
+		}
 
 		public GLib.Value get_value () { return this._property_name; }
 		public void set_value (GLib.Value value) { this._property_name = (string) value; }

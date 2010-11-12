@@ -18,13 +18,13 @@
 
 namespace MidgardCR
 {
-
 	public class SQLQueryConstraint : GLib.Object, QueryConstraintSimple, QueryConstraint {
 
 		/* internal properties */
 		internal QueryValueHolder _holder = null;
 		internal QueryProperty _property = null;
-		internal QueryStorage _storage = null;
+		internal SQLQueryStorage _storage = null;
+		internal GLib.Object _core_query_constraint = null;
 		internal string _op = null;
 		internal int _op_type = 0;
 
@@ -40,8 +40,8 @@ namespace MidgardCR
 		}
 
 		public QueryStorage storage { 
-			get { return this._storage; } 
-			set { this._storage = value; }
+			get { return (QueryStorage) this._storage; } 
+			set { this._storage = (SQLQueryStorage) value; }
 		}
 
 		public string operator { 
@@ -50,11 +50,29 @@ namespace MidgardCR
 		}
 
 		/* constructor */
-		public SQLQueryConstraint (QueryProperty property, string op, QueryValueHolder holder, QueryStorage? storage) {
+		public SQLQueryConstraint (QueryProperty property, string op, QueryValueHolder holder, SQLQueryStorage? storage) {
 			Object (property: property, operator: op, holder: holder);
 			if (storage != null)
 				this.storage = storage;
+			MidgardCRCore.QueryStorage _core_storage = storage != null ? storage._core_query_storage as MidgardCRCore.QueryStorage: null;
+			/*MidgardCRCore.QueryValue _core_query_value = null;
+			if (holder is QueryValue)
+				_core_query_value = new MidgardCRCore.QueryValue ();
+				_core_query_value.set_value (holder.get_value ());
+			if (holder is QueryProperty)
+				_core_query_value = (MidgardCRCore.QueryValue) new MidgardCRCore.QueryProperty (holder.get_value ().get_string (), null); */
+			this._core_query_constraint = 
+				new MidgardCRCore.QueryConstraint (
+					property._core_query_holder as MidgardCRCore.QueryProperty,
+					op,
+					((holder as MidgardCR.QueryValue)._core_query_holder as MidgardCRCore.QueryValue),
+					_core_storage);
 		}	
+
+		public static SQLQueryConstraint create_constraint (
+			QueryProperty property, string op, QueryValueHolder holder, SQLQueryStorage? storage){
+			return new SQLQueryConstraint (property, op, holder, storage);
+		}
 
 		/* methods */
 		public QueryConstraintSimple[]? list_constraints () {

@@ -68,6 +68,7 @@ namespace MidgardCR
 
 		public void set_constraint (QueryConstraintSimple constraint) {
 			this._create_core_query_select ();
+			(this._core_query_select as MidgardCRCore.QuerySelect).set_constraint ((constraint as MidgardCR.SQLQueryConstraint)._core_query_constraint as MidgardCRCore.QueryConstraint);
 			this._constraint = constraint;
 		}
 

@@ -175,7 +175,7 @@ midgard_cr_core_core_query_compute_constraint_property (MidgardCRCoreQueryExecut
 
 	/* case: property */
 	if (i == 1) {
-		const gchar *property_field = NULL; //midgard_cr_core_core_class_get_property_colname (klass, name);
+		const gchar *property_field = "FIXME_COMPUTE_COLNAME"; //midgard_cr_core_core_class_get_property_colname (klass, name);
 		if (!property_field) {
 			g_warning ("%s doesn't seem to be registered for %s", name, G_OBJECT_CLASS_NAME (klass));
 			g_strfreev (spltd);

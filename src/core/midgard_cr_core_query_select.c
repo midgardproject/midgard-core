@@ -385,6 +385,7 @@ __add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *ta
         GdaSqlExpr *expr;
         GValue *val;
         gchar *table_field;
+	GError *err = NULL;
 
 	MidgardCRModel **models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (storage_model), &n_models); 
 	if (!models) {
@@ -396,6 +397,15 @@ __add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *ta
 	
 	const gchar *property_table = table_name;
 	for (i = 0; i < n_models; i++) {
+		/* Storage model of object type, select fields from this model */
+		if (midgard_cr_model_property_get_valuegtype (MIDGARD_CR_MODEL_PROPERTY (models[i])) == G_TYPE_OBJECT) {
+			__add_fields_to_select_statement (select, table_name, MIDGARD_CR_STORAGE_MODEL (models[i]), &err);
+			if (err) {
+				g_propagate_error (error, err);
+				return;
+			}
+			continue;
+		}
 		const gchar *property = midgard_cr_model_get_name (models[i]);
 		const gchar *property_field = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (models[i]));
 		select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
@@ -476,7 +486,6 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError 
 	s_target->expr = texpr;
 
 	/* Add fields for all properties registered per class (SELECT a,b,c...) */
-	//klass->dbpriv->add_fields_to_select_statement (klass, sss, s_target->as);
 	__add_fields_to_select_statement (sss, s_target->as, MIDGARD_CR_STORAGE_MODEL (table_model), &err);
 	if (err)
 		goto return_false;

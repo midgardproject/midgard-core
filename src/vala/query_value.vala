@@ -20,12 +20,22 @@ namespace MidgardCR
 {
 	public class QueryValue : GLib.Object, QueryValueHolder {
 		
+		/* internal properties */
+		internal GLib.Object _core_query_holder = null;
+
 		/* private properties */
 		private GLib.Value _value;
-			
+
+		private void _create_core_value () {
+			if (this._core_query_holder == null)
+				this._core_query_holder = new MidgardCRCore.QueryValue ();
+			return;
+		}
+
 		/* static constructor */
 		public static QueryValue create_with_value (GLib.Value value) {
 			QueryValue qv = new QueryValue ();
+			qv._create_core_value ();
 			qv.set_value (value);
 			return qv;
 		}
@@ -35,7 +45,8 @@ namespace MidgardCR
 		}
 
 		public void set_value (GLib.Value value) { 
-			this._value = value; 
+			this._create_core_value ();
+			((MidgardCRCore.QueryValue)this._core_query_holder).set_value (value);
 		}
 	}
 }

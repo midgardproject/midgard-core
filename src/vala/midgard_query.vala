@@ -21,7 +21,7 @@ using GLib;
 namespace MidgardCR
 {
 	public interface QueryConstraintSimple : GLib.Object {
-
+			
 		public abstract QueryConstraintSimple[]? list_constraints ();
 	}
 

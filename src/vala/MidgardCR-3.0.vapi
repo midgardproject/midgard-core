@@ -103,9 +103,10 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class QueryProperty : GLib.Object, MidgardCR.QueryValueHolder {
-		public QueryProperty (string property, MidgardCR.QueryStorage? storage);
+		public QueryProperty (string property, MidgardCR.SQLQueryStorage? storage);
+		public static MidgardCR.QueryProperty create_property (string property, MidgardCR.SQLQueryStorage? storage);
 		public string propertyname { get; set; }
-		public MidgardCR.QueryStorage storage { get; set; }
+		public MidgardCR.SQLQueryStorage storage { get; set; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class QueryValue : GLib.Object, MidgardCR.QueryValueHolder {
@@ -170,7 +171,8 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLQueryConstraint : GLib.Object, MidgardCR.QueryConstraintSimple, MidgardCR.QueryConstraint {
-		public SQLQueryConstraint (MidgardCR.QueryProperty property, string op, MidgardCR.QueryValueHolder holder, MidgardCR.QueryStorage? storage);
+		public SQLQueryConstraint (MidgardCR.QueryProperty property, string op, MidgardCR.QueryValueHolder holder, MidgardCR.SQLQueryStorage? storage);
+		public static MidgardCR.SQLQueryConstraint create_constraint (MidgardCR.QueryProperty property, string op, MidgardCR.QueryValueHolder holder, MidgardCR.SQLQueryStorage? storage);
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLQuerySelect : GLib.Object, MidgardCR.Executable, MidgardCR.QueryExecutor, MidgardCR.QuerySelect {
