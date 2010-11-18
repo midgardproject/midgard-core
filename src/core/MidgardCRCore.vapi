@@ -95,6 +95,6 @@ namespace MidgardCRCore {
 
 	public class QuerySelect : MidgardCRCore.QueryExecutor {
 		public static MidgardCRCore.QuerySelect create_static (MidgardCR.StorageManager manager, MidgardCRCore.QueryStorage storage);
-		//public void execute () throws MidgardCR.ExecutableError;
+		public MidgardCR.Storable[]? list_objects ();
 	}
 }

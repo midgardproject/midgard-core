@@ -109,9 +109,8 @@ namespace MidgardCR
 		}
 		
 		public Storable[]? list_objects () {
-			this._create_core_query_select ();
-			/* TODO */
-			return null;
+			this._create_core_query_select ();	
+			return ((MidgardCRCore.QuerySelect)this._core_query_select).list_objects ();
 		}
 
 		public void toggle_read_only (bool toggle) {

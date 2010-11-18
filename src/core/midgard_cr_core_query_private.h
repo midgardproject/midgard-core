@@ -186,5 +186,6 @@ void		midgard_cr_core_core_dbjoin_free	(MidgardCRCoreDBJoin *mdbj);
 
 MidgardCRCoreDBColumn *midgard_cr_core_core_dbcolumn_new(void);
 gchar	*midgard_cr_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *executor, MidgardCRCoreQueryStorage *storage, const gchar *name);
+MidgardCRSQLTableModel *midgard_cr_core_query_find_table_model_by_name (MidgardCRSQLStorageManager *manager, const gchar *class_name);
 
 #endif /* MIDGARD_CR_CORE_QUERY_H */

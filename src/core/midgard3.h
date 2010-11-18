@@ -1274,6 +1274,7 @@ struct _MidgardCRSQLColumnModel {
 	char* _refname;
 	char* _reftarget;
 	char* _property_of;
+	guint _col_id;
 };
 
 struct _MidgardCRSQLColumnModelClass {

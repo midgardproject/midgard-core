@@ -57,6 +57,7 @@ namespace MidgardCR {
 		internal string _refname = null;
 		internal string _reftarget = null;
 		internal string _property_of = null;
+		internal uint _col_id = 0;
 
 		/* public properties */
 	

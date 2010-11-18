@@ -144,14 +144,14 @@ __compute_reserved_property_constraint (Psh *holder, const gchar *token_1, const
 	return TRUE;
 }
 
-static MidgardCRModel *
-__find_table_model_by_name (MidgardCRSQLStorageManager *manager, const gchar *class_name)
+MidgardCRSQLTableModel *
+midgard_cr_core_query_find_table_model_by_name (MidgardCRSQLStorageManager *manager, const gchar *class_name)
 {
 	MidgardCRStorageModel** models = manager->_storage_models;
 	guint i = 0;
 	for (i = 0; models[i] != NULL; i++) {
 		if (g_str_equal (class_name, midgard_cr_model_get_name (MIDGARD_CR_MODEL (models[i]))))
-			return MIDGARD_CR_MODEL (models[i]);
+			return MIDGARD_CR_SQL_TABLE_MODEL (models[i]);
 	}
 	return NULL;
 }
@@ -159,10 +159,10 @@ __find_table_model_by_name (MidgardCRSQLStorageManager *manager, const gchar *cl
 static MidgardCRModel *
 __find_column_model_by_name (MidgardCRSQLStorageManager *manager, const gchar *class_name, const gchar *property_name)
 {
-	MidgardCRModel *table_model = __find_table_model_by_name (manager, class_name);
+	MidgardCRSQLTableModel *table_model = midgard_cr_core_query_find_table_model_by_name (manager, class_name);
 	if (!table_model)
 		return NULL;
-	return midgard_cr_model_get_model_by_name (table_model, property_name);
+	return midgard_cr_model_get_model_by_name (MIDGARD_CR_MODEL (table_model), property_name);
 }
 
 static const gchar *

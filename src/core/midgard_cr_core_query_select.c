@@ -377,7 +377,8 @@ __add_second_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *t
 }
 
 static void
-__add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *table_name, MidgardCRStorageModel *storage_model, GError **error)
+__add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *table_name, 
+		MidgardCRStorageModel *storage_model, guint *col_id, GError **error)
 {
 	guint n_models;
         guint i;
@@ -399,7 +400,7 @@ __add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *ta
 	for (i = 0; i < n_models; i++) {
 		/* Storage model of object type, select fields from this model */
 		if (midgard_cr_model_property_get_valuegtype (MIDGARD_CR_MODEL_PROPERTY (models[i])) == G_TYPE_OBJECT) {
-			__add_fields_to_select_statement (select, table_name, MIDGARD_CR_STORAGE_MODEL (models[i]), &err);
+			__add_fields_to_select_statement (select, table_name, MIDGARD_CR_STORAGE_MODEL (models[i]), col_id, &err);
 			if (err) {
 				g_propagate_error (error, err);
 				return;
@@ -419,6 +420,9 @@ __add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *ta
 		g_free (table_field);
 		expr->value = val;
 		select_field->expr = expr;
+		MIDGARD_CR_SQL_COLUMN_MODEL (models[i])->_col_id = *col_id;
+		g_print ("COL %s has %d ID \n", property_field, *col_id);
+		(*col_id)++;
 	}
 
 	return;
@@ -486,7 +490,8 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError 
 	s_target->expr = texpr;
 
 	/* Add fields for all properties registered per class (SELECT a,b,c...) */
-	__add_fields_to_select_statement (sss, s_target->as, MIDGARD_CR_STORAGE_MODEL (table_model), &err);
+	guint _col_id = 0;
+	__add_fields_to_select_statement (sss, s_target->as, MIDGARD_CR_STORAGE_MODEL (table_model), &_col_id, &err);
 	if (err)
 		goto return_false;
 
@@ -595,27 +600,62 @@ _midgard_cr_core_query_select_get_results_count (MidgardCRCoreQueryExecutor *sel
 	return self->priv->results_count;
 }
 
+static void __set_object_from_data_model (MidgardCRModel *table_model, GObjectClass *klass, GObject *object, GdaDataModel *data_model, guint row)
+{
+	guint n_models;
+	MidgardCRSQLColumnModel **col_models = (MidgardCRSQLColumnModel**) midgard_cr_model_list_models (MIDGARD_CR_MODEL (table_model), &n_models);
+	if (col_models == NULL)
+		g_error ("No single column model associated with %s table model", midgard_cr_model_get_name (MIDGARD_CR_MODEL (table_model)));
+	guint i;
+	GParamSpec *pspec = NULL;
+	const gchar *property_name = NULL;
+	for (i = 0; i < n_models; i++) {
+		property_name = midgard_cr_model_get_name (MIDGARD_CR_MODEL (col_models[i]));
+		pspec = g_object_class_find_property (klass, property_name);
+		if (midgard_cr_model_property_get_valuegtype (MIDGARD_CR_MODEL_PROPERTY (col_models[i])) == G_TYPE_OBJECT) {
+			GObject *obj = NULL;
+			g_object_get (object, property_name, &obj, NULL);
+			if (obj == NULL) {
+				obj = g_object_new (pspec->value_type, NULL);
+				g_object_set (object, property_name, obj, NULL);
+			}			
+			__set_object_from_data_model (col_models[i], G_OBJECT_GET_CLASS (obj), obj, data_model, row);
+			continue;
+		}
+		g_print ("COLUMN MODEL %s (%d) (DataModel: '%s') \n", 
+				midgard_cr_model_get_name (MIDGARD_CR_MODEL (col_models[i])), col_models[i]->_col_id,
+				gda_data_model_get_column_name (data_model, col_models[i]->_col_id));
+		if (!(pspec->flags & G_PARAM_WRITABLE)) {
+			g_print ("Read only property %s, FIXME", property_name); 
+		} else {
+			g_object_set (object, property_name, gda_data_model_get_value_at (data_model, col_models[i]->_col_id, row, NULL));
+		}
+	}
+}
+
 MidgardCRStorable **
 _midgard_cr_core_query_select_list_objects (MidgardCRCoreQuerySelect *self, guint *n_objects)
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	
 	*n_objects = 0;
-	GdaDataModel *model = GDA_DATA_MODEL (MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->resultset);
-	if (!model || (model && !GDA_IS_DATA_MODEL (model)))
+	GdaDataModel *data_model = GDA_DATA_MODEL (MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->resultset);
+	if (!data_model || (data_model && !GDA_IS_DATA_MODEL (data_model)))
 		return NULL;
 
 	guint i;
-	guint rows = gda_data_model_get_n_rows (model);
+	guint rows = gda_data_model_get_n_rows (data_model);
 	if (rows < 1)
 		return NULL;
 
-	MidgardCRStorageManager *mgd = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage_manager;
+	MidgardCRStorageManager *manager = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage_manager;
 	GObjectClass *klass = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
+	MidgardCRSQLTableModel *table_model = midgard_cr_core_query_find_table_model_by_name (MIDGARD_CR_SQL_STORAGE_MANAGER (manager), G_OBJECT_CLASS_NAME (klass));
 	MidgardCRStorable **objects = g_new (MidgardCRStorable *, rows+1);	
 
 	for (i = 0; i < rows; i++) {	
 		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), NULL);
+		__set_object_from_data_model (MIDGARD_CR_MODEL (table_model), klass, G_OBJECT (objects[i]), data_model, i);
 		/* MGD_OBJECT_IN_STORAGE (objects[i]) = TRUE;
 		MIDGARD_CR_CORE_DBOBJECT(objects[i])->dbpriv->datamodel = model;
 		MIDGARD_CR_CORE_DBOBJECT(objects[i])->dbpriv->row = i;

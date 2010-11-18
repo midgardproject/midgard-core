@@ -84,4 +84,13 @@ void main () {
 
 	query.validate ();		 
 	query.execute ();
+
+	MidgardCR.Storable[]? objects = query.list_objects ();
+	int i = 1;
+	foreach (MidgardCR.Storable object in objects) {
+		string guid;
+		object.get ("guid", out guid);
+		//GLib.print ("Found %d Activity object identified by %s \n", i, guid);
+		i++;
+	} 
 }
