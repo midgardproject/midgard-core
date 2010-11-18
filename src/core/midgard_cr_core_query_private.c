@@ -144,6 +144,36 @@ __compute_reserved_property_constraint (Psh *holder, const gchar *token_1, const
 	return TRUE;
 }
 
+static MidgardCRModel *
+__find_table_model_by_name (MidgardCRSQLStorageManager *manager, const gchar *class_name)
+{
+	MidgardCRStorageModel** models = manager->_storage_models;
+	guint i = 0;
+	for (i = 0; models[i] != NULL; i++) {
+		if (g_str_equal (class_name, midgard_cr_model_get_name (MIDGARD_CR_MODEL (models[i]))))
+			return MIDGARD_CR_MODEL (models[i]);
+	}
+	return NULL;
+}
+
+static MidgardCRModel *
+__find_column_model_by_name (MidgardCRSQLStorageManager *manager, const gchar *class_name, const gchar *property_name)
+{
+	MidgardCRModel *table_model = __find_table_model_by_name (manager, class_name);
+	if (!table_model)
+		return NULL;
+	return midgard_cr_model_get_model_by_name (table_model, property_name);
+}
+
+static const gchar *
+__get_property_colname (MidgardCRSQLStorageManager *manager, const gchar *class_name, const gchar *property_name)
+{
+	MidgardCRModel *column_model = __find_column_model_by_name (manager, class_name, property_name);
+	if (!column_model)
+		return NULL;
+	return midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (column_model));
+}
+
 gchar *
 midgard_cr_core_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *executor,
 		                MidgardCRCoreQueryStorage *storage, const gchar *name)
@@ -175,7 +205,8 @@ midgard_cr_core_core_query_compute_constraint_property (MidgardCRCoreQueryExecut
 
 	/* case: property */
 	if (i == 1) {
-		const gchar *property_field = "FIXME_COMPUTE_COLNAME"; //midgard_cr_core_core_class_get_property_colname (klass, name);
+		const gchar *property_field = 
+			__get_property_colname (MIDGARD_CR_SQL_STORAGE_MANAGER (executor->priv->storage_manager), G_OBJECT_CLASS_NAME (klass), name);
 		if (!property_field) {
 			g_warning ("%s doesn't seem to be registered for %s", name, G_OBJECT_CLASS_NAME (klass));
 			g_strfreev (spltd);
