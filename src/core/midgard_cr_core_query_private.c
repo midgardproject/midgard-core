@@ -175,7 +175,7 @@ __get_property_colname (MidgardCRSQLStorageManager *manager, const gchar *class_
 }
 
 gchar *
-midgard_cr_core_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *executor,
+midgard_cr_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *executor,
 		                MidgardCRCoreQueryStorage *storage, const gchar *name)
 {
 	g_return_val_if_fail (executor != NULL, FALSE);

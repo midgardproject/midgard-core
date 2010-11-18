@@ -224,7 +224,7 @@ __query_select_add_orders (MidgardCRCoreQueryExecutor *self)
 		/* Compute table.colname for given property name */
 		GValue rval = {0, };
 		midgard_cr_core_query_holder_get_value (MIDGARD_CR_CORE_QUERY_HOLDER (property), &rval);
-		gchar *table_field = midgard_cr_core_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval));
+		gchar *table_field = midgard_cr_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval));
 		g_value_unset (&rval);
 
 		value = g_new0 (GValue, 1);
@@ -268,12 +268,12 @@ __query_select_add_joins (MidgardCRCoreQuerySelect *self, GdaSqlOperation *opera
 		GValue lval = {0, };
 		midgard_cr_core_query_holder_get_value (MIDGARD_CR_CORE_QUERY_HOLDER (_sj->left_property), &lval);
 		gchar *left_table_field = 
-			midgard_cr_core_core_query_compute_constraint_property (executor, left_storage, g_value_get_string (&lval));
+			midgard_cr_core_query_compute_constraint_property (executor, left_storage, g_value_get_string (&lval));
 
 		GValue rval = {0, };
 		midgard_cr_core_query_holder_get_value (MIDGARD_CR_CORE_QUERY_HOLDER (_sj->right_property), &rval);
 		gchar *right_table_field = 
-			midgard_cr_core_core_query_compute_constraint_property (executor, right_storage, g_value_get_string (&rval));
+			midgard_cr_core_query_compute_constraint_property (executor, right_storage, g_value_get_string (&rval));
 
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (join));
 		expr->value = gda_value_new (G_TYPE_STRING);
@@ -611,13 +611,12 @@ _midgard_cr_core_query_select_list_objects (MidgardCRCoreQuerySelect *self, guin
 		return NULL;
 
 	MidgardCRStorageManager *mgd = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage_manager;
-	//MidgardCRCoreDBObjectClass *klass = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
-	//MidgardCRCoreDBObject **objects = g_new (MidgardCRCoreDBObject *, rows+1);
-	MidgardCRStorable **objects = NULL;
+	GObjectClass *klass = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
+	MidgardCRStorable **objects = g_new (MidgardCRStorable *, rows+1);	
 
 	for (i = 0; i < rows; i++) {	
-		/*objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), "connection", mgd, NULL);
-		MGD_OBJECT_IN_STORAGE (objects[i]) = TRUE;
+		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), NULL);
+		/* MGD_OBJECT_IN_STORAGE (objects[i]) = TRUE;
 		MIDGARD_CR_CORE_DBOBJECT(objects[i])->dbpriv->datamodel = model;
 		MIDGARD_CR_CORE_DBOBJECT(objects[i])->dbpriv->row = i;
 		g_object_ref (model);
@@ -633,7 +632,7 @@ _midgard_cr_core_query_select_list_objects (MidgardCRCoreQuerySelect *self, guin
 		}*/
 	}
 
-	//objects[i] = NULL;
+	objects[i] = NULL;
 	*n_objects = rows;
 	
 	return objects;

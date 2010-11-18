@@ -185,6 +185,6 @@ void		midgard_cr_core_core_dbjoin_free	(MidgardCRCoreDBJoin *mdbj);
 	}
 
 MidgardCRCoreDBColumn *midgard_cr_core_core_dbcolumn_new(void);
-gchar	*midgard_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *executor, MidgardCRCoreQueryStorage *storage, const gchar *name);
+gchar	*midgard_cr_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *executor, MidgardCRCoreQueryStorage *storage, const gchar *name);
 
 #endif /* MIDGARD_CR_CORE_QUERY_H */

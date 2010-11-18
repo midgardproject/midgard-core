@@ -39,7 +39,7 @@ typedef struct _MidgardCRCoreQuerySelectClass MidgardCRCoreQuerySelectClass;
 struct _MidgardCRCoreQuerySelectClass {
 	MidgardCRCoreQueryExecutorClass parent;
 
-	GObject		**(*list_objects)		(MidgardCRCoreQuerySelect *self, guint *n_objects);
+	struct _MidgardCRStorable	**(*list_objects)		(MidgardCRCoreQuerySelect *self, guint *n_objects);
 	void		(*toggle_read_only)		(MidgardCRCoreQuerySelect *self, gboolean toggle);
 	void		(*include_deleted)		(MidgardCRCoreQuerySelect *self, gboolean toggle);
 };

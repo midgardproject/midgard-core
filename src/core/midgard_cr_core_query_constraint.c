@@ -338,7 +338,7 @@ _midgard_cr_core_query_constraint_add_conditions_to_statement (MidgardCRCoreQuer
 	/* Create table_alias.field name */
 	gchar *table_alias_field;
 	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
-	table_alias_field = midgard_cr_core_core_query_compute_constraint_property (executor, 
+	table_alias_field = midgard_cr_core_query_compute_constraint_property (executor, 
 			MIDGARD_CR_CORE_QUERY_CONSTRAINT (constraint_simple)->priv->storage, g_value_get_string (&field_value));
 	if (!table_alias_field)
 		g_warning ("Null table.field alias for given '%s'", g_value_get_string (&field_value));
