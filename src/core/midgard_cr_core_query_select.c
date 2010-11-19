@@ -421,7 +421,6 @@ __add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *ta
 		expr->value = val;
 		select_field->expr = expr;
 		MIDGARD_CR_SQL_COLUMN_MODEL (models[i])->_col_id = *col_id;
-		g_print ("COL %s has %d ID \n", property_field, *col_id);
 		(*col_id)++;
 	}
 
@@ -600,7 +599,7 @@ _midgard_cr_core_query_select_get_results_count (MidgardCRCoreQueryExecutor *sel
 	return self->priv->results_count;
 }
 
-static void __set_object_from_data_model (MidgardCRModel *table_model, GObjectClass *klass, GObject *object, GdaDataModel *data_model, guint row)
+static void __set_object_from_data_model (MidgardCRModel *table_model, MidgardCRModel *object_model, GObjectClass *klass, GObject *object, GdaDataModel *data_model, guint row)
 {
 	guint n_models;
 	MidgardCRSQLColumnModel **col_models = (MidgardCRSQLColumnModel**) midgard_cr_model_list_models (MIDGARD_CR_MODEL (table_model), &n_models);
@@ -610,25 +609,46 @@ static void __set_object_from_data_model (MidgardCRModel *table_model, GObjectCl
 	GParamSpec *pspec = NULL;
 	const gchar *property_name = NULL;
 	for (i = 0; i < n_models; i++) {
-		property_name = midgard_cr_model_get_name (MIDGARD_CR_MODEL (col_models[i]));
+		property_name = midgard_cr_model_get_name (MIDGARD_CR_MODEL (col_models[i]));	
 		pspec = g_object_class_find_property (klass, property_name);
-		if (midgard_cr_model_property_get_valuegtype (MIDGARD_CR_MODEL_PROPERTY (col_models[i])) == G_TYPE_OBJECT) {
+		/* ReferenceObject, so get all its properties */
+		if (midgard_cr_model_property_get_valuegtype (MIDGARD_CR_MODEL_PROPERTY (col_models[i])) == G_TYPE_OBJECT
+				&& g_type_is_a (pspec->value_type, MIDGARD_CR_TYPE_REFERENCE_OBJECT)) {
 			GObject *obj = NULL;
 			g_object_get (object, property_name, &obj, NULL);
 			if (obj == NULL) {
-				obj = g_object_new (pspec->value_type, NULL);
+				MidgardCRModelProperty *ref_model = 
+					MIDGARD_CR_MODEL_PROPERTY (midgard_cr_model_get_model_by_name (object_model, property_name));
+				obj = g_object_new (pspec->value_type, 
+						"classname", midgard_cr_model_property_get_refname (ref_model), NULL);
 				g_object_set (object, property_name, obj, NULL);
 			}			
-			__set_object_from_data_model (col_models[i], G_OBJECT_GET_CLASS (obj), obj, data_model, row);
+			__set_object_from_data_model (MIDGARD_CR_MODEL (col_models[i]), NULL, G_OBJECT_GET_CLASS (obj), obj, data_model, row);
 			continue;
 		}
-		g_print ("COLUMN MODEL %s (%d) (DataModel: '%s') \n", 
+		/* g_print ("COLUMN MODEL %s (%d) (DataModel: '%s') \n", 
 				midgard_cr_model_get_name (MIDGARD_CR_MODEL (col_models[i])), col_models[i]->_col_id,
-				gda_data_model_get_column_name (data_model, col_models[i]->_col_id));
+				gda_data_model_get_column_name (data_model, col_models[i]->_col_id)); */
+		/* READ ONLY PROPERTY */
 		if (!(pspec->flags & G_PARAM_WRITABLE)) {
-			g_print ("Read only property %s, FIXME", property_name); 
+			/* FIXME, these setters should be much more efficient, and not such ugly */
+			if (g_str_equal (property_name, "id"))
+				MIDGARD_CR_REPOSITORY_OBJECT (object)->_id = 
+					g_value_get_int (gda_data_model_get_value_at (data_model, col_models[i]->_col_id, row, NULL));
+			else if (g_str_equal (property_name, "guid")) {
+				g_free (MIDGARD_CR_REPOSITORY_OBJECT (object)->_guid);
+				MIDGARD_CR_REPOSITORY_OBJECT (object)->_guid = 
+					g_value_dup_string (gda_data_model_get_value_at (data_model, col_models[i]->_col_id, row, NULL));
+			}
+		/* CONSTRUCT ONLY PROPERTY */
+		} else if ((pspec->flags & G_PARAM_CONSTRUCT_ONLY)) {
+			/* TODO, yep, there's something to do with this case.
+			 * Though, it is only related to ReferenceObject. */
+			/* g_print ("Unhandled construct only property %s \n", property_name); */
+		/* WRITE&READ PROPERTY, SET */
 		} else {
-			g_object_set (object, property_name, gda_data_model_get_value_at (data_model, col_models[i]->_col_id, row, NULL));
+			/* Every column model has column id set when select has been built. Use it instead of name. */
+			g_object_set (object, property_name, gda_data_model_get_value_at (data_model, col_models[i]->_col_id, row, NULL), NULL);
 		}
 	}
 }
@@ -648,14 +668,18 @@ _midgard_cr_core_query_select_list_objects (MidgardCRCoreQuerySelect *self, guin
 	if (rows < 1)
 		return NULL;
 
-	MidgardCRStorageManager *manager = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage_manager;
+	MidgardCRSQLStorageManager *manager = MIDGARD_CR_SQL_STORAGE_MANAGER (MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage_manager);
 	GObjectClass *klass = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
-	MidgardCRSQLTableModel *table_model = midgard_cr_core_query_find_table_model_by_name (MIDGARD_CR_SQL_STORAGE_MANAGER (manager), G_OBJECT_CLASS_NAME (klass));
+	const gchar *classname = G_OBJECT_CLASS_NAME (klass);
+	MidgardCRSQLTableModel *table_model = midgard_cr_core_query_find_table_model_by_name (manager, classname);
+	MidgardCRObjectModel *object_model = 
+		midgard_cr_sql_storage_model_manager_get_object_model_by_name (
+				MIDGARD_CR_SQL_STORAGE_MODEL_MANAGER (midgard_cr_storage_manager_get_model_manager (MIDGARD_CR_STORAGE_MANAGER (manager))), classname);
 	MidgardCRStorable **objects = g_new (MidgardCRStorable *, rows+1);	
 
 	for (i = 0; i < rows; i++) {	
 		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), NULL);
-		__set_object_from_data_model (MIDGARD_CR_MODEL (table_model), klass, G_OBJECT (objects[i]), data_model, i);
+		__set_object_from_data_model (MIDGARD_CR_MODEL (table_model), MIDGARD_CR_MODEL (object_model), klass, G_OBJECT (objects[i]), data_model, i);
 		/* MGD_OBJECT_IN_STORAGE (objects[i]) = TRUE;
 		MIDGARD_CR_CORE_DBOBJECT(objects[i])->dbpriv->datamodel = model;
 		MIDGARD_CR_CORE_DBOBJECT(objects[i])->dbpriv->row = i;

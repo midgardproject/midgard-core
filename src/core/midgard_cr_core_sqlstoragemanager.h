@@ -49,5 +49,4 @@ gint midgard_cr_core_sql_storage_manager_query_execute (struct _MidgardCRSQLStor
 /* MODELS */
 void midgard_cr_core_sql_storage_manager_load_models (struct _MidgardCRSQLStorageManager *self, GError **error);
 
-
 #endif /* _MIDGARD_CR_CORE_SQL_STORAGE_MANAGER_H_ */
