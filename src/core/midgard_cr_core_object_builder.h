@@ -42,6 +42,10 @@ struct _MgdSchemaTypeAttr {
 	GHashTable *user_values;
 	GdaStatement *prepared_sql_statement_insert;
 	GdaSet *prepared_sql_statement_insert_params;
+	GdaStatement *prepared_sql_statement_update;
+	GdaSet *prepared_sql_statement_update_params;
+	GdaStatement *prepared_sql_statement_delete;
+	GdaSet *prepared_sql_statement_delete_params;
 };
 
 struct _MgdSchemaPropertyAttr {

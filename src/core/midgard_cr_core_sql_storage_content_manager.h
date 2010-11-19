@@ -34,5 +34,6 @@ void midgard_cr_core_sql_table_model_manager_execute (MidgardCRSQLStorageModelMa
 */
 
 void midgard_cr_core_sql_storage_content_manager_storable_insert (MidgardCRStorable *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, MidgardCRSQLTableModel *table_model, GError **error);
+void midgard_cr_core_sql_storage_content_manager_storable_update (MidgardCRStorable *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, MidgardCRSQLTableModel *table_model, GError **error);
 
 #endif /* _MIDGARD_CR_CORE_SQL_STORAGE_CONTENT_MANAGER_H_ */

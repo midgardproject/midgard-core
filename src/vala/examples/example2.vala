@@ -90,7 +90,8 @@ void main () {
 	foreach (MidgardCR.Storable object in objects) {
 		string guid;
 		object.get ("guid", out guid);
-		//GLib.print ("Found %d Activity object identified by %s \n", i, guid);
+		GLib.print ("Found %d Activity object identified by %s \n", i, guid);
+		content_manager.update (activity);
 		i++;
 	} 
 }

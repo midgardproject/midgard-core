@@ -43,6 +43,8 @@ namespace MidgardCRCore {
 
 	public class SQLStorageContentManager {
 		public static void storable_insert (MidgardCR.Storable storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
+		public static void storable_update (MidgardCR.Storable storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
+
 	}
 
 	public class ObjectBuilder {

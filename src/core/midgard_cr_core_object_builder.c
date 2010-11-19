@@ -42,6 +42,10 @@ midgard_cr_core_schema_type_attr_new (void)
 	type->user_values = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, (GDestroyNotify) midgard_cr_core_schema_type_attr_free);
 	type->prepared_sql_statement_insert = NULL;
 	type->prepared_sql_statement_insert_params = NULL;
+	type->prepared_sql_statement_update = NULL;
+	type->prepared_sql_statement_update_params = NULL;
+	type->prepared_sql_statement_delete = NULL;
+	type->prepared_sql_statement_delete_params = NULL;
 
 	return type;
 }

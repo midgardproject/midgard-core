@@ -36,6 +36,9 @@
 		g_string_append_printf (values, "##%s::%s", col_name, type_name); \
 		add_coma = TRUE;
 
+/* ************************* */
+/* INSERT SQL QUERY ROUTINES */
+/* ************************* */
 
 static void
 __initialize_statement_insert (MidgardCRRepositoryObjectClass *klass, MgdSchemaTypeAttr *type_attr, MidgardCRSQLTableModel *table_model, GError **error)
@@ -260,6 +263,181 @@ midgard_cr_core_sql_storage_content_manager_storable_insert (
 	if (inserted == -1) {
 		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
 				"Failed to execute SQL statement INSERT for given '%s' object. %s ", 
+				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+	}	
+
+	return;
+}
+/* ************************* */
+/* UPDATE SQL QUERY ROUTINES */
+/* ************************* */
+
+#define __ADD_COLS_AND_VALUES_TO_UPDATE(__model, __pspec) \
+	const gchar *col_name = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (__model)); \
+	const gchar *type_name = g_type_name (__pspec->value_type); \
+	if (__pspec->value_type == MIDGARD_CR_TYPE_TIMESTAMP) \
+		type_name = "string"; \
+	g_string_append_printf (query, "%s%s=##%s::%s", add_coma ? ", " : "", col_name, col_name, type_name); \
+	add_coma = TRUE;
+
+static void
+__initialize_statement_update (MidgardCRRepositoryObjectClass *klass, MgdSchemaTypeAttr *type_attr, MidgardCRSQLTableModel *table_model, GError **error)
+{
+	GString *query = g_string_new ("");
+	guint n_props;
+	guint i;
+	const gchar *table = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (table_model));
+	g_string_append_printf (query, "UPDATE %s SET ", table);
+
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (klass), &n_props);
+	g_return_if_fail (pspecs != NULL);
+
+	const gchar *pk = "id"; /* FIXME, get primary from model */
+	gboolean add_coma = FALSE;
+	const gchar *property_name;
+	
+	for (i = 0; i < n_props; i++) {
+		property_name = pspecs[i]->name;	
+		MidgardCRSQLColumnModel *col_model = 
+			MIDGARD_CR_SQL_COLUMN_MODEL (midgard_cr_model_get_model_by_name (MIDGARD_CR_MODEL (table_model), property_name));
+
+		/* Ignore primary key and property without column model */
+		if (pk && g_str_equal (property_name, pk) 
+				|| col_model == NULL)
+			continue;
+
+		/* Handle referenced object case */
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT) {
+			guint n_sub_models;
+			guint k;
+			/* Get class pointer, initialize it, it's been not referenced before */
+			GObjectClass *pklass = g_type_class_peek (pspecs[i]->value_type);
+			if (pklass == NULL)
+				pklass = g_type_class_ref (pspecs[i]->value_type);
+			/* Get all models associated with property and add those to statement */
+			MidgardCRModel **sub_models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (col_model), &n_sub_models);
+			if (sub_models && (pklass != NULL)) {
+				for (k = 0; k < n_sub_models; k++) {
+					GParamSpec *pspec = 
+						g_object_class_find_property (pklass, midgard_cr_model_get_name (MIDGARD_CR_MODEL (sub_models[k])));
+					__ADD_COLS_AND_VALUES_TO_UPDATE (sub_models[k], pspec);
+				}
+				continue;
+			}
+			g_warning ("Invalid property %s of object type without proper model", property_name);
+		}
+      
+	       	__ADD_COLS_AND_VALUES_TO_UPDATE (col_model, pspecs[i]);	
+	}
+
+	/* FIXME, add metadata and references objects statement */
+      	/* __statement_insert_add_metadata_fields (klass, colnames, values); */
+
+	g_string_append (query, " WHERE mgd_guid=##mgd_guid::string");
+	GdaSqlParser *parser = gda_sql_parser_new ();
+	GdaStatement *stmt;
+	GError *err = NULL;
+	g_print ("SQL: %s \n", query->str);
+	stmt = gda_sql_parser_parse_string (parser, query->str, NULL, &err);
+	g_string_free (query, TRUE);
+
+	if (!stmt) {
+		g_propagate_error (error, err);
+	       	return;
+	}
+
+	GdaSet *params;
+	if (!gda_statement_get_parameters (stmt, &params, &err)) {
+		g_propagate_error (error, err);
+		return;
+	}
+
+	type_attr->prepared_sql_statement_update = stmt;
+	type_attr->prepared_sql_statement_update_params = params;	
+
+	return;
+}
+
+void 
+midgard_cr_core_sql_storage_content_manager_storable_update (
+		MidgardCRStorable *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, 
+		MidgardCRSQLTableModel *table_model, GError **error) 
+{
+	/* Allow NULL object_model.
+	 * We need to follow table_model which describes table we want insert record into */
+	g_return_if_fail (storable != NULL);
+	g_return_if_fail (MIDGARD_CR_IS_STORABLE (storable));
+	g_return_if_fail (manager != NULL);
+	g_return_if_fail (table_model != NULL);
+	g_return_if_fail (error == NULL || *error == NULL);
+
+	GError *err = NULL;
+
+	/* If this is StorageObject, create SQL query on demand (until something faster is implemented) */
+	if (MIDGARD_CR_IS_STORAGE_OBJECT (storable)) {
+		gchar *query = midgard_cr_core_storage_sql_create_query_update (G_OBJECT (storable), object_model, MIDGARD_CR_STORAGE_MODEL (table_model));
+		if (!query) {
+			*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+					"Failed to generate SQL UPDATE query for given %s instance", G_OBJECT_TYPE_NAME (G_OBJECT (storable)));
+			return;
+		}
+		gint rv = midgard_cr_core_sql_storage_manager_query_execute (manager, query, &err);
+		g_free (query);
+		if (err) {
+			*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+					"Failed to execute SQL UPDATE query for given %s instance. %s ", 
+					G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return;
+		}
+	}
+
+	/* RepositoryObject */
+	if (!MIDGARD_CR_IS_REPOSITORY_OBJECT (storable)) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_OBJECT_INVALID,
+				"Expected RepositoryObject. %s given to create SQL UPDATE query", G_OBJECT_TYPE_NAME (G_OBJECT (storable)));
+		return;
+	}
+
+	MidgardCRRepositoryObjectClass *rklass = MIDGARD_CR_REPOSITORY_OBJECT_GET_CLASS (storable);
+	MgdSchemaTypeAttr *type_attr = g_type_class_get_private ((GTypeClass*)rklass, G_OBJECT_CLASS_TYPE (rklass));
+	if (!type_attr) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+				"Missed private data of %s class ", G_OBJECT_TYPE_NAME (G_OBJECT (storable)));
+		return;
+	}
+
+	/* Check if prepared UPDATE statement exists*/
+	if (type_attr->prepared_sql_statement_update == NULL) {
+		/* Generate prepared UPDATE statement */
+		__initialize_statement_update (rklass, type_attr, table_model, &err);
+		if (err) {
+			*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+					"Failed to initialize prepared SQL statement UPDATE for given %s class. %s ", 
+					G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return;
+		}
+	}
+	/* Set statement parameters */
+	GdaSet *set = type_attr->prepared_sql_statement_update_params;
+	__set_query_insert_parameters (MIDGARD_CR_STORAGE_MODEL (table_model), G_OBJECT_CLASS (rklass), G_OBJECT (storable), set);
+
+	/* Execute UPDATE query */
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	GdaStatement *stmt = type_attr->prepared_sql_statement_update;
+
+        gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, set, GDA_STATEMENT_SQL_PRETTY, NULL, &err);
+	if (err) g_warning ("%s", err->message);
+	g_clear_error (&err);
+	g_debug ("Object update: %s", debug_sql);
+	g_free (debug_sql);
+
+	gint inserted = gda_connection_statement_execute_non_select (cnc, stmt, set, NULL, &err);
+	if (inserted == -1) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+				"Failed to execute SQL statement UPDATE for given '%s' object. %s ", 
 				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
 		g_clear_error (&err);
 	}	
