@@ -18,6 +18,11 @@
 
 namespace MidgardCR {
 
+	/**
+	 * SQLStorageContentManager's purpose is to create, update, or delete object's data
+	 * in underlying SQL database. Any {@link Storable} object is volatile data, and once 
+	 * created with content manager becomes persistant.
+	 */	 
 	public class SQLStorageContentManager : GLib.Object, StorageContentManager {
 	
 		/* internal properties */
@@ -44,30 +49,77 @@ namespace MidgardCR {
 			return false;
 		}	
 
+		/**
+		 * Creates object's record in SQL table.
+		 * 
+		 * @param object Storable object
+		 *
+		 * This method requires valid {@link SQLTableModel}, available from {@link SQLStorageModelManager}.
+		 * If such is found, object's properties values will be stored in table, which name, 
+		 * is declared as table model's location.
+		 *
+		 * If given object is {@link RepositoryObject}, valid SQL INSERT prepared statament is generated for 
+		 * object's class and stored as permanent statement available for every class instance.
+		 */
 		public virtual bool create (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+			if (table_model == null)
+				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			MidgardCRCore.SQLStorageContentManager.storable_insert (object, this._storage_manager, object_model, table_model);
 			return true;
 		}	
-	
+
+		/**
+		 * Updates object's record in SQL table.
+		 * 
+		 * @param object Storable object
+		 *
+		 * This method requires valid {@link SQLTableModel}, available from {@link SQLStorageModelManager}.
+		 * If such is found, object's properties values will be stored in table, which name, 
+		 * is declared as table model's location.
+		 *
+		 * If given object is {@link RepositoryObject}, valid SQL UPDATE prepared statament is generated for 
+		 * object's class and stored as permanent statement available for every class instance.
+		 */
 		public virtual bool update (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+			if (table_model == null)
+				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			MidgardCRCore.SQLStorageContentManager.storable_update (object, this._storage_manager, object_model, table_model);
 			return true;
 		}		
 
+		/**
+		 * Saves object's record in SQL table
+		 *
+		 * @param object Storable object
+		 *
+		 * This method requires valid {@link SQLTableModel}, available from {@link SQLStorageModelManager}.
+		 * If such is found, object's properties values will be stored in table, which name, 
+		 * is declared as table model's location.
+		 *
+		 * This method is slower than create () one and equal to update ().
+		 * It's very important to note that this method tries to update object's record first, 
+		 * and in case of false update performs create operation.
+		 * Of course, create operation is executed only (and only) if update fails due to 
+		 * non exisiting record identified by object's guid. 
+		 * In case of other failure, particular exception is thrown. 	
+		 *
+		 */
 		public virtual bool save (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+			if (table_model == null)
+				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			try {
