@@ -73,10 +73,6 @@ namespace MidgardCRCore {
 		[CCode (has_construct_function = false)]
 		public QueryValue ();
 		public static unowned MidgardCRCore.QueryValue create_with_value (GLib.Value value);
-		//[NoWrapper]
-		//public virtual void get_value (GLib.Value value);
-		//[NoWrapper]
-		//public virtual unowned MidgardCRCore.QueryValue set_value (GLib.Value value);
 	}
 
 	public interface QueryConstraintSimple : GLib.Object {
@@ -91,6 +87,11 @@ namespace MidgardCRCore {
 	public class QueryExecutor: GLib.Object {
 		public virtual bool execute() throws MidgardCR.ExecutableError;
 		public virtual bool set_constraint (MidgardCRCore.QueryConstraintSimple constraint);
+		public virtual bool set_limit (uint limit);
+		public virtual bool set_offset (uint offset);
+		public virtual bool add_order (MidgardCRCore.QueryProperty property, string type);
+		public virtual bool add_join (string type, MidgardCRCore.QueryProperty left_property, MidgardCRCore.QueryProperty right_property);
+		public virtual uint get_results_count ();
 	}
 
 	public class QuerySelect : MidgardCRCore.QueryExecutor {

@@ -1315,11 +1315,6 @@ struct _MidgardCRSQLQuerySelect {
 	GObject* _core_query_select;
 	MidgardCRQueryConstraintSimple* _constraint;
 	guint _n_constraints;
-	guint _limit;
-	guint _offset;
-	guint _results_count;
-	GSList* _orders;
-	GSList* _joins;
 	GObject* _stmt;
 	GObject* _resultset;
 	gboolean _readonly;

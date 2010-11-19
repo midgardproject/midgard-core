@@ -26,11 +26,6 @@ namespace MidgardCR
 		internal GLib.Object _core_query_select = null;
 		internal QueryConstraintSimple _constraint = null;
 		internal uint _n_constraints = 0;
-		internal uint _limit = 0;
-		internal uint _offset = 0;
-		internal uint _results_count = 0;
-		internal SList _orders = null;
-		internal SList _joins = null;
 		internal Object _stmt = null;
 		internal Object _resultset = null;
 		internal bool _readonly = false;
@@ -73,24 +68,24 @@ namespace MidgardCR
 		}
 
 		public void set_limit (uint limit) {
-			this._create_core_query_select ();
-			this._limit = limit;
+			this._create_core_query_select ();	
+			(this._core_query_select as MidgardCRCore.QuerySelect).set_limit (limit);
 		}
 
 		public void set_offset (uint offset) {
 			this._create_core_query_select ();
-			this._offset = offset;
+			(this._core_query_select as MidgardCRCore.QuerySelect).set_offset (offset);
 		}
 
 		public void add_order (QueryProperty property, string type) {
 			this._create_core_query_select ();
-			/* TODO */
-			return;
+			(this._core_query_select as MidgardCRCore.QuerySelect).add_order (property._core_query_holder as MidgardCRCore.QueryProperty, type);
+	
 		}
 
 		public uint get_results_count () {
 			this._create_core_query_select ();
-			return this._results_count;
+			return (this._core_query_select as MidgardCRCore.QuerySelect).get_results_count ();
 		}
 
 		public void validate () throws ValidationError {
@@ -105,7 +100,7 @@ namespace MidgardCR
 
 		public void add_join (string type, QueryProperty left_property, QueryProperty right_property) {
 			this._create_core_query_select ();
-			/* TODO */
+			(this._core_query_select as MidgardCRCore.QuerySelect).add_join (type, left_property._core_query_holder as MidgardCRCore.QueryProperty, right_property._core_query_holder as MidgardCRCore.QueryProperty);
 		}
 		
 		public Storable[]? list_objects () {
