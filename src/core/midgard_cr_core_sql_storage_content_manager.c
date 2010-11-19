@@ -434,11 +434,26 @@ midgard_cr_core_sql_storage_content_manager_storable_update (
 	g_debug ("Object update: %s", debug_sql);
 	g_free (debug_sql);
 
-	gint inserted = gda_connection_statement_execute_non_select (cnc, stmt, set, NULL, &err);
-	if (inserted == -1) {
+	gint updated = gda_connection_statement_execute_non_select (cnc, stmt, set, NULL, &err);
+	
+	if (updated == 0) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_OBJECT_NOT_EXISTS,
+				"Failed to execute SQL statement UPDATE for given '%s' object. No record identified by '%s'.", 
+				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), MIDGARD_CR_REPOSITORY_OBJECT (storable)->_guid);
+		g_clear_error (&err);
+	}	
+
+	if (updated == -1) {
 		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
 				"Failed to execute SQL statement UPDATE for given '%s' object. %s ", 
 				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+	}	
+
+	if (updated == -2) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+				"SQL provider didn't return information about affected rows for '%s' object identified by '%s' ", 
+				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), MIDGARD_CR_REPOSITORY_OBJECT (storable)->_guid);
 		g_clear_error (&err);
 	}	
 

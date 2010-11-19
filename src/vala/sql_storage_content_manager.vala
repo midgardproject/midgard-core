@@ -46,22 +46,37 @@ namespace MidgardCR {
 
 		public virtual bool create (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
-			SQLTableModel table_model = ((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
-			ObjectModel object_model = ((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+			SQLTableModel table_model = 
+				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+			ObjectModel object_model = 
+				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			MidgardCRCore.SQLStorageContentManager.storable_insert (object, this._storage_manager, object_model, table_model);
 			return true;
 		}	
 	
 		public virtual bool update (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
-			SQLTableModel table_model = ((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
-			ObjectModel object_model = ((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+			SQLTableModel table_model = 
+				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+			ObjectModel object_model = 
+				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			MidgardCRCore.SQLStorageContentManager.storable_update (object, this._storage_manager, object_model, table_model);
 			return true;
 		}		
 
 		public virtual bool save (Storable object) throws StorageContentManagerError {
-			return false;
+			string name = object.get_type().name();
+			SQLTableModel table_model = 
+				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+			ObjectModel object_model = 
+				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+			try {
+				MidgardCRCore.SQLStorageContentManager.storable_update (object, this._storage_manager, object_model, table_model);			
+			} catch (StorageContentManagerError e) {
+				if (e is StorageContentManagerError.OBJECT_NOT_EXISTS)
+					MidgardCRCore.SQLStorageContentManager.storable_insert (object, this._storage_manager, object_model, table_model);
+			}
+			return true;
 		}		
 
 		public virtual bool remove (Storable object) throws StorageContentManagerError {

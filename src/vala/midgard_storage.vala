@@ -106,6 +106,7 @@ namespace MidgardCR {
 
 		OBJECT_INVALID,
 		OBJECT_DUPLICATE,
+		OBJECT_NOT_EXISTS,
 		INTERNAL
 	}
 

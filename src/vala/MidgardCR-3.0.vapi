@@ -464,6 +464,7 @@ namespace MidgardCR {
 	public errordomain StorageContentManagerError {
 		OBJECT_INVALID,
 		OBJECT_DUPLICATE,
+		OBJECT_NOT_EXISTS,
 		INTERNAL,
 	}
 	[CCode (cprefix = "MIDGARD_CR_STORAGE_MANAGER_ERROR_", cheader_filename = "midgard3.h")]

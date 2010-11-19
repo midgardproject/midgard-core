@@ -62,6 +62,7 @@ void main () {
 	person.set (
 		"firstname", "Alice",
 		"lastname", "Wonderland");
+	/* Explicitly create person record */
 	content_manager.create (person);
 
 	Storable activity = builder.factory ("Activity");
@@ -69,7 +70,8 @@ void main () {
 		"verb", "http://activitystrea.ms/schema/1.0/post", 
 		"application", "MidgardCR",
 		"summary", "Initialy created");
-	content_manager.create (activity);
+	/* If unsure, save() creates or updates record */
+	content_manager.save (activity);
 
 	/* Query Activity */
 	/* Select Activity object which value of 'application' property is 'MidgardCR' */
@@ -91,6 +93,7 @@ void main () {
 		string guid;
 		object.get ("guid", out guid);
 		GLib.print ("Found %d Activity object identified by %s \n", i, guid);
+		/* update every object's record found */
 		content_manager.update (activity);
 		i++;
 	} 
