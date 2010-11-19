@@ -110,6 +110,10 @@ namespace MidgardCR {
 
 			Object (name: name, config: config);
 
+			/* Silent valac during compile time */
+			this._cnc = null;
+			this._parser = null;
+
 			/* OBJECT MODEL  */
 			  /* Initialize ObjectModel for ObjectModel */
                         this._object_model_object_model = new ObjectModel ("MidgardCRObjectModel");

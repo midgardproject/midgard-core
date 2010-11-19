@@ -86,7 +86,9 @@ namespace MidgardCR {
 		 */
 		public SQLTableModel (SQLStorageManager manager, string classname, string location) {
 			Object (storagemanager: manager, name: classname, location: location);
-			this._id = 0; /* Satisfy valac */
+			/* Silent valac during compile time */
+			this._id = 0;
+			this._object_model = null;
 		}
 
 		public unowned StorageManager get_storagemanager () {

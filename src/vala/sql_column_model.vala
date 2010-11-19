@@ -235,7 +235,8 @@ namespace MidgardCR {
 		 */
 		public SQLColumnModel (SQLStorageManager manager, string name, string location, string type) {
 			Object (storagemanager: manager, name: name, location: location, valuetypename: type);
-			this._set_gtype_from_name ();	
+			this._set_gtype_from_name ();
+			this._col_id = 0;	
 		} 
 	
 		/* destructor */

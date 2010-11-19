@@ -25,7 +25,6 @@ namespace MidgardCR
 		internal SQLQueryStorage _query_storage = null;	
 		internal GLib.Object _core_query_select = null;
 		internal QueryConstraintSimple _constraint = null;
-		internal uint _n_constraints = 0;
 		internal Object _stmt = null;
 		internal Object _resultset = null;
 		internal bool _readonly = false;
@@ -55,6 +54,9 @@ namespace MidgardCR
 		public SQLQuerySelect (StorageManager manager, SQLQueryStorage storage) {
 			Object (storagemanager: manager, storage: storage);
 			this._create_core_query_select ();
+			/* Dummy, to silent valac during compile time. We need those in MidgardCRCore. */
+			this._stmt = null;
+			this._resultset = null;	
 		}
 		
 		public static SQLQuerySelect create_query_select (StorageManager manager, SQLQueryStorage storage) {

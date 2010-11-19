@@ -464,7 +464,7 @@ namespace MidgardCR {
 	 */ 
 	public class ObjectPropertyReference : ObjectPropertyModel {
 
-		internal string _ref_classname = null;	
+		//internal string _ref_classname = null;	
 	
 		/**
 		 * Creates new ObjectPropertyModel of object type

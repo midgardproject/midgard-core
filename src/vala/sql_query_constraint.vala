@@ -25,8 +25,7 @@ namespace MidgardCR
 		internal QueryProperty _property = null;
 		internal SQLQueryStorage _storage = null;
 		internal GLib.Object _core_query_constraint = null;
-		internal string _op = null;
-		internal int _op_type = 0;
+		internal string _op = null;	
 
 		/* properties */
 		public QueryValueHolder holder { 
@@ -55,12 +54,6 @@ namespace MidgardCR
 			if (storage != null)
 				this.storage = storage;
 			MidgardCRCore.QueryStorage _core_storage = storage != null ? storage._core_query_storage as MidgardCRCore.QueryStorage: null;
-			/*MidgardCRCore.QueryValue _core_query_value = null;
-			if (holder is QueryValue)
-				_core_query_value = new MidgardCRCore.QueryValue ();
-				_core_query_value.set_value (holder.get_value ());
-			if (holder is QueryProperty)
-				_core_query_value = (MidgardCRCore.QueryValue) new MidgardCRCore.QueryProperty (holder.get_value ().get_string (), null); */
 			this._core_query_constraint = 
 				new MidgardCRCore.QueryConstraint (
 					property._core_query_holder as MidgardCRCore.QueryProperty,

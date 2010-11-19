@@ -928,7 +928,6 @@ struct _MidgardCRObjectPropertyFloatClass {
 struct _MidgardCRObjectPropertyReference {
 	MidgardCRObjectPropertyModel parent_instance;
 	MidgardCRObjectPropertyReferencePrivate * priv;
-	char* _ref_classname;
 };
 
 struct _MidgardCRObjectPropertyReferenceClass {
@@ -1300,7 +1299,6 @@ struct _MidgardCRSQLQueryConstraint {
 	MidgardCRSQLQueryStorage* _storage;
 	GObject* _core_query_constraint;
 	char* _op;
-	gint _op_type;
 };
 
 struct _MidgardCRSQLQueryConstraintClass {
@@ -1314,7 +1312,6 @@ struct _MidgardCRSQLQuerySelect {
 	MidgardCRSQLQueryStorage* _query_storage;
 	GObject* _core_query_select;
 	MidgardCRQueryConstraintSimple* _constraint;
-	guint _n_constraints;
 	GObject* _stmt;
 	GObject* _resultset;
 	gboolean _readonly;
