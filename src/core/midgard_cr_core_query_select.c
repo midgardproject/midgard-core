@@ -648,7 +648,7 @@ static void __set_object_from_data_model (MidgardCRModel *table_model, MidgardCR
 		/* WRITE&READ PROPERTY, SET */
 		} else {
 			/* Every column model has column id set when select has been built. Use it instead of name. */
-			g_object_set (object, property_name, gda_data_model_get_value_at (data_model, col_models[i]->_col_id, row, NULL), NULL);
+			g_object_set_property (object, property_name, gda_data_model_get_value_at (data_model, col_models[i]->_col_id, row, NULL));
 		}
 	}
 }
