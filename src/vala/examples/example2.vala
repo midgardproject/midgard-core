@@ -73,6 +73,10 @@ void main () {
 	/* If unsure, save() creates or updates record */
 	content_manager.save (activity);
 
+	string guid;
+	activity.get ("guid", out guid);
+	print ("Saved Activity object identified by guid %s \n", guid);
+
 	/* Query Activity */
 	/* Select Activity object which value of 'application' property is 'MidgardCR' */
 	var query = new SQLQuerySelect (storage_manager, new SQLQueryStorage ("Activity"));
@@ -89,16 +93,16 @@ void main () {
 
 	MidgardCR.Storable[]? objects = query.list_objects ();
 	int i = 1;
-	foreach (MidgardCR.Storable object in objects) {
-		string guid;
+	foreach (MidgardCR.Storable object in objects) {	
 		object.get ("guid", out guid);
-		GLib.print ("Found %d Activity object identified by %s \n", i, guid);
+		print ("Found %d Activity object identified by %s \n", i, guid);
 		object.set ("summary", "First update");
-		object.get ("application", out guid); print ("APP %s \n", guid);
 		/* update every object's record found */
 		content_manager.update (object);
+		print ("Updated Activity object identified by %s \n", guid);
 		/* delete every object's record */
 		content_manager.purge (object);
+		print ("Purged Activity object identified by %s \n", guid);
 		i++;
 	} 
 }
