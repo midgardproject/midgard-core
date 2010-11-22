@@ -401,6 +401,8 @@ namespace MidgardCR {
 		public abstract MidgardCR.StorageWorkspaceManager workspace_manager { get; }
 		public signal void closed ();
 		public signal void opened ();
+		public signal void operation_end ();
+		public signal void operation_start ();
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageManagerPool : GLib.Object {

@@ -60,7 +60,9 @@ namespace MidgardCR {
 
 		/* signals */
 		public abstract signal void opened ();
-		public abstract signal void closed ();	
+		public abstract signal void closed ();
+		public abstract signal void operation_start ();
+		public abstract signal void operation_end ();	
 		//public abstract signal void lost-provider (); 
 
 		/* connection methods */

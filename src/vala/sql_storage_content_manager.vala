@@ -46,6 +46,8 @@ namespace MidgardCR {
 		}
 
 		public virtual bool exists (Storable object) {
+			this._storage_manager.operation_start ();
+			this._storage_manager.operation_end ();
 			return false;
 		}	
 
@@ -69,8 +71,10 @@ namespace MidgardCR {
 				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+			this._storage_manager.operation_start ();
 			MidgardCRCore.SQLStorageContentManager.storable_insert (object, this._storage_manager, object_model, table_model);
-		}	
+			this._storage_manager.operation_end ();
+	}	
 
 		/**
 		 * Updates object's record in SQL table.
@@ -92,7 +96,9 @@ namespace MidgardCR {
 				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+			this._storage_manager.operation_start ();
 			MidgardCRCore.SQLStorageContentManager.storable_update (object, this._storage_manager, object_model, table_model);
+			this._storage_manager.operation_end ();
 		}		
 
 		/**
@@ -121,10 +127,15 @@ namespace MidgardCR {
 			ObjectModel object_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			try {
+				this._storage_manager.operation_start ();
 				MidgardCRCore.SQLStorageContentManager.storable_update (object, this._storage_manager, object_model, table_model);			
+				this._storage_manager.operation_end ();
 			} catch (StorageContentManagerError e) {
-				if (e is StorageContentManagerError.OBJECT_NOT_EXISTS)
+				if (e is StorageContentManagerError.OBJECT_NOT_EXISTS) {
+					this._storage_manager.operation_start ();
 					MidgardCRCore.SQLStorageContentManager.storable_insert (object, this._storage_manager, object_model, table_model);
+					this._storage_manager.operation_end ();
+				}
 			}
 		}		
 
@@ -136,11 +147,16 @@ namespace MidgardCR {
 				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+			this._storage_manager.operation_start ();
 			MidgardCRCore.SQLStorageContentManager.storable_purge (object, this._storage_manager, object_model, table_model);
+			this._storage_manager.operation_end ();
+
 		}	
 	
 		public virtual void remove (Storable object) throws StorageContentManagerError {
+			this._storage_manager.operation_start ();
 			this.purge (object);
+			this._storage_manager.operation_end ();
 		}		
 
 		public unowned QueryManager get_query_manager () {
