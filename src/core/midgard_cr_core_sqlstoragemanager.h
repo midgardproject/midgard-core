@@ -28,6 +28,26 @@ struct _MidgardCRStorageManager;
 struct _MidgardCRSQLStorageManager;
 struct _MidgardCRSQLColumnModel;
 
+/* Helper macros */
+
+#define MIDGARD_CR_CORE_MANAGER_UPDATE_PROFILER(__manager, __query) \
+	if (__manager->_profiler) { \
+		if (__manager->_profiler->_enabled) { \
+			g_free (__manager->_profiler->_command); \
+			__manager->_profiler->_command = g_strdup (__query); \
+		} \
+	}
+
+#define __STORAGE_MANAGER_UPDATE_PROFILER_WITH_STMT(__manager, __stmt, __set) \
+	if (__manager->_profiler && __manager->_profiler->_enabled) { \
+		GError *__err = NULL; \
+		gchar *debug_sql = gda_connection_statement_to_sql (GDA_CONNECTION (__manager->_cnc), __stmt, __set, GDA_STATEMENT_SQL_PRETTY, NULL, &__err); \
+		if (__err) g_warning ("%s error: %s", G_OBJECT_TYPE_NAME (__manager), __err->message ? __err->message : "Unknown reason"); \
+		g_clear_error (&__err); \
+		g_free (__manager->_profiler->_command); \
+		__manager->_profiler->_command = debug_sql; \
+	}
+
 gboolean midgard_cr_core_sql_storage_manager_open (struct _MidgardCRSQLStorageManager *manager, GError **error);
 gboolean midgard_cr_core_sql_storage_manager_close (struct _MidgardCRSQLStorageManager *manager, GError **error);
 gboolean midgard_cr_core_sql_storage_manager_initialize_storage (struct _MidgardCRSQLStorageManager *manager, GError **error);

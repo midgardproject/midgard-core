@@ -21,6 +21,7 @@
 #include "midgard_cr_core_query_holder.h"
 #include <sql-parser/gda-sql-parser.h>
 #include "midgard3.h"
+#include "midgard_cr_core_sqlstoragemanager.h"
 
 /**
  * midgard_cr_core_query_select_new:
@@ -552,11 +553,7 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError 
 	gda_sql_statement_free (sql_stm);
 	sql_stm = NULL;
 
-	//if (MGD_CNC_DEBUG (mgd)) {
-		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
-		g_debug ("QuerySelect: %s", debug_sql);
-		g_free (debug_sql);
-	//}
+	__STORAGE_MANAGER_UPDATE_PROFILER_WITH_STMT(mgd, stmt, NULL);
 
 	/* execute statement */
 	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);

@@ -21,7 +21,7 @@
 #include "midgard_cr_core_schema_object.h"
 #include <sql-parser/gda-sql-parser.h>
 #include "src/core/midgard_cr_core_storage_sql.h"
-
+#include "midgard_cr_core_sqlstoragemanager.h"
 
 #define __ADD_COLS_AND_VALUES(__model, __pspec) \
 	const gchar *col_name = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (__model)); \
@@ -99,7 +99,6 @@ __initialize_statement_insert (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 	GdaSqlParser *parser = gda_sql_parser_new ();
 	GdaStatement *stmt;
 	GError *err = NULL;
-	g_print ("SQL: %s \n", sql->str);
 	stmt = gda_sql_parser_parse_string (parser, sql->str, NULL, &err);
 	g_string_free (sql, TRUE);
 	g_string_free (colnames, TRUE);
@@ -253,11 +252,7 @@ midgard_cr_core_sql_storage_content_manager_storable_insert (
 	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
 	GdaStatement *stmt = type_attr->prepared_sql_statement_insert;
 
-        gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, set, GDA_STATEMENT_SQL_PRETTY, NULL, &err);
-	if (err) g_warning ("%s", err->message);
-	g_clear_error (&err);
-	g_debug ("Object create: %s", debug_sql);
-	g_free (debug_sql);
+	__STORAGE_MANAGER_UPDATE_PROFILER_WITH_STMT (manager, stmt, set);
 
 	gint inserted = gda_connection_statement_execute_non_select (cnc, stmt, set, NULL, &err);
 	if (inserted == -1) {
@@ -428,11 +423,7 @@ midgard_cr_core_sql_storage_content_manager_storable_update (
 	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
 	GdaStatement *stmt = type_attr->prepared_sql_statement_update;
 
-        gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, set, GDA_STATEMENT_SQL_PRETTY, NULL, &err);
-	if (err) g_warning ("%s", err->message);
-	g_clear_error (&err);
-	g_debug ("Object update: %s", debug_sql);
-	g_free (debug_sql);
+	__STORAGE_MANAGER_UPDATE_PROFILER_WITH_STMT (manager, stmt, set);
 
 	gint updated = gda_connection_statement_execute_non_select (cnc, stmt, set, NULL, &err);
 	
@@ -477,7 +468,6 @@ __initialize_statement_delete (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 	GdaSqlParser *parser = gda_sql_parser_new ();
 	GdaStatement *stmt;
 	GError *err = NULL;
-	g_print ("SQL: %s \n", query->str);
 	stmt = gda_sql_parser_parse_string (parser, query->str, NULL, &err);
 	g_string_free (query, TRUE);
 
@@ -579,11 +569,7 @@ midgard_cr_core_sql_storage_content_manager_storable_purge (
 	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
 	GdaStatement *stmt = type_attr->prepared_sql_statement_delete;
 
-        gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, set, GDA_STATEMENT_SQL_PRETTY, NULL, &err);
-	if (err) g_warning ("%s", err->message);
-	g_clear_error (&err);
-	g_debug ("Object delete: %s", debug_sql);
-	g_free (debug_sql);
+	__STORAGE_MANAGER_UPDATE_PROFILER_WITH_STMT (manager, stmt, set);
 
 	gint updated = gda_connection_statement_execute_non_select (cnc, stmt, set, NULL, &err);
 	
