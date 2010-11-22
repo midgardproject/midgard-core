@@ -269,6 +269,7 @@ midgard_cr_core_sql_storage_content_manager_storable_insert (
 
 	return;
 }
+
 /* ************************* */
 /* UPDATE SQL QUERY ROUTINES */
 /* ************************* */
@@ -338,7 +339,6 @@ __initialize_statement_update (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 	GdaSqlParser *parser = gda_sql_parser_new ();
 	GdaStatement *stmt;
 	GError *err = NULL;
-	g_print ("SQL: %s \n", query->str);
 	stmt = gda_sql_parser_parse_string (parser, query->str, NULL, &err);
 	g_string_free (query, TRUE);
 
@@ -453,6 +453,157 @@ midgard_cr_core_sql_storage_content_manager_storable_update (
 	if (updated == -2) {
 		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
 				"SQL provider didn't return information about affected rows for '%s' object identified by '%s' ", 
+				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), MIDGARD_CR_REPOSITORY_OBJECT (storable)->_guid);
+		g_clear_error (&err);
+	}	
+
+	return;
+}
+
+/* ************************* */
+/* DELETE SQL QUERY ROUTINES */
+/* ************************* */
+
+static void
+__initialize_statement_delete (MidgardCRRepositoryObjectClass *klass, MgdSchemaTypeAttr *type_attr, MidgardCRSQLTableModel *table_model, GError **error)
+{
+	GString *query = g_string_new ("");
+	guint n_props;
+	guint i;
+	const gchar *table = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (table_model));
+	g_string_append_printf (query, "DELETE FROM %s ", table);
+
+	g_string_append (query, " WHERE mgd_guid=##mgd_guid::string");
+	GdaSqlParser *parser = gda_sql_parser_new ();
+	GdaStatement *stmt;
+	GError *err = NULL;
+	g_print ("SQL: %s \n", query->str);
+	stmt = gda_sql_parser_parse_string (parser, query->str, NULL, &err);
+	g_string_free (query, TRUE);
+
+	if (!stmt) {
+		g_propagate_error (error, err);
+	       	return;
+	}
+
+	GdaSet *params;
+	if (!gda_statement_get_parameters (stmt, &params, &err)) {
+		g_propagate_error (error, err);
+		return;
+	}
+
+	type_attr->prepared_sql_statement_delete = stmt;
+	type_attr->prepared_sql_statement_delete_params = params;	
+
+	return;
+}
+
+void 
+midgard_cr_core_sql_storage_content_manager_storable_purge (
+		MidgardCRStorable *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, 
+		MidgardCRSQLTableModel *table_model, GError **error) 
+{
+	/* Allow NULL object_model.
+	 * We need to follow table_model which describes table we want insert record into */
+	g_return_if_fail (storable != NULL);
+	g_return_if_fail (MIDGARD_CR_IS_STORABLE (storable));
+	g_return_if_fail (manager != NULL);
+	g_return_if_fail (table_model != NULL);
+	g_return_if_fail (error == NULL || *error == NULL);
+
+	GError *err = NULL;
+
+	/* If this is StorageObject, create SQL query on demand (until something faster is implemented) */
+	if (MIDGARD_CR_IS_STORAGE_OBJECT (storable)) {
+		/* FIXME
+		gchar *query = midgard_cr_core_storage_sql_create_query_delete (G_OBJECT (storable), object_model, MIDGARD_CR_STORAGE_MODEL (table_model));
+		if (!query) {
+			*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+					"Failed to generate SQL UPDATE query for given %s instance", G_OBJECT_TYPE_NAME (G_OBJECT (storable)));
+			return;
+		}
+		gint rv = midgard_cr_core_sql_storage_manager_query_execute (manager, query, &err);
+		g_free (query);
+		if (err) {
+			*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+					"Failed to execute SQL UPDATE query for given %s instance. %s ", 
+					G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return;
+		} */
+	}
+
+	/* RepositoryObject */
+	if (!MIDGARD_CR_IS_REPOSITORY_OBJECT (storable)) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_OBJECT_INVALID,
+				"Expected RepositoryObject. %s given to create SQL DELETE query", G_OBJECT_TYPE_NAME (G_OBJECT (storable)));
+		return;
+	}
+
+	MidgardCRRepositoryObjectClass *rklass = MIDGARD_CR_REPOSITORY_OBJECT_GET_CLASS (storable);
+	MgdSchemaTypeAttr *type_attr = g_type_class_get_private ((GTypeClass*)rklass, G_OBJECT_CLASS_TYPE (rklass));
+	if (!type_attr) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+				"Missed private data of %s class ", G_OBJECT_TYPE_NAME (G_OBJECT (storable)));
+		return;
+	}
+
+	/* Check if prepared DELETE statement exists*/
+	if (type_attr->prepared_sql_statement_delete == NULL) {
+		/* Generate prepared DELETE statement */
+		__initialize_statement_delete (rklass, type_attr, table_model, &err);
+		if (err) {
+			*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+					"Failed to initialize prepared SQL statement DELETE for given %s class. %s ", 
+					G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return;
+		}
+	}
+	/* Get guid parameter and set its value */
+	GdaSet *set = type_attr->prepared_sql_statement_delete_params;
+	GdaHolder *holder = gda_set_get_holder (set, "mgd_guid"); /* FIXME, do not hardcode guid column name */
+	GValue val = {0, };
+	g_value_init (&val, G_TYPE_STRING);
+	g_object_get_property (G_OBJECT (storable), "guid", &val);
+        gda_holder_set_value (holder, (const GValue*) &val, &err);
+	if (err) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+				"Failed to set GUID's parameter value for SQL statement DELETE, for given %s class. %s ", 
+				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		return;
+	}
+
+	/* Execute DELETE query */
+	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
+	GdaStatement *stmt = type_attr->prepared_sql_statement_delete;
+
+        gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, set, GDA_STATEMENT_SQL_PRETTY, NULL, &err);
+	if (err) g_warning ("%s", err->message);
+	g_clear_error (&err);
+	g_debug ("Object delete: %s", debug_sql);
+	g_free (debug_sql);
+
+	gint updated = gda_connection_statement_execute_non_select (cnc, stmt, set, NULL, &err);
+	
+	if (updated == 0) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_OBJECT_NOT_EXISTS,
+				"Failed to execute SQL statement DELETE for given '%s' object. No record identified by '%s'.", 
+				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), MIDGARD_CR_REPOSITORY_OBJECT (storable)->_guid);
+		g_clear_error (&err);
+	}	
+
+	if (updated == -1) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+				"Failed to execute SQL statement DELETE for given '%s' object. %s ", 
+				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+	}	
+
+	if (updated == -2) {
+		*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
+				"SQL provider didn't return information about deleted rows for '%s' object identified by '%s' ", 
 				G_OBJECT_TYPE_NAME (G_OBJECT (storable)), MIDGARD_CR_REPOSITORY_OBJECT (storable)->_guid);
 		g_clear_error (&err);
 	}	

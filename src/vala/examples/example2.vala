@@ -93,8 +93,12 @@ void main () {
 		string guid;
 		object.get ("guid", out guid);
 		GLib.print ("Found %d Activity object identified by %s \n", i, guid);
+		object.set ("summary", "First update");
+		object.get ("application", out guid); print ("APP %s \n", guid);
 		/* update every object's record found */
-		content_manager.update (activity);
+		content_manager.update (object);
+		/* delete every object's record */
+		content_manager.purge (object);
 		i++;
 	} 
 }

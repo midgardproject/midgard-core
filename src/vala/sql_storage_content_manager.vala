@@ -61,7 +61,7 @@ namespace MidgardCR {
 		 * If given object is {@link RepositoryObject}, valid SQL INSERT prepared statament is generated for 
 		 * object's class and stored as permanent statement available for every class instance.
 		 */
-		public virtual bool create (Storable object) throws StorageContentManagerError {
+		public virtual void create (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
@@ -70,7 +70,6 @@ namespace MidgardCR {
 			ObjectModel object_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			MidgardCRCore.SQLStorageContentManager.storable_insert (object, this._storage_manager, object_model, table_model);
-			return true;
 		}	
 
 		/**
@@ -85,7 +84,7 @@ namespace MidgardCR {
 		 * If given object is {@link RepositoryObject}, valid SQL UPDATE prepared statament is generated for 
 		 * object's class and stored as permanent statement available for every class instance.
 		 */
-		public virtual bool update (Storable object) throws StorageContentManagerError {
+		public virtual void update (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
@@ -94,7 +93,6 @@ namespace MidgardCR {
 			ObjectModel object_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			MidgardCRCore.SQLStorageContentManager.storable_update (object, this._storage_manager, object_model, table_model);
-			return true;
 		}		
 
 		/**
@@ -114,7 +112,7 @@ namespace MidgardCR {
 		 * In case of other failure, particular exception is thrown. 	
 		 *
 		 */
-		public virtual bool save (Storable object) throws StorageContentManagerError {
+		public virtual void save (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
@@ -128,15 +126,21 @@ namespace MidgardCR {
 				if (e is StorageContentManagerError.OBJECT_NOT_EXISTS)
 					MidgardCRCore.SQLStorageContentManager.storable_insert (object, this._storage_manager, object_model, table_model);
 			}
-			return true;
 		}		
 
-		public virtual bool remove (Storable object) throws StorageContentManagerError {
-			return false;
+		public virtual void purge (Storable object) throws StorageContentManagerError {
+			string name = object.get_type().name();
+			SQLTableModel table_model = 
+				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+			if (table_model == null)
+				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
+			ObjectModel object_model = 
+				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+			MidgardCRCore.SQLStorageContentManager.storable_purge (object, this._storage_manager, object_model, table_model);
 		}	
 	
-		public virtual bool purge (Storable object) throws StorageContentManagerError {
-			return false;
+		public virtual void remove (Storable object) throws StorageContentManagerError {
+			this.purge (object);
 		}		
 
 		public unowned QueryManager get_query_manager () {

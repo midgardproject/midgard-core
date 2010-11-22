@@ -115,11 +115,11 @@ namespace MidgardCR {
 
 		/* per object methods */
 		public abstract bool exists (Storable object);
-		public abstract bool create (Storable object) throws StorageContentManagerError;
-		public abstract bool update (Storable object) throws StorageContentManagerError;
-		public abstract bool save (Storable object) throws StorageContentManagerError; 
-		public abstract bool remove (Storable object) throws StorageContentManagerError;
-		public abstract bool purge (Storable object) throws StorageContentManagerError;
+		public abstract void create (Storable object) throws StorageContentManagerError;
+		public abstract void update (Storable object) throws StorageContentManagerError;
+		public abstract void save (Storable object) throws StorageContentManagerError; 
+		public abstract void remove (Storable object) throws StorageContentManagerError;
+		public abstract void purge (Storable object) throws StorageContentManagerError;
 
 		public abstract unowned QueryManager get_query_manager ();
 		public abstract unowned StorageManager get_storage_manager ();

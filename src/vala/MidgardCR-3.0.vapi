@@ -129,12 +129,12 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class RDFSQLContentManager : MidgardCR.SQLStorageContentManager {
 		public RDFSQLContentManager (MidgardCR.SQLStorageManager manager);
-		public override bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override void create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public override bool exists (MidgardCR.Storable object);
-		public override bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public override bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public override bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public override bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override void purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override void remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override void save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public override void update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public class RDFSQLStorageManager : MidgardCR.SQLStorageManager, MidgardCR.RDFStorageManager {
@@ -189,12 +189,12 @@ namespace MidgardCR {
 	[CCode (cheader_filename = "midgard3.h")]
 	public class SQLStorageContentManager : GLib.Object, MidgardCR.StorageContentManager {
 		public SQLStorageContentManager (MidgardCR.SQLStorageManager manager);
-		public virtual bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual void create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public virtual bool exists (MidgardCR.Storable object);
-		public virtual bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public virtual bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public virtual bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public virtual bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual void purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual void remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual void save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public virtual void update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public MidgardCR.StorageManager storagemanager { get; construct; }
 	}
 	[CCode (cheader_filename = "midgard3.h")]
@@ -369,14 +369,14 @@ namespace MidgardCR {
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageContentManager : GLib.Object {
-		public abstract bool create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public abstract void create (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 		public abstract bool exists (MidgardCR.Storable object);
 		public abstract unowned MidgardCR.QueryManager get_query_manager ();
 		public abstract unowned MidgardCR.StorageManager get_storage_manager ();
-		public abstract bool purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public abstract bool remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public abstract bool save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
-		public abstract bool update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public abstract void purge (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public abstract void remove (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public abstract void save (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
+		public abstract void update (MidgardCR.Storable object) throws MidgardCR.StorageContentManagerError;
 	}
 	[CCode (cheader_filename = "midgard3.h")]
 	public interface StorageExecutor : MidgardCR.Executable {
@@ -465,6 +465,7 @@ namespace MidgardCR {
 		OBJECT_INVALID,
 		OBJECT_DUPLICATE,
 		OBJECT_NOT_EXISTS,
+		MODEL_INVALID,
 		INTERNAL,
 	}
 	[CCode (cprefix = "MIDGARD_CR_STORAGE_MANAGER_ERROR_", cheader_filename = "midgard3.h")]

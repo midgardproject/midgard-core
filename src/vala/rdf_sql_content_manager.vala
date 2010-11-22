@@ -29,7 +29,7 @@ namespace MidgardCR {
 			return false;
 		}	
 
-		public override bool create (Storable object) throws StorageContentManagerError
+		public override void create (Storable object) throws StorageContentManagerError
 		{
 			base.create (object);
 
@@ -51,23 +51,22 @@ namespace MidgardCR {
 					base.create (rdf_prop);
 				}
 			}
-			return true;
 		}	
 	
-		public override bool update (Storable object) throws StorageContentManagerError {
-			return false;
+		public override void update (Storable object) throws StorageContentManagerError {
+			return;
 		}		
 
-		public override bool save (Storable object) throws StorageContentManagerError {
-			return false;
+		public override void save (Storable object) throws StorageContentManagerError {
+			return;
 		}		
 
-		public override bool remove (Storable object) throws StorageContentManagerError {
-			return false;
+		public override void remove (Storable object) throws StorageContentManagerError {
+			return;
 		}	
 	
-		public override bool purge (Storable object) throws StorageContentManagerError {
-			return false;
+		public override void purge (Storable object) throws StorageContentManagerError {
+			return;
 		}		
 
 		/* public unowned QueryManager get_query_manager () {
