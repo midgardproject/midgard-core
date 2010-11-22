@@ -139,6 +139,19 @@ namespace MidgardCR {
 			}
 		}		
 
+		/**
+		 * Delete object's record from SQL table.
+		 * 
+		 * @param object Storable object
+		 *
+		 * This method requires valid {@link SQLTableModel}, available from {@link SQLStorageModelManager}.
+		 * If such is found, its location, will be used to determine target table for SQL DELETE operation.
+		 *
+		 * Entire object's record is deleted from table and it's recover is impossible.
+		 *
+		 * If given object is {@link RepositoryObject}, valid SQL DELETE prepared statament is generated for 
+		 * object's class and stored as permanent statement available for every class instance.
+		 */
 		public virtual void purge (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
@@ -155,7 +168,7 @@ namespace MidgardCR {
 	
 		public virtual void remove (Storable object) throws StorageContentManagerError {
 			this._storage_manager.operation_start ();
-			this.purge (object);
+			//this.purge (object);
 			this._storage_manager.operation_end ();
 		}		
 
