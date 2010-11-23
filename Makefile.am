@@ -8,16 +8,9 @@ DISTCHECK_CONFIGURE_FLAGS = --enable-introspection
 
 lib_LTLIBRARIES = src/libmidgardcr.la
 
-if MIDGARD_DBUS_SUPPORT
-dbus_pkgdatadir = $(DBUS_CONF_DIR)/dbus-1/system.d
-dbus_pkgdata_DATA = midgard_dbus.conf
-endif
-
 nobase_dist_sysconf_DATA = conf.d/midgard.conf.example
 
 dist_pkgdata_DATA = \
-		    midgard_auth_types.xml \
-	    	    midgard_dbus.conf \
 	    	    conf.d/midgard.conf.example 
 
 EXTRA_DIST =  \

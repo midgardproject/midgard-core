@@ -91,11 +91,11 @@ AC_MSG_RESULT($platform_win32)
 AM_CONDITIONAL(PLATFORM_WIN32, test x$platform_win32 = xyes)
 
 if test "$prefix" = "/usr"; then
-	sysconfdir="/etc/midgard3"
+	sysconfdir="/etc/midgardcr"
 elif test "$prefix" = "NONE"; then
-	sysconfdir="/usr/local/etc/midgard3"
+	sysconfdir="/usr/local/etc/midgardcr"
 else 
-	sysconfdir="$prefix/etc/midgard3"
+	sysconfdir="$prefix/etc/midgardcr"
 fi
 
 LIBS="$LIBS $MIDGARD_LIBS"
@@ -114,7 +114,6 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile 
 		 src/core/Makefile 
 		 src/core/midgard_local.h
-		 src/vala/Makefile 
-		 src/midgard_config_auto.h 
+		 src/vala/Makefile 	
 		 midgardcr.pc])
 AC_OUTPUT
