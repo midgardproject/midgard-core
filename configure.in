@@ -1,5 +1,5 @@
 AC_PREREQ(2.59)
-AC_INIT([midgard3-core],[10.05.99])
+AC_INIT([midgardcr-core],[10.05.99])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_SRCDIR(src/midgard.c)
