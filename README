@@ -1,16 +1,5 @@
 
-Midgard2 is an Open Source Content Repository. 
+MidgardCR is an Open Source Content Repository. 
 It provides an object-oriented and replicated environment for building 
 data-intensive applications for both web and the desktop.
 
-With Midgard2 you have generic way to define your own storage objects, 
-that can then be queried and managed using multiple programming languages 
-and applications. This enables writing your CMS or project management tool 
-using a repository-oriented architecture where the Midgard2 storage system 
-acts as the central point of integration between various tools.
-
-Midgard2 is built on the GNOME stack of libraries like GLib and libgda, 
-and has language bindings for C, Objective-C, Python and PHP. 
-Communications between applications written in the different languages happen over D-Bus.
-
-http://midgard2.org
