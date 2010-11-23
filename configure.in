@@ -116,5 +116,5 @@ AC_CONFIG_FILES([Makefile
 		 src/core/midgard_local.h
 		 src/vala/Makefile 
 		 src/midgard_config_auto.h 
-		 midgard3.pc])
+		 midgardcr.pc])
 AC_OUTPUT
