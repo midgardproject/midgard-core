@@ -50,7 +50,7 @@ pkglibdir = $(libdir)/midgardcr
 libmidgardincludedir = $(includedir)/midgard/midgardcr/
 libmidgardinclude_HEADERS = $(midgardcr_public_h) 
 midgardcrincludedir = $(includedir)/midgard
-midgardcrinclude_HEADERS = midgard-cr.h 
+midgardcrinclude_HEADERS = src/midgardcr.h 
 
 src_libmidgardcr_la_SOURCES = $(src_libmidgardcr_la_public_SOURCES)
 

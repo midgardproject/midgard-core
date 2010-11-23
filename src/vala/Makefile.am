@@ -2,7 +2,7 @@ NULL =
 
 noinst_LTLIBRARIES = libmidgardvala.la
 
-AM_CFLAGS = -I$(top_srcdir)/src/core -I$(top_srcdir)/src @MIDGARD_CFLAGS@
+AM_CFLAGS = -I$(top_srcdir)/src/core  @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@
 
 BUILT_SOURCES = libmidgardvala.vala.stamp

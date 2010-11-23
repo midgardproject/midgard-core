@@ -1,5 +1,5 @@
 /* 
- * MidgardCR core, API headers.
+ * MidgardCR core, API headers - entry point.
  *
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *

@@ -3,8 +3,7 @@ NULL=
 AM_CFLAGS = \
 	    $(GLIB_CFLAGS) \
 	    $(LIBVALA_CFLAGS) \
-	    -I/usr/local/include/midgard3/midgard \
-	    -L/usr/local/lib -lmidgardcr \
+	    $(MIDGARDCR_CFLAGS) \
 	    $(NULL)
 
 bin_PROGRAMS = \
@@ -38,25 +37,28 @@ example3_SOURCES = \
 example1_LDADD = \
 		 $(GLIB_LIBS) \
 		 $(LIBVALA_LIBS) \
+		 $(MIDGARDCR_LIBS) \
 		 $(NULL)
 example2_LDADD = \
 		 $(GLIB_LIBS) \
 		 $(LIBVALA_LIBS) \
+		 $(MIDGARDCR_LIBS) \
 		 $(NULL)
 
 example3_LDADD = \
 		 $(GLIB_LIBS) \
 		 $(LIBVALA_LIBS) \
+		 $(MIDGARDCR_LIBS) \
 		 $(NULL)
 
 example1.vala.stamp: $(example1_VALASOURCES)
-	$(VALAC) -X -I/usr/local/include/midgard3/midgard -X -L/usr/local/lib -X -lmidgardcr --includedir=/usr/local/include/ --save-temps --pkg MidgardCR-3.0 $^
+	$(VALAC) --save-temps --pkg MidgardCR-3.0 $^
 	touch $@
 
 example2.vala.stamp: $(example2_VALASOURCES)
-	$(VALAC) -X -I/usr/local/include/midgard3/midgard -X -L/usr/local/lib -X -lmidgardcr --includedir=/usr/local/include/ --save-temps --pkg MidgardCR-3.0 $^
+	$(VALAC) -C --save-temps --pkg MidgardCR-3.0 $^
 	touch $@
 
 example3.vala.stamp: $(example3_VALASOURCES)
-	$(VALAC) -X -I/usr/local/include/midgard3/midgard -X -L/usr/local/lib -X -lmidgardcr --includedir=/usr/local/include/ --save-temps --pkg MidgardCR-3.0 $^
+	$(VALAC) -C --save-temps --pkg MidgardCR-3.0 $^
 	touch $@
