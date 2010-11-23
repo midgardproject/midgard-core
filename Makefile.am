@@ -48,7 +48,9 @@ src_libmidgardcr_la_public_SOURCES = \
 pkgdatadir = $(datadir)/midgardcr
 pkglibdir = $(libdir)/midgardcr
 libmidgardincludedir = $(includedir)/midgard/midgardcr/
-libmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h 
+libmidgardinclude_HEADERS = $(midgardcr_public_h) 
+midgardcrincludedir = $(includedir)/midgard
+midgardcrinclude_HEADERS = midgard-cr.h 
 
 src_libmidgardcr_la_SOURCES = $(src_libmidgardcr_la_public_SOURCES)
 

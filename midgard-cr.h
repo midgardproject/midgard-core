@@ -1,5 +1,5 @@
 /* 
- * Midgard core, API headers.
+ * MidgardCR core, API headers.
  *
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *
@@ -18,13 +18,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef _MIDGARD_API_H_
-#define _MIDGARD_API_H_
+#ifndef _MIDGARDCR_API_H_
+#define _MIDGARDCR_API_H_
 
 #include <glib.h>
 #include <glib-object.h>
 
-#include <midgard3.h>
+#include <midgardcr/midgardcr.h>
 
-#endif /* _MIDGARD_API_H_ */
+#endif /* _MIDGARDCR_API_H_ */
 
