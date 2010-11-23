@@ -20,7 +20,7 @@
 #include "midgard_cr_core_query_private.h"
 #include "midgard_cr_core_query_holder.h"
 #include <sql-parser/gda-sql-parser.h>
-#include "midgard3.h"
+#include "midgardcr.h"
 #include "midgard_cr_core_sqlstoragemanager.h"
 
 /**

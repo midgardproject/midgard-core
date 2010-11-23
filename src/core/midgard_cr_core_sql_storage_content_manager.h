@@ -21,7 +21,7 @@
 #define _MIDGARD_CR_CORE_SQL_STORAGE_CONTENT_MANAGER_H_
 
 #include <glib-object.h>
-#include "midgard3.h"
+#include "midgardcr.h"
 #include "midgard_local.h"
 
 /*

@@ -20,7 +20,7 @@
 #define MIDGARD_CR_CORE_QUERY_H
 
 #include <libgda/libgda.h>
-#include "midgard3.h"
+#include "midgardcr.h"
 #include "midgard_cr_core_query_property.h"
 #include "midgard_cr_core_query_storage.h"
 #include "midgard_cr_core_query_constraint_simple.h"

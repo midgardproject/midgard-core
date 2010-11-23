@@ -19,7 +19,7 @@
 
 #include "midgard_cr_core_sql_storage_model_manager.h"
 #include "midgard_cr_core_storage_sql.h"
-#include "midgard3.h"
+#include "midgardcr.h"
 
 void 
 midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageModelManager *manager, MidgardCRModel *model, GError **error)

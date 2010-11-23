@@ -20,13 +20,11 @@ dist_pkgdata_DATA = \
 	    	    midgard_dbus.conf \
 	    	    conf.d/midgard.conf.example 
 
-midgard_public_h = src/core/midgard3.h
-
 EXTRA_DIST =  \
-      	      midgard3.pc.in \
+      	      midgardcr.pc.in \
       	      m4/introspection.m4
 
-midgard3_public_h = src/core/midgard3.h
+midgardcr_public_h = src/core/midgardcr.h
 
 src_libmidgardcr_la_LIBADD = \
 			     src/core/libmidgardcore.la \
@@ -47,15 +45,15 @@ src_libmidgardcr_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
 src_libmidgardcr_la_public_SOURCES = \
 				    src/midgard.c 
  
-pkgdatadir = $(datadir)/midgard3
-pkglibdir = $(libdir)/midgard3
-libmidgardincludedir = $(includedir)/midgard3/midgard
+pkgdatadir = $(datadir)/midgardcr
+pkglibdir = $(libdir)/midgardcr
+libmidgardincludedir = $(includedir)/midgard/midgardcr/
 libmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h 
 
 src_libmidgardcr_la_SOURCES = $(src_libmidgardcr_la_public_SOURCES)
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = midgard3.pc
+pkgconfig_DATA = midgardcr.pc
 
 vapidir = $(datadir)/vala/vapi
 vapi_DATA = \
@@ -68,7 +66,7 @@ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
-introspection_sources = $(src_libmidgardcr_la_public_SOURCES) $(midgard3_public_h)
+introspection_sources = $(src_libmidgardcr_la_public_SOURCES) $(midgardcr_public_h)
 MidgardCR-3.0.gir: $(lib_LTLIBRARIES)
 MidgardCR_3_0_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0
 MidgardCR_3_0_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`

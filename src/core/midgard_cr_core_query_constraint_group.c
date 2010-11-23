@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "midgard3.h"
+#include "midgardcr.h"
 #include "midgard_cr_core_query_constraint_group.h"
 #include "midgard_cr_core_query_property.h"
 #include "midgard_cr_core_query_storage.h"

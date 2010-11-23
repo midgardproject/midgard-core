@@ -27,7 +27,7 @@
 #include <errno.h>
 
 #include "midgard_cr_core_config.h"
-#include "midgard3.h"
+#include "midgardcr.h"
 
 gchar *
 midgard_cr_core_config_build_path (const gchar **dirs, const gchar *filename, gboolean user)

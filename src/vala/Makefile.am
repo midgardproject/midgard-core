@@ -7,7 +7,7 @@ AM_LDFLAGS = @MIDGARD_LIBS@
 
 BUILT_SOURCES = libmidgardvala.vala.stamp
 
-midgard3_header = $(top_srcdir)/src/core/midgard3.h
+midgardcr_header = $(top_srcdir)/src/core/midgardcr.h
 
 libmidgardvala_la_VALASOURCES = \
 			  midgard_config.vala \
@@ -48,7 +48,7 @@ libmidgardvala_la_LDFLAGS = -module -export-dynamic
 libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
 
 libmidgardvala.vala.stamp: $(libmidgardvala_la_VALASOURCES)
-	$(VALAC) $(VALAFLAGS)  --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgard3_header) -C $^
+	$(VALAC) $(VALAFLAGS)  --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgardcr_header) -C $^
 	touch $@
 
 EXTRA_DIST = \

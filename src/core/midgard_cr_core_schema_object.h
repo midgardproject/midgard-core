@@ -21,7 +21,7 @@
 #define _MIDGARD_CR_CORE_SCHEMA_OBJECT_H_
 
 #include <glib-object.h>
-#include "midgard3.h"
+#include "midgardcr.h"
 #include "midgard_local.h"
 #include "midgard_cr_core_object_builder.h"
 
