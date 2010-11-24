@@ -450,6 +450,8 @@ midgard_core_storage_sql_column_update (GdaConnection *cnc, MgdCoreStorageSQLCol
 	g_return_val_if_fail (mdc != NULL, FALSE);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
+	return FALSE;
+
 	/* TODO */
 	/* Create new column */
 	/* INSERT while SELECT */
