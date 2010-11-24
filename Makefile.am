@@ -63,13 +63,12 @@ if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
 introspection_sources = $(src_libmidgardcr_la_public_SOURCES) $(midgardcr_public_h)
 MidgardCR-3.0.gir: $(lib_LTLIBRARIES)
-MidgardCR_3_0_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0
-MidgardCR_3_0_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
+MidgardCR_3_0_gir_INCLUDES = GObject-2.0 Gda-4.0
+MidgardCR_3_0_gir_CFLAGS = $(AM_CFLAGS)
 MidgardCR_3_0_gir_LIBS = $(lib_LTLIBRARIES) 
 MidgardCR_3_0_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
-MidgardCR_3_0_gir_PACKAGES = gobject-2.0 libxml-2.0 libgda-4.0
+MidgardCR_3_0_gir_PACKAGES = gobject-2.0 libgda-4.0
 INTROSPECTION_GIRS = MidgardCR-3.0.gir
-INTROSPECTION_LIBS += -lxml2
 girdir = $(datadir)/gir-1.0
 gir_DATA = $(INTROSPECTION_GIRS)
 
