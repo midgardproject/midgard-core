@@ -640,8 +640,8 @@ midgard_cr_core_sql_storage_manager_initialize_storage (MidgardCRSQLStorageManag
 gboolean  
 midgard_cr_core_sql_storage_manager_table_exists (MidgardCRSQLStorageManager *manager, MidgardCRSQLTableModel *storage_model)
 {
-	g_return_if_fail (manager != NULL);
-	g_return_if_fail (storage_model != NULL);
+	g_return_val_if_fail (manager != NULL, FALSE);
+	g_return_val_if_fail (storage_model != NULL, FALSE);
 
 	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
 	g_return_if_fail (GDA_IS_CONNECTION (cnc));

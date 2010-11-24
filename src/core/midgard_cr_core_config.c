@@ -731,6 +731,7 @@ gboolean _cr_config_recurse_prepare_blobdir(const gchar *parentdir, int max_dept
 gboolean 
 midgard_cr_core_config_create_blobdir (struct _MidgardCRConfig *self)
 {
+	return FALSE;
 	/*
 	g_assert (self != NULL);
 

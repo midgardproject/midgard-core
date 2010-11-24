@@ -1516,5 +1516,5 @@ midgard_cr_core_storage_sql_create_query_update (GObject *object, MidgardCRObjec
 	g_free (columns);
 	g_free (where);
 
-	g_string_free (query, FALSE);
+	return g_string_free (query, FALSE);
 }
