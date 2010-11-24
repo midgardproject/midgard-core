@@ -292,7 +292,7 @@ libmidgardvala_la_SOURCES = \
 
 libmidgardvala_la_LDFLAGS = -module -export-dynamic
 libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
-VALAFLAGS = --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgardcr_header) -C
+VALAFLAGS = --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgardcr_header) $(libmidgardvala_la_SOURCES)
 all: all-am
 
 .SUFFIXES:

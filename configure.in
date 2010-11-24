@@ -89,6 +89,6 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile 
 		 src/core/Makefile 
 		 src/core/midgard_local.h
-		 src/vala/Makefile 	
+		 src/vala/Makefile 
 		 midgardcr.pc])
 AC_OUTPUT

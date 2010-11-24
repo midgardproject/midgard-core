@@ -1,6 +1,6 @@
 QUIET_GEN = $(Q:@=@echo ' GEN '$@;)
 
-SUBDIRS = src
+SUBDIRS = src 
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -33,7 +33,7 @@ src_libmidgardcr_la_CPPFLAGS = \
 AM_CFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/core @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 
 
-src_libmidgardcr_la_LDFLAGS = -version-info 2021:0:11 $(no_undefined)
+src_libmidgardcr_la_LDFLAGS = -version-info @MIDGARD_ABI_MAJOR@:0:0 $(no_undefined)
 
 src_libmidgardcr_la_public_SOURCES = \
 				    src/midgard.c 
