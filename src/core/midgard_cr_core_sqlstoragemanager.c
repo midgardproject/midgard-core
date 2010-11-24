@@ -644,7 +644,7 @@ midgard_cr_core_sql_storage_manager_table_exists (MidgardCRSQLStorageManager *ma
 	g_return_val_if_fail (storage_model != NULL, FALSE);
 
 	GdaConnection *cnc = (GdaConnection *) manager->_cnc;
-	g_return_val_if_fail (GDA_IS_CONNECTION (cnc));
+	g_return_val_if_fail (GDA_IS_CONNECTION (cnc), FALSE);
 
 	const gchar *tablename = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (storage_model));
 
