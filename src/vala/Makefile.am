@@ -5,11 +5,9 @@ noinst_LTLIBRARIES = libmidgardvala.la
 AM_CFLAGS = -I$(top_srcdir)/src/core  @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@
 
-BUILT_SOURCES = libmidgardvala.vala.stamp
-
 midgardcr_header = $(top_srcdir)/src/core/midgardcr.h
 
-libmidgardvala_la_VALASOURCES = \
+libmidgardvala_la_SOURCES = \
 			  config.vala \
 			  executable.vala \
 			  namespace.vala \
@@ -39,29 +37,8 @@ libmidgardvala_la_VALASOURCES = \
 			  rdf_sql_storage_manager.vala \
 			  rdf_sql_content_manager.vala \
 			  $(NULL)
-
-libmidgardvala_la_SOURCES = \
-			  libmidgardvala.vala.stamp \
-  			  $(libmidgardvala_la_VALASOURCES:.vala=.c)
-
+			  
 libmidgardvala_la_LDFLAGS = -module -export-dynamic
 libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
 
-libmidgardvala.vala.stamp: $(libmidgardvala_la_VALASOURCES)
-	$(VALAC) $(VALAFLAGS)  --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgardcr_header) -C $^
-	touch $@
-
-EXTRA_DIST = \
-	     $(libmidgardvala_la_VALASOURCES) 
-
-CLEANFILES = \
-	     libmidgardvala.vala.stamp \
-	     $(libmidgardvala_la_VALASOURCES:.vala=.c) 	
-
-dist-hook:
-	cp *.vala $(distdir)
-	cp Makefile.am $(distdir)
-	cp Makefile.in $(distdir)
-	cp MidgardCR-3.0.vapi $(distdir)
-
-distdir: dist-hook
+VALAFLAGS = --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgardcr_header) -C
