@@ -43,7 +43,7 @@
 #define MGD_MYSQL_PASSWORD "midgard"
 
 gboolean 
-__midgard_connection_open (MidgardConnection *mgd, GHashTable **hashtable, gboolean init_schema);
+__midgard_connection_open (MidgardConnection *mgd, gboolean init_schema);
 
 static MidgardConnectionPrivate *
 midgard_connection_private_new (void)
@@ -486,9 +486,8 @@ static void cnc_add_part(
 #endif
 }
 
-gboolean __midgard_connection_open(
-		MidgardConnection *mgd, 
-		GHashTable **hashtable, gboolean init_schema)
+gboolean 
+__midgard_connection_open(MidgardConnection *mgd, gboolean init_schema)
 {
 	g_return_val_if_fail(mgd != NULL, FALSE);
 
@@ -713,15 +712,11 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 
 	self->priv->config = config;
 
-	GHashTable *hash = NULL;
-
-	if(!__midgard_connection_open(self, &hash, TRUE)) {
+	if(!__midgard_connection_open(self, TRUE)) {
 
 		MIDGARD_ERRNO_SET (self, MGD_ERR_NOT_CONNECTED);
 		rv = FALSE;
 	}
-
-	g_hash_table_destroy(hash);
 	
 	return rv;
 }
@@ -778,13 +773,8 @@ gboolean midgard_connection_open_from_file(
 
 	mgd->priv->config = config;
 
-	GHashTable *hash = NULL;
-
-	if(!__midgard_connection_open(mgd, &hash, TRUE)) 
+	if(!__midgard_connection_open(mgd, TRUE)) 
 		rv = FALSE;
-
-	if(hash)
-		g_hash_table_destroy(hash);
 	
 	return rv;
 }
@@ -802,7 +792,6 @@ extern GHashTable *midgard_connection_open_all(gboolean userdir)
 {
 	GHashTable *cncs = 
 		g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_object_unref);
-	GHashTable *hash = NULL;
 
 	gchar **cfgs = midgard_config_list_files(userdir);
 	
@@ -832,7 +821,7 @@ extern GHashTable *midgard_connection_open_all(gboolean userdir)
 
 		cnc->priv->config = config;
 
-		if(__midgard_connection_open(cnc, &hash, TRUE)) {
+		if(__midgard_connection_open(cnc, TRUE)) {
 
 			g_hash_table_insert(cncs, g_strdup(cfgs[i]), cnc);
 		
@@ -893,13 +882,8 @@ gboolean midgard_connection_open_config(
 
 	self->priv->config = midgard_config_copy (config);
 
-	GHashTable *hash = NULL;
-
-	if(!__midgard_connection_open(self, &hash, TRUE))
+	if(!__midgard_connection_open(self, TRUE))
 		rv = FALSE;
-
-	if(hash)
-		g_hash_table_destroy(hash);
 
 	return rv;
 }
@@ -912,7 +896,7 @@ gboolean midgard_connection_struct_open_config(
 	
 	self->priv->config = config;
 	
-	if(!__midgard_connection_open(self, NULL, FALSE))
+	if(!__midgard_connection_open(self, FALSE))
 		return FALSE;
 	
 	return TRUE;
