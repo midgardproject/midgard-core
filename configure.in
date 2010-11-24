@@ -53,12 +53,6 @@ AC_HEADER_STDC
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 
-dnl Checks for library functions.
-
-dnl accomodate Solaris
-AC_SEARCH_LIBS(gethostbyname, nsl)
-AC_SEARCH_LIBS(htonl, socket)
-
 AC_MSG_CHECKING([if building for some Win32 platform])
 case "$host" in
   *-*-mingw*|*-*-cygwin*)
