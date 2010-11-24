@@ -35,12 +35,24 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = src/vala
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in config.c \
+	executable.c libmidgardvala_la_vala.stamp \
+	midgard_schema_model_reflector.c model.c namespace.c \
+	object_builder.c object_model.c object_property_model.c \
+	profiler.c query.c query_property.c query_value.c \
+	rdf_generic_object.c rdf_sql_content_manager.c \
+	rdf_sql_storage_manager.c rdf_storage_manager.c \
+	sql_column_model.c sql_profiler.c sql_query_constraint.c \
+	sql_query_select.c sql_query_storage.c \
+	sql_storage_content_manager.c sql_storage_manager.c \
+	sql_storage_model_manager.c sql_table_model.c storable.c \
+	storage.c workspace.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/introspection.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/configure.in
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/vala.m4 \
+	$(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -50,20 +62,18 @@ CONFIG_CLEAN_VPATH_FILES =
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmidgardvala_la_DEPENDENCIES =
 am__objects_1 =
-am__objects_2 = midgard_config.lo executable.lo midgard_namespace.lo \
-	profiler.lo sql_profiler.lo midgard_query.lo \
+am_libmidgardvala_la_OBJECTS = config.lo executable.lo namespace.lo \
+	profiler.lo sql_profiler.lo query.lo \
 	midgard_schema_model_reflector.lo model.lo object_model.lo \
-	object_property_model.lo object_builder.lo \
-	midgard_schema_object.lo midgard_storage_manager_sql.lo \
-	midgard_storage.lo midgard_workspace.lo query_property.lo \
-	query_value.lo sql_storage_content_manager.lo \
-	sql_storage_model_manager.lo sql_table_model.lo \
-	sql_column_model.lo sql_query_storage.lo \
+	object_property_model.lo object_builder.lo storable.lo \
+	sql_storage_manager.lo storage.lo workspace.lo \
+	query_property.lo query_value.lo \
+	sql_storage_content_manager.lo sql_storage_model_manager.lo \
+	sql_table_model.lo sql_column_model.lo sql_query_storage.lo \
 	sql_query_constraint.lo sql_query_select.lo \
 	rdf_generic_object.lo rdf_storage_manager.lo \
 	rdf_sql_storage_manager.lo rdf_sql_content_manager.lo \
 	$(am__objects_1)
-am_libmidgardvala_la_OBJECTS = $(am__objects_2)
 libmidgardvala_la_OBJECTS = $(am_libmidgardvala_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -95,6 +105,13 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_$(V))
 am__v_CCLD_ = $(am__v_CCLD_$(AM_DEFAULT_VERBOSITY))
 am__v_CCLD_0 = @echo "  CCLD  " $@;
+VALACOMPILE = $(VALAC) $(AM_VALAFLAGS) $(VALAFLAGS)
+LTVALACOMPILE = $(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(VALAC) $(AM_VALAFLAGS) \
+	$(VALAFLAGS)
+AM_V_VALAC = $(am__v_VALAC_$(V))
+am__v_VALAC_ = $(am__v_VALAC_$(AM_DEFAULT_VERBOSITY))
+am__v_VALAC_0 = @echo "  VALAC " $@;
 AM_V_GEN = $(am__v_GEN_$(V))
 am__v_GEN_ = $(am__v_GEN_$(AM_DEFAULT_VERBOSITY))
 am__v_GEN_0 = @echo "  GEN   " $@;
@@ -149,8 +166,6 @@ LIBGDA_VERSION = @LIBGDA_VERSION@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
-LIBVALA_CFLAGS = @LIBVALA_CFLAGS@
-LIBVALA_LIBS = @LIBVALA_LIBS@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
@@ -185,8 +200,6 @@ SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
 VALAC = @VALAC@
-VALAFLAGS = @VALAFLAGS@
-VALA_PACKAGE = @VALA_PACKAGE@
 VERSION = @VERSION@
 VERSION_STRING = @VERSION_STRING@
 abs_builddir = @abs_builddir@
@@ -245,24 +258,23 @@ NULL =
 noinst_LTLIBRARIES = libmidgardvala.la
 AM_CFLAGS = -I$(top_srcdir)/src/core  @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@
-BUILT_SOURCES = libmidgardvala.vala.stamp
 midgardcr_header = $(top_srcdir)/src/core/midgardcr.h
-libmidgardvala_la_VALASOURCES = \
-			  midgard_config.vala \
+libmidgardvala_la_SOURCES = \
+			  config.vala \
 			  executable.vala \
-			  midgard_namespace.vala \
+			  namespace.vala \
 			  profiler.vala \
 			  sql_profiler.vala \
-			  midgard_query.vala \
+			  query.vala \
 			  midgard_schema_model_reflector.vala \
 			  model.vala \
 			  object_model.vala \
 			  object_property_model.vala \
 			  object_builder.vala \
-			  midgard_schema_object.vala \
-			  midgard_storage_manager_sql.vala \
-			  midgard_storage.vala \
-			  midgard_workspace.vala \
+			  storable.vala \
+			  sql_storage_manager.vala \
+			  storage.vala \
+			  workspace.vala \
 			  query_property.vala \
 			  query_value.vala \
 			  sql_storage_content_manager.vala \
@@ -278,21 +290,10 @@ libmidgardvala_la_VALASOURCES = \
 			  rdf_sql_content_manager.vala \
 			  $(NULL)
 
-libmidgardvala_la_SOURCES = \
-			  libmidgardvala.vala.stamp \
-  			  $(libmidgardvala_la_VALASOURCES:.vala=.c)
-
 libmidgardvala_la_LDFLAGS = -module -export-dynamic
 libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
-EXTRA_DIST = \
-	     $(libmidgardvala_la_VALASOURCES) 
-
-CLEANFILES = \
-	     libmidgardvala.vala.stamp \
-	     $(libmidgardvala_la_VALASOURCES:.vala=.c) 	
-
-all: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+VALAFLAGS = --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgardcr_header) -C
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .c .lo .o .obj
@@ -344,20 +345,16 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/config.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/executable.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_config.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_namespace.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_query.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_schema_model_reflector.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_schema_object.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_storage.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_storage_manager_sql.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/midgard_workspace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/namespace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_builder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/object_property_model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/profiler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_property.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_value.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_generic_object.Plo@am__quote@
@@ -370,8 +367,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_query_select.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_query_storage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_storage_content_manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_storage_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_storage_model_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_table_model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/storable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/storage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/workspace.Plo@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -396,6 +397,149 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+$(srcdir)/config.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/executable.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/namespace.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/profiler.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_profiler.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/query.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/midgard_schema_model_reflector.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/model.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/object_model.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/object_property_model.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/object_builder.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/storable.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_storage_manager.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/storage.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/workspace.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/query_property.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/query_value.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_storage_content_manager.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_storage_model_manager.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_table_model.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_column_model.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_query_storage.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_query_constraint.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_query_select.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/rdf_generic_object.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/rdf_storage_manager.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/rdf_sql_storage_manager.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/rdf_sql_content_manager.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+libmidgardvala_la_vala.stamp: $(libmidgardvala_la_SOURCES)
+	$(AM_V_VALAC)$(VALAC) $(AM_VALAFLAGS) $(VALAFLAGS) -C $(libmidgardvala_la_SOURCES)
+	$(AM_V_at)touch $@
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -454,13 +598,42 @@ GTAGS:
 
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
+
+distdir: $(DISTFILES)
+	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
+	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
+	list='$(DISTFILES)'; \
+	  dist_files=`for file in $$list; do echo $$file; done | \
+	  sed -e "s|^$$srcdirstrip/||;t" \
+	      -e "s|^$$topsrcdirstrip/|$(top_builddir)/|;t"`; \
+	case $$dist_files in \
+	  */*) $(MKDIR_P) `echo "$$dist_files" | \
+			   sed '/\//!d;s|^|$(distdir)/|;s,/[^/]*$$,,' | \
+			   sort -u` ;; \
+	esac; \
+	for file in $$dist_files; do \
+	  if test -f $$file || test -d $$file; then d=.; else d=$(srcdir); fi; \
+	  if test -d $$d/$$file; then \
+	    dir=`echo "/$$file" | sed -e 's,/[^/]*$$,,'`; \
+	    if test -d "$(distdir)/$$file"; then \
+	      find "$(distdir)/$$file" -type d ! -perm -700 -exec chmod u+rwx {} \;; \
+	    fi; \
+	    if test -d $(srcdir)/$$file && test $$d != $(srcdir); then \
+	      cp -fpR $(srcdir)/$$file "$(distdir)$$dir" || exit 1; \
+	      find "$(distdir)/$$file" -type d ! -perm -700 -exec chmod u+rwx {} \;; \
+	    fi; \
+	    cp -fpR $$d/$$file "$(distdir)$$dir" || exit 1; \
+	  else \
+	    test -f "$(distdir)/$$file" \
+	    || cp -p $$d/$$file "$(distdir)/$$file" \
+	    || exit 1; \
+	  fi; \
+	done
 check-am: all-am
-check: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) check-am
+check: check-am
 all-am: Makefile $(LTLIBRARIES)
 installdirs:
-install: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) install-am
+install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -477,7 +650,6 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -486,7 +658,35 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
+	-rm -f config.c
+	-rm -f executable.c
+	-rm -f libmidgardvala_la_vala.stamp
+	-rm -f midgard_schema_model_reflector.c
+	-rm -f model.c
+	-rm -f namespace.c
+	-rm -f object_builder.c
+	-rm -f object_model.c
+	-rm -f object_property_model.c
+	-rm -f profiler.c
+	-rm -f query.c
+	-rm -f query_property.c
+	-rm -f query_value.c
+	-rm -f rdf_generic_object.c
+	-rm -f rdf_sql_content_manager.c
+	-rm -f rdf_sql_storage_manager.c
+	-rm -f rdf_storage_manager.c
+	-rm -f sql_column_model.c
+	-rm -f sql_profiler.c
+	-rm -f sql_query_constraint.c
+	-rm -f sql_query_select.c
+	-rm -f sql_query_storage.c
+	-rm -f sql_storage_content_manager.c
+	-rm -f sql_storage_manager.c
+	-rm -f sql_storage_model_manager.c
+	-rm -f sql_table_model.c
+	-rm -f storable.c
+	-rm -f storage.c
+	-rm -f workspace.c
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
@@ -558,34 +758,21 @@ ps-am:
 
 uninstall-am:
 
-.MAKE: all check install install-am install-strip
+.MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-libtool clean-noinstLTLIBRARIES ctags dist-hook \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am
+	clean-libtool clean-noinstLTLIBRARIES ctags distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags uninstall uninstall-am
 
-
-libmidgardvala.vala.stamp: $(libmidgardvala_la_VALASOURCES)
-	$(VALAC) $(VALAFLAGS)  --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgardcr_header) -C $^
-	touch $@
-
-dist-hook:
-	cp *.vala $(distdir)
-	cp Makefile.am $(distdir)
-	cp Makefile.in $(distdir)
-	cp MidgardCR-3.0.vapi $(distdir)
-
-distdir: dist-hook
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
