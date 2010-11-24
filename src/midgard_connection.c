@@ -685,13 +685,13 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 	if (!rv)
 		return rv;	
 
-	/* FIXME, it should be handled by GError */
 	if(self->priv->config != NULL){
 		midgard_set_error(self,
 				MGD_GENERIC_ERROR,
 				MGD_ERR_USER_DATA,
 				"MidgardConfig already associated with "
 				"MidgardConnection");
+		*error = g_error_new (MGD_GENERIC_ERROR, MGD_ERR_INTERNAL, "%s", midgard_connection_get_error_string (self));
 		return FALSE;
 	}
 	
