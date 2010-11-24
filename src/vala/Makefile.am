@@ -10,21 +10,21 @@ BUILT_SOURCES = libmidgardvala.vala.stamp
 midgardcr_header = $(top_srcdir)/src/core/midgardcr.h
 
 libmidgardvala_la_VALASOURCES = \
-			  midgard_config.vala \
+			  config.vala \
 			  executable.vala \
-			  midgard_namespace.vala \
+			  namespace.vala \
 			  profiler.vala \
 			  sql_profiler.vala \
-			  midgard_query.vala \
+			  query.vala \
 			  midgard_schema_model_reflector.vala \
 			  model.vala \
 			  object_model.vala \
 			  object_property_model.vala \
 			  object_builder.vala \
-			  midgard_schema_object.vala \
-			  midgard_storage_manager_sql.vala \
-			  midgard_storage.vala \
-			  midgard_workspace.vala \
+			  storable.vala \
+			  sql_storage_manager.vala \
+			  storage.vala \
+			  workspace.vala \
 			  query_property.vala \
 			  query_value.vala \
 			  sql_storage_content_manager.vala \
