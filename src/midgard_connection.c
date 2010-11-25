@@ -833,9 +833,6 @@ extern GHashTable *midgard_connection_open_all(gboolean userdir)
 		
 		i++;
 	}
-	
-	if(hash)
-		g_hash_table_destroy(hash);
 
 	g_strfreev(cfgs);
 	
