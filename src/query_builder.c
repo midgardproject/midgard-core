@@ -1020,7 +1020,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 				GParamSpec *pspec =
 					g_object_class_find_property(G_OBJECT_GET_CLASS(object), coltitle);
 
-				if(G_IS_VALUE(gvalue)) {
+				if(G_IS_VALUE(gvalue) && !gda_value_is_null(gvalue)) {
 
 					if (!pspec) {
 						
@@ -1066,6 +1066,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 
 						case G_TYPE_INT:
 						case G_TYPE_UINT:
+						case G_TYPE_BOOLEAN:
 							g_object_set(G_OBJECT(object), coltitle, 0, NULL);
 							break;
 
