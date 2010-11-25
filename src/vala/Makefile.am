@@ -2,10 +2,16 @@ NULL =
 
 noinst_LTLIBRARIES = libmidgardvala.la
 
-AM_CFLAGS = -I$(top_srcdir)/src/core  @MIDGARD_CFLAGS@
+AM_CFLAGS = \
+	    -I$(top_srcdir)/src/core \
+	    @MIDGARD_CFLAGS@ \
+	    $(GLIB_CFLAGS) \
+	    $(GDA_CFLAGS) 
+
 AM_LDFLAGS = @MIDGARD_LIBS@
 
 midgardcr_header = $(top_srcdir)/src/core/midgardcr.h
+midgardcr_vapi_file = MidgardCR-3.0.vapi
 
 libmidgardvala_la_SOURCES = \
 			  config.vala \
@@ -41,4 +47,11 @@ libmidgardvala_la_SOURCES = \
 libmidgardvala_la_LDFLAGS = -module -export-dynamic
 libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
 
-VALAFLAGS = --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgardcr_header) $(libmidgardvala_la_SOURCES)
+EXTRA_DIST = $(midgardcr_vapi_file)
+
+VALAFLAGS = --vapi=$(midgardcr_vapi_file) --vapidir=$(top_srcdir)/src/core --pkg=MidgardCRCore 
+
+CLEANFILES = \
+	     $(midgardcr_vapi_file) \
+	     libmidgardvala_la_vala.stamp \
+	     $(libmidgardvala_la_SOURCES:.vala=.c)
