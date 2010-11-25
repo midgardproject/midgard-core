@@ -31,7 +31,7 @@ src_libmidgardcr_la_CPPFLAGS = \
 		      	      -I$(top_srcdir)/src -I$(top_srcdir)/src/core -DG_LOG_DOMAIN=\"MidgardCR\"
 
 AM_CFLAGS = -I$(top_srcdir)/src -I$(top_srcdir)/src/core @MIDGARD_CFLAGS@
-#AM_LDFLAGS = @MIDGARD_LIBS@ 
+AM_LDFLAGS = @MIDGARD_LIBS@ 
 
 src_libmidgardcr_la_LDFLAGS = -version-info @MIDGARD_ABI_MAJOR@:0:0 $(no_undefined)
 
@@ -50,10 +50,10 @@ src_libmidgardcr_la_SOURCES = $(src_libmidgardcr_la_public_SOURCES)
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = midgardcr.pc
 
-#vapidir = $(datadir)/vala/vapi
-#vapi_DATA = \
-#	    src/vala/MidgardCR-3.0.vapi \
-#	    $(NULL)
+vapidir = $(datadir)/vala/vapi
+vapi_DATA = \
+	    src/vala/MidgardCR-3.0.vapi \
+	    $(NULL)
 
 -include $(INTROSPECTION_MAKEFILE)
 INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir)
@@ -61,7 +61,7 @@ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
-introspection_sources = $(src_libmidgardcr_la_public_SOURCES) $(midgardcr_public_h) src/core/*.c
+introspection_sources = $(src_libmidgardcr_la_public_SOURCES) $(midgardcr_public_h)
 MidgardCR-3.0.gir: $(lib_LTLIBRARIES)
 MidgardCR_3_0_gir_INCLUDES = GObject-2.0 Gda-4.0
 MidgardCR_3_0_gir_CFLAGS = $(AM_CFLAGS)
