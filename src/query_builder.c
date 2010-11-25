@@ -187,7 +187,7 @@ void midgard_query_builder_free(MidgardQueryBuilder *builder)
  * 
  * <para>
  * @name referes to a property of the queried Midgard object class. 
- * For example: #MidgardQueryBuilder has been initialized for person 
+ * For example, #MidgardQueryBuilder has been initialized for person 
  * class which has lastname property registered.
  * <example>
  * <programlisting>
@@ -210,7 +210,7 @@ void midgard_query_builder_free(MidgardQueryBuilder *builder)
  * <listitem><para>
  * First property is the one registered for given class which is a link
  * to property of different class. Second is a property of target class.
- * For example: person object has property 'friend' which holds some identifier
+ * For example, person object has property 'friend' which holds some identifier
  * (id or guid) to friend class property, and friend class has property 'nick'.
  * In such case we can use constraint and comparison using friend property,
  * even if #MidgardQueryBuilder has been initialized for person class.
