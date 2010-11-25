@@ -906,54 +906,6 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 }
 
 
-/* based on gda_default_unescape_string */
-/* https://bugzilla.gnome.org/show_bug.cgi?id=617565 */
-gchar *
-__default_unescape_string (const gchar *string)
-{
-	glong total;
-	gchar *ptr;
-	gchar *retval;
-	glong offset = 0;
-	
-	if (!string) 
-		return NULL;
-
-	total = strlen (string);
-	retval = g_memdup (string, total+1);
-	ptr = (gchar *) retval;
-	while (offset < total) {
-
-		/* we accept the "''" as a synonym of "\'" */
-		if (*ptr == '\'') {
-			if (*(ptr+1) == '\'') {
-				g_memmove (ptr+1, ptr+2, total - offset);
-				offset += 2;
-			}
-		}
-		if (*ptr == '\\') {
-			if (*(ptr+1) == '\\') {
-				g_memmove (ptr+1, ptr+2, total - offset);
-				offset += 2;
-			}
-			else {
-				if (*(ptr+1) == '\'') {
-					*ptr = '\'';
-					g_memmove (ptr+1, ptr+2, total - offset);
-					offset += 2;
-				}				
-			}
-		}
-		else
-			offset ++;
-
-		ptr++;
-	}
-
-	return retval;	
-}
-
-
 GList *
 midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint select_type, MidgardObject **nobject)
 {
@@ -1090,15 +1042,6 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 						g_value_init (&_convert, pspec->value_type);	
 				
 						if (g_value_transform (gvalue, &_convert)) {
-
-							/* FIXME, remove workaround once it's fixed in GDA */
-							/* https://bugzilla.gnome.org/show_bug.cgi?id=617550 */
-							guint dbtype = mgd->priv->config->priv->dbtype;
-							if (dbtype == MIDGARD_DB_TYPE_MYSQL && G_VALUE_TYPE (gvalue) == GDA_TYPE_BLOB) {
-								gchar *tmp_str = __default_unescape_string (g_value_get_string (&_convert));
-								if (tmp_str)
-									g_value_take_string (&_convert, tmp_str);
-							}
 
 							g_object_set_property (G_OBJECT (object), coltitle, &_convert);
 					
