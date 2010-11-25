@@ -2861,9 +2861,10 @@ void midgard_core_dbjoin_free (MidgardDBJoin *mdbj)
 }
 
 /* Routine which is a workaround for gda_binary_stringify, 
- *  * which is also registered as transform function which converts 
- *   * binary value to string one.
- *    * With this function we get GdaBinary->data 'as is' */
+ * which is also registered as transform function which converts 
+ * binary value to string one.
+ * With this function we get GdaBinary->data 'as is' */
+/*
 gchar *
 midgard_core_query_binary_stringify (GValue *src_value)
 {
@@ -2877,6 +2878,7 @@ midgard_core_query_binary_stringify (GValue *src_value)
 
 	return (gchar *) g_strndup((const gchar *) binary->data, binary->binary_length);
 }
+*/
 
 #define _RESERVED_BLOB_NAME "attachment"
 #define _RESERVED_BLOB_TABLE "blobs"
