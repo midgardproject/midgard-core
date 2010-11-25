@@ -17,6 +17,7 @@
  *   */
 
 #include "midgard_core_metadata.h"
+#include "midgard_core_query.h"
 
 #define __SET_METADATA_PROPERTY_STRING(__property, __mstrval) { \
 	if (!__mstrval) \
@@ -154,22 +155,19 @@ midgard_core_metadata_set_imported (MidgardMetadata *self, const GValue *importe
 void 
 midgard_core_metadata_set_deleted (MidgardMetadata *self, const GValue *deleted)
 {
-	if (G_VALUE_HOLDS_BOOLEAN (deleted))
-		self->priv->deleted = g_value_get_boolean (deleted);
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (self->priv->deleted, deleted);
 }
 
 void 
 midgard_core_metadata_set_isapproved (MidgardMetadata *self, const GValue *isapproved)
 {
-	if (G_VALUE_HOLDS_BOOLEAN (isapproved))
-		self->priv->is_approved = g_value_get_boolean (isapproved);
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (self->priv->is_approved, isapproved);
 }
 
 void 
 midgard_core_metadata_set_islocked (MidgardMetadata *self, const GValue *islocked)
 {
-	if (G_VALUE_HOLDS_BOOLEAN (islocked))
-		self->priv->is_locked = g_value_get_boolean (islocked);
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (self->priv->is_locked, islocked);
 }
 
 void 
@@ -203,15 +201,13 @@ midgard_core_metadata_set_score (MidgardMetadata *self, const GValue *score)
 void 
 midgard_core_metadata_set_hidden (MidgardMetadata *self, const GValue *hidden)
 {
-	if (G_VALUE_HOLDS_BOOLEAN (hidden))
-		self->priv->hidden = g_value_get_boolean (hidden);
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (self->priv->hidden, hidden);
 }
 
 void 
 midgard_core_metadata_set_navnoentry (MidgardMetadata *self, const GValue *nav)
 {
-	if (G_VALUE_HOLDS_BOOLEAN (nav))
-		self->priv->nav_noentry = g_value_get_boolean (nav);
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (self->priv->nav_noentry, nav);
 }
 
 /* routines */
