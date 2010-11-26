@@ -270,15 +270,16 @@ gboolean midgard_query_builder_add_constraint(
 	midgard_core_query_constraint_set_class(constraint, MIDGARD_DBOBJECT_CLASS(g_type_class_peek(builder->priv->type)));
 	
 	if(!midgard_core_query_constraint_add_operator(constraint, op))
-		return FALSE;
+		goto return_false;
 		
 	if(!midgard_core_query_constraint_parse_property(&constraint, MIDGARD_DBOBJECT_CLASS(g_type_class_peek(builder->priv->type)), name))
-		return FALSE;
+		goto return_false;
 
 	if(!midgard_core_query_constraint_add_value(constraint, value))
-		return FALSE;
+		goto return_false;
 	
-	midgard_core_query_constraint_build_condition(constraint);
+	if (!midgard_core_query_constraint_build_condition(constraint))
+		goto return_false;
 
 	/* FIXME, table should be stored per every constraint, order, whatever */
 	midgard_core_qb_add_table(builder, constraint->priv->prop_left->table);
@@ -295,6 +296,10 @@ gboolean midgard_query_builder_add_constraint(
 	midgard_core_qb_add_constraint(builder, constraint);	
 
 	return TRUE;
+
+return_false:
+	g_object_unref (constraint);
+	return FALSE;
 }
 
 /**
@@ -342,14 +347,15 @@ gboolean midgard_query_builder_add_constraint_with_property(
 	midgard_core_query_constraint_set_class(constraint, klass);
 
 	if(!midgard_core_query_constraint_parse_property(&constraint, klass, property_a))
-		return FALSE;
+		goto return_false;
 	constraint->priv->current = constraint->priv->prop_right;
 	if(!midgard_core_query_constraint_parse_property(&constraint, klass, property_b))
-		return FALSE;
+		goto return_false;
 
 	constraint->priv->condition_operator = g_strdup(op);
 
-	midgard_core_query_constraint_build_condition(constraint);
+	if (!midgard_core_query_constraint_build_condition(constraint))
+		goto return_false;
 
 	midgard_core_qb_add_table(builder, constraint->priv->prop_left->table);
 	midgard_core_qb_add_table(builder, constraint->priv->prop_right->table);
@@ -366,6 +372,10 @@ gboolean midgard_query_builder_add_constraint_with_property(
 	}
 	
 	return TRUE;
+
+return_false:
+	g_object_unref (constraint);
+	return FALSE;
 }
 
 /**
