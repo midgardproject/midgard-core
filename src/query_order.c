@@ -56,6 +56,10 @@ MidgardQueryOrder *midgard_core_query_order_new(
 	order->constraint = midgard_core_query_constraint_new();
 	order->constraint->priv->order_dir = g_strdup(dir);
 
+	/* Explicitly set builder. It's required for proper constraint's property "parser".
+	 * Without builder, implicit joins (for example) are not added */
+	midgard_core_query_constraint_set_builder(order->constraint, builder);
+
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_CLASS(g_type_class_peek(builder->priv->type));
 
 	if(!midgard_core_query_constraint_parse_property(&(order->constraint), klass, name)) {
