@@ -1029,7 +1029,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 						continue;
 					}
 
-					if (G_VALUE_TYPE (gvalue) == GDA_TYPE_BINARY
+					if (G_VALUE_TYPE (gvalue) == GDA_TYPE_BLOB
 							&& G_TYPE_FUNDAMENTAL (pspec->value_type) == G_TYPE_STRING) {
 
 						gchar *stringified = gda_value_stringify ((GValue *)gvalue);
