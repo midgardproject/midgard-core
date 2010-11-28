@@ -35,8 +35,8 @@ midgard_test_database_provider_new_user_config (const gchar *provider)
 
 	g_object_set (config, "database", CONFIG_DB_PROVIDER_NAME, NULL);
 	g_object_set (config, "dbtype", provider, NULL);
-	g_object_set (config, "dbuser", "midgard", NULL);
-	g_object_set (config, "dbpass", "midgard", NULL);
+	g_object_set (config, "dbuser", "midgard_test", NULL);
+	g_object_set (config, "dbpass", "midgard_test", NULL);
 
 	// g_object_set (config, "loglevel", "debug", NULL); 
 	// g_object_set (config, "logfilename", "/tmp/midgard-test-database-provider.log", NULL); 
