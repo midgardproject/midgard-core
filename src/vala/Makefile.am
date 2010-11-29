@@ -38,7 +38,7 @@ libmidgardvala_la_SOURCES = \
 			  sql_query_storage.vala \
 			  sql_query_constraint.vala \
 			  sql_query_select.vala \
-			  rdf_generic_object.vala \
+			  rdf_triple_object.vala \
 			  rdf_storage_manager.vala \
 			  rdf_sql_storage_manager.vala \
 			  rdf_sql_content_manager.vala \
@@ -49,9 +49,10 @@ libmidgardvala_la_LIBADD = @MIDGARD_LIBS@
 
 EXTRA_DIST = $(midgardcr_vapi_file)
 
-VALAFLAGS = --vapi=$(midgardcr_vapi_file) --vapidir=$(top_srcdir)/src/core --pkg=MidgardCRCore 
+VALAFLAGS = --vapi=$(midgardcr_vapi_file) --vapidir=$(top_srcdir)/src/core --pkg=MidgardCRCore  -H $(midgardcr_header) 
 
 CLEANFILES = \
 	     $(midgardcr_vapi_file) \
+	     $(midgardcr_header) \
 	     libmidgardvala_la_vala.stamp \
 	     $(libmidgardvala_la_SOURCES:.vala=.c)
