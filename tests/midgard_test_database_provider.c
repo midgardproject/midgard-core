@@ -160,6 +160,23 @@ _midgard_test_database_provider_escape (const gchar *provider)
 	copy_page = midgard_object_new (mgd_global, TEST_CLASS_NAME, &guid_value);
 	g_assert (copy_page != NULL);
 
+	/* clean&clear*/
+	g_free (initial_name);
+	g_free (initial_content);
+	g_free (copy_name);
+	g_free (copy_content);
+
+	/* Get properties once again */
+	g_object_get (G_OBJECT (page), 
+			"name", &initial_name, 
+			"code", &initial_content, 
+			NULL);
+
+	g_object_get (G_OBJECT (copy_page), 
+			"name", &copy_name, 
+			"code", &copy_content, 
+			NULL);
+
 	/* Compare again */
 	/* Check invalid cases */
 	g_assert_cmpstr (copy_name, !=, "");
@@ -271,6 +288,23 @@ _midgard_test_database_provider_double_escape (const gchar *provider)
 	copy_page = midgard_object_new (mgd_global, TEST_CLASS_NAME, &guid_value);
 	g_assert (copy_page != NULL);
 
+	/* clean&clear*/
+	g_free (initial_name);
+	g_free (initial_content);
+	g_free (copy_name);
+	g_free (copy_content);
+
+	/* Get properties once again */
+	g_object_get (G_OBJECT (page), 
+			"name", &initial_name, 
+			"code", &initial_content, 
+			NULL);
+
+	g_object_get (G_OBJECT (copy_page), 
+			"name", &copy_name, 
+			"code", &copy_content, 
+			NULL);
+
 	/* Compare again */
 	/* Check invalid cases */
 	g_assert_cmpstr (copy_name, !=, "");
@@ -381,6 +415,23 @@ _midgard_test_database_provider_complex_escape (const gchar *provider)
 	/* Get copy */
 	copy_page = midgard_object_new (mgd_global, TEST_CLASS_NAME, &guid_value);
 	g_assert (copy_page != NULL);
+
+	/* clean&clear*/
+	g_free (initial_name);
+	g_free (initial_content);
+	g_free (copy_name);
+	g_free (copy_content);
+
+	/* Get properties once again */
+	g_object_get (G_OBJECT (page), 
+			"name", &initial_name, 
+			"code", &initial_content, 
+			NULL);
+
+	g_object_get (G_OBJECT (copy_page), 
+			"name", &copy_name, 
+			"code", &copy_content, 
+			NULL);
 
 	/* Compare again */
 	/* Check invalid cases */
@@ -538,6 +589,23 @@ _midgard_test_database_provider_utf8_chars (const gchar *provider)
 	/* Get copy */
 	copy_page = midgard_object_new (mgd_global, TEST_CLASS_NAME, &guid_value);
 	g_assert (copy_page != NULL);
+
+	/* clean&clear*/
+	g_free (initial_name);
+	g_free (initial_content);
+	g_free (copy_name);
+	g_free (copy_content);
+
+	/* Get properties once again */
+	g_object_get (G_OBJECT (page), 
+			"name", &initial_name, 
+			"code", &initial_content, 
+			NULL);
+
+	g_object_get (G_OBJECT (copy_page), 
+			"name", &copy_name, 
+			"code", &copy_content, 
+			NULL);
 
 	/* Compare again */
 	/* Check invalid cases */
