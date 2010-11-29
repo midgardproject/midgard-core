@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: Midgard
 Description: Midgard Framework Library 
-Requires: glib-2.0 gobject-2.0 gda-4.0 
+Requires: glib-2.0 gobject-2.0 libgda-4.0 
 Version: @VERSION@
 Libs: -L${libdir} -lmidgardcr
 Cflags: -I${includedir}/midgard @MIDGARD_CFLAGS@
