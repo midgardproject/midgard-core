@@ -40,6 +40,7 @@ gtester -k -o midgard-test.xml \
 	./run-midgard-test-tree \
 	./run-midgard-test-replicator \
 	./run-midgard-test-user \
+	./run-midgard-test-database-provider \
 	# ./run-midgard-test-replicator-import
 
 echo "\nCleanup…"
@@ -49,6 +50,8 @@ sudo mysqladmin -f drop midgard_test > /dev/null 2> /dev/null
 echo "-> Droping database midgard_test_replicator_import"
 sudo mysqladmin -f drop midgard_test_replicator_import > /dev/null 2> /dev/null
 
+echo "-> Droping database midgard_test_database_provider"
+sudo mysqladmin -f drop midgard_test_database_provider > /dev/null 2> /dev/null
 
 echo "\nGenerating report… "
 gtester-report midgard-test.xml > midgard-test.html

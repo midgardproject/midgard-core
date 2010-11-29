@@ -13,4 +13,7 @@ void	midgard_test_database_provider_sqlite_complex_escape	(void);
 
 void	midgard_test_database_sql_injection 			(void);
 
+void	midgard_test_database_provider_sqlite_utf8_chars 	(void);
+void	midgard_test_database_provider_mysql_utf8_chars 	(void);
+
 #endif /* MIDGARD_TEST_DATABASE_PROVIDER_H */
