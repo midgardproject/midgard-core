@@ -33,10 +33,10 @@ namespace MidgardCR {
 		{
 			base.create (object);
 
-			if (object is RDFGenericObject) {
+			if (object is RDFTripleObject) {
 				var builder = new ObjectBuilder ();
 
-				var rdf_object = (RDFGenericObject) object;
+				var rdf_object = (RDFTripleObject) object;
 				foreach (string name in rdf_object.list_all_properties()) {
 					/* TODO: convert property-name to canonical form */
 					var rdf_prop = builder.factory ("RDFTripleObject") as RepositoryObject;

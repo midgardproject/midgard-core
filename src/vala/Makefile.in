@@ -40,13 +40,12 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in config.c \
 	midgard_schema_model_reflector.c model.c namespace.c \
 	object_builder.c object_model.c object_property_model.c \
 	profiler.c query.c query_property.c query_value.c \
-	rdf_generic_object.c rdf_sql_content_manager.c \
-	rdf_sql_storage_manager.c rdf_storage_manager.c \
-	sql_column_model.c sql_profiler.c sql_query_constraint.c \
-	sql_query_select.c sql_query_storage.c \
-	sql_storage_content_manager.c sql_storage_manager.c \
-	sql_storage_model_manager.c sql_table_model.c storable.c \
-	storage.c workspace.c
+	rdf_sql_content_manager.c rdf_sql_storage_manager.c \
+	rdf_storage_manager.c rdf_triple_object.c sql_column_model.c \
+	sql_profiler.c sql_query_constraint.c sql_query_select.c \
+	sql_query_storage.c sql_storage_content_manager.c \
+	sql_storage_manager.c sql_storage_model_manager.c \
+	sql_table_model.c storable.c storage.c workspace.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/introspection.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
@@ -71,7 +70,7 @@ am_libmidgardvala_la_OBJECTS = config.lo executable.lo namespace.lo \
 	sql_storage_content_manager.lo sql_storage_model_manager.lo \
 	sql_table_model.lo sql_column_model.lo sql_query_storage.lo \
 	sql_query_constraint.lo sql_query_select.lo \
-	rdf_generic_object.lo rdf_storage_manager.lo \
+	rdf_triple_object.lo rdf_storage_manager.lo \
 	rdf_sql_storage_manager.lo rdf_sql_content_manager.lo \
 	$(am__objects_1)
 libmidgardvala_la_OBJECTS = $(am_libmidgardvala_la_OBJECTS)
@@ -256,9 +255,15 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 NULL = 
 noinst_LTLIBRARIES = libmidgardvala.la
-AM_CFLAGS = -I$(top_srcdir)/src/core  @MIDGARD_CFLAGS@
+AM_CFLAGS = \
+	    -I$(top_srcdir)/src/core \
+	    @MIDGARD_CFLAGS@ \
+	    $(GLIB_CFLAGS) \
+	    $(GDA_CFLAGS) 
+
 AM_LDFLAGS = @MIDGARD_LIBS@
 midgardcr_header = $(top_srcdir)/src/core/midgardcr.h
+midgardcr_vapi_file = MidgardCR-3.0.vapi
 libmidgardvala_la_SOURCES = \
 			  config.vala \
 			  executable.vala \
@@ -284,7 +289,7 @@ libmidgardvala_la_SOURCES = \
 			  sql_query_storage.vala \
 			  sql_query_constraint.vala \
 			  sql_query_select.vala \
-			  rdf_generic_object.vala \
+			  rdf_triple_object.vala \
 			  rdf_storage_manager.vala \
 			  rdf_sql_storage_manager.vala \
 			  rdf_sql_content_manager.vala \
@@ -292,7 +297,14 @@ libmidgardvala_la_SOURCES = \
 
 libmidgardvala_la_LDFLAGS = -module -export-dynamic
 libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
-VALAFLAGS = --vapi=MidgardCR-3.0.vapi --use-header $(top_srcdir)/src/core/MidgardCRCore.vapi --vapidir=$(top_srcdir)/src/core -H $(midgardcr_header) $(libmidgardvala_la_SOURCES)
+EXTRA_DIST = $(midgardcr_vapi_file)
+VALAFLAGS = --vapi=$(midgardcr_vapi_file) --vapidir=$(top_srcdir)/src/core --pkg=MidgardCRCore  -H $(midgardcr_header) 
+CLEANFILES = \
+	     $(midgardcr_vapi_file) \
+	     $(midgardcr_header) \
+	     libmidgardvala_la_vala.stamp \
+	     $(libmidgardvala_la_SOURCES:.vala=.c)
+
 all: all-am
 
 .SUFFIXES:
@@ -357,10 +369,10 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_property.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_value.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_generic_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_content_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_storage_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_storage_manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_triple_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_column_model.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_profiler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_query_constraint.Plo@am__quote@
@@ -517,7 +529,7 @@ $(srcdir)/sql_query_select.c: $(srcdir)/libmidgardvala_la_vala.stamp
 	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
 	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
 	fi
-$(srcdir)/rdf_generic_object.c: $(srcdir)/libmidgardvala_la_vala.stamp
+$(srcdir)/rdf_triple_object.c: $(srcdir)/libmidgardvala_la_vala.stamp
 	@if test -f $@; then :; else \
 	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
 	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
@@ -650,6 +662,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -671,10 +684,10 @@ maintainer-clean-generic:
 	-rm -f query.c
 	-rm -f query_property.c
 	-rm -f query_value.c
-	-rm -f rdf_generic_object.c
 	-rm -f rdf_sql_content_manager.c
 	-rm -f rdf_sql_storage_manager.c
 	-rm -f rdf_storage_manager.c
+	-rm -f rdf_triple_object.c
 	-rm -f sql_column_model.c
 	-rm -f sql_profiler.c
 	-rm -f sql_query_constraint.c

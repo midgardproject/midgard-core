@@ -30,13 +30,13 @@ void main()
 	var content_manager = new RDFSQLContentManager(storage_manager);
 
 	/* Store data */
-	var mgd = new RDFGenericObject("owl:Thing");
+	var mgd = new RDFTripleObject("owl:Thing");
 	mgd.identifier = "http://www.midgard-project.org/";
 
 	mgd.set_property_value("http://xmlns.com/foaf/0.1/topic", "http://www.midgard-project.org/rdf/topics/content_repository");
 	content_manager.create(mgd);
 
-	var rdf_vali = new RDFGenericObject("http://xmlns.com/foaf/0.1/Person");
+	var rdf_vali = new RDFTripleObject("http://xmlns.com/foaf/0.1/Person");
 	rdf_vali.identifier = "http://www.midgard-project.org/people/vali";
 
 	rdf_vali.set_property_value  ("foaf:currentProject", "http://www.midgard-project.org/");
