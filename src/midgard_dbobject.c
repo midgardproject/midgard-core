@@ -339,7 +339,94 @@ __initialize_statement_insert (MidgardDBObjectClass *klass)
 	}
 	
 	klass->dbpriv->statement_insert = stmt;
-	klass->dbpriv->param_set_insert = params;
+	klass->dbpriv->statement_insert_params = params;
+	
+	return;
+}
+
+static void
+__statement_update_add_metadata_fields (MidgardDBObjectClass *klass, GString *sql)
+{
+	MidgardMetadataClass *mklass = MGD_DBCLASS_METADATA_CLASS (klass);
+	if (!mklass)
+		return;
+
+	guint i;
+	guint n_prop;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (mklass), &n_prop);
+
+	if (!pspecs)
+		return;
+
+	for (i = 0; i < n_prop; i++) {
+		const gchar *col_name = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), pspecs[i]->name);
+		if (!col_name)
+			continue;
+		const gchar *type_name = g_type_name (pspecs[i]->value_type);
+		if (pspecs[i]->value_type == MIDGARD_TYPE_TIMESTAMP)
+			type_name = "string";
+		g_string_append_printf (sql, ", %s=##%s::%s", col_name, col_name, type_name);
+	}
+
+	g_free (pspecs);
+}
+
+static void
+__initialize_statement_update (MidgardDBObjectClass *klass)
+{
+	GString *sql = g_string_new ("");
+	guint n_props;
+	guint i;
+	const gchar *table = MGD_DBCLASS_TABLENAME (klass);
+	g_return_if_fail (table != NULL);
+
+	g_string_append_printf (sql, "UPDATE %s SET ", table); 
+
+	GParamSpec **pspecs = midgard_core_dbobject_class_list_properties (klass, &n_props);
+	g_return_if_fail (pspecs != NULL);
+
+	const gchar *pk = MGD_DBCLASS_PRIMARY (klass);
+	gboolean add_coma = FALSE;
+
+	for (i = 0; i < n_props; i++) {
+		/* Ignore primary key */
+		if (pk && g_str_equal (pspecs[i]->name, pk))
+			continue;
+
+		const gchar *col_name = midgard_core_class_get_property_colname (klass, pspecs[i]->name);
+
+		const gchar *type_name = g_type_name (pspecs[i]->value_type);
+		if (pspecs[i]->value_type == MIDGARD_TYPE_TIMESTAMP)
+			type_name = "string";
+		g_string_append_printf (sql, "%s%s=##%s::%s", add_coma ? ", " : " ", col_name, col_name, type_name);
+		add_coma = TRUE;
+	}
+
+	__statement_update_add_metadata_fields (klass, sql);
+
+	g_string_append(sql, " WHERE guid=##guid::string ");		
+	GdaSqlParser *parser = gda_sql_parser_new ();
+	GdaStatement *stmt;
+	GError *error = NULL;
+	stmt = gda_sql_parser_parse_string (parser, sql->str, NULL, &error);
+
+	g_string_free (sql, TRUE);
+
+	if (!stmt) {
+
+		g_error ("Couldn't create %s class prepared UPDATE statement. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+		return;
+	}
+
+	GdaSet *params; 
+	if (!gda_statement_get_parameters (stmt, &params, &error)) {
+		g_error ("Failed to create GdaSet for %s class. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+	}
+	
+	klass->dbpriv->statement_update = stmt;
+	klass->dbpriv->statement_update_params = params;
 	
 	return;
 }
@@ -521,6 +608,8 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->dbpriv->set_from_data_model = _midgard_dbobject_set_from_data_model;
 	klass->dbpriv->statement_insert = NULL;
 	klass->dbpriv->set_statement_insert = __initialize_statement_insert;	
+	klass->dbpriv->statement_update = NULL;
+	klass->dbpriv->set_statement_update = __initialize_statement_update;
 
 	/* Properties */
 	GParamSpec *pspec = g_param_spec_object ("connection",

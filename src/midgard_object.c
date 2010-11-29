@@ -621,7 +621,7 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 			return FALSE;
 		}
 	}
-
+/*
 	gint updated;
 	gchar *where = midgard_core_query_where_guid(table, MGD_OBJECT_GUID (gobj));
 
@@ -632,8 +632,9 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 #endif
 	
 	g_free(where);
-	
-	if (updated == -1) {
+*/
+	gboolean updated = midgard_core_query_update_dbobject_record (MIDGARD_DBOBJECT (gobj));	
+	if (!updated) {
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (gobj), MGD_ERR_INTERNAL);
 		return FALSE;
 	}
@@ -1342,6 +1343,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_property;
 		dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model;
 		dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_statement_insert;
+		dbklass->dbpriv->set_statement_update = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_statement_update;
 	}	
 
 	if (G_OBJECT_CLASS_TYPE(g_class) != MIDGARD_TYPE_OBJECT) {
@@ -1378,8 +1380,9 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 	g_free (data->params);
 	data->params = NULL;
 
-	/* Initialize persistent statement */
+	/* Initialize persistent statements */
 	dbklass->dbpriv->set_statement_insert (dbklass);
+	dbklass->dbpriv->set_statement_update (dbklass);
 }
 
 static void
@@ -1585,6 +1588,7 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_property;
 	dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_from_data_model;
 	dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_statement_insert;
+	dbklass->dbpriv->set_statement_update = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_statement_update;
 
 	if (!signals_registered && mklass) {
 		

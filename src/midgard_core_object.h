@@ -41,7 +41,9 @@ struct _MidgardDBObjectPrivate {
 
 	/* GDA pointers */
 	GdaStatement *statement_insert;
-	GdaSet *param_set_insert;	
+	GdaSet *statement_insert_params;
+	GdaStatement *statement_update;
+	GdaSet *statement_update_params;	
 
 	/* GdaSql virtual helpers */
 	void			(*add_fields_to_select_statement)	(MidgardDBObjectClass *klass, 
@@ -61,6 +63,7 @@ struct _MidgardDBObjectPrivate {
 
 	/* GDA helpers */
 	void			(*set_statement_insert)	(MidgardDBObjectClass *klass);
+	void			(*set_statement_update)	(MidgardDBObjectClass *klass);
 };
 
 #define MGD_DBOBJECT_DBPRIV(__obj) (MIDGARD_DBOBJECT(__obj)->dbpriv)
