@@ -630,6 +630,54 @@ _midgard_test_database_provider_utf8_chars (const gchar *provider)
 	g_assert_cmpstr (copy_name, ==, VARCHAR_PROPERTY_UTF8_VALUE);
 	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_UTF8_VALUE);
 
+	/* Update initial instance */
+	gboolean second_updated = midgard_object_update (copy_page);
+	g_assert (second_updated != FALSE);
+
+	/* Get copy */
+	MidgardObject *second_copy_page = midgard_object_new (mgd_global, TEST_CLASS_NAME, &guid_value);
+	g_assert (copy_page != NULL);
+
+	/* clean&clear*/
+	g_free (initial_name);
+	g_free (initial_content);
+	g_free (copy_name);
+	g_free (copy_content);
+
+	/* Get properties once again */
+	g_object_get (G_OBJECT (copy_page), 
+			"name", &initial_name, 
+			"code", &initial_content, 
+			NULL);
+
+	g_object_get (G_OBJECT (second_copy_page), 
+			"name", &copy_name, 
+			"code", &copy_content, 
+			NULL);
+
+	/* Compare again */
+	/* Check invalid cases */
+	g_assert_cmpstr (copy_name, !=, "");
+	g_assert_cmpstr (copy_content, !=, "");
+	g_assert_cmpstr (copy_name, !=, " ");
+	g_assert_cmpstr (copy_content, !=, " ");
+	g_assert_cmpstr (copy_name, !=, "A ");
+	g_assert_cmpstr (copy_content, !=, "A ");
+
+	/* Check very stupid cases */
+	g_assert_cmpstr (copy_name, !=, "Abrakadabra");
+	g_assert_cmpstr (copy_content, !=, "Abrakadabra");
+
+	/* Check initial instance */
+	g_assert_cmpstr (initial_name, ==, VARCHAR_PROPERTY_UTF8_VALUE);
+	g_assert_cmpstr (initial_content, ==, LONGTEXT_PROPERTY_UTF8_VALUE);
+	/* Compare both instances */
+	g_assert_cmpstr (initial_name, ==, copy_name);
+	g_assert_cmpstr (initial_content, ==, copy_content);
+	/* Check copy instance */
+	g_assert_cmpstr (copy_name, ==, VARCHAR_PROPERTY_UTF8_VALUE);
+	g_assert_cmpstr (copy_content, ==, LONGTEXT_PROPERTY_UTF8_VALUE);
+
 	/* clean&clear*/
 	g_free (initial_name);
 	g_free (initial_content);
@@ -639,6 +687,7 @@ _midgard_test_database_provider_utf8_chars (const gchar *provider)
 	g_value_unset (&guid_value);
 	g_object_unref (page);
 	g_object_unref (copy_page);
+	g_object_unref (second_copy_page);
 	g_object_unref (mgd_global);
 	g_object_unref (config_global);
 }
