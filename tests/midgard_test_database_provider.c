@@ -60,6 +60,8 @@ midgard_test_database_provider_connection_init (const gchar *provider)
 		printf("ERROR: %s\n", midgard_connection_get_error_string(mgd_global));
 		g_assert (connected != FALSE);
 	}
+	
+	//midgard_connection_set_loglevel (mgd_global, "debug", NULL);
 
 	gboolean base_storage_created = midgard_storage_create_base_storage (mgd_global);
 	/* Ugly workaround for 'constraint failed' warning thrown from SQLite provider */
@@ -80,10 +82,10 @@ midgard_test_database_provider_connection_init (const gchar *provider)
 #define LONGTEXT_PROPERTY_DOUBLE_ESCAPE_VALUE "LONGTEXT \\ \'  "
 
 #define VARCHAR_PROPERTY_COMPLEX_ESCAPE_VALUE "VARCHAR \' IS THE NAME"
-#define LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE "LONGTEXT \' IS THE CONTENT"
+#define LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE "LONGTEXT \' IS THE CONTENT <?php $title=''; ?>"
 
 #define VARCHAR_PROPERTY_UTF8_VALUE "Źdźbło Ędward Ącki"
-#define LONGTEXT_PROPERTY_UTF8_VALUE "öä"
+#define LONGTEXT_PROPERTY_UTF8_VALUE "öä κόσμε"
 
 static void 
 _midgard_test_database_provider_escape (const gchar *provider)
