@@ -850,18 +850,11 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 	/* hidden */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
 	mdata->priv->hidden = FALSE;
-	if(G_VALUE_HOLDS_BOOLEAN(gvalue)) {
-		mdata->priv->hidden = 
-			g_value_get_boolean(gvalue);
-	}
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (mdata->priv->hidden, gvalue);
 
 	/* nav_noentry */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	mdata->priv->nav_noentry = FALSE;
-	if(G_VALUE_HOLDS_BOOLEAN(gvalue)) {
-		mdata->priv->nav_noentry = 
-			g_value_get_boolean(gvalue);
-	}
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (mdata->priv->nav_noentry, gvalue);
 
 	/* size */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -884,11 +877,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 
 	/* deleted */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	mdata->priv->deleted = FALSE;
-	if(G_VALUE_HOLDS_BOOLEAN(gvalue)) {
-		mdata->priv->deleted = 
-			g_value_get_boolean(gvalue);
-	}
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (mdata->priv->deleted, gvalue);
 		
 	/* score */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
@@ -900,17 +889,11 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 
 	/* islocked */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	if(G_VALUE_HOLDS_BOOLEAN(gvalue)) {
-		mdata->priv->is_locked = 
-			g_value_get_boolean(gvalue);
-	}
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (mdata->priv->is_locked, gvalue);
 
 	/* isapproved */
 	gvalue = midgard_data_model_get_value_at(model, ++col, i);
-	if(G_VALUE_HOLDS_BOOLEAN(gvalue)) {
-		mdata->priv->is_approved = 
-			g_value_get_boolean(gvalue);
-	}
+	MIDGARD_GET_BOOLEAN_FROM_VALUE (mdata->priv->is_approved, gvalue);
 
 	return;
 }
