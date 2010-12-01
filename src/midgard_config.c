@@ -70,8 +70,9 @@ static MidgardConfigPrivate *midgard_config_private_new(void)
 	MidgardConfigPrivate *config_private = g_new(MidgardConfigPrivate, 1);
 
         config_private->keyfile = NULL;
-	config_private->log_channel = NULL;
 	config_private->configname = NULL;
+	config_private->g_file = NULL;
+	config_private->output_stream = NULL;
 
 	return config_private;
 }
@@ -208,29 +209,28 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 
 	/* Get log filename */
 	tmpstr = g_key_file_get_string (keyfile, "MidgardDatabase", "Logfile", NULL);
-	GIOChannel *channel = NULL;
 	if(tmpstr != NULL && !g_str_equal(tmpstr, "")) {
 
 		__create_log_dir((const gchar *) tmpstr);
 
 		self->logfilename = g_strdup(tmpstr);
 		GError *err = NULL;
-		channel =
-			g_io_channel_new_file(
-					tmpstr,
-					"a",
-					&err);
+		GFile *g_file = g_file_new_for_path ((const gchar *)self->logfilename);
+		GFileOutputStream *output_stream = 
+			g_file_append_to (g_file, G_FILE_CREATE_NONE, NULL, &err);
 		g_free (tmpstr);
 		tmpstr = NULL;
 
-		if(!channel){
+		if(!output_stream){
 			g_warning ("Can not open '%s' logfile. %s", 
 					self->logfilename,
 					err->message);
 		} else {
-			self->priv->log_channel = channel;
+			self->priv->g_file = g_file;
+			self->priv->output_stream = output_stream;
 		}
-		g_clear_error(&err);
+		if (err)
+			g_clear_error(&err);
 	}
 
 	if(tmpstr)
@@ -1114,9 +1114,12 @@ __midgard_config_struct_free (MidgardConfig *self)
 	g_free (self->priv->configname);
 	self->priv->configname = NULL;
 
-	if (self->priv->log_channel)
-		g_io_channel_unref (self->priv->log_channel);
-	self->priv->log_channel = NULL;
+	if (self->priv->output_stream)
+		g_object_unref (self->priv->output_stream);
+	self->priv->output_stream = NULL;
+	if (self->priv->g_file)
+		g_object_unref  (self->priv->g_file);
+	self->priv->g_file = NULL;
 
 	g_free (self->priv);
 	self->priv = NULL;
@@ -1382,16 +1385,15 @@ midgard_config_copy (MidgardConfig *self)
 	if (self->priv->configname)
 		copy->priv->configname = g_strdup (self->priv->configname);
 
-	if (copy->logfilename && self->priv->log_channel) {
-		GIOChannel *channel = g_io_channel_new_file (copy->logfilename, "a", NULL);
-		copy->priv->log_channel = channel;
+	if (copy->logfilename && self->priv->output_stream) {
+		copy->priv->g_file = g_file_new_for_path ((const gchar *)self->logfilename);
+		copy->priv->output_stream = g_file_append_to (copy->priv->g_file, G_FILE_CREATE_NONE, NULL, NULL);
 	}
 
 	copy->priv->dbtype = self->priv->dbtype;
 
 	return copy;
 }
-
 
 /* GOBJECT ROUTINES */
 static void

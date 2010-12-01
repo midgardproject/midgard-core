@@ -53,6 +53,7 @@ midgard_connection_private_new (void)
 
 	cnc_private->pattern = NULL;	
 	cnc_private->config = NULL;
+	cnc_private->copy_config = NULL;
 	cnc_private->connected = FALSE;
 	cnc_private->loghandler = 0;
 	cnc_private->loglevel = 0;	
@@ -123,6 +124,10 @@ static void _midgard_connection_finalize(GObject *object)
 			self->priv->config = NULL;
 		}
 	}
+
+	if (self->priv->copy_config)
+		g_object_unref (self->priv->copy_config);
+	self->priv->copy_config = NULL;
 
 	g_free(self->priv);
 	self->priv = NULL;
@@ -206,8 +211,13 @@ _midgard_connection_get_property (GObject *object, guint property_id,
 		case PROPERTY_CONFIG:
 			if (!self->priv->config)
 				return;
+			if (self->priv->copy_config) {
+				g_value_set_object (value, self->priv->copy_config);
+				return;
+			}
 			MidgardConfig *config = midgard_config_copy (self->priv->config);
 			g_object_set (config, "dbuser", "", "dbpass", "", NULL);
+			self->priv->copy_config = config;
 			g_value_set_object (value, config);
 			break;
 

@@ -268,7 +268,7 @@ void midgard_error_default_log(const gchar *domain, GLogLevelFlags level,
 {
 	gchar *level_ad = NULL;
 	guint mlevel;
-	GIOChannel *channel = NULL;
+	GFileOutputStream *output_stream = NULL;
 	MidgardConnection *mgd;
 	MidgardTypeHolder *holder;
 
@@ -283,7 +283,7 @@ void midgard_error_default_log(const gchar *domain, GLogLevelFlags level,
 			mgd = MIDGARD_CONNECTION(ptr);
 			mlevel = midgard_connection_get_loglevel(mgd);
 			if(mgd->priv->config != NULL && mgd->priv->config->priv != NULL)
-				channel = mgd->priv->config->priv->log_channel;
+				output_stream = mgd->priv->config->priv->output_stream;
 		
 		} else {
 			
@@ -344,13 +344,12 @@ void midgard_error_default_log(const gchar *domain, GLogLevelFlags level,
 	
 		gchar *tmpstr = g_string_free(logstr, FALSE);
 
-		if(channel) {
-
-			g_io_channel_write_chars(channel,
-					(const gchar *)tmpstr,
-					-1, NULL, NULL);
+		if(output_stream) {
 			GError *err = NULL;
-			g_io_channel_flush(channel, &err);
+			g_output_stream_write (G_OUTPUT_STREAM (output_stream), 
+					(const gchar *) tmpstr, strlen (tmpstr), NULL, &err);
+			g_output_stream_flush (G_OUTPUT_STREAM (output_stream), NULL, NULL);
+			//g_output_stream_close_async (G_OUTPUT_STREAM (output_stream), 1, NULL, NULL, NULL);
 			if (err)
 				g_warning ("Logfile write error: %s", err && err->message ? err->message : err->message);
 			

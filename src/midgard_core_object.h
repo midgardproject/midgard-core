@@ -27,6 +27,7 @@
 #include "schema.h"
 #include "midgard_timestamp.h"
 #include "midgard_connection.h"
+#include <gio/gio.h>
 
 struct _MidgardDBObjectPrivate {
 
@@ -140,7 +141,8 @@ struct _MidgardConfigPrivate{
 	
 	GKeyFile *keyfile;
 	guint dbtype;
-	GIOChannel *log_channel;
+	GFile *g_file;
+	GFileOutputStream *output_stream;	
 	gchar *configname;
 	
 	gchar *host;
@@ -166,6 +168,7 @@ struct _MidgardConfigPrivate{
 struct _MidgardConnectionPrivate {
 	MidgardConnection *pattern; /* a pointer to connection we made copy from */
         MidgardConfig *config;
+	MidgardConfig *copy_config;
 	gboolean connected;
 	gboolean free_config;
 	guint loghandler;
