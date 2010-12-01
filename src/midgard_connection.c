@@ -387,7 +387,8 @@ __mysql_reconnect (MidgardConnection *mgd)
 	gda_connection_close_no_warning (mgd->priv->connection);
 	g_signal_emit (mgd, MIDGARD_CONNECTION_GET_CLASS (mgd)->signal_id_disconnected, 0);
 
-	/* Try to reconnect 3 times */
+	/* Try to reconnect 10 times */
+	guint n_times = 10;
 	do {
 		g_usleep (5000000); /* 5 seconds interval */
 		g_debug ("Trying to reopen connection");
@@ -403,7 +404,7 @@ __mysql_reconnect (MidgardConnection *mgd)
 
 		i++;
 
-	} while (i < 3);
+	} while (i < n_times);
 
 	return FALSE;
 }
@@ -1161,7 +1162,10 @@ gboolean midgard_connection_reopen(MidgardConnection *self)
 
 				case MIDGARD_DB_TYPE_MYSQL:
 
-					if (errcode == 2006) { /* CR_SERVER_GONE_ERROR , we can not use it */
+					/* For some, unknown reason GDA sets unknown error code for MySQL provider */
+					/* Take into account MySQL's server gone error and gda's unknown one */
+					if (errcode == 2006 /* CR_SERVER_GONE_ERROR , we can not use it */
+							|| errcode == GDA_CONNECTION_EVENT_CODE_UNKNOWN) { 
 						g_debug("MySQL server has gone away. Reconnect.");
 						return __mysql_reconnect(self);
 					}
