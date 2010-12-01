@@ -349,7 +349,10 @@ void midgard_error_default_log(const gchar *domain, GLogLevelFlags level,
 			g_io_channel_write_chars(channel,
 					(const gchar *)tmpstr,
 					-1, NULL, NULL);
-			g_io_channel_shutdown(channel, TRUE, NULL);
+			GError *err = NULL;
+			g_io_channel_flush(channel, &err);
+			if (err)
+				g_warning ("Logfile write error: %s", err && err->message ? err->message : err->message);
 			
 		} else {
 
