@@ -349,7 +349,7 @@ void midgard_error_default_log(const gchar *domain, GLogLevelFlags level,
 			g_io_channel_write_chars(channel,
 					(const gchar *)tmpstr,
 					-1, NULL, NULL);
-			g_io_channel_flush(channel, NULL);
+			g_io_channel_shutdown(channel, TRUE, NULL);
 			
 		} else {
 
