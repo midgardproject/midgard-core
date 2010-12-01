@@ -43,7 +43,7 @@
 #define MGD_MYSQL_PASSWORD "midgard"
 
 gboolean 
-__midgard_connection_open (MidgardConnection *mgd, gboolean init_schema);
+__midgard_connection_open (MidgardConnection *mgd, gboolean init_schema, GError **error);
 
 static MidgardConnectionPrivate *
 midgard_connection_private_new (void)
@@ -487,9 +487,10 @@ static void cnc_add_part(
 }
 
 gboolean 
-__midgard_connection_open(MidgardConnection *mgd, gboolean init_schema)
+__midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError **error)
 {
 	g_return_val_if_fail(mgd != NULL, FALSE);
+	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
@@ -582,16 +583,16 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema)
 #endif
 	}
 
-	GError *error = NULL;
+	GError *err = NULL;
 #ifdef HAVE_LIBGDA_4
 	GdaConnection *connection = gda_connection_open_from_string(
-			config->dbtype, tmpstr, auth, GDA_CONNECTION_OPTIONS_NONE, &error);
+			config->dbtype, tmpstr, auth, GDA_CONNECTION_OPTIONS_NONE, &err);
 
 	g_free(auth);	
 #else
 	GdaClient *client =  gda_client_new();
 	GdaConnection *connection = gda_client_open_connection_from_string(
-			client, config->dbtype, tmpstr, NULL, NULL, 0, &error);
+			client, config->dbtype, tmpstr, NULL, NULL, 0, &err);
 	mgd->priv->cnc_str = g_strdup(tmpstr);
 	mgd->priv->auth_str = NULL;
 #endif
@@ -599,12 +600,14 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema)
 	if(connection == NULL) {
 
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_NOT_CONNECTED, 
-				" Database [%s]. %s", tmpstr, error->message);
-
+				" Database [%s]. %s", tmpstr, err->message);
+		if (err) {
+			*error = g_error_new (MGD_GENERIC_ERROR, MGD_ERR_NOT_CONNECTED, 
+					"Database [%s]. %s", tmpstr, err->message);
+			g_clear_error (&err);
+		}
 		g_free(tmpstr);
-
 		return FALSE;
-	
 	} 
 
 	g_free(tmpstr);
@@ -707,15 +710,15 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 		return FALSE;
 	}
 	
-	if(error)
-		g_clear_error(&rf_error);
-
 	self->priv->config = config;
 
-	if(!__midgard_connection_open(self, TRUE)) {
+	GError *err = NULL;
+	if(!__midgard_connection_open(self, TRUE, &err)) {
 
 		MIDGARD_ERRNO_SET (self, MGD_ERR_NOT_CONNECTED);
 		rv = FALSE;
+		if (err)
+			g_propagate_error (error, err);
 	}
 	
 	return rv;
@@ -768,13 +771,14 @@ gboolean midgard_connection_open_from_file(
 		return FALSE;
 	}
 	
-	if(error)
-		g_clear_error(&rf_error);
-
 	mgd->priv->config = config;
 
-	if(!__midgard_connection_open(mgd, TRUE)) 
+	GError *err = NULL;
+	if(!__midgard_connection_open(mgd, TRUE, &err)) 
 		rv = FALSE;
+
+	if (err)
+		g_propagate_error (error, err);
 	
 	return rv;
 }
@@ -821,9 +825,12 @@ extern GHashTable *midgard_connection_open_all(gboolean userdir)
 
 		cnc->priv->config = config;
 
-		if(__midgard_connection_open(cnc, TRUE)) {
+		GError *err = NULL;
+		if(__midgard_connection_open(cnc, TRUE, &err)) {
 
 			g_hash_table_insert(cncs, g_strdup(cfgs[i]), cnc);
+			if (err)
+				g_clear_error (&err);
 		
 		} else {
 			
@@ -879,8 +886,11 @@ gboolean midgard_connection_open_config(
 
 	self->priv->config = midgard_config_copy (config);
 
-	if(!__midgard_connection_open(self, TRUE))
+	GError *err = NULL;
+	if(!__midgard_connection_open(self, TRUE, &err))
 		rv = FALSE;
+	if (err)
+		g_clear_error (&err);
 
 	return rv;
 }
@@ -893,9 +903,13 @@ gboolean midgard_connection_struct_open_config(
 	
 	self->priv->config = config;
 	
-	if(!__midgard_connection_open(self, FALSE))
+	GError *err = NULL;
+	if(!__midgard_connection_open(self, FALSE, &err)) {
+		if (err)
+			g_clear_error (&err);
 		return FALSE;
-	
+	}
+
 	return TRUE;
 }
 
