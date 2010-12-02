@@ -50,6 +50,10 @@ struct _MidgardDBJoin {
 	guint typeid;
 	gchar *table;
 	MidgardObjectClass *klass;
+	gchar *left_table;
+	gchar *right_table;
+	gchar *left_tablefield;
+	gchar *right_tablefield;
 
 	/* pointers references */
 	MgdSchemaPropertyAttr *left;

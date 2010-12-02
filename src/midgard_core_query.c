@@ -1555,17 +1555,17 @@ static gboolean __mcq_column_exists(MidgardConnection *mgd,
         g_value_set_string ((mcontext.column_values[0] = gda_value_new (G_TYPE_STRING)), mdc->table_name);
         g_value_set_string ((mcontext.column_values[1] = gda_value_new (G_TYPE_STRING)), mdc->column_name);
 	GError *error = NULL;
-	if (!gda_connection_update_meta_store (mgd->priv->connection, &mcontext, &error)) {
+	/*if (!gda_connection_update_meta_store (mgd->priv->connection, &mcontext, &error)) {
 		gda_value_free (mcontext.column_values[0]);
-		/* FIXME, there should be warning, but for some reason 
-		 * either SQLite or gda-sqlite provider is buggy */	
+		//FIXME, there should be warning, but for some reason 
+		//either SQLite or gda-sqlite provider is buggy 
 		g_message ("Failed to update meta data for table '%s': %s", mdc->table_name, 
 				error && error->message ? error->message : "No detail");
 		if (error)
 			g_error_free(error);
 
 		return FALSE;
-	}
+	}*/
 
 	GdaDataModel *dm_schema =
 		gda_connection_get_meta_store_data (mgd->priv->connection,
@@ -2574,6 +2574,10 @@ midgard_core_dbjoin_new(void)
 	mdbj->type = NULL;
 	mdbj->typeid = 0;
 	mdbj->klass = NULL;
+	mdbj->left_table = NULL;
+	mdbj->right_table = NULL;
+	mdbj->left_tablefield = NULL;
+	mdbj->right_tablefield = NULL;
 
 	/* pointers references */
 	mdbj->left = NULL;
@@ -2590,6 +2594,15 @@ void midgard_core_dbjoin_free (MidgardDBJoin *mdbj)
 	mdbj->type = NULL;
 
 	mdbj->typeid = 0;	
+
+	g_free (mdbj->left_table);
+	mdbj->left_table = NULL;
+	g_free (mdbj->right_table);
+	mdbj->right_table = NULL;
+	g_free (mdbj->left_tablefield);
+	mdbj->left_tablefield = NULL;
+	g_free (mdbj->right_tablefield);
+	mdbj->right_tablefield = NULL;
 
 	g_free(mdbj);
 }

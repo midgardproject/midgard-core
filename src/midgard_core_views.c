@@ -169,6 +169,11 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 	gchar *property_name = NULL;	
 	MgdSchemaPropertyAttr *propright = NULL;
 	MgdSchemaPropertyAttr *propleft = NULL;
+	MidgardDBObjectClass *metadata_klass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (MIDGARD_TYPE_METADATA));
+	gchar *left_table = NULL;
+	gchar *right_table = NULL;
+	gchar *left_tablefield = NULL;
+	gchar *right_tablefield = NULL;
 
 	for (cur = node->children; cur; cur = cur->next) {
 	
@@ -231,12 +236,21 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				return;
 			}
 
-			MgdSchemaPropertyAttr *propleft = 
-				g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
-			if (!propleft)
-				__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]); 
-			/* __get_property_attribute (cur, classprop, &property_name, &propleft, klass); */ 
-			g_strfreev(classprop);
+			/* Check reserved metadata property */
+			if (g_str_equal (classprop[1], "metadata")) {
+				if (classprop[2] == NULL)
+					__view_error (cur, "Metadata defined without property name");
+				propleft = g_hash_table_lookup(metadata_klass->dbpriv->storage_data->prophash, classprop[2]);
+				if (!propleft)
+					__view_error(cur, "Property %s not registered for metadata class", classprop[2]);
+				left_table = g_strdup (midgard_core_class_get_table (klass));
+				left_tablefield = g_strjoin (".", left_table, propleft->field, NULL);
+			} else {
+				propleft = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
+				if (!propleft)
+					__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]); 
+			}
+			g_strfreev(classprop);	
 
 			/* Get right property attribute */
 			classprop = g_strsplit_set(right, ":.", -1);
@@ -251,11 +265,20 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				return;
 			}
 
-			MgdSchemaPropertyAttr *propright = 
-				g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
-			if (!propright)
-				__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]);
-			/* __get_property_attribute (cur, classprop, &property_name, &propright, klass); */
+			/* Check reserved metadata property */
+			if (g_str_equal (classprop[1], "metadata")) {
+				if (classprop[2] == NULL)
+					__view_error (cur, "Metadata defined without property name");
+				propright = g_hash_table_lookup(metadata_klass->dbpriv->storage_data->prophash, classprop[2]);
+				if (!propright)
+					__view_error(cur, "Property %s not registered for metadata class", classprop[2]);
+				right_table = g_strdup (midgard_core_class_get_table (klass));
+				right_tablefield = g_strjoin (".", right_table, propright->field, NULL);
+			} else {
+				propright = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
+				if (!propright)
+					__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]);	
+			}
 			g_strfreev(classprop);
 
 			MidgardDBJoin *mdbj = midgard_core_dbjoin_new();
@@ -266,7 +289,20 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				mdbj->table = g_strdup(midgard_core_class_get_table(joinklass));
 			else 
 				mdbj->table = g_strdup((gchar *)table);
-	
+
+			/* Set left and right table and tablefield explicitly.
+			 * It's important to ignore  MgdSchemaPropertyAttr in case of metadata usage.
+			 * For this class, we can use explicit table and tablefield, and setting such 
+			 * for metadata's MgdSchemaPropertyAttr could break any other queries. */
+			if (left_table)
+				mdbj->left_table = left_table;
+			if (right_table)
+				mdbj->right_table = right_table;
+			if (left_tablefield)
+				mdbj->left_tablefield = left_tablefield;
+			if (right_tablefield)
+				mdbj->right_tablefield = right_tablefield;
+
 			mdbj->left = propleft;
 			mdbj->right = propright;
 
@@ -422,7 +458,8 @@ gchar *__build_static_create_view(MgdSchemaTypeAttr *type)
 		g_string_append_printf(query, "%s JOIN %s ON %s = %s ", 
 				join->type, 
 				join->table, 
-				join->left->tablefield, join->right->tablefield);		
+				join->left_tablefield ? join->left_tablefield : join->left->tablefield, 
+				join->right_tablefield ? join->right_tablefield : join->right->tablefield);		
 	}	
 
 	/* Select only those records which are not deleted. #1437 */
@@ -440,7 +477,8 @@ gchar *__build_static_create_view(MgdSchemaTypeAttr *type)
 
 		MidgardDBJoin *join = (MidgardDBJoin *) list->data;
 		g_string_append_printf(query, " %s.metadata_deleted = 0 AND %s.metadata_deleted = 0 ", 
-				join->left->table, join->right->table);
+				join->left_table ? join->left_table : join->left->table, 
+				join->right_table ? join->right_table : join->right->table);
 
 		i++;
 	}
