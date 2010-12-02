@@ -30,20 +30,29 @@ void main()
 	var content_manager = new RDFSQLContentManager(storage_manager);
 
 	/* Store data */
-	var mgd = new RDFTripleObject("owl:Thing");
+	var mgd = new RDFGenericObject("owl:Thing");
 	mgd.identifier = "http://www.midgard-project.org/";
 
 	mgd.set_property_value("http://xmlns.com/foaf/0.1/topic", "http://www.midgard-project.org/rdf/topics/content_repository");
-	content_manager.create(mgd);
+	try {
+		content_manager.create(mgd);
+	} catch (StorageContentManagerError e) {
+		GLib.error (e.message);
+	}
 
-	var rdf_vali = new RDFTripleObject("http://xmlns.com/foaf/0.1/Person");
+	var rdf_vali = new RDFGenericObject("http://xmlns.com/foaf/0.1/Person");
 	rdf_vali.identifier = "http://www.midgard-project.org/people/vali";
 
 	rdf_vali.set_property_value  ("foaf:currentProject", "http://www.midgard-project.org/");
 	rdf_vali.set_property_literal("foaf:myersBriggs",    "INTJ");
 	rdf_vali.set_property_literal("foaf:name",           "Vali");
 	rdf_vali.set_property_literal("foaf:homepage",       "http://www.midgard-project.org/people/vali");
-	content_manager.create(rdf_vali);
+	
+	try {
+		content_manager.create(rdf_vali);
+	} catch (StorageContentManagerError e) {
+		GLib.error (e.message);
+	}
 
 	/* Query Data */
 	/*var query = new SQLRDFQuerySelect(storage_manager, new SQLRDFQueryStorage("foaf:Person"));

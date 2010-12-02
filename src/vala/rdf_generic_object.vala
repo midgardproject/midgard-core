@@ -18,7 +18,7 @@
 
 namespace MidgardCR {
 
-	public class RDFTripleObject : GLib.Object, Storable {
+	public class RDFGenericObject : GLib.Object, Storable {
 
 		/* internal properties */
 		internal string _guid = null;
@@ -54,7 +54,7 @@ namespace MidgardCR {
 		}
 
 		/* constructor */
-		public RDFTripleObject (string classname) {
+		public RDFGenericObject (string classname) {
 			Object (classname: classname);	
 		}
 		

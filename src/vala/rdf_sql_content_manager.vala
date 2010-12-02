@@ -31,12 +31,12 @@ namespace MidgardCR {
 
 		public override void create (Storable object) throws StorageContentManagerError
 		{
-			base.create (object);
+			//base.create (object);
 
-			if (object is RDFTripleObject) {
+			if (object is RDFGenericObject) {
 				var builder = new ObjectBuilder ();
 
-				var rdf_object = (RDFTripleObject) object;
+				var rdf_object = (RDFGenericObject) object;
 				foreach (string name in rdf_object.list_all_properties()) {
 					/* TODO: convert property-name to canonical form */
 					var rdf_prop = builder.factory ("RDFTripleObject") as RepositoryObject;
