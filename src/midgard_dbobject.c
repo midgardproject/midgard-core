@@ -26,7 +26,7 @@ static GObjectClass *parent_class= NULL;
 
 /* Create GdaSqlSelectField for every property registered for the class. */
 void
-_add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSelect *select, const gchar *table_name)
+_add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaConnection *cnc, GdaSqlStatementSelect *select, const gchar *table_name)
 {
 	guint n_prop;
 	guint i;
@@ -55,13 +55,17 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
        		select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
 		/*select_field->field_name = g_strdup (property_field);
 		select_field->table_name = g_strdup (property_table);*/
-		select_field->as = g_strdup (property);
+		select_field->as = gda_connection_quote_sql_identifier (cnc, property);
 		select->expr_list = g_slist_append (select->expr_list, select_field);
 		expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
 		val = g_new0 (GValue, 1);
 		g_value_init (val, G_TYPE_STRING);
-		table_field = g_strconcat (property_table, ".", property_field, NULL);
+		gchar *q_table = gda_connection_quote_sql_identifier (cnc, property_table);
+		gchar *q_field = gda_connection_quote_sql_identifier (cnc, property_field);
+		table_field = g_strconcat (q_table, ".", q_field, NULL);
 		g_value_set_string (val, table_field);
+		g_free (q_table);
+		g_free (q_field);
 		g_free (table_field);
 		expr->value = val;
 		select_field->expr = expr;
@@ -78,7 +82,7 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaSqlStatementSel
 			return;
 
 		if (MIDGARD_DBOBJECT_CLASS (mklass)->dbpriv->add_fields_to_select_statement) {
-			MIDGARD_DBOBJECT_CLASS (mklass)->dbpriv->add_fields_to_select_statement (MIDGARD_DBOBJECT_CLASS (mklass), select, table_name);
+			MIDGARD_DBOBJECT_CLASS (mklass)->dbpriv->add_fields_to_select_statement (MIDGARD_DBOBJECT_CLASS (mklass), cnc, select, table_name);
 			return;
 		}
 
