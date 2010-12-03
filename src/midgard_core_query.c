@@ -2575,7 +2575,9 @@ midgard_core_dbjoin_new(void)
 	mdbj->typeid = 0;
 	mdbj->klass = NULL;
 	mdbj->left_table = NULL;
+	mdbj->left_field = NULL;
 	mdbj->right_table = NULL;
+	mdbj->right_field = NULL;
 	mdbj->left_tablefield = NULL;
 	mdbj->right_tablefield = NULL;
 
@@ -2597,8 +2599,12 @@ void midgard_core_dbjoin_free (MidgardDBJoin *mdbj)
 
 	g_free (mdbj->left_table);
 	mdbj->left_table = NULL;
+	g_free (mdbj->left_field);
+	mdbj->left_field = NULL;
 	g_free (mdbj->right_table);
 	mdbj->right_table = NULL;
+	g_free (mdbj->right_field);
+	mdbj->right_field = NULL;
 	g_free (mdbj->left_tablefield);
 	mdbj->left_tablefield = NULL;
 	g_free (mdbj->right_tablefield);

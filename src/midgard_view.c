@@ -150,6 +150,9 @@ _midgard_view_derived_create_storage (MidgardConnection *mgd, MidgardDBObjectCla
 		return TRUE;
 	}
 
+	if (type_attr->sql_create_view == NULL)
+		type_attr->sql_create_view = midgard_core_view_build_create_view_command (mgd, klass);
+
 	gint rv = midgard_core_query_execute(mgd, type_attr->sql_create_view, FALSE);
 
 	if (rv == -1)
@@ -240,6 +243,57 @@ _midgard_view_derived_delete_storage(MidgardConnection *mgd, MidgardDBObjectClas
 }
 
 static void
+_midgard_view_derived_set_static_sql_select (MidgardConnection *mgd, MidgardDBObjectClass *klass)
+{
+	guint n_props;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (klass), &n_props);
+	GdaConnection *cnc = mgd->priv->connection;
+	MgdSchemaTypeAttr *type = midgard_core_class_get_type_attr (klass);
+
+	g_free (type->sql_select_full);
+	guint i;
+	GString *ssf = g_string_new ("");
+	gboolean add_coma = FALSE;
+	
+	for (i = 0; i < n_props; i++) {
+		
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT) {
+			if (i == 1)
+				add_coma = FALSE;
+			continue;
+		}
+
+		/* Replace tablefield for every property */
+		MgdSchemaPropertyAttr *prop_attr = g_hash_table_lookup (type->prophash, pspecs[i]->name);
+		if (!prop_attr) {
+			g_warning ("%s property not registered for %s", pspecs[i]->name, type->name);
+			g_error ("Failed to register view class");
+		}
+
+		gchar *q_table = gda_connection_quote_sql_identifier (cnc, prop_attr->table);
+		gchar *q_field = gda_connection_quote_sql_identifier (cnc, prop_attr->field);
+		gchar *q_name = gda_connection_quote_sql_identifier (cnc, pspecs[i]->name);
+
+		g_string_append_printf (ssf, "%s%s.%s AS %s", 
+				add_coma ? ", " : " ",
+				q_table, q_field, q_name);
+		
+		gchar *t_table = gda_connection_quote_sql_identifier (cnc, type->name);
+		midgard_core_schema_type_property_set_tablefield (prop_attr, t_table, q_name);
+	
+		g_free (q_table);
+		g_free (q_field); 
+		g_free (q_name);
+		g_free (t_table);
+
+		add_coma = TRUE;
+	}
+	
+	type->sql_select_full = g_string_free (ssf, FALSE);
+	g_free (pspecs);
+}
+
+static void
 __midgard_view_derived_class_init(gpointer g_class, gpointer class_data)
 {
 	MgdSchemaTypeAttr *data = (MgdSchemaTypeAttr *) class_data;
@@ -271,6 +325,7 @@ __midgard_view_derived_class_init(gpointer g_class, gpointer class_data)
 		mklass->dbpriv->delete_storage = _midgard_view_derived_delete_storage;
 
 		mklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__view_parent_class)->dbpriv->add_fields_to_select_statement;
+		mklass->dbpriv->set_static_sql_select = _midgard_view_derived_set_static_sql_select;
 	}
 
 	g_type_class_add_private (g_class, sizeof(MgdSchemaTypeAttr));

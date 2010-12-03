@@ -177,6 +177,7 @@ midgard_core_schema_type_attr_new (void)
 	type->params = NULL;
 	type->properties = NULL;
 	type->table = NULL;
+	type->view_table = NULL;
 	type->parentfield = NULL;
 	type->upfield = NULL;
 	type->primaryfield = NULL;
@@ -265,6 +266,9 @@ midgard_core_schema_type_attr_free (MgdSchemaTypeAttr *type)
 
 	g_free ((gchar *)type->table);
 	type->table = NULL;
+
+	g_free ((gchar *)type->view_table);
+	type->view_table = NULL;
 
 	g_free ((gchar *)type->tables);
 	type->tables = NULL;

@@ -24,5 +24,6 @@
 
 void		midgard_core_views_read_dir		(const gchar *path);
 GType		midgard_core_view_type_register		(MgdSchemaTypeAttr *type, GType parent_type);
+gchar 		*midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBObjectClass *klass);
 
 #endif /* MIDGARD_CORE_VIEWS_H */

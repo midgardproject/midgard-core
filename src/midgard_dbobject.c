@@ -614,6 +614,7 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->dbpriv->set_statement_insert = __initialize_statement_insert;	
 	klass->dbpriv->statement_update = NULL;
 	klass->dbpriv->set_statement_update = __initialize_statement_update;
+	klass->dbpriv->set_static_sql_select = NULL;
 
 	/* Properties */
 	GParamSpec *pspec = g_param_spec_object ("connection",

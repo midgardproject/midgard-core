@@ -64,6 +64,7 @@ struct _MgdSchemaTypeAttr {
 	GSList *_properties_list;
 	const gchar *tables;
 	const gchar *table;
+	const gchar *view_table; /* Valid, only in case of MidgardView derived class */
 	const gchar *parent;
 	const gchar *primary;
 	const gchar *property_up;

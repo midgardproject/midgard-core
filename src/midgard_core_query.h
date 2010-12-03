@@ -51,7 +51,9 @@ struct _MidgardDBJoin {
 	gchar *table;
 	MidgardObjectClass *klass;
 	gchar *left_table;
+	gchar *left_field;
 	gchar *right_table;
+	gchar *right_field;
 	gchar *left_tablefield;
 	gchar *right_tablefield;
 

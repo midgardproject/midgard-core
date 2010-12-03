@@ -63,8 +63,13 @@ struct _MidgardDBObjectPrivate {
 	gboolean		(*set_property)		(MidgardDBObject *self, const gchar *name, GValue *value);
 
 	/* GDA helpers */
+	/* prepared statements */
 	void			(*set_statement_insert)	(MidgardDBObjectClass *klass);
 	void			(*set_statement_update)	(MidgardDBObjectClass *klass);
+	/* static SQL commands */
+	void 			(*set_static_sql_select)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
+
+
 };
 
 #define MGD_DBOBJECT_DBPRIV(__obj) (MIDGARD_DBOBJECT(__obj)->dbpriv)

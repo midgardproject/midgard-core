@@ -172,8 +172,8 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 	MidgardDBObjectClass *metadata_klass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (MIDGARD_TYPE_METADATA));
 	gchar *left_table = NULL;
 	gchar *right_table = NULL;
-	gchar *left_tablefield = NULL;
-	gchar *right_tablefield = NULL;
+	gchar *left_field = NULL;
+	gchar *right_field = NULL;
 
 	for (cur = node->children; cur; cur = cur->next) {
 	
@@ -236,6 +236,12 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				return;
 			}
 
+			/* Set left and right table and field explicitly.
+			 * It's important to ignore  MgdSchemaPropertyAttr in case of metadata usage.
+			 * For this class, we can use explicit table and tablefield, and setting such 
+			 * for metadata's MgdSchemaPropertyAttr could break any other queries. 
+			 * Also, we need explicit table and field names for proper quoting. */
+
 			/* Check reserved metadata property */
 			if (g_str_equal (classprop[1], "metadata")) {
 				if (classprop[2] == NULL)
@@ -244,11 +250,13 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				if (!propleft)
 					__view_error(cur, "Property %s not registered for metadata class", classprop[2]);
 				left_table = g_strdup (midgard_core_class_get_table (klass));
-				left_tablefield = g_strjoin (".", left_table, propleft->field, NULL);
+				left_field = g_strdup (propleft->field);
 			} else {
 				propleft = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
 				if (!propleft)
 					__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]); 
+				left_table = g_strdup (propleft->table ? propleft->table : type->table);
+				left_field = g_strdup (propleft->field);
 			}
 			g_strfreev(classprop);	
 
@@ -273,11 +281,13 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				if (!propright)
 					__view_error(cur, "Property %s not registered for metadata class", classprop[2]);
 				right_table = g_strdup (midgard_core_class_get_table (klass));
-				right_tablefield = g_strjoin (".", right_table, propright->field, NULL);
+				right_field = g_strdup (propright->field);
 			} else {
 				propright = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
 				if (!propright)
-					__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]);	
+					__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]);
+				right_table = g_strdup (propright->table ? propright->table : type->table);
+				right_field = g_strdup (propright->field);
 			}
 			g_strfreev(classprop);
 
@@ -290,21 +300,13 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 			else 
 				mdbj->table = g_strdup((gchar *)table);
 
-			/* Set left and right table and tablefield explicitly.
-			 * It's important to ignore  MgdSchemaPropertyAttr in case of metadata usage.
-			 * For this class, we can use explicit table and tablefield, and setting such 
-			 * for metadata's MgdSchemaPropertyAttr could break any other queries. */
-			if (left_table)
-				mdbj->left_table = left_table;
-			if (right_table)
-				mdbj->right_table = right_table;
-			if (left_tablefield)
-				mdbj->left_tablefield = left_tablefield;
-			if (right_tablefield)
-				mdbj->right_tablefield = right_tablefield;
-
 			mdbj->left = propleft;
 			mdbj->right = propright;
+
+			mdbj->left_table = left_table;
+			mdbj->left_field = left_field;
+			mdbj->right_table = right_table;
+			mdbj->right_field = right_field;
 
 			g_free(left);
 			g_free(right);
@@ -443,23 +445,42 @@ static void __mgdschematype_from_node(xmlNode *node, GSList **list)
 	xmlFree(viewname);
 }
 
-gchar *__build_static_create_view(MgdSchemaTypeAttr *type)
+gchar *
+midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBObjectClass *klass)
 {
-	GString *query = g_string_new("CREATE VIEW ");	
+	GdaConnection *cnc = mgd->priv->connection;
+	GString *query = g_string_new ("CREATE VIEW ");	
+	MgdSchemaTypeAttr *type = midgard_core_class_get_type_attr (klass);
 
-	g_string_append_printf(query, "%s AS SELECT %s FROM %s ", 
-			type->name, (gchar *)type->sql_select_full, type->table);
+	klass->dbpriv->set_static_sql_select (mgd, klass);
+
+	g_string_append_printf (query, "%s AS SELECT %s FROM %s ", 
+			type->name, (gchar *)type->sql_select_full, type->view_table);
 
 	GSList *list = NULL;
 
 	for (list = type->joins; list != NULL; list = list->next) {
 	
 		MidgardDBJoin *join = (MidgardDBJoin *) list->data;
+		gchar *jtable = gda_connection_quote_sql_identifier (cnc, join->table);
+
+		gchar *q_table = gda_connection_quote_sql_identifier (cnc, join->left_table);
+		gchar *q_field = gda_connection_quote_sql_identifier (cnc, join->left_field);
+		gchar *ltf = g_strjoin (".", q_table, q_field, NULL);
+		g_free (q_table);
+		g_free (q_field);
+
+		q_table = gda_connection_quote_sql_identifier (cnc, join->right_table);
+		q_field = gda_connection_quote_sql_identifier (cnc, join->right_field);
+		gchar *rtf = g_strjoin (".", q_table, q_field, NULL);
+		g_free (q_table);
+		g_free (q_field);
+
 		g_string_append_printf(query, "%s JOIN %s ON %s = %s ", 
-				join->type, 
-				join->table, 
-				join->left_tablefield ? join->left_tablefield : join->left->tablefield, 
-				join->right_tablefield ? join->right_tablefield : join->right->tablefield);		
+				join->type, jtable, ltf, rtf );
+		g_free (jtable);
+		g_free (ltf);
+		g_free (rtf);
 	}	
 
 	/* Select only those records which are not deleted. #1437 */
@@ -523,45 +544,12 @@ static void __register_view_type (MgdSchemaTypeAttr *type)
 					&type->class_nprop);
 
 		/* Replace storage name */
+		type->view_table = g_strdup (type->table);
 		g_hash_table_destroy(type->tableshash);
 		g_free((gchar *)type->table);
 		type->table = NULL;
 		type->tableshash = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 		midgard_core_schema_type_set_table(type, (const gchar *)type->name);
-
-		/* Recreate static sql used by QB */
-		g_free(type->sql_select_full);
-		guint i;
-		GString *ssf = g_string_new("");
-		gboolean add_coma = FALSE;
-
-		for (i = 0; i < type->class_nprop; i++) {
-		
-			if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT) {
-				if (i == 1)
-					add_coma = FALSE;
-				continue;
-			}
-
-			if (!add_coma)
-				g_string_append(ssf, pspecs[i]->name);
-			else 
-				g_string_append_printf(ssf, ", %s", pspecs[i]->name);
-
-			add_coma = TRUE;
-
-			/* Replace tablefield for every property */
-			MgdSchemaPropertyAttr *prop_attr = g_hash_table_lookup(type->prophash, pspecs[i]->name);
-			if (!prop_attr) {
-
-				g_warning ("%s property not registered for %s", pspecs[i]->name, type->name);
-				g_error ("Failed to register view class");
-			}
-			midgard_core_schema_type_property_set_tablefield(prop_attr, type->name, pspecs[i]->name);
-		}
-
-		type->sql_select_full = ssf->str;
-		g_string_free(ssf, FALSE);
 
 		g_free(pspecs);
 		g_object_unref(foo);
@@ -612,8 +600,7 @@ void midgard_core_views_read_file(const gchar *path)
 		GSList *clist = NULL;
 		for (clist = list; clist != NULL; clist = clist->next) {
 			
-			MgdSchemaTypeAttr *type = (MgdSchemaTypeAttr *) clist->data;
-			type->sql_create_view = __build_static_create_view(type);
+			MgdSchemaTypeAttr *type = (MgdSchemaTypeAttr *) clist->data;	
 			midgard_core_schema_type_initialize_paramspec (type);
 			midgard_core_schema_type_validate_fields(type);
 			__register_view_type(type);	
