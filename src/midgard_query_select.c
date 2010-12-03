@@ -110,7 +110,7 @@ _midgard_query_select_add_order (MidgardQueryExecutor *self, MidgardQueryPropert
 
 	qso *_qs = g_new (qso, 1);
 	_qs->asc = asc;
-	_qs->property = property;
+	_qs->property = g_object_ref (property);
 
 	self->priv->orders = g_slist_append (self->priv->orders, _qs);
 
@@ -213,7 +213,12 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 		order = gda_sql_select_order_new (GDA_SQL_ANY_PART (select));
 		order->asc = _so->asc;
 		MidgardQueryProperty *property = _so->property;
-		MidgardQueryStorage *storage = property->priv->storage;
+		MidgardQueryStorage *storage = NULL;
+		
+		if (property->priv && property->priv->storage)
+			storage = property->priv->storage;
+		else 
+			storage = MIDGARD_QUERY_EXECUTOR (self)->priv->storage;
 
 		/* Compute table.colname for given property name */
 		GValue rval = {0, };
@@ -661,6 +666,13 @@ _midgard_query_select_finalize (GObject *object)
 	 * reference to it. */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset && G_IS_OBJECT (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset))
 		g_object_unref (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset);
+
+	/* Drop the reference to QueryProperty object. Orders are freed in parent class */
+	GSList *l;
+	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->orders; l != NULL; l = l->next) {
+		qso *_so = (qso*) l->data;
+		g_object_unref (_so->property);
+	}
 
 	parent_class->finalize (object);
 }
