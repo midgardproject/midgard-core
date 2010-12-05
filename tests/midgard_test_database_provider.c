@@ -82,7 +82,7 @@ midgard_test_database_provider_connection_init (const gchar *provider)
 #define LONGTEXT_PROPERTY_DOUBLE_ESCAPE_VALUE "LONGTEXT \\ \'  "
 
 #define VARCHAR_PROPERTY_COMPLEX_ESCAPE_VALUE "VARCHAR \' IS THE NAME"
-#define LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE "LONGTEXT \' IS THE CONTENT <?php $title=''; ?>"
+#define LONGTEXT_PROPERTY_COMPLEX_ESCAPE_VALUE "LONGTEXT \' IS THE CONTENT <?php $title=''; echo \"<?xml version=\\\"1.0\\\" encoding=\\\"utf-8\\\" ?>\\n?>"
 
 #define VARCHAR_PROPERTY_UTF8_VALUE "Źdźbło Ędward Ącki"
 #define LONGTEXT_PROPERTY_UTF8_VALUE "öä κόσμε"

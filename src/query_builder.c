@@ -1025,18 +1025,10 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 					if (G_VALUE_TYPE (gvalue) == GDA_TYPE_BLOB
 							&& G_TYPE_FUNDAMENTAL (pspec->value_type) == G_TYPE_STRING) {
 
-						gchar *stringified = midgard_core_query_binary_stringify ((GValue*)gvalue);
-						gchar *uesc = gda_default_unescape_string (stringified);	
-						g_object_set (G_OBJECT (object), coltitle, uesc, NULL);
+						gchar *stringified = midgard_core_query_binary_stringify ((GValue*)gvalue);	
+						g_object_set (G_OBJECT (object), coltitle, stringified, NULL);
 				   		g_free (stringified);
-						g_free (uesc);
 				
-					} else if (G_VALUE_HOLDS_STRING (gvalue)) {
-
-						gchar *uesc = gda_default_unescape_string (g_value_get_string ((GValue*)gvalue));	
-						g_object_set (G_OBJECT (object), coltitle, uesc, NULL);
-						g_free (uesc);
-
 					} else if (pspec->value_type != G_VALUE_TYPE (gvalue)) {
 
 						GValue _convert = {0, };

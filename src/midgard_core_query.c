@@ -617,10 +617,8 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 		case G_TYPE_STRING:							\
 			g_object_get (object, pname, &pstr, NULL);			\
 			if (pstr == NULL) pstr = g_strdup ("");				\
-			gchar *estr = gda_default_escape_string (pstr);			\
-			gda_set_set_holder_value (params, NULL, col_name, estr);	\
+			gda_set_set_holder_value (params, NULL, col_name, pstr);	\
 			g_free (pstr);							\
-			g_free (estr);							\
 		break;									\
 		case G_TYPE_UINT:							\
 			g_object_get (object, pname, &puint, NULL);			\
