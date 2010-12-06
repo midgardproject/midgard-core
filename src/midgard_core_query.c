@@ -2769,6 +2769,8 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 	g_return_val_if_fail (executor != NULL, FALSE);
 	g_return_val_if_fail (name != NULL, FALSE);
 
+	GdaConnection *cnc = executor->priv->mgd->priv->connection;
+
 	/* Set table alias if it's not set */
 	if (storage)
 		MQE_SET_TABLE_ALIAS (executor, storage);
@@ -2791,6 +2793,9 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 	while(spltd[i] != NULL)
 		i++;
 
+	gchar *q_table = NULL;
+	gchar *q_field = NULL;
+
 	/* case: property */
 	if (i == 1) {
 		const gchar *property_field = midgard_core_class_get_property_colname (klass, name);
@@ -2799,7 +2804,11 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 			g_strfreev (spltd);
 			return NULL;
 		}
-		table_field = g_strdup_printf ("%s.%s", table_alias, property_field);
+		q_table = gda_connection_quote_sql_identifier (cnc, table_alias);
+		q_field = gda_connection_quote_sql_identifier (cnc, property_field);
+		table_field = g_strdup_printf ("%s.%s", q_table, q_field);
+		g_free (q_table);
+		g_free (q_field);
 	} else if (i < 4) {
 		/* Set all pointers we need to generate valid tables' names, aliases or joins */
 		Psh holder = {NULL, };
@@ -2819,8 +2828,13 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 			j++;
 		}	
 		
-		if (holder.table_alias && holder.colname)
-			table_field = g_strdup_printf ("%s.%s", holder.table_alias, holder.colname);
+		if (holder.table_alias && holder.colname) {
+			q_table = gda_connection_quote_sql_identifier (cnc, holder.table_alias);
+			q_field = gda_connection_quote_sql_identifier (cnc, holder.colname);
+			table_field = g_strdup_printf ("%s.%s", q_table, q_field);
+			g_free (q_table);
+			g_free (q_field);
+		}
 
 	} else {
 		  g_warning("Failed to parse '%s'. At most 3 tokens allowed", name);
