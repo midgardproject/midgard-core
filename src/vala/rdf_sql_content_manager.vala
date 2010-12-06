@@ -35,11 +35,11 @@ namespace MidgardCR {
 				var builder = new ObjectBuilder ();
 
 				var rdf_object = (RDFGenericObject) object;
-				foreach (string name in rdf_object.list_all_properties()) {
+				foreach (string name in rdf_object.list_all_properties ()) {
 					/* TODO: convert property-name to canonical form */
 					var rdf_prop = builder.factory ("RDFTripleObject") as RepositoryObject;
-					string property_literal = rdf_object.get_property_literal(name);
-					var property_value = rdf_object.get_property_value(name);
+					string property_literal = rdf_object.get_property_literal (name);
+					var property_value = rdf_object.get_property_value (name);
 					rdf_prop.set(
 						"objectguid", rdf_object.guid,
 						"identifier", rdf_object.identifier,
