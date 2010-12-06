@@ -217,6 +217,7 @@ gboolean midgard_collector_set_key_property(
 	MidgardCoreQueryConstraint *constraint = midgard_core_query_constraint_new();
 	midgard_core_query_constraint_set_builder(constraint, self->priv->builder);
 	midgard_core_query_constraint_set_class(constraint, klass);
+	GdaConnection *cnc = self->priv->mgd->priv->connection;
 
 	if(!midgard_core_query_constraint_parse_property(&constraint, klass, key)) {
 		
@@ -233,8 +234,11 @@ gboolean midgard_collector_set_key_property(
 		return FALSE;
 	}
 
-	gchar *sql_field = g_strconcat(constraint->priv->current->table, ".",
-			constraint->priv->current->field, " AS midgard_collector_key", NULL);
+	gchar *q_table = gda_connection_quote_sql_identifier (cnc, constraint->priv->current->table);
+	gchar *q_field = gda_connection_quote_sql_identifier (cnc, constraint->priv->current->field);
+	gchar *sql_field = g_strconcat(q_table, ".", q_field, " AS midgard_collector_key", NULL);
+	g_free (q_table);
+	g_free (q_field);
 	
 	g_object_unref(constraint);
 
@@ -293,6 +297,7 @@ gboolean midgard_collector_add_value_property(
 	MidgardCoreQueryConstraint *constraint = midgard_core_query_constraint_new();
 	midgard_core_query_constraint_set_builder(constraint, self->priv->builder);
 	midgard_core_query_constraint_set_class(constraint, klass);
+	GdaConnection *cnc = self->priv->mgd->priv->connection;
 
 	if(!midgard_core_query_constraint_parse_property(&constraint, klass, value)) {
 		
@@ -309,10 +314,14 @@ gboolean midgard_collector_add_value_property(
 		return FALSE;
 	}
 
-	gchar *sql_field = g_strconcat(constraint->priv->current->table, ".",
-			constraint->priv->current->field, " AS ",
-			constraint->priv->pspec->name, NULL);
-	
+	gchar *q_table = gda_connection_quote_sql_identifier (cnc, constraint->priv->current->table);
+	gchar *q_field = gda_connection_quote_sql_identifier (cnc, constraint->priv->current->field);
+	gchar *q_name = gda_connection_quote_sql_identifier (cnc, constraint->priv->pspec->name);
+	gchar *sql_field = g_strconcat (q_table, ".", q_field, " AS ", q_name, NULL);
+	g_free (q_table);
+	g_free (q_field);
+	g_free (q_name);
+
 	g_object_unref(constraint);
 	self->priv->values =
 		g_list_prepend(self->priv->values, sql_field);

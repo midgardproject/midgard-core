@@ -309,22 +309,28 @@ gboolean midgard_core_query_constraint_build_condition(
 {
 	g_assert(constraint != NULL);
 	
-	GString *cond = g_string_new("");
-	g_string_append_printf(cond,
-			"%s.%s ",
-			constraint->priv->prop_left->table,
-			constraint->priv->prop_left->field);
+	GdaConnection *cnc = constraint->priv->builder->priv->mgd->priv->connection;
+	gchar *q_table = NULL;
+	gchar *q_field = NULL;
 	guint i;
+
+	GString *cond = g_string_new("");
+	q_table = gda_connection_quote_sql_identifier (cnc, constraint->priv->prop_left->table);
+	q_field = gda_connection_quote_sql_identifier (cnc, constraint->priv->prop_left->field);
+	g_string_append_printf(cond, "%s.%s ", q_table, q_field);
+	g_free (q_table);
+	g_free (q_field);
 
 	/* No value, just use left and right conditions */
 	if(constraint->priv->value == NULL) {
 		
+		q_table = gda_connection_quote_sql_identifier (cnc, constraint->priv->prop_right->table);
+		q_field = gda_connection_quote_sql_identifier (cnc, constraint->priv->prop_right->field);
 		g_string_append_printf(cond,
-				"%s %s.%s",
-				constraint->priv->condition_operator,
-				constraint->priv->prop_right->table,
-				constraint->priv->prop_right->field);
-		
+				"%s %s.%s", constraint->priv->condition_operator, q_table, q_field);
+		g_free (q_table);
+		g_free (q_field);		
+
 		constraint->priv->condition = g_string_free(cond, FALSE);
 
 		return TRUE;
