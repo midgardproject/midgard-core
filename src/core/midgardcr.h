@@ -526,16 +526,16 @@ typedef struct _MidgardCRQueryValue MidgardCRQueryValue;
 typedef struct _MidgardCRQueryValueClass MidgardCRQueryValueClass;
 typedef struct _MidgardCRQueryValuePrivate MidgardCRQueryValuePrivate;
 
-#define MIDGARD_CR_TYPE_SQL_STORAGE_CONTENT_MANAGER (midgard_cr_sql_storage_content_manager_get_type ())
-#define MIDGARD_CR_SQL_STORAGE_CONTENT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_CONTENT_MANAGER, MidgardCRSQLStorageContentManager))
-#define MIDGARD_CR_SQL_STORAGE_CONTENT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_CONTENT_MANAGER, MidgardCRSQLStorageContentManagerClass))
-#define MIDGARD_CR_IS_SQL_STORAGE_CONTENT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_CONTENT_MANAGER))
-#define MIDGARD_CR_IS_SQL_STORAGE_CONTENT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_STORAGE_CONTENT_MANAGER))
-#define MIDGARD_CR_SQL_STORAGE_CONTENT_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_CONTENT_MANAGER, MidgardCRSQLStorageContentManagerClass))
+#define MIDGARD_CR_TYPE_SQL_CONTENT_MANAGER (midgard_cr_sql_content_manager_get_type ())
+#define MIDGARD_CR_SQL_CONTENT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_CONTENT_MANAGER, MidgardCRSQLContentManager))
+#define MIDGARD_CR_SQL_CONTENT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_CONTENT_MANAGER, MidgardCRSQLContentManagerClass))
+#define MIDGARD_CR_IS_SQL_CONTENT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_CONTENT_MANAGER))
+#define MIDGARD_CR_IS_SQL_CONTENT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_CONTENT_MANAGER))
+#define MIDGARD_CR_SQL_CONTENT_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_CONTENT_MANAGER, MidgardCRSQLContentManagerClass))
 
-typedef struct _MidgardCRSQLStorageContentManager MidgardCRSQLStorageContentManager;
-typedef struct _MidgardCRSQLStorageContentManagerClass MidgardCRSQLStorageContentManagerClass;
-typedef struct _MidgardCRSQLStorageContentManagerPrivate MidgardCRSQLStorageContentManagerPrivate;
+typedef struct _MidgardCRSQLContentManager MidgardCRSQLContentManager;
+typedef struct _MidgardCRSQLContentManagerClass MidgardCRSQLContentManagerClass;
+typedef struct _MidgardCRSQLContentManagerPrivate MidgardCRSQLContentManagerPrivate;
 
 #define MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER (midgard_cr_sql_storage_model_manager_get_type ())
 #define MIDGARD_CR_SQL_STORAGE_MODEL_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MODEL_MANAGER, MidgardCRSQLStorageModelManager))
@@ -1210,20 +1210,20 @@ struct _MidgardCRQueryValueClass {
 	GObjectClass parent_class;
 };
 
-struct _MidgardCRSQLStorageContentManager {
+struct _MidgardCRSQLContentManager {
 	GObject parent_instance;
-	MidgardCRSQLStorageContentManagerPrivate * priv;
+	MidgardCRSQLContentManagerPrivate * priv;
 	MidgardCRSQLStorageManager* _storage_manager;
 };
 
-struct _MidgardCRSQLStorageContentManagerClass {
+struct _MidgardCRSQLContentManagerClass {
 	GObjectClass parent_class;
-	gboolean (*exists) (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object);
-	void (*create) (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
-	void (*update) (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
-	void (*save) (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
-	void (*purge) (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
-	void (*remove) (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
+	gboolean (*exists) (MidgardCRSQLContentManager* self, MidgardCRStorable* object);
+	void (*create) (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+	void (*update) (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+	void (*save) (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+	void (*purge) (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+	void (*remove) (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
 };
 
 struct _MidgardCRSQLStorageModelManager {
@@ -1361,12 +1361,12 @@ struct _MidgardCRRDFSQLStorageManagerClass {
 };
 
 struct _MidgardCRRDFSQLContentManager {
-	MidgardCRSQLStorageContentManager parent_instance;
+	MidgardCRSQLContentManager parent_instance;
 	MidgardCRRDFSQLContentManagerPrivate * priv;
 };
 
 struct _MidgardCRRDFSQLContentManagerClass {
-	MidgardCRSQLStorageContentManagerClass parent_class;
+	MidgardCRSQLContentManagerClass parent_class;
 };
 
 
@@ -1687,16 +1687,16 @@ GType midgard_cr_query_value_get_type (void) G_GNUC_CONST;
 MidgardCRQueryValue* midgard_cr_query_value_create_with_value (GValue* value);
 MidgardCRQueryValue* midgard_cr_query_value_new (void);
 MidgardCRQueryValue* midgard_cr_query_value_construct (GType object_type);
-GType midgard_cr_sql_storage_content_manager_get_type (void) G_GNUC_CONST;
-MidgardCRSQLStorageContentManager* midgard_cr_sql_storage_content_manager_new (MidgardCRSQLStorageManager* manager);
-MidgardCRSQLStorageContentManager* midgard_cr_sql_storage_content_manager_construct (GType object_type, MidgardCRSQLStorageManager* manager);
-gboolean midgard_cr_sql_storage_content_manager_exists (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object);
-void midgard_cr_sql_storage_content_manager_create (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
-void midgard_cr_sql_storage_content_manager_update (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
-void midgard_cr_sql_storage_content_manager_save (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
-void midgard_cr_sql_storage_content_manager_purge (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
-void midgard_cr_sql_storage_content_manager_remove (MidgardCRSQLStorageContentManager* self, MidgardCRStorable* object, GError** error);
-MidgardCRStorageManager* midgard_cr_sql_storage_content_manager_get_storagemanager (MidgardCRSQLStorageContentManager* self);
+GType midgard_cr_sql_content_manager_get_type (void) G_GNUC_CONST;
+MidgardCRSQLContentManager* midgard_cr_sql_content_manager_new (MidgardCRSQLStorageManager* manager);
+MidgardCRSQLContentManager* midgard_cr_sql_content_manager_construct (GType object_type, MidgardCRSQLStorageManager* manager);
+gboolean midgard_cr_sql_content_manager_exists (MidgardCRSQLContentManager* self, MidgardCRStorable* object);
+void midgard_cr_sql_content_manager_create (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+void midgard_cr_sql_content_manager_update (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+void midgard_cr_sql_content_manager_save (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+void midgard_cr_sql_content_manager_purge (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+void midgard_cr_sql_content_manager_remove (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+MidgardCRStorageManager* midgard_cr_sql_content_manager_get_storagemanager (MidgardCRSQLContentManager* self);
 GType midgard_cr_sql_storage_model_manager_get_type (void) G_GNUC_CONST;
 GType midgard_cr_sql_table_model_get_type (void) G_GNUC_CONST;
 MidgardCRSQLTableModel* midgard_cr_sql_storage_model_manager_get_table_model_by_name (MidgardCRSQLStorageModelManager* self, const char* name);

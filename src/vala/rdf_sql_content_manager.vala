@@ -18,7 +18,7 @@
 
 namespace MidgardCR {
 
-	public class RDFSQLContentManager : SQLStorageContentManager {
+	public class RDFSQLContentManager : SQLContentManager {
 	
 		/* constructor */
 		public 	RDFSQLContentManager (SQLStorageManager manager) {

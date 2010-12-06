@@ -19,11 +19,11 @@
 namespace MidgardCR {
 
 	/**
-	 * SQLStorageContentManager's purpose is to create, update, or delete object's data
+	 * SQLContentManager's purpose is to create, update, or delete object's data
 	 * in underlying SQL database. Any {@link Storable} object is volatile data, and once 
 	 * created with content manager becomes persistant.
 	 */	 
-	public class SQLStorageContentManager : GLib.Object, StorageContentManager {
+	public class SQLContentManager : GLib.Object, StorageContentManager {
 	
 		/* internal properties */
 		internal SQLStorageManager _storage_manager = null;
@@ -35,7 +35,7 @@ namespace MidgardCR {
 		}
 
 		/* constructor */
-		public 	SQLStorageContentManager (SQLStorageManager manager) {
+		public 	SQLContentManager (SQLStorageManager manager) {
 			Object (storagemanager: manager);
 		}
 
