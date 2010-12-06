@@ -77,6 +77,64 @@ __midgard_view_derived_object_set_from_sql(MidgardConnection *mgd, GType type, c
 	return olist;
 }	
 
+/* Create GdaSqlSelectField for every property registered for the class. */
+static void
+__midgard_view_derived_add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaConnection *cnc, GdaSqlStatementSelect *select, const gchar *table_name)
+{
+	guint n_prop;
+	guint i;
+	GdaSqlSelectField *select_field;
+	GdaSqlExpr *expr;
+	GValue *val;
+	gchar *table_field;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (klass), &n_prop);
+	if (!pspecs)
+		return;
+
+	const gchar *property_table = NULL;
+
+	for (i = 0; i < n_prop; i++) {
+
+		MgdSchemaPropertyAttr *prop_attr = midgard_core_class_get_property_attr (klass, pspecs[i]->name);
+		if (!prop_attr)
+			continue; 
+
+		const gchar *property = pspecs[i]->name;
+		const gchar *property_field = prop_attr->name;
+		property_table = midgard_core_class_get_property_table (klass, property); 
+		if (property_table && table_name)
+			property_table = table_name;
+
+		/* FIXME, ugly workaround to keep prop_attr->field with proper value */
+		g_free ((gchar *)prop_attr->field);
+		prop_attr->field = g_strdup (property);
+
+		/* Ignore properties with NULL storage and those of object type */
+		if (!property_table || pspecs[i]->value_type == G_TYPE_OBJECT)
+			continue;
+
+       		select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
+		/*select_field->field_name = g_strdup (property_field);
+		select_field->table_name = g_strdup (property_table);*/
+		select_field->as = gda_connection_quote_sql_identifier (cnc, property);
+		select->expr_list = g_slist_append (select->expr_list, select_field);
+		expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
+		val = g_new0 (GValue, 1);
+		g_value_init (val, G_TYPE_STRING);
+		gchar *q_table = gda_connection_quote_sql_identifier (cnc, property_table);
+		gchar *q_field = gda_connection_quote_sql_identifier (cnc, property_field);
+		table_field = g_strconcat (q_table, ".", q_field, NULL);
+		g_value_set_string (val, table_field);
+		g_free (q_table);
+		g_free (q_field);
+		g_free (table_field);
+		expr->value = val;
+		select_field->expr = expr;
+	}	
+
+	return;
+}
+
 static GObject *
 __midgard_view_derived_object_constructor (GType type,
 		guint n_construct_properties,
@@ -270,15 +328,15 @@ _midgard_view_derived_set_static_sql_select (MidgardConnection *mgd, MidgardDBOb
 			g_error ("Failed to register view class");
 		}
 
-		gchar *q_table = gda_connection_quote_sql_identifier (cnc, prop_attr->table);
-		gchar *q_field = gda_connection_quote_sql_identifier (cnc, prop_attr->field);
+		gchar *q_table = gda_connection_quote_sql_identifier (cnc, prop_attr->derived->table);
+		gchar *q_field = gda_connection_quote_sql_identifier (cnc, prop_attr->derived->field);
 		gchar *q_name = gda_connection_quote_sql_identifier (cnc, pspecs[i]->name);
 
 		g_string_append_printf (ssf, "%s%s.%s AS %s", 
 				add_coma ? ", " : " ",
 				q_table, q_field, q_name);
 		
-		gchar *t_table = gda_connection_quote_sql_identifier (cnc, type->name);
+		gchar *t_table = gda_connection_quote_sql_identifier (cnc, type->name);	
 		midgard_core_schema_type_property_set_tablefield (prop_attr, t_table, q_name);
 	
 		g_free (q_table);
@@ -324,8 +382,8 @@ __midgard_view_derived_class_init(gpointer g_class, gpointer class_data)
 		mklass->dbpriv->storage_exists = _midgard_view_derived_storage_exists;
 		mklass->dbpriv->delete_storage = _midgard_view_derived_delete_storage;
 
-		mklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__view_parent_class)->dbpriv->add_fields_to_select_statement;
-		mklass->dbpriv->set_static_sql_select = _midgard_view_derived_set_static_sql_select;
+		mklass->dbpriv->add_fields_to_select_statement = __midgard_view_derived_add_fields_to_select_statement; 
+		mklass->dbpriv->set_static_sql_select = _midgard_view_derived_set_static_sql_select;	
 	}
 
 	g_type_class_add_private (g_class, sizeof(MgdSchemaTypeAttr));

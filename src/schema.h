@@ -50,6 +50,7 @@ struct _MgdSchemaPropertyAttr{
 	gboolean is_unique;
 	gchar *description;
 	GHashTable *user_values;
+	MgdSchemaPropertyAttr *derived;
 };
 
 struct _MgdSchemaTypeAttr {

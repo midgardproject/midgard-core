@@ -56,6 +56,7 @@ midgard_core_schema_type_property_attr_new_empty (void)
 	prop->is_unique = FALSE;
 	prop->description = NULL;
 	prop->user_values = NULL;
+	prop->derived = NULL;
 
 	return prop;
 }
@@ -160,6 +161,8 @@ midgard_core_schema_type_property_attr_free (MgdSchemaPropertyAttr *prop)
 
 	g_hash_table_destroy(prop->user_values);
 	prop->user_values = NULL;
+
+	prop->derived = NULL;
 
 	g_free (prop);
 

@@ -134,6 +134,9 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 			/* Create property attributes copy using original property.
 			   Then change name. */
 			MgdSchemaPropertyAttr *prop_attr = g_hash_table_lookup(type->prophash, property_name);
+
+			/* Keep pointer to original property attribue. At least, we need it when creating view. */
+			prop_attr->derived = rprop_attr;
 	
 			if (!prop_attr)
 				g_warning("Can not find  %s.%s in newly registered view", type->name, name); 
@@ -142,6 +145,8 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 
 				g_free((gchar *)prop_attr->name);
 				prop_attr->name = g_strdup((gchar *)name);
+				g_free ((gchar *)prop_attr->field);
+				prop_attr->field = g_strdup((gchar *)name);
 
 				/* Free old key and remove new one in hash table */
 				g_hash_table_remove(type->prophash, (gconstpointer) rprop[1]);
