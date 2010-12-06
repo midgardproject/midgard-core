@@ -898,21 +898,22 @@ midgard_collector_execute (MidgardCollector *self)
 
 				g_value_init(new_value, MGD_TYPE_TIMESTAMP);
 				g_value_transform(gda_value, new_value);
-
-			} else if (GDA_VALUE_HOLDS_BINARY(gda_value)) {
-
+			
+			} else if (G_VALUE_TYPE (gda_value) == GDA_TYPE_BLOB
+					|| G_VALUE_TYPE (gda_value) == G_TYPE_STRING) {
+				gchar *stringified = gda_value_stringify ((GValue*)gda_value);
+				gchar *escaped = gda_default_unescape_string (stringified);
 				g_value_init(new_value, G_TYPE_STRING);
-				gchar *bstr = gda_binary_to_string(gda_value_get_binary(gda_value), 0);
-				g_value_set_string(new_value, bstr);
-				g_free(bstr);
-
+				g_value_take_string(new_value, escaped);
+				g_free (stringified);
+				
 			} else {
-
 				g_value_init(new_value, G_TYPE_STRING);
 				if(!G_VALUE_HOLDS_STRING(gda_value))
 					g_value_transform(gda_value, new_value);
 				else
 					g_value_copy(gda_value, new_value);
+				
 			}
 
 			ck_value = g_new0(GValue, 1);
