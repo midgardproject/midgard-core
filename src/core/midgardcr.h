@@ -1339,7 +1339,7 @@ struct _MidgardCRRDFGenericObjectClass {
 	void (*set_property_value) (MidgardCRRDFGenericObject* self, const char* name, GValue* value);
 	void (*set_property_literal) (MidgardCRRDFGenericObject* self, const char* name, const char* value);
 	GValue* (*get_property_value) (MidgardCRRDFGenericObject* self, const char* name);
-	GValue* (*get_property_literal) (MidgardCRRDFGenericObject* self, const char* name);
+	char* (*get_property_literal) (MidgardCRRDFGenericObject* self, const char* name);
 	char** (*list_all_properties) (MidgardCRRDFGenericObject* self, int* result_length1);
 };
 
@@ -1731,7 +1731,7 @@ MidgardCRRDFGenericObject* midgard_cr_rdf_generic_object_construct (GType object
 void midgard_cr_rdf_generic_object_set_property_value (MidgardCRRDFGenericObject* self, const char* name, GValue* value);
 void midgard_cr_rdf_generic_object_set_property_literal (MidgardCRRDFGenericObject* self, const char* name, const char* value);
 GValue* midgard_cr_rdf_generic_object_get_property_value (MidgardCRRDFGenericObject* self, const char* name);
-GValue* midgard_cr_rdf_generic_object_get_property_literal (MidgardCRRDFGenericObject* self, const char* name);
+char* midgard_cr_rdf_generic_object_get_property_literal (MidgardCRRDFGenericObject* self, const char* name);
 char** midgard_cr_rdf_generic_object_list_all_properties (MidgardCRRDFGenericObject* self, int* result_length1);
 const char* midgard_cr_rdf_generic_object_get_guid (MidgardCRRDFGenericObject* self);
 const char* midgard_cr_rdf_generic_object_get_identifier (MidgardCRRDFGenericObject* self);

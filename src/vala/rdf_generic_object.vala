@@ -61,6 +61,7 @@ namespace MidgardCR {
 		construct {
 			this._ns_values_hash = new HashTable <string, GLib.Value?>(str_hash, str_equal);
 			this._ns_literals_hash = new HashTable <string, string>(str_hash, str_equal);
+			this._guid = MidgardCRCore.Guid.create ();
 		}			
 
 		/* methods */
@@ -73,21 +74,24 @@ namespace MidgardCR {
 		}
 
 		public virtual GLib.Value? get_property_value (string name) {
+			/* TODO, is required throw exception */
+			if (name == null || name == "") 
+				return null;
 			return this._ns_values_hash.lookup (name);
 		}
 
-		public virtual GLib.Value? get_property_literal (string name) {
+		public virtual string? get_property_literal (string name) {
 			return this._ns_literals_hash.lookup (name);
 		}
 
 		public virtual string[]? list_all_properties () {
 			HashTable <weak string, string> tmphash = new HashTable<weak string, string> (str_hash, str_equal);
 			foreach (string element in this._ns_values_hash.get_keys ()) {
-				tmphash.insert (element, null);
+				tmphash.insert (element, "");
 			}	
 			
 			foreach (string element in this._ns_literals_hash.get_keys ()) {
-				tmphash.insert (element, null);
+				tmphash.insert (element, "");
 			}	
 
 			string[] propnames = null;

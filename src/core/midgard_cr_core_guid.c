@@ -21,7 +21,7 @@
 #include "midgard_cr_core_uuid.h"
 
 gboolean 
-midgard_cr_core_is_guid (const gchar *guid) {
+midgard_cr_core_guid_is_valid (const gchar *guid) {
         
 	/* Handle the case when object's guid property might be 
 	 * initialized with NULL or empty string by default */
@@ -49,7 +49,7 @@ uuid2guid (gchar *uuid) {
 }
 
 gchar *
-midgard_cr_core_guid_new (void) {
+midgard_cr_core_guid_create (void) {
         gchar *uuid = midgard_cr_core_uuid_new();
         uuid2guid(uuid);
         return uuid;

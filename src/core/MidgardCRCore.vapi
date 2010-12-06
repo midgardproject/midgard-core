@@ -100,4 +100,9 @@ namespace MidgardCRCore {
 		public static MidgardCRCore.QuerySelect create_static (MidgardCR.StorageManager manager, MidgardCRCore.QueryStorage storage);
 		public MidgardCR.Storable[]? list_objects ();
 	}
+
+	public class Guid {
+		public static string create ();
+		public static bool is_valid (string guid);
+	}
 }

@@ -26,6 +26,7 @@ using MidgardCR;
 
 void main()
 {
+	GLib.Log.set_always_fatal (GLib.LogLevelFlags.LEVEL_CRITICAL);
 	var storage_manager = getStorageManager();
 	var content_manager = new RDFSQLContentManager(storage_manager);
 
@@ -43,10 +44,10 @@ void main()
 	var rdf_vali = new RDFGenericObject("http://xmlns.com/foaf/0.1/Person");
 	rdf_vali.identifier = "http://www.midgard-project.org/people/vali";
 
-	rdf_vali.set_property_value  ("foaf:currentProject", "http://www.midgard-project.org/");
-	rdf_vali.set_property_literal("foaf:myersBriggs",    "INTJ");
-	rdf_vali.set_property_literal("foaf:name",           "Vali");
-	rdf_vali.set_property_literal("foaf:homepage",       "http://www.midgard-project.org/people/vali");
+	rdf_vali.set_property_literal ("foaf:currentProject", "http://www.midgard-project.org/");
+	rdf_vali.set_property_value ("foaf:myersBriggs",    "INTJ");
+	rdf_vali.set_property_value ("foaf:name",           "Vali");
+	rdf_vali.set_property_value ("foaf:homepage",       "http://www.midgard-project.org/people/vali");
 	
 	try {
 		content_manager.create(rdf_vali);

@@ -20,7 +20,7 @@
 
 #include <glib.h>
 
-gboolean midgard_cr_core_is_guid (const gchar *guid);
-gchar *midgard_cr_core_guid_new (void);
+gchar		*midgard_cr_core_guid_create 	(void);
+gboolean 	midgard_cr_core_guid_is_valid 	(const gchar *guid);
 
 #endif
