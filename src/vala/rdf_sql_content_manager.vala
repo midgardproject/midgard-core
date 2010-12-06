@@ -31,25 +31,25 @@ namespace MidgardCR {
 
 		public override void create (Storable object) throws StorageContentManagerError
 		{
-			if (object is RDFGenericObject) {
-				var builder = new ObjectBuilder ();
+			if (!(object is RDFGenericObject))
+				throw new StorageContentManagerError.OBJECT_INVALID ("Expected RDFGenericObject");
 
-				var rdf_object = (RDFGenericObject) object;
-				foreach (string name in rdf_object.list_all_properties ()) {
-					/* TODO: convert property-name to canonical form */
-					var rdf_prop = builder.factory ("RDFTripleObject") as RepositoryObject;
-					string property_literal = rdf_object.get_property_literal (name);
-					var property_value = rdf_object.get_property_value (name);
-					rdf_prop.set(
-						"objectguid", rdf_object.guid,
-						"identifier", rdf_object.identifier,
-						"classname",  rdf_object.classname,
-						"property",   name,
-						"literal",    property_literal != null ? property_literal : "",
-						"value",      property_value != null ? property_value : ""
-					);
-					base.create (rdf_prop);
-				}
+			var builder = new ObjectBuilder ();
+			var rdf_object = (RDFGenericObject) object;
+			foreach (string name in rdf_object.list_all_properties ()) {
+				/* TODO: convert property-name to canonical form */
+				var rdf_prop = builder.factory ("RDFTripleObject") as RepositoryObject;
+				string property_literal = rdf_object.get_property_literal (name);
+				var property_value = rdf_object.get_property_value (name);
+				rdf_prop.set(
+					"objectguid", rdf_object.guid,
+					"identifier", rdf_object.identifier,
+					"classname",  rdf_object.classname,
+					"property",   name,
+					"literal",    property_literal != null ? property_literal : "",
+					"value",      property_value != null ? property_value : ""
+				);
+				base.create (rdf_prop);
 			}
 		}	
 	
