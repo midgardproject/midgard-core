@@ -246,41 +246,53 @@ _midgard_query_constraint_list_constraints (MidgardQueryConstraintSimple *self, 
 }
 
 static void 
-__set_expression_value (GValue *dest, GValue *src)
+__get_expression_value (GValue *src, GString *str)
 {
-	gchar *str;
-
 	switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE (src))) {
 	
 		case G_TYPE_STRING:
-			  str = g_strdup_printf ("'%s'", g_value_get_string (src));
+			  g_string_append_printf (str, "'%s'", g_value_get_string (src));
 			  break;
 
 		case G_TYPE_UINT:
-			  str = g_strdup_printf ("%d", g_value_get_uint (src));
+			  g_string_append_printf (str, "%d", g_value_get_uint (src));
 			  break;
 
 		case G_TYPE_INT:
-			  str = g_strdup_printf ("%d", g_value_get_int (src));
+			  g_string_append_printf (str, "%d", g_value_get_int (src));
 			  break;
 
 		case G_TYPE_FLOAT:
-			  str = g_strdup_printf ("%.04f", g_value_get_float (src));
+			  g_string_append_printf (str, "%.04f", g_value_get_float (src));
 			  break;
 
 		case G_TYPE_BOOLEAN:
-			  str = g_strdup_printf ("%d", g_value_get_boolean (src));
+			  g_string_append_printf (str, "%d", g_value_get_boolean (src));
 			  break;
 
 		case G_TYPE_BOXED:
-			  g_print ("BOXED type not implemented \n");
+			  if (G_VALUE_TYPE (src) == G_TYPE_VALUE_ARRAY) {
+				GValueArray *array = (GValueArray *) g_value_get_boxed (src);
+				if (!array) {
+					g_warning ("Empty array given");
+					return;
+				}
+				guint i;
+				for (i = 0; i < array->n_values; i++) {
+					if (i > 0)
+						g_string_append (str, ", ");
+					__get_expression_value (g_value_array_get_nth (array, i), str);
+				}	
+			  } else {
+			  	g_warning ("BOXED type '%s' not implemented \n", G_VALUE_TYPE_NAME (src));
+			  }
 			  break;
 
 		default:
 			  break;
 	}
 
-	g_value_take_string (dest, str);
+	return;
 }
 
 void 
@@ -347,7 +359,9 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	//expr->param_spec = gda_sql_param_spec_new (dval);
 	//expr->param_spec->g_type = v_type;
 	expr->value = gda_value_new (G_TYPE_STRING);
-	__set_expression_value (expr->value, &val);
+	GString *str = g_string_new ("");
+	__get_expression_value (&val, str);
+	g_value_take_string (expr->value, g_string_free (str, FALSE));
 	g_value_unset (&val);
 	cond->operands = g_slist_append (cond->operands, expr);
 
