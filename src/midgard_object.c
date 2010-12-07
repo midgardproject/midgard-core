@@ -1337,7 +1337,7 @@ _mgdschema_class_set_static_sql_select (MidgardConnection *mgd, MidgardDBObjectC
 				add_coma ? ", " : " ",
 				q_table, q_field, q_name);
 		
-		midgard_core_schema_type_property_set_tablefield (prop_attr, q_table, q_name);
+		midgard_core_schema_type_property_set_tablefield (prop_attr, q_table, q_field);
 		
 		g_free (q_table);
 		g_free (q_field);
