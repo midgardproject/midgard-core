@@ -635,7 +635,8 @@ midgard_core_schema_type_build_static_sql (MgdSchemaTypeAttr *type_attr)
 	if (_sql->str == NULL)
 		return;
 
-	type_attr->sql_select_full = g_string_free (_sql, FALSE);
+	g_string_free (_sql, TRUE);
+	/* type_attr->sql_select_full = g_string_free (_sql, FALSE); */
 }
 
 static void 

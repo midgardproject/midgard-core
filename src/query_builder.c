@@ -758,7 +758,11 @@ gchar *midgard_query_builder_get_object_select(
 		/* TODO, Set select which suits better */	
 	} 
 
-	if(builder->priv->schema->sql_select_full != NULL) {
+	if (builder->priv->schema->sql_select_full == NULL
+			|| MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_static_sql_select != NULL)
+		MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_static_sql_select (builder->priv->mgd, MIDGARD_DBOBJECT_CLASS (klass));
+
+	if (builder->priv->schema->sql_select_full != NULL) {
 		g_string_append_printf(select, " %s", 
 				builder->priv->schema->sql_select_full);
 	}

@@ -1296,6 +1296,60 @@ _object_delete_storage(MidgardConnection *mgd, MidgardDBObjectClass *klass)
 	return FALSE;
 }
 
+static void
+_mgdschema_class_set_static_sql_select (MidgardConnection *mgd, MidgardDBObjectClass *klass)
+{
+	MgdSchemaTypeAttr *type = midgard_core_class_get_type_attr (klass);
+	if (type->sql_select_full != NULL)
+		return;
+
+       	guint n_props;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (klass), &n_props);
+	GdaConnection *cnc = mgd->priv->connection;
+	
+	guint i;
+	GString *ssf = g_string_new ("");
+	gboolean add_coma = FALSE;
+
+	for (i = 0; i < n_props; i++) {
+		
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT
+				|| g_str_equal (pspecs[i]->name, "guid")) {
+			if (i == 1)
+				add_coma = FALSE;
+			continue;
+		}
+
+		/* Replace tablefield for every property */
+		MgdSchemaPropertyAttr *prop_attr = g_hash_table_lookup (type->prophash, pspecs[i]->name);
+		if (!prop_attr) {
+			if (i == 1)
+				add_coma = FALSE;
+			continue;
+		}
+
+		gchar *q_table = gda_connection_quote_sql_identifier (cnc,
+				prop_attr->table ? prop_attr->table : type->table);
+		gchar *q_field = gda_connection_quote_sql_identifier (cnc, prop_attr->field);
+		gchar *q_name = gda_connection_quote_sql_identifier (cnc, pspecs[i]->name);
+		
+		g_string_append_printf (ssf, "%s%s.%s AS %s",
+				add_coma ? ", " : " ",
+				q_table, q_field, q_name);
+		
+		midgard_core_schema_type_property_set_tablefield (prop_attr, q_table, q_name);
+		
+		g_free (q_table);
+		g_free (q_field);
+		g_free (q_name);
+		
+		add_coma = TRUE;
+	}
+
+ 	type->sql_select_full = g_string_free (ssf, FALSE);
+	g_free (pspecs);
+}
+
 /* Initialize class. 
  * Properties setting follow data in class_data.
  */ 
@@ -1344,6 +1398,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model;
 		dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_statement_insert;
 		dbklass->dbpriv->set_statement_update = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_statement_update;
+		dbklass->dbpriv->set_static_sql_select = _mgdschema_class_set_static_sql_select;
 	}	
 
 	if (G_OBJECT_CLASS_TYPE(g_class) != MIDGARD_TYPE_OBJECT) {
@@ -1589,6 +1644,7 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_from_data_model;
 	dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_statement_insert;
 	dbklass->dbpriv->set_statement_update = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_statement_update;
+	dbklass->dbpriv->set_static_sql_select = NULL;
 
 	if (!signals_registered && mklass) {
 		
