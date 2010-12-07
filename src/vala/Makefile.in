@@ -41,6 +41,7 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in config.c \
 	object_builder.c object_model.c object_property_model.c \
 	profiler.c query.c query_property.c query_value.c \
 	rdf_generic_object.c rdf_sql_content_manager.c \
+	rdf_sql_query_select.c rdf_sql_query_storage.c \
 	rdf_sql_storage_manager.c rdf_storage_manager.c \
 	sql_column_model.c sql_content_manager.c sql_profiler.c \
 	sql_query_constraint.c sql_query_select.c sql_query_storage.c \
@@ -72,6 +73,7 @@ am_libmidgardvala_la_OBJECTS = config.lo executable.lo namespace.lo \
 	sql_query_constraint.lo sql_query_select.lo \
 	rdf_generic_object.lo rdf_storage_manager.lo \
 	rdf_sql_storage_manager.lo rdf_sql_content_manager.lo \
+	rdf_sql_query_select.lo rdf_sql_query_storage.lo \
 	$(am__objects_1)
 libmidgardvala_la_OBJECTS = $(am_libmidgardvala_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
@@ -293,6 +295,8 @@ libmidgardvala_la_SOURCES = \
 			  rdf_storage_manager.vala \
 			  rdf_sql_storage_manager.vala \
 			  rdf_sql_content_manager.vala \
+			  rdf_sql_query_select.vala \
+			  rdf_sql_query_storage.vala \
 			  $(NULL)
 
 libmidgardvala_la_LDFLAGS = -module -export-dynamic
@@ -371,6 +375,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/query_value.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_generic_object.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_content_manager.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_query_select.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_query_storage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_sql_storage_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdf_storage_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_column_model.Plo@am__quote@
@@ -549,6 +555,16 @@ $(srcdir)/rdf_sql_content_manager.c: $(srcdir)/libmidgardvala_la_vala.stamp
 	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
 	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
 	fi
+$(srcdir)/rdf_sql_query_select.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/rdf_sql_query_storage.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
 libmidgardvala_la_vala.stamp: $(libmidgardvala_la_SOURCES)
 	$(AM_V_VALAC)$(VALAC) $(AM_VALAFLAGS) $(VALAFLAGS) -C $(libmidgardvala_la_SOURCES)
 	$(AM_V_at)touch $@
@@ -686,6 +702,8 @@ maintainer-clean-generic:
 	-rm -f query_value.c
 	-rm -f rdf_generic_object.c
 	-rm -f rdf_sql_content_manager.c
+	-rm -f rdf_sql_query_select.c
+	-rm -f rdf_sql_query_storage.c
 	-rm -f rdf_sql_storage_manager.c
 	-rm -f rdf_storage_manager.c
 	-rm -f sql_column_model.c

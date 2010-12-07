@@ -634,6 +634,28 @@ typedef struct _MidgardCRRDFSQLContentManager MidgardCRRDFSQLContentManager;
 typedef struct _MidgardCRRDFSQLContentManagerClass MidgardCRRDFSQLContentManagerClass;
 typedef struct _MidgardCRRDFSQLContentManagerPrivate MidgardCRRDFSQLContentManagerPrivate;
 
+#define MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT (midgard_cr_rdfsql_query_select_get_type ())
+#define MIDGARD_CR_RDFSQL_QUERY_SELECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT, MidgardCRRDFSQLQuerySelect))
+#define MIDGARD_CR_RDFSQL_QUERY_SELECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT, MidgardCRRDFSQLQuerySelectClass))
+#define MIDGARD_CR_IS_RDFSQL_QUERY_SELECT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT))
+#define MIDGARD_CR_IS_RDFSQL_QUERY_SELECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT))
+#define MIDGARD_CR_RDFSQL_QUERY_SELECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT, MidgardCRRDFSQLQuerySelectClass))
+
+typedef struct _MidgardCRRDFSQLQuerySelect MidgardCRRDFSQLQuerySelect;
+typedef struct _MidgardCRRDFSQLQuerySelectClass MidgardCRRDFSQLQuerySelectClass;
+typedef struct _MidgardCRRDFSQLQuerySelectPrivate MidgardCRRDFSQLQuerySelectPrivate;
+
+#define MIDGARD_CR_TYPE_RDFSQL_QUERY_STORAGE (midgard_cr_rdfsql_query_storage_get_type ())
+#define MIDGARD_CR_RDFSQL_QUERY_STORAGE(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDFSQL_QUERY_STORAGE, MidgardCRRDFSQLQueryStorage))
+#define MIDGARD_CR_RDFSQL_QUERY_STORAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDFSQL_QUERY_STORAGE, MidgardCRRDFSQLQueryStorageClass))
+#define MIDGARD_CR_IS_RDFSQL_QUERY_STORAGE(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_RDFSQL_QUERY_STORAGE))
+#define MIDGARD_CR_IS_RDFSQL_QUERY_STORAGE_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_RDFSQL_QUERY_STORAGE))
+#define MIDGARD_CR_RDFSQL_QUERY_STORAGE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_RDFSQL_QUERY_STORAGE, MidgardCRRDFSQLQueryStorageClass))
+
+typedef struct _MidgardCRRDFSQLQueryStorage MidgardCRRDFSQLQueryStorage;
+typedef struct _MidgardCRRDFSQLQueryStorageClass MidgardCRRDFSQLQueryStorageClass;
+typedef struct _MidgardCRRDFSQLQueryStoragePrivate MidgardCRRDFSQLQueryStoragePrivate;
+
 struct _MidgardCRConfig {
 	GObject parent_instance;
 	MidgardCRConfigPrivate * priv;
@@ -1370,6 +1392,25 @@ struct _MidgardCRRDFSQLContentManagerClass {
 	MidgardCRSQLContentManagerClass parent_class;
 };
 
+struct _MidgardCRRDFSQLQuerySelect {
+	MidgardCRSQLQuerySelect parent_instance;
+	MidgardCRRDFSQLQuerySelectPrivate * priv;
+	MidgardCRRDFSQLQueryStorage* _rdf_query_storage;
+};
+
+struct _MidgardCRRDFSQLQuerySelectClass {
+	MidgardCRSQLQuerySelectClass parent_class;
+};
+
+struct _MidgardCRRDFSQLQueryStorage {
+	MidgardCRSQLQueryStorage parent_instance;
+	MidgardCRRDFSQLQueryStoragePrivate * priv;
+};
+
+struct _MidgardCRRDFSQLQueryStorageClass {
+	MidgardCRSQLQueryStorageClass parent_class;
+};
+
 
 GType midgard_cr_config_get_type (void) G_GNUC_CONST;
 gboolean midgard_cr_config_read_configuration (MidgardCRConfig* self, const char* name, gboolean user, GError** error);
@@ -1735,6 +1776,7 @@ GValue* midgard_cr_rdf_generic_object_get_property_value (MidgardCRRDFGenericObj
 char* midgard_cr_rdf_generic_object_get_property_literal (MidgardCRRDFGenericObject* self, const char* name);
 char** midgard_cr_rdf_generic_object_list_all_properties (MidgardCRRDFGenericObject* self, int* result_length1);
 MidgardCRRepositoryObject** midgard_cr_rdf_generic_object_list_triples (MidgardCRRDFGenericObject* self, int* result_length1);
+void midgard_cr_rdf_generic_object_add_triple (MidgardCRRDFGenericObject* self, MidgardCRRepositoryObject* triple);
 const char* midgard_cr_rdf_generic_object_get_guid (MidgardCRRDFGenericObject* self);
 const char* midgard_cr_rdf_generic_object_get_identifier (MidgardCRRDFGenericObject* self);
 void midgard_cr_rdf_generic_object_set_identifier (MidgardCRRDFGenericObject* self, const char* value);
@@ -1748,6 +1790,13 @@ MidgardCRRDFSQLStorageManager* midgard_cr_rdfsql_storage_manager_construct (GTyp
 GType midgard_cr_rdfsql_content_manager_get_type (void) G_GNUC_CONST;
 MidgardCRRDFSQLContentManager* midgard_cr_rdfsql_content_manager_new (MidgardCRSQLStorageManager* manager);
 MidgardCRRDFSQLContentManager* midgard_cr_rdfsql_content_manager_construct (GType object_type, MidgardCRSQLStorageManager* manager);
+GType midgard_cr_rdfsql_query_select_get_type (void) G_GNUC_CONST;
+GType midgard_cr_rdfsql_query_storage_get_type (void) G_GNUC_CONST;
+MidgardCRRDFSQLQuerySelect* midgard_cr_rdfsql_query_select_new (MidgardCRStorageManager* manager, MidgardCRRDFSQLQueryStorage* storage);
+MidgardCRRDFSQLQuerySelect* midgard_cr_rdfsql_query_select_construct (GType object_type, MidgardCRStorageManager* manager, MidgardCRRDFSQLQueryStorage* storage);
+MidgardCRRDFSQLQuerySelect* midgard_cr_rdfsql_query_select_create_query_select (MidgardCRStorageManager* manager, MidgardCRRDFSQLQueryStorage* storage);
+MidgardCRRDFSQLQueryStorage* midgard_cr_rdfsql_query_storage_new (const char* name);
+MidgardCRRDFSQLQueryStorage* midgard_cr_rdfsql_query_storage_construct (GType object_type, const char* name);
 
 
 G_END_DECLS

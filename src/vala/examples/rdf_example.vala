@@ -56,8 +56,8 @@ void main()
 	}
 
 	/* Query Data */
-	/*var query = new SQLRDFQuerySelect(storage_manager, new SQLRDFQueryStorage("foaf:Person"));
-	query.set_constraint(new QueryConstraint(
+	var query = new RDFSQLQuerySelect(storage_manager, new RDFSQLQueryStorage("foaf:Person"));
+	query.set_constraint(new SQLQueryConstraint(
 		new QueryProperty("http://xmlns.com/foaf/0.1/currentProject", null),
 		"=",
 		QueryValue.create_with_value("http://www.midgard-project.org/"),
@@ -68,9 +68,10 @@ void main()
 	query.execute();
 
 	GLib.print("These people work on midgard!\n");
-	foreach (RDFGenericObject rdf_obj in query.list_objects()) {
-		GLib.print("\t%s\n", rdf_obj.get_property_value("foaf:name"));
-	}*/
+	foreach (Storable object in query.list_objects()) {
+		RDFGenericObject rdf_obj = (RDFGenericObject) object;
+		GLib.print("\t%s\n", rdf_obj.get_property_literal ("foaf:name"));
+	}
 }
 
 /* ================= */

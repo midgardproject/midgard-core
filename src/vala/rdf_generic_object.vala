@@ -157,5 +157,9 @@ namespace MidgardCR {
 		public unowned RepositoryObject[]? list_triples () {
 			return this._triples;
 		}
+
+		public void add_triple (RepositoryObject triple) {
+			this._triples += triple;
+		}
 	}
 }
