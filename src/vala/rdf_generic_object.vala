@@ -25,8 +25,7 @@ namespace MidgardCR {
 		internal string _identifier = null;
 		internal string _classname = null;
 		internal int _id = 0;
-		internal HashTable<string, GLib.Value?> _ns_values_hash = null;
-		internal HashTable<string, string> _ns_literals_hash = null;
+		internal RepositoryObject[]? _triples = null;
 
 		/* properties */
 		public string guid {
@@ -59,47 +58,104 @@ namespace MidgardCR {
 		}
 		
 		construct {
-			this._ns_values_hash = new HashTable <string, GLib.Value?>(str_hash, str_equal);
-			this._ns_literals_hash = new HashTable <string, string>(str_hash, str_equal);
 			this._guid = MidgardCRCore.Guid.create ();
 		}			
 
-		/* methods */
-		public virtual void set_property_value (string name, GLib.Value value) {
-			this._ns_values_hash.insert (name,value);
+		/* private methods */
+		private RepositoryObject[]? _find_triples_by_name (string name) {
+			if (this._triples ==null)
+				return null;
+			RepositoryObject[]? found_triples = null;
+			foreach (unowned RepositoryObject triple in this._triples) {
+				string pname;
+				triple.get ("property", out pname);
+				if (pname == name)
+					found_triples += triple;
+			}
+			return found_triples;
 		}
 
-		public virtual void set_property_literal (string name, string value) {
-			this._ns_literals_hash.insert (name,value);
+		/* public methods */
+		public virtual void set_property_value (string name, GLib.Value value) {
+			RepositoryObject[]? triples = this._find_triples_by_name (name);
+			RepositoryObject triple = null;
+			/* FIXME, handle returned array */
+			if (triples == null) {
+				var builder = new ObjectBuilder ();
+	                       	triple = builder.factory ("RDFTripleObject") as RepositoryObject; 
+				this._triples += triple;
+			} else {
+				triple = triples[0];
+			}
+                        triple.set(
+                               	"objectguid", this.guid,
+                               	"identifier", this.identifier,
+                               	"classname",  this.classname,
+                               	"property",   name,
+                               	"literal",    "",
+                               	"value",      (string) value
+                       	);
+		}
+
+		public virtual void set_property_literal (string name, string value) {	
+			RepositoryObject[]? triples = this._find_triples_by_name (name);
+			RepositoryObject triple = null;
+			/* FIXME, handle returned array */
+			if (triples == null) {
+				var builder = new ObjectBuilder ();
+	                       	triple = builder.factory ("RDFTripleObject") as RepositoryObject; 
+				this._triples += triple;
+			} else {
+				triple = triples[0];
+			}
+                        triple.set(
+                               	"objectguid", this.guid,
+                               	"identifier", this.identifier,
+                               	"classname",  this.classname,
+                               	"property",   name,
+                               	"literal",    value,
+                               	"value",      ""
+                       	);
 		}
 
 		public virtual GLib.Value? get_property_value (string name) {
-			/* TODO, is required throw exception */
+			/* TODO, if required throw exception */
 			if (name == null || name == "") 
 				return null;
-			return this._ns_values_hash.lookup (name);
+			RepositoryObject[]? triples = this._find_triples_by_name (name);
+			if (triples == null)
+				return null;
+			string val;
+			triples[0].get ("value", out val);
+			return val;
 		}
 
 		public virtual string? get_property_literal (string name) {
-			return this._ns_literals_hash.lookup (name);
+			/* TODO, if required throw exception */
+			if (name == null || name == "") 
+				return null;
+			RepositoryObject[]? triples = this._find_triples_by_name (name);
+			if (triples == null)
+				return null;
+			string val;
+			triples[0].get ("literal", out val);
+			return val;	
 		}
 
 		public virtual string[]? list_all_properties () {
-			HashTable <weak string, string> tmphash = new HashTable<weak string, string> (str_hash, str_equal);
-			foreach (string element in this._ns_values_hash.get_keys ()) {
-				tmphash.insert (element, "");
-			}	
-			
-			foreach (string element in this._ns_literals_hash.get_keys ()) {
-				tmphash.insert (element, "");
-			}	
-
+			if (this._triples == null)
+				return null;
 			string[] propnames = null;
-			foreach (string el in tmphash.get_keys ())
-				propnames += el;
+			foreach (unowned RepositoryObject triple in this._triples) {
+				string name;
+				triple.get ("property", out name);
+				propnames += name;
+			}
+			return propnames;
+		}
 
-			return propnames;	
+		public unowned RepositoryObject[]? list_triples () {
+			return this._triples;
 		}
 	}
-
 }

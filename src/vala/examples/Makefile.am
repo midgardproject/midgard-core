@@ -44,7 +44,7 @@ rdf_example_SOURCES = \
 examples_LDADD = \
 		 $(GLIB_LIBS) \
 		 $(LIBVALA_LIBS) \
-		 $(MIDGARDCR_LIBS) \
+		 $(MIDGARDCR_LIBS) \	
 		 $(NULL)
 
 example1_LDADD = \
@@ -63,7 +63,7 @@ rdf_example_LDADD = \
 		 $(NULL)
 
 example1.vala.stamp: $(example1_VALASOURCES)
-	$(VALAC) --save-temps --pkg MidgardCR-3.0 $^
+	$(VALAC) -C --save-temps --pkg MidgardCR-3.0 $^
 	touch $@
 
 example2.vala.stamp: $(example2_VALASOURCES)

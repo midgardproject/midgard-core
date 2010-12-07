@@ -29,32 +29,14 @@ namespace MidgardCR {
 			return false;
 		}	
 
-		private RepositoryObject _new_triple_from_property (RDFGenericObject rdf_object, string name) {
-			/* TODO: convert property-name to canonical form */
-			var builder = new ObjectBuilder ();
-			var rdf_prop = builder.factory ("RDFTripleObject") as RepositoryObject;
-			string property_literal = rdf_object.get_property_literal (name);
-			var property_value = rdf_object.get_property_value (name);
-			rdf_prop.set(
-				"objectguid", rdf_object.guid,
-				"identifier", rdf_object.identifier,
-				"classname",  rdf_object.classname,
-				"property",   name,
-				"literal",    property_literal != null ? property_literal : "",
-				"value",      property_value != null ? property_value : ""
-			);
-			return rdf_prop;
-		}
-
 		public override void create (Storable object) throws StorageContentManagerError {
 
 			if (!(object is RDFGenericObject))
 				throw new StorageContentManagerError.OBJECT_INVALID ("Expected RDFGenericObject");
 
 			var rdf_object = (RDFGenericObject) object;
-			foreach (string name in rdf_object.list_all_properties ()) {
-				var rdf_prop = _new_triple_from_property (rdf_object, name);
-				base.create (rdf_prop);
+			foreach (RepositoryObject triple in rdf_object.list_triples ()) {
+				base.create (triple);
 			}
 		}	
 	
@@ -68,9 +50,8 @@ namespace MidgardCR {
 				throw new StorageContentManagerError.OBJECT_INVALID ("Expected RDFGenericObject");
 
 			var rdf_object = (RDFGenericObject) object;
-			foreach (string name in rdf_object.list_all_properties ()) {
-				var rdf_prop = _new_triple_from_property (rdf_object, name);
-				base.save (rdf_prop);
+			foreach (RepositoryObject triple in rdf_object.list_triples ()) {
+				base.save (triple);
 			}
 		}		
 
@@ -80,9 +61,8 @@ namespace MidgardCR {
 				throw new StorageContentManagerError.OBJECT_INVALID ("Expected RDFGenericObject");
 
 			var rdf_object = (RDFGenericObject) object;
-			foreach (string name in rdf_object.list_all_properties ()) {
-				var rdf_prop = _new_triple_from_property (rdf_object, name);
-				base.purge (rdf_prop);
+			foreach (RepositoryObject triple in rdf_object.list_triples ()) {
+				base.purge (triple);
 			}
 		}	
 	

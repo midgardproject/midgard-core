@@ -1330,8 +1330,9 @@ struct _MidgardCRRDFGenericObject {
 	char* _identifier;
 	char* _classname;
 	gint _id;
-	GHashTable* _ns_values_hash;
-	GHashTable* _ns_literals_hash;
+	MidgardCRRepositoryObject** _triples;
+	gint _triples_length1;
+	gint __triples_size_;
 };
 
 struct _MidgardCRRDFGenericObjectClass {
@@ -1733,6 +1734,7 @@ void midgard_cr_rdf_generic_object_set_property_literal (MidgardCRRDFGenericObje
 GValue* midgard_cr_rdf_generic_object_get_property_value (MidgardCRRDFGenericObject* self, const char* name);
 char* midgard_cr_rdf_generic_object_get_property_literal (MidgardCRRDFGenericObject* self, const char* name);
 char** midgard_cr_rdf_generic_object_list_all_properties (MidgardCRRDFGenericObject* self, int* result_length1);
+MidgardCRRepositoryObject** midgard_cr_rdf_generic_object_list_triples (MidgardCRRDFGenericObject* self, int* result_length1);
 const char* midgard_cr_rdf_generic_object_get_guid (MidgardCRRDFGenericObject* self);
 const char* midgard_cr_rdf_generic_object_get_identifier (MidgardCRRDFGenericObject* self);
 void midgard_cr_rdf_generic_object_set_identifier (MidgardCRRDFGenericObject* self, const char* value);

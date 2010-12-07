@@ -55,7 +55,7 @@ void main () {
 		GLib.error (e.message);
 	}
 
-	var content_manager = new SQLStorageContentManager (storage_manager);
+	var content_manager = new SQLContentManager (storage_manager);
 
 	/* Store Person and Activity */
 	Storable person = builder.factory ("Person");

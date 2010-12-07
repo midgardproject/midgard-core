@@ -50,7 +50,7 @@ void main()
 	rdf_vali.set_property_value ("foaf:homepage",       "http://www.midgard-project.org/people/vali");
 	
 	try {
-		content_manager.create(rdf_vali);
+		content_manager.create(rdf_vali);	
 	} catch (StorageContentManagerError e) {
 		GLib.error (e.message);
 	}
