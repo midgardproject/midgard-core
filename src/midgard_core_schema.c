@@ -646,6 +646,10 @@ __field_is_equal(gpointer key, gpointer val, gpointer userdata)
 
 	if (!g_str_equal (prop_attr->name, src_prop->name)) {
 
+		if (prop_attr->tablefield == NULL
+				|| src_prop->tablefield == NULL)
+			return;
+
 		if (g_str_equal (prop_attr->tablefield, src_prop->tablefield)) {
 
 			g_warning ("Field %s redefined for %s and %s", 
