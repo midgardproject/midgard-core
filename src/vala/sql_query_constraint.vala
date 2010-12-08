@@ -68,7 +68,7 @@ namespace MidgardCR
 		}
 
 		/* methods */
-		public QueryConstraintSimple[]? list_constraints () {
+		public unowned QueryConstraintSimple[]? list_constraints () {
 			return null;
 		}
 	}

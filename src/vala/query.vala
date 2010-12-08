@@ -22,7 +22,7 @@ namespace MidgardCR
 {
 	public interface QueryConstraintSimple : GLib.Object {
 			
-		public abstract QueryConstraintSimple[]? list_constraints ();
+		public abstract unowned QueryConstraintSimple[]? list_constraints ();
 	}
 
 	public interface QueryStorage : GLib.Object {
@@ -45,8 +45,6 @@ namespace MidgardCR
 		/* properties */
 		public abstract string grouptype { get; set; }
 
-		public abstract string get_group_type ();
-		public abstract void set_group_type (string name);
 		public abstract void add_constraint (QueryConstraintSimple constraint);
 	}
 
