@@ -63,10 +63,14 @@ namespace MidgardCR
 			return new SQLQuerySelect (manager, storage);
 		}
 
-		public void set_constraint (QueryConstraintSimple constraint) {
+		public virtual void set_constraint (QueryConstraintSimple constraint) {
 			this._create_core_query_select ();
-			(this._core_query_select as MidgardCRCore.QuerySelect).set_constraint ((constraint as MidgardCR.SQLQueryConstraint)._core_query_constraint as MidgardCRCore.QueryConstraint);
+			(this._core_query_select as MidgardCRCore.QuerySelect).set_constraint ((MidgardCRCore.QueryConstraintSimple) ((SQLQueryConstraint)constraint)._core_query_constraint);
 			this._constraint = constraint;
+		}
+
+		public virtual unowned QueryConstraintSimple get_constraint () {
+			return this._constraint;
 		}
 
 		public void set_limit (uint limit) {
@@ -90,12 +94,12 @@ namespace MidgardCR
 			return (this._core_query_select as MidgardCRCore.QuerySelect).get_results_count ();
 		}
 
-		public void validate () throws ValidationError {
+		public virtual void validate () throws ValidationError {
 			this._create_core_query_select ();
 			/* TODO */
 		}
 
-		public void execute () throws ExecutableError {
+		public virtual void execute () throws ExecutableError {
 			this._create_core_query_select ();
 			((MidgardCRCore.QueryExecutor)this._core_query_select).execute ();
 		}
@@ -105,7 +109,7 @@ namespace MidgardCR
 			(this._core_query_select as MidgardCRCore.QuerySelect).add_join (type, left_property._core_query_holder as MidgardCRCore.QueryProperty, right_property._core_query_holder as MidgardCRCore.QueryProperty);
 		}
 		
-		public Storable[]? list_objects () {
+		public virtual Storable[]? list_objects () {
 			this._create_core_query_select ();	
 			return ((MidgardCRCore.QuerySelect)this._core_query_select).list_objects ();
 		}
