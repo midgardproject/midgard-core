@@ -582,6 +582,17 @@ typedef struct _MidgardCRSQLQueryConstraint MidgardCRSQLQueryConstraint;
 typedef struct _MidgardCRSQLQueryConstraintClass MidgardCRSQLQueryConstraintClass;
 typedef struct _MidgardCRSQLQueryConstraintPrivate MidgardCRSQLQueryConstraintPrivate;
 
+#define MIDGARD_CR_TYPE_SQL_QUERY_CONSTRAINT_GROUP (midgard_cr_sql_query_constraint_group_get_type ())
+#define MIDGARD_CR_SQL_QUERY_CONSTRAINT_GROUP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_QUERY_CONSTRAINT_GROUP, MidgardCRSQLQueryConstraintGroup))
+#define MIDGARD_CR_SQL_QUERY_CONSTRAINT_GROUP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_QUERY_CONSTRAINT_GROUP, MidgardCRSQLQueryConstraintGroupClass))
+#define MIDGARD_CR_IS_SQL_QUERY_CONSTRAINT_GROUP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_QUERY_CONSTRAINT_GROUP))
+#define MIDGARD_CR_IS_SQL_QUERY_CONSTRAINT_GROUP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_QUERY_CONSTRAINT_GROUP))
+#define MIDGARD_CR_SQL_QUERY_CONSTRAINT_GROUP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_QUERY_CONSTRAINT_GROUP, MidgardCRSQLQueryConstraintGroupClass))
+
+typedef struct _MidgardCRSQLQueryConstraintGroup MidgardCRSQLQueryConstraintGroup;
+typedef struct _MidgardCRSQLQueryConstraintGroupClass MidgardCRSQLQueryConstraintGroupClass;
+typedef struct _MidgardCRSQLQueryConstraintGroupPrivate MidgardCRSQLQueryConstraintGroupPrivate;
+
 #define MIDGARD_CR_TYPE_SQL_QUERY_SELECT (midgard_cr_sql_query_select_get_type ())
 #define MIDGARD_CR_SQL_QUERY_SELECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_QUERY_SELECT, MidgardCRSQLQuerySelect))
 #define MIDGARD_CR_SQL_QUERY_SELECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_QUERY_SELECT, MidgardCRSQLQuerySelectClass))
@@ -749,8 +760,6 @@ struct _MidgardCRQueryConstraintIface {
 
 struct _MidgardCRQueryConstraintGroupIface {
 	GTypeInterface parent_iface;
-	char* (*get_group_type) (MidgardCRQueryConstraintGroup* self);
-	void (*set_group_type) (MidgardCRQueryConstraintGroup* self, const char* name);
 	void (*add_constraint) (MidgardCRQueryConstraintGroup* self, MidgardCRQueryConstraintSimple* constraint);
 	const char* (*get_grouptype) (MidgardCRQueryConstraintGroup* self);
 	void (*set_grouptype) (MidgardCRQueryConstraintGroup* self, const char* value);
@@ -1329,6 +1338,17 @@ struct _MidgardCRSQLQueryConstraintClass {
 	GObjectClass parent_class;
 };
 
+struct _MidgardCRSQLQueryConstraintGroup {
+	GObject parent_instance;
+	MidgardCRSQLQueryConstraintGroupPrivate * priv;
+	char* _group_type;
+	GObject* _core_query_constraint;
+};
+
+struct _MidgardCRSQLQueryConstraintGroupClass {
+	GObjectClass parent_class;
+};
+
 struct _MidgardCRSQLQuerySelect {
 	GObject parent_instance;
 	MidgardCRSQLQuerySelectPrivate * priv;
@@ -1343,6 +1363,11 @@ struct _MidgardCRSQLQuerySelect {
 
 struct _MidgardCRSQLQuerySelectClass {
 	GObjectClass parent_class;
+	void (*set_constraint) (MidgardCRSQLQuerySelect* self, MidgardCRQueryConstraintSimple* constraint);
+	MidgardCRQueryConstraintSimple* (*get_constraint) (MidgardCRSQLQuerySelect* self);
+	void (*validate) (MidgardCRSQLQuerySelect* self, GError** error);
+	void (*execute) (MidgardCRSQLQuerySelect* self, GError** error);
+	MidgardCRStorable** (*list_objects) (MidgardCRSQLQuerySelect* self, int* result_length1);
 };
 
 struct _MidgardCRRDFGenericObject {
@@ -1396,6 +1421,7 @@ struct _MidgardCRRDFSQLQuerySelect {
 	MidgardCRSQLQuerySelect parent_instance;
 	MidgardCRRDFSQLQuerySelectPrivate * priv;
 	MidgardCRRDFSQLQueryStorage* _rdf_query_storage;
+	MidgardCRQueryConstraintSimple* _original_constraint;
 };
 
 struct _MidgardCRRDFSQLQuerySelectClass {
@@ -1497,8 +1523,6 @@ void midgard_cr_query_constraint_set_storage (MidgardCRQueryConstraint* self, Mi
 const char* midgard_cr_query_constraint_get_operator (MidgardCRQueryConstraint* self);
 void midgard_cr_query_constraint_set_operator (MidgardCRQueryConstraint* self, const char* value);
 GType midgard_cr_query_constraint_group_get_type (void) G_GNUC_CONST;
-char* midgard_cr_query_constraint_group_get_group_type (MidgardCRQueryConstraintGroup* self);
-void midgard_cr_query_constraint_group_set_group_type (MidgardCRQueryConstraintGroup* self, const char* name);
 void midgard_cr_query_constraint_group_add_constraint (MidgardCRQueryConstraintGroup* self, MidgardCRQueryConstraintSimple* constraint);
 const char* midgard_cr_query_constraint_group_get_grouptype (MidgardCRQueryConstraintGroup* self);
 void midgard_cr_query_constraint_group_set_grouptype (MidgardCRQueryConstraintGroup* self, const char* value);
@@ -1759,17 +1783,27 @@ GType midgard_cr_sql_query_constraint_get_type (void) G_GNUC_CONST;
 MidgardCRSQLQueryConstraint* midgard_cr_sql_query_constraint_new (MidgardCRQueryProperty* property, const char* op, MidgardCRQueryValueHolder* holder, MidgardCRSQLQueryStorage* storage);
 MidgardCRSQLQueryConstraint* midgard_cr_sql_query_constraint_construct (GType object_type, MidgardCRQueryProperty* property, const char* op, MidgardCRQueryValueHolder* holder, MidgardCRSQLQueryStorage* storage);
 MidgardCRSQLQueryConstraint* midgard_cr_sql_query_constraint_create_constraint (MidgardCRQueryProperty* property, const char* op, MidgardCRQueryValueHolder* holder, MidgardCRSQLQueryStorage* storage);
+GType midgard_cr_sql_query_constraint_group_get_type (void) G_GNUC_CONST;
+MidgardCRSQLQueryConstraintGroup* midgard_cr_sql_query_constraint_group_new (const char* group_type);
+MidgardCRSQLQueryConstraintGroup* midgard_cr_sql_query_constraint_group_construct (GType object_type, const char* group_type);
+MidgardCRSQLQueryConstraintGroup* midgard_cr_sql_query_constraint_group_create_constraint_group (const char* group_type);
+MidgardCRSQLQueryConstraintGroup* midgard_cr_sql_query_constraint_group_create_with_constraints (const char* group_type, MidgardCRQueryConstraintSimple** constraints, int constraints_length1);
 GType midgard_cr_sql_query_select_get_type (void) G_GNUC_CONST;
 MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_new (MidgardCRStorageManager* manager, MidgardCRSQLQueryStorage* storage);
 MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_construct (GType object_type, MidgardCRStorageManager* manager, MidgardCRSQLQueryStorage* storage);
 MidgardCRSQLQuerySelect* midgard_cr_sql_query_select_create_query_select (MidgardCRStorageManager* manager, MidgardCRSQLQueryStorage* storage);
+void midgard_cr_sql_query_select_set_constraint (MidgardCRSQLQuerySelect* self, MidgardCRQueryConstraintSimple* constraint);
+MidgardCRQueryConstraintSimple* midgard_cr_sql_query_select_get_constraint (MidgardCRSQLQuerySelect* self);
+void midgard_cr_sql_query_select_validate (MidgardCRSQLQuerySelect* self, GError** error);
+void midgard_cr_sql_query_select_execute (MidgardCRSQLQuerySelect* self, GError** error);
+MidgardCRStorable** midgard_cr_sql_query_select_list_objects (MidgardCRSQLQuerySelect* self, int* result_length1);
 MidgardCRStorageManager* midgard_cr_sql_query_select_get_storagemanager (MidgardCRSQLQuerySelect* self);
 MidgardCRSQLQueryStorage* midgard_cr_sql_query_select_get_storage (MidgardCRSQLQuerySelect* self);
 gboolean midgard_cr_sql_query_select_get_readonly (MidgardCRSQLQuerySelect* self);
 void midgard_cr_sql_query_select_set_readonly (MidgardCRSQLQuerySelect* self, gboolean value);
 GType midgard_cr_rdf_generic_object_get_type (void) G_GNUC_CONST;
-MidgardCRRDFGenericObject* midgard_cr_rdf_generic_object_new (const char* classname);
-MidgardCRRDFGenericObject* midgard_cr_rdf_generic_object_construct (GType object_type, const char* classname);
+MidgardCRRDFGenericObject* midgard_cr_rdf_generic_object_new (const char* classname, const char* guid);
+MidgardCRRDFGenericObject* midgard_cr_rdf_generic_object_construct (GType object_type, const char* classname, const char* guid);
 void midgard_cr_rdf_generic_object_set_property_value (MidgardCRRDFGenericObject* self, const char* name, GValue* value);
 void midgard_cr_rdf_generic_object_set_property_literal (MidgardCRRDFGenericObject* self, const char* name, const char* value);
 GValue* midgard_cr_rdf_generic_object_get_property_value (MidgardCRRDFGenericObject* self, const char* name);

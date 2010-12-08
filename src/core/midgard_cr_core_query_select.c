@@ -251,6 +251,7 @@ __query_select_add_joins (MidgardCRCoreQuerySelect *self, GdaSqlOperation *opera
 	GSList *l = NULL;
 
 	MidgardCRCoreQueryExecutor *executor = MIDGARD_CR_CORE_QUERY_EXECUTOR (self);
+	MidgardCRSQLStorageManager *manager = MIDGARD_CR_SQL_STORAGE_MANAGER (executor->priv->storage_manager);
 	GdaSqlStatement *sql_stm = executor->priv->stmt;
 	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;	
 	GdaSqlSelectFrom *from = select->from;
@@ -287,7 +288,7 @@ __query_select_add_joins (MidgardCRCoreQuerySelect *self, GdaSqlOperation *opera
 		MQE_SET_TABLE_ALIAS (executor, right_storage);
 		gda_sql_select_from_take_new_join (from , join);
 		GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (from));
-		s_target->table_name = g_strdup (right_storage->priv->table);
+		s_target->table_name = g_strdup (MQE_GET_STORAGE_TABLE (manager, right_storage));
 		s_target->as = g_strdup (right_storage->priv->table_alias);
 		gda_sql_select_from_take_new_target (from, s_target);
 	
@@ -295,7 +296,7 @@ __query_select_add_joins (MidgardCRCoreQuerySelect *self, GdaSqlOperation *opera
 		GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
 		GValue *tval = g_new0 (GValue, 1);
 		g_value_init (tval, G_TYPE_STRING);
-		g_value_set_string (tval, right_storage->priv->table);
+		g_value_set_string (tval, s_target->table_name);
 		texpr->value = tval;
 		s_target->expr = texpr;
 	}
@@ -441,7 +442,7 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError 
 	}
 
 	GError *err = NULL;
-	GObjectClass *klass = self->priv->storage->priv->klass;
+	GObjectClass *klass = g_type_class_peek (g_type_from_name (self->priv->storage->priv->classname));
 	/* if (!klass->dbpriv->add_fields_to_select_statement) {
 		// FIXME, handle error 
 		g_warning ("Missed private DBObjectClass' fields to statement helper");
@@ -666,8 +667,8 @@ _midgard_cr_core_query_select_list_objects (MidgardCRCoreQuerySelect *self, guin
 		return NULL;
 
 	MidgardCRSQLStorageManager *manager = MIDGARD_CR_SQL_STORAGE_MANAGER (MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage_manager);
-	GObjectClass *klass = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
-	const gchar *classname = G_OBJECT_CLASS_NAME (klass);
+	const gchar *classname = MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->storage->priv->classname;
+	GObjectClass *klass = g_type_class_peek (g_type_from_name (classname));
 	MidgardCRSQLTableModel *table_model = midgard_cr_core_query_find_table_model_by_name (manager, classname);
 	MidgardCRObjectModel *object_model = 
 		midgard_cr_sql_storage_model_manager_get_object_model_by_name (

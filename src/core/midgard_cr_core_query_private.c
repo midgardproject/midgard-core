@@ -185,14 +185,17 @@ midgard_cr_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *e
 	if (storage)
 		MQE_SET_TABLE_ALIAS (executor, storage);
 
+	MidgardCRSQLStorageManager *manager = (MidgardCRSQLStorageManager*) executor->priv->storage_manager;
+	GObjectClass *klass = g_type_class_peek (g_type_from_name (executor->priv->storage->priv->classname));
+	MidgardCRSQLTableModel *table_model = midgard_cr_core_query_find_table_model_by_name (manager, executor->priv->storage->priv->classname);
+
 	gchar *table_field = NULL;
 	gchar *table_alias = executor->priv->table_alias;
-	const gchar *table = executor->priv->storage->priv->table;
-       	GObjectClass *klass = executor->priv->storage->priv->klass; 
+	const gchar *table = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (table_model));
 	if (storage) {
-		table = executor->priv->storage->priv->table;
+		//table = executor->priv->storage->priv->table;
 		table_alias = storage->priv->table_alias;
-		klass = storage->priv->klass;	
+		klass = g_type_class_peek (g_type_from_name (storage->priv->classname));	
 	}
 
       	gchar **spltd = g_strsplit(name, ".", 0);

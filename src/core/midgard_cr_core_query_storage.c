@@ -32,30 +32,8 @@ MidgardCRCoreQueryStorage*
 midgard_cr_core_query_storage_new (const gchar *classname)
 {
 	g_return_val_if_fail (classname != NULL, NULL);
-
-	GType type = g_type_from_name (classname);
-	if (!type) {
-		g_warning ("Class %s is not registered in GType system", classname);
-		return NULL;
-	}
-
-	GObjectClass *klass = G_OBJECT_CLASS (g_type_class_peek (type));
-	if (!klass) {
-		g_warning ("Can not find %s class", classname);
-		return NULL;
-	}
-
-	/*
-	g_return_val_if_fail (MIDGARD_CR_CORE_IS_DBOBJECT_CLASS (klass), NULL);
-
-	MidgardCRCoreDBObjectClass *dbklass = MIDGARD_CR_CORE_DBOBJECT_CLASS (klass);
-
-	MidgardCRCoreQueryStorage *self = g_object_new (MIDGARD_CR_CORE_TYPE_QUERY_STORAGE, "dbclass", classname, NULL);
-	self->priv->table = midgard_cr_core_core_class_get_table (dbklass); */
 	
 	MidgardCRCoreQueryStorage *self = g_object_new (MIDGARD_CR_CORE_TYPE_QUERY_STORAGE, "dbclass", classname, NULL);
-	self->priv->klass = klass;
-
 	return self;
 }
 
@@ -74,7 +52,6 @@ __midgard_cr_core_query_storage_instance_init (GTypeInstance *instance, gpointer
 	MidgardCRCoreQueryStorage *self = (MidgardCRCoreQueryStorage *) instance;
 
 	self->priv = g_new (MidgardCRCoreQueryStoragePrivate, 1);
-	self->priv->klass = NULL;
 	self->priv->table_alias = NULL;
 	self->priv->table = NULL;
 	self->priv->classname = NULL;
@@ -136,18 +113,12 @@ __midgard_cr_core_query_storage_set_property (GObject *object, guint property_id
 		const GValue *value, GParamSpec *pspec)
 {
 	MidgardCRCoreQueryStorage *self = (MidgardCRCoreQueryStorage *) (object);
-	GObjectClass *dbklass = NULL;
 
 	switch (property_id) {
 
 		case MIDGARD_CR_CORE_QUERY_STORAGE_DBCLASS:
-			dbklass = g_type_class_peek (g_type_from_name (g_value_get_string (value)));
-			//g_return_if_fail (MIDGARD_CR_CORE_IS_DBOBJECT_CLASS (dbklass));
-			if (dbklass) {
-				self->priv->klass = dbklass;
-				self->priv->classname = G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (dbklass));
-				//self->priv->table = midgard_cr_core_core_class_get_table (dbklass);
-			}
+			g_free ((gchar*)self->priv->classname);
+			self->priv->classname = g_value_dup_string (value);
 			break;
 
   		default:

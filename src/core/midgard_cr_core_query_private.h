@@ -60,11 +60,19 @@ struct MidgardCRCoreCoreQueryOrder {
 };
 
 struct _MidgardCRCoreQueryStoragePrivate {
-	GObjectClass *klass;
-	gchar *table_alias;
-	const gchar *table;
 	const gchar *classname;
+	gchar *table_alias;
+	gchar *table;
 };
+
+#define MQE_GET_STORAGE_TABLE(__manager, __storage) \
+	__storage->priv->table ? \
+	__storage->priv->table : \
+	midgard_cr_storage_model_get_location ( \
+			(MidgardCRStorageModel*) midgard_cr_core_query_find_table_model_by_name ( \
+				MIDGARD_CR_SQL_STORAGE_MANAGER (__manager), \
+				__storage->priv->classname) \
+			)	
 
 struct _MidgardCRCoreQueryPropertyPrivate {
 	GValue value;

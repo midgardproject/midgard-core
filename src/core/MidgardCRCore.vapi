@@ -86,6 +86,16 @@ namespace MidgardCRCore {
 		public QueryConstraint (MidgardCRCore.QueryProperty property, string op, MidgardCRCore.QueryHolder holder, MidgardCRCore.QueryStorage? storage);
 	}
 
+	public class QueryConstraintGroup : GLib.Object, MidgardCRCore.QueryConstraintSimple {
+		[CCode (has_construct_function = false)]
+		public QueryConstraintGroup ();
+		public void add_constraint (MidgardCRCore.QueryConstraintSimple constraint);
+		public unowned string get_group_type ();
+		public bool set_group_type (string type);
+		[NoAccessorMethod]
+		public string grouptype { owned get; set; }
+	}
+
 	public class QueryExecutor: GLib.Object {
 		public virtual bool execute() throws MidgardCR.ExecutableError;
 		public virtual bool set_constraint (MidgardCRCore.QueryConstraintSimple constraint);
