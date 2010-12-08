@@ -65,7 +65,15 @@ namespace MidgardCR
 
 		public virtual void set_constraint (QueryConstraintSimple constraint) {
 			this._create_core_query_select ();
-			(this._core_query_select as MidgardCRCore.QuerySelect).set_constraint ((MidgardCRCore.QueryConstraintSimple) ((SQLQueryConstraint)constraint)._core_query_constraint);
+			/* Keep this condition. We need to make proper typecasting to internal,
+			 * core's query constraints. We can not type cast to interface, 
+			 * and we should not provide internal methods for constraint classes */
+			if (constraint is SQLQueryConstraint)
+				(this._core_query_select as MidgardCRCore.QuerySelect)
+					.set_constraint ((MidgardCRCore.QueryConstraintSimple) ((SQLQueryConstraint)constraint)._core_query_constraint);
+			else if (constraint is SQLQueryConstraintGroup)
+				(this._core_query_select as MidgardCRCore.QuerySelect)
+					.set_constraint (((MidgardCRCore.QueryConstraintSimple) ((SQLQueryConstraintGroup)constraint)._core_query_constraint));
 			this._constraint = constraint;
 		}
 

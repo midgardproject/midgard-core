@@ -22,7 +22,7 @@ namespace MidgardCR
 
 		/* internal properties */
 		internal string _group_type = null;
-		internal GLib.Object _core_query_constraint = null;
+		internal GLib.Object? _core_query_constraint = null;
 
 		/* properties */
 		public string grouptype { 
@@ -34,8 +34,7 @@ namespace MidgardCR
 		public SQLQueryConstraintGroup (string group_type) {
 			Object (grouptype: group_type);
 
-			this._core_query_constraint = 
-				new MidgardCRCore.QueryConstraintGroup ();
+			this._core_query_constraint = (MidgardCRCore.QueryConstraintSimple) new MidgardCRCore.QueryConstraintGroup ();
 			((this as SQLQueryConstraintGroup)._core_query_constraint as MidgardCRCore.QueryConstraintGroup)
 				.set_group_type (group_type);
 		}	

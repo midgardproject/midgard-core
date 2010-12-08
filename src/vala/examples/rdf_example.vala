@@ -26,7 +26,7 @@ using MidgardCR;
 
 void main()
 {
-	GLib.Log.set_always_fatal (GLib.LogLevelFlags.LEVEL_CRITICAL);
+	GLib.Log.set_always_fatal (GLib.LogLevelFlags.LEVEL_WARNING);
 	var storage_manager = getStorageManager();
 	var content_manager = new RDFSQLContentManager(storage_manager);
 
