@@ -70,7 +70,8 @@ void main()
 	GLib.print("These people work on midgard!\n");
 	foreach (Storable object in query.list_objects()) {
 		RDFGenericObject rdf_obj = (RDFGenericObject) object;
-		GLib.print("\t%s\n", rdf_obj.get_property_literal ("foaf:name"));
+		var name = rdf_obj.get_property_value ("foaf:name");
+		GLib.print("\t%s\n", name != null ? (string) name : "Not found");
 	}
 }
 

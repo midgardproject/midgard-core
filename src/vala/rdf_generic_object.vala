@@ -30,6 +30,12 @@ namespace MidgardCR {
 		/* properties */
 		public string guid {
 			get { return this._guid; }
+			construct {
+				if ((string)value == null)
+					this._guid = MidgardCRCore.Guid.create ();
+				else 
+					this._guid = value;
+			}
 		}
 
 		public string identifier {
@@ -53,15 +59,12 @@ namespace MidgardCR {
 		}
 
 		/* constructor */
-		public RDFGenericObject (string classname) {
-			Object (classname: classname);	
+		public RDFGenericObject (string classname, string? guid = null) {
+			Object (classname: classname, guid: guid);	
 		}
 		
-		construct {
-			this._guid = MidgardCRCore.Guid.create ();
-		}			
-
 		/* private methods */
+		/* Return array of triples. This is done to allow arrays as returned values */
 		private RepositoryObject[]? _find_triples_by_name (string name) {
 			if (this._triples ==null)
 				return null;
@@ -87,7 +90,7 @@ namespace MidgardCR {
 			} else {
 				triple = triples[0];
 			}
-                        triple.set(
+                        triple.set (
                                	"objectguid", this.guid,
                                	"identifier", this.identifier,
                                	"classname",  this.classname,
@@ -108,7 +111,7 @@ namespace MidgardCR {
 			} else {
 				triple = triples[0];
 			}
-                        triple.set(
+                        triple.set (
                                	"objectguid", this.guid,
                                	"identifier", this.identifier,
                                	"classname",  this.classname,
@@ -123,10 +126,11 @@ namespace MidgardCR {
 			if (name == null || name == "") 
 				return null;
 			RepositoryObject[]? triples = this._find_triples_by_name (name);
-			if (triples == null)
+			if (triples == null) {
 				return null;
-			string val;
-			triples[0].get ("value", out val);
+			}
+			GLib.Value val = "";
+			triples[0].get_property ("value", ref val);
 			return val;
 		}
 

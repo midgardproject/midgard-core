@@ -22,14 +22,96 @@ namespace MidgardCR
 
 		/* internal properties */
 		internal RDFSQLQueryStorage _rdf_query_storage = null;	
+		internal QueryConstraintSimple _original_constraint = null;
 	
 		/* Constructor */
 		public RDFSQLQuerySelect (StorageManager manager, RDFSQLQueryStorage storage) {
 			base (manager, (SQLQueryStorage) storage);
+			this._rdf_query_storage = storage;
 		}
 		
 		public static new RDFSQLQuerySelect create_query_select (StorageManager manager, RDFSQLQueryStorage storage) {
 			return new RDFSQLQuerySelect (manager, storage);
+		}
+
+		public override void set_constraint (QueryConstraintSimple constraint) {
+			this._original_constraint = constraint;
+		}
+
+		public override unowned QueryConstraintSimple get_constraint () {
+			return this._original_constraint;
+		}
+
+		public override void validate () throws ValidationError {
+			/* TODO */
+		}
+
+		public override void execute () throws ExecutableError {
+			/* TODO, determine classname */
+			print ("CLASS %s \n", this._query_storage.classname);
+			this._query_storage._core_query_storage.set ("dbclass", "RDFTripleObject");
+
+			/* Create new constraint group, which will hold all triple related constraints */
+			QueryConstraintGroup c_group = new SQLQueryConstraintGroup ("AND");
+
+			/* Default case, so we add implicit classname constraint.
+			 * ... AND triple_table.classname = ''...  */
+			c_group.add_constraint (new SQLQueryConstraint (
+				new QueryProperty ("classname", null),
+				"=",
+				QueryValue.create_with_value (this._query_storage.classname),
+				null));
+
+			/* Get all available constraints */
+			QueryConstraintSimple[]? constraints = null;
+			var c = this.get_constraint ();
+			if (c !=null) {
+				constraints += c;
+				foreach (QueryConstraintSimple constraint in c.list_constraints ()) {
+					constraints += constraint;
+				}
+			}
+			/* Determine new constraints and add them to group */
+			foreach (QueryConstraintSimple constraint in constraints) {
+				print ("CONSTR MISSED\n");
+			}
+
+			base.set_constraint (c_group);
+			base.execute ();	
+		}
+
+		private RDFGenericObject _find_rdf_object (RDFGenericObject[]? objects, string name, string guid) {
+			if (objects == null)
+				return null;
+			foreach (RDFGenericObject object in objects) {
+				if (object.classname == name
+					&& object.guid == guid)
+					return object;
+			}
+			return null;
+		}
+
+		public override Storable[]? list_objects () {
+			Storable[]? objects = base.list_objects ();
+			if (objects == null)
+				return null;
+			/* Initialize new RDFGenericObject instances, from all triple objects
+			 * selected from database. Every triple is initialized as standalone 
+			 * object and added to specific rdf object if both holds the same 
+			 * guid and objectguid properties values */
+			RDFGenericObject[]? rdf_objects = null;
+			foreach (Storable object in objects) {
+				string classname;
+				string guid;
+				object.get ("classname", out classname, "objectguid", out guid);
+				RDFGenericObject rdf_object = this._find_rdf_object (rdf_objects, classname, guid);
+				if (rdf_object == null) {
+					rdf_object = new RDFGenericObject (classname, guid);
+					rdf_objects += rdf_object;
+				}
+				rdf_object.add_triple ((RepositoryObject)object);
+			}
+			return (Storable[]) rdf_objects;
 		}
 	}
 }
