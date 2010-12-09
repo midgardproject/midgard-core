@@ -53,9 +53,17 @@ namespace MidgardCR
 		}
 
 		public void add_constraint (QueryConstraintSimple constraint) {
-			((this as SQLQueryConstraintGroup).
-				_core_query_constraint as MidgardCRCore.QueryConstraintGroup).
-					add_constraint (((constraint as SQLQueryConstraint)._core_query_constraint as MidgardCRCore.QueryConstraintSimple));
+			/* This condition is for safe typecasting. We can not type cast to constraint simple
+			 * interface, due to core query objects held by particular constraints */
+			if (constraint is QueryConstraint)
+				((this as SQLQueryConstraintGroup).
+					_core_query_constraint as MidgardCRCore.QueryConstraintGroup).
+						add_constraint (((constraint as SQLQueryConstraint)._core_query_constraint as MidgardCRCore.QueryConstraintSimple));
+			else if (constraint is QueryConstraintGroup)
+				((this as SQLQueryConstraintGroup).
+					_core_query_constraint as MidgardCRCore.QueryConstraintGroup).
+						add_constraint (((constraint as SQLQueryConstraintGroup)._core_query_constraint as MidgardCRCore.QueryConstraintSimple));
+
 		}
 
 		public unowned QueryConstraintSimple[]? list_constraints () {
