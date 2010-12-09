@@ -58,7 +58,7 @@ namespace MidgardCRCore {
 	}
 
 	public interface QueryHolder : GLib.Object {
-		public void get_value (GLib.Value value);
+		public void get_value (ref GLib.Value value);
 		public bool set_value (GLib.Value value);
 	}
 

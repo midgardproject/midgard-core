@@ -73,6 +73,9 @@ __get_value (MidgardCRCoreQueryHolder *self, GValue *value)
 
 	MidgardCRCoreQueryValue *mqp = (MidgardCRCoreQueryValue *) self;
 
+	if (G_IS_VALUE (value))
+		g_value_unset (value);
+
 	g_value_init (value, G_VALUE_TYPE (&mqp->priv->value));
 	g_value_copy ((const GValue *) &mqp->priv->value, value);
 
