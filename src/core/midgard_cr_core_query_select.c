@@ -19,6 +19,7 @@
 #include "midgard_cr_core_query_select.h"
 #include "midgard_cr_core_query_private.h"
 #include "midgard_cr_core_query_holder.h"
+#include "midgard_cr_core_query_constraint_group.h"
 #include <sql-parser/gda-sql-parser.h>
 #include "midgardcr.h"
 #include "midgard_cr_core_sqlstoragemanager.h"
@@ -507,8 +508,12 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->constraint) {
 		MIDGARD_CR_CORE_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement 			(MIDGARD_CR_CORE_QUERY_EXECUTOR (self), MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where);
-		if (MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->n_constraints == 1)
+		if (MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->n_constraints == 1) 
 			__add_second_dummy_constraint (sss, operation);
+		/* FIXME, this is added to avoid 'Wrong number of operands error'.
+		 * This is caused by either QuerySelect implementation or by MidgardCR&MidgardCRCore decorators */ 
+		if (MIDGARD_CR_CORE_IS_QUERY_CONSTRAINT_GROUP (MIDGARD_CR_CORE_QUERY_EXECUTOR (self)->priv->constraint))
+			__add_dummy_constraint (sss, operation);
 	} else { 
 		/* no constraints, add dummy '1=1 AND 0<1' to satisfy top constraint group */
 		__add_dummy_constraint (sss, operation); 

@@ -1422,6 +1422,7 @@ struct _MidgardCRRDFSQLQuerySelect {
 	MidgardCRRDFSQLQuerySelectPrivate * priv;
 	MidgardCRRDFSQLQueryStorage* _rdf_query_storage;
 	MidgardCRQueryConstraintSimple* _original_constraint;
+	MidgardCRQueryConstraintSimple* _triple_constraint;
 };
 
 struct _MidgardCRRDFSQLQuerySelectClass {

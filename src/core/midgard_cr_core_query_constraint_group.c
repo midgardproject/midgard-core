@@ -257,6 +257,7 @@ _midgard_cr_core_query_group_add_conditions_to_statement (MidgardCRCoreQueryExec
 	
 	/* Create base top expression and operation */
 	if (!select->where_cond) {
+		g_print ("CREATE TOP WHERE \n");
 		top_where = gda_sql_expr_new (GDA_SQL_ANY_PART (select));
 		top_operation = gda_sql_operation_new (GDA_SQL_ANY_PART (top_where));
 		top_operation->operator_type = MIDGARD_CR_CORE_QUERY_CONSTRAINT_GROUP (self)->priv->op_type;
@@ -276,6 +277,15 @@ _midgard_cr_core_query_group_add_conditions_to_statement (MidgardCRCoreQueryExec
 	for (i = 0; i < n_objects; i++) {
 
 		MIDGARD_CR_CORE_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (constraints[i])->priv->add_conditions_to_statement (executor, MIDGARD_CR_CORE_QUERY_CONSTRAINT_SIMPLE (constraints[i]), stmt, top_where);
+	}
+
+	/* Add dummy constraint if there's only one constraint.
+	 * In group we need to have at least two operands. */
+	if ((top_operation && top_operation->operands) && g_slist_length (top_operation->operands) == 1) {
+		GdaSqlExpr *dexpr = gda_sql_expr_new (GDA_SQL_ANY_PART (top_operation));
+		dexpr->value = gda_value_new (G_TYPE_STRING);
+		g_value_take_string (dexpr->value, g_strdup ("1=1"));
+		top_operation->operands = g_slist_append (top_operation->operands, dexpr);
 	}
 
 	g_free (constraints);
