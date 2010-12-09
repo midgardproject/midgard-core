@@ -2845,4 +2845,48 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 	return table_field;
 }
 
+gchar*
+midgard_core_query_unescape_string (MidgardConnection *mgd, const gchar *string)
+{
+	glong total;
+	gchar *ptr;
+	gchar *retval;
+	glong offset = 0;
+	
+	if (!string) 
+		return NULL;
+
+	total = strlen (string);
+	retval = g_memdup (string, total+1);
+	ptr = (gchar *) retval;
+	while (offset < total) {
+
+		/* we accept the "''" as a synonym of "\'" */
+		if (*ptr == '\'') {
+			if (*(ptr+1) == '\'') {
+				g_memmove (ptr+1, ptr+2, total - offset);
+				offset += 2;
+			}
+		}
+		if (*ptr == '\\') {
+			if (*(ptr+1) == '\\') {
+				g_memmove (ptr+1, ptr+2, total - offset);
+				offset += 2;
+			}
+			else {
+				if (*(ptr+1) == '\'') {
+					*ptr = '\'';
+					g_memmove (ptr+1, ptr+2, total - offset);
+					offset += 2;
+				}				
+			}
+		}
+		else
+			offset ++;
+
+		ptr++;
+	}
+
+	return retval;		
+}
 
