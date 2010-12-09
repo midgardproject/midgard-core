@@ -108,8 +108,10 @@ namespace MidgardCR
 		}
 
 		public virtual void execute () throws ExecutableError {
+			this._storage_manager.operation_start ();
 			this._create_core_query_select ();
 			((MidgardCRCore.QueryExecutor)this._core_query_select).execute ();
+			this._storage_manager.operation_end ();
 		}
 
 		public void add_join (string type, QueryProperty left_property, QueryProperty right_property) {
