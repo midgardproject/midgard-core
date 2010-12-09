@@ -24,6 +24,17 @@
 
 using MidgardCR;
 
+void profiler_callback_start (SQLProfiler profiler)
+{
+        profiler.start ();
+}
+
+void profiler_callback_end (SQLProfiler profiler)
+{
+        profiler.end ();
+        GLib.print ("SQL QUERY: %s (%.04f) \n", profiler.command, profiler.time);
+}
+
 void main()
 {
 	GLib.Log.set_always_fatal (GLib.LogLevelFlags.LEVEL_WARNING);
@@ -98,6 +109,17 @@ RDFSQLStorageManager getStorageManager()
 	foreach (ObjectModel model in model_manager.list_object_models())
 		builder.register_model(model);
 	builder.execute();
+
+	/* Connect profiler callbacks to all ModelManager signal emissions */
+        SQLProfiler profiler = (SQLProfiler) storage_manager.profiler;
+        profiler.enable (true);
+        storage_manager.operation_start.connect (() => {
+                profiler_callback_start(profiler);
+        });
+        storage_manager.operation_end.connect (() => {
+                profiler_callback_end(profiler);
+        });
+
 
 	return storage_manager;
 }
