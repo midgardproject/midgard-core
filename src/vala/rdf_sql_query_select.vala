@@ -23,6 +23,7 @@ namespace MidgardCR
 		/* internal properties */
 		internal RDFSQLQueryStorage _rdf_query_storage = null;	
 		internal QueryConstraintSimple _original_constraint = null;
+		internal QueryConstraintSimple _triple_constraint = null;
 	
 		/* Constructor */
 		public RDFSQLQuerySelect (StorageManager manager, RDFSQLQueryStorage storage) {
@@ -32,6 +33,10 @@ namespace MidgardCR
 		
 		public static new RDFSQLQuerySelect create_query_select (StorageManager manager, RDFSQLQueryStorage storage) {
 			return new RDFSQLQuerySelect (manager, storage);
+		}
+
+		~RDFSQLQuerySelect () {
+			print ("FIXME, destroy implicit constraints");
 		}
 
 		public override void set_constraint (QueryConstraintSimple constraint) {
@@ -60,7 +65,8 @@ namespace MidgardCR
 				new QueryProperty ("classname", null),
 				"=",
 				QueryValue.create_with_value (this._query_storage.classname),
-				null));
+				null)
+			);
 
 			/* Get all available constraints */
 			QueryConstraintSimple[]? constraints = null;
@@ -73,8 +79,47 @@ namespace MidgardCR
 			}
 			/* Determine new constraints and add them to group */
 			foreach (QueryConstraintSimple constraint in constraints) {
-				print ("CONSTR MISSED\n");
+				/* Create three constraints for every added one.
+				 * We need to check if property_literal or property_value match.
+				 * ...AND (
+				 *        property_name = constraint.property.propertyname 
+				 *        AND
+				 * 	 (property_literal = constraint.value.get_value 
+				 * 		OR property_value = constraint.value.get_value))	 */
+				if (constraint is SQLQueryConstraint) {
+					string property_name = ((QueryProperty) ((SQLQueryConstraint)constraint).property).propertyname;
+					string property_value = ((QueryValueHolder) ((SQLQueryConstraint)constraint).holder).get_value ().get_string ();
+					/* Add 'property' constraint */
+					c_group.add_constraint ( 
+						new SQLQueryConstraint (
+							new QueryProperty ("property", null),
+								"=",
+								QueryValue.create_with_value (property_name),
+								null)
+					);
+					
+					/* Add property_value and property_literal constraints */
+					var t_group = new SQLQueryConstraintGroup ("OR");
+					t_group.add_constraint ( 
+						new SQLQueryConstraint (
+							new QueryProperty ("literal", null),
+								"=",
+								QueryValue.create_with_value (property_value),
+								null)
+					);
+					t_group.add_constraint ( 
+						new SQLQueryConstraint (
+							new QueryProperty ("value", null),
+								"=",
+								QueryValue.create_with_value (property_value),
+								null)
+					);
+					c_group.add_constraint (t_group);	
+				}
 			}
+
+			/* Set implicit constraints, so we can destroy them all */
+			this._triple_constraint = c_group;
 
 			base.set_constraint (c_group);
 			base.execute ();	
