@@ -41,7 +41,10 @@ namespace MidgardCR
 		}
 
 		public GLib.Value get_value () { 
-			return this._value; 
+			this._create_core_value ();
+			GLib.Value val = "";
+			((MidgardCRCore.QueryValue)this._core_query_holder).get_value (ref val);
+			return val;
 		}
 
 		public void set_value (GLib.Value value) { 
