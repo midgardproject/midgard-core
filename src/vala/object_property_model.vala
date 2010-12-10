@@ -177,6 +177,7 @@ namespace MidgardCR {
 		 */
 		public ObjectPropertyModel (string name, string type, string dvalue) {
 			Object (name: name, valuetypename: type, valuedefault: dvalue);
+			this._id = 0; /* silent valac */
 			this._set_gtype_from_name ();	
 		} 
 		

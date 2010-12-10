@@ -125,7 +125,7 @@ namespace MidgardCR
 			base.execute ();	
 		}
 
-		private RDFGenericObject _find_rdf_object (RDFGenericObject[]? objects, string name, string guid) {
+		private RDFGenericObject? _find_rdf_object (RDFGenericObject[]? objects, string name, string guid) {
 			if (objects == null)
 				return null;
 			foreach (RDFGenericObject object in objects) {

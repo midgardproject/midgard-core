@@ -975,9 +975,6 @@ struct _MidgardCRObjectBuilder {
 	MidgardCRObjectModel** _models;
 	gint _models_length1;
 	gint __models_size_;
-	MidgardCRObjectModel** _delayed_models;
-	gint _delayed_models_length1;
-	gint __delayed_models_size_;
 };
 
 struct _MidgardCRObjectBuilderClass {

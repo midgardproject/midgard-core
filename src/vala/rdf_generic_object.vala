@@ -85,7 +85,13 @@ namespace MidgardCR {
 			/* FIXME, handle returned array */
 			if (triples == null) {
 				var builder = new ObjectBuilder ();
-	                       	triple = builder.factory ("RDFTripleObject") as RepositoryObject; 
+				try {
+	                       		triple = builder.factory ("RDFTripleObject") as RepositoryObject; 
+				} catch ( ValidationError e) {
+					/* Do nothing */
+				} catch (ObjectBuilderError e) {
+					/* Do nothing */
+				}
 				this._triples += triple;
 			} else {
 				triple = triples[0];
@@ -106,7 +112,13 @@ namespace MidgardCR {
 			/* FIXME, handle returned array */
 			if (triples == null) {
 				var builder = new ObjectBuilder ();
-	                       	triple = builder.factory ("RDFTripleObject") as RepositoryObject; 
+	                       	try {
+					triple = builder.factory ("RDFTripleObject") as RepositoryObject; 
+				} catch ( ValidationError e) {
+					/* Do nothing */
+				} catch (ObjectBuilderError e) {
+					/* Do nothing */
+				}
 				this._triples += triple;
 			} else {
 				triple = triples[0];

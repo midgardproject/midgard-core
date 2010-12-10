@@ -26,7 +26,7 @@ namespace MidgardCR {
 
 		/* private properties */
 		internal ObjectModel[] _models = null;
-		internal ObjectModel[] _delayed_models = null;
+		/* internal ObjectModel[] _delayed_models = null; */
 
 		/* private methods */
 		private void _validate_model (Model model) throws ValidationError {
@@ -77,7 +77,11 @@ namespace MidgardCR {
 		public void execute () throws ExecutableError {
 			if (this._models == null)
 				throw new ExecutableError.COMMAND_INVALID_DATA ("No models associated with builder");
-			MidgardCRCore.ObjectBuilder.register_types (this);
+			try {
+				MidgardCRCore.ObjectBuilder.register_types (this);
+			} catch (Error e) {
+				throw new ExecutableError.INTERNAL (e.message);
+			}
 		}
 	}
 }

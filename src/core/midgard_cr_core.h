@@ -15,3 +15,5 @@
 #include "midgard_cr_core_object_builder.h"
 #include "midgard_cr_core_sql_storage_model_manager.h"
 #include "midgard_cr_core_storage_sql.h"
+#include "midgard_cr_core_guid.h"
+

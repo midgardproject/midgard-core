@@ -80,10 +80,14 @@ namespace MidgardCR {
 				this.model_manager.prepare_create ();
 			} catch (ValidationError e) {
 				if (!(e is ValidationError.NAME_DUPLICATED))
-					throw e;
+					throw new StorageManagerError.INTERNAL (e.message);
 			}
 			
-			this.model_manager.execute ();	
+			try {
+				this.model_manager.execute ();	
+			} catch (ExecutableError e) {
+				throw new StorageManagerError.INTERNAL (e.message);
+			}
 			
 			return true;	
 		}

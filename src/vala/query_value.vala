@@ -23,9 +23,6 @@ namespace MidgardCR
 		/* internal properties */
 		internal GLib.Object _core_query_holder = null;
 
-		/* private properties */
-		private GLib.Value _value;
-
 		private void _create_core_value () {
 			if (this._core_query_holder == null)
 				this._core_query_holder = new MidgardCRCore.QueryValue ();

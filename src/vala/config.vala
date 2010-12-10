@@ -130,7 +130,13 @@ namespace MidgardCR {
 		}
 
 		public static string[]? list_configurations (bool user) throws GLib.FileError {
-			string[] names = MidgardCRCore.Config.list_files (user);	
+			string[]? names = null;
+			/* FIXME, both error domains shoudl be equal */
+			try {
+				names = MidgardCRCore.Config.list_files (user);	
+			} catch (KeyFileError e) {
+				throw new FileError.FAILED (e.message);
+			}
 			return names;
 		}
 
