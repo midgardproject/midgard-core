@@ -205,7 +205,7 @@ __query_select_add_orders (MidgardCRCoreQueryExecutor *self)
 	MidgardCRCoreQueryExecutor *executor = MIDGARD_CR_CORE_QUERY_EXECUTOR (self);
 	GdaSqlStatement *sql_stm = executor->priv->stmt;
 	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;	
-	MidgardCRStorageManager *mgd = self->priv->storage_manager;
+	MidgardCRSQLStorageManager *mgd = self->priv->storage_manager;
 	GdaSqlSelectOrder *order; 
 	GValue *value;
 	GdaSqlExpr *expr;
@@ -380,7 +380,7 @@ __add_second_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *t
 }
 
 static void
-__add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *table_name, 
+__add_fields_to_select_statement (GdaConnection *cnc, GdaSqlStatementSelect *select, const gchar *table_name, 
 		MidgardCRStorageModel *storage_model, guint *col_id, GError **error)
 {
 	guint n_models;
@@ -390,6 +390,9 @@ __add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *ta
         GValue *val;
         gchar *table_field;
 	GError *err = NULL;
+	gchar *q_property;
+	gchar *q_table;
+	gchar *q_field;
 
 	MidgardCRModel **models = midgard_cr_model_list_models (MIDGARD_CR_MODEL (storage_model), &n_models); 
 	if (!models) {
@@ -403,27 +406,29 @@ __add_fields_to_select_statement (GdaSqlStatementSelect *select, const gchar *ta
 	for (i = 0; i < n_models; i++) {
 		/* Storage model of object type, select fields from this model */
 		if (midgard_cr_model_property_get_valuegtype (MIDGARD_CR_MODEL_PROPERTY (models[i])) == G_TYPE_OBJECT) {
-			__add_fields_to_select_statement (select, table_name, MIDGARD_CR_STORAGE_MODEL (models[i]), col_id, &err);
+			__add_fields_to_select_statement (cnc, select, table_name, MIDGARD_CR_STORAGE_MODEL (models[i]), col_id, &err);
 			if (err) {
 				g_propagate_error (error, err);
 				return;
 			}
 			continue;
 		}
-		const gchar *property = midgard_cr_model_get_name (models[i]);
-		const gchar *property_field = midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (models[i]));
+		q_field = gda_connection_quote_sql_identifier (cnc, 
+				midgard_cr_storage_model_get_location (MIDGARD_CR_STORAGE_MODEL (models[i])));
+		q_table = gda_connection_quote_sql_identifier (cnc, table_name);
 		select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
-		select_field->as = g_strdup (property);
+		select_field->as = gda_connection_quote_sql_identifier (cnc, midgard_cr_model_get_name (models[i]));
 		select->expr_list = g_slist_append (select->expr_list, select_field);
 		expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
 		val = g_new0 (GValue, 1);
 		g_value_init (val, G_TYPE_STRING);
-		table_field = g_strconcat (property_table, ".", property_field, NULL);
-		g_value_set_string (val, table_field);
-		g_free (table_field);
+		table_field = g_strconcat (q_table, ".", q_field, NULL);
+		g_value_take_string (val, table_field);
 		expr->value = val;
 		select_field->expr = expr;
 		MIDGARD_CR_SQL_COLUMN_MODEL (models[i])->_col_id = *col_id;
+		g_free (q_field);
+		g_free (q_table);
 		(*col_id)++;
 	}
 
@@ -493,7 +498,7 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError 
 
 	/* Add fields for all properties registered per class (SELECT a,b,c...) */
 	guint _col_id = 0;
-	__add_fields_to_select_statement (sss, s_target->as, MIDGARD_CR_STORAGE_MODEL (table_model), &_col_id, &err);
+	__add_fields_to_select_statement (cnc, sss, s_target->as, MIDGARD_CR_STORAGE_MODEL (table_model), &_col_id, &err);
 	if (err)
 		goto return_false;
 

@@ -81,7 +81,7 @@ struct _MidgardCRCoreQueryPropertyPrivate {
 };
 
 struct _MidgardCRCoreQueryExecutorPrivate {
-	MidgardCRStorageManager *storage_manager;
+	MidgardCRSQLStorageManager *storage_manager;
 	MidgardCRCoreQueryStorage *storage;
 	guint n_constraints;
 	MidgardCRCoreQueryConstraintSimple *constraint;
@@ -99,6 +99,8 @@ struct _MidgardCRCoreQueryExecutorPrivate {
 	gboolean include_deleted; /* whether to select deleted objects or not */
 	GSList *include_deleted_targets; /* particular targets to select deleted objects from */
 };
+
+#define MCQE_CNC(__executor) (GdaConnection *)__executor->priv->storage_manager->_cnc
 
 struct _MidgardCRCoreQueryConstraintSimplePrivate {
 	void	(*add_conditions_to_statement)	(MidgardCRCoreQueryExecutor *executor, MidgardCRCoreQueryConstraintSimple *self, 

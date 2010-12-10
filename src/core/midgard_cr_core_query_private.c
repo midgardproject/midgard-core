@@ -206,6 +206,9 @@ midgard_cr_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *e
 	while(spltd[i] != NULL)
 		i++;
 
+	gchar *q_table = NULL;
+	gchar *q_field = NULL;
+
 	/* case: property */
 	if (i == 1) {
 		const gchar *property_field = 
@@ -215,7 +218,9 @@ midgard_cr_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *e
 			g_strfreev (spltd);
 			return NULL;
 		}
-		table_field = g_strdup_printf ("%s.%s", table_alias, property_field);
+		q_table = gda_connection_quote_sql_identifier (MCQE_CNC (executor), table_alias);
+		q_field = gda_connection_quote_sql_identifier (MCQE_CNC (executor), property_field);
+		table_field = g_strdup_printf ("%s.%s", q_table, q_field);
 	} else if (i < 4) {
 		/* Set all pointers we need to generate valid tables' names, aliases or joins */
 		Psh holder = {NULL, };
@@ -235,14 +240,19 @@ midgard_cr_core_query_compute_constraint_property (MidgardCRCoreQueryExecutor *e
 			j++;
 		}	
 		
-		if (holder.table_alias && holder.colname)
-			table_field = g_strdup_printf ("%s.%s", holder.table_alias, holder.colname);
+		if (holder.table_alias && holder.colname) {
+			q_table = gda_connection_quote_sql_identifier (MCQE_CNC (executor), holder.table_alias);
+			q_field = gda_connection_quote_sql_identifier (MCQE_CNC (executor), holder.colname);
+			table_field = g_strdup_printf ("%s.%s", q_table, q_field);
+		}
 
 	} else {
 		  g_warning("Failed to parse '%s'. At most 3 tokens allowed", name);
 	}
 
 	g_strfreev (spltd);
+	g_free (q_table);
+	g_free (q_field);
 
 	return table_field;
 }
