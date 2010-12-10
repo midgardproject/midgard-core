@@ -32,7 +32,7 @@ libmidgardvala_la_SOURCES = \
 			  query_property.vala \
 			  query_value.vala \
 			  sql_content_manager.vala \
-			  sql_storage_model_manager.vala \
+			  sql_model_manager.vala \
 			  sql_table_model.vala \
 			  sql_column_model.vala \
 			  sql_query_storage.vala \

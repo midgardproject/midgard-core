@@ -36,9 +36,9 @@ namespace MidgardCRCore {
 		public static void load_models (MidgardCR.SQLStorageManager storage_mgr) throws MidgardCR.StorageManagerError;
 }
 
-	public class SQLStorageModelManager {
-		public static void prepare_create (MidgardCR.SQLStorageModelManager manager, MidgardCR.Model model) throws MidgardCR.ValidationError;
-		public static void execute (MidgardCR.SQLStorageModelManager manager) throws MidgardCR.ExecutableError;
+	public class SQLModelManager {
+		public static void prepare_create (MidgardCR.SQLModelManager manager, MidgardCR.Model model) throws MidgardCR.ValidationError;
+		public static void execute (MidgardCR.SQLModelManager manager) throws MidgardCR.ExecutableError;
 	}
 
 	public class SQLStorageContentManager {

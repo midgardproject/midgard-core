@@ -1,4 +1,4 @@
-/* MidgardCore SQLStorageModelManager routines
+/* MidgardCore SQLModelManager routines
  *    
  * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
  *        
@@ -22,7 +22,7 @@
 #include "midgardcr.h"
 
 void 
-midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageModelManager *manager, MidgardCRModel *model, GError **error)
+midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLModelManager *manager, MidgardCRModel *model, GError **error)
 {
 	/* 
 	g_return_if_fail (manager != NULL);
@@ -61,31 +61,31 @@ midgard_cr_core_sql_storage_model_manager_prepare_create (MidgardCRSQLStorageMod
 }
 
 void 
-midgard_cr_core_sql_table_model_manager_prepare_update (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_prepare_update (MidgardCRSQLModelManager *manager, GError **error)
 {
 
 }
 
 void 
-midgard_cr_core_sql_table_model_manager_prepare_save (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_prepare_save (MidgardCRSQLModelManager *manager, GError **error)
 {
 
 }
 
 void 
-midgard_cr_core_sql_table_model_manager_prepare_delete (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_prepare_delete (MidgardCRSQLModelManager *manager, GError **error)
 {
 
 }
 
 void 
-midgard_cr_core_sql_table_model_manager_prepare_purge (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_prepare_purge (MidgardCRSQLModelManager *manager, GError **error)
 {
 
 }
 
 void 
-midgard_cr_core_sql_table_model_manager_execute (MidgardCRSQLStorageModelManager *manager, GError **error)
+midgard_cr_core_sql_table_model_manager_execute (MidgardCRSQLModelManager *manager, GError **error)
 {
 	/*
 	g_return_if_fail (manager != NULL);

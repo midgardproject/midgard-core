@@ -454,10 +454,10 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError 
 
 	MidgardCRSQLStorageManager *mgd = (MidgardCRSQLStorageManager *) self->priv->storage_manager;
 	g_return_val_if_fail (mgd != NULL, FALSE);
-	MidgardCRSQLStorageModelManager *model_manager = 
-		(MidgardCRSQLStorageModelManager *) midgard_cr_storage_manager_get_model_manager (MIDGARD_CR_STORAGE_MANAGER (mgd));
+	MidgardCRSQLModelManager *model_manager = 
+		(MidgardCRSQLModelManager *) midgard_cr_storage_manager_get_model_manager (MIDGARD_CR_STORAGE_MANAGER (mgd));
 	MidgardCRSQLTableModel *table_model = 
-		midgard_cr_sql_storage_model_manager_get_table_model_by_name (model_manager, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (klass)));
+		midgard_cr_sql_model_manager_get_table_model_by_name (model_manager, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (klass)));
 	GdaConnection *cnc = (GdaConnection *) mgd->_cnc;
 	GdaSqlParser *parser = (GdaSqlParser *) mgd->_parser;
 	GdaSqlStatement *sql_stm;
@@ -676,8 +676,8 @@ _midgard_cr_core_query_select_list_objects (MidgardCRCoreQuerySelect *self, guin
 	GObjectClass *klass = g_type_class_peek (g_type_from_name (classname));
 	MidgardCRSQLTableModel *table_model = midgard_cr_core_query_find_table_model_by_name (manager, classname);
 	MidgardCRObjectModel *object_model = 
-		midgard_cr_sql_storage_model_manager_get_object_model_by_name (
-				MIDGARD_CR_SQL_STORAGE_MODEL_MANAGER (midgard_cr_storage_manager_get_model_manager (MIDGARD_CR_STORAGE_MANAGER (manager))), classname);
+		midgard_cr_sql_model_manager_get_object_model_by_name (
+				MIDGARD_CR_SQL_MODEL_MANAGER (midgard_cr_storage_manager_get_model_manager (MIDGARD_CR_STORAGE_MANAGER (manager))), classname);
 	MidgardCRStorable **objects = g_new (MidgardCRStorable *, rows+1);	
 
 	for (i = 0; i < rows; i++) {	

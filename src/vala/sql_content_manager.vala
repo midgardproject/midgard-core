@@ -56,7 +56,7 @@ namespace MidgardCR {
 		 * 
 		 * @param object Storable object
 		 *
-		 * This method requires valid {@link SQLTableModel}, available from {@link SQLStorageModelManager}.
+		 * This method requires valid {@link SQLTableModel}, available from {@link SQLModelManager}.
 		 * If such is found, object's properties values will be stored in table, which name, 
 		 * is declared as table model's location.
 		 *
@@ -66,11 +66,11 @@ namespace MidgardCR {
 		public virtual void create (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
-				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+				((SQLModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
 			if (table_model == null)
 				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
-				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+				((SQLModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			this._storage_manager.operation_start ();
 			MidgardCRCore.SQLStorageContentManager.storable_insert (object, this._storage_manager, object_model, table_model);
 			this._storage_manager.operation_end ();
@@ -81,7 +81,7 @@ namespace MidgardCR {
 		 * 
 		 * @param object Storable object
 		 *
-		 * This method requires valid {@link SQLTableModel}, available from {@link SQLStorageModelManager}.
+		 * This method requires valid {@link SQLTableModel}, available from {@link SQLModelManager}.
 		 * If such is found, object's properties values will be stored in table, which name, 
 		 * is declared as table model's location.
 		 *
@@ -91,11 +91,11 @@ namespace MidgardCR {
 		public virtual void update (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
-				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+				((SQLModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
 			if (table_model == null)
 				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
-				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+				((SQLModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			this._storage_manager.operation_start ();
 			MidgardCRCore.SQLStorageContentManager.storable_update (object, this._storage_manager, object_model, table_model);
 			this._storage_manager.operation_end ();
@@ -106,7 +106,7 @@ namespace MidgardCR {
 		 *
 		 * @param object Storable object
 		 *
-		 * This method requires valid {@link SQLTableModel}, available from {@link SQLStorageModelManager}.
+		 * This method requires valid {@link SQLTableModel}, available from {@link SQLModelManager}.
 		 * If such is found, object's properties values will be stored in table, which name, 
 		 * is declared as table model's location.
 		 *
@@ -121,11 +121,11 @@ namespace MidgardCR {
 		public virtual void save (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
-				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+				((SQLModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
 			if (table_model == null)
 				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
-				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+				((SQLModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			try {
 				this._storage_manager.operation_start ();
 				MidgardCRCore.SQLStorageContentManager.storable_update (object, this._storage_manager, object_model, table_model);			
@@ -144,7 +144,7 @@ namespace MidgardCR {
 		 * 
 		 * @param object Storable object
 		 *
-		 * This method requires valid {@link SQLTableModel}, available from {@link SQLStorageModelManager}.
+		 * This method requires valid {@link SQLTableModel}, available from {@link SQLModelManager}.
 		 * If such is found, its location, will be used to determine target table for SQL DELETE operation.
 		 *
 		 * Entire object's record is deleted from table and it's recover is impossible.
@@ -155,11 +155,11 @@ namespace MidgardCR {
 		public virtual void purge (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
-				((SQLStorageModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
+				((SQLModelManager)this._storage_manager.model_manager).get_table_model_by_name (name);
 			if (table_model == null)
 				throw new StorageContentManagerError.MODEL_INVALID ("SQL table model not available for %s class", name);
 			ObjectModel object_model = 
-				((SQLStorageModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
+				((SQLModelManager)this._storage_manager.model_manager).get_object_model_by_name (name);
 			this._storage_manager.operation_start ();
 			MidgardCRCore.SQLStorageContentManager.storable_purge (object, this._storage_manager, object_model, table_model);
 			this._storage_manager.operation_end ();

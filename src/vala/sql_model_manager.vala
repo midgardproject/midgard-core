@@ -18,7 +18,7 @@
 
 namespace MidgardCR {
 
-	public class SQLStorageModelManager : GLib.Object, Model, Executable, StorageExecutor, StorageModelManager {
+	public class SQLModelManager : GLib.Object, Model, Executable, StorageExecutor, StorageModelManager {
 
 		/* internal properties */
 		internal unowned SQLStorageManager _storage_manager = null;
@@ -34,7 +34,7 @@ namespace MidgardCR {
 
 		/* Model properties */
 		/**
-		 * SQLStorageModelManager doesn't hold parent model.
+		 * SQLModelManager doesn't hold parent model.
 		 */	
 		public Model? parent { 
 			get { return null; }
@@ -81,7 +81,7 @@ namespace MidgardCR {
 				
 		/**
                  * Get model by given name. 
-		 * SQLStorageModelManager holds {@link ObjectModel} and {@link StorageModel} models,
+		 * SQLModelManager holds {@link ObjectModel} and {@link StorageModel} models,
 		 * so accepted name by the one of Schema or Storage model.
 	         * 
                  * @param name {@link Model} name to look for
@@ -372,7 +372,7 @@ namespace MidgardCR {
 		}		
 
 		/**
-		 * SQLStorageModelManager can not be copied.
+		 * SQLModelManager can not be copied.
 		 * @return null
 		 */
 		public Model? copy () {

@@ -24,7 +24,7 @@ namespace MidgardCR {
 	 *
 	 * Property and column name mapping is done with {@link SQLColumnModel}. 
 	 * 
-	 * {@link SQLStorageModelManager} provides access to all available schema and SQL storage models.
+	 * {@link SQLModelManager} provides access to all available schema and SQL storage models.
 	 * 
 	 */ 
 	public class SQLTableModel: GLib.Object, Executable, StorageExecutor, Model, StorageModel {
@@ -42,7 +42,7 @@ namespace MidgardCR {
 
 		internal uint _id = 0;
 		internal SQLStorageManager _storage_manager = null;
-		internal SQLStorageModelManager _model_manager = null;
+		internal SQLModelManager _model_manager = null;
 	
 		/* public properties */
 		
