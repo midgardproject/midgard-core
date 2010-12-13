@@ -909,11 +909,9 @@ midgard_collector_execute (MidgardCollector *self)
 				g_value_transform(gda_value, new_value);
 			
 			} else if (G_VALUE_TYPE (gda_value) == GDA_TYPE_BLOB) {
-				gchar *stringified = gda_value_stringify ((GValue*)gda_value);
-				gchar *escaped = midgard_core_query_unescape_string (NULL, stringified);
+				gchar *stringified = midgard_core_query_binary_stringify ((GValue*)gda_value);
 				g_value_init(new_value, G_TYPE_STRING);
-				g_value_take_string(new_value, escaped);
-				g_free (stringified);
+				g_value_take_string(new_value, stringified);
 			} else if (G_VALUE_TYPE (gda_value) == G_TYPE_STRING) {		
 				g_value_init(new_value, G_TYPE_STRING);
 				g_value_take_string(new_value, g_value_dup_string (gda_value));
