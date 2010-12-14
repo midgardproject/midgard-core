@@ -329,7 +329,7 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 	}
 
 	/* CacheDir */
-	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "ShareDir", NULL);
+	tmpstr = g_key_file_get_string (keyfile, "MidgardDir", "CacheDir", NULL);
 	if(tmpstr != NULL || (tmpstr && *tmpstr == '\0')) {
 
 		g_free (self->cachedir);
