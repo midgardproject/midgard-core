@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Schema xmlns="http://www.midgard-project.org/repligard/1.4">
     <type name="midgard_person" table="person">
+        <user_values>
+            <typeof>http://xmlns.com/foaf/0.1/Person</typeof>
+            <namespaces>foaf:http://xmlns.com/foaf/0.1/</namespaces>
+        </user_values>
         <property name="id" type="unsigned integer" primaryfield="id">
             <description>Local non-replication-safe database identifier</description>
         </property>
         <property name="firstname" type="string" index="yes" unique="yes">
             <description>First name of the person</description>
+            <property>foaf:firstName</property>
         </property>
         <property name="lastname" type="string" index="yes">
             <description>Last name of the person</description>
+            <property>foaf:lastName</property>
         </property>
     </type>
 
@@ -115,24 +121,33 @@
     </type>
 
     <type name="midgard_activity" table="midgard_activity">
+        <user_values>
+            <typeof>http://xmlns.notu.be/aair#Activity</typeof>
+            <namespaces>aair:http://xmlns.notu.be/aair#</namespaces>
+        </user_values>
         <property name="id" type="unsigned integer" primaryfield="id">
             <description>Local non-replication-safe database identifier</description>
         </property>
         <property name="actor" link="midgard_person:id" type="unsigned integer" parentfield="actor">
             <description>The person who performed the activity</description>
+            <property>aair:Actor</property>
         </property>
         <property name="verb" type="string" index="yes">
             <!-- Note: there must be multiple verbs when Midgard supports it -->
             <description>The action performed, following Atom Activity Extension URL schema (for example: http://activitystrea.ms/schema/1.0/post)</description>
+            <property>aair:activityVerb</property>
         </property>
         <property name="target" type="guid">
             <description>The object that the action was done to</description>
+            <property>aair:activityObject</property>
         </property>
         <property name="summary" type="string">
             <description>A human-readable description of the activity</description>
+            <property>aair:summary</property>
         </property>
         <property name="application" type="string" index="yes">
             <description>Application the activity was performed with. In case of MidCOM, a component</description>
+            <property>aair:Application</property>
         </property>
     </type>
 </Schema>
