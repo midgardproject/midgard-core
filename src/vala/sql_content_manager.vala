@@ -27,20 +27,28 @@ namespace MidgardCR {
 	
 		/* internal properties */
 		internal SQLStorageManager _storage_manager = null;
+		protected NamespaceManager _ns_manager = null;
 
 		/* public properties */
-		public StorageManager storagemanager {
-			get { return this._storage_manager; }
+		public unowned StorageManager storage_manager {
+			get { return (StorageManager) this._storage_manager; }
 			construct { this._storage_manager = (SQLStorageManager) value; }
 		}
 
+		public unowned NamespaceManager namespace_manager {
+			get {
+				if (this._ns_manager == null);
+					this._ns_manager = new SQLNamespaceManager (this);
+				return this._ns_manager;
+			}
+		}
+
 		/* constructor */
-		public 	SQLContentManager (SQLStorageManager manager) {
-			Object (storagemanager: manager);
+		public SQLContentManager (SQLStorageManager manager) {
+			Object (storage_manager: manager);
 		}
 
 		/* public methods */
-
 		public unowned StorageManager get_storage_manager () {
 			return this._storage_manager;
 		}
@@ -74,7 +82,7 @@ namespace MidgardCR {
 			this._storage_manager.operation_start ();
 			MidgardCRCore.SQLStorageContentManager.storable_insert (object, this._storage_manager, object_model, table_model);
 			this._storage_manager.operation_end ();
-	}	
+		}	
 
 		/**
 		 * Updates object's record in SQL table.

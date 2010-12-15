@@ -22,12 +22,12 @@ namespace MidgardCR {
 
 		internal string[] _names = null;
 		internal string[] _uris = null;
-		internal SQLStorageManager _storage_manager = null;
+		internal SQLContentManager _content_manager = null;
 
 		/* constructor */
-		public SQLNamespaceManager (SQLStorageManager manager) {
+		public SQLNamespaceManager (SQLContentManager manager) {
 			Object ();
-			this._storage_manager = manager;
+			this._content_manager = manager;
 		}
 
 		/* methods */

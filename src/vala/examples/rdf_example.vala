@@ -39,7 +39,10 @@ void main()
 {
 	GLib.Log.set_always_fatal (GLib.LogLevelFlags.LEVEL_WARNING);
 	var storage_manager = getStorageManager();
-	var content_manager = new RDFSQLContentManager(storage_manager);
+	var content_manager = storage_manager.content_manager;
+
+	/* Set names and uris for NamespaceManager */
+	content_manager.namespace_manager.create_uri ("foaf", "http://xmlns.com/foaf/0.1/");
 
 	/* Store data */
 	var mgd = new RDFGenericObject("owl:Thing");

@@ -25,7 +25,7 @@ namespace MidgardCR {
 		/* private properties */
 		private string _name = "";
 		private Config _config = null;
-		private StorageContentManager _content_manager = null;
+		protected StorageContentManager _content_manager = null;
 		private Transaction _transaction = null;
 		private StorageWorkspaceManager _workspace_manager = null;
 		private SQLModelManager _model_manager = null;

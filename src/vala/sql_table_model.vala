@@ -91,7 +91,7 @@ namespace MidgardCR {
 			this._object_model = null;
 		}
 
-		public unowned StorageManager get_storagemanager () {
+		public unowned StorageManager get_storage_manager () {
 			return this._storage_manager;
 		}
 	
@@ -182,7 +182,7 @@ namespace MidgardCR {
 		 * Create new {@link SQLColumnModel}
 		 */
 		public SQLColumnModel create_model_property (string name, string location, string type) {
-			SQLColumnModel model = new SQLColumnModel ( (SQLStorageManager)this.get_storagemanager (), name, location, type);
+			SQLColumnModel model = new SQLColumnModel ( (SQLStorageManager)this.get_storage_manager (), name, location, type);
 			model.parent = this;
 			model.execution_start.connect (this._emit_execution_start);
                         model.execution_end.connect (this._emit_execution_end);
@@ -278,7 +278,7 @@ namespace MidgardCR {
 		 * @return new SQLTableModel
 		 */
 		public Model? copy () {
-			var copy = new SQLTableModel ((SQLStorageManager) this.get_storagemanager (), this.name, this.location);
+			var copy = new SQLTableModel ((SQLStorageManager) this.get_storage_manager (), this.name, this.location);
 			copy.namespace = this.namespace;
 			return (Model) copy;
 		}	

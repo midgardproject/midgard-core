@@ -95,7 +95,6 @@ namespace MidgardCR {
 	public interface StorageModelManager : Model, StorageExecutor {
 
 		/* properties */
-		public abstract NamespaceManager namespace_manager { get; }
 		public abstract unowned StorageManager   storagemanager   { get; } 
 
 		/* methods */
@@ -115,6 +114,9 @@ namespace MidgardCR {
 
 	public interface StorageContentManager : GLib.Object {
 
+		/* properties */
+		public abstract unowned NamespaceManager namespace_manager { get; }
+
 		/* per object methods */
 		public abstract bool exists (Storable object);
 		public abstract void create (Storable object) throws StorageContentManagerError;
@@ -123,7 +125,6 @@ namespace MidgardCR {
 		public abstract void remove (Storable object) throws StorageContentManagerError;
 		public abstract void purge (Storable object) throws StorageContentManagerError;
 
-		public abstract unowned QueryManager get_query_manager ();
 		public abstract unowned StorageManager get_storage_manager ();
 	} 
 
@@ -140,7 +141,7 @@ namespace MidgardCR {
 		public abstract string location { get; set; }		
 
 		/* methods */
-		public abstract unowned StorageManager get_storagemanager ();
+		public abstract unowned StorageManager get_storage_manager ();
 	}
 
 	/* Initialized for every given property name */

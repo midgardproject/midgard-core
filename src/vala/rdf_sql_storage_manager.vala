@@ -24,20 +24,23 @@ namespace MidgardCR {
 	 * RDFSQLStorageManager is designed to store objects without {@link SQLTableModel} models.
 	 * It provides managers to RDF triples, which might be objects or their properties.
 	 */
-	public class RDFSQLStorageManager : SQLStorageManager, RDFStorageManager {
+	public class RDFSQLStorageManager : SQLStorageManager {
 	
 		/* internal properties */
-		internal NamespaceManager _nsmanager = null;
 		internal ObjectModel _rdf_object_model = null;
 		internal SQLTableModel _rdf_table_model = null;
 
 		/* public properties */
 
 		/**
-		 * {@inheritDoc}
+		 * Content Manager of RDFSQLContentManager type 
 		 */
-		public NamespaceManager nsmanager { 
-			get { return this._nsmanager; }
+		public new StorageContentManager content_manager {
+			get {
+				if (this._content_manager == null)
+					this._content_manager = new RDFSQLContentManager(this);
+				return this._content_manager;
+			}
 		}
 
 		/* Constructor */

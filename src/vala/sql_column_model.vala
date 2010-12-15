@@ -244,7 +244,7 @@ namespace MidgardCR {
 			this._id = 0;
 		}
 
-		public unowned StorageManager get_storagemanager () {
+		public unowned StorageManager get_storage_manager () {
 			return (StorageManager) this._storage_manager;
 		}
 	
@@ -427,7 +427,7 @@ namespace MidgardCR {
 		 * @return new SQLColumnModel 
 		 */
 		public Model? copy () {
-			var copy = new SQLColumnModel ((SQLStorageManager) this.get_storagemanager (), this.name, this.location, this.valuetypename);
+			var copy = new SQLColumnModel ((SQLStorageManager) this.get_storage_manager (), this.name, this.location, this.valuetypename);
 			copy.valuedefault = this.valuedefault;
 			copy.namespace = this.namespace;
 			copy.primary = this.primary;
