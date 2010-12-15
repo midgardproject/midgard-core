@@ -30,7 +30,7 @@ namespace MidgardCR {
 	public interface NamespaceManager : GLib.Object {
 
 		/* methods */
-		public abstract void create_uri (string uri, string name) throws NamespaceManagerError;
+		public abstract void create_uri (string name, string uri) throws NamespaceManagerError;
 		public abstract unowned string[]? list_names ();
 		public abstract unowned string? get_uri_by_name (string name);
 		public abstract unowned string? get_name_by_uri (string uri);
