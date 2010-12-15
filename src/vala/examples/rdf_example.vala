@@ -70,7 +70,7 @@ void main()
 	}
 
 	/* Query Data */
-	var query = new RDFSQLQuerySelect(storage_manager, new RDFSQLQueryStorage("foaf:Person"));
+	var query = content_manager.query_manager.create_query_select ("foaf:Person");
 	query.set_constraint(new SQLQueryConstraint(
 		new QueryProperty("http://xmlns.com/foaf/0.1/currentProject", null),
 		"=",

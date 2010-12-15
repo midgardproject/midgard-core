@@ -44,7 +44,7 @@ namespace MidgardCR {
 			}
 		}
 
-		public unowned QueryManager query_manager {
+		public virtual unowned QueryManager query_manager {
 			get {
 				if (this._query_manager == null);
 					this._query_manager = new SQLQueryManager ((SQLStorageManager)this.storage_manager);

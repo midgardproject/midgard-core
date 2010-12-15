@@ -38,7 +38,7 @@ namespace MidgardCR {
 			Object (storage_manager: storage);
 		}
 
-		public new QuerySelect create_query_select (string classname) {
+		public override QuerySelect create_query_select (string classname) {
 			return new RDFSQLQuerySelect (this.storage_manager, new RDFSQLQueryStorage (classname));
 		}
 	}

@@ -38,7 +38,7 @@ namespace MidgardCR {
 			Object (storage_manager: storage);
 		}
 
-		public QuerySelect create_query_select (string classname) {
+		public virtual QuerySelect create_query_select (string classname) {
 			return new SQLQuerySelect (this.storage_manager, new SQLQueryStorage (classname));
 		}
 

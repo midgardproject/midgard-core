@@ -19,7 +19,18 @@
 namespace MidgardCR {
 
 	public class RDFSQLContentManager : SQLContentManager {
-	
+
+		/* private properties */
+		private RDFSQLQueryManager _rdf_query_manager = null;	
+
+		public override unowned QueryManager query_manager {
+			get { 
+				if (this._rdf_query_manager == null)
+					this._rdf_query_manager = new RDFSQLQueryManager ((RDFSQLStorageManager) this.storage_manager);
+				return (QueryManager) this._rdf_query_manager;
+			}
+		}
+
 		/* constructor */
 		public 	RDFSQLContentManager (SQLStorageManager manager) {
 			base (manager);
@@ -69,9 +80,5 @@ namespace MidgardCR {
 		public override void remove (Storable object) throws StorageContentManagerError {
 			return;
 		}		
-
-		/* public unowned QueryManager get_query_manager () {
-			return null;
-		} */
 	}
 }
