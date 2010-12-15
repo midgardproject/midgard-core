@@ -23,7 +23,7 @@ namespace MidgardCR {
 	public interface QueryManager : GLib.Object {
 
 		public abstract QuerySelect create_query_select (string classname);
-		public unowned StorageManager get_storage_manager ();
+		public abstract unowned StorageManager get_storage_manager ();
 	}
 
 	/* FIXME, improve it so we can catch exception in one step */
