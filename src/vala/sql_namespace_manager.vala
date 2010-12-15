@@ -20,8 +20,8 @@ namespace MidgardCR {
 
 	public class SQLNamespaceManager : GLib.Object, NamespaceManager {
 
-		internal string _names[] = null;
-		internal string _uris[] = null;
+		internal string[] _names = null;
+		internal string[] _uris = null;
 		internal SQLStorageManager _storage_manager = null;
 
 		/* constructor */
@@ -31,25 +31,36 @@ namespace MidgardCR {
 		}
 
 		/* methods */
-		public abstract bool create_uri (string uri, string name) throws NamespaceManagerError;
+		public bool create_uri (string uri, string name) throws NamespaceManagerError {
+			return false;
+		}
+
 		public  unowned string[]? list_names () {
-			if (this._names = null)
+			if (this._names == null)
 				return null;
 			return this._names;
 		}
 
-		public unowned string get_uri_by_name (string name) {
+		public unowned string? get_uri_by_name (string name) {
 			uint i = 0;
 			foreach (unowned string n in this._names) {
 				if (n == name)
 					break;
 				i++;
 			}
-			return unowned this._uris[i];
+			return this._uris[i];
 		}
 
-		public abstract string get_name_by_uri (string uri);
-		public abstract bool name_exists ();
-		public abstract bool uri_exists ();
+		public unowned string? get_name_by_uri (string uri) {
+			return null;
+		}
+
+		public bool name_exists () {
+			return false;
+		}
+
+		public bool uri_exists () {
+			return false;
+		}
 	}
 }
