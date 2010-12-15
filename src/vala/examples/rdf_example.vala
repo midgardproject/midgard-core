@@ -45,17 +45,17 @@ void main()
 	content_manager.namespace_manager.create_uri ("foaf", "http://xmlns.com/foaf/0.1/");
 
 	/* Store data */
-	var mgd = new RDFGenericObject("owl:Thing");
+	var mgd = new RDFGenericObject ("owl:Thing");
 	mgd.identifier = "http://www.midgard-project.org/";
 
-	mgd.set_property_value("http://xmlns.com/foaf/0.1/topic", "http://www.midgard-project.org/rdf/topics/content_repository");
+	mgd.set_property_value ("http://xmlns.com/foaf/0.1/topic", "http://www.midgard-project.org/rdf/topics/content_repository");
 	try {
-		content_manager.create(mgd);
+		content_manager.create (mgd);
 	} catch (StorageContentManagerError e) {
 		GLib.error (e.message);
 	}
 
-	var rdf_vali = new RDFGenericObject("http://xmlns.com/foaf/0.1/Person");
+	var rdf_vali = new RDFGenericObject ("http://xmlns.com/foaf/0.1/Person");
 	rdf_vali.identifier = "http://www.midgard-project.org/people/vali";
 
 	rdf_vali.set_property_literal ("foaf:currentProject", "http://www.midgard-project.org/");
@@ -64,25 +64,25 @@ void main()
 	rdf_vali.set_property_value ("foaf:homepage",       "http://www.midgard-project.org/people/vali");
 	
 	try {
-		content_manager.create(rdf_vali);	
+		content_manager.create (rdf_vali);	
 	} catch (StorageContentManagerError e) {
 		GLib.error (e.message);
 	}
 
 	/* Query Data */
 	var query = content_manager.query_manager.create_query_select ("foaf:Person");
-	query.set_constraint(new SQLQueryConstraint(
-		new QueryProperty("http://xmlns.com/foaf/0.1/currentProject", null),
+	query.set_constraint (new SQLQueryConstraint(
+		new QueryProperty ("http://xmlns.com/foaf/0.1/currentProject", null),
 		"=",
-		QueryValue.create_with_value("http://www.midgard-project.org/"),
+		QueryValue.create_with_value ("http://www.midgard-project.org/"),
 		null
 	));
 
 	query.validate();
 	query.execute();
 
-	GLib.print("These people work on midgard!\n");
-	foreach (Storable object in query.list_objects()) {
+	GLib.print ("These people work on midgard!\n");
+	foreach (Storable object in query.list_objects ()) {
 		RDFGenericObject rdf_obj = (RDFGenericObject) object;
 		var name = rdf_obj.get_property_value ("foaf:name");
 		GLib.print("\t%s\n", name != null ? (string) name : "Not found");
@@ -101,8 +101,8 @@ RDFSQLStorageManager getStorageManager()
 	config.dbdir = "./";
 
 	/* connect */
-	var storage_manager = new RDFSQLStorageManager("rdf_test_manager", config);
-	storage_manager.open();
+	var storage_manager = new RDFSQLStorageManager ("rdf_test_manager", config);
+	storage_manager.open ();
 	storage_manager.initialize_storage();
 
 	/* Register models in builder and validate models */
@@ -110,17 +110,17 @@ RDFSQLStorageManager getStorageManager()
 	var builder = new MidgardCR.ObjectBuilder ();
 
 	foreach (ObjectModel model in model_manager.list_object_models())
-		builder.register_model(model);
-	builder.execute();
+		builder.register_model (model);
+	builder.execute ();
 
 	/* Connect profiler callbacks to all ModelManager signal emissions */
         SQLProfiler profiler = (SQLProfiler) storage_manager.profiler;
         profiler.enable (true);
         storage_manager.operation_start.connect (() => {
-                profiler_callback_start(profiler);
+                profiler_callback_start (profiler);
         });
         storage_manager.operation_end.connect (() => {
-                profiler_callback_end(profiler);
+                profiler_callback_end (profiler);
         });
 
 
