@@ -34,7 +34,7 @@ namespace MidgardCR {
 		public abstract unowned string[]? list_names ();
 		public abstract unowned string? get_uri_by_name (string name);
 		public abstract unowned string? get_name_by_uri (string uri);
-		public abstract bool name_exists ();
-		public abstract bool uri_exists ();
+		public abstract bool name_exists (string name);
+		public abstract bool uri_exists (string uri);
 	}
 }
