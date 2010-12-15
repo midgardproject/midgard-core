@@ -31,8 +31,17 @@ namespace MidgardCR {
 		}
 
 		/* methods */
-		public bool create_uri (string uri, string name) throws NamespaceManagerError {
-			return false;
+		public void create_uri (string uri, string name) throws NamespaceManagerError {
+			if (this.uri_exists (uri))
+				throw new NamespaceManagerError.URI_EXISTS ("%s uri already exists", uri);
+			if (this.name_exists (name))
+				throw new NamespaceManagerError.ALIAS_EXISTS ("%s name already exists", name);	
+
+			this._names += name;
+			this._uris += uri;
+
+			/* TODO */
+			/* Store it in a table */
 		}
 
 		public  unowned string[]? list_names () {
@@ -42,6 +51,8 @@ namespace MidgardCR {
 		}
 
 		public unowned string? get_uri_by_name (string name) {
+			if (this._names == null)
+				return null;
 			uint i = 0;
 			foreach (unowned string n in this._names) {
 				if (n == name)
@@ -52,14 +63,34 @@ namespace MidgardCR {
 		}
 
 		public unowned string? get_name_by_uri (string uri) {
-			return null;
+			if (this._uris == null)
+				return null;
+			uint i = 0;
+			foreach (unowned string u in this._uris) {
+				if (u == uri)
+					break;
+				i++;
+			}
+			return this._names[i];
 		}
 
-		public bool name_exists () {
+		public bool name_exists (string name) {	
+			if (this._names == null)
+				return false;
+			foreach (unowned string n in this._names) {
+				if (n == name)
+					return true;
+			}
 			return false;
 		}
 
-		public bool uri_exists () {
+		public bool uri_exists (string uri) {
+			if (this._uris == null)
+				return false;
+			foreach (unowned string u in this._uris) {
+				if (u == uri)
+					return true;
+			}
 			return false;
 		}
 	}
