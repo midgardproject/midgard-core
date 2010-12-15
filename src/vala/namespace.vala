@@ -31,9 +31,9 @@ namespace MidgardCR {
 
 		/* methods */
 		public abstract bool create_uri (string uri, string name) throws NamespaceManagerError;
-		public abstract string[]? list_names ();
-		public abstract string get_uri_by_name (string name);
-		public abstract string get_name_by_uri (string uri);
+		public abstract unowned string[]? list_names ();
+		public abstract unowned string? get_uri_by_name (string name);
+		public abstract unowned string? get_name_by_uri (string uri);
 		public abstract bool name_exists ();
 		public abstract bool uri_exists ();
 	}
