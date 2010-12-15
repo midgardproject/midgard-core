@@ -38,7 +38,7 @@ namespace MidgardCR {
 
 		public unowned NamespaceManager namespace_manager {
 			get {
-				if (this._ns_manager == null);
+				if (this._ns_manager == null)
 					this._ns_manager = new SQLNamespaceManager (this);
 				return this._ns_manager;
 			}
