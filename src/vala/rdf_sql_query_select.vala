@@ -63,20 +63,44 @@ namespace MidgardCR
 			/* TODO */
 		}
 
+		private string _encode_value (NamespaceManager ns_manager, string val) {
+			if ("/" in val) {
+				string rs = val.rstr ("/");
+				if (rs == null)
+					return val;
+				/* Add extra 1 for "/" taken into account in rstr */
+				string uri = val.substring (0, (val.length - rs.length) + 1);
+				string name = ns_manager.get_name_by_uri (uri);
+				if (name == null)
+					return val;
+				return name + ":" + rs.substring (1, -1); 
+			} 
+			else if (":" in val) { 
+				/* foaf:Person */
+				string[] spltd = val.split (":");
+				string uri = ns_manager.get_uri_by_name (spltd[0]);	
+				if (uri == null)
+					return val;
+				return uri + spltd[1];
+			}
+			return val.dup ();
+		}
+
 		public override void execute () throws ExecutableError {
-			/* TODO, determine classname */
-			print ("CLASS %s \n", this._query_storage.classname);
+			/* TODO, determine classname */	
 			this._query_storage._core_query_storage.set ("dbclass", "RDFTripleObject");
+			NamespaceManager ns_manager = this.storagemanager.content_manager.namespace_manager;
 
 			/* Create new constraint group, which will hold all triple related constraints */
 			QueryConstraintGroup c_group = new SQLQueryConstraintGroup ("AND");
 
 			/* Default case, so we add implicit classname constraint.
-			 * ... AND triple_table.classname = ''...  */
+			 * ... AND triple_table.class_name = ''...  */
+			string _classname = _encode_value (ns_manager, this._query_storage.classname);
 			c_group.add_constraint (new SQLQueryConstraint (
 				new QueryProperty ("classname", null),
 				"=",
-				QueryValue.create_with_value (this._query_storage.classname),
+				QueryValue.create_with_value (_classname),
 				null)
 			);
 
@@ -99,7 +123,8 @@ namespace MidgardCR
 				 * 	 (property_literal = constraint.value.get_value 
 				 * 		OR property_value = constraint.value.get_value))	 */
 				if (constraint is SQLQueryConstraint) {
-					string property_name = ((QueryProperty) ((SQLQueryConstraint)constraint).property).propertyname;
+					string property_name = _encode_value (ns_manager, 
+						((QueryProperty) ((SQLQueryConstraint)constraint).property).propertyname);
 					string property_value = ((QueryValueHolder) ((SQLQueryConstraint)constraint).holder).get_value ().get_string ();
 					/* Add 'property' constraint */
 					c_group.add_constraint ( 

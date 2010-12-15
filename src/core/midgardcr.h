@@ -732,7 +732,7 @@ typedef enum  {
 #define MIDGARD_CR_NAMESPACE_MANAGER_ERROR midgard_cr_namespace_manager_error_quark ()
 struct _MidgardCRNamespaceManagerIface {
 	GTypeInterface parent_iface;
-	void (*create_uri) (MidgardCRNamespaceManager* self, const char* uri, const char* name, GError** error);
+	void (*create_uri) (MidgardCRNamespaceManager* self, const char* name, const char* uri, GError** error);
 	char** (*list_names) (MidgardCRNamespaceManager* self, int* result_length1);
 	const char* (*get_uri_by_name) (MidgardCRNamespaceManager* self, const char* name);
 	const char* (*get_name_by_uri) (MidgardCRNamespaceManager* self, const char* uri);
@@ -1561,7 +1561,7 @@ GType midgard_cr_executable_get_type (void) G_GNUC_CONST;
 void midgard_cr_executable_execute (MidgardCRExecutable* self, GError** error);
 GQuark midgard_cr_namespace_manager_error_quark (void);
 GType midgard_cr_namespace_manager_get_type (void) G_GNUC_CONST;
-void midgard_cr_namespace_manager_create_uri (MidgardCRNamespaceManager* self, const char* uri, const char* name, GError** error);
+void midgard_cr_namespace_manager_create_uri (MidgardCRNamespaceManager* self, const char* name, const char* uri, GError** error);
 char** midgard_cr_namespace_manager_list_names (MidgardCRNamespaceManager* self, int* result_length1);
 const char* midgard_cr_namespace_manager_get_uri_by_name (MidgardCRNamespaceManager* self, const char* name);
 const char* midgard_cr_namespace_manager_get_name_by_uri (MidgardCRNamespaceManager* self, const char* uri);

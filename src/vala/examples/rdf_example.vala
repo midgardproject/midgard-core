@@ -68,7 +68,7 @@ void main()
 	} catch (StorageContentManagerError e) {
 		GLib.error (e.message);
 	}
-
+        
 	/* Query Data */
 	var query = content_manager.query_manager.create_query_select ("foaf:Person");
 	query.set_constraint (new SQLQueryConstraint(
@@ -113,7 +113,7 @@ RDFSQLStorageManager getStorageManager()
 		builder.register_model (model);
 	builder.execute ();
 
-	/* Connect profiler callbacks to all ModelManager signal emissions */
+	/* Connect profiler callbacks to all StorageManager signal emissions */
         SQLProfiler profiler = (SQLProfiler) storage_manager.profiler;
         profiler.enable (true);
         storage_manager.operation_start.connect (() => {
@@ -121,7 +121,7 @@ RDFSQLStorageManager getStorageManager()
         });
         storage_manager.operation_end.connect (() => {
                 profiler_callback_end (profiler);
-        });
+        }); 
 
 
 	return storage_manager;

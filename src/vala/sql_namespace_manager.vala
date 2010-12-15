@@ -31,7 +31,7 @@ namespace MidgardCR {
 		}
 
 		/* methods */
-		public void create_uri (string uri, string name) throws NamespaceManagerError {
+		public void create_uri (string name, string uri) throws NamespaceManagerError {
 			if (this.uri_exists (uri))
 				throw new NamespaceManagerError.URI_EXISTS ("%s uri already exists", uri);
 			if (this.name_exists (name))
