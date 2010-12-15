@@ -35,8 +35,20 @@ namespace MidgardCR
 			return new RDFSQLQuerySelect (manager, storage);
 		}
 
-		~RDFSQLQuerySelect () {
-			print ("FIXME, destroy implicit constraints");
+		private void _destroy_constraint (QueryConstraintSimple c) {
+			return;
+			if (c == null)
+				return;
+			QueryConstraintSimple[]? constraints = c.list_constraints ();
+			return;
+			foreach (QueryConstraintSimple constraint in c.list_constraints ()) {
+				this._destroy_constraint (constraint);
+			}
+			c = null;
+		}
+
+		~RDFSQLQuerySelect () {	
+			this._destroy_constraint (this._triple_constraint);
 		}
 
 		public override void set_constraint (QueryConstraintSimple constraint) {
@@ -122,7 +134,7 @@ namespace MidgardCR
 			this._triple_constraint = c_group;
 
 			base.set_constraint (c_group);
-			base.execute ();	
+			base.execute ();		
 		}
 
 		private RDFGenericObject? _find_rdf_object (RDFGenericObject[]? objects, string name, string guid) {
