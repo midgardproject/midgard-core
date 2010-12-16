@@ -121,7 +121,7 @@ RDFSQLStorageManager getStorageManager()
         });
         storage_manager.operation_end.connect (() => {
                 profiler_callback_end (profiler);
-        }); */ 
+        }); */  
 
 
 	return storage_manager;

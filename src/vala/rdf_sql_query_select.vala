@@ -96,15 +96,23 @@ namespace MidgardCR
 			/* Create new constraint group, which will hold all triple related constraints */
 			QueryConstraintGroup c_group = new SQLQueryConstraintGroup ("AND");
 
-			/* Default case, so we add implicit classname constraint.
-			 * ... AND triple_table.class_name = ''...  */
+			/* Default case, so we add implicit classname constraints.
+			 * ... AND (triple_table.class_name = '' OR triple.class_name = '' )...  */
+			var classname_group = new SQLQueryConstraintGroup ("OR");
 			string _classname = _encode_value (ns_manager, this._query_storage.classname);
-			c_group.add_constraint (new SQLQueryConstraint (
+			classname_group.add_constraint (new SQLQueryConstraint (
 				new QueryProperty ("classname", null),
 				"=",
 				QueryValue.create_with_value (_classname),
 				null)
 			);
+			classname_group.add_constraint (new SQLQueryConstraint (
+				new QueryProperty ("classname", null),
+				"=",
+				QueryValue.create_with_value (this._query_storage.classname),
+				null)
+			);
+			c_group.add_constraint (classname_group);
 
 			/* Get all available constraints */
 			QueryConstraintSimple[]? constraints = null;
@@ -125,8 +133,9 @@ namespace MidgardCR
 				 * 	 (property_literal = constraint.value.get_value 
 				 * 		OR property_value = constraint.value.get_value))	 */
 				if (constraint is SQLQueryConstraint) {
-					string property_name = _encode_value (ns_manager, 
+					string encoded_property_name = _encode_value (ns_manager, 
 						((QueryProperty) ((SQLQueryConstraint)constraint).property).propertyname);
+					string property_name = ((QueryProperty) ((SQLQueryConstraint)constraint).property).propertyname;
 					string property_value = ((QueryValueHolder) ((SQLQueryConstraint)constraint).holder).get_value ().get_string ();
 					
 					/* Create new QueryStorage for join and constraints added */
@@ -138,14 +147,24 @@ namespace MidgardCR
 
 
 					/* Add 'property' constraint */
-					c_group.add_constraint ( 
+					/* We add both (OR grouped) constraints. One with uri and second one with it's alias */
+					var property_name_group = new SQLQueryConstraintGroup ("OR");
+					property_name_group.add_constraint ( 
 						new SQLQueryConstraint (
 							new QueryProperty ("property", join_storage),
 								"=",
 								QueryValue.create_with_value (property_name),
 								null)
+					);	
+					property_name_group.add_constraint ( 
+						new SQLQueryConstraint (
+							new QueryProperty ("property", join_storage),
+								"=",
+								QueryValue.create_with_value (encoded_property_name),
+								null)
 					);
-					
+					c_group.add_constraint (property_name_group);			
+	
 					/* Add property_value and property_literal constraints */
 					var t_group = new SQLQueryConstraintGroup ("OR");
 					t_group.add_constraint ( 
