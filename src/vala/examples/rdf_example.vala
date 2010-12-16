@@ -114,14 +114,14 @@ RDFSQLStorageManager getStorageManager()
 	builder.execute ();
 
 	/* Connect profiler callbacks to all StorageManager signal emissions */
-        SQLProfiler profiler = (SQLProfiler) storage_manager.profiler;
+        /* SQLProfiler profiler = (SQLProfiler) storage_manager.profiler;
         profiler.enable (true);
         storage_manager.operation_start.connect (() => {
                 profiler_callback_start (profiler);
         });
         storage_manager.operation_end.connect (() => {
                 profiler_callback_end (profiler);
-        }); 
+        }); */ 
 
 
 	return storage_manager;
