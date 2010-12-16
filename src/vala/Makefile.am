@@ -53,7 +53,16 @@ libmidgardvala_la_SOURCES = \
 libmidgardvala_la_LDFLAGS = -module -export-dynamic
 libmidgardvala_la_LIBADD = @MIDGARD_LIBS@ 
 
-EXTRA_DIST = $(midgardcr_vapi_file)
+EXTRA_DIST = \
+	     $(midgardcr_vapi_file) \
+	     examples/autogen.sh \
+	     examples/configure.in \
+	     examples/Makefile.am \
+	     examples/example1.vala \
+	     examples/example2.vala \
+	     examples/example3.vala \
+	     examples/rdf_example.vala \
+	     $(NULL)
 
 VALAFLAGS = --vapi=$(midgardcr_vapi_file) --vapidir=$(top_srcdir)/src/core --pkg=MidgardCRCore  -H $(midgardcr_header) 
 
