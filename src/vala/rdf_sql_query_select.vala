@@ -68,11 +68,12 @@ namespace MidgardCR
 				string rs = val.rstr ("/");
 				if (rs == null)
 					return val;
-				/* Add extra 1 for "/" taken into account in rstr */
+				/* Add extra 1 for "/" taken into account in rstr() */
 				string uri = val.substring (0, (val.length - rs.length) + 1);
 				string name = ns_manager.get_name_by_uri (uri);
 				if (name == null)
 					return val;
+				/* Exclude extra "/" returned from rstr() */
 				return name + ":" + rs.substring (1, -1); 
 			} 
 			else if (":" in val) { 
@@ -88,7 +89,8 @@ namespace MidgardCR
 
 		public override void execute () throws ExecutableError {
 			/* TODO, determine classname */	
-			this._query_storage._core_query_storage.set ("dbclass", "RDFTripleObject");
+			string _dest_classname = "RDFTripleObject";
+			this._query_storage._core_query_storage.set ("dbclass", _dest_classname);
 			NamespaceManager ns_manager = this.storagemanager.content_manager.namespace_manager;
 
 			/* Create new constraint group, which will hold all triple related constraints */
@@ -126,10 +128,19 @@ namespace MidgardCR
 					string property_name = _encode_value (ns_manager, 
 						((QueryProperty) ((SQLQueryConstraint)constraint).property).propertyname);
 					string property_value = ((QueryValueHolder) ((SQLQueryConstraint)constraint).holder).get_value ().get_string ();
+					
+					/* Create new QueryStorage for join and constraints added */
+					var join_storage = new RDFSQLQueryStorage (_dest_classname);
+
+					/* Create implicit join, so we can select all triples with the same objectguid */
+					base.add_join ("left", new QueryProperty ("objectguid", null), 
+						new QueryProperty ("objectguid", join_storage));			
+
+
 					/* Add 'property' constraint */
 					c_group.add_constraint ( 
 						new SQLQueryConstraint (
-							new QueryProperty ("property", null),
+							new QueryProperty ("property", join_storage),
 								"=",
 								QueryValue.create_with_value (property_name),
 								null)
@@ -139,14 +150,14 @@ namespace MidgardCR
 					var t_group = new SQLQueryConstraintGroup ("OR");
 					t_group.add_constraint ( 
 						new SQLQueryConstraint (
-							new QueryProperty ("literal", null),
+							new QueryProperty ("literal", join_storage),
 								"=",
 								QueryValue.create_with_value (property_value),
 								null)
 					);
 					t_group.add_constraint ( 
 						new SQLQueryConstraint (
-							new QueryProperty ("value", null),
+							new QueryProperty ("value", join_storage),
 								"=",
 								QueryValue.create_with_value (property_value),
 								null)

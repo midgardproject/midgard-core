@@ -187,8 +187,8 @@ _midgard_cr_core_query_select_add_join (MidgardCRCoreQueryExecutor *self, const 
 	}
 
 	qsj *_sj = g_new (qsj, 1);
-	_sj->left_property = left_property;
-	_sj->right_property = right_property;
+	_sj->left_property = g_object_ref (left_property);
+	_sj->right_property = g_object_ref (right_property);
 
 	_sj->join_type = join_type_id;
 
@@ -802,7 +802,23 @@ _midgard_cr_core_query_select_constructor (GType type,
 
 static void
 _midgard_cr_core_query_select_dispose (GObject *object)
-{	
+{
+	GSList *l;
+	MidgardCRCoreQueryExecutor *self = MIDGARD_CR_CORE_QUERY_EXECUTOR (object);
+	for (l = self->priv->joins; l != NULL; l = l->next) {
+		if (l->data) {
+			qsj *j = (qsj*)	l->data;
+			if (j->left_property && G_IS_OBJECT (j->left_property)) {
+				g_object_unref (j->left_property);
+				j->left_property = NULL;
+			}
+			if (j->right_property && G_IS_OBJECT (j->right_property)) {
+				g_object_unref (j->right_property);
+				j->right_property = NULL;
+			}
+		}
+	}
+
 	parent_class->dispose (object);
 }
 

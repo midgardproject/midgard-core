@@ -85,7 +85,7 @@ void main()
 	foreach (Storable object in query.list_objects ()) {
 		RDFGenericObject rdf_obj = (RDFGenericObject) object;
 		var name = rdf_obj.get_property_value ("foaf:name");
-		GLib.print("\t%s\n", name != null ? (string) name : "Not found");
+		GLib.print("\t%s\n", name != null ? (string) name : "Empty name");
 	}
 }
 

@@ -114,7 +114,7 @@ namespace MidgardCR
 			this._storage_manager.operation_end ();
 		}
 
-		public void add_join (string type, QueryProperty left_property, QueryProperty right_property) {
+		public virtual void add_join (string type, QueryProperty left_property, QueryProperty right_property) {
 			this._create_core_query_select ();
 			(this._core_query_select as MidgardCRCore.QuerySelect).add_join (type, left_property._core_query_holder as MidgardCRCore.QueryProperty, right_property._core_query_holder as MidgardCRCore.QueryProperty);
 		}

@@ -1402,6 +1402,7 @@ struct _MidgardCRSQLQuerySelectClass {
 	MidgardCRQueryConstraintSimple* (*get_constraint) (MidgardCRSQLQuerySelect* self);
 	void (*validate) (MidgardCRSQLQuerySelect* self, GError** error);
 	void (*execute) (MidgardCRSQLQuerySelect* self, GError** error);
+	void (*add_join) (MidgardCRSQLQuerySelect* self, const char* type, MidgardCRQueryProperty* left_property, MidgardCRQueryProperty* right_property);
 	MidgardCRStorable** (*list_objects) (MidgardCRSQLQuerySelect* self, int* result_length1);
 };
 
@@ -1870,6 +1871,7 @@ void midgard_cr_sql_query_select_set_constraint (MidgardCRSQLQuerySelect* self, 
 MidgardCRQueryConstraintSimple* midgard_cr_sql_query_select_get_constraint (MidgardCRSQLQuerySelect* self);
 void midgard_cr_sql_query_select_validate (MidgardCRSQLQuerySelect* self, GError** error);
 void midgard_cr_sql_query_select_execute (MidgardCRSQLQuerySelect* self, GError** error);
+void midgard_cr_sql_query_select_add_join (MidgardCRSQLQuerySelect* self, const char* type, MidgardCRQueryProperty* left_property, MidgardCRQueryProperty* right_property);
 MidgardCRStorable** midgard_cr_sql_query_select_list_objects (MidgardCRSQLQuerySelect* self, int* result_length1);
 MidgardCRStorageManager* midgard_cr_sql_query_select_get_storagemanager (MidgardCRSQLQuerySelect* self);
 MidgardCRSQLQueryStorage* midgard_cr_sql_query_select_get_storage (MidgardCRSQLQuerySelect* self);
