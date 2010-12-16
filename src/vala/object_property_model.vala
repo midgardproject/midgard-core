@@ -201,7 +201,7 @@ namespace MidgardCR {
 		 *
 		 * Model is invalid, if added one, is neither {@link ObjectModel} or ObjectPropertyModel
 		 */
-		public Model add_model (Model model) {
+		public virtual Model add_model (Model model) {
 			if (model is ObjectModel) {
 				this._isref = true;
 				this._refname = model.name;
@@ -223,7 +223,7 @@ namespace MidgardCR {
 		 * matches the first added model's one. There's no lookup by name done, as multiple 
 		 * models are invalid in case of property model 
 		 */
-		public unowned Model? get_model_by_name (string name) {
+		public virtual unowned Model? get_model_by_name (string name) {
 			if (this._models == null)
 				return null;
 			if (this._models[0].name == name)
@@ -475,11 +475,11 @@ namespace MidgardCR {
 		 * @param model_reference {@link ObjectModelReference} 
 		 */
 		public ObjectPropertyReference (string name, ObjectModel object_model, ObjectModelReference model_reference) {
-			Object (valuetypename: "object", name: name);
+			Object (valuetypename: "object", name: name);	
 			if (model_reference != null) {
 				this._reference = model_reference.name;
 				model_reference.add_model (object_model);
-			}	
+			}
 			this.add_model ((Model)model_reference);
 			this._isref = true;
 			this._refname = object_model.name;
@@ -492,14 +492,5 @@ namespace MidgardCR {
 			string name, ObjectModel object_model, ObjectModelReference model_reference) { 	
 			return new ObjectPropertyReference (name, object_model, model_reference);
 		}
-		
-		/* Enable and extend this method if constructor routines fails in some language */
-		/* public Model add_model (Model model) {
-			if (model is ObjectModelReference) {
-				this._isref = true;
-				this._refname = model.name;
-			}
-			return this;
-		} */
 	}
 }

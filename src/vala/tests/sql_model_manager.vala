@@ -397,10 +397,11 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		assert (a_actor_model is ObjectPropertyReference);
 		assert (a_actor_model.valuegtype == typeof (Object));
 		assert (a_actor_model.valuetypename == "object");
-		var a_actor_reference_model = (ObjectModel) a_actor_model.get_model_by_name ("ReferenceObject");
+		/* FIXME, ReferenceObject is registered "statically" so MidgardCR namespace forced */
+		var a_actor_reference_model = (ObjectModel) a_actor_model.get_model_by_name ("MidgardCRReferenceObject");
 		assert (a_actor_reference_model != null);
 		assert (a_actor_reference_model is ObjectModelReference);
-		assert (a_actor_reference_model.name == "ReferenceObject");	
+		assert (a_actor_reference_model.name == "MidgardCRReferenceObject");	
 		var a_verb_model = (ObjectPropertyModel) ds_activity_model.get_model_by_name (VERB);
 		assert (a_verb_model != null);
 		assert (a_verb_model.valuegtype == typeof (string));

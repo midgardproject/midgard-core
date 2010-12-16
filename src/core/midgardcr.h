@@ -915,6 +915,8 @@ struct _MidgardCRObjectPropertyModel {
 
 struct _MidgardCRObjectPropertyModelClass {
 	GObjectClass parent_class;
+	MidgardCRModel* (*add_model) (MidgardCRObjectPropertyModel* self, MidgardCRModel* model);
+	MidgardCRModel* (*get_model_by_name) (MidgardCRObjectPropertyModel* self, const char* name);
 };
 
 struct _MidgardCRObjectPropertyString {
@@ -1662,6 +1664,8 @@ void midgard_cr_object_model_reference_is_valid (MidgardCRObjectModelReference* 
 GType midgard_cr_object_property_model_get_type (void) G_GNUC_CONST;
 MidgardCRObjectPropertyModel* midgard_cr_object_property_model_new (const char* name, const char* type, const char* dvalue);
 MidgardCRObjectPropertyModel* midgard_cr_object_property_model_construct (GType object_type, const char* name, const char* type, const char* dvalue);
+MidgardCRModel* midgard_cr_object_property_model_add_model (MidgardCRObjectPropertyModel* self, MidgardCRModel* model);
+MidgardCRModel* midgard_cr_object_property_model_get_model_by_name (MidgardCRObjectPropertyModel* self, const char* name);
 const char* midgard_cr_object_property_model_get_classname (MidgardCRObjectPropertyModel* self);
 GType midgard_cr_object_property_string_get_type (void) G_GNUC_CONST;
 MidgardCRObjectPropertyString* midgard_cr_object_property_string_new (const char* name, const char* dvalue, const char* namespace);
