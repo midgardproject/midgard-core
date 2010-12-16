@@ -25,16 +25,20 @@ midgardcr_test_VALASOURCES = \
 			     $(NULL)
 
 midgardcr_test_SOURCES = \
-		   $(midgardcr_test_VALASOURCES:.vala=.c) \
-		   $(NULL)
+			 $(midgardcr_test_VALASOURCES:.vala=.c) \
+			 $(NULL)
 
 midgardcr_test_LDADD = \
-		 $(GLIB_LIBS) \
-		 $(LIBVALA_LIBS) \
-		 $(MIDGARDCR_LIBS) \	
-		 $(NULL)
+		       $(GLIB_LIBS) \
+		       $(LIBVALA_LIBS) \
+		       $(MIDGARDCR_LIBS) \
+		       $(NULL)
 
 midgardcr_test.vala.stamp: $(midgardcr_test_VALASOURCES)
 	$(VALAC) -C --save-temps --pkg MidgardCR-3.0 $^
 	touch $@
 
+CLEANFILES = \
+	     $(midgardcr_test_VALASOURCES:.vala=.c) \
+	     midgardcr_test.vala.stamp \
+	     $(NULL)
