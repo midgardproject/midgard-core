@@ -475,7 +475,7 @@ midgard_dbus_get_type(void)
 			(GInstanceInitFunc) _midgard_dbus_instance_init/* instance_init */
 		};
 		type = g_type_register_static (G_TYPE_OBJECT,
-				"midgard_dbus",
+				"MidgardDbus",
 				&info, 0);
 	}
 	
