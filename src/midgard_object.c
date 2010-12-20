@@ -206,8 +206,9 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 			g_value_set_string (value, MGD_OBJECT_GUID (self));
 			break;
 				
-		case MIDGARD_PROPERTY_METADATA:	
-			g_value_set_object (value, (MidgardMetadata *) MGD_DBOBJECT_METADATA (self));
+		case MIDGARD_PROPERTY_METADATA:
+			if (MGD_DBOBJECT_METADATA (self) && G_IS_OBJECT (MGD_DBOBJECT_METADATA (self)))
+				g_value_set_object (value, (MidgardMetadata *) MGD_DBOBJECT_METADATA (self));
 			break;
 		
 		default:
