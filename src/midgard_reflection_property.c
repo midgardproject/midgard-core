@@ -64,7 +64,7 @@ midgard_reflection_property_get_type (void)
 			NULL            /* instance_init */
 		};
 		type = g_type_register_static (G_TYPE_OBJECT,
-				"midgard_reflection_property",
+				"MidgardReflectionProperty",
 				&info, 0);
 	}
 	return type;
