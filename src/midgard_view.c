@@ -328,9 +328,8 @@ _midgard_view_derived_set_static_sql_select (MidgardConnection *mgd, MidgardDBOb
 			g_error ("Failed to register view class");
 		}
 
-		gchar *q_table = gda_connection_quote_sql_identifier (cnc, 
-				prop_attr->derived->table ? prop_attr->derived->table : prop_attr->table);
-		gchar *q_field = gda_connection_quote_sql_identifier (cnc, prop_attr->derived->field);
+		gchar *q_table = gda_connection_quote_sql_identifier (cnc, type->table);
+		gchar *q_field = gda_connection_quote_sql_identifier (cnc, prop_attr->field);
 		gchar *q_name = gda_connection_quote_sql_identifier (cnc, pspecs[i]->name);
 
 		g_string_append_printf (ssf, "%s%s.%s AS %s", 

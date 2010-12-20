@@ -453,6 +453,58 @@ static void __mgdschematype_from_node(xmlNode *node, GSList **list)
 	xmlFree(viewname);
 }
 
+static gchar*
+__build_create_view_cmd (MidgardConnection *mgd, MidgardDBObjectClass *klass)
+{
+	guint n_props;
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (klass), &n_props);
+	GdaConnection *cnc = mgd->priv->connection;
+	MgdSchemaTypeAttr *type = midgard_core_class_get_type_attr (klass);
+
+	guint i;
+	GString *ssf = g_string_new ("");
+	gboolean add_coma = FALSE;
+	
+	for (i = 0; i < n_props; i++) {
+		
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT) {
+			if (i == 1)
+				add_coma = FALSE;
+			continue;
+		}
+
+		/* Replace tablefield for every property */
+		MgdSchemaPropertyAttr *prop_attr = g_hash_table_lookup (type->prophash, pspecs[i]->name);
+		if (!prop_attr) {
+			g_warning ("%s property not registered for %s", pspecs[i]->name, type->name);
+			g_error ("Failed to register view class");
+		}
+
+		gchar *q_table = gda_connection_quote_sql_identifier (cnc, 
+				prop_attr->derived->table ? prop_attr->derived->table : prop_attr->table);
+		gchar *q_field = gda_connection_quote_sql_identifier (cnc, prop_attr->derived->field);
+		gchar *q_name = gda_connection_quote_sql_identifier (cnc, pspecs[i]->name);
+
+		g_string_append_printf (ssf, "%s%s.%s AS %s", 
+				add_coma ? ", " : " ",
+				q_table, q_field, q_name);
+		
+		gchar *t_table = gda_connection_quote_sql_identifier (cnc, type->name);	
+		midgard_core_schema_type_property_set_tablefield (prop_attr, t_table, q_name);
+	
+		g_free (q_table);
+		g_free (q_field); 
+		g_free (q_name);
+		g_free (t_table);
+
+		add_coma = TRUE;
+	}
+	
+	g_free (pspecs);
+
+	return g_string_free (ssf, FALSE);
+}
+
 gchar *
 midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBObjectClass *klass)
 {
@@ -460,10 +512,10 @@ midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBOb
 	GString *query = g_string_new ("CREATE VIEW ");	
 	MgdSchemaTypeAttr *type = midgard_core_class_get_type_attr (klass);
 
-	klass->dbpriv->set_static_sql_select (mgd, klass);
-
+	gchar *create_view_cmd = __build_create_view_cmd (mgd, klass);	
 	g_string_append_printf (query, "%s AS SELECT %s FROM %s ", 
-			type->name, (gchar *)type->sql_select_full, type->view_table);
+			type->name, create_view_cmd, type->view_table);
+	g_free (create_view_cmd);
 
 	GSList *list = NULL;
 
