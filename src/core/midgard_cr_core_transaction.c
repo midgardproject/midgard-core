@@ -18,9 +18,10 @@
 
 #include "midgard_cr_core_transaction.h"
 #include "midgard_cr_core_uuid.h"
+#include <libgda/libgda.h>
 
 struct _MidgardCRCoreTransactionPrivate {
-	MidgardCRSQLStorageManager *mmanager;
+	MidgardCRSQLStorageManager *manager;
 	const gchar *name;
 };
 
@@ -28,170 +29,95 @@ struct _MidgardCRCoreTransactionPrivate {
 	g_assert(_s->priv->manager != NULL); \
 	g_assert(_s->priv->manager->_cnc != NULL); }
 
-#define _T_CNC(_s) _s->priv->manager->_cnc;
+#define _T_CNC(_s) (GdaConnection*)_s->priv->manager->_cnc;
 
-/**
- * midgard_cr_core_transaction_new:
- * @mgd:#MidgardConnection instance
- *
- * Returns: New #MidgardCRCoreTransaction instance or NULL on failure
- * 
- * Since: 9.09
- */
 MidgardCRCoreTransaction*	
 midgard_cr_core_transaction_new (MidgardCRSQLStorageManager *manager) 
 {
-	g_return_val_if_fail(mgd != NULL, NULL);
+	g_return_val_if_fail (manager != NULL, NULL);
 
 	MidgardCRCoreTransaction *self = g_object_new (MIDGARD_CR_CORE_TYPE_TRANSACTION, NULL);
 	
 	if (!self)
 		return NULL;
 
-	self->priv->manager = manager;
+	self->priv->manager = g_object_ref (manager);
 	return self;
 }
 
-/**
- * midgard_cr_core_transaction_begin:
- * @self: #MidgardCRCoreTransaction instance
- * 
- * Begins new, underlying database provider's transaction.
- * In case of error, #MidgardConnection error is set to MGD_ERR_INTERNAL.
- *
- * Returns: %TRUE on success, %FALSE otherwise.
- * 
- * Since: 9.09
- */
-gboolean
-midgard_cr_core_transaction_begin (MidgardCRCoreTransaction *self)
+void
+midgard_cr_core_transaction_begin (MidgardCRCoreTransaction *self, GError **error)
 {
-	_ASSERT_T_MGD(self);
+	_ASSERT_T_MGD (self);
 
 	gboolean rv = FALSE;
-	GdaConnection *cnc = _T_CNC(self);
-	MidgardConnection *mgd = self->priv->mgd;
-	GError *error = NULL;
+	GdaConnection *cnc = _T_CNC (self);
+	MidgardCRSQLStorageManager *manager = self->priv->manager;
+	GError *err = NULL;
 
-	g_debug("Begin named transaction '%s'", self->priv->name);
+	rv = gda_connection_begin_transaction (cnc, self->priv->name, GDA_TRANSACTION_ISOLATION_UNKNOWN, &err);
 
-	rv = gda_connection_begin_transaction(cnc, self->priv->name, 
-			GDA_TRANSACTION_ISOLATION_UNKNOWN, &error);
+	if (err)
+		g_propagate_error (error, err);
 
-	if (!error && rv)
-		return TRUE;
+	if (!rv && !err)
+		g_warning ("Failed to begin underlying database transaction and no error has been set");
 
-	midgard_set_error(mgd,
-			MGD_GENERIC_ERROR,
-			MGD_ERR_INTERNAL,
-			error && error->message ? error->message : " Unknown error.");
-
-	if (error)
-		g_error_free(error);
-
-	return FALSE;
+	return;
 }
 
-/**
- * midgard_cr_core_transaction_commit:
- * @self: #MidgardCRCoreTransaction instance
- * 
- * In case of error, #MidgardConnection error is set to MGD_ERR_INTERNAL.
- *
- * Returns: %TRUE on success, %FALSE otherwise
- * 
- * Since: 9.09
- */ 
-gboolean
-midgard_cr_core_transaction_commit (MidgardCRCoreTransaction *self)
+void
+midgard_cr_core_transaction_commit (MidgardCRCoreTransaction *self, GError **error)
 {
-	_ASSERT_T_MGD(self);
+	_ASSERT_T_MGD (self);
 
 	gboolean rv = FALSE;
-	GdaConnection *cnc = _T_CNC(self);
-	MidgardConnection *mgd = self->priv->mgd;
-	GError *error = NULL;
+	GdaConnection *cnc = _T_CNC (self);
+	MidgardCRSQLStorageManager *manager = self->priv->manager;
+	GError *err = NULL;
 
-	g_debug("Commit named transaction '%s'", self->priv->name);
+	rv = gda_connection_commit_transaction (cnc, self->priv->name, &err);
 
-	rv = gda_connection_commit_transaction(cnc, self->priv->name, &error);
+	if (err)
+		g_propagate_error (error, err);
 
-	if (!error && rv)
-		return TRUE;
+	if (!rv && !err)
+		g_warning ("Failed to commit underlying database transaction and no error has been set");
 
-	midgard_set_error(mgd,
-			MGD_GENERIC_ERROR,
-			MGD_ERR_INTERNAL,
-			error && error->message ? error->message : " Unknown error.");
-
-	if (error)
-		g_error_free(error);
-
-	return FALSE;
+	return;
 }
 
-/**
- * midgard_cr_core_transaction_rollback:
- * @self: #MidgardCRCoreTransaction instance
- *
- * In case of error, #MidgardConnection error is set to MGD_ERR_INTERNAL
- * 
- * Returns: %TRUE on success, %FALSE otherwise.
- * 
- * Since: 9.09
- */
-gboolean
-midgard_cr_core_transaction_rollback (MidgardCRCoreTransaction *self)
+void
+midgard_cr_core_transaction_rollback (MidgardCRCoreTransaction *self, GError **error)
 {
-	_ASSERT_T_MGD(self);
+	_ASSERT_T_MGD (self);
 
 	gboolean rv = FALSE;
-	GdaConnection *cnc = _T_CNC(self);
-	MidgardConnection *mgd = self->priv->mgd;
-	GError *error = NULL;
+	GdaConnection *cnc = _T_CNC (self);
+	MidgardCRSQLStorageManager *manager = self->priv->manager;
+	GError *err = NULL;
 
-	g_debug("Rollback named transaction '%s'", self->priv->name);
+	rv = gda_connection_rollback_transaction (cnc, self->priv->name, &err);
 
-	rv = gda_connection_rollback_transaction(cnc, self->priv->name, &error);
+	if (err)
+		g_propagate_error (error, err);
 
-	if (!error && rv)
-		return TRUE;
+	if (!rv && !err)
+		g_warning ("Failed to rollback underlying database transaction and no error has been set");
 
-	midgard_set_error(mgd,
-			MGD_GENERIC_ERROR,
-			MGD_ERR_INTERNAL,
-			error && error->message ? error->message : " Unknown error.");
-
-	if (error)
-		g_error_free(error);
-
-	return FALSE;
+	return;
 }
 
-/**
- * midgard_cr_core_transaction_get_status:
- * @self: #MidgardCRCoreTransaction instance
- *
- * Returns transaction status. %FALSE means, any transaction operation failed.
- * No #MidgardConnection error is set in case of error.
- *
- * Returns: %TRUE on success, %FALSE otherwise
- * 
- * Since: 9.09
- */
 gboolean
 midgard_cr_core_transaction_get_status (MidgardCRCoreTransaction *self)
 {
-	_ASSERT_T_MGD(self);
-	
-	GdaConnection *cnc = _T_CNC(self);
+	_ASSERT_T_MGD (self);
+	GdaConnection *cnc = _T_CNC (self);
 
 	if (!cnc)
 		return FALSE;
 
-	GdaTransactionStatus *status = 
-	       gda_connection_get_transaction_status(cnc);	
-	
+	GdaTransactionStatus *status = gda_connection_get_transaction_status(cnc);	
 	if (status->state == 0)
 		return TRUE;
 
@@ -235,16 +161,16 @@ static void __midgard_cr_core_transaction_instance_init(
 	self->priv->name = (const gchar *)g_strconcat("midgardcr", uuid, NULL);
 	g_free(uuid);
 
-	self->priv->mgd = NULL;
+	self->priv->manager = NULL;
 }
 
 static void
 __midgard_cr_core_transaction_dispose (GObject *object)
 {
 	MidgardCRCoreTransaction *self = MIDGARD_CR_CORE_TRANSACTION (object);
-	if (self->priv->mgd != NULL) {
-		g_object_unref (self->priv->mgd);
-		self->priv->mgd = NULL;
+	if (self->priv->manager != NULL) {
+		g_object_unref (self->priv->manager);
+		self->priv->manager = NULL;
 	}
 
 	__parent_class->dispose (object);

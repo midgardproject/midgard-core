@@ -19,7 +19,7 @@
 #ifndef MIDGARD_CR_CORE_TRANSACTION_H
 #define MIDGARD_CR_CORE_TRANSACTION_H
 
-#include "midgard_local.h"
+#include "midgardcr.h"
 
 G_BEGIN_DECLS
 
@@ -49,22 +49,15 @@ struct _MidgardCRCoreTransaction {
 
 struct _MidgardCRCoreTransactionClass{
 	GObjectClass parent;
-
-	/* class members */
-	gboolean	(*begin)		(MidgardCRCoreTransaction *self);
-	gboolean	(*commit)		(MidgardCRCoreTransaction *self);
-	gboolean	(*rollback)		(MidgardCRCoreTransaction *self);
-	gboolean	(*get_status)		(MidgardCRCoreTransaction *self);
-	const gchar 	*(*get_name)		(MidgardCRCoreTransaction *self);
 };
 
 GType			midgard_cr_core_transaction_get_type			(void);
 MidgardCRCoreTransaction	*midgard_cr_core_transaction_new		(MidgardCRSQLStorageManager *manager);
-gboolean 		midgard_cr_core_transaction_begin			(MidgardCRCoreTransaction *self);
-gboolean 		midgard_cr_core_transaction_commit			(MidgardCRCoreTransaction *self);
-gboolean 		midgard_cr_core_transaction_rollback			(MidgardCRCoreTransaction *self);
-gboolean		midgard_cr_core_transaction_get_status			(MidgardCRCoreTransaction *self);
-const gchar 		*midgard_cr_core_transaction_get_name			(MidgardCRCoreTransaction *self);
+void 				midgard_cr_core_transaction_begin		(MidgardCRCoreTransaction *self, GError **error);
+void 				midgard_cr_core_transaction_commit		(MidgardCRCoreTransaction *self, GError **error);
+void				midgard_cr_core_transaction_rollback		(MidgardCRCoreTransaction *self, GError **error);
+gboolean			midgard_cr_core_transaction_get_status		(MidgardCRCoreTransaction *self);
+const gchar 			*midgard_cr_core_transaction_get_name		(MidgardCRCoreTransaction *self);
 
 G_END_DECLS
 

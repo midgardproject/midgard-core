@@ -51,6 +51,8 @@ libmidgardcore_la_SOURCES = \
 			    midgard_cr_core_md5.c \
 			    midgard_cr_core_md5.h \
 			    midgard_cr_core.h \
+			    midgard_cr_core_transaction.c \
+			    midgard_cr_core_transaction.h \
 			    $(NULL)
 
 libmidgardcore_la_LDFLAGS = -module -export-dynamic
