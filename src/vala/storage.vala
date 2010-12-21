@@ -29,11 +29,10 @@ namespace MidgardCR {
 	/* FIXME, improve it so we can catch exception in one step */
 	public interface Transaction : GLib.Object, Executable {
 
-		public abstract string name { get; construct; }
-
-		public abstract bool begin ();
-		public abstract bool rollback ();
+		public abstract void begin () throws ExecutableError;
+		public abstract void rollback () throws ExecutableError;
 		public abstract bool get_status ();
+		public abstract unowned string get_name ();
 	}
 
 	public interface StorageManagerPool : GLib.Object {

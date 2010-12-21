@@ -626,6 +626,17 @@ typedef struct _MidgardCRSQLQueryManager MidgardCRSQLQueryManager;
 typedef struct _MidgardCRSQLQueryManagerClass MidgardCRSQLQueryManagerClass;
 typedef struct _MidgardCRSQLQueryManagerPrivate MidgardCRSQLQueryManagerPrivate;
 
+#define MIDGARD_CR_TYPE_SQL_TRANSACTION (midgard_cr_sql_transaction_get_type ())
+#define MIDGARD_CR_SQL_TRANSACTION(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_TRANSACTION, MidgardCRSQLTransaction))
+#define MIDGARD_CR_SQL_TRANSACTION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_TRANSACTION, MidgardCRSQLTransactionClass))
+#define MIDGARD_CR_IS_SQL_TRANSACTION(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_TRANSACTION))
+#define MIDGARD_CR_IS_SQL_TRANSACTION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_TRANSACTION))
+#define MIDGARD_CR_SQL_TRANSACTION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_TRANSACTION, MidgardCRSQLTransactionClass))
+
+typedef struct _MidgardCRSQLTransaction MidgardCRSQLTransaction;
+typedef struct _MidgardCRSQLTransactionClass MidgardCRSQLTransactionClass;
+typedef struct _MidgardCRSQLTransactionPrivate MidgardCRSQLTransactionPrivate;
+
 #define MIDGARD_CR_TYPE_RDF_GENERIC_OBJECT (midgard_cr_rdf_generic_object_get_type ())
 #define MIDGARD_CR_RDF_GENERIC_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDF_GENERIC_OBJECT, MidgardCRRDFGenericObject))
 #define MIDGARD_CR_RDF_GENERIC_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDF_GENERIC_OBJECT, MidgardCRRDFGenericObjectClass))
@@ -1077,11 +1088,10 @@ struct _MidgardCRStorageModelManagerIface {
 
 struct _MidgardCRTransactionIface {
 	GTypeInterface parent_iface;
-	gboolean (*begin) (MidgardCRTransaction* self);
-	gboolean (*rollback) (MidgardCRTransaction* self);
+	void (*begin) (MidgardCRTransaction* self, GError** error);
+	void (*rollback) (MidgardCRTransaction* self, GError** error);
 	gboolean (*get_status) (MidgardCRTransaction* self);
 	const char* (*get_name) (MidgardCRTransaction* self);
-	void (*set_name) (MidgardCRTransaction* self, const char* value);
 };
 
 struct _MidgardCRWorkspaceStorageIface {
@@ -1434,6 +1444,15 @@ struct _MidgardCRSQLQueryManagerClass {
 	MidgardCRQuerySelect* (*create_query_select) (MidgardCRSQLQueryManager* self, const char* classname);
 };
 
+struct _MidgardCRSQLTransaction {
+	GObject parent_instance;
+	MidgardCRSQLTransactionPrivate * priv;
+};
+
+struct _MidgardCRSQLTransactionClass {
+	GObjectClass parent_class;
+};
+
 struct _MidgardCRRDFGenericObject {
 	GObject parent_instance;
 	MidgardCRRDFGenericObjectPrivate * priv;
@@ -1748,8 +1767,8 @@ const char* midgard_cr_sql_storage_manager_get_name (MidgardCRSQLStorageManager*
 MidgardCRConfig* midgard_cr_sql_storage_manager_get_config (MidgardCRSQLStorageManager* self);
 MidgardCRQuerySelect* midgard_cr_query_manager_create_query_select (MidgardCRQueryManager* self, const char* classname);
 MidgardCRStorageManager* midgard_cr_query_manager_get_storage_manager (MidgardCRQueryManager* self);
-gboolean midgard_cr_transaction_begin (MidgardCRTransaction* self);
-gboolean midgard_cr_transaction_rollback (MidgardCRTransaction* self);
+void midgard_cr_transaction_begin (MidgardCRTransaction* self, GError** error);
+void midgard_cr_transaction_rollback (MidgardCRTransaction* self, GError** error);
 gboolean midgard_cr_transaction_get_status (MidgardCRTransaction* self);
 const char* midgard_cr_transaction_get_name (MidgardCRTransaction* self);
 GType midgard_cr_storage_manager_pool_get_type (void) G_GNUC_CONST;
@@ -1889,6 +1908,9 @@ MidgardCRSQLQueryManager* midgard_cr_sql_query_manager_new (MidgardCRSQLStorageM
 MidgardCRSQLQueryManager* midgard_cr_sql_query_manager_construct (GType object_type, MidgardCRSQLStorageManager* storage);
 MidgardCRQuerySelect* midgard_cr_sql_query_manager_create_query_select (MidgardCRSQLQueryManager* self, const char* classname);
 MidgardCRStorageManager* midgard_cr_sql_query_manager_get_storage_manager (MidgardCRSQLQueryManager* self);
+GType midgard_cr_sql_transaction_get_type (void) G_GNUC_CONST;
+MidgardCRSQLTransaction* midgard_cr_sql_transaction_new (MidgardCRSQLStorageManager* manager);
+MidgardCRSQLTransaction* midgard_cr_sql_transaction_construct (GType object_type, MidgardCRSQLStorageManager* manager);
 GType midgard_cr_rdf_generic_object_get_type (void) G_GNUC_CONST;
 MidgardCRRDFGenericObject* midgard_cr_rdf_generic_object_new (const char* classname, const char* guid);
 MidgardCRRDFGenericObject* midgard_cr_rdf_generic_object_construct (GType object_type, const char* classname, const char* guid);

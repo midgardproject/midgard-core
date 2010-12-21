@@ -18,6 +18,7 @@
 
 #include "midgard_cr_core_transaction.h"
 #include "midgard_cr_core_uuid.h"
+#include "midgardcr.h"
 #include <libgda/libgda.h>
 
 struct _MidgardCRCoreTransactionPrivate {

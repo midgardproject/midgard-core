@@ -111,6 +111,15 @@ namespace MidgardCRCore {
 		public MidgardCR.Storable[]? list_objects ();
 	}
 
+	public class Transaction : GLib.Object {
+		public Transaction (MidgardCR.SQLStorageManager manager);
+		public static void begin (MidgardCRCore.Transaction transaction) throws GLib.Error;
+		public static void rollback (MidgardCRCore.Transaction transaction) throws GLib.Error;
+		public static void commit (MidgardCRCore.Transaction transaction) throws GLib.Error;
+		public static unowned string get_name (MidgardCRCore.Transaction transaction);
+		public static bool get_status (MidgardCRCore.Transaction transaction);
+	}
+
 	public class Guid {
 		public static string create ();
 		public static bool is_valid (string guid);

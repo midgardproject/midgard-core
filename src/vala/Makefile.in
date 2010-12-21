@@ -47,8 +47,8 @@ DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in config.c \
 	sql_model_manager.c sql_namespace_manager.c sql_profiler.c \
 	sql_query_constraint.c sql_query_constraint_group.c \
 	sql_query_manager.c sql_query_select.c sql_query_storage.c \
-	sql_storage_manager.c sql_table_model.c storable.c storage.c \
-	workspace.c
+	sql_storage_manager.c sql_table_model.c sql_transaction.c \
+	storable.c storage.c workspace.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/introspection.m4 \
 	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
@@ -74,10 +74,11 @@ am_libmidgardvala_la_OBJECTS = config.lo executable.lo namespace.lo \
 	sql_query_storage.lo sql_query_constraint.lo \
 	sql_query_constraint_group.lo sql_query_select.lo \
 	sql_namespace_manager.lo sql_query_manager.lo \
-	rdf_generic_object.lo rdf_storage_manager.lo \
-	rdf_sql_storage_manager.lo rdf_sql_content_manager.lo \
-	rdf_sql_query_select.lo rdf_sql_query_storage.lo \
-	rdf_sql_query_manager.lo $(am__objects_1)
+	sql_transaction.lo rdf_generic_object.lo \
+	rdf_storage_manager.lo rdf_sql_storage_manager.lo \
+	rdf_sql_content_manager.lo rdf_sql_query_select.lo \
+	rdf_sql_query_storage.lo rdf_sql_query_manager.lo \
+	$(am__objects_1)
 libmidgardvala_la_OBJECTS = $(am_libmidgardvala_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -297,6 +298,7 @@ libmidgardvala_la_SOURCES = \
 			  sql_query_select.vala \
 			  sql_namespace_manager.vala \
 			  sql_query_manager.vala \
+			  sql_transaction.vala \
 			  rdf_generic_object.vala \
 			  rdf_storage_manager.vala \
 			  rdf_sql_storage_manager.vala \
@@ -409,6 +411,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_query_storage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_storage_manager.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_table_model.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sql_transaction.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/storable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/storage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/workspace.Plo@am__quote@
@@ -567,6 +570,11 @@ $(srcdir)/sql_namespace_manager.c: $(srcdir)/libmidgardvala_la_vala.stamp
 	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
 	fi
 $(srcdir)/sql_query_manager.c: $(srcdir)/libmidgardvala_la_vala.stamp
+	@if test -f $@; then :; else \
+	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
+	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
+	fi
+$(srcdir)/sql_transaction.c: $(srcdir)/libmidgardvala_la_vala.stamp
 	@if test -f $@; then :; else \
 	  rm -f $(srcdir)/libmidgardvala_la_vala.stamp; \
 	  $(am__cd) $(srcdir) && $(MAKE) $(AM_MAKEFLAGS) libmidgardvala_la_vala.stamp; \
@@ -760,6 +768,7 @@ maintainer-clean-generic:
 	-rm -f sql_query_storage.c
 	-rm -f sql_storage_manager.c
 	-rm -f sql_table_model.c
+	-rm -f sql_transaction.c
 	-rm -f storable.c
 	-rm -f storage.c
 	-rm -f workspace.c

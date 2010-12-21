@@ -19,7 +19,7 @@
 #ifndef MIDGARD_CR_CORE_TRANSACTION_H
 #define MIDGARD_CR_CORE_TRANSACTION_H
 
-#include "midgardcr.h"
+#include <glib-object.h>
 
 G_BEGIN_DECLS
 
@@ -51,8 +51,10 @@ struct _MidgardCRCoreTransactionClass{
 	GObjectClass parent;
 };
 
+struct _MidgardCRSQLStorageManager;
+
 GType			midgard_cr_core_transaction_get_type			(void);
-MidgardCRCoreTransaction	*midgard_cr_core_transaction_new		(MidgardCRSQLStorageManager *manager);
+MidgardCRCoreTransaction	*midgard_cr_core_transaction_new		(struct _MidgardCRSQLStorageManager *manager);
 void 				midgard_cr_core_transaction_begin		(MidgardCRCoreTransaction *self, GError **error);
 void 				midgard_cr_core_transaction_commit		(MidgardCRCoreTransaction *self, GError **error);
 void				midgard_cr_core_transaction_rollback		(MidgardCRCoreTransaction *self, GError **error);
