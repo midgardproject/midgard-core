@@ -95,13 +95,39 @@ namespace MidgardCR {
 
 	public interface StorageModelManager : Model, StorageExecutor {
 
-		/* properties */
-		public abstract unowned StorageManager   storagemanager   { get; } 
-
 		/* methods */
-		public abstract StorageModel create_storage_model (ObjectModel object_model, string location);
-		public abstract unowned StorageModel[]? list_storage_models ();	
-		public abstract unowned ObjectModel[]? list_object_models ();
+		
+		/**
+		 * List class names of all models associated with model manager.
+		 */
+		public abstract string[]? list_model_types ();
+
+		/**
+		 * List all available models, associated with model manager which are instances of given type. 
+		 * There's no strict rule for model manager to hold only models with unique names. 
+		 * There might be different models initialized for particular class, e.g. {@link ObjectModel} and 
+		 * {@link StorageModel}. @see list_model_types. 
+		 *
+		 * @param type, {@link Model} class name 
+		 *
+		 * @return array of models or null
+		 */  
+		public abstract unowned Model[]? list_models_by_type (string type);
+
+		/**
+		 * Get {@link Model} instance of a named type identified by given name.
+		 *
+		 * @param type, name of the model to get
+		 * @param name, class name of the model
+		 *
+		 * @return model or null if not found
+		 */
+		public abstract unowned Model? get_type_model_by_name (string type, string name); 
+
+		/**
+		 * Get {@link StorageManager} associated with given model manager.
+		 */
+		public abstract unowned StorageManager get_storage_manager ();
 	}
 
 	public errordomain StorageContentManagerError {

@@ -95,16 +95,6 @@ namespace MidgardCR {
 			return model;
 		}
 
-		/**
-		 * List all models associated with with an instance.
-		 * See list_storage_models() and list_object_models().
-		 *
-		 * @return array of models or null
-		 */
-                public unowned Model[]? list_models () {
-			return this._models;
-		}
-
 		private unowned Model? _find_model_by_name (Model[] models, string name) {
 			if (models == null)
 				return null;
@@ -298,54 +288,30 @@ namespace MidgardCR {
 			}
 		}
 
-		private void _emit_execution_start () {
-			this.execution_start();
-		}
-
-		private void _emit_execution_end () {
-			this.execution_end();
-		}
-
 		/* methods */
-		/**
-		 * Creates new StorageModel instance.
-		 * 
-		 * @param model, {@link ObjectModel} instance, which underlying 
-		 * storage should be created for.
-		 * @param location, name of the table which stores data of objects of the class
-		 * represented by ObjectModel.
-		 *
-		 * @return SQLTableModel instance 
-		 */
-		public StorageModel create_storage_model (ObjectModel model, string location) {
-			SQLTableModel storage_model = new SQLTableModel ((SQLStorageManager)this.storagemanager, model.name, location);
-			storage_model._model_manager = this;	
-			storage_model.execution_start.connect (this._emit_execution_start);
-			storage_model.execution_end.connect (this._emit_execution_end);
-			return (StorageModel) storage_model;
-		}
 
 		/**
-		 * List all StorageModel models for which database entries already exist.
+		 * {@inheritDoc} 
 		 */
-		public unowned StorageModel[]? list_storage_models () {
-			return this._storage_models;
+		public unowned Model[]? list_models_by_type (string type) {
+			if (type == "ObjectModel")
+				return (Model[]) this._object_models;
+			if (type == "StorageModel")
+				return (Model[]) this._storage_models;
+			return null;
 		}
-		
+	
 		/**
-		 * List all ObjectModel models for which database entries already exist.
+		 * {@inheritDoc}
 		 */
-		public unowned ObjectModel[]? list_object_models () {
-			return this._object_models;
+		public string[]? list_model_types () {
+			string[] _types = null;
+			_types += "ObjectModel";
+			_types += "StorageModel";
+			return _types;
 		}
-
-		/**
-		 * Get SQLTableModel by name
-		 *
-		 * @param name, name of the model to find
-		 * @return {@link SQLTableModel} if found or null
-		 */
-		public unowned SQLTableModel? get_table_model_by_name (string name) {
+	
+		private unowned SQLTableModel? get_table_model_by_name (string name) {
 			if (this._storage_models == null)
 				return null;
 			foreach (StorageModel model in this._storage_models) {
@@ -355,13 +321,7 @@ namespace MidgardCR {
 			return null;
 		}
 
-		/**
-		 * Get ObjectModel by name
-		 *
-		 * @param name, name of the model to find
-		 * @return {@link ObjectModel} if found or null
-		 */
-		public unowned ObjectModel? get_object_model_by_name (string name) {
+		private unowned ObjectModel? get_object_model_by_name (string name) {
 			if (this._storage_models == null)
 				return null;
 			foreach (unowned ObjectModel model in this._object_models) {
@@ -371,12 +331,37 @@ namespace MidgardCR {
 			return null;
 		}		
 
+		public unowned Model? get_type_model_by_name (string type, string name) {
+			if (type == "ObjectModel")
+				return this.get_object_model_by_name (name);
+			if (type == "StorageModel")
+				return this.get_table_model_by_name (name);
+			return null;
+		}
+
+		/**
+		 * List all models associated with with an instance.
+		 * See list_storage_models() and list_object_models().	
+		 *
+		 * @return array of models or null
+		 */
+		public unowned Model[]? list_models () {
+			return this._models;
+		}
+
 		/**
 		 * SQLModelManager can not be copied.
 		 * @return null
 		 */
 		public Model? copy () {
 			return null;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		public unowned StorageManager get_storage_manager () {
+			return this.storagemanager;
 		}
 	}
 }
