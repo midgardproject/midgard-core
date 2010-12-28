@@ -22,11 +22,20 @@ namespace MidgardCR {
 
 		/* private properties */
 		private RDFSQLQueryManager _rdf_query_manager = null;	
+		private RDFSQLNamespaceManager _ns_manager = null;
+
+		public override unowned NamespaceManager namespace_manager {
+                        get {
+                                if (this._ns_manager == null)
+                                        this._ns_manager = new RDFSQLNamespaceManager (this);
+                                return this._ns_manager;
+                        }
+                }
 
 		public override unowned QueryManager query_manager {
 			get { 
 				if (this._rdf_query_manager == null)
-					this._rdf_query_manager = new RDFSQLQueryManager ((RDFSQLStorageManager) this.storage_manager);
+					this._rdf_query_manager = new RDFSQLQueryManager ((RDFSQLStorageManager) this.storagemanager);
 				return (QueryManager) this._rdf_query_manager;
 			}
 		}
@@ -42,6 +51,11 @@ namespace MidgardCR {
 
 		public override void create (Storable object) throws StorageContentManagerError {
 
+			/* RDFGenericObject object with RDFObjectModel for RepositoryObject available */
+
+			/* Repository object */
+
+			/* RDFGenericObject */
 			if (!(object is RDFGenericObject))
 				throw new StorageContentManagerError.OBJECT_INVALID ("Expected RDFGenericObject");
 

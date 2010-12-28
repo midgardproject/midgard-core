@@ -27,16 +27,16 @@ namespace MidgardCR {
 	
 		/* internal properties */
 		internal SQLStorageManager _storage_manager = null;
-		protected NamespaceManager _ns_manager = null;
+		private NamespaceManager _ns_manager = null;
 		private SQLQueryManager _query_manager = null;
 
 		/* public properties */
-		public unowned StorageManager storage_manager {
+		public virtual unowned StorageManager storagemanager {
 			get { return (StorageManager) this._storage_manager; }
 			construct { this._storage_manager = (SQLStorageManager) value; }
 		}
 
-		public unowned NamespaceManager namespace_manager {
+		public virtual unowned NamespaceManager namespace_manager {
 			get {
 				if (this._ns_manager == null)
 					this._ns_manager = new SQLNamespaceManager (this);
@@ -47,14 +47,14 @@ namespace MidgardCR {
 		public virtual unowned QueryManager query_manager {
 			get {
 				if (this._query_manager == null);
-					this._query_manager = new SQLQueryManager ((SQLStorageManager)this.storage_manager);
+					this._query_manager = new SQLQueryManager ((SQLStorageManager)this.storagemanager);
 				return this._query_manager;
 			}
 		}
 
 		/* constructor */
 		public SQLContentManager (SQLStorageManager manager) {
-			Object (storage_manager: manager);
+			Object (storagemanager: manager);
 		}
 
 		/* public methods */

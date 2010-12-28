@@ -21,8 +21,8 @@ namespace MidgardCR {
 	public class SQLNamespaceManager : GLib.Object, NamespaceManager {
 
 		internal string[] _names = null;
-		internal string[] _uris = null;
-		internal SQLContentManager _content_manager = null;
+		internal string[] _ids = null;
+		private SQLContentManager _content_manager = null;
 
 		/* constructor */
 		public SQLNamespaceManager (SQLContentManager manager) {
@@ -31,26 +31,35 @@ namespace MidgardCR {
 		}
 
 		/* methods */
-		public void create_uri (string name, string uri) throws NamespaceManagerError {
-			if (this.uri_exists (uri))
-				throw new NamespaceManagerError.URI_EXISTS ("%s uri already exists", uri);
+		/**
+		 * {@inheritDoc}
+		 */
+		public void create_mapping (string name, string id) throws NamespaceManagerError {
+			if (this.identifier_exists (id))
+				throw new NamespaceManagerError.IDENTIFIER_EXISTS ("%s identifier already exists", id);
 			if (this.name_exists (name))
-				throw new NamespaceManagerError.ALIAS_EXISTS ("%s name already exists", name);	
+				throw new NamespaceManagerError.NAME_EXISTS ("%s name already exists", name);	
 
 			this._names += name;
-			this._uris += uri;
+			this._ids += id;
 
 			/* TODO */
 			/* Store it in a table */
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		public  unowned string[]? list_names () {
 			if (this._names == null)
 				return null;
 			return this._names;
 		}
 
-		public unowned string? get_uri_by_name (string name) {
+		/**
+		 * {@inheritDoc}
+		 */
+		public unowned string? get_identifier_by_name (string name) {
 			if (this._names == null)
 				return null;
 			uint i = 0;
@@ -59,21 +68,27 @@ namespace MidgardCR {
 					break;
 				i++;
 			}
-			return this._uris[i];
+			return this._ids[i];
 		}
 
-		public unowned string? get_name_by_uri (string uri) {
-			if (this._uris == null)
+		/**
+		 * {@inheritDoc}
+		 */
+		public unowned string? get_name_by_identifier (string id) {
+			if (this._ids == null)
 				return null;
 			uint i = 0;
-			foreach (unowned string u in this._uris) {
-				if (u == uri)
+			foreach (unowned string u in this._ids) {
+				if (u == id)
 					break;
 				i++;
 			}
 			return this._names[i];
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		public bool name_exists (string name) {	
 			if (this._names == null)
 				return false;
@@ -84,11 +99,14 @@ namespace MidgardCR {
 			return false;
 		}
 
-		public bool uri_exists (string uri) {
-			if (this._uris == null)
+		/**
+		 * {@inheritDoc}
+		 */
+		public bool identifier_exists (string id) {
+			if (this._ids == null)
 				return false;
-			foreach (unowned string u in this._uris) {
-				if (u == uri)
+			foreach (unowned string u in this._ids) {
+				if (u == id)
 					return true;
 			}
 			return false;

@@ -70,7 +70,7 @@ namespace MidgardCR
 					return val;
 				/* Add extra 1 for "/" taken into account in rstr() */
 				string uri = val.substring (0, (val.length - rs.length) + 1);
-				string name = ns_manager.get_name_by_uri (uri);
+				string name = ns_manager.get_name_by_identifier (uri);
 				if (name == null)
 					return val;
 				/* Exclude extra "/" returned from rstr() */
@@ -79,7 +79,7 @@ namespace MidgardCR
 			else if (":" in val) { 
 				/* foaf:Person */
 				string[] spltd = val.split (":");
-				string uri = ns_manager.get_uri_by_name (spltd[0]);	
+				string uri = ns_manager.get_identifier_by_name (spltd[0]);	
 				if (uri == null)
 					return val;
 				return uri + spltd[1];
