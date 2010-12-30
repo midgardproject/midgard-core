@@ -1137,7 +1137,7 @@ gboolean midgard_connection_reopen(MidgardConnection *self)
 {
 	g_assert(self != NULL);
 
-	const gchar *query = "SELECT id FROM person LIMIT 1";
+	const gchar *query = "SELECT 1";
 	GdaDataModel *model =
 		midgard_core_query_get_model(self, query);
 
