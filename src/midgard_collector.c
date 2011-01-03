@@ -52,11 +52,10 @@ static const gchar *_collector_find_class_property(
 		 
 		MidgardMetadataClass *mklass =
 			(MidgardMetadataClass*) g_type_class_peek(g_type_from_name("MidgardMetadata"));
-
-		table_field =
-			midgard_core_class_get_property_tablefield(
-					MIDGARD_DBOBJECT_CLASS(mklass),
-					propname);
+		GParamSpec *pspec = g_object_class_find_property (G_OBJECT_CLASS (mklass), propname);
+		/* We do not need table.col alias, so dummy empty string is fine in this case */
+		if (pspec)
+			return "";
 	}
 
 	return table_field;
@@ -885,6 +884,7 @@ midgard_collector_execute (MidgardCollector *self)
 	const GValue *gda_value;
 	const GValue *key_value;
 	GValue *ck_value;
+	GParamSpec *pspec = NULL;
 
 	ret_rows = gda_data_model_get_n_rows(model);
 
@@ -894,12 +894,14 @@ midgard_collector_execute (MidgardCollector *self)
 
 		for (columns = 0; columns < ret_fields; columns++) {
 			
+			pspec = NULL;
 			key_value = 
 				midgard_data_model_get_value_at(model, 0, rows);
 
 			gda_value =
 				midgard_data_model_get_value_at(model, columns, rows); 
 			GValue *new_value = g_new0(GValue, 1);
+			const gchar *col_title = gda_data_model_get_column_title (model, columns);
 			//g_value_init(new_value, G_VALUE_TYPE(gda_value));
 			//g_value_init(new_value, G_TYPE_STRING);
 
@@ -916,12 +918,36 @@ midgard_collector_execute (MidgardCollector *self)
 				g_value_init(new_value, G_TYPE_STRING);
 				g_value_take_string(new_value, g_value_dup_string (gda_value));
 			} else {
-				g_value_init(new_value, G_TYPE_STRING);
-				if(!G_VALUE_HOLDS_STRING(gda_value))
-					g_value_transform(gda_value, new_value);
-				else
-					g_value_copy(gda_value, new_value);
-				
+				/* Look for property's spec */
+				pspec = g_object_class_find_property (G_OBJECT_CLASS (self->priv->klass), col_title);
+				if (pspec) {
+					g_value_init(new_value, pspec->value_type);
+					if (G_VALUE_TYPE (gda_value) != pspec->value_type)
+						g_value_transform(gda_value, new_value);
+					else
+						g_value_copy(gda_value, new_value);
+				/* Try metadata class */
+				} else {
+					MidgardMetadataClass *mklass =
+						(MidgardMetadataClass*) g_type_class_peek(g_type_from_name("MidgardMetadata"));
+					pspec = g_object_class_find_property(G_OBJECT_CLASS(mklass), col_title);
+					if (pspec) {
+						g_value_init(new_value, pspec->value_type);
+						if (G_VALUE_TYPE (gda_value) != pspec->value_type)
+							g_value_transform(gda_value, new_value);
+						else
+							g_value_copy(gda_value, new_value);
+					}
+				}
+
+				/* Try default string type */
+				if (!pspec) {
+					g_value_init(new_value, G_TYPE_STRING);
+					if (G_VALUE_TYPE (gda_value) != G_TYPE_STRING)
+						g_value_transform(gda_value, new_value);
+					else
+						g_value_copy(gda_value, new_value);
+				}
 			}
 
 			ck_value = g_new0(GValue, 1);
@@ -938,7 +964,7 @@ midgard_collector_execute (MidgardCollector *self)
 
 			midgard_collector_set(self,
 					g_value_get_string((GValue*)ck_value),
-					gda_data_model_get_column_title(model, columns),
+					col_title,
 					new_value);
 			
 			if (ret_fields == 1){
