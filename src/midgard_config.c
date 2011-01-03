@@ -1017,27 +1017,43 @@ static void __config_struct_new(MidgardConfig *self)
 static void
 __config_copy (MidgardConfig *self, MidgardConfig *src)
 {
+	g_free (self->dbtype);
 	self->dbtype = g_strdup(src->dbtype);
+	g_free (self->mgdusername);
 	self->mgdusername = g_strdup(src->mgdusername);
+	g_free (self->mgdpassword);
 	self->mgdpassword = g_strdup(src->mgdpassword);
+	g_free (self->host);
 	self->host = g_strdup(src->host);
+	g_free (self->database);
 	self->database = g_strdup(src->database);
 	self->dbport = src->dbport;	
+	g_free (self->dbuser);
 	self->dbuser = g_strdup(src->dbuser);
+	g_free (self->dbpass);
 	self->dbpass = g_strdup(src->dbpass);
+	g_free (self->dbdir);
 	self->dbdir = g_strdup (src->dbdir);
+	g_free (self->logfilename);
 	self->logfilename = g_strdup (src->logfilename);;
+	g_free (self->loglevel);
 	self->loglevel = g_strdup(src->loglevel);
+	g_free (self->pamfile);
 	self->pamfile = g_strdup (src->pamfile);
 
 	self->tablecreate = src->tablecreate;
 	self->tableupdate = src->tableupdate;
 	self->testunit = src->testunit;
 
+	g_free (self->blobdir);
 	self->blobdir = g_strdup(src->blobdir);
+	g_free (self->sharedir);
 	self->sharedir = g_strdup(src->sharedir);
+	g_free (self->vardir);
 	self->vardir = g_strdup(src->vardir);
+	g_free (self->cachedir);
 	self->cachedir = g_strdup(src->cachedir);
+	g_free (self->confdir);
 	self->confdir = g_strdup(src->confdir);
 	self->gdathreads = src->gdathreads;
 
