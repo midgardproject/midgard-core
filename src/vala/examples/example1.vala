@@ -115,7 +115,7 @@ void main () {
 		.add_model (activity_sm);
 
 	/* Connect profiler callbacks to all ModelManager signal emissions */	
-	SQLProfiler profiler = (SQLProfiler) model_manager.storagemanager.profiler;
+	SQLProfiler profiler = (SQLProfiler) storage_manager.profiler;
 	profiler.enable (true);
 	model_manager.execution_start.connect (() => {
 		profiler_callback_start(profiler);

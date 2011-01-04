@@ -42,7 +42,7 @@ void main () {
 	var builder = new ObjectBuilder ();	
 
 	/* Get all available ObjectModel models from model manager */
-        ObjectModel[] object_models = storage_manager.model_manager.list_object_models ();
+        ObjectModel[] object_models = (ObjectModel[]) storage_manager.model_manager.list_models_by_type ("ObjectModel");
 	
 	/* Register models in builder and validate models */
 	try {

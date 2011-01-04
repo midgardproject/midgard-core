@@ -51,7 +51,7 @@ void main()
 	/* Define 'topic' property. */
         owl_thing_model.add_model (new ObjectPropertyModel ("topic", "string", ""));
 
-	/* For 'OwlThing' class, prepare 'owl_tthing' table with 'topic' column */
+	/* For 'OwlThing' class, prepare 'owl_thing' table with 'topic' column */
 	SQLTableModel owl_thing_tm = new SQLTableModel (storage_manager, "OwlThing", "owl_thing");
 	owl_thing_tm.add_model (new SQLColumnModel (storage_manager, "topic", "topic", "string"))
 
