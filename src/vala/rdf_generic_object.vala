@@ -18,26 +18,15 @@
 
 namespace MidgardCR {
 
-	public class RDFGenericObject : GLib.Object, Storable {
+	public class RDFGenericObject : RepositoryObject {
 
 		/* internal properties */
-		internal string _guid = null;
 		internal string _identifier = null;
 		internal string _classname = null;
-		internal int _id = 0;
 		internal RepositoryObject[]? _triples = null;
 
 		/* properties */
-		public string guid {
-			get { return this._guid; }
-			construct {
-				if ((string)value == null)
-					this._guid = MidgardCRCore.Guid.create ();
-				else 
-					this._guid = value;
-			}
-		}
-
+		
 		public string identifier {
 			get {
 				if (this._identifier == null) {
@@ -52,10 +41,6 @@ namespace MidgardCR {
 		public string classname {
 			get { return this._classname; }
 			construct { this._classname = value; }
-		}
-
-		public uint id {
-			get { return this._id; }
 		}
 
 		/* constructor */
@@ -79,7 +64,7 @@ namespace MidgardCR {
 		}
 
 		/* public methods */
-		public virtual void set_property_value (string name, GLib.Value value) {
+		public new void set_property_value (string name, GLib.Value value) {
 			RepositoryObject[]? triples = this._find_triples_by_name (name);
 			RepositoryObject triple = null;
 			/* FIXME, handle returned array */
@@ -133,7 +118,7 @@ namespace MidgardCR {
                        	);
 		}
 
-		public virtual GLib.Value? get_property_value (string name) {
+		public new GLib.Value? get_property_value (string name) {
 			/* TODO, if required throw exception */
 			if (name == null || name == "") 
 				return null;
@@ -158,7 +143,7 @@ namespace MidgardCR {
 			return val;	
 		}
 
-		public virtual string[]? list_all_properties () {
+		public override string[]? list_all_properties () {
 			if (this._triples == null)
 				return null;
 			string[] propnames = null;
