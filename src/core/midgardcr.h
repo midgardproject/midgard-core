@@ -1466,24 +1466,19 @@ struct _MidgardCRSQLTransactionClass {
 };
 
 struct _MidgardCRRDFGenericObject {
-	GObject parent_instance;
+	MidgardCRRepositoryObject parent_instance;
 	MidgardCRRDFGenericObjectPrivate * priv;
-	char* _guid;
 	char* _identifier;
 	char* _classname;
-	gint _id;
 	MidgardCRRepositoryObject** _triples;
 	gint _triples_length1;
 	gint __triples_size_;
 };
 
 struct _MidgardCRRDFGenericObjectClass {
-	GObjectClass parent_class;
-	void (*set_property_value) (MidgardCRRDFGenericObject* self, const char* name, GValue* value);
+	MidgardCRRepositoryObjectClass parent_class;
 	void (*set_property_literal) (MidgardCRRDFGenericObject* self, const char* name, const char* value);
-	GValue* (*get_property_value) (MidgardCRRDFGenericObject* self, const char* name);
 	char* (*get_property_literal) (MidgardCRRDFGenericObject* self, const char* name);
-	char** (*list_all_properties) (MidgardCRRDFGenericObject* self, int* result_length1);
 };
 
 struct _MidgardCRRDFStorageManagerIface {
@@ -1939,14 +1934,11 @@ void midgard_cr_rdf_generic_object_set_property_value (MidgardCRRDFGenericObject
 void midgard_cr_rdf_generic_object_set_property_literal (MidgardCRRDFGenericObject* self, const char* name, const char* value);
 GValue* midgard_cr_rdf_generic_object_get_property_value (MidgardCRRDFGenericObject* self, const char* name);
 char* midgard_cr_rdf_generic_object_get_property_literal (MidgardCRRDFGenericObject* self, const char* name);
-char** midgard_cr_rdf_generic_object_list_all_properties (MidgardCRRDFGenericObject* self, int* result_length1);
 MidgardCRRepositoryObject** midgard_cr_rdf_generic_object_list_triples (MidgardCRRDFGenericObject* self, int* result_length1);
 void midgard_cr_rdf_generic_object_add_triple (MidgardCRRDFGenericObject* self, MidgardCRRepositoryObject* triple);
-const char* midgard_cr_rdf_generic_object_get_guid (MidgardCRRDFGenericObject* self);
 const char* midgard_cr_rdf_generic_object_get_identifier (MidgardCRRDFGenericObject* self);
 void midgard_cr_rdf_generic_object_set_identifier (MidgardCRRDFGenericObject* self, const char* value);
 const char* midgard_cr_rdf_generic_object_get_classname (MidgardCRRDFGenericObject* self);
-guint midgard_cr_rdf_generic_object_get_id (MidgardCRRDFGenericObject* self);
 GType midgard_cr_rdf_storage_manager_get_type (void) G_GNUC_CONST;
 MidgardCRNamespaceManager* midgard_cr_rdf_storage_manager_get_nsmanager (MidgardCRRDFStorageManager* self);
 GType midgard_cr_rdfsql_storage_manager_get_type (void) G_GNUC_CONST;
