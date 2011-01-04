@@ -55,7 +55,12 @@ namespace MidgardCR {
 
 		/* properties */
 		public string guid { 
-			get { return this._guid; }
+			get { 
+				return this._guid; 
+			}
+			construct {
+				this._guid = value;
+			}
 		}
 
 		public uint id { 
