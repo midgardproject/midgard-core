@@ -711,6 +711,17 @@ typedef struct _MidgardCRRDFSQLQueryManager MidgardCRRDFSQLQueryManager;
 typedef struct _MidgardCRRDFSQLQueryManagerClass MidgardCRRDFSQLQueryManagerClass;
 typedef struct _MidgardCRRDFSQLQueryManagerPrivate MidgardCRRDFSQLQueryManagerPrivate;
 
+#define MIDGARD_CR_TYPE_RDFSQL_NAMESPACE_MANAGER (midgard_cr_rdfsql_namespace_manager_get_type ())
+#define MIDGARD_CR_RDFSQL_NAMESPACE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDFSQL_NAMESPACE_MANAGER, MidgardCRRDFSQLNamespaceManager))
+#define MIDGARD_CR_RDFSQL_NAMESPACE_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDFSQL_NAMESPACE_MANAGER, MidgardCRRDFSQLNamespaceManagerClass))
+#define MIDGARD_CR_IS_RDFSQL_NAMESPACE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_RDFSQL_NAMESPACE_MANAGER))
+#define MIDGARD_CR_IS_RDFSQL_NAMESPACE_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_RDFSQL_NAMESPACE_MANAGER))
+#define MIDGARD_CR_RDFSQL_NAMESPACE_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_RDFSQL_NAMESPACE_MANAGER, MidgardCRRDFSQLNamespaceManagerClass))
+
+typedef struct _MidgardCRRDFSQLNamespaceManager MidgardCRRDFSQLNamespaceManager;
+typedef struct _MidgardCRRDFSQLNamespaceManagerClass MidgardCRRDFSQLNamespaceManagerClass;
+typedef struct _MidgardCRRDFSQLNamespaceManagerPrivate MidgardCRRDFSQLNamespaceManagerPrivate;
+
 struct _MidgardCRConfig {
 	GObject parent_instance;
 	MidgardCRConfigPrivate * priv;
@@ -735,20 +746,20 @@ struct _MidgardCRExecutableIface {
 };
 
 typedef enum  {
-	MIDGARD_CR_NAMESPACE_MANAGER_ERROR_URI_INVALID,
-	MIDGARD_CR_NAMESPACE_MANAGER_ERROR_URI_EXISTS,
-	MIDGARD_CR_NAMESPACE_MANAGER_ERROR_ALIAS_INVALID,
-	MIDGARD_CR_NAMESPACE_MANAGER_ERROR_ALIAS_EXISTS
+	MIDGARD_CR_NAMESPACE_MANAGER_ERROR_IDENTIFIER_INVALID,
+	MIDGARD_CR_NAMESPACE_MANAGER_ERROR_IDENTIFIER_EXISTS,
+	MIDGARD_CR_NAMESPACE_MANAGER_ERROR_NAME_INVALID,
+	MIDGARD_CR_NAMESPACE_MANAGER_ERROR_NAME_EXISTS
 } MidgardCRNamespaceManagerError;
 #define MIDGARD_CR_NAMESPACE_MANAGER_ERROR midgard_cr_namespace_manager_error_quark ()
 struct _MidgardCRNamespaceManagerIface {
 	GTypeInterface parent_iface;
-	void (*create_uri) (MidgardCRNamespaceManager* self, const char* name, const char* uri, GError** error);
+	void (*create_mapping) (MidgardCRNamespaceManager* self, const char* name, const char* id, GError** error);
 	char** (*list_names) (MidgardCRNamespaceManager* self, int* result_length1);
-	const char* (*get_uri_by_name) (MidgardCRNamespaceManager* self, const char* name);
-	const char* (*get_name_by_uri) (MidgardCRNamespaceManager* self, const char* uri);
+	const char* (*get_identifier_by_name) (MidgardCRNamespaceManager* self, const char* name);
+	const char* (*get_name_by_identifier) (MidgardCRNamespaceManager* self, const char* id);
 	gboolean (*name_exists) (MidgardCRNamespaceManager* self, const char* name);
-	gboolean (*uri_exists) (MidgardCRNamespaceManager* self, const char* uri);
+	gboolean (*identifier_exists) (MidgardCRNamespaceManager* self, const char* id);
 };
 
 struct _MidgardCRProfilerIface {
@@ -1290,7 +1301,6 @@ struct _MidgardCRSQLContentManager {
 	GObject parent_instance;
 	MidgardCRSQLContentManagerPrivate * priv;
 	MidgardCRSQLStorageManager* _storage_manager;
-	MidgardCRNamespaceManager* _ns_manager;
 };
 
 struct _MidgardCRSQLContentManagerClass {
@@ -1301,6 +1311,9 @@ struct _MidgardCRSQLContentManagerClass {
 	void (*save) (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
 	void (*purge) (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
 	void (*remove) (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
+	MidgardCRStorageManager* (*get_storagemanager) (MidgardCRSQLContentManager* self);
+	void (*set_storagemanager) (MidgardCRSQLContentManager* self, MidgardCRStorageManager* value);
+	MidgardCRNamespaceManager* (*get_namespace_manager) (MidgardCRSQLContentManager* self);
 	MidgardCRQueryManager* (*get_query_manager) (MidgardCRSQLContentManager* self);
 };
 
@@ -1424,10 +1437,9 @@ struct _MidgardCRSQLNamespaceManager {
 	char** _names;
 	gint _names_length1;
 	gint __names_size_;
-	char** _uris;
-	gint _uris_length1;
-	gint __uris_size_;
-	MidgardCRSQLContentManager* _content_manager;
+	char** _ids;
+	gint _ids_length1;
+	gint __ids_size_;
 };
 
 struct _MidgardCRSQLNamespaceManagerClass {
@@ -1529,6 +1541,15 @@ struct _MidgardCRRDFSQLQueryManagerClass {
 	MidgardCRSQLQueryManagerClass parent_class;
 };
 
+struct _MidgardCRRDFSQLNamespaceManager {
+	MidgardCRSQLNamespaceManager parent_instance;
+	MidgardCRRDFSQLNamespaceManagerPrivate * priv;
+};
+
+struct _MidgardCRRDFSQLNamespaceManagerClass {
+	MidgardCRSQLNamespaceManagerClass parent_class;
+};
+
 
 GType midgard_cr_config_get_type (void) G_GNUC_CONST;
 gboolean midgard_cr_config_read_configuration (MidgardCRConfig* self, const char* name, gboolean user, GError** error);
@@ -1583,12 +1604,12 @@ GType midgard_cr_executable_get_type (void) G_GNUC_CONST;
 void midgard_cr_executable_execute (MidgardCRExecutable* self, GError** error);
 GQuark midgard_cr_namespace_manager_error_quark (void);
 GType midgard_cr_namespace_manager_get_type (void) G_GNUC_CONST;
-void midgard_cr_namespace_manager_create_uri (MidgardCRNamespaceManager* self, const char* name, const char* uri, GError** error);
+void midgard_cr_namespace_manager_create_mapping (MidgardCRNamespaceManager* self, const char* name, const char* id, GError** error);
 char** midgard_cr_namespace_manager_list_names (MidgardCRNamespaceManager* self, int* result_length1);
-const char* midgard_cr_namespace_manager_get_uri_by_name (MidgardCRNamespaceManager* self, const char* name);
-const char* midgard_cr_namespace_manager_get_name_by_uri (MidgardCRNamespaceManager* self, const char* uri);
+const char* midgard_cr_namespace_manager_get_identifier_by_name (MidgardCRNamespaceManager* self, const char* name);
+const char* midgard_cr_namespace_manager_get_name_by_identifier (MidgardCRNamespaceManager* self, const char* id);
 gboolean midgard_cr_namespace_manager_name_exists (MidgardCRNamespaceManager* self, const char* name);
-gboolean midgard_cr_namespace_manager_uri_exists (MidgardCRNamespaceManager* self, const char* uri);
+gboolean midgard_cr_namespace_manager_identifier_exists (MidgardCRNamespaceManager* self, const char* id);
 GType midgard_cr_profiler_get_type (void) G_GNUC_CONST;
 void midgard_cr_profiler_enable (MidgardCRProfiler* self, gboolean toggle);
 void midgard_cr_profiler_start (MidgardCRProfiler* self);
@@ -1858,7 +1879,8 @@ void midgard_cr_sql_content_manager_update (MidgardCRSQLContentManager* self, Mi
 void midgard_cr_sql_content_manager_save (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
 void midgard_cr_sql_content_manager_purge (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
 void midgard_cr_sql_content_manager_remove (MidgardCRSQLContentManager* self, MidgardCRStorable* object, GError** error);
-MidgardCRStorageManager* midgard_cr_sql_content_manager_get_storage_manager (MidgardCRSQLContentManager* self);
+MidgardCRStorageManager* midgard_cr_sql_content_manager_get_storagemanager (MidgardCRSQLContentManager* self);
+MidgardCRNamespaceManager* midgard_cr_sql_content_manager_get_namespace_manager (MidgardCRSQLContentManager* self);
 MidgardCRQueryManager* midgard_cr_sql_content_manager_get_query_manager (MidgardCRSQLContentManager* self);
 GType midgard_cr_sql_model_manager_get_type (void) G_GNUC_CONST;
 MidgardCRSQLModelManager* midgard_cr_sql_model_manager_new (void);
@@ -1945,6 +1967,10 @@ GType midgard_cr_rdfsql_query_manager_get_type (void) G_GNUC_CONST;
 MidgardCRRDFSQLQueryManager* midgard_cr_rdfsql_query_manager_new (MidgardCRRDFSQLStorageManager* storage);
 MidgardCRRDFSQLQueryManager* midgard_cr_rdfsql_query_manager_construct (GType object_type, MidgardCRRDFSQLStorageManager* storage);
 MidgardCRStorageManager* midgard_cr_rdfsql_query_manager_get_storage_manager (MidgardCRRDFSQLQueryManager* self);
+GType midgard_cr_rdfsql_namespace_manager_get_type (void) G_GNUC_CONST;
+MidgardCRRDFSQLNamespaceManager* midgard_cr_rdfsql_namespace_manager_new (MidgardCRRDFSQLContentManager* manager);
+MidgardCRRDFSQLNamespaceManager* midgard_cr_rdfsql_namespace_manager_construct (GType object_type, MidgardCRRDFSQLContentManager* manager);
+char* midgard_cr_rdfsql_namespace_manager_decode (MidgardCRRDFSQLNamespaceManager* self, const char* id);
 
 
 G_END_DECLS
