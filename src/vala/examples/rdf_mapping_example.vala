@@ -43,26 +43,17 @@ void main()
 	var model_manager = storage_manager.model_manager;
 
 	/* Set names and uris for NamespaceManager */
-	content_manager.namespace_manager.create_uri ("foaf", "http://xmlns.com/foaf/0.1/");
-	content_manager.namespace_manager.create_uri ("owl", "http://www.w3.org/2002/07/owl#");
+	content_manager.namespace_manager.create_mapping ("foaf", "http://xmlns.com/foaf/0.1/");
+	content_manager.namespace_manager.create_mapping ("owl", "http://www.w3.org/2002/07/owl#");
 
-	/* Register Repository object and prepare its storage */
-	ObjectModel owl_thing_model = new ObjectModel ("OwlThing");
-	/* Define 'topic' property. */
-        owl_thing_model.add_model (new ObjectPropertyModel ("topic", "string", ""));
+	/* Create mapping models. This is bidirectional mapping between explicit 'OwlThing' 
+	 * repository class and 'owl' namespace */
+	var rdf_model = new RDFMapperObject ("owl:Thing", "OwlThing");
+	rdf_model.add_model (new RDFMapperProperty ("foaf:topic", "topic"));
+	/* Add rdf model to manager */
+	model_manager.add_model (rdf_model);
 
-	/* For 'OwlThing' class, prepare 'owl_thing' table with 'topic' column */
-	SQLTableModel owl_thing_tm = new SQLTableModel (storage_manager, "OwlThing", "owl_thing");
-	owl_thing_tm.add_model (new SQLColumnModel (storage_manager, "topic", "topic", "string"))
-
-	RDFObjectModel rdf_model = new RDFObjectModel ("OwlThing", "owl:Thing");
-	rdf_model.add_model (new RDFPropertyModel ("topic", "foaf:topic");
-
-	model_manager
-		.add_model (owl_thing_model)
-		.add_model (owl_thing_tm)
-		.add_model (rdf_model);
-
+	/* Validate and register rdf model with manager */
 	model_manager.prepare_create ();
 	model_manager.execute ();
 
@@ -125,13 +116,32 @@ RDFSQLStorageManager getStorageManager()
 	/* connect */
 	var storage_manager = new RDFSQLStorageManager ("rdf_test_manager", config);
 	storage_manager.open ();
-	storage_manager.initialize_storage();
+	storage_manager.initialize_storage ();
 
 	/* Register models in builder and validate models */
 	var model_manager = storage_manager.model_manager;
+
+	/* Register 'OwlThing' repository class and prepare its storage */
+	ObjectModel owl_thing_model = new ObjectModel ("OwlThing");
+	/* Define 'topic' property. */
+        owl_thing_model.add_model (new ObjectPropertyModel ("topic", "string", ""));
+	/* Add class model to manager */
+	model_manager.add_model (owl_thing_model);
+
+	/* For 'OwlThing' class, prepare 'owl_thing' table with 'topic' column */
+	SQLTableModel owl_thing_tm = new SQLTableModel (storage_manager, "OwlThing", "owl_thing");
+	owl_thing_tm.add_model (new SQLColumnModel (storage_manager, "topic", "topic", "string"));
+	/* Add table model to manager */
+	model_manager.add_model (owl_thing_tm);
+	
+	/* Validate models and execute.
+	 * Register classes and create tables in SQL database */
+	model_manager.prepare_create ();
+	model_manager.execute ();
+
 	var builder = new MidgardCR.ObjectBuilder ();
 
-	foreach (ObjectModel model in model_manager.list_object_models())
+	foreach (ObjectModel model in (ObjectModel[]) model_manager.list_models_by_type ("ObjectModel"))
 		builder.register_model (model);
 	builder.execute ();
 

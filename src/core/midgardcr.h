@@ -648,6 +648,28 @@ typedef struct _MidgardCRRDFGenericObject MidgardCRRDFGenericObject;
 typedef struct _MidgardCRRDFGenericObjectClass MidgardCRRDFGenericObjectClass;
 typedef struct _MidgardCRRDFGenericObjectPrivate MidgardCRRDFGenericObjectPrivate;
 
+#define MIDGARD_CR_TYPE_RDF_MAPPER_OBJECT (midgard_cr_rdf_mapper_object_get_type ())
+#define MIDGARD_CR_RDF_MAPPER_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDF_MAPPER_OBJECT, MidgardCRRDFMapperObject))
+#define MIDGARD_CR_RDF_MAPPER_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDF_MAPPER_OBJECT, MidgardCRRDFMapperObjectClass))
+#define MIDGARD_CR_IS_RDF_MAPPER_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_RDF_MAPPER_OBJECT))
+#define MIDGARD_CR_IS_RDF_MAPPER_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_RDF_MAPPER_OBJECT))
+#define MIDGARD_CR_RDF_MAPPER_OBJECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_RDF_MAPPER_OBJECT, MidgardCRRDFMapperObjectClass))
+
+typedef struct _MidgardCRRDFMapperObject MidgardCRRDFMapperObject;
+typedef struct _MidgardCRRDFMapperObjectClass MidgardCRRDFMapperObjectClass;
+typedef struct _MidgardCRRDFMapperObjectPrivate MidgardCRRDFMapperObjectPrivate;
+
+#define MIDGARD_CR_TYPE_RDF_MAPPER_PROPERTY (midgard_cr_rdf_mapper_property_get_type ())
+#define MIDGARD_CR_RDF_MAPPER_PROPERTY(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDF_MAPPER_PROPERTY, MidgardCRRDFMapperProperty))
+#define MIDGARD_CR_RDF_MAPPER_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDF_MAPPER_PROPERTY, MidgardCRRDFMapperPropertyClass))
+#define MIDGARD_CR_IS_RDF_MAPPER_PROPERTY(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_RDF_MAPPER_PROPERTY))
+#define MIDGARD_CR_IS_RDF_MAPPER_PROPERTY_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_RDF_MAPPER_PROPERTY))
+#define MIDGARD_CR_RDF_MAPPER_PROPERTY_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_RDF_MAPPER_PROPERTY, MidgardCRRDFMapperPropertyClass))
+
+typedef struct _MidgardCRRDFMapperProperty MidgardCRRDFMapperProperty;
+typedef struct _MidgardCRRDFMapperPropertyClass MidgardCRRDFMapperPropertyClass;
+typedef struct _MidgardCRRDFMapperPropertyPrivate MidgardCRRDFMapperPropertyPrivate;
+
 #define MIDGARD_CR_TYPE_RDF_STORAGE_MANAGER (midgard_cr_rdf_storage_manager_get_type ())
 #define MIDGARD_CR_RDF_STORAGE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDF_STORAGE_MANAGER, MidgardCRRDFStorageManager))
 #define MIDGARD_CR_IS_RDF_STORAGE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_RDF_STORAGE_MANAGER))
@@ -677,6 +699,17 @@ typedef struct _MidgardCRRDFSQLStorageManagerPrivate MidgardCRRDFSQLStorageManag
 typedef struct _MidgardCRRDFSQLContentManager MidgardCRRDFSQLContentManager;
 typedef struct _MidgardCRRDFSQLContentManagerClass MidgardCRRDFSQLContentManagerClass;
 typedef struct _MidgardCRRDFSQLContentManagerPrivate MidgardCRRDFSQLContentManagerPrivate;
+
+#define MIDGARD_CR_TYPE_RDFSQL_MODEL_MANAGER (midgard_cr_rdfsql_model_manager_get_type ())
+#define MIDGARD_CR_RDFSQL_MODEL_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDFSQL_MODEL_MANAGER, MidgardCRRDFSQLModelManager))
+#define MIDGARD_CR_RDFSQL_MODEL_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDFSQL_MODEL_MANAGER, MidgardCRRDFSQLModelManagerClass))
+#define MIDGARD_CR_IS_RDFSQL_MODEL_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_RDFSQL_MODEL_MANAGER))
+#define MIDGARD_CR_IS_RDFSQL_MODEL_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_RDFSQL_MODEL_MANAGER))
+#define MIDGARD_CR_RDFSQL_MODEL_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_RDFSQL_MODEL_MANAGER, MidgardCRRDFSQLModelManagerClass))
+
+typedef struct _MidgardCRRDFSQLModelManager MidgardCRRDFSQLModelManager;
+typedef struct _MidgardCRRDFSQLModelManagerClass MidgardCRRDFSQLModelManagerClass;
+typedef struct _MidgardCRRDFSQLModelManagerPrivate MidgardCRRDFSQLModelManagerPrivate;
 
 #define MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT (midgard_cr_rdfsql_query_select_get_type ())
 #define MIDGARD_CR_RDFSQL_QUERY_SELECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT, MidgardCRRDFSQLQuerySelect))
@@ -1341,6 +1374,20 @@ struct _MidgardCRSQLModelManager {
 
 struct _MidgardCRSQLModelManagerClass {
 	GObjectClass parent_class;
+	MidgardCRModel* (*add_model) (MidgardCRSQLModelManager* self, MidgardCRModel* model);
+	MidgardCRModel* (*get_model_by_name) (MidgardCRSQLModelManager* self, const char* name);
+	void (*is_valid) (MidgardCRSQLModelManager* self, GError** error);
+	void (*prepare_create) (MidgardCRSQLModelManager* self, GError** error);
+	void (*prepare_update) (MidgardCRSQLModelManager* self, GError** error);
+	void (*prepare_save) (MidgardCRSQLModelManager* self, GError** error);
+	void (*prepare_remove) (MidgardCRSQLModelManager* self, GError** error);
+	void (*prepare_purge) (MidgardCRSQLModelManager* self, GError** error);
+	void (*execute) (MidgardCRSQLModelManager* self, GError** error);
+	MidgardCRModel** (*list_models_by_type) (MidgardCRSQLModelManager* self, const char* type, int* result_length1);
+	char** (*list_model_types) (MidgardCRSQLModelManager* self, int* result_length1);
+	MidgardCRModel* (*get_type_model_by_name) (MidgardCRSQLModelManager* self, const char* type, const char* name);
+	MidgardCRModel** (*list_models) (MidgardCRSQLModelManager* self, int* result_length1);
+	MidgardCRModel* (*copy) (MidgardCRSQLModelManager* self);
 };
 
 struct _MidgardCRSQLTableModel {
@@ -1481,6 +1528,24 @@ struct _MidgardCRRDFGenericObjectClass {
 	char* (*get_property_literal) (MidgardCRRDFGenericObject* self, const char* name);
 };
 
+struct _MidgardCRRDFMapperObject {
+	MidgardCRObjectModel parent_instance;
+	MidgardCRRDFMapperObjectPrivate * priv;
+};
+
+struct _MidgardCRRDFMapperObjectClass {
+	MidgardCRObjectModelClass parent_class;
+};
+
+struct _MidgardCRRDFMapperProperty {
+	MidgardCRObjectPropertyModel parent_instance;
+	MidgardCRRDFMapperPropertyPrivate * priv;
+};
+
+struct _MidgardCRRDFMapperPropertyClass {
+	MidgardCRObjectPropertyModelClass parent_class;
+};
+
 struct _MidgardCRRDFStorageManagerIface {
 	GTypeInterface parent_iface;
 	MidgardCRNamespaceManager* (*get_nsmanager) (MidgardCRRDFStorageManager* self);
@@ -1504,6 +1569,18 @@ struct _MidgardCRRDFSQLContentManager {
 
 struct _MidgardCRRDFSQLContentManagerClass {
 	MidgardCRSQLContentManagerClass parent_class;
+};
+
+struct _MidgardCRRDFSQLModelManager {
+	MidgardCRSQLModelManager parent_instance;
+	MidgardCRRDFSQLModelManagerPrivate * priv;
+	MidgardCRRDFMapperObject** _mapper_objects;
+	gint _mapper_objects_length1;
+	gint __mapper_objects_size_;
+};
+
+struct _MidgardCRRDFSQLModelManagerClass {
+	MidgardCRSQLModelManagerClass parent_class;
 };
 
 struct _MidgardCRRDFSQLQuerySelect {
@@ -1878,6 +1955,20 @@ MidgardCRStorageManager* midgard_cr_sql_content_manager_get_storagemanager (Midg
 MidgardCRNamespaceManager* midgard_cr_sql_content_manager_get_namespace_manager (MidgardCRSQLContentManager* self);
 MidgardCRQueryManager* midgard_cr_sql_content_manager_get_query_manager (MidgardCRSQLContentManager* self);
 GType midgard_cr_sql_model_manager_get_type (void) G_GNUC_CONST;
+MidgardCRModel* midgard_cr_sql_model_manager_add_model (MidgardCRSQLModelManager* self, MidgardCRModel* model);
+MidgardCRModel* midgard_cr_sql_model_manager_get_model_by_name (MidgardCRSQLModelManager* self, const char* name);
+void midgard_cr_sql_model_manager_is_valid (MidgardCRSQLModelManager* self, GError** error);
+void midgard_cr_sql_model_manager_prepare_create (MidgardCRSQLModelManager* self, GError** error);
+void midgard_cr_sql_model_manager_prepare_update (MidgardCRSQLModelManager* self, GError** error);
+void midgard_cr_sql_model_manager_prepare_save (MidgardCRSQLModelManager* self, GError** error);
+void midgard_cr_sql_model_manager_prepare_remove (MidgardCRSQLModelManager* self, GError** error);
+void midgard_cr_sql_model_manager_prepare_purge (MidgardCRSQLModelManager* self, GError** error);
+void midgard_cr_sql_model_manager_execute (MidgardCRSQLModelManager* self, GError** error);
+MidgardCRModel** midgard_cr_sql_model_manager_list_models_by_type (MidgardCRSQLModelManager* self, const char* type, int* result_length1);
+char** midgard_cr_sql_model_manager_list_model_types (MidgardCRSQLModelManager* self, int* result_length1);
+MidgardCRModel* midgard_cr_sql_model_manager_get_type_model_by_name (MidgardCRSQLModelManager* self, const char* type, const char* name);
+MidgardCRModel** midgard_cr_sql_model_manager_list_models (MidgardCRSQLModelManager* self, int* result_length1);
+MidgardCRModel* midgard_cr_sql_model_manager_copy (MidgardCRSQLModelManager* self);
 MidgardCRSQLModelManager* midgard_cr_sql_model_manager_new (void);
 MidgardCRSQLModelManager* midgard_cr_sql_model_manager_construct (GType object_type);
 MidgardCRNamespaceManager* midgard_cr_sql_model_manager_get_namespace_manager (MidgardCRSQLModelManager* self);
@@ -1939,6 +2030,16 @@ void midgard_cr_rdf_generic_object_add_triple (MidgardCRRDFGenericObject* self, 
 const char* midgard_cr_rdf_generic_object_get_identifier (MidgardCRRDFGenericObject* self);
 void midgard_cr_rdf_generic_object_set_identifier (MidgardCRRDFGenericObject* self, const char* value);
 const char* midgard_cr_rdf_generic_object_get_classname (MidgardCRRDFGenericObject* self);
+GType midgard_cr_rdf_mapper_object_get_type (void) G_GNUC_CONST;
+MidgardCRRDFMapperObject* midgard_cr_rdf_mapper_object_new (const char* rdfs_class, const char* repository_class);
+MidgardCRRDFMapperObject* midgard_cr_rdf_mapper_object_construct (GType object_type, const char* rdfs_class, const char* repository_class);
+const char* midgard_cr_rdf_mapper_object_get_classname (MidgardCRRDFMapperObject* self);
+void midgard_cr_rdf_mapper_object_set_classname (MidgardCRRDFMapperObject* self, const char* value);
+GType midgard_cr_rdf_mapper_property_get_type (void) G_GNUC_CONST;
+MidgardCRRDFMapperProperty* midgard_cr_rdf_mapper_property_new (const char* rdfs_property, const char* property_name);
+MidgardCRRDFMapperProperty* midgard_cr_rdf_mapper_property_construct (GType object_type, const char* rdfs_property, const char* property_name);
+const char* midgard_cr_rdf_mapper_property_get_propertyname (MidgardCRRDFMapperProperty* self);
+void midgard_cr_rdf_mapper_property_set_propertyname (MidgardCRRDFMapperProperty* self, const char* value);
 GType midgard_cr_rdf_storage_manager_get_type (void) G_GNUC_CONST;
 MidgardCRNamespaceManager* midgard_cr_rdf_storage_manager_get_nsmanager (MidgardCRRDFStorageManager* self);
 GType midgard_cr_rdfsql_storage_manager_get_type (void) G_GNUC_CONST;
@@ -1948,6 +2049,7 @@ MidgardCRStorageContentManager* midgard_cr_rdfsql_storage_manager_get_content_ma
 GType midgard_cr_rdfsql_content_manager_get_type (void) G_GNUC_CONST;
 MidgardCRRDFSQLContentManager* midgard_cr_rdfsql_content_manager_new (MidgardCRSQLStorageManager* manager);
 MidgardCRRDFSQLContentManager* midgard_cr_rdfsql_content_manager_construct (GType object_type, MidgardCRSQLStorageManager* manager);
+GType midgard_cr_rdfsql_model_manager_get_type (void) G_GNUC_CONST;
 GType midgard_cr_rdfsql_query_select_get_type (void) G_GNUC_CONST;
 GType midgard_cr_rdfsql_query_storage_get_type (void) G_GNUC_CONST;
 MidgardCRRDFSQLQuerySelect* midgard_cr_rdfsql_query_select_new (MidgardCRStorageManager* manager, MidgardCRRDFSQLQueryStorage* storage);

@@ -74,7 +74,7 @@ namespace MidgardCR {
                  *
                  * @return {@link Model} instance (self reference)
                  */
-		public Model add_model (Model model) {
+		public virtual Model add_model (Model model) {
 			this._models += model;
 			return this;
 		}
@@ -88,7 +88,7 @@ namespace MidgardCR {
                  *
                  * @return {@link Model} if found, null otherwise
                  */
-                public unowned Model? get_model_by_name (string name) {
+                public virtual unowned Model? get_model_by_name (string name) {
 			unowned Model model = this._find_model_by_name (this._models, name);
 			if (model == null)
 				model = this._find_model_by_name (this._models_registered, name);
@@ -130,7 +130,7 @@ namespace MidgardCR {
 		/**
 		 * Perform all checks required to mark instance as valid.
 		 */
-                public void is_valid () throws ValidationError {
+                public virtual void is_valid () throws ValidationError {
 			if (((MidgardCR.SQLStorageManager)this._storage_manager)._cnc == null)
 				throw new MidgardCR.ValidationError.INTERNAL ("StorageManager not connected to any database"); 		
 		}
@@ -162,7 +162,7 @@ namespace MidgardCR {
 		 * call will be ignored and none of its data will be included in 
 		 * executed query.
 		 */
-		public void prepare_create () throws ValidationError {
+		public virtual void prepare_create () throws ValidationError {
 			this.is_valid ();
 			this._find_references ();
 
@@ -224,7 +224,7 @@ namespace MidgardCR {
 		/**
 		 * Prepares update operation.
 		 */
-                public void prepare_update () throws ValidationError {
+                public virtual void prepare_update () throws ValidationError {
 			this.is_valid ();
 			this._model_check_in_storage ();
 		}
@@ -232,7 +232,7 @@ namespace MidgardCR {
 		/**
 		 * Prepares save operation. 
 		 */
-                public void prepare_save () throws ValidationError {
+                public virtual void prepare_save () throws ValidationError {
 			this.is_valid ();
 			this._model_check_in_storage ();
 		}
@@ -240,7 +240,7 @@ namespace MidgardCR {
 		/**
 		 * Prepares remove operation.
 		 */
-                public void prepare_remove () throws ValidationError {
+                public virtual void prepare_remove () throws ValidationError {
 			this.is_valid ();
 			this._model_check_in_storage ();
 		}
@@ -248,7 +248,7 @@ namespace MidgardCR {
 		/**
 		 * Prepares purge operation.
 		 */
-                public void prepare_purge () throws ValidationError {
+                public virtual void prepare_purge () throws ValidationError {
 			this.is_valid ();
 			this._model_check_in_storage ();
 		}
@@ -263,7 +263,7 @@ namespace MidgardCR {
 		 * in this method, so there's no limit how many SQL queries might be 
 		 * executed for underlying SQL storage engine.
 		 */
-		public void execute () throws ExecutableError {		
+		public virtual void execute () throws ExecutableError {		
 			/* Execute command for every StorageExecutor derived object */
 			foreach (Model model in this._models) {
 				if (model is StorageExecutor) { 	
@@ -293,7 +293,7 @@ namespace MidgardCR {
 		/**
 		 * {@inheritDoc} 
 		 */
-		public unowned Model[]? list_models_by_type (string type) {
+		public virtual unowned Model[]? list_models_by_type (string type) {
 			if (type == "ObjectModel")
 				return (Model[]) this._object_models;
 			if (type == "StorageModel")
@@ -304,7 +304,7 @@ namespace MidgardCR {
 		/**
 		 * {@inheritDoc}
 		 */
-		public string[]? list_model_types () {
+		public virtual string[]? list_model_types () {
 			string[] _types = null;
 			_types += "ObjectModel";
 			_types += "StorageModel";
@@ -331,7 +331,7 @@ namespace MidgardCR {
 			return null;
 		}		
 
-		public unowned Model? get_type_model_by_name (string type, string name) {
+		public virtual unowned Model? get_type_model_by_name (string type, string name) {
 			if (type == "ObjectModel")
 				return this.get_object_model_by_name (name);
 			if (type == "StorageModel")
@@ -345,7 +345,7 @@ namespace MidgardCR {
 		 *
 		 * @return array of models or null
 		 */
-		public unowned Model[]? list_models () {
+		public virtual unowned Model[]? list_models () {
 			return this._models;
 		}
 
@@ -353,7 +353,7 @@ namespace MidgardCR {
 		 * SQLModelManager can not be copied.
 		 * @return null
 		 */
-		public Model? copy () {
+		public virtual Model? copy () {
 			return null;
 		}
 
