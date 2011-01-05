@@ -22,17 +22,16 @@ namespace MidgardCR {
 	 * RDFMapperProperty provides mappings (relations) between RDFS property and property registered 
 	 * for {@link RepositoryObject} derived class. 
 	 *
-	 * {@see RDFMapperObject} 
-	 *
 	 * For example, RDFS property is 'foaf:name' and we need to store its data using 'firstname' property
 	 * registered for 'Person' repository object.
 	 * 
 	 * {{{
 	 *   var mapper_object = new RDFMapperObject ('foaf:Person', 'Person'); 
-	 *   var mapper_property = new RDFMapperProperty ('foaf:name', 'username');
+	 *   var mapper_property = new RDFMapperProperty ('foaf:name', 'firstname');
 	 *   mapper_object.add_model (mapper_property);
 	 * }}}
 	 *
+	 * @see RDFMapperObject
 	 */ 
 	public class RDFMapperProperty : ObjectPropertyModel {
 		

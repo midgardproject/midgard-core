@@ -30,17 +30,19 @@ namespace MidgardCR {
 
 		/**
 		 * Determines whether given string is identifier or its name, and returns
-		 * valid name or identifier. 
+		 * valid name or identifier.
 		 * 
 		 * If given string is valid uri, returns valid prefixed name.
 		 * If given string is valid namespace's prefix, returns valid uri.
 		 * 
-		 * For example: for given "foaf:Person" string, returns "http://xmlns.com/foaf/0.1/Person", 
-		 * for "http://xmlns.com/foaf/0.1/Person" string, returns "foaf:Person".
+		 * For example, for given 'foaf:Person' string, 'http:\/\/xmlns.com\/foaf\/0.1\/Person' is returned,
+		 *
+		 * for 'http:////xmlns.com\/foaf\/0.1\/Person' string, returns 'foaf:Person'.
 		 * 
 		 * @param id, string to decode
+		 * 
 		 * @return valid prefix or uri, or null if none is found
-		 *
+		 * 
 		 */
 		public string? decode (string id) {
 			if ("/" in id) {

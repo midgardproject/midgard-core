@@ -160,14 +160,13 @@ namespace MidgardCR {
 		}	
 	}
 
-	/**
-	 *
+	/** 
 	 * ObjectModelReference defines class which holds identifiers to other object.
-	 *
+	 * 
 	 * Class registered with ObjectModelReference is {@link ReferenceObject} derived one.
 	 * The purpose of the reference class is to provide ability to hold reference to other object
 	 * indirectly, via reference object which holds identifiers to other one.
-	 *  
+	 * 
 	 * For example, ReferenceObject hold identifiers of other object via 'id' and 'guid' property. 
 	 */	
 	public class ObjectModelReference : ObjectModel {

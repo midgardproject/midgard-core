@@ -20,11 +20,11 @@ namespace MidgardCR {
 
 	/**
 	 * RDFMapperObject provides mappings (relations) between {@link RepositoryObject} derived class 
-	 * and RDFS' one.   
+	 * and RDFS' one.
 	 *
 	 * The main purpose is to find (quickly) repository class using given RDFS one, and let application
 	 * to work with repository objects instead of (unknown in some cases) RDF triples. RDFMapperObject shall 
-	 * be always associated with {@link RDFModelManager} and thus available for all RDF implementations,
+	 * be always associated with {@link RDFSQLModelManager} and thus available for all RDF implementations,
 	 * including Query, Storage or Content managers.  
 	 *
 	 * For example, RDFS class is 'foaf:Person' and we need to store its data using 'Person' repository object.

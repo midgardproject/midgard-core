@@ -71,14 +71,14 @@ namespace MidgardCR {
 		/**
 		 * Creates object's record in SQL table.
 		 * 
-		 * @param object Storable object
-		 *
 		 * This method requires valid {@link SQLTableModel}, available from {@link SQLModelManager}.
-		 * If such is found, object's properties values will be stored in table, which name, 
+		 * If such is found, object's properties values will be stored in table, which name,
 		 * is declared as table model's location.
-		 *
-		 * If given object is {@link RepositoryObject}, valid SQL INSERT prepared statament is generated for 
+		 * 
+		 * If given object is {@link RepositoryObject}, valid SQL INSERT prepared statament is generated for
 		 * object's class and stored as permanent statement available for every class instance.
+		 * 
+		 * @param object Storable object
 		 */
 		public virtual void create (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
@@ -97,8 +97,6 @@ namespace MidgardCR {
 
 		/**
 		 * Updates object's record in SQL table.
-		 * 
-		 * @param object Storable object
 		 *
 		 * This method requires valid {@link SQLTableModel}, available from {@link SQLModelManager}.
 		 * If such is found, object's properties values will be stored in table, which name, 
@@ -106,6 +104,8 @@ namespace MidgardCR {
 		 *
 		 * If given object is {@link RepositoryObject}, valid SQL UPDATE prepared statament is generated for 
 		 * object's class and stored as permanent statement available for every class instance.
+		 *
+		 * @param object Storable object
 		 */
 		public virtual void update (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
@@ -125,8 +125,6 @@ namespace MidgardCR {
 		/**
 		 * Saves object's record in SQL table
 		 *
-		 * @param object Storable object
-		 *
 		 * This method requires valid {@link SQLTableModel}, available from {@link SQLModelManager}.
 		 * If such is found, object's properties values will be stored in table, which name, 
 		 * is declared as table model's location.
@@ -136,8 +134,9 @@ namespace MidgardCR {
 		 * and in case of false update performs create operation.
 		 * Of course, create operation is executed only (and only) if update fails due to 
 		 * non exisiting record identified by object's guid. 
-		 * In case of other failure, particular exception is thrown. 	
+		 * In case of other failure, particular exception is thrown.
 		 *
+		 * @param object Storable object
 		 */
 		public virtual void save (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();
@@ -165,8 +164,6 @@ namespace MidgardCR {
 		/**
 		 * Delete object's record from SQL table.
 		 * 
-		 * @param object Storable object
-		 *
 		 * This method requires valid {@link SQLTableModel}, available from {@link SQLModelManager}.
 		 * If such is found, its location, will be used to determine target table for SQL DELETE operation.
 		 *
@@ -174,6 +171,8 @@ namespace MidgardCR {
 		 *
 		 * If given object is {@link RepositoryObject}, valid SQL DELETE prepared statament is generated for 
 		 * object's class and stored as permanent statement available for every class instance.
+		 *
+		 * @param object Storable object
 		 */
 		public virtual void purge (Storable object) throws StorageContentManagerError {
 			string name = object.get_type().name();

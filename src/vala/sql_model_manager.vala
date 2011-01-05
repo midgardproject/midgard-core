@@ -341,7 +341,7 @@ namespace MidgardCR {
 
 		/**
 		 * List all models associated with with an instance.
-		 * See list_storage_models() and list_object_models().	
+		 * @see list_models_by_type
 		 *
 		 * @return array of models or null
 		 */

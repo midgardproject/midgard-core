@@ -106,7 +106,9 @@ namespace MidgardCR {
 		 * List all available models, associated with model manager which are instances of given type. 
 		 * There's no strict rule for model manager to hold only models with unique names. 
 		 * There might be different models initialized for particular class, e.g. {@link ObjectModel} and 
-		 * {@link StorageModel}. @see list_model_types. 
+		 * {@link StorageModel}.
+		 *
+		 * @see list_model_types
 		 *
 		 * @param type, {@link Model} class name 
 		 *
