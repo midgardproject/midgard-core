@@ -17,8 +17,8 @@ MidgardUser
  authentication type. Which means, the same login name can be used with different authentication types.
 </para> 
 <para> 
- Valid authentication types are read from shared data directory (e.g. /usr/local/share/midgard2/midgard_auth_types.xml)
- and initialized when application is initialized. New authentication types are always defined in this shared xml file. 
+ Valid authentication types are read from shared data directory (e.g. /usr/local/share/midgard2)
+ and initialized when application is initialized. New authentication types are always defined in shared, midgard_auth_types.xml file. 
 </para>
 <para>
  #MidgardUser class doesn't do any password validation or doesn't support password encryption or decryption.
