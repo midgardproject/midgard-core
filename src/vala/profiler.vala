@@ -20,14 +20,48 @@ using GLib;
 
 namespace MidgardCR {
 
+	/**
+	 * Provides information about executed commands.
+	 *
+	 * Minimal Profiler implementation shall provide information about executed command:
+	 * the time spent on execution and the command itself. Command might be SQL query, 
+	 * directory, file or xml node creation.
+	 *
+	 * Profiler initialization shall be done with {@link StorageManager}.
+	 * The easiest way to get information about commands is to connect profiler's 
+	 * callback to {@link Executable} signals.
+	 */
 	public interface Profiler : GLib.Object {
 
 		/* properties */
+
+		/**
+		 * The spent to execute any command.
+		 */
 		public abstract double time { get; }
+
+		/**
+		 * The command being executed.
+		 */
 		public abstract string command { get; }
 
+		/**
+		 * Enable or disable profiler.
+		 */
 		public abstract void enable (bool toggle);
+
+		/**
+		 * Start profiler.
+		 * 
+		 * Implementation shall (at least) reset profiler's time and start timer . 
+		 */
 		public abstract void start ();
+
+		/**
+		 * Stop profiler.
+		 *
+		 * Implementation shall (at least) keep profiler's times unchanged and stop timer.
+		 */
 		public abstract void end ();
 	}
 }

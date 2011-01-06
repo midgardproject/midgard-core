@@ -155,6 +155,5 @@ RDFSQLStorageManager getStorageManager()
                 profiler_callback_end (profiler);
         }); */  
 
-
 	return storage_manager;
 }

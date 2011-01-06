@@ -13,13 +13,47 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
- * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
+ * Copyright (C) 2010, 2011 Piotr Pokora <piotrek.pokora@gmail.com>
  */
 
 using GLib;
 
 namespace MidgardCR {
 
+	/** 
+	 * {@link Profiler} implementation for SQL database.
+	 * 
+	 * SQLProfiler provides information about SQL queries being executed and
+	 * the time spent on execution.
+	 *
+	 * The example below demonstrates simple profiler's usage. In callback function, 
+	 * on execution start, profiler starts it's timer, and stops it on execition end.
+	 * 
+	 * {{{
+	 *   void profiler_callback_start (SQLProfiler profiler)
+	 *   {
+	 *      profiler.start ();
+	 *   }
+	 *
+	 *   void profiler_callback_end (SQLProfiler profiler)
+	 *   {
+	 *      profiler.end ();
+	 *      GLib.print ("SQL QUERY: %s (%.04f) \n", profiler.command, profiler.time);
+	 *   }
+	 *
+	 * 
+	 *   SQLProfiler profiler = (SQLProfiler) storage_manager.profiler;
+	 *   profiler.enable (true);
+	 *   storage_manager.operation_start.connect (() => {
+	 *      profiler_callback_start (profiler);
+	 *   });
+	 * 
+	 *   storage_manager.operation_end.connect (() => {
+	 *      profiler_callback_end (profiler);
+	 *   }); 
+	 * }}}
+	 *
+	 */
 	public class SQLProfiler : GLib.Object, Profiler {
 
 		/* internal properties */
@@ -31,10 +65,18 @@ namespace MidgardCR {
 
 		/* public properties */
 
+		/**
+		 * Returns the time elapsed from the last start() invocation.
+		 */
 		public double time { 
 			get { return this._timer.elapsed (null); }
 		}
 
+		/**
+		 * Returns the SQL query command executed recently.
+		 *
+		 * The command is set internally by {@link SQLStorageManager}
+		 */
 		public string command { 
 			get { return this._command; }
 		}
@@ -45,10 +87,21 @@ namespace MidgardCR {
 			this._timer = new GLib.Timer ();
 		}
 
+		/**
+		 * Enable or disable profiler.
+		 */
 		public void enable (bool toggle) {
 			this._enabled = toggle;
 		}
 
+		/**
+		 * Starts profiler.
+		 *
+		 * Starts profiler's timer and mark profiler as running.
+		 *
+		 * This method silently returns, if profiler is running or disabled.
+		 * @see enable
+		 */
 		public void start () {
 			if (this._enabled == false)
 				return;
@@ -58,6 +111,15 @@ namespace MidgardCR {
 			this._timer.start ();
 		}
 
+		/**
+		 * Stops profiler.
+		 *
+		 * Stops profiler's timer and mark it as not running.
+		 * 
+		 * This method silently returns, if profiler is not running or disabled.
+		 * @see enable
+		 * @see start
+		 */
 		public void end () {
 			if (this._enabled == false)
 				return;

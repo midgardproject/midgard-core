@@ -670,14 +670,6 @@ typedef struct _MidgardCRRDFMapperProperty MidgardCRRDFMapperProperty;
 typedef struct _MidgardCRRDFMapperPropertyClass MidgardCRRDFMapperPropertyClass;
 typedef struct _MidgardCRRDFMapperPropertyPrivate MidgardCRRDFMapperPropertyPrivate;
 
-#define MIDGARD_CR_TYPE_RDF_STORAGE_MANAGER (midgard_cr_rdf_storage_manager_get_type ())
-#define MIDGARD_CR_RDF_STORAGE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDF_STORAGE_MANAGER, MidgardCRRDFStorageManager))
-#define MIDGARD_CR_IS_RDF_STORAGE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_RDF_STORAGE_MANAGER))
-#define MIDGARD_CR_RDF_STORAGE_MANAGER_GET_INTERFACE(obj) (G_TYPE_INSTANCE_GET_INTERFACE ((obj), MIDGARD_CR_TYPE_RDF_STORAGE_MANAGER, MidgardCRRDFStorageManagerIface))
-
-typedef struct _MidgardCRRDFStorageManager MidgardCRRDFStorageManager;
-typedef struct _MidgardCRRDFStorageManagerIface MidgardCRRDFStorageManagerIface;
-
 #define MIDGARD_CR_TYPE_RDFSQL_STORAGE_MANAGER (midgard_cr_rdfsql_storage_manager_get_type ())
 #define MIDGARD_CR_RDFSQL_STORAGE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDFSQL_STORAGE_MANAGER, MidgardCRRDFSQLStorageManager))
 #define MIDGARD_CR_RDFSQL_STORAGE_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDFSQL_STORAGE_MANAGER, MidgardCRRDFSQLStorageManagerClass))
@@ -1546,11 +1538,6 @@ struct _MidgardCRRDFMapperPropertyClass {
 	MidgardCRObjectPropertyModelClass parent_class;
 };
 
-struct _MidgardCRRDFStorageManagerIface {
-	GTypeInterface parent_iface;
-	MidgardCRNamespaceManager* (*get_nsmanager) (MidgardCRRDFStorageManager* self);
-};
-
 struct _MidgardCRRDFSQLStorageManager {
 	MidgardCRSQLStorageManager parent_instance;
 	MidgardCRRDFSQLStorageManagerPrivate * priv;
@@ -2040,8 +2027,6 @@ MidgardCRRDFMapperProperty* midgard_cr_rdf_mapper_property_new (const char* rdfs
 MidgardCRRDFMapperProperty* midgard_cr_rdf_mapper_property_construct (GType object_type, const char* rdfs_property, const char* property_name);
 const char* midgard_cr_rdf_mapper_property_get_propertyname (MidgardCRRDFMapperProperty* self);
 void midgard_cr_rdf_mapper_property_set_propertyname (MidgardCRRDFMapperProperty* self, const char* value);
-GType midgard_cr_rdf_storage_manager_get_type (void) G_GNUC_CONST;
-MidgardCRNamespaceManager* midgard_cr_rdf_storage_manager_get_nsmanager (MidgardCRRDFStorageManager* self);
 GType midgard_cr_rdfsql_storage_manager_get_type (void) G_GNUC_CONST;
 MidgardCRRDFSQLStorageManager* midgard_cr_rdfsql_storage_manager_new (const char* name, MidgardCRConfig* config, GError** error);
 MidgardCRRDFSQLStorageManager* midgard_cr_rdfsql_storage_manager_construct (GType object_type, const char* name, MidgardCRConfig* config, GError** error);

@@ -27,11 +27,24 @@ namespace MidgardCR {
 		INTERNAL
 	}
 
+	/**
+	 * Basic interface which includes simple execution routines.
+	 */ 
 	public interface Executable : GLib.Object {
 
+		/**
+		 * The signal which shall be emited before any command is executed.
+		 */
 		public abstract signal void execution_start ();
+
+		/**
+		 * The signal which shall be emited after any command has been executed.
+		 */
 		public abstract signal void execution_end ();
 
+		/**
+		 * Generic execute method. 
+		 */
 		public abstract void execute () throws ExecutableError;
 	}
 }

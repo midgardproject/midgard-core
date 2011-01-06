@@ -20,21 +20,54 @@ using GLib;
 
 namespace MidgardCR {
 
+	/**
+	 * Basic interface for objects which can be stored with {@link StorageContentManager}
+	 */
 	public interface Storable : GLib.Object {
 
 		/* signals */
+
+		/**
+		 * The signal which shall be emitted before object's creation.
+		 */
 		public abstract signal void create ();
+		
+		/**
+		 * The signal which shall be emitted after object has been created.
+		 */
 		public abstract signal void created ();
+
+		/**
+		 * The signal which shall be emitted before object's update.
+		 */
 		public abstract signal void update ();
+
+		/**
+		 * The signal which shall be emitted after object has been emitted.
+		 */
 		public abstract signal void updated ();
+	
+		/**
+		 * The signal which shall be emitted before object's removal.
+		 */ 
 		public abstract signal void remove ();
+
+		/**
+		 * The signal which shall be emitted after object has been removed.
+		 */
 		public abstract signal void removed ();
 	}
 
+	/**
+ 	 * Basic interface to implement objects which hold datetime.
+	 */
 	public abstract class Timestamp : GLib.Object {
 
 	}
 
+	/**
+	 * Basic interface for metadata objects.
+	 */
 	public abstract class Metadata : GLib.Object, Storable {
 
 		/* proprties */
@@ -44,6 +77,9 @@ namespace MidgardCR {
 		public abstract Timestamp revised { get; }
 	}
 
+	/**
+	 * Abstract class for objects which can be stored in repository.
+	 */
 	public abstract class RepositoryObject : GLib.Object, Storable {
 
 		/* internal properties */
@@ -54,6 +90,13 @@ namespace MidgardCR {
 		internal GLib.List<GLib.Value?> _ns_values_list = null;
 
 		/* properties */
+
+		/**
+		 * Holds unique guid which identifies object.
+		 *
+		 * Guid might be set by application, only during construction time.
+		 * It's internally set in any other case.
+		 */
 		public string guid { 
 			get { 
 				return this._guid; 
@@ -63,6 +106,14 @@ namespace MidgardCR {
 			}
 		}
 
+		/**
+		 * Holds unique (per class) id which identifies object.
+		 *
+		 * Any implementation shall never depend on this property in replicated or distributed
+		 * environment. It shall be used during runtime only, to identify objects which are unique
+		 * per application and storage. Unlike guid property, which is globally unique. 
+		 * 
+		 */ 
 		public uint id { 
 			get { return this._id; }
 		}

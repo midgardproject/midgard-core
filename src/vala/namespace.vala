@@ -40,7 +40,7 @@ namespace MidgardCR {
 		/* methods */
 
 		/**
-		 * Creates new uri with given name.
+		 * Creates new mapping between given name and unique identifier.
 		 *
 		 * {{{
 		 *   namespace_manager.create_mapping ("foaf", "http://xmlns.com/foaf/0.1/");
@@ -59,7 +59,7 @@ namespace MidgardCR {
 		public abstract unowned string[]? list_names ();
 		
 		/**
-		 *  Get identifier which is mapped with the given name.
+		 *  Get identifier which is mapped to the given name.
 		 *
 		 * {{{
 		 *   namespace_manager.create_mapping ("foaf", "http://xmlns.com/foaf/0.1/");
@@ -73,7 +73,7 @@ namespace MidgardCR {
 		public abstract unowned string? get_identifier_by_name (string name);
 
 		/**
-		 *  Get the name which is mapped with the given identifier.
+		 *  Get the name which is mapped to the given identifier.
 		 *
 		 * {{{
 		 *   namespace_manager.create_mapping ("foaf", "http://xmlns.com/foaf/0.1/");

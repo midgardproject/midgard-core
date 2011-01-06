@@ -13,24 +13,41 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
- * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
+ * Copyright (C) 2010, 2011 Piotr Pokora <piotrek.pokora@gmail.com>
  */
 
 using GLib;
 
 namespace MidgardCR
 {
+	/**
+	 * Basic interface for abstract constraints. 
+	 */
 	public interface QueryConstraintSimple : GLib.Object {
-			
+		
+		/**
+		 * List all constraints added to instance.
+		 */		
 		public abstract unowned QueryConstraintSimple[]? list_constraints ();
 	}
 
+	/**
+	 * Basic interface to propagate class' storage.
+	 *
+	 */ 
 	public interface QueryStorage : GLib.Object {
 		
 		/* properties */
+		
+		/**
+		 * Returns classname for which QueryStorage has been initialized for.
+		 */
 		public abstract string classname { get; set; }
 	}
 
+	/**
+	 * Basic interface for query single constraints.
+	 */
 	public interface QueryConstraint : QueryConstraintSimple {
 
 		/* properties */
@@ -40,6 +57,9 @@ namespace MidgardCR
 		public abstract string operator { get; set; }
 	}
 
+	/**
+	 * Basic interface for constraint which can group other constraints.
+	 */
 	public interface QueryConstraintGroup : QueryConstraintSimple {
 
 		/* properties */
@@ -48,12 +68,18 @@ namespace MidgardCR
 		public abstract void add_constraint (QueryConstraintSimple constraint);
 	}
 
+	/**
+	 * Basic interface which hold constraint's value.
+	 */
 	public interface QueryValueHolder : GLib.Object {
 		
 		public abstract GLib.Value get_value ();
 		public abstract void set_value (GLib.Value value); 
 	}	
 
+	/**
+	 * Basic interface for query execution.
+	 */ 
 	public interface QueryExecutor : Executable {
 
 		public abstract void set_constraint (QueryConstraintSimple constraint);
@@ -64,13 +90,19 @@ namespace MidgardCR
 		public abstract void validate () throws ValidationError;
 	}
 
+	/**
+	 * Basic interface for queries which fetch objects from storage
+	 */
 	public interface QuerySelect : QueryExecutor {
 		
 		public abstract void add_join (string type, QueryProperty left_property, QueryProperty right_property);		
 		public abstract Storable[]? list_objects ();
 		public abstract void toggle_read_only (bool toggle);
 	}
-
+	
+	/**
+	 * Basic interface for queries which fetch data from storage.
+	 */
 	public interface QueryData : QueryExecutor {
 		
 		public abstract void add_join (string type, QueryProperty left_property, QueryProperty right_property);	

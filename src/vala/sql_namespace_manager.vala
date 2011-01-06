@@ -31,8 +31,11 @@ namespace MidgardCR {
 		}
 
 		/* methods */
+
 		/**
 		 * {@inheritDoc}
+		 * 
+		 * Creates mapping between name and identifier and stores this information in SQL database.  
 		 */
 		public void create_mapping (string name, string id) throws NamespaceManagerError {
 			if (this.identifier_exists (id))
@@ -57,7 +60,9 @@ namespace MidgardCR {
 		}
 
 		/**
-		 * {@inheritDoc}
+		 * FIXME inheritDoc (valadoc segfaults)
+		 *
+		 * Get identifier which is mapped to given name
 		 */
 		public unowned string? get_identifier_by_name (string name) {
 			if (this._names == null)
@@ -71,9 +76,6 @@ namespace MidgardCR {
 			return this._ids[i];
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		public unowned string? get_name_by_identifier (string id) {
 			if (this._ids == null)
 				return null;
@@ -86,9 +88,6 @@ namespace MidgardCR {
 			return this._names[i];
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		public bool name_exists (string name) {	
 			if (this._names == null)
 				return false;
@@ -99,9 +98,6 @@ namespace MidgardCR {
 			return false;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
 		public bool identifier_exists (string id) {
 			if (this._ids == null)
 				return false;

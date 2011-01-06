@@ -29,11 +29,30 @@ namespace MidgardCR {
 		INTERNAL
 	}	
 
+	/**
+	 * Basic interface, which is a metadata for any kind of type described by model.
+	 * 
+	 * Any Model implementation shall describe complex type, like class, database table or
+	 * filesystem directory, and itself, shall provide introspection and reflection data
+	 * for the described type.
+	 */	
 	public interface Model : GLib.Object {
 		
 		/* properties */
+
+		/**
+		 * A model which is a parent for particular instance.
+		 */
 		public abstract Model?       parent    { get; set; }
+
+		/**
+		 * Namespace of the model
+		 */
 		public abstract string?      @namespace       { get; set;  }
+
+		/**
+		 * The name of the model
+		 */
 		public abstract string      name            { get; set;  }
 
 		/* methods */
@@ -64,6 +83,15 @@ namespace MidgardCR {
 		public abstract Model? copy ();
 	}
 
+	/**
+	 * Basic interface which is a metadata for any type depending on {@link Model}.
+	 * 
+	 * ModelProperty implementation shall describes types which depend on particular {@link Model},
+	 * and can not exist without Model. Such type can be class' property, database table column,
+	 * file or xml attribute.
+	 *
+	 * As in {@link Model} implementation shall provide introspection and reflection for described type.
+	 */
 	public interface ModelProperty : GLib.Object, Model {
 		
 		/* properties */
