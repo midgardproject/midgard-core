@@ -145,9 +145,9 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 		/* SQLTableModel */
 		/* SUCCESS */
-		MidgardCR.SQLTableModel storage_model = model_manager.create_storage_model (model, DEFAULT_TABLENAME) as MidgardCR.SQLTableModel;
+		MidgardCR.SQLTableModel storage_model = new SQLTableModel (storage_manager, DEFAULT_CLASSNAME, DEFAULT_TABLENAME) as MidgardCR.SQLTableModel;
 		assert (storage_model != null);
-		MidgardCR.SQLColumnModel storage_model_prop = storage_model.create_model_property (TITLE_PROPERTY_NAME, TITLE_COLUMN, "string");
+		MidgardCR.SQLColumnModel storage_model_prop = new SQLColumnModel (storage_manager, TITLE_PROPERTY_NAME, TITLE_COLUMN, "string");
 		assert (storage_model_prop != null);
 		MidgardCR.SQLColumnModel storage_model_prop_a = storage_model.create_model_property (ABSTRACT_PROPERTY_NAME, ABSTRACT_COLUMN, "string");
 		assert (storage_model_prop_a != null);
@@ -226,12 +226,12 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
         	/* Create new SQL StorageModel which defines 'Person' class table and all required columns */
         	/* Every 'Person' object's data will be stored in 'person' table */
 		/* SUCCESS */
-        	var person_sm = model_manager.create_storage_model (person_model, PERSON_TABLE_NAME) as SQLTableModel;
+        	var person_sm = new SQLTableModel (storage_manager, PERSON_CLASS_NAME, PERSON_TABLE_NAME) as SQLTableModel;
 		assert (person_sm != null);
         	/* Add two columns to 'person' table: 'firstname', 'lastname' */
         	person_sm
-                	.add_model (person_sm.create_model_property (FIRSTNAME, FIRSTNAME, "string"))
-                	.add_model (person_sm.create_model_property (LASTNAME, LASTNAME, "string"));
+                	.add_model (new SQLColumnModel (storage_manager, FIRSTNAME, FIRSTNAME, "string"))
+                	.add_model (new SQLColumnModel (storage_manager, LASTNAME, LASTNAME, "string"));
 
 		/* Define 'Activity' class */
 		/* SUCCESS */
@@ -253,30 +253,30 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		/* Create new SQL StorageModel which defines 'Activity' class table and all required columns */
 		/* Activity class requires 'midgard_activity' table */
 		/* SUCCESS */
-		var activity_sm = model_manager.create_storage_model (activity_model, "midgard_activity") as SQLTableModel;
+		var activity_sm = new SQLTableModel (storage_manager, ACTIVITY_CLASS_NAME, "midgard_activity") as SQLTableModel;
 		assert (activity_sm != null);
 		/* Add columns to table: 'verb', 'application', 'target', 'summary' and those required by 'actor' */
-		var asm_verb = activity_sm.create_model_property (VERB, VERB, "string");
+		var asm_verb = new SQLColumnModel (storage_manager, VERB, VERB, "string");
 		assert (asm_verb != null);
 		asm_verb.index = true;
 
-		var asm_application = activity_sm.create_model_property (APPLICATION, APPLICATION, "string");
+		var asm_application = new SQLColumnModel (storage_manager, APPLICATION, APPLICATION, "string");
 		assert (asm_application != null);
 		asm_application.index = true;
 
-		var actor_model = activity_sm.create_model_property (ACTOR, ACTOR, "object");
+		var actor_model = new SQLColumnModel (storage_manager, ACTOR, ACTOR, "object");
 		assert (actor_model != null);
 		
 		/* Adds additional columns to store info for reference object */
 		actor_model
-			.add_model (activity_sm.create_model_property ("id", "actor_id", "int"))
-			.add_model (activity_sm.create_model_property ("guid", "actor_guid", "guid"));
+			.add_model (new SQLColumnModel (storage_manager, "id", "actor_id", "int"))
+			.add_model (new SQLColumnModel (storage_manager, "guid", "actor_guid", "guid"));
 		activity_sm
 			.add_model (asm_verb)
 			.add_model (asm_application)
 			.add_model (actor_model)
-			.add_model (activity_sm.create_model_property (TARGET, TARGET, "guid"))
-			.add_model (activity_sm.create_model_property (SUMMARY, SUMMARY, "text"));
+			.add_model (new SQLColumnModel (storage_manager, TARGET, TARGET, "guid"))
+			.add_model (new SQLColumnModel (storage_manager, SUMMARY, SUMMARY, "text"));
 
 		/* Add Object and Storage models to StorageModelManager */
 		model_manager
@@ -285,7 +285,7 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 			.add_model (activity_model)
 			.add_model (activity_sm);
 
-		SQLProfiler profiler = (SQLProfiler) model_manager.storagemanager.profiler;
+		SQLProfiler profiler = (SQLProfiler) storage_manager.profiler;
 		profiler.enable (true);
 		model_manager.execution_start.connect (() => {
 			profiler_callback_start(profiler);
@@ -336,10 +336,10 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 		/* SUCCESS */
 		int table_n = 3; /* Default table, person and activity */
-		unowned ObjectModel[]? object_models = model_mngr.list_object_models ();
+		unowned ObjectModel[]? object_models = (ObjectModel[]) model_mngr.list_models_by_type ("ObjectModel");
 		assert (object_models != null);
 		assert (object_models.length == table_n);
-		StorageModel[]? storage_models = model_mngr.list_storage_models ();
+		StorageModel[]? storage_models = (StorageModel[]) model_mngr.list_models_by_type ("StorageModel");
 		assert (storage_models != null);
 		assert (storage_models.length == table_n);
 

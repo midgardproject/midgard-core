@@ -3,14 +3,14 @@ using MidgardCR;
 void midgardcr_test_add_schema_builder_tests () {
 
 	/* constructor */
-	Test.add_func ("/ObjectBuilder/constructor", () => {
-		MidgardCR.ObjectBuilder builder = new MidgardCR.ObjectBuilder ();
+	Test.add_func ("/ObjectManager/constructor", () => {
+		MidgardCR.ObjectManager builder = new MidgardCR.ObjectManager ();
 		assert (builder != null);
 	});
 
 	/* register model */
-	Test.add_func ("/ObjectBuilder/register_model", () => {
-		MidgardCR.ObjectBuilder builder = new MidgardCR.ObjectBuilder ();
+	Test.add_func ("/ObjectManager/register_type_from_model", () => {
+		MidgardCR.ObjectManager builder = new MidgardCR.ObjectManager ();
 		assert (builder != null);
 
 		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
@@ -25,27 +25,27 @@ void midgardcr_test_add_schema_builder_tests () {
 
 		/* SUCCESS */
 		try {
-			builder.register_model (model);		
+			builder.register_type_from_model (model);		
 		} catch (MidgardCR.ValidationError e) {
 			GLib.warning (e.message);
-		} catch (MidgardCR.ObjectBuilderError e) {
+		} catch (MidgardCR.ObjectManagerError e) {
 			GLib.warning (e.message);
 		} 
 
 		/* FAIL */
 		try {
-			builder.register_model (model);
+			builder.register_type_from_model (model);
 		} catch (MidgardCR.ValidationError e) {
 			if (!(e is MidgardCR.ValidationError.NAME_DUPLICATED))
 				GLib.warning (e.message);
-		} catch (MidgardCR.ObjectBuilderError e) {
+		} catch (MidgardCR.ObjectManagerError e) {
 			GLib.warning (e.message);
 		}	
 	});
 
 	/* execute */
-	Test.add_func ("/ObjectBuilder/execute", () => {
-		MidgardCR.ObjectBuilder builder = new MidgardCR.ObjectBuilder ();
+	Test.add_func ("/ObjectManager/execute", () => {
+		MidgardCR.ObjectManager builder = new MidgardCR.ObjectManager ();
 		assert (builder != null);
 
 		MidgardCR.ObjectModel model = new MidgardCR.ObjectModel (DEFAULT_CLASSNAME);
@@ -60,20 +60,20 @@ void midgardcr_test_add_schema_builder_tests () {
 
 		/* SUCCESS */
 		try {
-			builder.register_model (model);		
+			builder.register_type_from_model (model);		
 		} catch (MidgardCR.ValidationError e) {
 			GLib.warning (e.message);
-		} catch (MidgardCR.ObjectBuilderError e) {
+		} catch (MidgardCR.ObjectManagerError e) {
 			GLib.warning (e.message);
 		} 
 
 		/* FAIL */
 		try {
-			builder.register_model (model);
+			builder.register_type_from_model (model);
 		} catch (MidgardCR.ValidationError e) {
 			if (!(e is MidgardCR.ValidationError.NAME_DUPLICATED))
 				GLib.warning (e.message);
-		} catch (MidgardCR.ObjectBuilderError e) {
+		} catch (MidgardCR.ObjectManagerError e) {
 			GLib.warning (e.message);
 		} 	
 
@@ -114,8 +114,8 @@ void midgardcr_test_add_schema_builder_tests () {
 	});
 
 	/* factory */
-	Test.add_func ("/ObjectBuilder/factory", () => {
-		MidgardCR.ObjectBuilder builder = new MidgardCR.ObjectBuilder ();
+	Test.add_func ("/ObjectManager/factory", () => {
+		MidgardCR.ObjectManager builder = new MidgardCR.ObjectManager ();
 		assert (builder != null);
 		Storable obj = null;
 
