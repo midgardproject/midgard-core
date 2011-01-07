@@ -48,6 +48,14 @@ namespace MidgardCR {
 		}
 
 		/* public methods */
+		
+		/**
+		 * Prepare new class(es) registration.
+		 *
+		 * Validate given model, and prepare {@link RepositoryObject} derived class registration.
+		 * 
+		 * @param model, {@link ObjectModel} which describes class 
+		 */
 		public virtual void register_type_from_model (ObjectModel model) throws ObjectManagerError, ValidationError { 
 			GLib.Type typeid = GLib.Type.from_name (model.name);
 			if (typeid > 0)
@@ -65,6 +73,20 @@ namespace MidgardCR {
 			this._models += model;	
 		}	
 
+		/**
+		 * Construct {@link Storable} object.
+		 *
+		 * Creates new instance of given classname. If second (optional) guid argument is not null, it's value
+		 * is set as object's guid. If required, application is responsible to set unique guid.
+		 *
+		 * If required object, identified by given guid, should be fetched from storage, particular implementation
+		 * of ObjectManager should be involved. Every {@link StorageManager} implementation shall provide own, 
+		 * storage optimized ObjectManager.
+		 *
+		 * @param classname, name of the new instance's class
+		 * @param guid, guid or uuid which should identify object
+		 */
+
 		public virtual Storable? factory (string classname, string? guid = null) throws ObjectManagerError, ValidationError { 
 			GLib.Type type_id = GLib.Type.from_name (classname);	
 			if (type_id == 0)
@@ -78,6 +100,10 @@ namespace MidgardCR {
 			return obj;	 
 		}
 		
+		/**
+		 * Register new {@link RepositoryObject} derived class.
+		 *
+		 */
 		public virtual void execute () throws ExecutableError {
 			if (this._models == null)
 				throw new ExecutableError.COMMAND_INVALID_DATA ("No models associated with builder");
