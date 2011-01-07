@@ -236,7 +236,7 @@ midgard_core_schema_type_property_attr_free (MgdSchemaPropertyAttr *prop)
 }
 
 void 
-midgard_cr_core_object_builder_register_types (MidgardCRObjectBuilder *builder, GError **error)
+midgard_cr_core_object_builder_register_types (MidgardCRObjectManager *builder, GError **error)
 {
 	g_return_if_fail (builder != NULL);
 	g_return_if_fail (error == NULL || *error == NULL);

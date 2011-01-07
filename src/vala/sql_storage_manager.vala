@@ -29,6 +29,7 @@ namespace MidgardCR {
 		private Transaction _transaction = null;
 		private StorageWorkspaceManager _workspace_manager = null;
 		private SQLModelManager _model_manager = null;
+		private SQLObjectManager _object_manager = null;
 
 		/* internal properties */
 		internal SQLProfiler _profiler = null;
@@ -67,6 +68,14 @@ namespace MidgardCR {
 					this._content_manager = StorageContentManager (); */
 				return this._content_manager; 
 			} 
+		}
+
+		public unowned ObjectManager object_manager {
+			get {
+				if (this._object_manager == null)
+					this._object_manager = new SQLObjectManager (this);
+				return (ObjectManager) this._object_manager;
+			}
 		}
 
 		public Profiler profiler {

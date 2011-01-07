@@ -24,7 +24,7 @@ libmidgardvala_la_SOURCES = \
 			  model.vala \
 			  object_model.vala \
 			  object_property_model.vala \
-			  object_builder.vala \
+			  object_manager.vala \
 			  storable.vala \
 			  sql_storage_manager.vala \
 			  storage.vala \
@@ -35,6 +35,7 @@ libmidgardvala_la_SOURCES = \
 			  sql_model_manager.vala \
 			  sql_table_model.vala \
 			  sql_column_model.vala \
+			  sql_object_manager.vala \
 			  sql_query_storage.vala \
 			  sql_query_constraint.vala \
 			  sql_query_constraint_group.vala \

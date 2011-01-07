@@ -34,8 +34,8 @@ void main () {
                 GLib.warning (e.message);
         }
 
-	/* Initialize ObjectBuilder which is responsible to register classes from models */
-	var builder = new ObjectBuilder ();	
+	/* Initialize ObjectManager which is responsible to register classes from models */
+	var builder = storage_manager.object_manager;	
 
 	/* Get all available ObjectModel models from model manager */
         ObjectModel[] object_models = (ObjectModel[]) storage_manager.model_manager.list_models_by_type ("ObjectModel");
@@ -43,7 +43,7 @@ void main () {
 	/* Register models in builder and validate models */
 	try {
 		foreach (ObjectModel model in object_models) 
-			builder.register_model (model);
+			builder.register_type_from_model (model);
 	} catch (ValidationError e) {
 		GLib.error (e.message);
 	}

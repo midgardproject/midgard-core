@@ -48,7 +48,7 @@ namespace MidgardCRCore {
 	}
 
 	public class ObjectBuilder {
-		public static void register_types (MidgardCR.ObjectBuilder builder) throws GLib.Error;
+		public static void register_types (MidgardCR.ObjectManager builder) throws GLib.Error;
 	}
 
 	/* Query classes */

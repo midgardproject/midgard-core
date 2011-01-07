@@ -107,10 +107,10 @@ RDFSQLStorageManager getStorageManager()
 
 	/* Register models in builder and validate models */
 	var model_manager = storage_manager.model_manager;
-	var builder = new MidgardCR.ObjectBuilder ();
+	var builder = storage_manager.object_manager;
 
 	foreach (ObjectModel model in (ObjectModel[]) model_manager.list_models_by_type ("ObjectModel"))
-		builder.register_model (model);
+		builder.register_type_from_model (model);
 	builder.execute ();
 
 	/* Connect profiler callbacks to all StorageManager signal emissions */

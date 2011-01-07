@@ -306,16 +306,71 @@ typedef struct _MidgardCRObjectPropertyReference MidgardCRObjectPropertyReferenc
 typedef struct _MidgardCRObjectPropertyReferenceClass MidgardCRObjectPropertyReferenceClass;
 typedef struct _MidgardCRObjectPropertyReferencePrivate MidgardCRObjectPropertyReferencePrivate;
 
-#define MIDGARD_CR_TYPE_OBJECT_BUILDER (midgard_cr_object_builder_get_type ())
-#define MIDGARD_CR_OBJECT_BUILDER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_OBJECT_BUILDER, MidgardCRObjectBuilder))
-#define MIDGARD_CR_OBJECT_BUILDER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_OBJECT_BUILDER, MidgardCRObjectBuilderClass))
-#define MIDGARD_CR_IS_OBJECT_BUILDER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_OBJECT_BUILDER))
-#define MIDGARD_CR_IS_OBJECT_BUILDER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_OBJECT_BUILDER))
-#define MIDGARD_CR_OBJECT_BUILDER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_OBJECT_BUILDER, MidgardCRObjectBuilderClass))
+#define MIDGARD_CR_TYPE_OBJECT_MANAGER (midgard_cr_object_manager_get_type ())
+#define MIDGARD_CR_OBJECT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_OBJECT_MANAGER, MidgardCRObjectManager))
+#define MIDGARD_CR_OBJECT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_OBJECT_MANAGER, MidgardCRObjectManagerClass))
+#define MIDGARD_CR_IS_OBJECT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_OBJECT_MANAGER))
+#define MIDGARD_CR_IS_OBJECT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_OBJECT_MANAGER))
+#define MIDGARD_CR_OBJECT_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_OBJECT_MANAGER, MidgardCRObjectManagerClass))
 
-typedef struct _MidgardCRObjectBuilder MidgardCRObjectBuilder;
-typedef struct _MidgardCRObjectBuilderClass MidgardCRObjectBuilderClass;
-typedef struct _MidgardCRObjectBuilderPrivate MidgardCRObjectBuilderPrivate;
+typedef struct _MidgardCRObjectManager MidgardCRObjectManager;
+typedef struct _MidgardCRObjectManagerClass MidgardCRObjectManagerClass;
+typedef struct _MidgardCRObjectManagerPrivate MidgardCRObjectManagerPrivate;
+
+#define MIDGARD_CR_TYPE_TIMESTAMP (midgard_cr_timestamp_get_type ())
+#define MIDGARD_CR_TIMESTAMP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_TIMESTAMP, MidgardCRTimestamp))
+#define MIDGARD_CR_TIMESTAMP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_TIMESTAMP, MidgardCRTimestampClass))
+#define MIDGARD_CR_IS_TIMESTAMP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_TIMESTAMP))
+#define MIDGARD_CR_IS_TIMESTAMP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_TIMESTAMP))
+#define MIDGARD_CR_TIMESTAMP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_TIMESTAMP, MidgardCRTimestampClass))
+
+typedef struct _MidgardCRTimestamp MidgardCRTimestamp;
+typedef struct _MidgardCRTimestampClass MidgardCRTimestampClass;
+typedef struct _MidgardCRTimestampPrivate MidgardCRTimestampPrivate;
+
+#define MIDGARD_CR_TYPE_METADATA (midgard_cr_metadata_get_type ())
+#define MIDGARD_CR_METADATA(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_METADATA, MidgardCRMetadata))
+#define MIDGARD_CR_METADATA_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_METADATA, MidgardCRMetadataClass))
+#define MIDGARD_CR_IS_METADATA(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_METADATA))
+#define MIDGARD_CR_IS_METADATA_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_METADATA))
+#define MIDGARD_CR_METADATA_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_METADATA, MidgardCRMetadataClass))
+
+typedef struct _MidgardCRMetadata MidgardCRMetadata;
+typedef struct _MidgardCRMetadataClass MidgardCRMetadataClass;
+typedef struct _MidgardCRMetadataPrivate MidgardCRMetadataPrivate;
+
+#define MIDGARD_CR_TYPE_REPOSITORY_OBJECT (midgard_cr_repository_object_get_type ())
+#define MIDGARD_CR_REPOSITORY_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_REPOSITORY_OBJECT, MidgardCRRepositoryObject))
+#define MIDGARD_CR_REPOSITORY_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_REPOSITORY_OBJECT, MidgardCRRepositoryObjectClass))
+#define MIDGARD_CR_IS_REPOSITORY_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_REPOSITORY_OBJECT))
+#define MIDGARD_CR_IS_REPOSITORY_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_REPOSITORY_OBJECT))
+#define MIDGARD_CR_REPOSITORY_OBJECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_REPOSITORY_OBJECT, MidgardCRRepositoryObjectClass))
+
+typedef struct _MidgardCRRepositoryObject MidgardCRRepositoryObject;
+typedef struct _MidgardCRRepositoryObjectClass MidgardCRRepositoryObjectClass;
+typedef struct _MidgardCRRepositoryObjectPrivate MidgardCRRepositoryObjectPrivate;
+
+#define MIDGARD_CR_TYPE_STORAGE_OBJECT (midgard_cr_storage_object_get_type ())
+#define MIDGARD_CR_STORAGE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_STORAGE_OBJECT, MidgardCRStorageObject))
+#define MIDGARD_CR_STORAGE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_STORAGE_OBJECT, MidgardCRStorageObjectClass))
+#define MIDGARD_CR_IS_STORAGE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_STORAGE_OBJECT))
+#define MIDGARD_CR_IS_STORAGE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_STORAGE_OBJECT))
+#define MIDGARD_CR_STORAGE_OBJECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_STORAGE_OBJECT, MidgardCRStorageObjectClass))
+
+typedef struct _MidgardCRStorageObject MidgardCRStorageObject;
+typedef struct _MidgardCRStorageObjectClass MidgardCRStorageObjectClass;
+typedef struct _MidgardCRStorageObjectPrivate MidgardCRStorageObjectPrivate;
+
+#define MIDGARD_CR_TYPE_REFERENCE_OBJECT (midgard_cr_reference_object_get_type ())
+#define MIDGARD_CR_REFERENCE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_REFERENCE_OBJECT, MidgardCRReferenceObject))
+#define MIDGARD_CR_REFERENCE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_REFERENCE_OBJECT, MidgardCRReferenceObjectClass))
+#define MIDGARD_CR_IS_REFERENCE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_REFERENCE_OBJECT))
+#define MIDGARD_CR_IS_REFERENCE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_REFERENCE_OBJECT))
+#define MIDGARD_CR_REFERENCE_OBJECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_REFERENCE_OBJECT, MidgardCRReferenceObjectClass))
+
+typedef struct _MidgardCRReferenceObject MidgardCRReferenceObject;
+typedef struct _MidgardCRReferenceObjectClass MidgardCRReferenceObjectClass;
+typedef struct _MidgardCRReferenceObjectPrivate MidgardCRReferenceObjectPrivate;
 
 #define MIDGARD_CR_TYPE_STORAGE_MANAGER (midgard_cr_storage_manager_get_type ())
 #define MIDGARD_CR_STORAGE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_STORAGE_MANAGER, MidgardCRStorageManager))
@@ -380,61 +435,6 @@ typedef struct _MidgardCRStorageWorkspaceManagerIface MidgardCRStorageWorkspaceM
 
 typedef struct _MidgardCRWorkspaceStorage MidgardCRWorkspaceStorage;
 typedef struct _MidgardCRWorkspaceStorageIface MidgardCRWorkspaceStorageIface;
-
-#define MIDGARD_CR_TYPE_TIMESTAMP (midgard_cr_timestamp_get_type ())
-#define MIDGARD_CR_TIMESTAMP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_TIMESTAMP, MidgardCRTimestamp))
-#define MIDGARD_CR_TIMESTAMP_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_TIMESTAMP, MidgardCRTimestampClass))
-#define MIDGARD_CR_IS_TIMESTAMP(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_TIMESTAMP))
-#define MIDGARD_CR_IS_TIMESTAMP_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_TIMESTAMP))
-#define MIDGARD_CR_TIMESTAMP_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_TIMESTAMP, MidgardCRTimestampClass))
-
-typedef struct _MidgardCRTimestamp MidgardCRTimestamp;
-typedef struct _MidgardCRTimestampClass MidgardCRTimestampClass;
-typedef struct _MidgardCRTimestampPrivate MidgardCRTimestampPrivate;
-
-#define MIDGARD_CR_TYPE_METADATA (midgard_cr_metadata_get_type ())
-#define MIDGARD_CR_METADATA(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_METADATA, MidgardCRMetadata))
-#define MIDGARD_CR_METADATA_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_METADATA, MidgardCRMetadataClass))
-#define MIDGARD_CR_IS_METADATA(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_METADATA))
-#define MIDGARD_CR_IS_METADATA_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_METADATA))
-#define MIDGARD_CR_METADATA_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_METADATA, MidgardCRMetadataClass))
-
-typedef struct _MidgardCRMetadata MidgardCRMetadata;
-typedef struct _MidgardCRMetadataClass MidgardCRMetadataClass;
-typedef struct _MidgardCRMetadataPrivate MidgardCRMetadataPrivate;
-
-#define MIDGARD_CR_TYPE_REPOSITORY_OBJECT (midgard_cr_repository_object_get_type ())
-#define MIDGARD_CR_REPOSITORY_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_REPOSITORY_OBJECT, MidgardCRRepositoryObject))
-#define MIDGARD_CR_REPOSITORY_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_REPOSITORY_OBJECT, MidgardCRRepositoryObjectClass))
-#define MIDGARD_CR_IS_REPOSITORY_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_REPOSITORY_OBJECT))
-#define MIDGARD_CR_IS_REPOSITORY_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_REPOSITORY_OBJECT))
-#define MIDGARD_CR_REPOSITORY_OBJECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_REPOSITORY_OBJECT, MidgardCRRepositoryObjectClass))
-
-typedef struct _MidgardCRRepositoryObject MidgardCRRepositoryObject;
-typedef struct _MidgardCRRepositoryObjectClass MidgardCRRepositoryObjectClass;
-typedef struct _MidgardCRRepositoryObjectPrivate MidgardCRRepositoryObjectPrivate;
-
-#define MIDGARD_CR_TYPE_STORAGE_OBJECT (midgard_cr_storage_object_get_type ())
-#define MIDGARD_CR_STORAGE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_STORAGE_OBJECT, MidgardCRStorageObject))
-#define MIDGARD_CR_STORAGE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_STORAGE_OBJECT, MidgardCRStorageObjectClass))
-#define MIDGARD_CR_IS_STORAGE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_STORAGE_OBJECT))
-#define MIDGARD_CR_IS_STORAGE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_STORAGE_OBJECT))
-#define MIDGARD_CR_STORAGE_OBJECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_STORAGE_OBJECT, MidgardCRStorageObjectClass))
-
-typedef struct _MidgardCRStorageObject MidgardCRStorageObject;
-typedef struct _MidgardCRStorageObjectClass MidgardCRStorageObjectClass;
-typedef struct _MidgardCRStorageObjectPrivate MidgardCRStorageObjectPrivate;
-
-#define MIDGARD_CR_TYPE_REFERENCE_OBJECT (midgard_cr_reference_object_get_type ())
-#define MIDGARD_CR_REFERENCE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_REFERENCE_OBJECT, MidgardCRReferenceObject))
-#define MIDGARD_CR_REFERENCE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_REFERENCE_OBJECT, MidgardCRReferenceObjectClass))
-#define MIDGARD_CR_IS_REFERENCE_OBJECT(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_REFERENCE_OBJECT))
-#define MIDGARD_CR_IS_REFERENCE_OBJECT_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_REFERENCE_OBJECT))
-#define MIDGARD_CR_REFERENCE_OBJECT_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_REFERENCE_OBJECT, MidgardCRReferenceObjectClass))
-
-typedef struct _MidgardCRReferenceObject MidgardCRReferenceObject;
-typedef struct _MidgardCRReferenceObjectClass MidgardCRReferenceObjectClass;
-typedef struct _MidgardCRReferenceObjectPrivate MidgardCRReferenceObjectPrivate;
 
 #define MIDGARD_CR_TYPE_SQL_STORAGE_MANAGER (midgard_cr_sql_storage_manager_get_type ())
 #define MIDGARD_CR_SQL_STORAGE_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_STORAGE_MANAGER, MidgardCRSQLStorageManager))
@@ -569,6 +569,17 @@ typedef struct _MidgardCRSQLTableModelPrivate MidgardCRSQLTableModelPrivate;
 typedef struct _MidgardCRSQLColumnModel MidgardCRSQLColumnModel;
 typedef struct _MidgardCRSQLColumnModelClass MidgardCRSQLColumnModelClass;
 typedef struct _MidgardCRSQLColumnModelPrivate MidgardCRSQLColumnModelPrivate;
+
+#define MIDGARD_CR_TYPE_SQL_OBJECT_MANAGER (midgard_cr_sql_object_manager_get_type ())
+#define MIDGARD_CR_SQL_OBJECT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_SQL_OBJECT_MANAGER, MidgardCRSQLObjectManager))
+#define MIDGARD_CR_SQL_OBJECT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_SQL_OBJECT_MANAGER, MidgardCRSQLObjectManagerClass))
+#define MIDGARD_CR_IS_SQL_OBJECT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_SQL_OBJECT_MANAGER))
+#define MIDGARD_CR_IS_SQL_OBJECT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_SQL_OBJECT_MANAGER))
+#define MIDGARD_CR_SQL_OBJECT_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_SQL_OBJECT_MANAGER, MidgardCRSQLObjectManagerClass))
+
+typedef struct _MidgardCRSQLObjectManager MidgardCRSQLObjectManager;
+typedef struct _MidgardCRSQLObjectManagerClass MidgardCRSQLObjectManagerClass;
+typedef struct _MidgardCRSQLObjectManagerPrivate MidgardCRSQLObjectManagerPrivate;
 typedef struct _MidgardCRSQLQueryStoragePrivate MidgardCRSQLQueryStoragePrivate;
 
 #define MIDGARD_CR_TYPE_SQL_QUERY_CONSTRAINT (midgard_cr_sql_query_constraint_get_type ())
@@ -1048,18 +1059,82 @@ struct _MidgardCRObjectPropertyReferenceClass {
 };
 
 typedef enum  {
-	MIDGARD_CR_OBJECT_BUILDER_ERROR_NAME_EXISTS
-} MidgardCRObjectBuilderError;
-#define MIDGARD_CR_OBJECT_BUILDER_ERROR midgard_cr_object_builder_error_quark ()
-struct _MidgardCRObjectBuilder {
+	MIDGARD_CR_OBJECT_MANAGER_ERROR_OBJECT_NAME_EXISTS,
+	MIDGARD_CR_OBJECT_MANAGER_ERROR_OBJECT_NOT_EXIST,
+	MIDGARD_CR_OBJECT_MANAGER_ERROR_OBJECT_INVALID,
+	MIDGARD_CR_OBJECT_MANAGER_ERROR_OBJECT_DUPLICATE
+} MidgardCRObjectManagerError;
+#define MIDGARD_CR_OBJECT_MANAGER_ERROR midgard_cr_object_manager_error_quark ()
+struct _MidgardCRObjectManager {
 	GObject parent_instance;
-	MidgardCRObjectBuilderPrivate * priv;
+	MidgardCRObjectManagerPrivate * priv;
 	MidgardCRObjectModel** _models;
 	gint _models_length1;
 	gint __models_size_;
 };
 
-struct _MidgardCRObjectBuilderClass {
+struct _MidgardCRObjectManagerClass {
+	GObjectClass parent_class;
+	void (*register_type_from_model) (MidgardCRObjectManager* self, MidgardCRObjectModel* model, GError** error);
+	MidgardCRStorable* (*factory) (MidgardCRObjectManager* self, const char* classname, const char* guid, GError** error);
+	void (*execute) (MidgardCRObjectManager* self, GError** error);
+};
+
+struct _MidgardCRTimestamp {
+	GObject parent_instance;
+	MidgardCRTimestampPrivate * priv;
+};
+
+struct _MidgardCRTimestampClass {
+	GObjectClass parent_class;
+};
+
+struct _MidgardCRMetadata {
+	GObject parent_instance;
+	MidgardCRMetadataPrivate * priv;
+};
+
+struct _MidgardCRMetadataClass {
+	GObjectClass parent_class;
+	const char* (*get_parent) (MidgardCRMetadata* self);
+	void (*set_parent) (MidgardCRMetadata* self, const char* value);
+	guint (*get_action) (MidgardCRMetadata* self);
+	MidgardCRTimestamp* (*get_created) (MidgardCRMetadata* self);
+	MidgardCRTimestamp* (*get_revised) (MidgardCRMetadata* self);
+};
+
+struct _MidgardCRRepositoryObject {
+	GObject parent_instance;
+	MidgardCRRepositoryObjectPrivate * priv;
+	char* _guid;
+	gint _id;
+	MidgardCRMetadata* _metadata;
+	GList* _ns_properties_list;
+	GList* _ns_values_list;
+};
+
+struct _MidgardCRRepositoryObjectClass {
+	GObjectClass parent_class;
+	void (*set_property_value) (MidgardCRRepositoryObject* self, const char* name, GValue* value);
+	GValue* (*get_property_value) (MidgardCRRepositoryObject* self, const char* name);
+	char** (*list_all_properties) (MidgardCRRepositoryObject* self, int* result_length1);
+};
+
+struct _MidgardCRStorageObject {
+	GObject parent_instance;
+	MidgardCRStorageObjectPrivate * priv;
+};
+
+struct _MidgardCRStorageObjectClass {
+	GObjectClass parent_class;
+};
+
+struct _MidgardCRReferenceObject {
+	GObject parent_instance;
+	MidgardCRReferenceObjectPrivate * priv;
+};
+
+struct _MidgardCRReferenceObjectClass {
 	GObjectClass parent_class;
 };
 
@@ -1144,67 +1219,10 @@ struct _MidgardCRStorageManagerIface {
 	MidgardCRStorageManager* (*clone) (MidgardCRStorageManager* self);
 	MidgardCRStorageContentManager* (*get_content_manager) (MidgardCRStorageManager* self);
 	MidgardCRStorageModelManager* (*get_model_manager) (MidgardCRStorageManager* self);
+	MidgardCRObjectManager* (*get_object_manager) (MidgardCRStorageManager* self);
 	MidgardCRProfiler* (*get_profiler) (MidgardCRStorageManager* self);
 	MidgardCRTransaction* (*get_transaction) (MidgardCRStorageManager* self);
 	MidgardCRStorageWorkspaceManager* (*get_workspace_manager) (MidgardCRStorageManager* self);
-};
-
-struct _MidgardCRTimestamp {
-	GObject parent_instance;
-	MidgardCRTimestampPrivate * priv;
-};
-
-struct _MidgardCRTimestampClass {
-	GObjectClass parent_class;
-};
-
-struct _MidgardCRMetadata {
-	GObject parent_instance;
-	MidgardCRMetadataPrivate * priv;
-};
-
-struct _MidgardCRMetadataClass {
-	GObjectClass parent_class;
-	const char* (*get_parent) (MidgardCRMetadata* self);
-	void (*set_parent) (MidgardCRMetadata* self, const char* value);
-	guint (*get_action) (MidgardCRMetadata* self);
-	MidgardCRTimestamp* (*get_created) (MidgardCRMetadata* self);
-	MidgardCRTimestamp* (*get_revised) (MidgardCRMetadata* self);
-};
-
-struct _MidgardCRRepositoryObject {
-	GObject parent_instance;
-	MidgardCRRepositoryObjectPrivate * priv;
-	char* _guid;
-	gint _id;
-	MidgardCRMetadata* _metadata;
-	GList* _ns_properties_list;
-	GList* _ns_values_list;
-};
-
-struct _MidgardCRRepositoryObjectClass {
-	GObjectClass parent_class;
-	void (*set_property_value) (MidgardCRRepositoryObject* self, const char* name, GValue* value);
-	GValue* (*get_property_value) (MidgardCRRepositoryObject* self, const char* name);
-	char** (*list_all_properties) (MidgardCRRepositoryObject* self, int* result_length1);
-};
-
-struct _MidgardCRStorageObject {
-	GObject parent_instance;
-	MidgardCRStorageObjectPrivate * priv;
-};
-
-struct _MidgardCRStorageObjectClass {
-	GObjectClass parent_class;
-};
-
-struct _MidgardCRReferenceObject {
-	GObject parent_instance;
-	MidgardCRReferenceObjectPrivate * priv;
-};
-
-struct _MidgardCRReferenceObjectClass {
-	GObjectClass parent_class;
 };
 
 struct _MidgardCRStorageModelIface {
@@ -1410,6 +1428,16 @@ struct _MidgardCRSQLColumnModel {
 
 struct _MidgardCRSQLColumnModelClass {
 	GObjectClass parent_class;
+};
+
+struct _MidgardCRSQLObjectManager {
+	MidgardCRObjectManager parent_instance;
+	MidgardCRSQLObjectManagerPrivate * priv;
+	MidgardCRSQLStorageManager* _storage_manager;
+};
+
+struct _MidgardCRSQLObjectManagerClass {
+	MidgardCRObjectManagerClass parent_class;
 };
 
 struct _MidgardCRSQLQueryStorage {
@@ -1794,24 +1822,13 @@ GType midgard_cr_object_property_reference_get_type (void) G_GNUC_CONST;
 MidgardCRObjectPropertyReference* midgard_cr_object_property_reference_new (const char* name, MidgardCRObjectModel* object_model, MidgardCRObjectModelReference* model_reference);
 MidgardCRObjectPropertyReference* midgard_cr_object_property_reference_construct (GType object_type, const char* name, MidgardCRObjectModel* object_model, MidgardCRObjectModelReference* model_reference);
 MidgardCRObjectPropertyReference* midgard_cr_object_property_reference_create_model (const char* name, MidgardCRObjectModel* object_model, MidgardCRObjectModelReference* model_reference);
-GQuark midgard_cr_object_builder_error_quark (void);
-GType midgard_cr_object_builder_get_type (void) G_GNUC_CONST;
-void midgard_cr_object_builder_register_model (MidgardCRObjectBuilder* self, MidgardCRObjectModel* model, GError** error);
-GQuark midgard_cr_storage_manager_error_quark (void);
-GQuark midgard_cr_storage_content_manager_error_quark (void);
-GType midgard_cr_query_manager_get_type (void) G_GNUC_CONST;
-GType midgard_cr_storage_content_manager_get_type (void) G_GNUC_CONST;
-GType midgard_cr_storage_executor_get_type (void) G_GNUC_CONST;
-GType midgard_cr_storage_model_manager_get_type (void) G_GNUC_CONST;
-GType midgard_cr_transaction_get_type (void) G_GNUC_CONST;
-GType midgard_cr_workspace_storage_get_type (void) G_GNUC_CONST;
-GType midgard_cr_storage_workspace_manager_get_type (void) G_GNUC_CONST;
-GType midgard_cr_storage_manager_get_type (void) G_GNUC_CONST;
-void midgard_cr_object_builder_register_storage_models (MidgardCRObjectBuilder* self, MidgardCRStorageManager* manager, GError** error);
-MidgardCRStorable* midgard_cr_object_builder_factory (MidgardCRObjectBuilder* self, const char* classname, GError** error);
-MidgardCRObjectModel* midgard_cr_object_builder_get_object_model (MidgardCRObjectBuilder* self, const char* classname);
-MidgardCRObjectBuilder* midgard_cr_object_builder_new (void);
-MidgardCRObjectBuilder* midgard_cr_object_builder_construct (GType object_type);
+GQuark midgard_cr_object_manager_error_quark (void);
+GType midgard_cr_object_manager_get_type (void) G_GNUC_CONST;
+void midgard_cr_object_manager_register_type_from_model (MidgardCRObjectManager* self, MidgardCRObjectModel* model, GError** error);
+MidgardCRStorable* midgard_cr_object_manager_factory (MidgardCRObjectManager* self, const char* classname, const char* guid, GError** error);
+void midgard_cr_object_manager_execute (MidgardCRObjectManager* self, GError** error);
+MidgardCRObjectManager* midgard_cr_object_manager_new (void);
+MidgardCRObjectManager* midgard_cr_object_manager_construct (GType object_type);
 GType midgard_cr_timestamp_get_type (void) G_GNUC_CONST;
 MidgardCRTimestamp* midgard_cr_timestamp_construct (GType object_type);
 GType midgard_cr_metadata_get_type (void) G_GNUC_CONST;
@@ -1838,6 +1855,16 @@ const char* midgard_cr_reference_object_get_guid (MidgardCRReferenceObject* self
 void midgard_cr_reference_object_set_guid (MidgardCRReferenceObject* self, const char* value);
 gint midgard_cr_reference_object_get_id (MidgardCRReferenceObject* self);
 void midgard_cr_reference_object_set_id (MidgardCRReferenceObject* self, gint value);
+GQuark midgard_cr_storage_manager_error_quark (void);
+GQuark midgard_cr_storage_content_manager_error_quark (void);
+GType midgard_cr_query_manager_get_type (void) G_GNUC_CONST;
+GType midgard_cr_storage_content_manager_get_type (void) G_GNUC_CONST;
+GType midgard_cr_storage_executor_get_type (void) G_GNUC_CONST;
+GType midgard_cr_storage_model_manager_get_type (void) G_GNUC_CONST;
+GType midgard_cr_transaction_get_type (void) G_GNUC_CONST;
+GType midgard_cr_workspace_storage_get_type (void) G_GNUC_CONST;
+GType midgard_cr_storage_workspace_manager_get_type (void) G_GNUC_CONST;
+GType midgard_cr_storage_manager_get_type (void) G_GNUC_CONST;
 GType midgard_cr_sql_storage_manager_get_type (void) G_GNUC_CONST;
 GType midgard_cr_storage_model_get_type (void) G_GNUC_CONST;
 MidgardCRSQLStorageManager* midgard_cr_sql_storage_manager_new (const char* name, MidgardCRConfig* config, GError** error);
@@ -1863,6 +1890,7 @@ MidgardCRStorageManager* midgard_cr_storage_manager_fork (MidgardCRStorageManage
 MidgardCRStorageManager* midgard_cr_storage_manager_clone (MidgardCRStorageManager* self);
 MidgardCRStorageContentManager* midgard_cr_storage_manager_get_content_manager (MidgardCRStorageManager* self);
 MidgardCRStorageModelManager* midgard_cr_storage_manager_get_model_manager (MidgardCRStorageManager* self);
+MidgardCRObjectManager* midgard_cr_storage_manager_get_object_manager (MidgardCRStorageManager* self);
 MidgardCRProfiler* midgard_cr_storage_manager_get_profiler (MidgardCRStorageManager* self);
 MidgardCRTransaction* midgard_cr_storage_manager_get_transaction (MidgardCRStorageManager* self);
 MidgardCRStorageWorkspaceManager* midgard_cr_storage_manager_get_workspace_manager (MidgardCRStorageManager* self);
@@ -1969,6 +1997,9 @@ MidgardCRSQLColumnModel* midgard_cr_sql_column_model_new (MidgardCRSQLStorageMan
 MidgardCRSQLColumnModel* midgard_cr_sql_column_model_construct (GType object_type, MidgardCRSQLStorageManager* manager, const char* name, const char* location, const char* type);
 const char* midgard_cr_sql_column_model_get_tablename (MidgardCRSQLColumnModel* self);
 const char* midgard_cr_sql_column_model_get_propertyof (MidgardCRSQLColumnModel* self);
+GType midgard_cr_sql_object_manager_get_type (void) G_GNUC_CONST;
+MidgardCRSQLObjectManager* midgard_cr_sql_object_manager_new (MidgardCRSQLStorageManager* storage);
+MidgardCRSQLObjectManager* midgard_cr_sql_object_manager_construct (GType object_type, MidgardCRSQLStorageManager* storage);
 MidgardCRSQLQueryStorage* midgard_cr_sql_query_storage_new (const char* name);
 MidgardCRSQLQueryStorage* midgard_cr_sql_query_storage_construct (GType object_type, const char* name);
 GType midgard_cr_sql_query_constraint_get_type (void) G_GNUC_CONST;

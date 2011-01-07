@@ -21,7 +21,12 @@ using GLib;
 namespace MidgardCR {
 
 	/**
-	 * Basic interface for all query related classes
+	 * Basic interface for all query related classes.
+	 *
+	 * QueryManager implementation shall provide access to query tools, able to 
+	 * fetch from storage multiple objects or particular data using specific constraints.
+	 *
+	 * Check {@link ObjectManager} for single objects construction 
 	 */
 	public interface QueryManager : GLib.Object {
 
@@ -96,27 +101,32 @@ namespace MidgardCR {
 		/**
 		 * Get {@link StorageContentManager} object
 		 */
-		public abstract StorageContentManager 	content_manager 	{ get; }
+		public abstract unowned StorageContentManager 	content_manager 	{ get; }
 
 		/**
 		 * Get {@link StorageModelManager} object
 		 */
-		public abstract StorageModelManager   	model_manager   	{ get; }
+		public abstract unowned StorageModelManager   	model_manager   	{ get; }
+
+		/**
+		 * Get {@link ObjectManager} object
+		 */
+		public abstract unowned ObjectManager object_manager			{ get; }
 
 		/**
 		 * Get {@link Profiler} object
 		 */
-		public abstract Profiler              	profiler        	{ get; }
+		public abstract unowned Profiler              	profiler        	{ get; }
 
 		/**
 		 * Get {@link Transaction} object.
 		 */
-		public abstract Transaction           	transaction     	{ get; }
+		public abstract unowned Transaction           	transaction     	{ get; }
 
 		/**
 		 * Get {@link StorageWorkspaceManager} object
 		 */
-		public abstract StorageWorkspaceManager	workspace_manager	{ get; }	
+		public abstract unowned StorageWorkspaceManager	workspace_manager	{ get; }	
 
 		/* signals */
 
