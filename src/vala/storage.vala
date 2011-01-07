@@ -110,6 +110,10 @@ namespace MidgardCR {
 
 		/**
 		 * Get {@link ObjectManager} object
+		 *
+		 * Any StorageManager implementation shall provide own ObjectManager class.
+		 * The purpose of such implementation is to fetch single object from storage easily and quickly.
+		 * Returned object manager shall be associated with storage manager to optimize object creation.
 		 */
 		public abstract unowned ObjectManager object_manager			{ get; }
 
