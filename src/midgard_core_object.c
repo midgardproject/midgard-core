@@ -752,13 +752,15 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd,
 		
 		_objects = g_new(MidgardObject *, _n_nodes+1);
 		_n_nodes = 0;
-		
-		for(; olist ; olist = olist->next){
-			_objects[_n_nodes] = olist->data;
+	
+		GSList *l = NULL;	
+		for(l = olist; l != NULL ; l = l->next){
+			_objects[_n_nodes] = l->data;
 			_n_nodes++;
 		}
 
-		g_slist_free(olist);
+		if (olist)
+			g_slist_free(olist);
 		_objects[_n_nodes] = NULL;
 	}
 

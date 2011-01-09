@@ -637,8 +637,7 @@ GObject **midgard_query_builder_execute(
 
         list = midgard_query_builder_execute_or_count(builder, holder, MQB_SELECT_OBJECT);
 	
-	if(list == NULL) {
-		
+	if(list == NULL) {	
 		g_free(holder);
 		return NULL;
 	}
@@ -646,8 +645,9 @@ GObject **midgard_query_builder_execute(
 	*n_objects = holder->elements;
 	MidgardObject **objects = g_new(MidgardObject *, holder->elements+1);	
 
-	for( ; list; list = list->next){
-		objects[i] = list->data;
+	GList *l = NULL;
+	for(l = list; l != NULL; l = l->next){
+		objects[i] = l->data;
 		i++;
 	}	
 	objects[i] = NULL; /* Terminate by NULL */

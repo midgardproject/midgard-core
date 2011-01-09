@@ -530,7 +530,10 @@ void midgard_core_query_constraint_private_free(MidgardCoreQueryConstraintPrivat
 		midgard_core_query_constraint_private_free(
 				(MidgardCoreQueryConstraintPrivate*)list->data);
 	}
-	g_slist_free(list);
+	if (mqcp->joins) {
+		g_slist_free(mqcp->joins);
+		mqcp->joins = NULL;
+	}
 
 	g_free(mqcp);
 }
@@ -542,12 +545,15 @@ static void midgard_core_query_constraint_init(MidgardCoreQueryConstraint *self)
 	self->priv = midgard_core_query_constraint_private_new();
 }
 
+static GObjectClass *__parent_class = NULL;
+
 static void midgard_core_query_constraint_finalize(GObject *object)
 {
 	g_assert(object != NULL);
 
 	MidgardCoreQueryConstraint *self = MIDGARD_CORE_QUERY_CONSTRAINT(object);
 	midgard_core_query_constraint_private_free(self->priv);		
+	__parent_class->finalize(object);
 }
 
 static void midgard_core_query_constraint_class_init(
@@ -555,7 +561,8 @@ static void midgard_core_query_constraint_class_init(
 {
         g_assert(klass != NULL);
 	
-	klass->parent.finalize = midgard_core_query_constraint_finalize;
+	__parent_class = g_type_class_peek_parent(klass);
+	G_OBJECT_CLASS(klass)->finalize = midgard_core_query_constraint_finalize;
 	klass->add_sql = add_sql;
 }
 

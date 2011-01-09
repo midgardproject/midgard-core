@@ -257,7 +257,7 @@ __mgdschema_object_dispose (GObject *object)
 		for (; _param; _param = _param->next) {
 			g_object_unref(_param->data);
 		}
-		g_slist_free(_param);
+		g_slist_free(self->priv->parameters);
 		self->priv->parameters = NULL;
 	}
 

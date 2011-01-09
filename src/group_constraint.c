@@ -104,11 +104,14 @@ static void midgard_group_constraint_finalize(MidgardGroupConstraint *group)
 
 	GSList *list = NULL;
 
-	for(list = group->constraints; list != NULL; list = list->next) {
-		
+	for(list = group->constraints; list != NULL; list = list->next) {	
 		g_object_unref(list->data);
 	}
-	g_slist_free(list);
+
+	if (group->constraints) {
+		g_slist_free(group->constraints);
+		group->constraints = NULL;
+	}
 }
 
 static void midgard_group_constraint_class_init(

@@ -97,8 +97,10 @@ void midgard_core_query_group_constraint_private_free(
 	for(list = priv->constraints; list != NULL; list = list->next) 
 		g_object_unref(list->data);
 	
-	if(list)
-		g_slist_free(list);
+	if(priv->constraints) {
+		g_slist_free(priv->constraints);
+		priv->constraints = NULL;
+	}
 
 	return;
 }

@@ -651,8 +651,9 @@ midgard_collector_list_keys (MidgardCollector *self)
 		
 		/* list is already reversed 
 		 * it's done by prepending lists in __get_collection_keys */
-		for(; list; list = list->next){
-			keys[i] = list->data;
+		GList *l = NULL;
+		for(l = list; l != NULL; l = l->next) {
+			keys[i] = l->data;
 			i++;
 		}
 		keys[i] = NULL;
@@ -1027,11 +1028,14 @@ static void _midgard_collector_finalize(GObject *object)
 	
 	g_object_unref(self->priv->builder);
 
-	GList *list = self->priv->values;
-	for( ; list; list = list->next){
-		g_free(list->data);
+	GList *l = self->priv->values;
+	for(l = self->priv->values; l != NULL; l = l->next){
+		g_free(l->data);
 	}
-	g_list_free(list);
+	if (self->priv->values) {
+		g_list_free(self->priv->values);
+		self->priv->values = NULL;
+	}
 
 	g_free(self->priv);
 }
