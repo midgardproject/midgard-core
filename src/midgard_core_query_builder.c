@@ -72,36 +72,42 @@ void midgard_query_builder_private_free(MidgardQueryBuilderPrivate *mqbp)
 		if(list->data != NULL && G_IS_OBJECT(list->data))
 			g_object_unref(G_OBJECT(list->data));
 	}
-	if(list)
-		g_slist_free(list);
-	list = NULL;
+	if(mqbp->constraints) {		
+		g_slist_free(mqbp->constraints);
+		mqbp->constraints = NULL;
+	}
 
 	/* free groups */
 	for(list = mqbp->groups; list != NULL; list = list->next) {
 		g_object_unref(list->data);
 	}
-	if(list)
-		g_slist_free(list);
-	list = NULL;
+	if(mqbp->groups) {
+		g_slist_free(mqbp->groups);
+		mqbp->groups = NULL;
+	}
 
 	/* free orders */
 	for(list = mqbp->orders; list != NULL; list = list->next) {
 		midgard_core_query_order_free((MidgardQueryOrder *)list->data);
 	}
-	if(list)
-		g_slist_free(list);
-	list = NULL;
-
+	if(mqbp->orders) {
+		g_slist_free(mqbp->orders);
+		mqbp->orders = NULL;
+	}
+	
 	/* free joins */
 	for(list = mqbp->joins; list != NULL; list = list->next) {
 		midgard_core_query_constraint_private_free((MidgardCoreQueryConstraintPrivate*) list->data);
 	}
-	if(list)
-		g_slist_free(list);
+	if(mqbp->joins) {
+		g_slist_free(mqbp->joins);
+		mqbp->joins = NULL;
+	}
 	list = NULL;
 
 	/* free tables */
 	g_hash_table_destroy(mqbp->tables);
+	mqbp->tables = NULL;
 
 	/* free itself */
 	g_free(mqbp);
@@ -124,7 +130,7 @@ void midgard_core_qb_add_constraint(MidgardQueryBuilder *builder,
 	g_assert(constraint != NULL);
 
 	builder->priv->constraints = 
-		g_slist_append(builder->priv->constraints, constraint);	
+		g_slist_append(builder->priv->constraints, constraint);
 }
 
 void midgard_core_qb_add_order(MidgardQueryBuilder *builder,
