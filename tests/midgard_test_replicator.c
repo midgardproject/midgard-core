@@ -449,9 +449,18 @@ midgard_test_replicator_unserialize (MidgardObjectTest *mot, gconstpointer data)
 			continue;
 		}
 	
-
 		g_assert_cmpstr(__class_property(orig, pspecs[i]->name, &orig_val),
 				==, __class_property(copy, pspecs[i]->name, &copy_val));
+
+		/* If this is object, add reference */
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT) {
+			GObject *o = g_value_get_object (&orig_val);
+			GObject *co = g_value_get_object (&copy_val);
+			if (o)
+				g_object_ref (g_value_get_object (&orig_val));
+			if (co)
+				g_object_ref (g_value_get_object (&copy_val));
+		}
 
 		g_value_unset(&orig_val);
 		g_value_unset(&copy_val);
@@ -504,6 +513,12 @@ midgard_test_replicator_unserialize (MidgardObjectTest *mot, gconstpointer data)
 		g_assert_cmpstr(__class_property(morig, pspecs[i]->name, &orig_val),
 				==, __class_property(mcopy, pspecs[i]->name, &copy_val));
 		
+		/* If this is object, add reference */
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type == G_TYPE_OBJECT)) {
+			g_object_ref (g_value_get_object (&orig_val));
+			g_object_ref (g_value_get_object (&copy_val));
+		}
+
 		g_value_unset(&orig_val);
 		g_value_unset(&copy_val);
 	}
