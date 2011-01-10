@@ -1128,15 +1128,14 @@ void _object_copy_properties(GObject *src, GObject *dest)
 
 		if (props[i]->value_type == G_TYPE_OBJECT) {			
 		
-			g_object_get_property(src, props[i]->name, &pval);
-			
+			g_object_get_property(src, props[i]->name, &pval);	
 			GObject *nm = g_value_get_object(&pval);
 
 			if (MIDGARD_IS_METADATA(nm)) {
 
-				MidgardMetadata *new_metadata = 
-					midgard_core_metadata_copy(MIDGARD_METADATA(nm));
-				g_object_unref(nm);
+				/* Add reference to metadata object, it'll be unref when value is unset */
+				g_object_ref (nm);
+				MidgardMetadata *new_metadata = midgard_core_metadata_copy(MIDGARD_METADATA(nm));
 				MGD_DBOBJECT_METADATA (dest) = new_metadata;
 			}
 
