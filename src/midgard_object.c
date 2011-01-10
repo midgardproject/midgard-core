@@ -2471,9 +2471,7 @@ gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents
 	}
 	
 	GString *sql = g_string_new("UPDATE ");
-	g_string_append_printf(sql,
-			"%s SET ",
-			table);
+	g_string_append_printf(sql, "%s SET ", table);
 	
 	gchar *person_guid = "";
 
@@ -2481,18 +2479,35 @@ gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
 	if (person)
 		person_guid = (gchar *)MGD_OBJECT_GUID(person);
+
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
+	const gchar *deleted_field = midgard_core_object_get_deleted_field (MIDGARD_DBOBJECT_CLASS (MIDGARD_OBJECT_GET_CLASS (object)));
 	
+	if (!metadata && !deleted_field) {
+		midgard_set_error(MGD_OBJECT_CNC(object),
+				MGD_GENERIC_ERROR,
+				MGD_ERR_INVALID_PROPERTY_VALUE, 
+				"Object has neither metadata nor deleted property installed");
+		return FALSE;
+	}
+
 	GValue tval = {0, };
-	g_value_init (&tval, MGD_TYPE_TIMESTAMP);
-	midgard_timestamp_set_current_time(&tval);
-	gchar *timeupdated = midgard_timestamp_get_string_from_value (&tval);
-	midgard_core_metadata_increase_revision (MGD_DBOBJECT_METADATA (object));
-	g_string_append_printf(sql,
-			"metadata_revisor='%s', metadata_revised='%s',"
-			"metadata_revision=%d, "
-			"metadata_deleted=1 ",
-			person_guid, timeupdated, 
-			MGD_DBOBJECT_METADATA (object)->priv->revision);
+	gchar *timeupdated = NULL;
+
+	if (metadata) {
+		g_value_init (&tval, MGD_TYPE_TIMESTAMP);
+		midgard_timestamp_set_current_time(&tval);
+		timeupdated = midgard_timestamp_get_string_from_value (&tval);
+		midgard_core_metadata_increase_revision (MGD_DBOBJECT_METADATA (object));
+		g_string_append_printf(sql,
+				"metadata_revisor='%s', metadata_revised='%s',"
+				"metadata_revision=%d, "
+				"metadata_deleted=1 ",
+				person_guid, timeupdated, 
+				MGD_DBOBJECT_METADATA (object)->priv->revision);
+	} else if (deleted_field) {
+		g_string_append_printf (sql, "%s = 1", deleted_field);
+	}
 
 	g_string_append_printf(sql, " WHERE guid = '%s' ",  MGD_OBJECT_GUID(object));
         gint qr = midgard_core_query_execute(MGD_OBJECT_CNC (object), sql->str, FALSE);
@@ -2500,17 +2515,15 @@ gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents
 	g_string_free(sql, TRUE);
 	g_free (timeupdated);
 
-	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
-
 	if (qr == 0) {
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
-		g_value_unset(&tval);
+		if (G_IS_VALUE (&tval))
+			g_value_unset(&tval);
 		
 		if (metadata)
 			metadata->priv->revision--;
 
 		return FALSE;
-
 	} 
 
 	if (MGD_CNC_REPLICATION (mgd)) {
@@ -2537,7 +2550,8 @@ gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents
 		metadata->priv->deleted = TRUE;
 	}
 
-	g_value_unset(&tval);
+	if (G_IS_VALUE (&tval))
+		g_value_unset(&tval);
 
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_deleted, 0);
 	__dbus_send(object, "delete");
@@ -2555,6 +2569,10 @@ gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents
  * from database. Instead, it is marked as deleted , thus it is possible to undelete 
  * object later with midgard_schema_object_factory_object_undelete().
  *
+ * To perform valid delete operation, object's class has to have either 'metadata' 
+ * (of #MidgardMetadata type) or 'delete' property installed. The latter is not taken into 
+ * account if metadata object provides own 'deleted' property.
+ *
  * If @check_dependents toggle is %TRUE, parameters and attachments storage will be queried,
  * if any of such exist and depend on deleted object.
  *
@@ -2571,6 +2589,9 @@ gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents
  * Object's property guid is empty ( MGD_ERR_INVALID_PROPERTY_VALUE )
  * </para></listitem>
  * <listitem><para>
+ * Object's class has neither metadata nor deleted property installed ( MGD_ERR_INVALID_PROPERTY_VALUE )
+ * </para></listitem>
+ * <listitem><para>
  * There are still dependent objects in database ( MGD_ERR_HAS_DEPENDENTS )
  * </para></listitem>
  * <listitem><para>
@@ -2584,9 +2605,6 @@ gboolean
 midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 {
 	g_return_val_if_fail (object != NULL, FALSE);
-
-	if (!MGD_DBCLASS_METADATA_CLASS (MIDGARD_DBOBJECT_GET_CLASS (object))) 
-		return midgard_object_purge (object, check_dependents);
 
 	return _midgard_object_delete (object, check_dependents);
 }

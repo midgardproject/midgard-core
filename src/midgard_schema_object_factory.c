@@ -46,6 +46,9 @@
  * <listitem><para>
  * Object identified by given guid is purged (MGD_ERR_OBJECT_PURGED)
  * </para></listitem>
+ * <listitem><para>
+ * Object identified by given guid doesn't provide 'metadata' or 'deleted' property (MGD_ERR_INVALID_PROPERTY)
+ * </para></listitem>
  * </itemizedlist>
  *
  * Returns: #MidgardObject derived new instance or %NULL on failure
@@ -149,11 +152,17 @@ __get_id_from_path_element (MidgardConnection *mgd,
 		const gchar *table, const gchar *name, const gchar *field,
 		guint val, MidgardObjectClass *klass, guint *rval)
 {
-	const gchar *unique_name = MGD_DBCLASS_PROPERTY_UNIQUE (klass); 
+	const gchar *unique_name = MGD_DBCLASS_PROPERTY_UNIQUE (klass);
+	const gchar *deleted_field = midgard_core_object_get_deleted_field (MIDGARD_DBOBJECT_CLASS (klass));
 	GString *where = g_string_new ("");
-	g_string_append_printf (where,
-			"%s = '%s' AND %s = %d AND metadata_deleted = 0 ",
-			unique_name, name, field, val);
+	if (deleted_field)
+		g_string_append_printf (where, 
+				"%s = '%s' AND %s = %d AND %s = 0 ",
+				unique_name, name, field, val, deleted_field);
+	else 
+		g_string_append_printf (where,
+				"%s = '%s' AND %s = %d  ",
+				unique_name, name, field, val);
 
 	GValue *value = midgard_core_query_get_field_value (mgd, "id", table, where->str);
         g_string_free (where, TRUE);
@@ -377,6 +386,12 @@ midgard_schema_object_factory_object_undelete (MidgardConnection *mgd, const gch
 		case MGD_OBJECT_ACTION_DELETE:
 			klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME (g_value_get_string ((GValue *)type_value));
 			const gchar *tablename = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS(klass));
+			const gchar *deleted_field = midgard_core_object_get_deleted_field (MIDGARD_DBOBJECT_CLASS (klass));
+			if (!deleted_field) {
+				MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY, 
+						"Object identified by %s guid doesn't provide 'metadata' or 'deleted' property", guid);
+				return FALSE;
+			}
 			/* Update object's metadata */
 	   		sql = g_string_new ("UPDATE ");
 			g_string_append_printf (sql, "%s SET metadata_deleted=0 WHERE guid = '%s'", tablename, guid);

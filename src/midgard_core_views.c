@@ -178,6 +178,8 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 	MgdSchemaPropertyAttr *propright = NULL;
 	MgdSchemaPropertyAttr *propleft = NULL;
 	MidgardDBObjectClass *metadata_klass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (MIDGARD_TYPE_METADATA));
+	MidgardObjectClass *left_klass = NULL;
+	MidgardObjectClass *right_klass = NULL;
 	gchar *left_table = NULL;
 	gchar *right_table = NULL;
 	gchar *left_field = NULL;
@@ -266,6 +268,7 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				left_table = g_strdup (propleft->table ? propleft->table : type->table);
 				left_field = g_strdup (propleft->field);
 			}
+			left_klass = MIDGARD_OBJECT_CLASS (klass);
 			g_strfreev(classprop);	
 
 			/* Get right property attribute */
@@ -297,6 +300,7 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				right_table = g_strdup (propright->table ? propright->table : type->table);
 				right_field = g_strdup (propright->field);
 			}
+			right_klass = MIDGARD_OBJECT_CLASS (klass);
 			g_strfreev(classprop);
 
 			MidgardDBJoin *mdbj = midgard_core_dbjoin_new();
@@ -315,6 +319,9 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 			mdbj->left_field = left_field;
 			mdbj->right_table = right_table;
 			mdbj->right_field = right_field;
+
+			mdbj->left_klass = left_klass;
+			mdbj->right_klass = right_klass;
 
 			g_free(left);
 			g_free(right);
@@ -548,22 +555,39 @@ midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBOb
 	guint i = 0;
 	g_string_append(query, " WHERE ");
 
-	if (!type->joins)
-		g_string_append_printf (query, " %s.metadata_deleted = 0 ", type->table);
+	MidgardDBObjectClass *dbklass = NULL;
+	const gchar *deleted_field = NULL;
+	GSList *dellist = NULL;
+
+	if (!type->joins) {
+		dbklass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (g_type_from_name (type->name)));
+		deleted_field = midgard_core_object_get_deleted_field (dbklass);
+		if (deleted_field)
+			dellist = g_slist_prepend (dellist, 
+					g_strdup_printf ("%s.%s = 0", type->table, deleted_field));
+	}
 
 	for (list = type->joins; list != NULL; list = list->next) {
 		
-		if(i > 0)
-			g_string_append(query, " AND ");
-
 		MidgardDBJoin *join = (MidgardDBJoin *) list->data;
-		g_string_append_printf(query, " %s.metadata_deleted = 0 AND %s.metadata_deleted = 0 ", 
-				join->left_table ? join->left_table : join->left->table, 
-				join->right_table ? join->right_table : join->right->table);
-
-		i++;
+		deleted_field = midgard_core_object_get_deleted_field (MIDGARD_DBOBJECT_CLASS (join->left_klass));
+		if (deleted_field)
+			dellist = g_slist_prepend (dellist, 
+					g_strdup_printf ("%s.%s = 0", join->left_table ? join->left_table : join->left->table, deleted_field));
+		deleted_field = midgard_core_object_get_deleted_field (MIDGARD_DBOBJECT_CLASS (join->right_klass));
+		if (deleted_field)
+			dellist = g_slist_prepend (dellist, 
+					g_strdup_printf ("%s.%s = 0", join->right_table ? join->right_table : join->right->table, deleted_field));
 	}
 
+	if (dellist)
+		dellist = g_slist_reverse (dellist);
+	for (list = dellist; list != NULL; list = list->next) {
+		gchar *dc = (gchar*) list->data;
+		g_string_append_printf (query, " AND %s ", dc);
+		g_free (list->data);
+	}
+	g_slist_free (dellist);
 
 	list = NULL;
 	i = 0;

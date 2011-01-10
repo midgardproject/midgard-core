@@ -1132,7 +1132,11 @@ midgard_query_builder_get_type_name (MidgardQueryBuilder *builder)
  * midgard_query_builder_include_deleted:
  * @builder: #MidgardQueryBuilder instance
  * 
- * Query all objects, deleted and undeleted. 
+ * Query all objects - deleted and undeleted.
+ *
+ * This is valid for a class for which metadata is defined ('deleted' property
+ * of MidgardMetadata class), or class has 'metadata' property installed. 
+ * If none of them is found, this method does nothing.
  */ 
 void 
 midgard_query_builder_include_deleted (MidgardQueryBuilder *builder)

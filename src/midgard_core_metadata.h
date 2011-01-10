@@ -45,6 +45,8 @@
 #define METADATA_PROPERTY_SCHEDULEEND	"schedule_end"
 #define METADATA_PROPERTY_PUBLISHED	"published"
 
+#define METADATA_FIELD_DELETED		"metadata_deleted"
+
 /* Properties setters */
 void	midgard_core_metadata_set_creator		(MidgardMetadata *self, const GValue *creator);
 void	midgard_core_metadata_set_created		(MidgardMetadata *self, const GValue *value);

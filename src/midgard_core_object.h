@@ -265,6 +265,7 @@ gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object);
 gboolean midgard_core_object_prop_up_is_set(MidgardObject *object);
 
 gboolean midgard_core_object_has_dependents(MidgardObject *self, const gchar *classname);
+const gchar *midgard_core_object_get_deleted_field(MidgardDBObjectClass *klass);
 
 /* ACL */
 gboolean midgard_core_object_property_refuse_private (MidgardConnection *self, MgdSchemaTypeAttr *attr, MidgardDBObject *object, const gchar *property);

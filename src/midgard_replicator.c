@@ -409,6 +409,9 @@ midgard_replicator_unserialize (MidgardConnection *mgd, const gchar *xml, gboole
  * <listitem><para>
  * Object identified is deleted (MGD_ERR_OBJECT_DELETED)
  * </para></listitem>
+ * <listitem><para>
+ * Object doesn't provide metadata one (MGD_ERR_NO_METADATA)
+ * </para></listitem>
  * </itemizedlist>
  *
  * Set @force toggle if you want to import object even if it's already imported or deleted.
@@ -427,9 +430,14 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 	MIDGARD_ERRNO_SET(object->dbpriv->mgd, MGD_ERR_OK);
 	gboolean ret_val = FALSE;
 
-	if (guid == NULL || (guid && *guid == '\0')) {
-			
+	if (guid == NULL || (guid && *guid == '\0')) {		
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY_VALUE, "NULL or empty guid");
+		return ret_val;
+	}
+
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
+	if (!metadata) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_NO_METADATA, "Metadata class not available.");
 		return ret_val;
 	}
 
@@ -503,7 +511,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 		GValue dbupdated_timestamp = {0, };
 		g_value_init (&dbupdated_timestamp, MGD_TYPE_TIMESTAMP);
 		
-		MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
+		metadata = MGD_DBOBJECT_METADATA (object);
 
 		/* Compare revised datetimes. We must know if imported 
 		 * object is newer than that one which exists in database */

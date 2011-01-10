@@ -301,17 +301,21 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self)
 }
 
 static void 
-__add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperation *operation)
+__add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperation *operation, MidgardDBObjectClass *dbklass)
 {
 	GSList *l = select->from->targets;
+	const gchar *deleted_field = midgard_core_object_get_deleted_field (dbklass);
 
 	/* We have only one target table, so create one expression and add to top operation */
 	if (g_slist_length (l) == 1) {
 
+		if (!deleted_field)
+			return;
+
 		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
 		expr->value = gda_value_new (G_TYPE_STRING);
-		g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = 0", target->as));
+		g_value_take_string (expr->value, g_strdup_printf ("%s.%s = 0", target->as, deleted_field));
 		operation->operands = g_slist_append (operation->operands, expr);
 
 		return;
@@ -324,6 +328,7 @@ __add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperatio
 	deleted_expr->cond = deleted_operation;
 	operation->operands = g_slist_append (operation->operands, deleted_expr);
 
+	/* FIXME, we do not have own klass list involved in query */
 	/* Add metadata_deleted constraint for each statement's table */
 	for (l = select->from->targets; l != NULL; l = l->next) {
 		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
@@ -438,7 +443,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 
 	/* Exclude deleted */
 	if (MGD_DBCLASS_METADATA_CLASS (klass) && !MIDGARD_QUERY_EXECUTOR (self)->priv->include_deleted)
-		__add_exclude_deleted_constraints (sss, operation);
+		__add_exclude_deleted_constraints (sss, operation, klass);
 
 	/* Add limit, LIMIT x */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->limit > 0) {
@@ -576,7 +581,10 @@ _midgard_query_select_include_deleted (MidgardQuerySelect *self, gboolean toggle
  * By default, #MidgardQuerySelect ignores deleted objects.
  * With this method, you can set deleted objects toggle, so such can be 
  * included in execute results. This method may be called as many times 
- * as needed, to include (@TRUE) or exclude (@FALSE) deleted objects. 
+ * as needed, to include (@TRUE) or exclude (@FALSE) deleted objects.
+ *
+ * This is valid only for those classes which has 'metadata' (of #MidgardMetadata type)
+ * or 'deleted' property installed. 
  *
  * Since: 10.05.1
  */ 

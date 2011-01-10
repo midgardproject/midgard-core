@@ -290,14 +290,15 @@ gchar *midgard_core_qb_get_sql(
 
 	MidgardDBObjectClass *dbklass = g_type_class_peek(builder->priv->type);
 
-	if (dbklass->dbpriv->has_metadata) {
-	
-		if(!builder->priv->include_deleted) {
-	
+	if(!builder->priv->include_deleted) {
+
+		const gchar *deleted_field = midgard_core_object_get_deleted_field (dbklass);	
+		if (deleted_field) {
 			g_string_append(sql, " AND ");
 			g_string_append_printf(sql,
-					" %s.metadata_deleted = 0",
-					builder->priv->schema->table);
+					" %s.%s = 0",
+					builder->priv->schema->table, 
+					deleted_field);
 		}
 	}
 
@@ -359,8 +360,7 @@ static void __join_reference(MidgardQueryBuilder *builder, const gchar *src_tabl
 	MidgardCoreQueryConstraint *dc = midgard_core_query_constraint_new();
 	GString *dstr = g_string_new("");
 	g_string_append_printf(dstr,"%s.metadata_deleted = 0", ref_table);
-	dc->priv->condition = g_strdup(dstr->str);
-	g_string_free(dstr, TRUE);
+	dc->priv->condition = g_string_free(dstr, FALSE);
 	
 	midgard_core_qb_add_constraint(builder,dc);
 	

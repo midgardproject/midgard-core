@@ -857,3 +857,26 @@ midgard_core_object_property_refuse_private (MidgardConnection *mgd, MgdSchemaTy
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_ACCESS_DENIED);
 	return TRUE;
 }
+
+/* Returns field name of 'deleted' property or NULL if none is defined */
+const gchar*
+midgard_core_object_get_deleted_field(MidgardDBObjectClass *dbklass)
+{
+	g_return_val_if_fail (dbklass != NULL, NULL);
+
+	GParamSpec *pspec = NULL;
+	MidgardMetadataClass *mklass = MGD_DBCLASS_METADATA_CLASS (dbklass);
+
+	if (mklass == NULL) {
+		pspec = g_object_class_find_property (G_OBJECT_CLASS (dbklass), METADATA_PROPERTY_DELETED);
+		if (pspec)
+			midgard_core_class_get_property_colname (dbklass, METADATA_PROPERTY_DELETED);
+		return NULL;
+	}
+
+	pspec = g_object_class_find_property (G_OBJECT_CLASS (mklass), METADATA_PROPERTY_DELETED);
+	if (pspec)
+		return METADATA_FIELD_DELETED;
+
+	return NULL;
+}
