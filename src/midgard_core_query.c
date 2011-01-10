@@ -2121,7 +2121,11 @@ gboolean midgard_core_query_update_class_storage(MidgardConnection *mgd, Midgard
 	gchar **spltd;	
 
 	for (i = 0; i < n_prop; i++) {
-	
+
+		/* Ignore properties of object type */
+		if (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_OBJECT)
+			continue;
+
 		nick = midgard_core_class_get_property_tablefield
 			(MIDGARD_DBOBJECT_CLASS(klass), pspecs[i]->name);
 
