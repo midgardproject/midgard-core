@@ -82,7 +82,11 @@ namespace MidgardCR
 	 */ 
 	public interface QueryExecutor : Executable {
 
+		/* properties */
+		public abstract uint resultscount { get; }
+
 		public abstract void set_constraint (QueryConstraintSimple constraint);
+		public abstract unowned QueryConstraintSimple get_constraint ();
 		public abstract void set_limit (uint limit);
 		public abstract void set_offset (uint offset);
 		public abstract void add_order (QueryProperty property, string type);
