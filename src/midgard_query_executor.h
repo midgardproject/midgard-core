@@ -51,6 +51,14 @@ struct _MidgardQueryExecutorClass {
 								MidgardQueryProperty *left_property, MidgardQueryProperty *right_property);
 	gboolean	(*execute)			(MidgardQueryExecutor *self);
 	guint 		(*get_results_count)		(MidgardQueryExecutor *self);
+
+	/* signals */
+	void            (*execution_start)      (GObject *object);
+	void            (*execution_end)        (GObject *object);
+
+	/* signals IDs */
+	guint           signal_id_execution_start;
+	guint           signal_id_execution_end;
 };
 
 struct _MidgardQueryExecutor {

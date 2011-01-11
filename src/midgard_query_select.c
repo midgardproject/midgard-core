@@ -383,6 +383,8 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 
 	g_object_ref (self);
 
+	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_start, 0);
+
 	MidgardConnection *mgd = self->priv->mgd;
 	GdaConnection *cnc = mgd->priv->connection;
 	GdaSqlStatement *sql_stm;
@@ -505,13 +507,15 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	MIDGARD_QUERY_EXECUTOR (self)->priv->resultset = (gpointer) model;
 	g_object_unref (self);
 	
+	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
 	return TRUE;
 
 return_false:
 	if (sql_stm)
 		gda_sql_statement_free (sql_stm);
-	g_object_unref (self);
 
+	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
+	g_object_unref (self);
 	return FALSE;
 }
 
