@@ -223,8 +223,14 @@ guint *_midgard_tree_ids(MidgardConnection *mgd,
 	const gchar *classname = G_OBJECT_CLASS_NAME (klass);
 	pprop = midgard_reflector_object_get_property_parent(classname);
 
-	if(pprop == NULL)
+	if(pprop == NULL) {
 		pprop = MGD_DBCLASS_PROPERTY_UP (klass);
+	} else {
+		MidgardReflectorProperty *mrp = midgard_reflector_property_new (classname);
+		const MidgardDBObjectClass *dbklass = midgard_reflector_property_get_link_class (mrp, pprop);
+		g_object_unref (mrp);
+		return _midgard_tree_ids (mgd, MIDGARD_OBJECT_CLASS (dbklass), startid);
+	}
 
 	pcol = midgard_core_class_get_property_colname(MIDGARD_DBOBJECT_CLASS(klass), pprop);
 
@@ -249,6 +255,12 @@ guint *_midgard_tree_ids(MidgardConnection *mgd,
 	g_list_free(idlist);
 
 	return treeid;
+}
+
+guint*
+midgard_core_query_get_tree_ids (MidgardConnection *mgd, MidgardObjectClass *klass, guint tid)
+{
+	return _midgard_tree_ids (mgd, klass, tid);
 }
 
 /**

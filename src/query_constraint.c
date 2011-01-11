@@ -23,6 +23,7 @@
 #include "midgard_core_query_builder.h"
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
+#include "midgard_core_query.h"
 #include <libgda/libgda.h>
 
 static void add_sql(MidgardCoreQueryConstraint *constraint, GString *sql) {
@@ -309,7 +310,9 @@ gboolean midgard_core_query_constraint_build_condition(
 {
 	g_assert(constraint != NULL);
 	
-	GdaConnection *cnc = constraint->priv->builder->priv->mgd->priv->connection;
+	MidgardQueryBuilder *builder = constraint->priv->builder;
+	MidgardConnection *mgd = builder->priv->mgd;
+	GdaConnection *cnc = mgd->priv->connection;
 	gchar *q_table = NULL;
 	gchar *q_field = NULL;
 	guint i;
@@ -402,13 +405,8 @@ gboolean midgard_core_query_constraint_build_condition(
 		if(G_VALUE_HOLDS(value, G_TYPE_INT))
 			tid = (guint)g_value_get_int(value);
 		
-		guint *prnts = NULL;
-		/* FIXME 
-		guint *prnts = _midgard_tree_ids(
-				MIDGARD_CONNECTION(constraint->priv->builder->priv->mgd),
-				MIDGARD_OBJECT_CLASS(parent_class),
-				tid);
-				*/
+		guint *prnts = midgard_core_query_get_tree_ids(mgd, MIDGARD_OBJECT_CLASS (constraint->priv->klass), tid);
+
 		g_string_append_c(cond, '(');
 		if(prnts) {
 			
@@ -421,7 +419,7 @@ gboolean midgard_core_query_constraint_build_condition(
 						"%d", prnts[i]);
 				i++;
 				
-			} while (prnts[i]);
+			} while (prnts[i] != -1);
 	
 			g_free(prnts);
 

@@ -229,6 +229,11 @@ guint midgard_core_query_get_id(
 			const gchar *table,
 			const gchar *guid);
 
+guint* midgard_core_query_get_tree_ids(
+			MidgardConnection *mgd,
+			MidgardObjectClass *klass,
+			guint tid);
+
 gint midgard_core_query_insert_records(
 			MidgardConnection *mgd,
 			const gchar *table, 
