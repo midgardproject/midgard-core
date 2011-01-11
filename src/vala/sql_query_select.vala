@@ -45,6 +45,10 @@ namespace MidgardCR
 			set { this._readonly = value; }
 		}
 
+		public uint resultscount {
+			get { return this.get_results_count (); }
+		}
+
 		private void _create_core_query_select () {
 			if (this._core_query_select == null)
 				this._core_query_select = (MidgardCRCore.QuerySelect) MidgardCRCore.QuerySelect.create_static (this._storage_manager, (MidgardCRCore.QueryStorage) this._query_storage._core_query_storage);

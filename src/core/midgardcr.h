@@ -870,11 +870,13 @@ typedef enum  {
 struct _MidgardCRQueryExecutorIface {
 	GTypeInterface parent_iface;
 	void (*set_constraint) (MidgardCRQueryExecutor* self, MidgardCRQueryConstraintSimple* constraint);
+	MidgardCRQueryConstraintSimple* (*get_constraint) (MidgardCRQueryExecutor* self);
 	void (*set_limit) (MidgardCRQueryExecutor* self, guint limit);
 	void (*set_offset) (MidgardCRQueryExecutor* self, guint offset);
 	void (*add_order) (MidgardCRQueryExecutor* self, MidgardCRQueryProperty* property, const char* type);
 	guint (*get_results_count) (MidgardCRQueryExecutor* self);
 	void (*validate) (MidgardCRQueryExecutor* self, GError** error);
+	guint (*get_resultscount) (MidgardCRQueryExecutor* self);
 };
 
 struct _MidgardCRStorableIface {
@@ -1731,11 +1733,13 @@ void midgard_cr_query_value_holder_set_value (MidgardCRQueryValueHolder* self, G
 GQuark midgard_cr_validation_error_quark (void);
 GType midgard_cr_query_executor_get_type (void) G_GNUC_CONST;
 void midgard_cr_query_executor_set_constraint (MidgardCRQueryExecutor* self, MidgardCRQueryConstraintSimple* constraint);
+MidgardCRQueryConstraintSimple* midgard_cr_query_executor_get_constraint (MidgardCRQueryExecutor* self);
 void midgard_cr_query_executor_set_limit (MidgardCRQueryExecutor* self, guint limit);
 void midgard_cr_query_executor_set_offset (MidgardCRQueryExecutor* self, guint offset);
 void midgard_cr_query_executor_add_order (MidgardCRQueryExecutor* self, MidgardCRQueryProperty* property, const char* type);
 guint midgard_cr_query_executor_get_results_count (MidgardCRQueryExecutor* self);
 void midgard_cr_query_executor_validate (MidgardCRQueryExecutor* self, GError** error);
+guint midgard_cr_query_executor_get_resultscount (MidgardCRQueryExecutor* self);
 GType midgard_cr_storable_get_type (void) G_GNUC_CONST;
 GType midgard_cr_query_select_get_type (void) G_GNUC_CONST;
 void midgard_cr_query_select_add_join (MidgardCRQuerySelect* self, const char* type, MidgardCRQueryProperty* left_property, MidgardCRQueryProperty* right_property);
