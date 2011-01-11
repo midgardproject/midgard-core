@@ -21,7 +21,8 @@
 
 /* MidgardQueryExecutor properties */
 enum {
-	PROPERTY_RESULTS_COUNT = 1
+	PROPERTY_RESULTS_COUNT = 1,
+	PROPERTY_CONSTRAINT
 };
 
 MidgardQueryExecutor *
@@ -228,6 +229,10 @@ _midgard_query_executor_get_property (GObject *object, guint property_id,
 			g_value_set_uint (value, self->priv->results_count);
 			break;
 
+		case PROPERTY_CONSTRAINT:
+			g_value_take_object(value, self->priv->constraint);
+			break;
+
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(self, property_id, pspec);
 			break;
@@ -272,8 +277,24 @@ _midgard_query_executor_class_init (MidgardQueryExecutorClass *klass, gpointer c
 	GParamSpec *pspec = g_param_spec_uint ("resultscount",
 			"Number of objects.", "",
 			0, G_MAXUINT32, 0, G_PARAM_READABLE);
-	g_object_class_install_property (object_class,
-			PROPERTY_RESULTS_COUNT, pspec);
+
+	/**
+	 * MidgardQueryExecutor:resultscount
+	 *
+	 * Number of records matched in query.
+	 */ 
+	g_object_class_install_property (object_class, PROPERTY_RESULTS_COUNT, pspec);
+
+	pspec = g_param_spec_object ("constraint",
+			"", "",
+			MIDGARD_TYPE_QUERY_CONSTRAINT_SIMPLE,
+			G_PARAM_READABLE);
+	/**
+	 * MidgardQueryExecutor:constraint:
+	 * 
+	 * Constraint object which has been set to given executor instance
+	 */
+	g_object_class_install_property (object_class, PROPERTY_CONSTRAINT, pspec);
 
 	/* Nullify virtual methods pointers */
 	klass->set_constraint = NULL;
