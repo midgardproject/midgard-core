@@ -2455,6 +2455,17 @@ gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents
 		return FALSE;
 	}
 
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
+	const gchar *deleted_field = midgard_core_object_get_deleted_field (MIDGARD_DBOBJECT_CLASS (MIDGARD_OBJECT_GET_CLASS (object)));
+	
+	if (!metadata && !deleted_field) {
+		midgard_set_error(MGD_OBJECT_CNC(object),
+				MGD_GENERIC_ERROR,
+				MGD_ERR_INVALID_PROPERTY_VALUE, 
+				"Object has neither metadata nor deleted property installed");
+		return FALSE;
+	}
+
 	const gchar *guid = MGD_OBJECT_GUID(object);
 	
 	if (!guid){
@@ -2479,17 +2490,6 @@ gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
 	if (person)
 		person_guid = (gchar *)MGD_OBJECT_GUID(person);
-
-	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
-	const gchar *deleted_field = midgard_core_object_get_deleted_field (MIDGARD_DBOBJECT_CLASS (MIDGARD_OBJECT_GET_CLASS (object)));
-	
-	if (!metadata && !deleted_field) {
-		midgard_set_error(MGD_OBJECT_CNC(object),
-				MGD_GENERIC_ERROR,
-				MGD_ERR_INVALID_PROPERTY_VALUE, 
-				"Object has neither metadata nor deleted property installed");
-		return FALSE;
-	}
 
 	GValue tval = {0, };
 	gchar *timeupdated = NULL;
