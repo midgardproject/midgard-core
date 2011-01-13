@@ -714,6 +714,17 @@ typedef struct _MidgardCRRDFSQLModelManager MidgardCRRDFSQLModelManager;
 typedef struct _MidgardCRRDFSQLModelManagerClass MidgardCRRDFSQLModelManagerClass;
 typedef struct _MidgardCRRDFSQLModelManagerPrivate MidgardCRRDFSQLModelManagerPrivate;
 
+#define MIDGARD_CR_TYPE_RDFSQL_OBJECT_MANAGER (midgard_cr_rdfsql_object_manager_get_type ())
+#define MIDGARD_CR_RDFSQL_OBJECT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDFSQL_OBJECT_MANAGER, MidgardCRRDFSQLObjectManager))
+#define MIDGARD_CR_RDFSQL_OBJECT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDFSQL_OBJECT_MANAGER, MidgardCRRDFSQLObjectManagerClass))
+#define MIDGARD_CR_IS_RDFSQL_OBJECT_MANAGER(obj) (G_TYPE_CHECK_INSTANCE_TYPE ((obj), MIDGARD_CR_TYPE_RDFSQL_OBJECT_MANAGER))
+#define MIDGARD_CR_IS_RDFSQL_OBJECT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), MIDGARD_CR_TYPE_RDFSQL_OBJECT_MANAGER))
+#define MIDGARD_CR_RDFSQL_OBJECT_MANAGER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_CR_TYPE_RDFSQL_OBJECT_MANAGER, MidgardCRRDFSQLObjectManagerClass))
+
+typedef struct _MidgardCRRDFSQLObjectManager MidgardCRRDFSQLObjectManager;
+typedef struct _MidgardCRRDFSQLObjectManagerClass MidgardCRRDFSQLObjectManagerClass;
+typedef struct _MidgardCRRDFSQLObjectManagerPrivate MidgardCRRDFSQLObjectManagerPrivate;
+
 #define MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT (midgard_cr_rdfsql_query_select_get_type ())
 #define MIDGARD_CR_RDFSQL_QUERY_SELECT(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT, MidgardCRRDFSQLQuerySelect))
 #define MIDGARD_CR_RDFSQL_QUERY_SELECT_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_CR_TYPE_RDFSQL_QUERY_SELECT, MidgardCRRDFSQLQuerySelectClass))
@@ -977,6 +988,7 @@ struct _MidgardCRObjectPropertyModelClass {
 	GObjectClass parent_class;
 	MidgardCRModel* (*add_model) (MidgardCRObjectPropertyModel* self, MidgardCRModel* model);
 	MidgardCRModel* (*get_model_by_name) (MidgardCRObjectPropertyModel* self, const char* name);
+	void (*is_valid) (MidgardCRObjectPropertyModel* self, GError** error);
 };
 
 struct _MidgardCRObjectPropertyString {
@@ -1111,6 +1123,7 @@ struct _MidgardCRRepositoryObject {
 	char* _guid;
 	gint _id;
 	MidgardCRMetadata* _metadata;
+	char* _identifier;
 	GList* _ns_properties_list;
 	GList* _ns_values_list;
 };
@@ -1537,7 +1550,6 @@ struct _MidgardCRSQLTransactionClass {
 struct _MidgardCRRDFGenericObject {
 	MidgardCRRepositoryObject parent_instance;
 	MidgardCRRDFGenericObjectPrivate * priv;
-	char* _identifier;
 	char* _classname;
 	MidgardCRRepositoryObject** _triples;
 	gint _triples_length1;
@@ -1598,6 +1610,16 @@ struct _MidgardCRRDFSQLModelManager {
 
 struct _MidgardCRRDFSQLModelManagerClass {
 	MidgardCRSQLModelManagerClass parent_class;
+};
+
+struct _MidgardCRRDFSQLObjectManager {
+	MidgardCRObjectManager parent_instance;
+	MidgardCRRDFSQLObjectManagerPrivate * priv;
+	MidgardCRRDFSQLStorageManager* _storage_manager;
+};
+
+struct _MidgardCRRDFSQLObjectManagerClass {
+	MidgardCRObjectManagerClass parent_class;
 };
 
 struct _MidgardCRRDFSQLQuerySelect {
@@ -1797,6 +1819,7 @@ MidgardCRObjectPropertyModel* midgard_cr_object_property_model_new (const char* 
 MidgardCRObjectPropertyModel* midgard_cr_object_property_model_construct (GType object_type, const char* name, const char* type, const char* dvalue);
 MidgardCRModel* midgard_cr_object_property_model_add_model (MidgardCRObjectPropertyModel* self, MidgardCRModel* model);
 MidgardCRModel* midgard_cr_object_property_model_get_model_by_name (MidgardCRObjectPropertyModel* self, const char* name);
+void midgard_cr_object_property_model_is_valid (MidgardCRObjectPropertyModel* self, GError** error);
 const char* midgard_cr_object_property_model_get_classname (MidgardCRObjectPropertyModel* self);
 GType midgard_cr_object_property_string_get_type (void) G_GNUC_CONST;
 MidgardCRObjectPropertyString* midgard_cr_object_property_string_new (const char* name, const char* dvalue, const char* namespace);
@@ -1848,6 +1871,8 @@ char** midgard_cr_repository_object_list_all_properties (MidgardCRRepositoryObje
 MidgardCRRepositoryObject* midgard_cr_repository_object_construct (GType object_type);
 const char* midgard_cr_repository_object_get_guid (MidgardCRRepositoryObject* self);
 guint midgard_cr_repository_object_get_id (MidgardCRRepositoryObject* self);
+const char* midgard_cr_repository_object_get_identifier (MidgardCRRepositoryObject* self);
+void midgard_cr_repository_object_set_identifier (MidgardCRRepositoryObject* self, const char* value);
 MidgardCRMetadata* midgard_cr_repository_object_get_metadata (MidgardCRRepositoryObject* self);
 GType midgard_cr_storage_object_get_type (void) G_GNUC_CONST;
 MidgardCRStorageObject* midgard_cr_storage_object_construct (GType object_type);
@@ -2066,10 +2091,17 @@ GType midgard_cr_rdfsql_storage_manager_get_type (void) G_GNUC_CONST;
 MidgardCRRDFSQLStorageManager* midgard_cr_rdfsql_storage_manager_new (const char* name, MidgardCRConfig* config, GError** error);
 MidgardCRRDFSQLStorageManager* midgard_cr_rdfsql_storage_manager_construct (GType object_type, const char* name, MidgardCRConfig* config, GError** error);
 MidgardCRStorageContentManager* midgard_cr_rdfsql_storage_manager_get_content_manager (MidgardCRRDFSQLStorageManager* self);
+MidgardCRStorageModelManager* midgard_cr_rdfsql_storage_manager_get_model_manager (MidgardCRRDFSQLStorageManager* self);
 GType midgard_cr_rdfsql_content_manager_get_type (void) G_GNUC_CONST;
 MidgardCRRDFSQLContentManager* midgard_cr_rdfsql_content_manager_new (MidgardCRSQLStorageManager* manager);
 MidgardCRRDFSQLContentManager* midgard_cr_rdfsql_content_manager_construct (GType object_type, MidgardCRSQLStorageManager* manager);
 GType midgard_cr_rdfsql_model_manager_get_type (void) G_GNUC_CONST;
+MidgardCRRDFSQLModelManager* midgard_cr_rdfsql_model_manager_new (MidgardCRRDFSQLStorageManager* manager);
+MidgardCRRDFSQLModelManager* midgard_cr_rdfsql_model_manager_construct (GType object_type, MidgardCRRDFSQLStorageManager* manager);
+GType midgard_cr_rdfsql_object_manager_get_type (void) G_GNUC_CONST;
+MidgardCRRDFSQLObjectManager* midgard_cr_rdfsql_object_manager_new (MidgardCRRDFSQLStorageManager* storage);
+MidgardCRRDFSQLObjectManager* midgard_cr_rdfsql_object_manager_construct (GType object_type, MidgardCRRDFSQLStorageManager* storage);
+MidgardCRStorageManager* midgard_cr_rdfsql_object_manager_get_storagemanager (MidgardCRRDFSQLObjectManager* self);
 GType midgard_cr_rdfsql_query_select_get_type (void) G_GNUC_CONST;
 GType midgard_cr_rdfsql_query_storage_get_type (void) G_GNUC_CONST;
 MidgardCRRDFSQLQuerySelect* midgard_cr_rdfsql_query_select_new (MidgardCRStorageManager* manager, MidgardCRRDFSQLQueryStorage* storage);
@@ -2084,6 +2116,7 @@ MidgardCRStorageManager* midgard_cr_rdfsql_query_manager_get_storage_manager (Mi
 GType midgard_cr_rdfsql_namespace_manager_get_type (void) G_GNUC_CONST;
 MidgardCRRDFSQLNamespaceManager* midgard_cr_rdfsql_namespace_manager_new (MidgardCRRDFSQLContentManager* manager);
 MidgardCRRDFSQLNamespaceManager* midgard_cr_rdfsql_namespace_manager_construct (GType object_type, MidgardCRRDFSQLContentManager* manager);
+gboolean midgard_cr_rdfsql_namespace_manager_is_prefix (MidgardCRRDFSQLNamespaceManager* self, const char* id);
 char* midgard_cr_rdfsql_namespace_manager_decode (MidgardCRRDFSQLNamespaceManager* self, const char* id);
 
 
