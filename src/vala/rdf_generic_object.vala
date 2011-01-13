@@ -21,19 +21,19 @@ namespace MidgardCR {
 	public class RDFGenericObject : RepositoryObject {
 
 		/* internal properties */
-		internal string _identifier = null;
+		private string _rdf_identifier = null;
 		internal string _classname = null;
 		internal RepositoryObject[]? _triples = null;
 
 		/* properties */
 		
-		public string identifier {
+		public new string identifier {
 			get {
-				if (this._identifier == null) {
-					this._identifier = "midgard:guid:" + this.guid;
+				if (this._rdf_identifier == null) {
+					this._rdf_identifier = "midgard:guid:" + this.guid;
 				}
 
-				return this._identifier;
+				return this._rdf_identifier;
 			}
 			set { this._identifier = value; } /* TODO: do we need to "denamespace" this? */
 		}
