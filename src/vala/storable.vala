@@ -86,6 +86,7 @@ namespace MidgardCR {
 		internal string _guid = null;
 		internal int _id = 0;
 		internal Metadata _metadata = null;	
+		internal string _identifier = null;
 		internal GLib.List<string> _ns_properties_list = null;
 		internal GLib.List<GLib.Value?> _ns_values_list = null;
 
@@ -116,6 +117,14 @@ namespace MidgardCR {
 		 */ 
 		public uint id { 
 			get { return this._id; }
+		}
+
+		/**
+		 * Application specific free form string identifier of the object.
+		 */
+		public string? identifier {
+			get { return this._identifier; }
+			set { this._identifier = value; }
 		}
 
 		public Metadata? metadata { 
