@@ -448,12 +448,13 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError 
 	}
 
 	GError *err = NULL;
-	GObjectClass *klass = g_type_class_peek (g_type_from_name (self->priv->storage->priv->classname));
-	/* if (!klass->dbpriv->add_fields_to_select_statement) {
-		// FIXME, handle error 
-		g_warning ("Missed private DBObjectClass' fields to statement helper");
+	const gchar *classname = self->priv->storage->priv->classname;
+	GObjectClass *klass = g_type_class_peek (g_type_from_name (classname));
+	if (!klass) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"SQL query execution failed. %s is not registered class", classname);
 		return FALSE;
-	} */
+	}	
 
 	g_object_ref (self);
 
@@ -463,6 +464,12 @@ _midgard_cr_core_query_select_execute (MidgardCRCoreQueryExecutor *self, GError 
 		(MidgardCRSQLModelManager *) midgard_cr_storage_manager_get_model_manager (MIDGARD_CR_STORAGE_MANAGER (mgd));
 	MidgardCRSQLTableModel *table_model =
 	       	midgard_cr_core_query_find_table_model_by_name (mgd, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (klass)));
+	if (!table_model) {
+		*error = g_error_new (MIDGARD_CR_EXECUTABLE_ERROR, MIDGARD_CR_EXECUTABLE_ERROR_INTERNAL,
+				"SQL query execution failed. SQLTableModel for %s (%s) class not found", classname, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (klass)));
+		g_object_unref (self);
+		return FALSE;
+	}	
 	GdaConnection *cnc = (GdaConnection *) mgd->_cnc;
 	GdaSqlParser *parser = (GdaSqlParser *) mgd->_parser;
 	GdaSqlStatement *sql_stm;
