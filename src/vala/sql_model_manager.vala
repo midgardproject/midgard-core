@@ -64,8 +64,19 @@ namespace MidgardCR {
 		 */
 		public StorageManager storagemanager   { 
 			get { return (StorageManager)this._storage_manager; }
-			construct { this._storage_manager = (SQLStorageManager) value; } 
+			construct { 
+				this._storage_manager = (SQLStorageManager) value; 
+				this._object_models = this._storage_manager._object_models;
+				this._storage_models = this._storage_manager._storage_models;
+				} 
 		} 		
+
+		/**
+		 * Create new SQLModelManager instance
+		 */
+		public SQLModelManager (SQLStorageManager storage) {
+			Object (storagemanager: storage);
+		}
 	
 		/* Model methods */
 		/**
@@ -100,7 +111,7 @@ namespace MidgardCR {
 			if (models == null)
 				return null;
 
-			foreach (unowned Model model in models) {
+			foreach (unowned Model model in models) {	
 				if (model.name == name)
 					return model;
 			}
@@ -158,10 +169,9 @@ namespace MidgardCR {
 
 		/**
 		 * Prepares create operation for all associated models.
-		 * Valid SQL query (or prepared statement) is generated 
-		 * in this method, so every model added after this method 
-		 * call will be ignored and none of its data will be included in 
-		 * executed query.
+		 * Valid SQL query (or prepared statement) is generated in this method.
+		 * Every model added after this method call will be ignored and none 
+		 * of its data will be included in executed query.
 		 */
 		public virtual void prepare_create () throws ValidationError {
 			this.is_valid ();
@@ -182,7 +192,7 @@ namespace MidgardCR {
 				} else if (model is ObjectModel) {
 					/* FIXME, Any ReferenceObject should not be added to model manager */
 					if (model is ObjectModelReference)
-						continue;
+						continue;					
 					string query = MidgardCRCore.StorageSQL.create_query_insert (
 						model, 
 						this._storage_manager._object_model_object_model, 
@@ -218,7 +228,7 @@ namespace MidgardCR {
 					break;
 				}
 			}
-			if (!found)
+			if (found)
 				throw new MidgardCR.ValidationError.NAME_INVALID ("No entry in schema or storage table found for given %s ", invalid_name); 
 		}
 

@@ -30,7 +30,7 @@ namespace MidgardCR {
 		 * Creates new RDFSQLModelManager for given storage manager.
 		 */
 		public RDFSQLModelManager (RDFSQLStorageManager manager) {
-			Object (storagemanager: manager);
+			base (manager);
 		}
 	
 		/* Model methods */
