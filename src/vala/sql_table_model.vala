@@ -191,7 +191,7 @@ namespace MidgardCR {
 
 		/* StorageExecutor methods */
 		public bool exists () {
-			return false;
+			return MidgardCRCore.SQLStorageManager.table_exists (this._storage_manager, this);;
 		} 
 		
                 public void prepare_create () throws ValidationError {
