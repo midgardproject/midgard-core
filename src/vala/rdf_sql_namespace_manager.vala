@@ -23,9 +23,84 @@ namespace MidgardCR {
 		private RDFSQLContentManager _content_manager = null;
 
 		/* constructor */
+
+		/** 
+		 * Initizalize new rdf {@link NamespaceManager} for given content manager.
+		 */
 		public RDFSQLNamespaceManager (RDFSQLContentManager manager) {
 			Object ();
 			this._content_manager = manager;
+		}
+
+		/**
+		 * Check whether string is known prefix
+		 *
+		 * Checks, if the given string is a valid prefix, or holds valid prefix.
+		 * For example, these both strings are valid for this method: 'foaf' and 'foaf:name'.
+		 */
+		public bool is_prefix (string id) {
+			if (this.get_prefix (id) == null)
+				return false;
+			return true;
+		}
+
+		/**
+		 * Get known prefix form string
+		 */
+		public string? get_prefix (string id) {
+			/* registered name */
+			if (this.name_exists (id) == true)
+				return id.dup ();
+
+			/* uri */
+			if ("/" in id)	
+				return null;
+
+			/* prefix */
+			if (":" in id) {
+				string[] spltd = id.split (":");
+				if (this.name_exists (spltd[0]) == true)
+					return spltd[0].dup ();	
+			}
+			return null;
+		}
+
+		/**
+		 * Check whether string is known uri
+		 */
+		public bool is_uri (string id) {
+			if (this.get_uri (id) == null)
+				return false;
+			return true;		
+		}	
+
+		/** 
+		 * Get known uri from string 
+		 */
+		public string? get_uri (string id) {
+			/* registered identifier */
+			if (this.identifier_exists (id) == true)
+				return id.dup ();
+			
+			/* uri '#' terminating */
+			if ("#" in id) {
+				string[] spltd = id.split ("#");
+				if (spltd[0] != null)
+					if (this.identifier_exists (spltd[0]));
+						return spltd[0] + "#";
+			}
+
+			/* prefix or unknown string */
+			if (!("/" in id))
+				return null;
+
+			/* check uri */
+			string rs = id.rstr ("/");
+			string uri = id.substring (0, (id.length - rs.length) + 1);
+			if (this.identifier_exists (uri) == true)
+				return uri;
+			
+			return null;			
 		}
 
 		/**
