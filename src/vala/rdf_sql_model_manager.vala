@@ -29,7 +29,7 @@ namespace MidgardCR {
 		/**
 		 * Creates new RDFSQLModelManager for given storage manager.
 		 */
-		RDFSQLModelManager (RDFSQLStorageManager manager) {
+		public RDFSQLModelManager (RDFSQLStorageManager manager) {
 			Object (storagemanager: manager);
 		}
 	
@@ -42,7 +42,7 @@ namespace MidgardCR {
                  * @return {@link Model} instance (self reference)
                  */
 		public override Model add_model (Model model) {
-			if (model is RDFMapperObject)
+			if (model is RDFMapperObject) 
 				this._mapper_objects += (RDFMapperObject) model;
 			else 
 				base.add_model (model);
