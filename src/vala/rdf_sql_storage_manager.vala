@@ -29,6 +29,7 @@ namespace MidgardCR {
 		/* internal properties */
 		internal ObjectModel _rdf_object_model = null;
 		internal SQLTableModel _rdf_table_model = null;
+		private RDFSQLModelManager _model_manager = null;
 
 		/* public properties */
 
@@ -43,6 +44,17 @@ namespace MidgardCR {
 			}
 		}
 
+		/**
+		 * {@link RDFSQLModelManager} model manager
+		 */
+		public new unowned StorageModelManager model_manager {
+			get { 
+				if (this._model_manager == null)
+					this._model_manager = new RDFSQLModelManager (this);
+				return (StorageModelManager) this._model_manager;
+			}
+		}
+
 		/* Constructor */
 		public RDFSQLStorageManager (string name, Config config) throws StorageManagerError {
 			/* chain up to parent constructor */
@@ -50,8 +62,7 @@ namespace MidgardCR {
 			
 			/* initialize generic RDF object and table models */ 
 			this._rdf_object_model = new ObjectModel ("RDFTripleObject");
-			this._rdf_object_model
-				.add_model (new ObjectPropertyModel ("identifier", "string", ""))
+			this._rdf_object_model	
 				.add_model (new ObjectPropertyModel ("classname", "string", ""))
 				.add_model (new ObjectPropertyModel ("objectguid", "guid", ""))
 				.add_model (new ObjectPropertyModel ("property", "string", ""))
@@ -61,7 +72,6 @@ namespace MidgardCR {
 
 			this._rdf_table_model = new SQLTableModel ((SQLStorageManager) this, "RDFTripleObject", "rdf_triple_object");
 			this._rdf_table_model
-				.add_model (new SQLColumnModel ((SQLStorageManager) this, "identifier", "identifier", "string"))
 				.add_model (new SQLColumnModel ((SQLStorageManager) this, "classname", "class_name", "string"))
 				.add_model (new SQLColumnModel ((SQLStorageManager) this, "objectguid", "object_guid", "guid"))
 				.add_model (new SQLColumnModel ((SQLStorageManager) this, "property", "property_name", "string"))
