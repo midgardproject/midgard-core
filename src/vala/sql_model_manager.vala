@@ -63,7 +63,8 @@ namespace MidgardCR {
 		 * {@link StorageManager}
 		 */
 		public StorageManager storagemanager   { 
-			get { return (StorageManager)this._storage_manager; } 
+			get { return (StorageManager)this._storage_manager; }
+			construct { this._storage_manager = (SQLStorageManager) value; } 
 		} 		
 	
 		/* Model methods */
