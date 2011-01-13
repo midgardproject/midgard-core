@@ -60,5 +60,17 @@ namespace MidgardCR {
 		public RDFMapperProperty (string rdfs_property, string property_name) {
 			Object (name: rdfs_property, propertyname: property_name);
 		}
+
+		/**
+		 * Validate model
+		 *
+		 * Validation is done against Model's name and propertyname which can not be null.
+		 */
+		public override void is_valid () throws ValidationError {
+			if (this.name == null)
+				throw new ValidationError.NAME_INVALID ("NULL name set for model");
+			if (this.propertyname == null)
+				throw new ValidationError.NAME_INVALID ("NULL property set for model");			
+		}
 	}
 }

@@ -251,7 +251,7 @@ namespace MidgardCR {
 		 *    a. more than one model associated
 		 *    a. associated ObjectPropertyModel model has no parent model
 		 */
-		public void is_valid () throws ValidationError { 
+		public virtual void is_valid () throws ValidationError { 
 			/* type id or name is empty thus invalid */
 			if ((this.valuetypename == null)
 				|| (this.valuetypename == ""))
