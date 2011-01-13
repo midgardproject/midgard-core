@@ -379,7 +379,8 @@ namespace MidgardCR {
 			/* Create column or alter table */
 			if (this._create_column) {
 				execution_start ();
-				MidgardCRCore.SQLStorageManager.column_create (this._storage_manager, this);
+				if (this.exists () == false)
+					MidgardCRCore.SQLStorageManager.column_create (this._storage_manager, this);
 				execution_end ();
 			}
 			if (this._update_column) {
