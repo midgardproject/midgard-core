@@ -30,6 +30,7 @@ namespace MidgardCR {
 		internal ObjectModel _rdf_object_model = null;
 		internal SQLTableModel _rdf_table_model = null;
 		private RDFSQLModelManager _model_manager = null;
+		private RDFSQLObjectManager _object_manager = null;
 
 		/* public properties */
 
@@ -54,6 +55,17 @@ namespace MidgardCR {
 				return (StorageModelManager) this._model_manager;
 			}
 		}
+
+		/**
+		 * {@link RDFSQLObjectManager} object manager
+		 */
+		public new unowned ObjectManager object_manager {
+			get {
+				if (this._object_manager == null)
+					this._object_manager = new RDFSQLObjectManager (this);
+				return (ObjectManager) this._object_manager;
+			}
+		} 
 
 		/* Constructor */
 		public RDFSQLStorageManager (string name, Config config) throws StorageManagerError {
