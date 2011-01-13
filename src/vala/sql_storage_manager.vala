@@ -96,12 +96,8 @@ namespace MidgardCR {
 
 		public unowned StorageModelManager model_manager {
 			get { 
-				if (this._model_manager == null) {
-					this._model_manager = new MidgardCR.SQLModelManager ();	
-					this._model_manager._storage_manager = this;
-					this._model_manager._object_models = this._object_models;
-					this._model_manager._storage_models = this._storage_models;
-				}
+				if (this._model_manager == null) 
+					this._model_manager = new MidgardCR.SQLModelManager (this);
 				return (MidgardCR.StorageModelManager)this._model_manager; 
 			}
 		}	
