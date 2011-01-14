@@ -44,24 +44,57 @@ namespace MidgardCR {
 			return true;
 		}
 
-		/**
-		 * Get known prefix form string
-		 */
-		public string? get_prefix (string id) {
+		private string[]? _get_prefix_tokens (string id) {
 			/* registered name */
-			if (this.name_exists (id) == true)
-				return id.dup ();
+			string[] tokens = new string[1];
+			tokens[0] = null;
+			tokens[1] = null;
+			
+			/* registered prefix */
+			if (this.name_exists (id) == true) {
+				tokens[0] = id;
+				tokens[1] = null;
+				return tokens;
+			}
 
 			/* uri */
-			if ("/" in id)	
-				return null;
+			if ("/" in id) {
+				string[] uri_tokens = this._get_uri_tokens (id);
+				if (uri_tokens[0] != null) {
+					tokens[0] = this.get_name_by_identifier (uri_tokens[0]);
+					tokens[1] = uri_tokens[1];
+				}	
+				return tokens;
+			}
 
-			/* prefix */
+			/* prefix statement */
 			if (":" in id) {
 				string[] spltd = id.split (":");
-				if (this.name_exists (spltd[0]) == true)
-					return spltd[0].dup ();	
+				if (this.name_exists (spltd[0]) == true) {
+					tokens[0] = spltd[0];
+					tokens[1] = spltd[1];	
+				}
 			}
+			return tokens;
+		}
+
+		/**
+		 * Get known prefix from string
+		 */
+		public string? get_prefix (string id) {
+			string[] prefix = this._get_prefix_tokens (id);
+			if (prefix[0] != null)
+				return prefix[0];
+			return null;
+		}
+
+		/**
+		 * Get statement with known prefix from string
+		 */
+		public string? get_prefix_with_statement (string id) {
+			string[] prefix = this._get_prefix_tokens (id);
+			if (prefix[0] != null && prefix[1] != null)
+				return prefix[0] + ":" + prefix[1];
 			return null;
 		}
 
@@ -74,73 +107,66 @@ namespace MidgardCR {
 			return true;		
 		}	
 
-		/** 
-		 * Get known uri from string 
-		 */
-		public string? get_uri (string id) {
+		private string[]? _get_uri_tokens (string id) {
+			string[] tokens = new string[1];
+			tokens[0] = null;
+			tokens[1] = null;
 			/* registered identifier */
-			if (this.identifier_exists (id) == true)
-				return id.dup ();
+			if (this.identifier_exists (id) == true) {
+				tokens[0] = id;
+				return tokens;
+			}
 			
 			/* uri '#' terminating */
 			if ("#" in id) {
 				string[] spltd = id.split ("#");
 				if (spltd[0] != null)
-					if (this.identifier_exists (spltd[0]));
-						return spltd[0] + "#";
+					if (this.identifier_exists (spltd[0] + "#")) {
+						tokens[0] = spltd[0] + "#";
+						tokens[1] = spltd[1];
+					}
+				return tokens;
 			}
 
-			/* prefix or unknown string */
-			if (!("/" in id))
-				return null;
+			/* prefix or unknown string, try to get prefix */
+			if (!("/" in id)) {
+				string[] prefix_tokens = this._get_prefix_tokens (id);
+				if (prefix_tokens[0] != null) {
+					tokens[0] = this.get_identifier_by_name (prefix_tokens[0]);
+					tokens[1] = prefix_tokens[1];		
+				}
+				return tokens;
+			}
 
 			/* check uri */
 			string rs = id.rstr ("/");
 			string uri = id.substring (0, (id.length - rs.length) + 1);
-			if (this.identifier_exists (uri) == true)
-				return uri;
+			if (this.identifier_exists (uri) == true) {
+				tokens[0] = uri;
+				tokens[1] = rs.substring (1, -1);
+			}
 			
-			return null;			
+			return tokens;			
+		}
+
+		/** 
+		 * Get known uri from string 
+		 */
+		public string? get_uri (string id) {
+			string[] tokens = this._get_uri_tokens (id);
+			if (tokens[0] != null)
+				return tokens[0];
+			return null;
 		}
 
 		/**
-		 * Determines whether given string is identifier or its name, and returns
-		 * valid name or identifier.
-		 * 
-		 * If given string is valid uri, returns valid prefixed name.
-		 * If given string is valid namespace's prefix, returns valid uri.
-		 * 
-		 * For example, for given 'foaf:Person' string, 'http:\/\/xmlns.com\/foaf\/0.1\/Person' is returned,
-		 *
-		 * for 'http:////xmlns.com\/foaf\/0.1\/Person' string, returns 'foaf:Person'.
-		 * 
-		 * @param id, string to decode
-		 * 
-		 * @return valid prefix or uri, or null if none is found
-		 * 
+		 * Get statement with known uri from string
 		 */
-		public string? decode (string id) {
-			if ("/" in id) {
-                                string rs = id.rstr ("/");
-                                if (rs == null)
-                                        return null;
-                                /* Add extra 1 for "/" taken into account in rstr() */
-                                string uri = id.substring (0, (id.length - rs.length) + 1);
-                                string name = this.get_name_by_identifier (uri);
-                                if (name == null)
-                                        return null;
-                                /* Exclude extra "/" returned from rstr() */
-                                return name + ":" + rs.substring (1, -1);
-                        }
-                        else if (":" in id) {
-                                /* foaf:Person */
-                                string[] spltd = id.split (":");
-                                string uri = this.get_identifier_by_name (spltd[0]);
-                                if (uri == null)
-                                        return null;
-                                return uri + spltd[1];
-                        }
-                        return null;
-		} 
+		public string? get_uri_with_statement (string id) {
+			string[] tokens = this._get_uri_tokens (id);
+			if (tokens[0] != null && tokens[1] != null)
+				return tokens[0] + tokens[1];
+			return null;
+		}
 	}
 }
