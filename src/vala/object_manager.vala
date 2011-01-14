@@ -43,8 +43,8 @@ namespace MidgardCR {
 			if (models == null)
 				return;
 
-			foreach (Model model in models)
-				this._validate_model (model);
+			foreach (Model m in models)
+				this._validate_model (m);
 		}
 
 		/* public methods */
