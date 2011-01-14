@@ -87,8 +87,6 @@ namespace MidgardCR {
 		internal int _id = 0;
 		internal Metadata _metadata = null;	
 		internal string _identifier = null;
-		internal GLib.List<string> _ns_properties_list = null;
-		internal GLib.List<GLib.Value?> _ns_values_list = null;
 
 		/* properties */
 
@@ -132,38 +130,82 @@ namespace MidgardCR {
 		}
 
 		/* methods */
+
+		/**
+		 * Set value of the property
+		 * 
+		 * Simple wrapper for GLib.Object.set_property.
+		 * Derived classes shall provide own implementation if required.
+		 */
 		public virtual void set_property_value (string name, GLib.Value value) {
-			if (this._ns_properties_list == null) {
-				this._ns_properties_list = new List<string> ();
-				this._ns_values_list = new List<GLib.Value?> ();
+			this.set_property (name, value);
+		}
+
+		/**
+		 * Set value of the property using string value
+		 * 
+		 * Sets stringified value. This method initializes correct Value and tries to 
+		 * make types conversion.
+		 */
+		public virtual void set_property_literal (string name, string literal) {
+			ParamSpec pspec = this.get_class ().find_property (name);
+			if (pspec == null) {
+				warning ("Property '%s' not installed for %s class", name, this.get_type ().name ());
+				return;
 			}
-			this._ns_properties_list.append (name);
-			this._ns_values_list.append (value);
-		}
+			Value dest_val = {};
+			dest_val.init (pspec.value_type);
+			Value sval = {};
+			sval.init (typeof (string));
+			sval.set_string (literal);
+			sval.transform (ref dest_val);
+			this.set_property (name, dest_val);
+		} 	
 
+		/**
+		 * Get stringified value
+		 * 
+		 * Get value of the property and transform it to string.
+		 */
+		public virtual string? get_property_literal (string name) {
+			ParamSpec pspec = this.get_class ().find_property (name);
+			if (pspec == null) {
+				warning ("Property '%s' not installed for %s class", name, this.get_type ().name ());
+				return null;
+			}
+			Value val = {};
+			val.init (pspec.value_type);
+			this.get_property (name, ref val);
+			Value sval = {};
+			sval.init (typeof (string));
+			val.transform (ref sval);
+			return sval.get_string ();	
+		}	
+
+		/**
+		 * Get value of the property
+		 *
+		 * Simple wrapper for GLib.Object.get_property.
+		 * Derived classes shall provide own implementation if required.
+		 */
 		public virtual GLib.Value? get_property_value (string name) {
-			if (this._ns_properties_list == null)
-				return null;
-		
-			int i = 0;
-			foreach (string element in this._ns_properties_list) {
-				if (element == name)
-					return this._ns_values_list.nth_data (i);
-				i++;
-			}			
-			
-			return null;
+			Value val = {};
+			this.get_property (name, ref val);
+			return val;
 		}
 
+		/**
+		 * List names of all properties registered for object's class.
+		 * 
+		 * Simple wrapper for GLib.Object.list_properties()
+		 */
 		public virtual string[]? list_all_properties () {
-			if (this._ns_properties_list == null)
-				return null;
-			
-			string[] all_props = null;	
-			foreach (string element in this._ns_properties_list) {
-				all_props += element;
-			}			
-			return all_props;	
+			ParamSpec[] pspecs = this.get_class ().list_properties ();
+			string[] props = null;
+			foreach (weak ParamSpec p in pspecs) {
+				props += p.name;
+			}	
+			return props;
 		}
 	}
 
