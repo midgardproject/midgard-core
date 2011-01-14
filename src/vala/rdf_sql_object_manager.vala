@@ -68,20 +68,22 @@ namespace MidgardCR {
 			if (nsm == null)
 				throw new ValidationError.INTERNAL ("No NamespaceManager associated with ContentManager"); 
 
-			string prefix_stmt = nsm.get_prefix_with_statement (classname);
-			string uri_stmt = nsm.get_uri_with_statement (classname);
 			/* Check if RDFMapperObject for given classname exists.
 			 * If yes, create RepositoryObject mapped to given prefix or uri. */
+			string prefix_stmt = nsm.get_prefix_with_statement (classname);
+			string uri_stmt = nsm.get_uri_with_statement (classname);
 			RDFSQLModelManager mm = (RDFSQLModelManager) this._storage_manager.model_manager;
 			var om = mm.get_model_by_name (prefix_stmt);
 			if (om == null)
 				om = mm.get_model_by_name (uri_stmt);
-			if (om != null) 
-				return base.factory (((RDFMapperObject)om).classname, guid);
+			if (om != null) { 
+				var ro = base.factory (((RDFMapperObject)om).classname, guid);
+				return new RDFGenericObject (classname, (RepositoryObject)ro, guid);				
+			}
 				
 			/* There's no namespace registered, try generic rdf object */
 			if (guid == null)
-				return (Storable) new RDFGenericObject (classname, guid);		
+				return (Storable) new RDFGenericObject (classname, null, null);		
 			
 			/* Initialize QuerySelect to fetch object's data from SQL table */
 			var qst = new SQLQueryStorage (classname);
