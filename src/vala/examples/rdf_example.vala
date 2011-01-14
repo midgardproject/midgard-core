@@ -45,7 +45,7 @@ void main()
 	content_manager.namespace_manager.create_mapping ("foaf", "http://xmlns.com/foaf/0.1/");
 
 	/* Store data */
-	var mgd = new RDFGenericObject ("owl:Thing");
+	var mgd = new RDFGenericObject ("owl:Thing", null, null);
 	mgd.identifier = "http://www.midgard-project.org/";
 
 	mgd.set_property_value ("http://xmlns.com/foaf/0.1/topic", "http://www.midgard-project.org/rdf/topics/content_repository");
@@ -55,7 +55,7 @@ void main()
 		GLib.error (e.message);
 	}
 
-	var rdf_vali = new RDFGenericObject ("http://xmlns.com/foaf/0.1/Person");
+	var rdf_vali = new RDFGenericObject ("http://xmlns.com/foaf/0.1/Person", null, null);
 	rdf_vali.identifier = "http://www.midgard-project.org/people/vali";
 
 	rdf_vali.set_property_literal ("foaf:currentProject", "http://www.midgard-project.org/");
