@@ -24,9 +24,15 @@ namespace MidgardCR {
 		private string _rdf_identifier = null;
 		internal string _classname = null;
 		internal RepositoryObject[]? _triples = null;
+		internal RepositoryObject? _decorated_object = null;
 
 		/* properties */
-		
+
+		public RepositoryObject? repository_object {
+			get { return this._decorated_object; }
+			construct { this._decorated_object = value; }
+		}	
+	
 		public new string identifier {
 			get {
 				if (this._rdf_identifier == null) {
@@ -44,8 +50,25 @@ namespace MidgardCR {
 		}
 
 		/* constructor */
-		public RDFGenericObject (string classname, string? guid = null) {
-			Object (classname: classname, guid: guid);	
+		/** 
+		 * Create new RDFGenericObject instance
+		 *
+		 * @param classname Valid RDF statement. For example, 'foaf:Person' or uri which identifies statement. 
+		 * @param object, optional {@link RepositoryObject} object 
+		 * @param guid, optional guid identifying object
+		 * 
+		 * If object argument is not null, created instance is a decorator for given one.
+		 * Application is responsible to set correct decorated object. 
+		 * If unsure, {@link RDFSQLObjectManager} should be involved in object creation.
+		 * If given object argument's value is null, rdf object will hold set of triples
+		 * objects to manage its properties.
+		 * 
+		 * If given guid is not null, object's data will be fetch from SQL database.
+		 * Otherwise, guid will be set internally, so there's no need to pass guid argument, 
+		 * if object doesn't have to be fetched from storage.
+		 */ 
+		public RDFGenericObject (string classname, RepositoryObject? object = null, string? guid = null) {
+			Object (classname: classname, repository_object: object, guid: guid);	
 		}
 		
 		/* private methods */
