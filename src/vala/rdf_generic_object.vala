@@ -87,7 +87,7 @@ namespace MidgardCR {
 		}
 
 		/* public methods */
-		public new void set_property_value (string name, GLib.Value value) {
+		public override void set_property_value (string name, GLib.Value value) {
 			RepositoryObject[]? triples = this._find_triples_by_name (name);
 			RepositoryObject triple = null;
 			/* FIXME, handle returned array */
@@ -114,7 +114,7 @@ namespace MidgardCR {
                        	);
 		}
 
-		public virtual void set_property_literal (string name, string value) {	
+		public override void set_property_literal (string name, string value) {	
 			RepositoryObject[]? triples = this._find_triples_by_name (name);
 			RepositoryObject triple = null;
 			/* FIXME, handle returned array */
@@ -141,7 +141,7 @@ namespace MidgardCR {
                        	);
 		}
 
-		public new GLib.Value? get_property_value (string name) {
+		public override GLib.Value? get_property_value (string name) {
 			/* TODO, if required throw exception */
 			if (name == null || name == "") 
 				return null;
@@ -154,7 +154,7 @@ namespace MidgardCR {
 			return val;
 		}
 
-		public virtual string? get_property_literal (string name) {
+		public override string? get_property_literal (string name) {
 			/* TODO, if required throw exception */
 			if (name == null || name == "") 
 				return null;
