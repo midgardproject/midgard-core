@@ -218,7 +218,7 @@ namespace MidgardCR
 				object.get ("classname", out classname, "objectguid", out guid);
 				RDFGenericObject rdf_object = this._find_rdf_object (rdf_objects, classname, guid);
 				if (rdf_object == null) {
-					rdf_object = new RDFGenericObject (classname, guid);
+					rdf_object = new RDFGenericObject (classname, null, guid);
 					rdf_objects += rdf_object;
 				}
 				rdf_object.add_triple ((RepositoryObject)object);
