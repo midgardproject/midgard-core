@@ -37,7 +37,7 @@ void profiler_callback_end (SQLProfiler profiler)
 
 void main()
 {
-	GLib.Log.set_always_fatal (GLib.LogLevelFlags.LEVEL_WARNING);
+	GLib.Log.set_always_fatal (GLib.LogLevelFlags.LEVEL_CRITICAL);
 	var storage_manager = getStorageManager();
 	var content_manager = storage_manager.content_manager;
 	var model_manager = storage_manager.model_manager;
@@ -58,7 +58,9 @@ void main()
 	model_manager.execute ();
 
 	/* Store data */
-	var mgd = new RDFGenericObject ("owl:Thing");
+	RepositoryObject mgd = (RepositoryObject) storage_manager.object_manager.factory ("owl:Thing");
+	/* The same object can be created with uri.
+	mgd = (RepositoryObject) storage_manager.object_manager.factory ("http://www.w3.org/2002/07/owl#Thing"); */
 	mgd.identifier = "http://www.midgard-project.org/";
 
 	mgd.set_property_value ("http://xmlns.com/foaf/0.1/topic", "http://www.midgard-project.org/rdf/topics/content_repository");
@@ -68,7 +70,7 @@ void main()
 		GLib.error (e.message);
 	}
 
-	var rdf_vali = new RDFGenericObject ("http://xmlns.com/foaf/0.1/Person");
+	RepositoryObject rdf_vali = (RepositoryObject) storage_manager.object_manager.factory ("http://xmlns.com/foaf/0.1/Person");
 	rdf_vali.identifier = "http://www.midgard-project.org/people/vali";
 
 	rdf_vali.set_property_literal ("foaf:currentProject", "http://www.midgard-project.org/");
@@ -136,7 +138,13 @@ RDFSQLStorageManager getStorageManager()
 	
 	/* Validate models and execute.
 	 * Register classes and create tables in SQL database */
-	model_manager.prepare_create ();
+	try {
+		model_manager.prepare_create ();
+	} catch (ValidationError e) {
+		if (e is ValidationError.NAME_DUPLICATED) {
+			/* Do nothing, class is already stored */	
+		}
+	}
 	model_manager.execute ();
 
 	var builder = storage_manager.object_manager;
