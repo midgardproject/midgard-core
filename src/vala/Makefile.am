@@ -49,6 +49,7 @@ libmidgardvala_la_SOURCES = \
 			  rdf_sql_storage_manager.vala \
 			  rdf_sql_content_manager.vala \
 			  rdf_sql_model_manager.vala \
+			  rdf_sql_object_manager.vala \
 			  rdf_sql_query_select.vala \
 			  rdf_sql_query_storage.vala \
 			  rdf_sql_query_manager.vala \
