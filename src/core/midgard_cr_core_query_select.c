@@ -81,7 +81,10 @@ gboolean
 _midgard_cr_core_query_select_set_offset (MidgardCRCoreQueryExecutor *self, guint offset)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
-	g_return_val_if_fail (offset > 0, FALSE);
+	if (offset < 0) {
+		g_warning ("Negative offset value not allowed. Setting default value 0");
+		offset = 0;
+	}
 
 	self->priv->offset = offset;
 
