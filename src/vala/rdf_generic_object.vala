@@ -41,7 +41,11 @@ namespace MidgardCR {
 
 				return this._rdf_identifier;
 			}
-			set { this._identifier = value; } /* TODO: do we need to "denamespace" this? */
+			set { 
+				this._identifier = value; /* TODO: do we need to "denamespace" this? */
+				if (this._decorated_object != null)
+					this._decorated_object.identifier = value;
+			} 
 		}
 
 		public string classname {
@@ -53,10 +57,6 @@ namespace MidgardCR {
 		/** 
 		 * Create new RDFGenericObject instance
 		 *
-		 * @param classname Valid RDF statement. For example, 'foaf:Person' or uri which identifies statement. 
-		 * @param object, optional {@link RepositoryObject} object 
-		 * @param guid, optional guid identifying object
-		 * 
 		 * If object argument is not null, created instance is a decorator for given one.
 		 * Application is responsible to set correct decorated object. 
 		 * If unsure, {@link RDFSQLObjectManager} should be involved in object creation.
@@ -66,6 +66,10 @@ namespace MidgardCR {
 		 * If given guid is not null, object's data will be fetch from SQL database.
 		 * Otherwise, guid will be set internally, so there's no need to pass guid argument, 
 		 * if object doesn't have to be fetched from storage.
+		 *
+		 * @param classname Valid RDF statement. For example, 'foaf:Person' or uri which identifies statement. 
+		 * @param object, optional {@link RepositoryObject} object 
+		 * @param guid, optional guid identifying object
 		 */ 
 		public RDFGenericObject (string classname, RepositoryObject? object = null, string? guid = null) {
 			Object (classname: classname, repository_object: object, guid: guid);	

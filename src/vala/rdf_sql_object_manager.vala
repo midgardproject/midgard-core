@@ -58,7 +58,7 @@ namespace MidgardCR {
 		 *
 		 *  1. Person
 		 *  1. foaf:Person
-		 *  1. http://xmlns.com/foaf/0.1/Person
+		 *  1. http:\/\/xmlns.com\/foaf\/0.1\/Person (fixme)
 		 */
 		public override Storable? factory (string classname, string? guid = null) throws ObjectManagerError, ValidationError {
 			if (this._storage_manager == null)
