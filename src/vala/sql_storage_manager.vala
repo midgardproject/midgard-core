@@ -87,7 +87,11 @@ namespace MidgardCR {
 		}
 			
 		public Transaction transaction {
-			get { return _transaction; }
+			get { 
+				if (this._transaction == null)
+					this._transaction = new SQLTransaction (this);
+				return _transaction; 
+			}
 		}
 		
 		public StorageWorkspaceManager workspace_manager {
