@@ -1,0 +1,10 @@
+#!/bin/sh
+
+
+echo "\n RUNNING TESTS…\n"
+gtester -k -o midgardcr_test_rdf.xml ./midgardcr_test_rdf
+echo "\n DONE \n"
+
+echo "\n GENERATING REPORT… "
+gtester-report midgardcr_test_rdf.xml > midgardcr_test_rdf.html
+echo "-> DONE. SEE midgardcr_test_rdf.html"
