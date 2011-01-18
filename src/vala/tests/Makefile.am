@@ -1,5 +1,9 @@
 NULL=
 
+SUBDIRS = \
+	  rdf \
+	  $(NULL)
+
 AM_CFLAGS = \
 	    $(GLIB_CFLAGS) \
 	    $(LIBVALA_CFLAGS) \
