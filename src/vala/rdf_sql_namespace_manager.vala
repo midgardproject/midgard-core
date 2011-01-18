@@ -44,11 +44,12 @@ namespace MidgardCR {
 			return true;
 		}
 
-		private string[]? _get_prefix_tokens (string id) {
+		public string[]? get_prefix_tokens (string id) {
 			/* registered name */
-			string[] tokens = new string[1];
+			string[] tokens = new string[2];
 			tokens[0] = null;
 			tokens[1] = null;
+			tokens[2] = null;
 			
 			/* registered prefix */
 			if (this.name_exists (id) == true) {
@@ -59,7 +60,7 @@ namespace MidgardCR {
 
 			/* uri */
 			if ("/" in id) {
-				string[] uri_tokens = this._get_uri_tokens (id);
+				string[] uri_tokens = this.get_uri_tokens (id);
 				if (uri_tokens[0] != null) {
 					tokens[0] = this.get_name_by_identifier (uri_tokens[0]);
 					tokens[1] = uri_tokens[1];
@@ -82,7 +83,7 @@ namespace MidgardCR {
 		 * Get known prefix from string
 		 */
 		public string? get_prefix (string id) {
-			string[] prefix = this._get_prefix_tokens (id);
+			string[] prefix = this.get_prefix_tokens (id);
 			if (prefix[0] != null)
 				return prefix[0];
 			return null;
@@ -92,7 +93,7 @@ namespace MidgardCR {
 		 * Get statement with known prefix from string
 		 */
 		public string? get_prefix_with_statement (string id) {
-			string[] prefix = this._get_prefix_tokens (id);
+			string[] prefix = this.get_prefix_tokens (id);
 			if (prefix[0] != null && prefix[1] != null)
 				return prefix[0] + ":" + prefix[1];
 			return null;
@@ -107,10 +108,16 @@ namespace MidgardCR {
 			return true;		
 		}	
 
-		private string[]? _get_uri_tokens (string id) {
-			string[] tokens = new string[1];
+		/** 
+		 * Get uri tokens
+		 *
+		 * 
+		 */
+		public string[]? get_uri_tokens (string id) {
+			string[] tokens = new string[2];
 			tokens[0] = null;
 			tokens[1] = null;
+			tokens[2] = null;
 			/* registered identifier */
 			if (this.identifier_exists (id) == true) {
 				tokens[0] = id;
@@ -130,7 +137,7 @@ namespace MidgardCR {
 
 			/* prefix or unknown string, try to get prefix */
 			if (!("/" in id)) {
-				string[] prefix_tokens = this._get_prefix_tokens (id);
+				string[] prefix_tokens = this.get_prefix_tokens (id);
 				if (prefix_tokens[0] != null) {
 					tokens[0] = this.get_identifier_by_name (prefix_tokens[0]);
 					tokens[1] = prefix_tokens[1];		
@@ -153,7 +160,7 @@ namespace MidgardCR {
 		 * Get known uri from string 
 		 */
 		public string? get_uri (string id) {
-			string[] tokens = this._get_uri_tokens (id);
+			string[] tokens = this.get_uri_tokens (id);
 			if (tokens[0] != null)
 				return tokens[0];
 			return null;
@@ -163,7 +170,7 @@ namespace MidgardCR {
 		 * Get statement with known uri from string
 		 */
 		public string? get_uri_with_statement (string id) {
-			string[] tokens = this._get_uri_tokens (id);
+			string[] tokens = this.get_uri_tokens (id);
 			if (tokens[0] != null && tokens[1] != null)
 				return tokens[0] + tokens[1];
 			return null;
