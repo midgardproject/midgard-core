@@ -23,8 +23,8 @@ namespace MidgardCR {
 		/* internal properties */
 		internal unowned SQLStorageManager _storage_manager = null;
 		internal NamespaceManager _ns_manager = null;
-		internal unowned StorageModel[] _storage_models = null;
-		internal unowned ObjectModel[] _object_models = null;
+		internal StorageModel[] _storage_models = null;
+		internal ObjectModel[] _object_models = null;
 		internal Model[] _models = null;
 		internal Model[] _models_registered = null;
 		internal string[] _queries = null;
@@ -88,6 +88,10 @@ namespace MidgardCR {
                  */
 		public virtual Model add_model (Model model) {
 			this._models += model;
+			if (model is ObjectModel)
+				this._object_models += (ObjectModel)model;
+			if (model is StorageModel)
+				this._storage_models += (StorageModel)model;
 			return this;
 		}
 				
