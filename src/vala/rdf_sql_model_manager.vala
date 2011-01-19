@@ -50,8 +50,6 @@ namespace MidgardCR {
 		}
 				
 		/**
-                 * {@inheritDoc}
-		 *
 		 * Find {@link RDFMapperObject} model by given name. 
 		 * 
                  * @param name {@link Model} name to look for
