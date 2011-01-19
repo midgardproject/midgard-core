@@ -306,12 +306,15 @@ namespace MidgardCR {
 		/* methods */
 
 		/**
-		 * {@inheritDoc} 
+		 * List models by type
+		 * 
+   		 * SQLModelManager returns models of either {@link ObjectModel} or {@link SQLTableModel} type.
+		 * 
 		 */
 		public virtual unowned Model[]? list_models_by_type (string type) {
 			if (type == "ObjectModel")
 				return (Model[]) this._object_models;
-			if (type == "StorageModel")
+			if (type == "SQLTableModel")
 				return (Model[]) this._storage_models;
 			return null;
 		}
@@ -322,7 +325,7 @@ namespace MidgardCR {
 		public virtual string[]? list_model_types () {
 			string[] _types = null;
 			_types += "ObjectModel";
-			_types += "StorageModel";
+			_types += "SQLTableModel";
 			return _types;
 		}
 	
@@ -349,7 +352,7 @@ namespace MidgardCR {
 		public virtual unowned Model? get_type_model_by_name (string type, string name) {
 			if (type == "ObjectModel")
 				return this.get_object_model_by_name (name);
-			if (type == "StorageModel")
+			if (type == "SQLTableModel")
 				return this.get_table_model_by_name (name);
 			return null;
 		}
