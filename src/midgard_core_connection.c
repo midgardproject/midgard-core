@@ -207,9 +207,10 @@ _connect_cnc_callback (GdaConnection *cnc, GdaConnectionEvent *event, gpointer u
 {
 
 	glong errcode = (glong) gda_connection_event_get_code(event);
+	const gchar *description = gda_connection_event_get_description(event);
 
 	g_warning("Midgard connection error: %s, No:(%li), src:%s, SQL: %s",
-			gda_connection_event_get_description(event),
+			description,
 			errcode,
 			gda_connection_event_get_source(event),
 			gda_connection_event_get_sqlstate (event));
@@ -224,12 +225,13 @@ _connect_cnc_callback (GdaConnection *cnc, GdaConnectionEvent *event, gpointer u
 	switch (dbtype) {
 
 		case MIDGARD_DB_TYPE_MYSQL:
-			if (errcode == 2006) { /* MySQL server has gone away */
-
+			/* CR_SERVER_GONE_ERROR - we do not have access to this constant,
+			 * that's why 2006 used directly. As of GDA 4.2.2 (and earlier 4.0.x), this error code 
+			 * is not propagated via GDA, so we check error description verbatim string also. */
+			if ((errcode == 2006)
+				       || (g_str_equal (description, "MySQL server has gone away"))) {
 				g_signal_emit(mgd, MIDGARD_CONNECTION_GET_CLASS(mgd)->signal_id_lost_provider, 0);
-				//gda_connection_close_no_warning(mgd->priv->connection);
-				//__mysql_reconnect(mgd); /* TODO, check if it leaks */
-			}
+			}	
 
 			break;
 	}
