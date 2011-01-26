@@ -580,11 +580,12 @@ midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBOb
 					g_strdup_printf ("%s.%s = 0", join->right_table ? join->right_table : join->right->table, deleted_field));
 	}
 
+	i = 0;
 	if (dellist)
 		dellist = g_slist_reverse (dellist);
-	for (list = dellist; list != NULL; list = list->next) {
+	for (list = dellist; list != NULL, i++; list = list->next) {
 		gchar *dc = (gchar*) list->data;
-		g_string_append_printf (query, " AND %s ", dc);
+		g_string_append_printf (query, " %s %s ", i > 0 ? "AND" : "", dc);
 		g_free (list->data);
 	}
 	g_slist_free (dellist);
