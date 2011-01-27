@@ -248,7 +248,9 @@ __mgdschema_object_dispose (GObject *object)
 			&& (MGD_DBOBJECT_METADATA (self) != NULL 
 				&& G_IS_OBJECT(MGD_DBOBJECT_METADATA (self)))) {
 		/* Remove weak reference */
-		g_object_remove_weak_pointer (G_OBJECT (self), (gpointer) MGD_DBOBJECT_METADATA (self));
+		//g_object_remove_weak_pointer (G_OBJECT (self), (gpointer) MGD_DBOBJECT_METADATA (self));
+		g_object_unref (MGD_DBOBJECT_METADATA (self));
+		MGD_DBOBJECT_METADATA (self) = NULL;
 	}
 
 	/* Free object's parameters */
@@ -1490,7 +1492,7 @@ __mgdschema_object_constructor (GType type,
 	if (MGD_TYPE_ATTR_METADATA_CLASS (type_attr)) {
 		MGD_DBOBJECT_METADATA (object) = midgard_metadata_new (MIDGARD_DBOBJECT (object));
 		/* Add weak reference */
-		g_object_add_weak_pointer (object, (gpointer) MGD_DBOBJECT_METADATA (object));
+		//g_object_add_weak_pointer (object, (gpointer) MGD_DBOBJECT_METADATA (object));
 	}
 	
 	return object;
