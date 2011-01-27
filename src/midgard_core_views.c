@@ -583,7 +583,7 @@ midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBOb
 	i = 0;
 	if (dellist)
 		dellist = g_slist_reverse (dellist);
-	for (list = dellist; list != NULL, i++; list = list->next) {
+	for (list = dellist; list != NULL; list = list->next, i++) {
 		gchar *dc = (gchar*) list->data;
 		g_string_append_printf (query, " %s %s ", i > 0 ? "AND" : "", dc);
 		g_free (list->data);
