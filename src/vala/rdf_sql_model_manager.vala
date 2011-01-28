@@ -23,6 +23,7 @@ namespace MidgardCR {
 		/* internal properties */
 		//internal unowned RDFSQLStorageManager _storage_manager = null;	
 		internal RDFMapperObject[]? _mapper_objects = null;
+		private Model[] _all_models = null;
 
 		/* Constructor */
 
@@ -42,6 +43,7 @@ namespace MidgardCR {
                  * @return {@link Model} instance (self reference)
                  */
 		public override Model add_model (Model model) {
+			this._all_models += model;
 			if (model is RDFMapperObject) 
 				this._mapper_objects += (RDFMapperObject) model;
 			else 
@@ -160,7 +162,7 @@ namespace MidgardCR {
 		}
 
 		public override unowned Model[]? list_models () {
-			return null;
+			return this._all_models;
 		}
 	}
 }
