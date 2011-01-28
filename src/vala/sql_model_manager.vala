@@ -183,7 +183,7 @@ namespace MidgardCR {
 
 			/* Validate models */
 			foreach (Model model in this._models) {
-				unowned Model model_found = this._find_model_by_name ((Model[])this._object_models, model.name);
+				unowned Model model_found = this._find_model_by_name ((Model[])this._storage_manager._object_models, model.name);
 				if (model_found != null)
 					throw new MidgardCR.ValidationError.NAME_DUPLICATED ("%s class already exists in ObjectModel table", model.name);
 			}
