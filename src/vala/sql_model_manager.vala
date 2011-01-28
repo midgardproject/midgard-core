@@ -226,13 +226,14 @@ namespace MidgardCR {
 				if (model_found == null)
 					model_found = this._find_model_by_name ((Model[])this._storage_models, model.name);
 				if (model_found != null 
+					&& (((MidgardCR.ObjectModel) model_found)._id > 0)
 					&& (((MidgardCR.ObjectModel) model_found)._id == ((MidgardCR.ObjectModel) model)._id)) {
 					found = true;
-					invalid_name = model.name;
+					invalid_name = model.name;	
 					break;
 				}
 			}
-			if (found)
+			if (found == false)
 				throw new MidgardCR.ValidationError.NAME_INVALID ("No entry in schema or storage table found for given %s ", invalid_name); 
 		}
 
