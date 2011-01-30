@@ -185,14 +185,14 @@ GdaDataModel *midgard_core_query_get_model(MidgardConnection *mgd, const gchar *
 	gda_command_free(command);
 #endif
 
+	if (MGD_CNC_DEBUG (mgd))
+		g_debug("Model query = %s", query);
+
 	if (lerror) {
 	
 		g_warning("Model query failed: %s", lerror && lerror->message ? lerror->message : "No description");
 		g_error_free(lerror);
 	}
-
-	if (MGD_CNC_DEBUG (mgd))
-		g_debug("Model query = %s", query);
 
 	/* This is query error */
 	if(!model) 

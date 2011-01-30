@@ -237,13 +237,10 @@ static void __condition_append_value(GString *str,
 			
 			if (G_VALUE_TYPE(value) == MGD_TYPE_TIMESTAMP) {
 
-				GValue str_val = {0, };
-				g_value_init(&str_val, G_TYPE_STRING);
-				g_value_transform(value, &str_val);
-
-				g_string_append_printf(str, "'%s'", g_value_get_string(&str_val));
-
-				g_value_unset(&str_val);
+				MidgardTimestamp *mt = (MidgardTimestamp *)g_value_get_boxed (value);
+				g_string_append_printf(
+						str, "'%04ld-%02d-%02d %02d:%02d:%02d'",
+						mt->year, mt->month, mt->day, mt->hour, mt->minute, mt->second);
 			
 			} else {
 
