@@ -35,13 +35,14 @@ namespace MidgardCR {
 		/**
 		 * Check whether string is known prefix
 		 *
-		 * Checks, if the given string is a valid prefix, or holds valid prefix.
-		 * For example, these both strings are valid for this method: 'foaf' and 'foaf:name'.
+		 * Checks, if the given string is a valid prefix, or holds valid prefix. 
 		 */
 		public bool is_prefix (string id) {
-			if (this.get_prefix (id) == null)
-				return false;
-			return true;
+			string[] names = this.list_names ();
+			string _t = id; /* valac requires char instead of const char */
+			if (_t in names)
+				return true;
+			return false;
 		}
 
 		public string[]? get_prefix_tokens (string id) {
@@ -103,9 +104,10 @@ namespace MidgardCR {
 		 * Check whether string is known uri
 		 */
 		public bool is_uri (string id) {
-			if (this.get_uri (id) == null)
+			string name = this.get_name_by_identifier (id);
+			if (name == null)
 				return false;
-			return true;		
+			return false;
 		}	
 
 		/** 
