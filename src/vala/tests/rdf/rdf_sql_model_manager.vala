@@ -1,10 +1,18 @@
 using MidgardCR;
 
 RDFSQLModelManager global_model_manager = null;
+RDFSQLStorageManager global_storage_manager = null;
 
 RDFSQLModelManager get_model_manager () {
-	RDFSQLStorageManager storage_manager = get_storage_manager ();
-	var model_manager = new RDFSQLModelManager (storage_manager);
+	if (global_model_manager != null)
+		return global_model_manager;
+	RDFSQLStorageManager global_storage_manager = get_storage_manager ();
+	try {
+		global_storage_manager.open ();
+	} catch (StorageManagerError e) {
+		warning (e.message);
+	}
+	var model_manager = new RDFSQLModelManager (global_storage_manager);
 	return model_manager;
 }
 
@@ -150,35 +158,131 @@ void midgardcr_test_add_rdf_sql_model_manager () {
 	});
 
 	Test.add_func ("/RDFSQLModelManager/list_models", () => {
-		assert (MISS_IMPL == null);
+		assert (global_model_manager != null);
+		
+		Model[] models = global_model_manager.list_models ();
+		assert (models.length != 0);	
+
+		string[] names = {OWLTHING_CLASS_NAME, RDF_OWL_PREFIX_THING};
+		foreach (Model m in models) {
+			assert (m.name.dup () in names); /* name duplication is done to satisfy vala compiler, remove it once that doesn't complain */
+			
+			/* FAIL */
+			assert (m.name != "");
+			assert (m.name != null);
+		}
 	});
 
 	Test.add_func ("/RDFSQLModelManager/is_valid", () => {
-		assert (MISS_IMPL == null);
+		assert (global_model_manager != null);
+		
+		try {
+			global_model_manager.is_valid ();
+		} catch (ValidationError e) {
+			warning (e.message);
+		}
 	});
 
 	Test.add_func ("/RDFSQLModelManager/prepare_create", () => {
-		assert (MISS_IMPL == null);
+		assert (global_model_manager != null);
+
+		try {
+			global_model_manager.prepare_create ();
+		} catch (ValidationError e) {
+			warning (e.message);
+		}
 	});
 
 	Test.add_func ("/RDFSQLModelManager/prepare_update", () => {
-		assert (MISS_IMPL == null);
+		assert (global_model_manager != null);
+
+		try {
+			global_model_manager.prepare_update ();
+		} catch (ValidationError e) {
+			if (e is ValidationError.NAME_INVALID) {
+				/* do nothing atm */
+			} else {
+				warning (e.message);
+			}
+		}
 	});
 
 	Test.add_func ("/RDFSQLModelManager/prepare_save", () => {
-		assert (MISS_IMPL == null);
+		assert (global_model_manager != null);
+
+		try {
+			global_model_manager.prepare_save ();
+		} catch (ValidationError e) {
+			warning (e.message);
+		}
 	});
 
 	Test.add_func ("/RDFSQLModelManager/prepare_remove", () => {
-		assert (MISS_IMPL == null);
+		assert (global_model_manager != null);
+
+		try {
+			global_model_manager.prepare_remove ();
+		} catch (ValidationError e) {
+			if (e is ValidationError.NAME_INVALID) {
+				/* do nothing atm */
+			} else {
+				warning (e.message);
+			}
+		}
 	});
 
 	Test.add_func ("/RDFSQLModelManager/prepare_purge", () => {
-		assert (MISS_IMPL == null);
+		assert (global_model_manager != null);
+
+		try {
+			global_model_manager.prepare_purge ();
+		} catch (ValidationError e) {
+			if (e is ValidationError.NAME_INVALID) {
+				/* do nothing atm */
+			} else {
+				warning (e.message);
+			}
+		}
 	});
 
 	Test.add_func ("/RDFSQLModelManager/execute", () => {
-		assert (MISS_IMPL == null);
+		assert (global_model_manager != null);
+		
+		global_model_manager.execute ();
+	});
+
+	Test.add_func ("/RDFSQLModelManager/prepare_update", () => {
+		assert (global_model_manager != null);
+
+		try {
+			global_model_manager.prepare_update ();
+			warning (MISS_IMPL);
+		} catch (ValidationError e) {
+			warning (e.message);
+		}
+	});
+
+	Test.add_func ("/RDFSQLModelManager/execute", () => {
+		assert (global_model_manager != null);
+		
+		global_model_manager.execute ();
+	});
+
+	Test.add_func ("/RDFSQLModelManager/prepare_remove", () => {
+		assert (global_model_manager != null);
+
+		try {
+			global_model_manager.prepare_remove ();
+			warning (MISS_IMPL);
+		} catch (ValidationError e) {
+			warning (e.message);
+		}
+	});
+
+	Test.add_func ("/RDFSQLModelManager/execute", () => {
+		assert (global_model_manager != null);
+		
+		global_model_manager.execute ();
 	});
 }
 
