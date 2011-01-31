@@ -107,7 +107,7 @@ namespace MidgardCR {
 			string name = this.get_name_by_identifier (id);
 			if (name == null)
 				return false;
-			return false;
+			return true;
 		}	
 
 		/** 
