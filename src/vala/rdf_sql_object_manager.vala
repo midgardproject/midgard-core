@@ -73,8 +73,10 @@ namespace MidgardCR {
 			string prefix_stmt = nsm.get_prefix_with_statement (classname);
 			string uri_stmt = nsm.get_uri_with_statement (classname);
 			RDFSQLModelManager mm = (RDFSQLModelManager) this._storage_manager.model_manager;
-			var om = mm.get_model_by_name (prefix_stmt);
-			if (om == null)
+			Model om = null;
+			if (prefix_stmt != null)
+				om = mm.get_model_by_name (prefix_stmt);
+			if (om == null && uri_stmt != null)
 				om = mm.get_model_by_name (uri_stmt);
 			if (om != null) { 
 				var ro = base.factory (((RDFMapperObject)om).classname, guid);
