@@ -269,13 +269,13 @@ void midgardcr_test_add_rdf_sql_namespace_manager () {
 		assert (uri == RDF_OWL_URI);
 
 		uri = global_namespace_manager.get_uri (RDF_FOAF_PREFIX);
-		assert (uri == RDF_FOAF_PREFIX);
+		assert (uri == RDF_FOAF_URI);
 		uri = global_namespace_manager.get_uri (RDF_FOAF_URI);
-		assert (uri == RDF_FOAF_PREFIX);
+		assert (uri == RDF_FOAF_URI);
 		uri = global_namespace_manager.get_uri (RDF_FOAF_PREFIX_TOPIC);
-		assert (uri == RDF_FOAF_PREFIX);
+		assert (uri == RDF_FOAF_URI);
 		uri = global_namespace_manager.get_uri (RDF_FOAF_URI_TOPIC);
-		assert (uri == RDF_FOAF_PREFIX);
+		assert (uri == RDF_FOAF_URI);
 
 		/* FAIL */
 		uri = global_namespace_manager.get_uri ("");
