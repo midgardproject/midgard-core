@@ -507,6 +507,30 @@ midgard_test_user_login (MidgardUserTest *mut, gconstpointer data)
 }
 
 void 
+midgard_test_user_property_usertype (MidgardUserTest *mut, gconstpointer data)
+{
+	MidgardConnection *mgd = mut->mgd;
+
+	/* Get current user */
+	MidgardUser *user = midgard_connection_get_user (mgd);
+	g_assert (user != NULL);
+
+	guint initial_type;
+	g_object_get (G_OBJECT (user), "usertype", &initial_type, NULL);
+
+	g_object_set (G_OBJECT (user), "usertype", MIDGARD_USER_TYPE_NONE, NULL);
+	g_object_set (G_OBJECT (user), "usertype", MIDGARD_USER_TYPE_USER, NULL);
+	g_object_set (G_OBJECT (user), "usertype", MIDGARD_USER_TYPE_ADMIN, NULL);
+	g_object_set (G_OBJECT (user), "usertype", initial_type, NULL);
+
+	if (g_test_trap_fork(0, G_TEST_TRAP_SILENCE_STDERR)) {
+		g_object_set (G_OBJECT (user), "usertype", -1, NULL);
+		g_object_set (G_OBJECT (user), "usertype", 3, NULL);
+	}
+	g_test_trap_assert_failed();
+}
+
+void 
 midgard_test_user_logout (MidgardUserTest *mut, gconstpointer data)
 {
 	MidgardConnection *mgd = mut->mgd;

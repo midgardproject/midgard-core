@@ -17,5 +17,6 @@ void 	midgard_test_user_get		(MidgardUserTest *mut, gconstpointer data);
 void 	midgard_test_user_query		(MidgardUserTest *mut, gconstpointer data);
 void	midgard_test_user_login		(MidgardUserTest *mut, gconstpointer data);
 void	midgard_test_user_logout	(MidgardUserTest *mut, gconstpointer data);
+void	midgard_test_user_property_usertype (MidgardUserTest *mut, gconstpointer data);
 
 #endif /* MIDGARD_TEST_USER_H */

@@ -66,6 +66,8 @@ int main (int argc, char *argv[])
 			midgard_test_user_query, midgard_test_user_teardown_foo);
 	g_test_add("/midgard_user/login", MidgardUserTest, user, midgard_test_user_setup,  
 			midgard_test_user_login, midgard_test_user_teardown_foo);
+	g_test_add("/midgard_user/property_usertype", MidgardUserTest, user, midgard_test_user_setup,  
+			midgard_test_user_property_usertype, midgard_test_user_teardown_foo);
 	g_test_add("/midgard_user/logout", MidgardUserTest, user, midgard_test_user_setup,  
 			midgard_test_user_logout, midgard_test_user_teardown_foo);
 
