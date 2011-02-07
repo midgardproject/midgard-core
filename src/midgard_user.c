@@ -1054,7 +1054,7 @@ midgard_user_set_person (MidgardUser *self, MidgardObject *person)
  *
  * Returned object should not be unref.
  *
- * Returns: #MidgardObject of "midgard_person" type, of %NULL if none associated.
+ * Returns: (transfer none): #MidgardObject of "midgard_person" type, or %NULL if none associated.
  */
 MidgardObject *
 midgard_user_get_person (MidgardUser *self)
