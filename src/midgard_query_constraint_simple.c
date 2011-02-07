@@ -24,7 +24,7 @@
  * @self: #MidgardQueryConstraintSimple instance
  * @n_objects: pointer to store numer of returned objects
  *
- * Returns: array of #MidgardQueryConstraintSimple instances
+ * Returns: (transfer container): array of #MidgardQueryConstraintSimple instances
  *
  * Since: 10.05
  */
