@@ -1023,7 +1023,7 @@ static void __set_from_sql(MidgardDBObject *object,
  * Sets person property and updates user storage record.
  *
  * #MidgardUser @self takes ownership of the given #MidgardPerson reference, 
- * which should be not unref any more.
+ * and increases person's object reference count. 
  * 
  * See midgard_user_update() for returned error details.
  *
