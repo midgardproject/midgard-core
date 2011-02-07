@@ -1196,12 +1196,12 @@ _midgard_user_set_property (GObject *object, guint property_id,
 		case MIDGARD_USER_TYPE:
 			if (g_value_get_uint (value) > MIDGARD_USER_TYPE_ADMIN
 					|| g_value_get_uint (value) < MIDGARD_USER_TYPE_NONE) {
-				
-				self->priv->user_type = g_value_get_uint (value);
+	
+				g_warning ("Invalid user type (%d).", g_value_get_uint (value));
 
 			} else {
 
-				g_warning ("Invalid user type");
+				self->priv->user_type = g_value_get_uint (value);	
 			}
 			break;
 	
