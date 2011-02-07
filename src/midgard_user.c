@@ -1041,7 +1041,9 @@ midgard_user_set_person (MidgardUser *self, MidgardObject *person)
 
 	g_return_val_if_fail (MGD_OBJECT_GUID (person) != NULL, FALSE);	
 
-	self->priv->person = person;
+	if (G_IS_OBJECT (self->priv->person))
+		g_object_unref (self->priv->person);
+	self->priv->person = g_object_ref (person);
 	g_free (self->priv->person_guid);
 	self->priv->person_guid = g_strdup (MGD_OBJECT_GUID (person));
 
