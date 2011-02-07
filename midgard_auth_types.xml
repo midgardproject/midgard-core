@@ -66,4 +66,9 @@
     <id>13</id>
   </type>
 
+	<type name="LDAP">
+    <description/>
+    <id>14</id>
+  </type>
+
 </Authentication>
