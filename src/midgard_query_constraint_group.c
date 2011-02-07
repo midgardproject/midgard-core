@@ -322,7 +322,7 @@ _midgard_query_constraint_group_dispose (GObject *object)
 	GSList *self_constraints = MIDGARD_QUERY_CONSTRAINT_GROUP (self)->priv->constraints;
 	GSList *l = NULL;
 	for (l = self_constraints; l != NULL; l = l->next) {
-		if (l->data) {
+		if (l->data && G_IS_OBJECT (l->data)) {
 			g_object_unref(l->data);
 			l->data = NULL;
 		}
