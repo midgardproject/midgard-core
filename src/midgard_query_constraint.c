@@ -413,12 +413,12 @@ _midgard_query_constraint_dispose (GObject *object)
 		self->priv->property_value = NULL;
 	}
 
-	if (self->priv->storage) {
+	if (self->priv->storage && G_IS_OBJECT (self->priv->storage)) {
 		g_object_unref (self->priv->storage);
 		self->priv->storage = NULL;
 	}
 
-	if (self->priv->holder) {
+	if (self->priv->holder && G_IS_OBJECT (self->priv->holder)) {
 		g_object_unref (self->priv->holder);
 		self->priv->holder = NULL;
 	}
