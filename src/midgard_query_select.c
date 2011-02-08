@@ -555,9 +555,11 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 
 		if (MIDGARD_QUERY_EXECUTOR (self)->priv->read_only) {
 			gint col_idx = gda_data_model_get_column_index (model, "guid");
-			const GValue *gval = gda_data_model_get_value_at (model, col_idx, i, NULL);
-			/* Set MidgardDBObject data */
-			MGD_OBJECT_GUID (objects[i]) = g_value_dup_string (gval);
+			if (col_idx != -1) {
+				const GValue *gval = gda_data_model_get_value_at (model, col_idx, i, NULL);
+				/* Set MidgardDBObject data */
+				MGD_OBJECT_GUID (objects[i]) = g_value_dup_string (gval);
+			}
 		} else {
 			MIDGARD_DBOBJECT_GET_CLASS (objects[i])->dbpriv->set_from_data_model (
 					MIDGARD_DBOBJECT (objects[i]), model, i);
