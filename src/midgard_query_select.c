@@ -546,17 +546,25 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 	MidgardDBObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
 	MidgardDBObject **objects = g_new (MidgardDBObject *, rows+1);
 
-	for (i = 0; i < rows; i++) {	
+	for (i = 0; i < rows; i++) {
+		GParamSpec *guid_spec = NULL;	
 		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), "connection", mgd, NULL);
 		MGD_OBJECT_IN_STORAGE (objects[i]) = TRUE;
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->datamodel = g_object_ref (model);
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->row = i;
 
 		if (MIDGARD_QUERY_EXECUTOR (self)->priv->read_only) {
-			gint col_idx = gda_data_model_get_column_index (model, "guid");
-			const GValue *gval = gda_data_model_get_value_at (model, col_idx, i, NULL);
-			/* Set MidgardDBObject data */
-			MGD_OBJECT_GUID (objects[i]) = g_value_dup_string (gval);
+			guid_spec = g_object_class_find_property (G_OBJECT_CLASS (klass), "guid");
+			if (guid_spec) {
+				gint col_idx = gda_data_model_get_column_index (model, "guid");
+				if (col_idx == -1) {
+					g_warning ("Missed column for registered 'guid' column. (%s)", G_OBJECT_CLASS_NAME (klass));
+					continue;
+				}
+				const GValue *gval = gda_data_model_get_value_at (model, col_idx, i, NULL);
+				/* Set MidgardDBObject data */
+				MGD_OBJECT_GUID (objects[i]) = g_value_dup_string (gval);
+			}
 		} else {
 			MIDGARD_DBOBJECT_GET_CLASS (objects[i])->dbpriv->set_from_data_model (
 					MIDGARD_DBOBJECT (objects[i]), model, i);
