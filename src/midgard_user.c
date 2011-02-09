@@ -478,6 +478,7 @@ __midgard_user_create (MidgardUser *self)
 
 	if (user) {
 		
+		g_object_unref (user);
 		MIDGARD_ERRNO_SET (mgd, MGD_ERR_DUPLICATE);
 		return FALSE;
 	}
