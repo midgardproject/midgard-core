@@ -549,9 +549,8 @@ _midgard_query_select_list_objects (MidgardQuerySelect *self, guint *n_objects)
 	for (i = 0; i < rows; i++) {	
 		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), "connection", mgd, NULL);
 		MGD_OBJECT_IN_STORAGE (objects[i]) = TRUE;
-		MIDGARD_DBOBJECT(objects[i])->dbpriv->datamodel = model;
+		MIDGARD_DBOBJECT(objects[i])->dbpriv->datamodel = g_object_ref (model);
 		MIDGARD_DBOBJECT(objects[i])->dbpriv->row = i;
-		g_object_ref (model);
 
 		if (MIDGARD_QUERY_EXECUTOR (self)->priv->read_only) {
 			gint col_idx = gda_data_model_get_column_index (model, "guid");
