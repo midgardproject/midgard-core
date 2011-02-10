@@ -720,6 +720,8 @@ __midgard_user_delete (MidgardUser *self)
  * Which means, #MidgardObject must be fetched from database.
  * Either with midgard_user_get() or with midgard_user_query().
  *
+ * This method silently returns with success when given user is already logged in.
+ *
  * Cases to return %FALSE:
  * <itemizedlist>
  * <listitem><para>
@@ -750,6 +752,10 @@ __midgard_user_login (MidgardUser *self)
 	g_return_val_if_fail(mgd != NULL, FALSE);
 
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
+
+	/* Check if given user instance is already logged in */
+	if (mgd->priv->user && mgd->priv->user == self)
+		return TRUE;
 
 	const gchar *guid = MGD_OBJECT_GUID(self);
 	if (!guid
