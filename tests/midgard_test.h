@@ -17,6 +17,7 @@
 
 #define MGD_TEST_SITEGROUP_NAME "midgard_test_sitegroup"
 #define MIDGARD_TRAC_TICKET_BASE_URL "http:/""/trac.midgard-project.org/ticket/"
+#define MIDGARD_GITHUB_ISSUES_BASE_URL "https://github.com/midgardproject/midgard-core/issues/#issue/"
 
 #define _MGD_TEST_OBJECT_SETUP \
 static void midgard_test_setup(MidgardObjectTest *mot, gconstpointer data) \

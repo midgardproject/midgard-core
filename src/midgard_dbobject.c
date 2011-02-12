@@ -497,6 +497,14 @@ midgard_dbobject_constructor (GType type,
 	return G_OBJECT(object);
 }
 
+static void __weak_ref_notify (gpointer data, GObject *object)
+{
+	if (data != NULL && G_IS_OBJECT (data)) {	
+		MidgardDBObject *dbobject = MIDGARD_DBOBJECT (data);
+		MGD_OBJECT_CNC (dbobject) = NULL;
+	}
+}
+
 static void 
 midgard_dbobject_dispose (GObject *object)
 {
@@ -511,10 +519,9 @@ midgard_dbobject_dispose (GObject *object)
 	if (metadata && G_IS_OBJECT (metadata)) 
 		g_object_unref (metadata);
 
-	/* Drop reference to MidgardConnection */
+	/* Nullify connection's pointer. */
 	MidgardConnection *mgd = MIDGARD_DBOBJECT (self)->dbpriv->mgd;
 	if (mgd != NULL && G_IS_OBJECT (mgd)) {	
-		g_object_unref (MIDGARD_DBOBJECT (self)->dbpriv->mgd);
 		MIDGARD_DBOBJECT (self)->dbpriv->mgd = NULL;
 	}
 
@@ -573,11 +580,17 @@ __midgard_dbobject_set_property (GObject *object, guint property_id,
 			if (!G_VALUE_HOLDS_OBJECT (value)) 
 				return;
 
-			if (!MIDGARD_IS_CONNECTION (g_value_get_object (value)))
+			mgd = g_value_get_object (value);
+
+			if (!MIDGARD_IS_CONNECTION (mgd))
 				return;
 	
-			/* Add new reference to MidgardConnection object */
-			MIDGARD_DBOBJECT (object)->dbpriv->mgd = g_value_dup_object (value);
+			MIDGARD_DBOBJECT (object)->dbpriv->mgd = MIDGARD_CONNECTION (mgd);
+			/* Add weak reference callback to connection. 
+			 * Instead of keeping connection's alive (implicitly) we create sentinel 
+			 * which guarantees connection's pointer to be null if connection is destroyed. */
+			g_object_weak_ref (mgd, __weak_ref_notify, object);
+
 			break;
 
   		default:
