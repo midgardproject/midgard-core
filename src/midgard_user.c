@@ -364,8 +364,7 @@ __midgard_user_query (MidgardConnection *mgd, guint n_params, const GParameter *
 
 	for (i = 0; i < rows; i++) {
 	
-		users[i] = g_object_new (MIDGARD_TYPE_USER, NULL);
-		MIDGARD_DBOBJECT (users[i])->dbpriv->mgd = mgd;
+		users[i] = g_object_new (MIDGARD_TYPE_USER, "connection", mgd, NULL);
 		MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql (MIDGARD_DBOBJECT (users[i]), model, i);
 	}
 
