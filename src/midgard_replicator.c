@@ -521,8 +521,8 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 		updated = midgard_timestamp_get_string_from_value ((const GValue *)&updated_timestamp);
 		dbupdated = midgard_timestamp_get_string_from_value ((const GValue *)&dbupdated_timestamp);
 
-		midgard_timestamp_free (updated_timestamp);
-		midgard_timestamp_free (dbupdated_timestamp);
+		g_value_unset (&updated_timestamp);
+		g_value_unset (&dbupdated_timestamp);
 
 		/* We can use g_ascii_strcasecmp as it type cast every single 
 		 * pointer to integer and unsigned char returning substract result */		
