@@ -65,7 +65,11 @@ _action_create_callback (MidgardObject *object, gpointer ud)
 	g_value_unset (&rev_val);
 
 	/* set default values */
+	if (mdata->priv->locker)
+		g_free (mdata->priv->locker);
 	mdata->priv->locker = g_strdup ("");
+	if (mdata->priv->approver)
+		g_free (mdata->priv->approver);
 	mdata->priv->approver = g_strdup ("");
 
 	if (!mdata->priv->authors)
@@ -98,10 +102,6 @@ _action_update_callback (MidgardObject *object, gpointer ud)
 	midgard_timestamp_new_current (&tval);
 	midgard_core_metadata_set_revised (mdata, (const GValue *)&tval);	
 	g_value_unset (&tval);
-
-	GValue _val = {0, };
-	g_value_init (&_val, MIDGARD_TYPE_TIMESTAMP);
-	g_object_get_property (G_OBJECT (mdata), "revised", &_val);
 
 	/* set revision */
 	midgard_core_metadata_increase_revision (mdata);
