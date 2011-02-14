@@ -1120,6 +1120,10 @@ __midgard_config_struct_free (MidgardConfig *self)
 		g_free (self->vardir);
 	self->vardir = NULL;
 
+	if (self->viewsdir)
+		g_free (self->viewsdir);
+	self->viewsdir = NULL;
+
 	if (self->dbtype)
 		g_free (self->dbtype);
 	self->dbtype = NULL;
