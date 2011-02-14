@@ -567,6 +567,8 @@ _metadata_instance_init(GTypeInstance *instance, gpointer g_class)
 
 	self->priv->approve_is_set = FALSE;
 	self->priv->is_approved = FALSE;
+
+	self->priv->object = NULL;
 }
 
 static void 
@@ -593,7 +595,7 @@ _metadata_object_finalize(GObject *object)
 	g_free(self->priv->exported);
 	g_free(self->priv->imported);
 
-	/* Set parent's object metadata to NULL, if metadata uniref has been 
+	/* Set parent's object metadata to NULL, if metadata unref has been 
 	 * invoked on metadata directly */
 	if (self->priv->object 
 			&& G_IS_OBJECT (self->priv->object))
