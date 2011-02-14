@@ -296,8 +296,6 @@ static void _write_nodes(GObject *object, xmlNodePtr node)
 				_object = g_value_get_object (&pval);
 				
 				if (_object) {
-					/* Add reference to object. It'll be unref in g_value_unset */
-					g_object_ref (_object);
 					op_node = xmlNewNode(NULL, BAD_CAST pspec[i]->name);
 					_write_nodes(_object, op_node);
 					xmlAddChild(node, op_node);
