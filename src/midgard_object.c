@@ -244,15 +244,6 @@ __mgdschema_object_dispose (GObject *object)
 {
 	MidgardObject *self = MIDGARD_OBJECT (object);
 
-	if (MIDGARD_DBOBJECT (self)->dbpriv 
-			&& (MGD_DBOBJECT_METADATA (self) != NULL 
-				&& G_IS_OBJECT(MGD_DBOBJECT_METADATA (self)))) {
-		/* Remove weak reference */
-		//g_object_remove_weak_pointer (G_OBJECT (self), (gpointer) MGD_DBOBJECT_METADATA (self));
-		g_object_unref (MGD_DBOBJECT_METADATA (self));
-		MGD_DBOBJECT_METADATA (self) = NULL;
-	}
-
 	/* Free object's parameters */
 	if (self->priv->parameters != NULL) {
 		GSList *_param = self->priv->parameters;

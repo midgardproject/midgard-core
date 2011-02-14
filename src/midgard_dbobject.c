@@ -514,14 +514,16 @@ midgard_dbobject_dispose (GObject *object)
 
 	self->dbpriv->row = -1;
 
-	/* Do not nullify metadata object, we might be in the middle of refcount decreasing */
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
-	if (metadata && G_IS_OBJECT (metadata)) 
+	if (metadata && G_IS_OBJECT (metadata)) {
 		g_object_unref (metadata);
+		MGD_DBOBJECT_METADATA (self) = NULL;
+	}
 
 	/* Nullify connection's pointer. */
 	MidgardConnection *mgd = MIDGARD_DBOBJECT (self)->dbpriv->mgd;
 	if (mgd != NULL && G_IS_OBJECT (mgd)) {	
+		g_object_weak_unref (G_OBJECT(self->dbpriv->mgd), __weak_ref_notify, self);	
 		MIDGARD_DBOBJECT (self)->dbpriv->mgd = NULL;
 	}
 
