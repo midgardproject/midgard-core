@@ -988,10 +988,13 @@ static void __set_from_sql(MidgardDBObject *object,
 
 	/* PERSON GUID */
 	value = midgard_data_model_get_value_at_col_name (model, "person", row);
-	if (value && G_IS_VALUE (value) && G_VALUE_HOLDS_STRING (value))
+	if (value && G_IS_VALUE (value) && G_VALUE_HOLDS_STRING (value)) {
+		g_free (self->priv->person_guid);
 		self->priv->person_guid = g_value_dup_string (value);
-	else 
+	
+	} else {
 		g_warning ("Invalid value type for user's person guid. Expected string, got %s", G_VALUE_TYPE_NAME (value));
+	}
 
 	/* ACTIVE */
 	value = midgard_data_model_get_value_at_col_name (model, "active", row);
