@@ -548,6 +548,7 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 		g_free (debug_query);
 	}
 
+	g_free (col_types);
 	g_object_unref (params);
 	g_object_unref (stmt);
 
