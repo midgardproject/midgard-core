@@ -251,7 +251,6 @@ __midgard_user_get (MidgardConnection *mgd, guint n_params, const GParameter *pa
 
 	if (rows > 1) {
 		
-		g_object_unref (model);
 		g_warning ("midgard_user storage inconsistency. Found %d records. Expected one.", rows);
 		MIDGARD_ERRNO_SET (mgd, MGD_ERR_INTERNAL);
 	}
@@ -266,6 +265,7 @@ __midgard_user_get (MidgardConnection *mgd, guint n_params, const GParameter *pa
 	MidgardUser *self = g_object_new (MIDGARD_TYPE_USER, "connection", mgd, NULL);
 
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql (MIDGARD_DBOBJECT (self), model, 0);
+	g_object_unref (model);
 
 	return self;
 }
