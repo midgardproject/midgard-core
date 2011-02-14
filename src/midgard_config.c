@@ -772,13 +772,13 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 	gboolean saved = g_file_set_contents(cnfpath, content, length, &kf_error);
 
 	g_free (content);
-	g_free (cnfpath);
 
 	if (!saved) {
 
 		if (kf_error)
 			g_propagate_error (error, kf_error);
-	
+
+		g_free (cnfpath);
 		return FALSE;
 	}
 
@@ -787,6 +787,8 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 #else 
 	g_chmod(cnfpath, 0600);
 #endif /* G_OS_WIN32 */
+
+	g_free (cnfpath);
 
 	return TRUE;
 }
