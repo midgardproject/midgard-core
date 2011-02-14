@@ -641,6 +641,7 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 				g_object_get (object, pname, &mt, NULL);		\
 				pstr = midgard_timestamp_get_string (mt);		\
 				gda_set_set_holder_value (params, NULL, col_name, pstr);\
+				midgard_timestamp_free (mt);				\
 				g_free (pstr);						\
 			}								\
 		break;									\
