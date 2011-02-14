@@ -56,6 +56,7 @@ void midgard_test_object_class_undelete(MidgardObjectTest *mot, gconstpointer da
 		/* g_print(" BOOL %d", undeleted); */
 		g_assert(undeleted != FALSE);
 		g_object_unref(objects[i]);
+		g_object_unref(metadata);
 		i++;
 	}
 
