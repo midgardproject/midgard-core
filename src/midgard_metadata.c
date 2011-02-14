@@ -592,7 +592,13 @@ _metadata_object_finalize(GObject *object)
 	g_free(self->priv->published);
 	g_free(self->priv->exported);
 	g_free(self->priv->imported);
-	
+
+	/* Set parent's object metadata to NULL, if metadata uniref has been 
+	 * invoked on metadata directly */
+	if (self->priv->object 
+			&& G_IS_OBJECT (self->priv->object))
+	       MGD_DBOBJECT_METADATA (self->priv->object) = NULL;	
+
 	g_free(self->priv);
 
 	__parent_class->finalize (object);
