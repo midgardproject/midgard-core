@@ -468,6 +468,7 @@ void midgard_test_object_basic_lock(MidgardObjectTest *mot, gconstpointer data)
 	g_free(revised);
 	g_free(oguid);
 	g_free(pguid);
+	g_object_unref (metadata);
 }
 
 void midgard_test_object_basic_unlock(MidgardObjectTest *mot, gconstpointer data)
@@ -530,6 +531,7 @@ void midgard_test_object_basic_unlock(MidgardObjectTest *mot, gconstpointer data
 	g_free(revised);
 	g_free(oguid);
 	g_free(pguid);
+	g_object_unref (metadata);
 }
 
 void midgard_test_object_basic_approve(MidgardObjectTest *mot, gconstpointer data)
@@ -592,7 +594,7 @@ void midgard_test_object_basic_approve(MidgardObjectTest *mot, gconstpointer dat
 	g_free(revised);
 	g_free(oguid);
 	g_free(pguid);
-
+	g_object_unref (metadata);
 }
 
 void midgard_test_object_basic_unapprove(MidgardObjectTest *mot, gconstpointer data)
@@ -655,4 +657,5 @@ void midgard_test_object_basic_unapprove(MidgardObjectTest *mot, gconstpointer d
 	g_free(revised);
 	g_free(oguid);
 	g_free(pguid);
+	g_object_unref (metadata);
 }
