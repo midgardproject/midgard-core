@@ -525,6 +525,9 @@ midgard_test_replicator_unserialize (MidgardObjectTest *mot, gconstpointer data)
 
 	g_free(pspecs);
 
+	g_object_unref (morig);
+	g_object_unref (mcopy);
+
 	i = 0;
 	while (objects[i] != NULL) {
 
@@ -583,6 +586,7 @@ void midgard_test_replicator_export_created (MidgardObjectTest *mot, gconstpoint
 
 	g_value_unset (&tval);
 	g_value_unset (&strval);
+	g_object_unref (metadata);
 }
 
 void midgard_test_replicator_export_updated (MidgardObjectTest *mot, gconstpointer data)
@@ -625,6 +629,7 @@ void midgard_test_replicator_export_updated (MidgardObjectTest *mot, gconstpoint
 
 	g_value_unset (&tval);
 	g_value_unset (&strval);
+	g_object_unref (metadata);
 }
 
 void 
