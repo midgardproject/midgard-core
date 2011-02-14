@@ -208,7 +208,7 @@ __midgard_object_get_property (GObject *object, guint prop_id,
 				
 		case MIDGARD_PROPERTY_METADATA:
 			if (MGD_DBOBJECT_METADATA (self) && G_IS_OBJECT (MGD_DBOBJECT_METADATA (self)))
-				g_value_take_object (value, (MidgardMetadata *) MGD_DBOBJECT_METADATA (self));
+				g_value_set_object (value, (MidgardMetadata *) MGD_DBOBJECT_METADATA (self));
 			break;
 		
 		default:
@@ -1126,8 +1126,6 @@ void _object_copy_properties(GObject *src, GObject *dest)
 
 			if (MIDGARD_IS_METADATA(nm)) {
 
-				/* Add reference to metadata object, it'll be unref when value is unset */
-				g_object_ref (nm);
 				MidgardMetadata *new_metadata = midgard_core_metadata_copy(MIDGARD_METADATA(nm));
 				MGD_DBOBJECT_METADATA (dest) = new_metadata;
 			}
