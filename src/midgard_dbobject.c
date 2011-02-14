@@ -522,7 +522,7 @@ midgard_dbobject_dispose (GObject *object)
 
 	/* Nullify connection's pointer. */
 	MidgardConnection *mgd = MIDGARD_DBOBJECT (self)->dbpriv->mgd;
-	if (mgd != NULL && G_IS_OBJECT (mgd)) {	
+	if (mgd != NULL && G_IS_OBJECT (mgd)) {
 		g_object_weak_unref (G_OBJECT(self->dbpriv->mgd), __weak_ref_notify, self);	
 		MIDGARD_DBOBJECT (self)->dbpriv->mgd = NULL;
 	}
