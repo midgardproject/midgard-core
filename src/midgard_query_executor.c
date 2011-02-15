@@ -230,7 +230,7 @@ _midgard_query_executor_get_property (GObject *object, guint property_id,
 			break;
 
 		case PROPERTY_CONSTRAINT:
-			g_value_take_object(value, self->priv->constraint);
+			g_value_set_object(value, self->priv->constraint);
 			break;
 
 		default:
