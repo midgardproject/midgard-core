@@ -500,8 +500,8 @@ static void cnc_add_part(
 gboolean 
 __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError **error)
 {
-	g_return_val_if_fail(mgd != NULL, FALSE);
-	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+	g_return_val_if_fail(mgd   != NULL, FALSE); // require valid connection
+	g_return_val_if_fail(error != NULL, FALSE); // require valid error-pointer
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
@@ -690,7 +690,7 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 {	
 	g_assert(self != NULL);
 	g_assert (name != NULL);
-	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+	g_return_val_if_fail(error != NULL, FALSE); // require valid error-pointer
 
 	MIDGARD_ERRNO_SET (self, MGD_ERR_OK);
 	gboolean rv = TRUE;
