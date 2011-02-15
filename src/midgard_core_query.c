@@ -2477,7 +2477,7 @@ midgard_core_query_binary_stringify (GValue *src_value)
 {
 	g_return_val_if_fail (src_value != NULL, NULL);
 
-	const GdaBinary *binary;
+	const GdaBinary *binary = NULL;
 	if (G_VALUE_TYPE (src_value) == GDA_TYPE_BLOB) {
 		const GdaBlob *blob = gda_value_get_blob (src_value);
 		binary = &blob->data;

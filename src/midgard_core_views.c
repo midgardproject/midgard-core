@@ -552,7 +552,6 @@ midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBOb
 
 	/* Select only those records which are not deleted. #1437 */
 	list = NULL;
-	guint i = 0;
 	g_string_append(query, " WHERE ");
 
 	MidgardDBObjectClass *dbklass = NULL;
@@ -580,7 +579,7 @@ midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBOb
 					g_strdup_printf ("%s.%s = 0", join->right_table ? join->right_table : join->right->table, deleted_field));
 	}
 
-	i = 0;
+	guint i = 0;
 	if (dellist)
 		dellist = g_slist_reverse (dellist);
 	for (list = dellist; list != NULL; list = list->next, i++) {
@@ -591,7 +590,6 @@ midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBOb
 	g_slist_free (dellist);
 
 	list = NULL;
-	i = 0;
 
 	for (list = type->constraints; list != NULL; list = list->next) {
 		
