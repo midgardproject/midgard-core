@@ -163,7 +163,10 @@ void		midgard_core_dbjoin_free	(MidgardDBJoin *mdbj);
 	}
 
 #define MIDGARD_GET_BOOLEAN_FROM_VALUE(__prop, __value) \
-	if(G_VALUE_HOLDS_UINT(__value)) { \
+	if (__value == NULL) { \
+		g_warning ("Invalid value (NULL). Converting to default FALSE boolean value"); \
+		__prop = FALSE; \
+	} else if(G_VALUE_HOLDS_UINT(__value)) { \
 		guint __i = g_value_get_uint(__value); \
 		if(__i == 1) \
 			__prop = TRUE; \
