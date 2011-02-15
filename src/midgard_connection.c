@@ -613,7 +613,7 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError *
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_NOT_CONNECTED, 
 				" Database [%s]. %s", tmpstr, err->message);
 		if (err) {
-			*error = g_error_new (MGD_GENERIC_ERROR, MGD_ERR_NOT_CONNECTED, 
+			g_set_error (error, MGD_GENERIC_ERROR, MGD_ERR_NOT_CONNECTED,
 					"Database [%s]. %s", tmpstr, err->message);
 			g_clear_error (&err);
 		}
@@ -705,7 +705,7 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 				MGD_ERR_USER_DATA,
 				"MidgardConfig already associated with "
 				"MidgardConnection");
-		*error = g_error_new (MGD_GENERIC_ERROR, MGD_ERR_INTERNAL, "%s", midgard_connection_get_error_string (self));
+		g_set_error (error, MGD_GENERIC_ERROR, MGD_ERR_INTERNAL, "%s", midgard_connection_get_error_string (self));
 		return FALSE;
 	}
 	
