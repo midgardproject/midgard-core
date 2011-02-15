@@ -1028,8 +1028,7 @@ static void _midgard_collector_finalize(GObject *object)
 	
 	g_object_unref(self->priv->builder);
 
-	GList *l = self->priv->values;
-	for(l = self->priv->values; l != NULL; l = l->next){
+	for(GList *l = self->priv->values; l != NULL; l = l->next){
 		g_free(l->data);
 	}
 	if (self->priv->values) {
