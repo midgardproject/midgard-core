@@ -1222,7 +1222,7 @@ gboolean midgard_object_get_by_id(MidgardObject *object, guint id)
 				"id",
 				"=", &pval)) {
 
-		GList *olist =
+		GSList *olist =
 			midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, &object);
 		g_value_unset(&pval);
 		g_object_unref(G_OBJECT(builder));
@@ -1233,7 +1233,7 @@ gboolean midgard_object_get_by_id(MidgardObject *object, guint id)
 			return FALSE;
 		}
 		
-		g_list_free(olist);
+		g_slist_free(olist);
 		
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_OK);
 		__dbus_send(object, "get");
@@ -2398,7 +2398,7 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 				"guid",
 				"=", &pval)) {
 	
-		GList *olist =
+		GSList *olist =
 			midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, &object);
 		
 		g_value_unset(&pval);
@@ -2410,7 +2410,7 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 			return FALSE;
 		}
 
-		g_list_free(olist);
+		g_slist_free(olist);
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_OK);
 		__dbus_send(object, "get");
 		return TRUE;

@@ -560,7 +560,7 @@ midgard_query_builder_set_offset (MidgardQueryBuilder *builder, guint offset)
         builder->priv->offset = offset;
 }
 
-static GList *midgard_query_builder_execute_or_count(MidgardQueryBuilder *builder, MidgardTypeHolder *holder, guint select_type)
+static GSList *midgard_query_builder_execute_or_count(MidgardQueryBuilder *builder, MidgardTypeHolder *holder, guint select_type)
 {
 	g_assert(builder != NULL);
 
@@ -589,7 +589,7 @@ static GList *midgard_query_builder_execute_or_count(MidgardQueryBuilder *builde
 
 	g_signal_emit (builder, MIDGARD_QUERY_BUILDER_GET_CLASS (builder)->signal_id_execution_start, 0);
 
-	GList *list = midgard_core_qb_set_object_from_query(builder, select_type, NULL);
+	GSList *list = midgard_core_qb_set_object_from_query(builder, select_type, NULL);
 
 	if (list == NULL) {
 
@@ -598,7 +598,7 @@ static GList *midgard_query_builder_execute_or_count(MidgardQueryBuilder *builde
 	} else {
 		
 		if (holder)
-			holder->elements = g_list_length(list);
+			holder->elements = g_slist_length(list);
 	}
 
 	g_signal_emit (builder, MIDGARD_QUERY_BUILDER_GET_CLASS (builder)->signal_id_execution_end, 0);
@@ -630,7 +630,7 @@ GObject **midgard_query_builder_execute(
 	*n_objects = 0;
 
 	guint i = 0;
-	GList *list = NULL;
+	GSList *list = NULL;
 	MIDGARD_ERRNO_SET(builder->priv->mgd, MGD_ERR_OK);
 
 	MidgardTypeHolder *holder = g_new(MidgardTypeHolder, 1);
@@ -645,14 +645,14 @@ GObject **midgard_query_builder_execute(
 	*n_objects = holder->elements;
 	MidgardObject **objects = g_new(MidgardObject *, holder->elements+1);	
 
-	GList *l = NULL;
+	GSList *l = NULL;
 	for(l = list; l != NULL; l = l->next){
 		objects[i] = l->data;
 		i++;
 	}	
 	objects[i] = NULL; /* Terminate by NULL */
 
-	g_list_free(list);
+	g_slist_free(list);
 	g_free(holder);
 
 	return (GObject **)objects;	
@@ -673,7 +673,7 @@ midgard_query_builder_count (MidgardQueryBuilder *builder)
 	g_assert(builder != NULL);
 	MIDGARD_ERRNO_SET(builder->priv->mgd, MGD_ERR_OK);
 	
-	GList *list =
+	GSList *list =
 		midgard_query_builder_execute_or_count(builder, NULL, MQB_SELECT_GUID);
 	
 	if(!list)
@@ -682,14 +682,14 @@ midgard_query_builder_count (MidgardQueryBuilder *builder)
 	MidgardTypeHolder *holder = (MidgardTypeHolder *)list->data;
 
 	if(!holder) {
-		g_list_free(list);
+		g_slist_free(list);
 		return 0;
 	}
 
 	guint elements = holder->elements;
 	
 	g_free(holder);
-	g_list_free(list);
+	g_slist_free(list);
 	
 	return elements;
 }
@@ -903,7 +903,7 @@ static void __mqb_set_metadata(MidgardMetadata *mdata, GdaDataModel *model, gint
 }
 
 
-GList *
+GSList *
 midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint select_type, MidgardObject **nobject)
 {
         g_assert(builder != NULL);
@@ -931,7 +931,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 			olist = dbklass->dbpriv->set_from_sql(mgd, builder->priv->type, ((const gchar *)sql));
 			g_free(sql);
 
-			return (GList *)olist;
+			return olist;
 		}
 	}
 
@@ -949,7 +949,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 	ret_fields =  gda_data_model_get_n_columns(model);
 
 	/* records found , allocate as many objects as many returned rows */ 
-	GList *list = NULL;
+	GSList *list = NULL;
 
 	if(ret_rows == 0) {
 		g_object_unref(model);
@@ -975,7 +975,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 
 		holder->elements = (guint)g_value_get_int64((GValue*)&val);
 		
-		list = g_list_append(list, holder);	
+		list = g_slist_append(list, holder);	
 		
 		g_object_unref(model);
 		g_value_unset (&val);
@@ -1099,7 +1099,7 @@ midgard_core_qb_set_object_from_query (MidgardQueryBuilder *builder, guint selec
 				__mqb_set_metadata(metadata, model, rows);
 		}	
 
-		list = g_list_append(list, G_OBJECT(object));                		
+		list = g_slist_append(list, G_OBJECT(object));                		
 	}
 
 	g_object_unref(model);

@@ -669,7 +669,7 @@ GObject **midgard_core_qb_execute(MidgardQueryBuilder *builder, guint *n_objects
 {
 	g_assert(builder != NULL);
 
-	GList *list = midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, NULL);
+	GSList *list = midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, NULL);
 
 	if(list == NULL) 
 		return NULL;
@@ -678,7 +678,7 @@ GObject **midgard_core_qb_execute(MidgardQueryBuilder *builder, guint *n_objects
 	*n_objects = g_list_length(list);
 	MidgardObject **objects = g_new(MidgardObject *, *n_objects+1);
 
-	GList *l = NULL;
+	GSList *l = NULL;
 	for(l = list; l != NULL; l = l->next) {
 		objects[i] = l->data;
 		i++;
@@ -686,7 +686,7 @@ GObject **midgard_core_qb_execute(MidgardQueryBuilder *builder, guint *n_objects
 
 	objects[i] = NULL; /* Terminate by NULL */
 
-	g_list_free(list);
+	g_slist_free(list);
 
 	return (GObject **)objects;
 }
