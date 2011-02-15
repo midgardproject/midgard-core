@@ -339,7 +339,6 @@ midgard_schema_object_tree_get_parent_object (MidgardObject *object)
         gboolean ret_object = FALSE;
         const gchar *parent_class_name = NULL;
         MidgardConnection *mgd = MGD_OBJECT_CNC (self);
-        MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(mobj);
 	const gchar *classname = G_OBJECT_TYPE_NAME (self);
 	
         const gchar *property_up = midgard_reflector_object_get_property_up (classname);
