@@ -58,8 +58,7 @@ __midgard_view_derived_object_set_from_sql(MidgardConnection *mgd, GType type, c
 
 	for (rows = 0; rows < ret_rows; rows++) {
 		
-		MidgardView *view = g_object_new(type, NULL);
-		MIDGARD_DBOBJECT(view)->dbpriv->mgd = mgd;
+		MidgardView *view = g_object_new(type, "connection", mgd, NULL);
 
 		/* Every view object holds reference to the same model.
 		 * And has different row which is used to determine its property location */
