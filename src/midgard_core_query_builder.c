@@ -675,7 +675,7 @@ GObject **midgard_core_qb_execute(MidgardQueryBuilder *builder, guint *n_objects
 		return NULL;
 	
 	guint i = 0;
-	*n_objects = g_list_length(list);
+	*n_objects = g_slist_length(list);
 	MidgardObject **objects = g_new(MidgardObject *, *n_objects+1);
 
 	GSList *l = NULL;
