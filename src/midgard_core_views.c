@@ -38,6 +38,7 @@
 
 static gchar *parsed_view = NULL;
 
+static void __view_error(xmlNode *node, const gchar *msg, ...) __attribute__((__noreturn__));
 static void __view_error(xmlNode *node, const gchar *msg, ...)
 {
 	g_assert(node != NULL);
