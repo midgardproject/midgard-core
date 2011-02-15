@@ -983,8 +983,10 @@ static void __set_from_sql(MidgardDBObject *object,
 	value = midgard_data_model_get_value_at_col_name (model, "password", row);
 	if (value && G_VALUE_HOLDS_STRING (value))
 		self->priv->password = g_value_dup_string (value);
-	else 
+	else if (value)
 		g_warning ("Invalid value type for user's password. Expected string, got %s", G_VALUE_TYPE_NAME (value));
+	else
+		g_warning ("Invalid value type for user's password. Expected string, got NULL");
 
 	/* PERSON GUID */
 	value = midgard_data_model_get_value_at_col_name (model, "person", row);
@@ -992,8 +994,10 @@ static void __set_from_sql(MidgardDBObject *object,
 		g_free (self->priv->person_guid);
 		self->priv->person_guid = g_value_dup_string (value);
 	
-	} else {
+	} else if (value) {
 		g_warning ("Invalid value type for user's person guid. Expected string, got %s", G_VALUE_TYPE_NAME (value));
+	} else {
+		g_warning ("Invalid value type for user's person guid. Expected string, got NULL");
 	}
 
 	/* ACTIVE */
