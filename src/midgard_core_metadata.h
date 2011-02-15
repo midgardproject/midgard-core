@@ -48,29 +48,29 @@
 #define METADATA_FIELD_DELETED		"metadata_deleted"
 
 /* Properties setters */
-void	midgard_core_metadata_set_creator		(MidgardMetadata *self, const GValue *creator);
-void	midgard_core_metadata_set_created		(MidgardMetadata *self, const GValue *value);
-void	midgard_core_metadata_set_revisor		(MidgardMetadata *self, const GValue *revisor);
-void	midgard_core_metadata_set_revised		(MidgardMetadata *self, const GValue *revised);
-void	midgard_core_metadata_set_revision		(MidgardMetadata *self, const GValue *revision);
-void	midgard_core_metadata_set_locker		(MidgardMetadata *self, const GValue *locker);
-void	midgard_core_metadata_set_locked		(MidgardMetadata *self, const GValue *locked);
-void	midgard_core_metadata_set_approver		(MidgardMetadata *self, const GValue *approver);
-void	midgard_core_metadata_set_approved		(MidgardMetadata *self, const GValue *approved);
-void	midgard_core_metadata_set_size			(MidgardMetadata *self, const GValue *size);
-void	midgard_core_metadata_set_exported		(MidgardMetadata *self, const GValue *exported);
-void	midgard_core_metadata_set_imported		(MidgardMetadata *self, const GValue *imported);
-void	midgard_core_metadata_set_deleted		(MidgardMetadata *self, const GValue *deleted);
-void	midgard_core_metadata_set_isapproved		(MidgardMetadata *self, const GValue *isapproved);
-void	midgard_core_metadata_set_islocked		(MidgardMetadata *self, const GValue *islocked);
-void	midgard_core_metadata_set_schedule_start	(MidgardMetadata *self, const GValue *schedule);
-void	midgard_core_metadata_set_schedule_end		(MidgardMetadata *self, const GValue *schedule);
-void	midgard_core_metadata_set_published		(MidgardMetadata *self, const GValue *published);
-void	midgard_core_metadata_set_authors		(MidgardMetadata *self, const GValue *authors);
-void	midgard_core_metadata_set_owner			(MidgardMetadata *self, const GValue *owner);
-void	midgard_core_metadata_set_score			(MidgardMetadata *self, const GValue *score);
-void	midgard_core_metadata_set_hidden		(MidgardMetadata *self, const GValue *hidden);
-void	midgard_core_metadata_set_navnoentry		(MidgardMetadata *self, const GValue *navnoentry);
+void	midgard_core_metadata_set_creator		(MidgardMetadata *self, const GValue *creator) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_created		(MidgardMetadata *self, const GValue *value) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_revisor		(MidgardMetadata *self, const GValue *revisor) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_revised		(MidgardMetadata *self, const GValue *revised) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_revision		(MidgardMetadata *self, const GValue *revision) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_locker		(MidgardMetadata *self, const GValue *locker) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_locked		(MidgardMetadata *self, const GValue *locked) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_approver		(MidgardMetadata *self, const GValue *approver) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_approved		(MidgardMetadata *self, const GValue *approved) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_size			(MidgardMetadata *self, const GValue *size) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_exported		(MidgardMetadata *self, const GValue *exported) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_imported		(MidgardMetadata *self, const GValue *imported) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_deleted		(MidgardMetadata *self, const GValue *deleted) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_isapproved		(MidgardMetadata *self, const GValue *isapproved) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_islocked		(MidgardMetadata *self, const GValue *islocked) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_schedule_start	(MidgardMetadata *self, const GValue *schedule) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_schedule_end		(MidgardMetadata *self, const GValue *schedule) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_published		(MidgardMetadata *self, const GValue *published) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_authors		(MidgardMetadata *self, const GValue *authors) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_owner			(MidgardMetadata *self, const GValue *owner) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_score			(MidgardMetadata *self, const GValue *score) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_hidden		(MidgardMetadata *self, const GValue *hidden) __attribute__((nonnull(1,2)));
+void	midgard_core_metadata_set_navnoentry		(MidgardMetadata *self, const GValue *navnoentry) __attribute__((nonnull(1,2)));
 
 /* MidgardDBObject */
 gboolean	midgard_core_metadata_dbpriv_set_property 	(MidgardDBObject *self, const gchar *name, GValue *value);
