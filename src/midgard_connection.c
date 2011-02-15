@@ -501,7 +501,7 @@ gboolean
 __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError **error)
 {
 	g_return_val_if_fail(mgd   != NULL, FALSE); // require valid connection
-	g_return_val_if_fail(error != NULL, FALSE); // require valid error-pointer
+	g_return_val_if_fail(error == NULL || *error == NULL, FALSE); // error should be NULL or point to NULL
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
@@ -613,8 +613,10 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError *
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_NOT_CONNECTED, 
 				" Database [%s]. %s", tmpstr, err->message);
 		if (err) {
-			*error = g_error_new (MGD_GENERIC_ERROR, MGD_ERR_NOT_CONNECTED, 
-					"Database [%s]. %s", tmpstr, err->message);
+			if (error) {
+				*error = g_error_new (MGD_GENERIC_ERROR, MGD_ERR_NOT_CONNECTED, 
+						"Database [%s]. %s", tmpstr, err->message);
+			}
 			g_clear_error (&err);
 		}
 		g_free(tmpstr);
@@ -690,7 +692,7 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 {	
 	g_assert(self != NULL);
 	g_assert (name != NULL);
-	g_return_val_if_fail(error != NULL, FALSE); // require valid error-pointer
+	g_return_val_if_fail(error == NULL || *error == NULL, FALSE); // error should be NULL or point to NULL
 
 	MIDGARD_ERRNO_SET (self, MGD_ERR_OK);
 	gboolean rv = TRUE;
