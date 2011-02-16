@@ -2098,21 +2098,23 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 
 		if (G_VALUE_TYPE(value) == G_TYPE_UINT) {
 			if (g_value_get_uint(value) == 0) {
-				goto return_empty_object;
+				goto return_null_with_error;
 			}
 		}	
 
 		if (G_VALUE_TYPE(value) == G_TYPE_INT) {
 			if (g_value_get_int(value) < 1) {
-				goto return_empty_object;
+				goto return_null_with_error;
 			}
 		}	
 
 		if (G_VALUE_TYPE(value) == G_TYPE_STRING) {
 			const gchar *guidval = g_value_get_string(value);
 			field = "guid";
-			if (!guidval || (guidval && !midgard_is_guid (guidval)))
-					goto return_empty_object;
+			if (!guidval)
+				goto return_empty_object;
+			if (guidval && !midgard_is_guid (guidval))
+				goto return_null_with_error;
 		}
 		
 		MidgardQueryBuilder *builder = midgard_query_builder_new(mgd, name);
@@ -2146,6 +2148,10 @@ return_empty_object:
 	MGD_OBJECT_CNC (self) = mgd;
 
 	return self;
+
+return_null_with_error:
+	MIDGARD_ERRNO_SET_STRING(mgd, MGD_ERR_INVALID_PROPERTY_VALUE, "Invalid value. Expected NULL, valid guid or valid, positive integer");
+	return NULL;
 }
 
 /**
