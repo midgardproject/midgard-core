@@ -304,7 +304,6 @@ midgard_core_metadata_copy_properties (MidgardMetadata *src, MidgardMetadata *co
 	g_return_if_fail (copy != NULL);
 
 	GValue sval = {0, };
-	g_value_init (&sval, G_TYPE_STRING);
 	
 	if (src->priv->creator != NULL) {
 		g_value_init (&sval, G_TYPE_STRING);
