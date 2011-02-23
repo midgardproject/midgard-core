@@ -2961,12 +2961,7 @@ gboolean midgard_object_get_by_path(MidgardObject *self, const gchar *path)
 	if (!object)
 		return FALSE;
 
-	g_print ("ORIGINAL INSTANCE [%p] (%u), METADATA [%p] (%u) \n",
-			self, G_OBJECT (self)->ref_count, MGD_DBOBJECT_METADATA (self), G_OBJECT (MGD_DBOBJECT_METADATA (self))->ref_count);
 	_object_copy_properties(G_OBJECT(object), G_OBJECT(self));
-	g_print ("COPY INSTANCE [%p] (%u), METADATA [%p] (%u) \n",
-			object, G_OBJECT (object)->ref_count, MGD_DBOBJECT_METADATA (object), G_OBJECT (MGD_DBOBJECT_METADATA (object))->ref_count);
-
 	g_object_unref(object);
 
 	return TRUE;
