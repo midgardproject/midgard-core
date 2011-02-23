@@ -1124,11 +1124,8 @@ void _object_copy_properties(GObject *src, GObject *dest)
 			g_object_get_property(src, props[i]->name, &pval);	
 			GObject *nm = g_value_get_object(&pval);
 
-			if (MIDGARD_IS_METADATA(nm)) {
-
-				MidgardMetadata *new_metadata = midgard_core_metadata_copy(MIDGARD_METADATA(nm));
-				MGD_DBOBJECT_METADATA (dest) = new_metadata;
-			}
+			if (MIDGARD_IS_METADATA(nm)) 
+				midgard_core_metadata_copy_properties (MIDGARD_METADATA(nm), MGD_DBOBJECT_METADATA (dest));
 
 		} else {
 

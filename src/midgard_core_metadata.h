@@ -78,6 +78,7 @@ gboolean	midgard_core_metadata_dbpriv_set_property 	(MidgardDBObject *self, cons
 /* routines */
 void		midgard_core_metadata_increase_revision		(MidgardMetadata *self);
 MidgardMetadata *midgard_core_metadata_copy			(MidgardMetadata *src);
+void		midgard_core_metadata_copy_properties 		(MidgardMetadata *src, MidgardMetadata *copy);
 guint 		midgard_core_metadata_get_size			(MidgardMetadata *self);
 
 #endif /* MIDGARD_CORE_METADATA_H */

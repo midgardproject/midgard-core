@@ -292,7 +292,17 @@ midgard_core_metadata_copy(MidgardMetadata *src)
 	/* Initialize it that way so all callbacks are correctly set */
 	MidgardMetadata *copy = midgard_metadata_new (src->priv->object);
 	g_assert (copy != NULL);
-	
+
+	midgard_core_metadata_copy_properties (src, copy);
+	return copy;
+}
+
+void 
+midgard_core_metadata_copy_properties (MidgardMetadata *src, MidgardMetadata *copy)
+{
+	g_return_if_fail (src != NULL);
+	g_return_if_fail (copy != NULL);
+
 	GValue sval = {0, };
 	g_value_init (&sval, G_TYPE_STRING);
 	
@@ -355,7 +365,7 @@ midgard_core_metadata_copy(MidgardMetadata *src)
 	copy->priv->score          = src->priv->score;
 	copy->priv->size           = src->priv->size;
 
-	return copy;
+	return;
 }
 
 static GObjectClass *__parent_class = NULL;
