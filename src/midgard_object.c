@@ -1119,7 +1119,7 @@ void _object_copy_properties(GObject *src, GObject *dest)
 		
 		g_value_init(&pval, props[i]->value_type);	
 
-		if (props[i]->value_type == G_TYPE_OBJECT) {			
+		if (G_TYPE_FUNDAMENTAL (props[i]->value_type) == G_TYPE_OBJECT) {			
 		
 			g_object_get_property(src, props[i]->name, &pval);	
 			GObject *nm = g_value_get_object(&pval);
@@ -2961,7 +2961,11 @@ gboolean midgard_object_get_by_path(MidgardObject *self, const gchar *path)
 	if (!object)
 		return FALSE;
 
+	g_print ("ORIGINAL INSTANCE [%p] (%u), METADATA [%p] (%u) \n",
+			self, G_OBJECT (self)->ref_count, MGD_DBOBJECT_METADATA (self), G_OBJECT (MGD_DBOBJECT_METADATA (self))->ref_count);
 	_object_copy_properties(G_OBJECT(object), G_OBJECT(self));
+	g_print ("COPY INSTANCE [%p] (%u), METADATA [%p] (%u) \n",
+			object, G_OBJECT (object)->ref_count, MGD_DBOBJECT_METADATA (object), G_OBJECT (MGD_DBOBJECT_METADATA (object))->ref_count);
 
 	g_object_unref(object);
 
