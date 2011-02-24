@@ -490,6 +490,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 
 	/* execute statement */
 	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &error);
+	g_object_unref (stmt);
 
 	if (!model && !error)
 		goto return_false;
