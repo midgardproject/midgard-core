@@ -1266,8 +1266,10 @@ static void __is_linked_valid(MidgardDBObjectClass *klass, const gchar *prop)
 	smrp = midgard_reflection_property_new(klass);
 	const gchar *typename = G_OBJECT_CLASS_NAME(klass);
 
-	if(!midgard_reflection_property_is_link(smrp, prop)) 
+	if(!midgard_reflection_property_is_link(smrp, prop)) {
+		g_object_unref (smrp);
 		return;
+	}
 
 	const MidgardDBObjectClass *pklass = midgard_reflection_property_get_link_class(smrp, prop);
 	
@@ -1297,6 +1299,9 @@ static void __is_linked_valid(MidgardDBObjectClass *klass, const gchar *prop)
 	dmrp = midgard_reflection_property_new(MIDGARD_DBOBJECT_CLASS(pklass));
 	GType dst_type = midgard_reflection_property_get_midgard_type(dmrp, prop_link);
 	
+	g_object_unref (smrp);
+	g_object_unref (dmrp);
+
 	if(src_type != dst_type)
 		g_error("Mismatched references' types: %s.%s type != %s.%s type",
 				typename, prop, G_OBJECT_CLASS_NAME(pklass), prop_link);
