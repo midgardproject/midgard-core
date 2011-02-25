@@ -349,6 +349,8 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	cond->operands = g_slist_append (cond->operands, expr);
 	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
 
+	g_value_unset (&field_value);
+
 	/* Create value */
 	GValue val = {0, };
 	midgard_query_holder_get_value (MIDGARD_QUERY_CONSTRAINT (constraint_simple)->priv->holder, &val);
