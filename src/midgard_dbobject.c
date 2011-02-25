@@ -71,6 +71,8 @@ _add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaConnection *cnc
 		select_field->expr = expr;
 	}	
 
+	g_free (pspecs);
+
 	if (!klass->dbpriv->has_metadata)
 		return;
 
