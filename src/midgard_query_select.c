@@ -183,8 +183,8 @@ _midgard_query_select_add_join (MidgardQueryExecutor *self, const gchar *join_ty
 	}
 
 	qsj *_sj = g_new (qsj, 1);
-	_sj->left_property = left_property;
-	_sj->right_property = right_property;
+	_sj->left_property = g_object_ref (left_property);
+	_sj->right_property = g_object_ref (right_property);
 
 	_sj->join_type = join_type_id;
 
