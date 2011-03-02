@@ -431,8 +431,11 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint) {
 		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement 			(MIDGARD_QUERY_EXECUTOR (self), MIDGARD_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where);
-		if (MIDGARD_QUERY_EXECUTOR (self)->priv->n_constraints == 1)
+		if (MIDGARD_QUERY_EXECUTOR (self)->priv->n_constraints == 1) 
 			__add_second_dummy_constraint (sss, operation);
+		/* Add dummy constraint if operation has only one operand */
+		if (operation->operands && (g_slist_length (operation->operands) == 1))
+			__add_dummy_constraint (sss, operation);
 	} else { 
 		/* no constraints, add dummy '1=1 AND 0<1' to satisfy top constraint group */
 		__add_dummy_constraint (sss, operation); 
@@ -465,7 +468,7 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 		g_value_take_string (offset_val, g_strdup_printf ("%d", MIDGARD_QUERY_EXECUTOR (self)->priv->offset));
 		offset_expr->value = offset_val;
 		sss->limit_offset = offset_expr;
-	}
+	}	
 
 	/* Check structure */
 	if (!gda_sql_statement_check_structure (sql_stm, &error)) {
