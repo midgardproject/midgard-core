@@ -660,6 +660,10 @@ midgard_core_query_constraint_parse_property (MidgardCoreQueryConstraint **const
 		j++;
 	}
 
+	/* Keep property name alive */
+	if (constraint->pspec->name)
+		constraint->propname = constraint->pspec->name;
+
 	g_strfreev(spltd);
 
 	return TRUE;
