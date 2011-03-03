@@ -661,8 +661,9 @@ midgard_core_query_constraint_parse_property (MidgardCoreQueryConstraint **const
 	}
 
 	/* Keep property name alive */
-	if (constraint->pspec->name)
-		constraint->propname = constraint->pspec->name;
+	/* TODO, Remove priv->propname access and replace it with paramspec's name */
+	(*constraint)->priv->pspec = g_object_class_find_property (G_OBJECT_CLASS (klass), (*constraint)->priv->propname);
+       	(*constraint)->priv->propname = (*constraint)->priv->pspec->name;
 
 	g_strfreev(spltd);
 
