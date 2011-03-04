@@ -573,8 +573,13 @@ gboolean _nodes2object(GObject *object, xmlNode *node, gboolean force)
 						g_object_get(G_OBJECT(object),
 								(const gchar *) cur->name,
 								&prop_object, NULL);
-						_nodes2object(prop_object, cur->children, force);	
-						g_value_set_object(&pval, prop_object);
+						if (prop_object) {
+							_nodes2object(prop_object, cur->children, force);	
+							g_value_set_object(&pval, prop_object);
+						} else {
+							g_warning ("Failed to unserialize '%s' object property. Expected to be initialized by given '%s' instance", (const gchar *) cur->name, G_OBJECT_TYPE_NAME (object));
+						}
+
 						break;
 
 					default:
