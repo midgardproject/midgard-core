@@ -792,7 +792,7 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	pspec = g_param_spec_object ("storage",
 			"", "", 
 			MIDGARD_TYPE_QUERY_STORAGE,
-			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
 	/**
 	 * MidgardQuerySelect:storage:
 	 * 
