@@ -159,6 +159,8 @@ MidgardQueryBuilder *midgard_query_builder_new(
  * This function is added for language bindings, in which, that function
  * can not be invoked explicitly.
  *
+ * Returns: (transfer full): new #MidgardQueryBuilder instance
+ *
  * Since: 10.05.1
  */
 MidgardQueryBuilder *
@@ -619,7 +621,7 @@ static GSList *midgard_query_builder_execute_or_count(MidgardQueryBuilder *build
  * 
  * In case of any error, #MidgardConnection error is set.
  * 
- * Returns: NULL terminated array of objects, or NULL if none found
+ * Returns: (transfer full): NULL terminated array of objects, or NULL if none found
  */  
 GObject **midgard_query_builder_execute(
 	MidgardQueryBuilder *builder, guint *n_objects)
