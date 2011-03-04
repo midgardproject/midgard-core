@@ -48,7 +48,7 @@ midgard_query_value_new (void)
  *
  * Static shortcut for midgard_query_value_new() and set_value.
  *
- * Returns: new #MidgardQueryValue or %NULL on failure
+ * Returns: (transfer full): new #MidgardQueryValue or %NULL on failure
  *
  * Since: 10.05.1
  */ 
