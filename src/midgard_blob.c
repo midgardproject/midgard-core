@@ -198,7 +198,8 @@ MidgardBlob *midgard_blob_new (MidgardObject *attachment, const gchar *encoding)
  *
  * Invokes midgard_blob_new() and it's designed for language bindings, in whic, 
  * that function can not be invoked explicitly.
- *
+ * 
+ * Returns: (transfer full): new #MidgardBlob instance
  * Since: 10.05.1
  */
 MidgardBlob*
@@ -379,7 +380,7 @@ gboolean  midgard_blob_write_content(MidgardBlob *self,	const gchar *content)
  * Returned channel is owned by midgard_blob and should not be freed
  * or unreferenced.
  *
- * Returns: GIOChannel or %NULL
+ * Returns: (transfer none): GIOChannel or %NULL
  */
 GIOChannel *midgard_blob_get_handler(MidgardBlob *self, const gchar *mode)
 {
