@@ -320,7 +320,7 @@ midgard_schema_object_tree_get_parent_name (MidgardObject *object)
  *
  * Get tree parent object, of the given @object.
  *
- * Returns: parent object or %NULL
+ * Returns: (transfer full): parent object or %NULL
  * Since: 10.05
  */ 
 MidgardObject*
