@@ -40,9 +40,6 @@ typedef struct _MidgardReflectionPropertyClass MidgardReflectionPropertyClass;
 
 struct _MidgardReflectionPropertyClass{
 	GObjectClass parent;
-
-	/* public class members */
-	gboolean (*is_link) (MidgardReflectionProperty *object, const gchar *propname);
 };
 
 GType midgard_reflection_property_get_type(void);
