@@ -718,7 +718,7 @@ __midgard_query_select_get_property (GObject *object, guint property_id,
 			break;
 
 		case PROPERTY_STORAGE:
-			g_value_set_object (value, g_object_ref (self->priv->storage));	
+			g_value_set_object (value, g_object_ref (MIDGARD_QUERY_EXECUTOR (self)->priv->storage));	
 			break;
 
 		default:
