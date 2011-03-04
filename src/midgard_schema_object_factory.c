@@ -51,7 +51,7 @@
  * </para></listitem>
  * </itemizedlist>
  *
- * Returns: #MidgardObject derived new instance or %NULL on failure
+ * Returns: (transfer full): #MidgardObject derived new instance or %NULL on failure
  * Since: 10.05
  */ 
 MidgardObject*
@@ -204,7 +204,7 @@ __get_id_from_path_element (MidgardConnection *mgd,
  * </para></listitem>
  * </itemizedlist>
  *
- * Returns: #MidgardObject derived, new @classname instance or %NULL 
+ * Returns: (transfer full): #MidgardObject derived, new @classname instance or %NULL 
  * Since: 10.05
  */ 
 MidgardObject*
@@ -433,7 +433,7 @@ midgard_schema_object_factory_object_undelete (MidgardConnection *mgd, const gch
  *
  * Check midgard_object_new() for returned value and possible errors.
  *
- * Returns: new #MidgardObject derived instance or NULL
+ * Returns: (transfer full): new #MidgardObject derived instance or NULL
  * Since: 10.05.1
  */ 
 MidgardObject*  
