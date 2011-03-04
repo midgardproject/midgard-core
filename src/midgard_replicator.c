@@ -383,7 +383,7 @@ midgard_replicator_export_blob(MidgardObject *object)
  * @xml: xml buffer which holds serialized object
  * @force: toggle to force unserialization
  *
- * Returns: Newly allocated array of GObjects
+ * Returns: (transfer full): Newly allocated array of GObjects
  */ 
 GObject **
 midgard_replicator_unserialize (MidgardConnection *mgd, const gchar *xml, gboolean force)
