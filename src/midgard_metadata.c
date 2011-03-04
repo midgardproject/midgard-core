@@ -376,7 +376,7 @@ _metadata_set_property (GObject *object, guint property_id,
 			break;
 						
 		case MIDGARD_METADATA_PUBLISHED:	    
-			g_free (self->priv->published);
+			g_free (self->priv->published);	
 			self->priv->published = g_value_dup_boxed (value);
 			break;
 
@@ -594,12 +594,6 @@ _metadata_object_finalize(GObject *object)
 	g_free(self->priv->published);
 	g_free(self->priv->exported);
 	g_free(self->priv->imported);
-
-	/* Set parent's object metadata to NULL, if metadata unref has been 
-	 * invoked on metadata directly */
-	if (self->priv->object 
-			&& G_IS_OBJECT (self->priv->object))
-	       MGD_DBOBJECT_METADATA (self->priv->object) = NULL;	
 
 	g_free(self->priv);
 
