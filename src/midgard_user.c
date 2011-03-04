@@ -1512,6 +1512,7 @@ static void _midgard_user_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->update_storage = midgard_core_query_update_class_storage;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_exists = _user_storage_exists; 
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->delete_storage = _user_storage_delete;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_static_sql_select = NULL;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_statement_insert;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_statement_update = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_statement_update;
 
