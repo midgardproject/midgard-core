@@ -34,7 +34,7 @@ static gchar *caltime_fmt(MidgardTimestamp *mt)
                 unsigned long n = mt->nano;
                 while ((n % 10) == 0) { n = n / 10; }
                 g_string_append_printf(string, ".%lo", n);
-        }
+        }	
         g_string_append_printf(string, "%+05ld", mt->offset);
         return g_string_free(string, FALSE);
 }
@@ -45,7 +45,9 @@ static unsigned int caltime_scan(const char *s, MidgardTimestamp *ct)
 	const char *t = s;
 	unsigned long z;
 	unsigned long c;
-	
+
+	/* 2011-03-04T11:25:44+00:00 */
+	/* ^                         */
 	if (*t == '-') { ++t; sign = -1; }
 	z = 0; while ((c = (unsigned char) (*t - '0')) <= 9) { z = z * 10 + c; ++t; }
 	
@@ -54,6 +56,8 @@ static unsigned int caltime_scan(const char *s, MidgardTimestamp *ct)
 	if (ct->year == 0)
 		ct->year = 1;
 
+	/* 2011-03-04T11:25:44+00:00 */
+	/*     ^                     */
 	if (*t++ != '-') return 0;
 	z = 0; while ((c = (unsigned char) (*t - '0')) <= 9) { z = z * 10 + c; ++t; }
 	ct->month = z;
@@ -61,6 +65,8 @@ static unsigned int caltime_scan(const char *s, MidgardTimestamp *ct)
 	if (ct->month == 0)
 		ct->month = 1;
 
+	/* 2011-03-04T11:25:44+00:00 */
+	/*        ^                  */
 	if (*t++ != '-') return 0;
 	z = 0; while ((c = (unsigned char) (*t - '0')) <= 9) { z = z * 10 + c; ++t; }
 	ct->day = z;
@@ -68,6 +74,8 @@ static unsigned int caltime_scan(const char *s, MidgardTimestamp *ct)
 	if (ct->day == 0)
 		ct->day = 1;
 
+	/* 2011-03-04T11:25:44+00:00 */
+	/*           ^               */
 	while ((*t == ' ') || (*t == '\t') || (*t == 'T')) ++t;
 	z = 0; while ((c = (unsigned char) (*t - '0')) <= 9) { z = z * 10 + c; ++t; }
 	ct->hour = z;
@@ -93,21 +101,36 @@ static unsigned int caltime_scan(const char *s, MidgardTimestamp *ct)
 		ct->nano *= z;
 	}
 
-	while ((*t == ' ') || (*t == '\t')) ++t;
+	/* Set default UTC offset */
+	ct->offset = 0;
 	
-	if(*t == '\0' || *t == 'Z') {
-		ct->offset = z * sign;
-		return t - s;
-	}
+	/* 2011-03-04T11:25:44+00:00 */
+	/*                    ^      */
 
-	if (*t == '+') sign = 1; else if (*t == '-') sign = -1; else return 0;
-	++t;
-	c = (unsigned char) (*t++ - '0'); if (c > 9) return 0; z = c;
-	c = (unsigned char) (*t++ - '0'); if (c > 9) return 0; z = z * 10 + c;
-	c = (unsigned char) (*t++ - '0'); if (c > 9) return 0; z = z * 6 + c;
-	c = (unsigned char) (*t++ - '0'); if (c > 9) return 0; z = z * 10 + c;
-	ct->offset = z * sign;
-	return t - s;
+	/* Zulu time, keep UTC */
+	if (*t == 'Z') 
+		return 0;
+
+	if (*t == '\0')
+		return 0;
+
+	if (*t == ' ' || *t == '+' || *t == '-') {
+		if (*t == '+') sign = 1;
+		if (*t == '-') sign = -1;
+		++t;
+
+		/* 2011-03-04T11:25:44+00:00 */
+		/*                     ^     */
+		c = (unsigned char) (*t++ - '0'); if (c > 9) return 0; z = c;
+		c = (unsigned char) (*t++ - '0'); if (c > 9) return 0; z = z * 10 + c;
+		c = (unsigned char) (*t++ - '0'); if (c > 9) return 0; z = z * 6 + c;
+		c = (unsigned char) (*t++ - '0'); if (c > 9) return 0; z = z * 10 + c;
+		ct->offset = z * sign;
+
+		return 0;
+	} 
+
+	return -1;
 }
 
 
@@ -352,25 +375,10 @@ static void midgard_timestamp_transform_from_string(const GValue *src, GValue *d
 		g_value_take_boxed(dst, mt);
 	}	
 
-	/* GDA seems to convert datetime better. Follow its value. */
+	gint rv = caltime_scan(time, mt);
 
-	GValue gt = {0, };
-	g_value_init(&gt, GDA_TYPE_TIMESTAMP);
-	g_value_transform(src, &gt);
-
-	g_value_transform(&gt, dst);
-	g_value_unset(&gt);
-
-        /*if (caltime_scan(time, mt) > 0) {
-
-		g_warning("set");
-                midgard_timestamp_set(mt);
-
-        } else {
-
-		g_warning("reset");
-        	__timestamp_reset(dst);
-        }*/
+	if (rv != 0)
+		g_warning ("Failed to transform given datetime string (%s) to MidgardTimestamp", time);
 }
 
 static void midgard_timestamp_transform_from_gda_timestamp(const GValue *src, GValue *dst)
@@ -402,6 +410,8 @@ static void midgard_timestamp_transform_from_gda_timestamp(const GValue *src, GV
 	mt->second = gt->second;
 
 	mt->offset = gt->timezone;
+	if (gt->timezone == GDA_TIMEZONE_INVALID)
+		mt->offset = 0;
 
 	g_value_take_boxed(dst, mt);	
 }
