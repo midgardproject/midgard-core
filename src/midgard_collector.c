@@ -439,7 +439,7 @@ midgard_collector_set (MidgardCollector *self, const gchar *key, const gchar *su
  * Quarks , so you must call g_quark_to_string if you need to get strings 
  * ( e.g. implementing hash table for language bindings ).
  *
- * Returns: #GData for the given key or %NULL if key is not found in collection
+ * Returns: (transfer full): #GData for the given key or %NULL if key is not found in collection
  */ 
 GData*
 midgard_collector_get (MidgardCollector *self, const gchar *key)
@@ -617,7 +617,7 @@ static void __get_collection_keys (	GQuark key_id,
  * in array. It should be freed without any need to free each string.
  * g_free (instead of g_strfreev) should be used to free returned list.
  * 
- * Returns: %NULL terminated array of strings or %NULL
+ * Returns: (transfer container):  %NULL terminated array of strings or %NULL
  */
 gchar**
 midgard_collector_list_keys (MidgardCollector *self)
