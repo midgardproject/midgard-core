@@ -22,8 +22,6 @@
 #include <stdlib.h>
 #include <glib.h>
 
-GHashTable *midgard_hash_strings_new(void);
-
 struct MidgardTypeHolder{
 	guint elements;
 	guint level;
