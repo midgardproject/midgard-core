@@ -155,7 +155,6 @@ src_libmidgard2_la_public_SOURCES = \
 	src/query_builder.c \
 	src/midgard_metadata.c \
 	src/midgard_timestamp.c \
-	src/midgard_datatypes.c \
 	src/midgard_reflection_property.c \
 	src/midgard_connection.c \
 	src/midgard_error.c \
