@@ -525,7 +525,7 @@ gboolean midgard_config_read_data(MidgardConfig *self, const gchar *data, GError
  *
  * Returned array should be freed when no longer needed.
  *
- * Returns: newly allocated and %NULL terminated array of file names.
+ * Returns: (transfer full): newly allocated and %NULL terminated array of file names.
  *
  */
 gchar **midgard_config_list_files(gboolean user)
@@ -1395,7 +1395,7 @@ void midgard_config_set_pamfile(MidgardConfig *self, const gchar *pamfile)
  * midgard_config_copy:
  * @self: #MidgardConfig instance
  *
- * Returns: deep copy of given #MidgardConfig object
+ * Returns: (transfer full): deep copy of given #MidgardConfig object
  * Since: 10.05
  */ 
 MidgardConfig *
