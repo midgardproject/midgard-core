@@ -737,7 +737,7 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
 
 /**
  * midgard_connection_open_from_file:	
- * @mgd: #MidgardConnection instance
+ * @self: #MidgardConnection instance
  * @filepath: configuration file path
  * @error: pointer to store error 
  *
@@ -748,22 +748,22 @@ midgard_connection_open (MidgardConnection *self, const char *name, GError **err
  *  
  * Returns: %TRUE if the operation succeeded, %FALSE otherwise.
  */ 
-gboolean midgard_connection_open_from_file(
-		MidgardConnection *mgd, const char *filepath, GError **error)
+gboolean 
+midgard_connection_open_from_file (MidgardConnection *self, const char *filepath, GError **error)
 {	
-	g_assert(mgd != NULL);
+	g_assert(self != NULL);
 	g_assert (filepath != NULL);
 	g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
 	gboolean rv = TRUE;
 
-	__SELF_REOPEN (mgd, rv);
+	__SELF_REOPEN (self, rv);
 	if (!rv) 
 		return rv;
 	
 	/* FIXME, it should be handled by GError */
 	if(mgd->priv->config != NULL){
-		midgard_set_error(mgd,
+		midgard_set_error(self,
 				MGD_GENERIC_ERROR,
 				MGD_ERR_USER_DATA,
 				"MidgardConfig already associated with "
@@ -782,10 +782,10 @@ gboolean midgard_connection_open_from_file(
 		return FALSE;
 	}
 	
-	mgd->priv->config = config;
+	self->priv->config = config;
 
 	GError *err = NULL;
-	if(!__midgard_connection_open(mgd, TRUE, &err)) 
+	if(!__midgard_connection_open(self, TRUE, &err)) 
 		rv = FALSE;
 
 	if (err)
