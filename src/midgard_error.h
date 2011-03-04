@@ -23,7 +23,8 @@
 
 G_BEGIN_DECLS
 
-#define MGD_GENERIC_ERROR midgard_error_generic()
+#define MIDGARD_GENERIC_ERROR midgard_error_generic()
+#define MGD_GENERIC_ERROR MIDGARD_GENERIC_ERROR
 
 typedef enum
 {
