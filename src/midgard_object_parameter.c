@@ -314,7 +314,7 @@ midgard_object_set_parameter (MidgardObject *self, const gchar *domain, const gc
  *
  * Returned array should be freed when no longer needed.
  * 
- * Returns: Newly allocated and NULL terminated array of midgard_parameter objects. 
+ * Returns: (transfer full): Newly allocated and NULL terminated array of midgard_parameter objects. 
  */
 MidgardObject **midgard_object_list_parameters(MidgardObject *self, const gchar *domain)
 {
@@ -414,7 +414,7 @@ gboolean midgard_object_purge_parameters(MidgardObject *self,
  * @parameters argument is optional. All object's parameters are 
  * returned ( if exist ) if @parameters is explicitly set to %NULL.
 *
- * Returns: newly created, NULL terminated array of #MidgardObject ( midgard_parameter class ) or %NULL on failure
+ * Returns: (transfer full): newly created, NULL terminated array of #MidgardObject ( midgard_parameter class ) or %NULL on failure
  */
 MidgardObject **midgard_object_find_parameters(MidgardObject *self, 
 		guint n_params, const GParameter *parameters)
