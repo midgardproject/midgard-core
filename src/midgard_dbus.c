@@ -230,6 +230,8 @@ midgard_dbus_new(MidgardConnection *mgd, const gchar *path, gboolean use_session
  * Constructor. Invokes midgard_dbus_new().
  * This function is added for language bindings, in which, midgard_dbus_new can not be 
  * invoked explicitly.
+ * 
+ * Returns: (transfer full): #MidgardDbus instance 
  *
  * Since: 10.05.1
  */
