@@ -110,7 +110,7 @@ midgard_query_constraint_new (MidgardQueryProperty *property, const gchar *op,
  * midgard_query_constraint_get_storage:
  * @self: #MidgardQueryStorage instance
  *
- * Returns: #MidgardQueryStorage associated with constraint or %NULL
+ * Returns: (transfer none): #MidgardQueryStorage associated with constraint or %NULL
  * Since: 10.05
  */  
 MidgardQueryStorage *
@@ -150,7 +150,7 @@ midgard_query_constraint_set_storage (MidgardQueryConstraint *self, MidgardQuery
  * midgard_query_constraint_get_property:
  * @self: #MidgardQueryConstraint instance
  *
- * Returns: #MidgardQueryProperty associated with @self constraint, or %NULL
+ * Returns: (transfer none): #MidgardQueryProperty associated with @self constraint, or %NULL
  * Since: 10.05
  */ 
 MidgardQueryProperty *
