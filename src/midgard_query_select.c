@@ -375,6 +375,11 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	}
 	
 	MidgardDBObjectClass *klass = self->priv->storage->priv->klass;
+	if (!klass || (klass && MIDGARD_IS_DBOBJECT_CLASS (klass))) {
+		g_warning ("Select storage initialized for invalid type");
+		return FALSE;
+	}
+
 	if (!klass->dbpriv->add_fields_to_select_statement) {
 		/* FIXME, handle error */
 		g_warning ("Missed private DBObjectClass' fields to statement helper");
