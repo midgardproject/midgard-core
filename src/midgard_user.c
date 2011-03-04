@@ -203,7 +203,7 @@ __convert_to_storage_parameters (MidgardConnection *mgd, guint n_params, const G
  * </para></listitem>
  * </itemizedlist>
  *
- * Returns: new #MidgardUser instance or %NULL in case of failure
+ * Returns: (transfer full): new #MidgardUser instance or %NULL in case of failure
  * 
  * Since 9.09
  */
@@ -294,7 +294,7 @@ __midgard_user_get (MidgardConnection *mgd, guint n_params, const GParameter *pa
  *
  * Returned array should be freed (g_free()) when no longer needed.
  * 
- * Returns: newly allocated and NULL terminated array of #MidgardUser objects or %NULL
+ * Returns: (transfer full): newly allocated and NULL terminated array of #MidgardUser objects or %NULL
  * 
  * Since 9.09
  */
