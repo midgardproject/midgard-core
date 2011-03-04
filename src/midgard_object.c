@@ -2159,7 +2159,8 @@ return_null_with_error:
  *
  * Static constructor, provided for language bindings, in which, 
  * midgard_object_new() can not be invoked explicitly.
- *
+ * 
+ * Returns: (transfer full): new #MidgardObject instance
  * Since: 10.05.1
  */
 MidgardObject *
