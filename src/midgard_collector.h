@@ -50,15 +50,15 @@ struct MidgardCollectorClass{
 	MidgardQueryBuilderClass parent;
 	
 	/* class members */
-	gboolean 	(*set_key_property) 	(MidgardCollector *collector, const gchar *key, GValue *value);
-	gboolean 	(*add_value_property) 	(MidgardCollector *collector, const gchar *value);
-	gboolean 	(*set) 			(MidgardCollector *collector, const gchar *key, const gchar *subkey, GValue *value);
-	GData 		*(*get) 		(MidgardCollector *collector, const gchar *key);
-	GValue 		*(*get_subkey) 		(MidgardCollector *collector, const gchar *key, const gchar *subkey);
-	gboolean 	(*merge) 		(MidgardCollector *collector, MidgardCollector *mc, gboolean overwrite);
-	gchar 		**(*list_keys)		(MidgardCollector *collector);
-	gboolean 	(*remove_key) 		(MidgardCollector *collector, const gchar *key);
-	void 		(*destroy) 		(MidgardCollector *collector);
+	gboolean 	(*set_key_property) 	(MidgardCollector *self, const gchar *key, GValue *value);
+	gboolean 	(*add_value_property) 	(MidgardCollector *self, const gchar *value);
+	gboolean 	(*set) 			(MidgardCollector *self, const gchar *key, const gchar *subkey, GValue *value);
+	GData 		*(*get) 		(MidgardCollector *self, const gchar *key);
+	GValue 		*(*get_subkey) 		(MidgardCollector *self, const gchar *key, const gchar *subkey);
+	gboolean 	(*merge) 		(MidgardCollector *self, MidgardCollector *mc, gboolean overwrite);
+	gchar 		**(*list_keys)		(MidgardCollector *self);
+	gboolean 	(*remove_key) 		(MidgardCollector *self, const gchar *key);
+	void 		(*destroy) 		(MidgardCollector *self);
 	gboolean 	(*add_constraint) 	(MidgardCollector *self, const gchar *name, const gchar *op, const GValue *value);
 	gboolean 	(*add_constraint_with_property) (MidgardCollector *self, const gchar *property_a, const gchar *op, const gchar *property_b);
 	gboolean 	(*begin_group) 		(MidgardCollector *self, const gchar *type);
