@@ -801,7 +801,7 @@ midgard_connection_open_from_file (MidgardConnection *self, const char *filepath
  * Every key is configuration name, and value is #MidgardConnection object.
  * Use g_hash_table_destroy to free hashtable and all opened connections.
  *
- * Returns: Newly allocated full #GHashTable.
+ * Returns: (transfer full): Newly allocated full #GHashTable.
  */
 extern GHashTable *midgard_connection_open_all(gboolean userdir)
 {
@@ -953,7 +953,7 @@ midgard_connection_close (MidgardConnection *self)
  * midgard_connection_set_loglevel:
  * @self: #MidgardConnection instance
  * @level: Loglevel string
- * @log_func: log handler function
+ * @log_func: (scope call): log handler function
  *
  * Sets log level of the given MidgardConnection.
  * Overwrites internal #MidgardConnection's log level defined in configuration file. 
@@ -1110,7 +1110,7 @@ const gchar *midgard_connection_get_error_string(MidgardConnection *self)
  * NULL is explicitly returned if there's no midgard_user logged in 
  * for the given MidgardConnection.
  * See also #MidgardUser methods if you need midgard_person associated with user.
- * Returns: A pointer to MidgardUser instance or %NULL
+ * Returns: (transfer none): A pointer to MidgardUser instance or %NULL
  */ 
 MidgardUser *midgard_connection_get_user(MidgardConnection *self)
 {
@@ -1199,7 +1199,7 @@ gboolean midgard_connection_reopen(MidgardConnection *self)
  * List available and registered authentication types.
  * Use g_free() to free returned array.
  * 
- * Returns: NULL terminated array with authentication types.
+ * Returns: (transfer container): NULL terminated array with authentication types.
  */
 gchar **
 midgard_connection_list_auth_types (MidgardConnection *self, guint *n_types)
@@ -1263,7 +1263,7 @@ midgard_connection_is_connected (MidgardConnection *self)
  *
  * Call g_object_unref if returned object is no longer needed.
  *
- * Returns: Newly allocated and duplicated #MidgardConnection
+ * Returns: (transfer full): Newly allocated and duplicated #MidgardConnection
  */ 
 MidgardConnection *midgard_connection_copy(MidgardConnection *self)
 {
