@@ -31,7 +31,7 @@
  *
  * Returned array should be freed when no longer needed.
  * 
- * Returns: Newly allocated and NULL terminated array of midgard_attachment objects. 
+ * Returns: (transfer full): Newly allocated and NULL terminated array of midgard_attachment objects. 
  */
 MidgardObject **midgard_object_list_attachments(MidgardObject *self)
 {
@@ -57,7 +57,7 @@ MidgardObject **midgard_object_list_attachments(MidgardObject *self)
  * Creates object's attachment using given properties.
  * Any property may be explicitly set to NULL.
  *
- * Returns: newly created #MidgardObject of midgard_attachment class or %NULL on failure
+ * Returns: (transfer full): newly created #MidgardObject of midgard_attachment class or %NULL on failure
  */
 MidgardObject *midgard_object_create_attachment(MidgardObject *self, 
 		const gchar *name, const gchar *title, const gchar *mimetype)
@@ -246,7 +246,7 @@ gboolean midgard_object_purge_attachments(MidgardObject *self, gboolean delete_b
  * @parameters argument is optional. All object's attachments are 
  * returned ( if exist ) if @parameters is explicitly set to %NULL.
 *
- * Returns: newly created, NULL terminated array of #MidgardObject ( midgard_attachment class ) or %NULL on failure
+ * Returns: (transfer null): newly created, NULL terminated array of #MidgardObject ( midgard_attachment class ) or %NULL on failure
  */
 MidgardObject **midgard_object_find_attachments(MidgardObject *self, 
 		guint n_params, const GParameter *parameters)
