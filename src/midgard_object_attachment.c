@@ -246,7 +246,7 @@ gboolean midgard_object_purge_attachments(MidgardObject *self, gboolean delete_b
  * @parameters argument is optional. All object's attachments are 
  * returned ( if exist ) if @parameters is explicitly set to %NULL.
 *
- * Returns: (transfer null): newly created, NULL terminated array of #MidgardObject ( midgard_attachment class ) or %NULL on failure
+ * Returns: (transfer full): newly created, NULL terminated array of #MidgardObject ( midgard_attachment class ) or %NULL on failure
  */
 MidgardObject **midgard_object_find_attachments(MidgardObject *self, 
 		guint n_params, const GParameter *parameters)
