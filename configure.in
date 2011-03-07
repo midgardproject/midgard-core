@@ -10,7 +10,7 @@ dnl If the version contains user visible changes then you should
 dnl have updated the NEWS file. Remember also to test the release
 dnl before committing.
 dnl
-AC_INIT([midgard2-core],[10.05.4])
+AC_INIT([midgard2-core],[10.05.5])
 AC_PREREQ(2.50)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
@@ -50,7 +50,7 @@ if test "$_MIDGARD_DBUS_SUPPORT" == "no"; then
 	dbus_libs=""
 fi
 
-PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 $gdamodule $dbus_libs)
+PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 libgda-4.0 $dbus_libs)
 if test "$gdamodule" == "libgda-4.0"; then
     MIDGARD_CFLAGS="${MIDGARD_CFLAGS} -DHAVE_LIBGDA_4"
 fi
