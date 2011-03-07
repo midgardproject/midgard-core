@@ -189,7 +189,7 @@ midgard_query_constraint_group_add_constraint (MidgardQueryConstraintGroup *self
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (constraint != NULL, FALSE);
 
-	g_return_val_if_fail (!MIDGARD_IS_QUERY_CONSTRAINT_SIMPLE (constraint), FALSE);
+	g_return_val_if_fail (MIDGARD_IS_QUERY_CONSTRAINT_SIMPLE (constraint), FALSE);
 
 	self->priv->constraints = g_slist_append (self->priv->constraints, g_object_ref (constraint));
 
