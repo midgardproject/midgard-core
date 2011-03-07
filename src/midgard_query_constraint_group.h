@@ -57,7 +57,8 @@ MidgardQueryConstraintGroup  	*midgard_query_constraint_group_new_valist	(const 
 MidgardQueryConstraintGroup  	*midgard_query_constraint_group_new_with_constraints	(const gchar *type, MidgardQueryConstraintSimple **constraints, guint n_constraints);
 const gchar 			*midgard_query_constraint_group_get_group_type	(MidgardQueryConstraintGroup *self);
 gboolean			midgard_query_constraint_group_set_group_type		(MidgardQueryConstraintGroup *self, const gchar *type);
-gboolean			midgard_query_constraint_group_add_constraint	(MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple *constraint, ...);
+gboolean			midgard_query_constraint_group_add_constraint	(MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple *constraint);
+gboolean 			midgard_query_constraint_group_add_constraints	(MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple **constraints, guint n_objects);
 
 G_END_DECLS
 

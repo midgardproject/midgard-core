@@ -178,33 +178,48 @@ midgard_query_constraint_group_set_group_type (MidgardQueryConstraintGroup *self
 /**
  * midgard_query_constraint_group_add_constraint:
  * @self: #MidgardQueryConstraintGroup instance
- * @constraint: list of #MidgardQueryConstraintSimple constraint(s) to add to constraint group
+ * @constraint: #MidgardQueryConstraintSimple constraint to add to constraint group
  *
  * Returns: %TRUE on success, %FALSE otherwise
  * Since: 10.05
  */ 
 gboolean
-midgard_query_constraint_group_add_constraint (MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple *constraint, ...)
+midgard_query_constraint_group_add_constraint (MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple *constraint)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (constraint != NULL, FALSE);
 
-	gboolean retval = TRUE;
-	MidgardQueryConstraintSimple *cnstr = constraint;
-	va_list args;
-	va_start (args, constraint);
-	while (cnstr != NULL) {
-		if (!MIDGARD_IS_QUERY_CONSTRAINT_SIMPLE (cnstr)) {
-			retval = FALSE;
-			break;
-		}
-		self->priv->constraints = g_slist_append (self->priv->constraints, g_object_ref (cnstr));
-		cnstr = va_arg (args, MidgardQueryConstraintSimple*);
-	}
-	va_end (args);
+	g_return_val_if_fail (!MIDGARD_IS_QUERY_CONSTRAINT_SIMPLE (constraint), FALSE);
 
-	return retval;
+	self->priv->constraints = g_slist_append (self->priv->constraints, g_object_ref (constraint));
+
+	return TRUE;
 }
+
+/**
+ * midgard_query_constraint_group_add_constraints:
+ * @self: #MidgardQueryConstraintGroup instance
+ * @constraints: (array) (element-type MidgardQueryConstraintSimple) (array length=n_objects): array of #MidgardQueryConstraintSimple objects
+ * @n_objects: number of elements in given array
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ * Since: 10.05.5
+ */ 
+gboolean
+midgard_query_constraint_group_add_constraints (MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple **constraints, guint n_objects)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (constraint != NULL, FALSE);
+
+	guint i;
+	for (i = 0; i < n_objects; i++) {
+		if (!midgard_query_constraint_group_add_constraint (self, constraints[i]))
+			return FALSE;
+	}
+
+	return TRUE;
+}
+
 
 /* GOBJECT ROUTINES */
 
