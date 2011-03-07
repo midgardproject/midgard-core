@@ -224,6 +224,13 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 		GValue rval = {0, };
 		midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (property), &rval);
 		gchar *table_field = midgard_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval));
+
+		if (!table_field) {
+			g_warning ("Can not find table and column name for given '%s' property name", g_value_get_string (&rval));
+			g_value_unset (&rval);
+			return FALSE;	
+		}
+
 		g_value_unset (&rval);
 
 		GValue *value = g_new0 (GValue, 1);
