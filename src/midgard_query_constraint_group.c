@@ -209,7 +209,7 @@ gboolean
 midgard_query_constraint_group_add_constraints (MidgardQueryConstraintGroup *self, MidgardQueryConstraintSimple **constraints, guint n_objects)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
-	g_return_val_if_fail (constraint != NULL, FALSE);
+	g_return_val_if_fail (constraints != NULL, FALSE);
 
 	guint i;
 	for (i = 0; i < n_objects; i++) {
