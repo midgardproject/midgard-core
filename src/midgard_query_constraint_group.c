@@ -92,7 +92,7 @@ midgard_query_constraint_group_new_with_constraints (const gchar *type, MidgardQ
 
 	guint i;
 	for (i = 0; i < n_constraints; i++) {
-		midgard_query_constraint_group_add_constraint (self, constraints[i], NULL);
+		midgard_query_constraint_group_add_constraint (self, constraints[i]);
 	}
 
 	return self;
@@ -126,7 +126,7 @@ midgard_query_constraint_group_new_valist (const gchar *type, MidgardQueryConstr
 	va_list args;
 	va_start (args, constraint);
 	while (cnstr != NULL) {
-		midgard_query_constraint_group_add_constraint (self, cnstr, NULL);
+		midgard_query_constraint_group_add_constraint (self, cnstr);
 		cnstr = va_arg (args, MidgardQueryConstraintSimple*);
 	}
 	va_end (args);
