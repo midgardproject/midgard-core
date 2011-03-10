@@ -65,7 +65,6 @@ gboolean
 _midgard_query_select_set_limit (MidgardQueryExecutor *self, guint limit)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
-	g_return_val_if_fail (limit > 0, FALSE);
 
 	self->priv->limit = limit;
 
@@ -416,6 +415,13 @@ _midgard_query_select_validable_iface_validate (MidgardValidable *iface, GError 
 	if (storage->priv->klass && !storage->priv->klass->dbpriv->add_fields_to_select_statement) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
 				"'%s' DBObjectClass doesn't provide select statement.", G_OBJECT_CLASS_NAME (storage->priv->klass));
+		return;
+	}
+
+	/* Limit */
+	if (MIDGARD_QUERY_EXECUTOR (self)->priv->limit == 0) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_VALUE_INVALID,
+				"Invalid limit value (0). Expected > 0");
 		return;
 	}
 
