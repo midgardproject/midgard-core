@@ -17,6 +17,9 @@ midgard_quota
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### FUNCTION midgard_quota_get_object_size ##### -->
 <para>
 

@@ -24,6 +24,9 @@ MidgardConnection
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### MACRO GETTEXT_PACKAGE ##### -->
 <para>
 
@@ -48,6 +51,7 @@ MidgardConnection
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -60,6 +64,14 @@ MidgardConnection
 @name: 
 @error: 
 @Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_close ##### -->
+<para>
+
+</para>
+
+@self: 
 
 
 <!-- ##### FUNCTION midgard_connection_open_config ##### -->

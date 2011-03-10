@@ -19,6 +19,9 @@ properties of any class which extends Midgard Schema one may be also reflected w
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT MidgardReflectorProperty ##### -->
 <para>
 

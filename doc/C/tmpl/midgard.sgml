@@ -17,11 +17,15 @@ midgard
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### FUNCTION midgard_version ##### -->
 <para>
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -30,5 +34,6 @@ midgard
 
 </para>
 
+@void: 
 
 

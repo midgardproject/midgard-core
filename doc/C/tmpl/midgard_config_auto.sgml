@@ -17,6 +17,9 @@ midgard_config_auto
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### MACRO MIDGARD_LIB_PREFIX ##### -->
 <para>
 

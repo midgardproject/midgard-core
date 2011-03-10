@@ -24,6 +24,9 @@ which creates storage tables. Instead, it invokes private routines of #MidgardDB
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT MidgardStorage ##### -->
 <para>
 

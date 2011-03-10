@@ -17,6 +17,9 @@ MidgardObject parameters
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### FUNCTION midgard_object_get_parameter ##### -->
 <para>
 

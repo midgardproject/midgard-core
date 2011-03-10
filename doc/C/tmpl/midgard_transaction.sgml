@@ -17,6 +17,9 @@ Database single transaction.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT MidgardTransactionClass ##### -->
 <para>
 
@@ -36,6 +39,11 @@ Database single transaction.
 </para>
 
 @Since: 9.09
+
+<!-- ##### ARG MidgardTransaction:connection ##### -->
+<para>
+
+</para>
 
 <!-- ##### FUNCTION midgard_transaction_new ##### -->
 <para>

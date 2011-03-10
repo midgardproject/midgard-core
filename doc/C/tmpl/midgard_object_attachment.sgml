@@ -17,6 +17,9 @@ MidgardObject attachments
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### FUNCTION midgard_object_create_attachment ##### -->
 <para>
 

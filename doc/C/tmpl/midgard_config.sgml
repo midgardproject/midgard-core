@@ -22,6 +22,9 @@ MidgardConfig
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF MidgardConfig ##### -->
 <para>
 
@@ -157,6 +160,7 @@ MidgardConfig
 
 </para>
 
+@void: 
 @Returns: 
 
 

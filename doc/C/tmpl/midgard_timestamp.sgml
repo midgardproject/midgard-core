@@ -17,6 +17,9 @@ MidgardTimestamp
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### MACRO MIDGARD_TYPE_TIMESTAMP ##### -->
 <para>
 
@@ -29,6 +32,7 @@ MidgardTimestamp
 
 </para>
 
+@void: 
 @Returns: 
 
 

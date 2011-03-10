@@ -17,6 +17,9 @@ MidgardDBObject
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT MidgardDBObjectPrivate ##### -->
 <para>
 
@@ -28,4 +31,9 @@ MidgardDBObject
 
 </para>
 
+
+<!-- ##### ARG MidgardDBObject:connection ##### -->
+<para>
+
+</para>
 

@@ -1060,13 +1060,6 @@ midgard_tree
 </para>
 
 
-<!-- ##### FUNCTION midgard_connection_close ##### -->
-<para>
-
-</para>
-
-@self: 
-
 <!-- ##### FUNCTION midgard_connection_get_default_lang ##### -->
 <para>
 

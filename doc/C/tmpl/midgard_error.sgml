@@ -17,6 +17,9 @@ midgard_error
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### MACRO MGD_GENERIC_ERROR ##### -->
 <para>
 
@@ -63,6 +66,7 @@ midgard_error
 
 </para>
 
+@void: 
 @Returns: 
 
 

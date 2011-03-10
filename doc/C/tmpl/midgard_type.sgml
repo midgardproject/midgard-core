@@ -17,6 +17,9 @@ midgard_type
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### MACRO MGD_TYPE_LONGTEXT ##### -->
 <para>
 
@@ -36,6 +39,7 @@ midgard_type
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -51,6 +55,7 @@ midgard_type
 
 </para>
 
+@void: 
 @Returns: 
 
 
@@ -66,6 +71,7 @@ midgard_type
 
 </para>
 
+@void: 
 @Returns: 
 
 

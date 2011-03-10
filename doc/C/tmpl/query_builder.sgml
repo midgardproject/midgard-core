@@ -53,6 +53,9 @@ The #MidgardQueryBuilder methods can be used to manipulate  the queries.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### STRUCT MidgardQueryBuilder ##### -->
 <para>
 
@@ -105,6 +108,16 @@ The #MidgardQueryBuilder methods can be used to manipulate  the queries.
 
 
 <!-- ##### FUNCTION midgard_query_builder_new ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@classname: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_query_builder_create_builder ##### -->
 <para>
 
 </para>

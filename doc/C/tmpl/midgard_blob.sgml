@@ -40,6 +40,9 @@ Files and binary data.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### TYPEDEF MidgardBlob ##### -->
 <para>
 
@@ -69,6 +72,16 @@ Files and binary data.
 
 
 <!-- ##### FUNCTION midgard_blob_new ##### -->
+<para>
+
+</para>
+
+@attachment: 
+@encoding: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_blob_create_blob ##### -->
 <para>
 
 </para>

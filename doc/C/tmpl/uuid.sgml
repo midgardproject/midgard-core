@@ -34,6 +34,9 @@ database-specific GUID generators or constraints.
 <!-- ##### SECTION Stability_Level ##### -->
 
 
+<!-- ##### SECTION Image ##### -->
+
+
 <!-- ##### FUNCTION midgard_is_uuid ##### -->
 <para>
 
@@ -48,6 +51,7 @@ database-specific GUID generators or constraints.
 
 </para>
 
+@void: 
 @Returns: 
 
 
