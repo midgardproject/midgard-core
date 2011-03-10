@@ -33,6 +33,8 @@
 #include "midgard_timestamp.h"
 #include "midgard_metadata.h"
 
+#include <locale.h>
+
 #include <libgda/libgda.h>
 
 const char *
