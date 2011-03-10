@@ -40,6 +40,7 @@ midgard_public_h = \
 	src/midgard_dbobject.h \
 	src/midgard_defs.h \
 	src/midgard_dbus.h \
+	src/midgard_executable.h \
 	src/midgard_key_config_common.h \
 	src/midgard_object.h \
  	src/query_builder.h \
@@ -76,6 +77,7 @@ midgard_public_h = \
 	src/midgard_transaction.h \
 	src/midgard_user.h \
 	src/midgard_utils.h \
+	src/midgard_validable.h \
 	src/midgard_view.h
 
 man_MANS = man/midgard2-schema.1 \
@@ -162,6 +164,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_dbus.h \
 	src/midgard_dbus.c \
 	src/midgard_dbus_interface.h \
+	src/midgard_executable.c \
 	src/midgard_object_parameter.c \
 	src/midgard_object_attachment.c \
 	src/midgard_query_constraint.c \
@@ -188,6 +191,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_transaction.c \
 	src/midgard_md5.c \
 	src/midgard_md5.h \
+	src/midgard_validable.c \
 	src/midgard_view.c
 
 pkgdatadir = $(datadir)/midgard2
