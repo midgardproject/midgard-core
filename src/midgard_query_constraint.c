@@ -25,6 +25,7 @@
 #include "midgard_core_query.h"
 #include "midgard_core_object_class.h"
 #include "midgard_core_object.h"
+#include "midgard_validable.h"
 
 struct _MidgardQueryConstraintPrivate {
 	GObject  parent;
@@ -33,6 +34,7 @@ struct _MidgardQueryConstraintPrivate {
 	GdaSqlOperatorType op_type;
 	MidgardQueryStorage *storage;
 	MidgardQueryHolder *holder;
+	gboolean is_valid;
 };
 
 static struct {
@@ -390,6 +392,55 @@ _midgard_query_constraint_instance_init (GTypeInstance *instance, gpointer g_cla
 	self->priv->op = NULL;
 	self->priv->storage = NULL;
 	self->priv->holder = NULL;
+	self->priv->is_valid = FALSE;
+}
+
+/* Validable iface */
+static void
+_midgard_query_constraint_validable_iface_validate (MidgardValidable *iface, GError **error)
+{
+	g_return_if_fail (iface != NULL);
+	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (iface);
+	self->priv->is_valid = FALSE;
+
+	/* Property */
+	if (MIDGARD_IS_VALIDABLE (self->priv->property_value)) {
+		GError *err = NULL;
+		if (!midgard_validable_is_valid (MIDGARD_VALIDABLE (self->priv->property_value)))
+			midgard_validable_validate (MIDGARD_VALIDABLE (self->priv->property_value), &err);
+		if (err) {
+			g_propagate_error (error, err);
+			return;
+		}
+	}
+
+	/* Storage, TODO */
+
+	/* Value, TODO */
+
+	/* Operator */
+	if (!__query_constraint_operator_is_valid (self->priv->op, NULL)) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
+				"Invalid operator type '%s'", self->priv->op);
+		return;
+	}
+
+	MIDGARD_QUERY_CONSTRAINT (self)->priv->is_valid = TRUE;
+	return;
+}
+
+gboolean
+_midgard_query_constraint_validable_iface_is_valid (MidgardValidable *self)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	return MIDGARD_QUERY_CONSTRAINT (self)->priv->is_valid;
+}
+
+static void
+_midgard_query_constraint_validable_iface_init (MidgardValidableIFace *iface)
+{
+	iface->validate = _midgard_query_constraint_validable_iface_validate;
+	iface->is_valid = _midgard_query_constraint_validable_iface_is_valid;
 }
 
 static GObject *
@@ -590,8 +641,15 @@ midgard_query_constraint_get_type (void)
 			NULL	/* interface_data */
 		};
 
+		static const GInterfaceInfo validable_info = {
+			(GInterfaceInitFunc) _midgard_query_constraint_validable_iface_init,
+			NULL,	/* interface_finalize */
+			NULL	/* interface_data */
+		};
+
   		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryConstraint", &info, 0);
 		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_CONSTRAINT_SIMPLE, &property_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_VALIDABLE, &validable_info);
     	}
     	return type;
 }

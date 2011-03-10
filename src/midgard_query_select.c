@@ -22,6 +22,8 @@
 #include "midgard_core_object_class.h"
 #include "midgard_query_holder.h"
 #include "midgard_dbobject.h"
+#include "midgard_validable.h"
+#include "midgard_executable.h"
 
 /**
  * midgard_query_select_new:
@@ -363,36 +365,107 @@ __add_second_dummy_constraint (GdaSqlStatementSelect *select, GdaSqlOperation *t
 	return;
 }
 
-gboolean 
-_midgard_query_select_execute (MidgardQueryExecutor *self)
+static void
+_get_all_constraints (MidgardQuerySelect *self, MidgardQueryConstraintSimple *constr, GSList **list)
+{
+	if (!constr)
+		if (self && MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)
+			constr = MIDGARD_QUERY_EXECUTOR (self)->priv->constraint;
+
+	if (!constr)
+		return;
+
+	*list = g_slist_prepend (*list, constr);
+	guint n_objects;
+	MidgardQueryConstraintSimple **constraints = midgard_query_constraint_simple_list_constraints (constr, &n_objects);
+	if (!constraints)
+		return;
+
+	guint i;
+	for (i = 0; i < n_objects; i++) {
+		_get_all_constraints (NULL, constraints[i], list);
+	}
+
+	g_free (constraints);
+}
+
+static void
+_midgard_query_select_validable_iface_validate (MidgardValidable *iface, GError **error)
+{
+	g_return_if_fail (iface != NULL);
+	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (iface);
+	MIDGARD_QUERY_EXECUTOR (self)->priv->is_valid = FALSE;
+
+	GError *err = NULL;
+	MidgardQueryStorage *storage = MIDGARD_QUERY_EXECUTOR (self)->priv->storage;
+
+
+	/* Storage */
+	if (!storage) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
+				"No QueryStorage associated with QuerySelect", NULL);
+		return;
+	}
+
+	if (storage->priv->klass && !storage->priv->klass->dbpriv->add_fields_to_select_statement) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
+				"'%s' DBObjectClass doesn't provide select statement.", G_OBJECT_CLASS_NAME (storage->priv->klass));
+		return;
+	}
+
+	/* Gather all objects required for execution */
+	GSList *o_list = NULL;
+	o_list = g_slist_prepend (o_list, storage);
+	_get_all_constraints (self, NULL, &o_list);
+
+	GSList *l = NULL;
+	for (l = o_list; l != NULL; l = l->next) {
+		if (!midgard_validable_is_valid (MIDGARD_VALIDABLE (l->data))) {
+			midgard_validable_validate (MIDGARD_VALIDABLE (l->data), &err);
+			if (err) {
+				g_propagate_error (error, err);
+				g_slist_free (o_list);
+				return;
+			}
+		}
+	}
+
+	if (o_list)
+		g_slist_free (o_list);
+
+	MIDGARD_QUERY_EXECUTOR (self)->priv->is_valid = TRUE;
+	return;
+}
+
+gboolean
+_midgard_query_select_validable_iface_is_valid (MidgardValidable *self)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
-	
-	GError *error = NULL;
+	return MIDGARD_QUERY_EXECUTOR (self)->priv->is_valid;
+}
 
-	if (!MIDGARD_QUERY_EXECUTOR (self)->priv->storage) {
-		/* FIXME, handle error */
-		g_warning ("Missed QueryStorage associated with QuerySelect");
-		return FALSE;
-	}
-	
-	MidgardDBObjectClass *klass = self->priv->storage->priv->klass;
-	if (!klass || (klass && !MIDGARD_IS_DBOBJECT_CLASS (klass))) {
-		g_warning ("Select storage initialized for invalid type");
-		return FALSE;
-	}
+static void
+_midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError **error)
+{
+	g_return_if_fail (iface != NULL);
+	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (iface);
+	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
 
-	if (!klass->dbpriv->add_fields_to_select_statement) {
-		/* FIXME, handle error */
-		g_warning ("Missed private DBObjectClass' fields to statement helper");
-		return FALSE;
+	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_start, 0);
+
+	GError *err = NULL;
+	if (!midgard_validable_is_valid (MIDGARD_VALIDABLE (self))) {
+		midgard_validable_validate (MIDGARD_VALIDABLE (self), &err);
+		if (err) {
+			g_propagate_error (error, err);
+			return;
+		}
 	}
 
 	g_object_ref (self);
 
-	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_start, 0);
-
-	MidgardConnection *mgd = self->priv->mgd;
+	MidgardDBObjectClass *klass = executor->priv->storage->priv->klass;
+	MidgardConnection *mgd = executor->priv->mgd;
 	GdaConnection *cnc = mgd->priv->connection;
 	GdaSqlStatement *sql_stm;
 	GdaSqlStatementSelect *sss;
@@ -450,39 +523,39 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	}
 
 	/* Add orders , ORDER BY t1.field... */
-	if (!__query_select_add_orders (self)) 
+	if (!__query_select_add_orders (executor)) 
 		goto return_false;
 
 	/* Exclude deleted */
-	if (MGD_DBCLASS_METADATA_CLASS (klass) && !MIDGARD_QUERY_EXECUTOR (self)->priv->include_deleted)
+	if (MGD_DBCLASS_METADATA_CLASS (klass) && !executor->priv->include_deleted)
 		__add_exclude_deleted_constraints (sss, operation, klass);
 
 	/* Add limit, LIMIT x */
-	if (MIDGARD_QUERY_EXECUTOR (self)->priv->limit > 0) {
+	if (executor->priv->limit > 0) {
 		GdaSqlExpr *limit_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
 		GValue *limit_val = g_new0 (GValue, 1);
 		g_value_init (limit_val, G_TYPE_STRING);
-		g_value_take_string (limit_val, g_strdup_printf ("%d", MIDGARD_QUERY_EXECUTOR (self)->priv->limit));
+		g_value_take_string (limit_val, g_strdup_printf ("%d", executor->priv->limit));
 		limit_expr->value = limit_val;
 		sss->limit_count = limit_expr;
 	}
 
 	/* Add offset, OFFSET x */
-	if (MIDGARD_QUERY_EXECUTOR (self)->priv->offset >= 0) {
+	if (executor->priv->offset >= 0) {
 		GdaSqlExpr *offset_expr = gda_sql_expr_new (GDA_SQL_ANY_PART (sss));
 		GValue *offset_val = g_new0 (GValue, 1);
 		g_value_init (offset_val, G_TYPE_STRING);
-		g_value_take_string (offset_val, g_strdup_printf ("%d", MIDGARD_QUERY_EXECUTOR (self)->priv->offset));
+		g_value_take_string (offset_val, g_strdup_printf ("%d", executor->priv->offset));
 		offset_expr->value = offset_val;
 		sss->limit_offset = offset_expr;
 	}	
 
 	/* Check structure */
-	if (!gda_sql_statement_check_structure (sql_stm, &error)) {
-		g_warning (_("Can't build SELECT statement: %s)"),
-				error && error->message ? error->message : _("Unknown reason"));
-		if (error)
-			g_error_free (error);
+	if (!gda_sql_statement_check_structure (sql_stm, &err)) {
+		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
+				"Can't build SELECT statement: %s)", err && err->message ? err->message : _("Unknown reason"));
+		if (err)
+			g_error_free (err);
 		goto return_false;
 	} 
 
@@ -499,27 +572,30 @@ _midgard_query_select_execute (MidgardQueryExecutor *self)
 	}
 
 	/* execute statement */
-	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &error);
+	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
 	g_object_unref (stmt);
 
-	if (!model && !error)
+	if (!model && !err) {
+		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
+				"Execute error - Unknown reason, underlying error is NULL", NULL);
 		goto return_false;
+	}
 
-	if (error) {
-		/* FIXME, set domain error code */
-		g_warning ("Execute error - %s", error->message);
-		g_error_free (error);
+	if (err) {
+		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
+				"Execute error - %s", err->message);
+		g_error_free (err);
 		goto return_false;
 	}
 	
-	MIDGARD_QUERY_EXECUTOR (self)->priv->results_count = gda_data_model_get_n_rows (model);
-	if (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset && G_IS_OBJECT (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset))
-		g_object_unref (G_OBJECT (MIDGARD_QUERY_EXECUTOR (self)->priv->resultset));
-	MIDGARD_QUERY_EXECUTOR (self)->priv->resultset = (gpointer) model;
+	executor->priv->results_count = gda_data_model_get_n_rows (model);
+	if (executor->priv->resultset && G_IS_OBJECT (executor->priv->resultset))
+		g_object_unref (G_OBJECT (executor->priv->resultset));
+	executor->priv->resultset = (gpointer) model;
 	g_object_unref (self);
 	
 	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
-	return TRUE;
+	return;
 
 return_false:
 	if (sql_stm)
@@ -527,7 +603,7 @@ return_false:
 
 	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
 	g_object_unref (self);
-	return FALSE;
+	return;
 }
 
 guint
@@ -773,7 +849,6 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	executor_class->set_offset = _midgard_query_select_set_offset;
 	executor_class->add_order = _midgard_query_select_add_order;
 	executor_class->add_join = _midgard_query_select_add_join;
-	executor_class->execute = _midgard_query_select_execute;
 	executor_class->get_results_count = _midgard_query_select_get_results_count;
 	
 	klass->list_objects = _midgard_query_select_list_objects;
@@ -809,6 +884,21 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	g_object_class_install_property (object_class, PROPERTY_STORAGE, pspec);
 }
 
+/* Executable iface */
+static void
+_midgard_query_select_executable_iface_init (MidgardExecutableIFace *iface)
+{
+	iface->execute = _midgard_query_select_executable_iface_execute;
+}
+
+/* Validable iface */
+static void
+_midgard_query_select_validable_iface_init (MidgardValidableIFace *iface)
+{
+	iface->is_valid = _midgard_query_select_validable_iface_is_valid;
+	iface->validate = _midgard_query_select_validable_iface_validate;
+}
+
 GType
 midgard_query_select_get_type (void)
 {
@@ -825,7 +915,22 @@ midgard_query_select_get_type (void)
 			0,              /* n_preallocs */
 			NULL /* instance_init */
 		};
+
+		static const GInterfaceInfo executable_info = {
+			(GInterfaceInitFunc) _midgard_query_select_executable_iface_init,
+			NULL,   /* interface_finalize */
+			NULL    /* interface_data */
+		};
+
+		static const GInterfaceInfo validable_info = {
+			(GInterfaceInitFunc) _midgard_query_select_validable_iface_init,
+			NULL,   /* interface_finalize */
+			NULL    /* interface_data */
+		};
+
 		type = g_type_register_static (MIDGARD_TYPE_QUERY_EXECUTOR, "MidgardQuerySelect", &info, 0);
+		g_type_add_interface_static (type, MIDGARD_TYPE_EXECUTABLE, &executable_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_VALIDABLE, &validable_info);
 	}
 	return type;
 }

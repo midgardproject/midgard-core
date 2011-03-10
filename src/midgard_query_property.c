@@ -21,6 +21,7 @@
 #include "midgard_dbobject.h"
 #include "midgard_query_storage.h"
 #include "midgard_core_query.h"
+#include "midgard_validable.h"
 
 /**
  * midgard_query_property_new:
@@ -92,6 +93,7 @@ _midgard_query_property_instance_init (GTypeInstance *instance, gpointer g_class
 	self->priv = g_new (MidgardQueryPropertyPrivate, 1);	
 	self->priv->storage = NULL;
 	self->priv->klass = NULL;
+	self->priv->is_valid = FALSE;
 	GValue value = {0, };
 	self->priv->value = value;
 	g_value_init (&self->priv->value, G_TYPE_STRING);
@@ -227,6 +229,62 @@ midgard_query_property_iface_init (MidgardQueryHolderIFace *iface)
        iface->set_value = __set_value;
 }
 
+/* Validable iface */
+static void
+_midgard_query_property_validable_iface_validate (MidgardValidable *iface, GError **error)
+{
+	g_return_if_fail (iface != NULL);
+	MidgardQueryProperty *self = MIDGARD_QUERY_PROPERTY (iface);
+	self->priv->is_valid = FALSE;
+	MidgardQueryStorage *storage = self->priv->storage;
+
+	if (!G_IS_VALUE (&self->priv->value) ||  !G_VALUE_HOLDS_STRING (&self->priv->value)) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_VALUE_INVALID,
+				"Invalid property's value type", NULL);
+		return;
+	}
+
+	/* There's no class context without storage. We have no access to executor,
+	 * so we assume property is valid. */
+	if (!storage)
+		return;
+
+	/* We do not check if storage is valid */
+	if (!storage->priv->classname)
+		return;
+
+	GObjectClass *klass = g_type_class_peek (g_type_from_name (storage->priv->classname));
+	if (!klass)
+		return;
+
+	const gchar *property_name = g_value_get_string (&self->priv->value);
+	GParamSpec *pspec = g_object_class_find_property (klass, property_name);
+	if (!pspec) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_NAME_INVALID,
+				"Property '%s' is not registered for '%s' class.",
+				property_name,
+				G_OBJECT_CLASS_NAME (klass));
+		return;
+	}
+
+	MIDGARD_QUERY_PROPERTY (self)->priv->is_valid = TRUE;
+	return;
+}
+
+gboolean
+_midgard_query_property_validable_iface_is_valid (MidgardValidable *self)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	return MIDGARD_QUERY_PROPERTY (self)->priv->is_valid;
+}
+
+static void
+_midgard_query_property_validable_iface_init (MidgardValidableIFace *iface)
+{
+	iface->validate = _midgard_query_property_validable_iface_validate;
+	iface->is_valid = _midgard_query_property_validable_iface_is_valid;
+}
+
 GType
 midgard_query_property_get_type (void)
 {
@@ -250,8 +308,15 @@ midgard_query_property_get_type (void)
 			NULL	/* interface_data */
 		};
 
+		static const GInterfaceInfo validable_info = {
+			(GInterfaceInitFunc) _midgard_query_property_validable_iface_init,
+			NULL,   /* interface_finalize */
+			NULL    /* interface_data */
+		};
+
   		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryProperty", &info, 0);
 		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_HOLDER, &property_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_VALIDABLE, &validable_info);
     	}
     	return type;
 }

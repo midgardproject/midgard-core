@@ -18,6 +18,8 @@
 
 #include "midgard_query_executor.h"
 #include "midgard_core_query.h"
+#include "midgard_validable.h"
+#include "midgard_executable.h"
 
 /* MidgardQueryExecutor properties */
 enum {
@@ -113,20 +115,6 @@ midgard_query_executor_get_results_count (MidgardQueryExecutor *self)
 	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->get_results_count (self);
 }
 
-/**
- * midgard_query_executor_execute:
- * @self: #MidgardQueryExecutor instance
- *
- * Returns: %TRUE on success, %FALSE otherwise
- *
- * Since: 10.05
- */ 
-gboolean
-midgard_query_executor_execute (MidgardQueryExecutor *self)
-{
-	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->execute (self);
-}
-
 /* GOBJECT ROUTINES */
 
 static GObjectClass *parent_class= NULL;
@@ -153,6 +141,7 @@ __midgard_query_executor_instance_init (GTypeInstance *instance, gpointer g_clas
 	MIDGARD_QUERY_EXECUTOR (object)->priv->results_count = 0;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->read_only = TRUE;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->include_deleted = FALSE;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->is_valid = FALSE;
 }
 
 static GObject *
@@ -302,8 +291,15 @@ _midgard_query_executor_class_init (MidgardQueryExecutorClass *klass, gpointer c
 	klass->set_offset = NULL;
 	klass->add_order = NULL;
 	klass->add_join = NULL;
-	klass->execute = NULL;
 	klass->get_results_count = NULL;
+}
+
+/* Executable iface */
+
+static void
+_midgard_query_executor_executable_iface_init (MidgardExecutableIFace *iface)
+{
+	iface->execute = NULL;
 }
 
 GType
@@ -322,7 +318,15 @@ midgard_query_executor_get_type (void)
 			0,              /* n_preallocs */
 			__midgard_query_executor_instance_init /* instance_init */
 		};
+
+		static const GInterfaceInfo executable_info = {
+			(GInterfaceInitFunc) _midgard_query_executor_executable_iface_init,
+			NULL,   /* interface_finalize */
+			NULL    /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryExecutor", &info, G_TYPE_FLAG_ABSTRACT);
+		g_type_add_interface_static (type, MIDGARD_TYPE_EXECUTABLE, &executable_info);
 	}
 	return type;
 }

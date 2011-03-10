@@ -23,11 +23,13 @@
 #include "midgard_query_constraint_simple.h"
 #include "midgard_dbobject.h"
 #include "midgard_core_query.h"
+#include "midgard_validable.h"
 
 struct _MidgardQueryConstraintGroupPrivate {
 	gchar *type;
 	GdaSqlOperatorType op_type;
 	GSList *constraints;
+	gboolean is_valid;
 };
 
 static gint
@@ -42,8 +44,6 @@ __get_operator_type (const gchar *type)
 	else if (g_str_equal (valid_type, "or"))
 		op_type = GDA_SQL_OPERATOR_TYPE_OR;
 	else {
-		/* FIXME, handle catchable error */
-		g_warning ("Invalid group type. Expected 'AND' or 'OR'. '%s' given", type);
 		g_free (valid_type);
 		return -1;
 	}
@@ -306,6 +306,46 @@ _midgard_query_constraint_group_iface_init (MidgardQueryConstraintSimpleIFace *i
 	return;
 }
 
+/* Validable iface */
+static void
+_midgard_query_constraint_group_validable_iface_validate (MidgardValidable *iface, GError **error)
+{
+	g_return_if_fail (iface != NULL);
+	MidgardQueryConstraintGroup *self = MIDGARD_QUERY_CONSTRAINT_GROUP (iface);
+	self->priv->is_valid = FALSE;
+
+	/* group type */
+	if (self->priv->op_type == -1) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
+				"Invalid group operator type", NULL);
+		return;
+	}
+
+	/* constraints */
+	if (!self->priv->constraints) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_ELEMENT_INVALID,
+				"Constraint group doesn't hold any constraints", NULL);
+		return;
+	}
+
+	self->priv->is_valid = TRUE;
+	return;
+}
+
+gboolean
+_midgard_query_constraint_group_validable_iface_is_valid (MidgardValidable *self)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	return MIDGARD_QUERY_CONSTRAINT_GROUP (self)->priv->is_valid;
+}
+
+static void
+_midgard_query_constraint_group_validable_iface_init (MidgardValidableIFace *iface)
+{
+	iface->validate = _midgard_query_constraint_group_validable_iface_validate;
+	iface->is_valid = _midgard_query_constraint_group_validable_iface_is_valid;
+}
+
 static void
 __midgard_query_constraint_group_instance_init (GTypeInstance *instance, gpointer g_class)
 {
@@ -314,6 +354,7 @@ __midgard_query_constraint_group_instance_init (GTypeInstance *instance, gpointe
 	self->priv->type = NULL;
 	self->priv->op_type = -1;
 	self->priv->constraints = NULL;
+	self->priv->is_valid = FALSE;
 
 }
 
@@ -449,8 +490,15 @@ midgard_query_constraint_group_get_type (void)
 			NULL	/* interface_data */
 		};
 
+		static const GInterfaceInfo validable_info = {
+			(GInterfaceInitFunc)_midgard_query_constraint_group_validable_iface_init,
+			NULL,	/* interface_finalize */
+			NULL	/* interface_data */
+		};
+
   		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryConstraintGroup", &info, 0);
 		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_CONSTRAINT_SIMPLE, &property_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_VALIDABLE, &validable_info);
     	}
     	return type;
 }

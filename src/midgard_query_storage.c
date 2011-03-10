@@ -19,6 +19,7 @@
 #include "midgard_query_storage.h"
 #include "midgard_core_query.h"
 #include "midgard_core_object_class.h"
+#include "midgard_validable.h"
 
 /**
  * midgard_query_storage_new:
@@ -59,6 +60,45 @@ midgard_query_storage_new (const gchar *classname)
 
 /* GOBJECT ROUTINES */
 
+/* Validable iface */
+static void
+_midgard_query_storage_validable_iface_validate (MidgardValidable *iface, GError **error)
+{
+	g_return_if_fail (iface != NULL);
+	MidgardQueryStorage *self = MIDGARD_QUERY_STORAGE (iface);
+	self->priv->is_valid = FALSE;
+
+	if (!self->priv->classname) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_VALUE_INVALID,
+				"No class associated with storage", NULL);
+		return;
+	}
+
+	MidgardDBObjectClass *dbklass = g_type_class_peek (g_type_from_name (self->priv->classname));
+	if (!dbklass || (dbklass && !MIDGARD_IS_DBOBJECT_CLASS (dbklass))) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
+				"Storage associated with class which is not DBObject derived.", NULL);
+		return;
+	}
+
+	MIDGARD_QUERY_STORAGE (self)->priv->is_valid = TRUE;
+	return;
+}
+
+gboolean
+_midgard_query_storage_validable_iface_is_valid (MidgardValidable *self)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	return MIDGARD_QUERY_STORAGE (self)->priv->is_valid;
+}
+
+static void
+_midgard_query_storage_validable_iface_init (MidgardValidableIFace *iface)
+{
+	iface->validate = _midgard_query_storage_validable_iface_validate;
+	iface->is_valid = _midgard_query_storage_validable_iface_is_valid;
+}
+
 enum {
 	MIDGARD_QUERY_STORAGE_DBCLASS = 1
 };
@@ -76,6 +116,7 @@ __midgard_query_storage_instance_init (GTypeInstance *instance, gpointer g_class
 	self->priv->table_alias = NULL;
 	self->priv->table = NULL;
 	self->priv->classname = NULL;
+	self->priv->is_valid = FALSE;
 }
 
 static GObject *
@@ -140,7 +181,6 @@ __midgard_query_storage_set_property (GObject *object, guint property_id,
 
 		case MIDGARD_QUERY_STORAGE_DBCLASS:
 			dbklass = g_type_class_peek (g_type_from_name (g_value_get_string (value)));
-			g_return_if_fail (MIDGARD_IS_DBOBJECT_CLASS (dbklass));
 			if (dbklass) {
 				self->priv->klass = dbklass;
 				self->priv->classname = G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (dbklass));
@@ -148,7 +188,7 @@ __midgard_query_storage_set_property (GObject *object, guint property_id,
 			}
 			break;
 
-  		default:
+		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
 			break;
 	}
@@ -199,7 +239,15 @@ midgard_query_storage_get_type (void)
 			0,              /* n_preallocs */
 			__midgard_query_storage_instance_init /* instance init */	
 		};
+
+		static const GInterfaceInfo validable_info = {
+			(GInterfaceInitFunc) _midgard_query_storage_validable_iface_init,
+			NULL,   /* interface_finalize */
+			NULL    /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT, "MidgardQueryStorage", &info, 0);
+		g_type_add_interface_static (type, MIDGARD_TYPE_VALIDABLE, &validable_info);
 	}
 	return type;
 }

@@ -74,12 +74,14 @@ struct _MidgardQueryStoragePrivate {
 	gchar *table_alias;
 	const gchar *table;
 	const gchar *classname;
+	gboolean is_valid;
 };
 
 struct _MidgardQueryPropertyPrivate {
 	GValue value;
 	MidgardDBObjectClass *klass;
 	MidgardQueryStorage *storage;
+	gboolean is_valid;
 };
 
 struct _MidgardQueryExecutorPrivate {
@@ -99,6 +101,7 @@ struct _MidgardQueryExecutorPrivate {
 	guint results_count;
 	gboolean read_only;
 	gboolean include_deleted;
+	gboolean is_valid;
 };
 
 struct _MidgardQueryConstraintSimplePrivate {
