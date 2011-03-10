@@ -277,6 +277,7 @@ __get_expression_value (GValue *src, GString *str)
 			  if (G_VALUE_TYPE (src) == G_TYPE_VALUE_ARRAY) {
 				GValueArray *array = (GValueArray *) g_value_get_boxed (src);
 				if (!array) {
+					/* FIXME, add this to validate */
 					g_warning ("Empty array given");
 					return;
 				}
@@ -285,14 +286,15 @@ __get_expression_value (GValue *src, GString *str)
 					if (i > 0)
 						g_string_append (str, ", ");
 					__get_expression_value (g_value_array_get_nth (array, i), str);
-				}	
-			  } else {
-			  	g_warning ("BOXED type '%s' not implemented \n", G_VALUE_TYPE_NAME (src));
-			  }
-			  break;
+				}
+			} else {
+				/*FIXME, add this to validate */
+				g_warning ("BOXED type '%s' not implemented \n", G_VALUE_TYPE_NAME (src));
+			}
+			break;
 
 		default:
-			  break;
+			break;
 	}
 
 	return;
@@ -344,6 +346,7 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
 	table_alias_field = midgard_core_query_compute_constraint_property (executor, 
 			MIDGARD_QUERY_CONSTRAINT (constraint_simple)->priv->storage, g_value_get_string (&field_value));
+	/* FIXME, add this to validate */
 	if (!table_alias_field)
 		g_warning ("Null table.field alias for given '%s'", g_value_get_string (&field_value));
 	/* TODO, handle error case when table_alias_field is NULL */
