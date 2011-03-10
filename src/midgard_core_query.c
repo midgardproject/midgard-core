@@ -31,6 +31,7 @@
 #endif
 #include "midgard_metadata.h"
 #include "midgard_reflector_object.h"
+#include "midgard_validable.h"
 
 /* Do not use _DB_DEFAULT_DATETIME.
  * Some databases (like MySQL) fails to create datetime column with datetime which included timezone. 
@@ -2619,7 +2620,7 @@ __compute_reserved_property_constraint (Psh *holder, const gchar *token_1, const
 
 gchar *
 midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
-		                MidgardQueryStorage *storage, const gchar *name)
+		                MidgardQueryStorage *storage, const gchar *name, GError **error)
 {
 	g_return_val_if_fail (executor != NULL, FALSE);
 	g_return_val_if_fail (name != NULL, FALSE);
@@ -2655,7 +2656,8 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 	if (i == 1) {
 		const gchar *property_field = midgard_core_class_get_property_colname (klass, name);
 		if (!property_field) {
-			g_warning ("%s doesn't seem to be registered for %s", name, G_OBJECT_CLASS_NAME (klass));
+			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL, 
+					"%s doesn't seem to be registered for %s", name, G_OBJECT_CLASS_NAME (klass));
 			g_strfreev (spltd);
 			return NULL;
 		}
@@ -2692,7 +2694,10 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 		}
 
 	} else {
-		  g_warning("Failed to parse '%s'. At most 3 tokens allowed", name);
+		  g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL, 
+				  "Failed to parse '%s'. At most 3 tokens allowed", name);
+		  g_strfreev (spltd);
+		  return NULL;
 	}
 
 	g_strfreev (spltd);

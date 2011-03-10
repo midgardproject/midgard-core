@@ -301,7 +301,7 @@ __get_expression_value (GValue *src, GString *str)
 }
 
 void 
-_midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQueryConstraintSimple *constraint_simple, GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node)
+_midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQueryConstraintSimple *constraint_simple, GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node, GError **error)
 {	
 	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (constraint_simple);
 	//GdaConnection *cnc = executor->priv->mgd->priv->connection;
@@ -344,12 +344,13 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	/* Create table_alias.field name */
 	gchar *table_alias_field;
 	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
+	GError *err = NULL;
 	table_alias_field = midgard_core_query_compute_constraint_property (executor, 
-			MIDGARD_QUERY_CONSTRAINT (constraint_simple)->priv->storage, g_value_get_string (&field_value));
-	/* FIXME, add this to validate */
-	if (!table_alias_field)
-		g_warning ("Null table.field alias for given '%s'", g_value_get_string (&field_value));
-	/* TODO, handle error case when table_alias_field is NULL */
+			MIDGARD_QUERY_CONSTRAINT (constraint_simple)->priv->storage, g_value_get_string (&field_value), &err);
+	if (err) {
+		g_propagate_error (error, err);
+		return;
+	}
 	g_value_take_string ((value = gda_value_new (G_TYPE_STRING)), table_alias_field);
 	expr->value = value;
 	cond->operands = g_slist_append (cond->operands, expr);

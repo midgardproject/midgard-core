@@ -210,7 +210,14 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self, GError **error)
 		/* Compute table.colname for given property name */
 		GValue rval = {0, };
 		midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (property), &rval);
-		gchar *table_field = midgard_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval));
+		GError *err = NULL;
+		gchar *table_field = midgard_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval), &err);
+		if (err) {
+			g_propagate_error (error, err);
+			g_free (table_field);
+			gda_sql_select_order_free (order);
+			return FALSE;
+		}
 
 		if (!table_field) {
 			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
@@ -235,7 +242,7 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self, GError **error)
 	return TRUE;
 }
 
-gboolean __query_select_add_joins (MidgardQuerySelect *self)
+gboolean __query_select_add_joins (MidgardQuerySelect *self, GError **error)
 {
 	if (!MIDGARD_QUERY_EXECUTOR (self)->priv->joins)
 		return TRUE;
@@ -258,15 +265,24 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self)
 		MidgardQueryStorage *left_storage = _sj->left_property->priv->storage;
 		MidgardQueryStorage *right_storage = _sj->right_property->priv->storage;
 
+		GError *err = NULL;
 		GValue lval = {0, };
 		midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (_sj->left_property), &lval);
 		gchar *left_table_field = 
-			midgard_core_query_compute_constraint_property (executor, left_storage, g_value_get_string (&lval));
+			midgard_core_query_compute_constraint_property (executor, left_storage, g_value_get_string (&lval), &err);
+		if (err) {
+			g_propagate_error (error, err);
+			g_free (left_table_field);
+		}
 
 		GValue rval = {0, };
 		midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (_sj->right_property), &rval);
 		gchar *right_table_field = 
-			midgard_core_query_compute_constraint_property (executor, right_storage, g_value_get_string (&rval));
+			midgard_core_query_compute_constraint_property (executor, right_storage, g_value_get_string (&rval), &err);
+		if (err) {
+			g_propagate_error (error, err);
+			g_free (right_table_field);
+		}
 
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (join));
 		expr->value = gda_value_new (G_TYPE_STRING);
@@ -510,15 +526,20 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 	klass->dbpriv->add_fields_to_select_statement (klass, cnc, sss, s_target->as);
 
 	/* Add joins, LEFT JOIN tbl2 ON... */
-	if (!__query_select_add_joins (MIDGARD_QUERY_SELECT (self))) 
+	__query_select_add_joins (MIDGARD_QUERY_SELECT (self), &err);
+	if (err) {
+	 	g_propagate_error (error, err);
 		goto return_false;
+	}
 
 	GdaSqlExpr *where = sss->where_cond;
 	GdaSqlOperation *operation = where->cond;
 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint) {
-		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement 			(MIDGARD_QUERY_EXECUTOR (self), MIDGARD_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where);
+		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement 			(MIDGARD_QUERY_EXECUTOR (self), MIDGARD_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where, &err);
+		if (err)
+			g_propagate_error (error, err);
 		if (MIDGARD_QUERY_EXECUTOR (self)->priv->n_constraints == 1) 
 			__add_second_dummy_constraint (sss, operation);
 		/* Add dummy constraint if operation has only one operand */

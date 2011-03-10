@@ -106,7 +106,7 @@ struct _MidgardQueryExecutorPrivate {
 
 struct _MidgardQueryConstraintSimplePrivate {
 	void	(*add_conditions_to_statement)	(MidgardQueryExecutor *executor, MidgardQueryConstraintSimple *self, 
-			GdaSqlStatement *stm, GdaSqlExpr *where_expr_node);
+			GdaSqlStatement *stm, GdaSqlExpr *where_expr_node, GError **error);
 };
 
 #define MQE_SET_TABLE_ALIAS(__executor, __storage) \
@@ -287,7 +287,7 @@ GdaDataModel 		*midgard_core_query_get_dbobject_model 		(MidgardConnection *mgd,
 gboolean		midgard_core_query_create_dbobject_record 	(MidgardDBObject *object);
 gboolean		midgard_core_query_update_dbobject_record 	(MidgardDBObject *object);
 gchar                   *midgard_core_query_binary_stringify            (GValue *src_value); 
-gchar 			*midgard_core_query_compute_constraint_property	(MidgardQueryExecutor *executor, MidgardQueryStorage *storage, const gchar *name);
+gchar 			*midgard_core_query_compute_constraint_property	(MidgardQueryExecutor *executor, MidgardQueryStorage *storage, const gchar *name, GError **error);
 gchar 			*midgard_core_query_unescape_string (MidgardConnection *mgd, const gchar *str);
 
 #endif /* MIDGARD_CORE_QUERY_H */

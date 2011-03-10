@@ -257,7 +257,7 @@ _midgard_query_constraint_group_list_constraints (MidgardQueryConstraintSimple *
 
 void
 _midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQueryConstraintSimple *self, 
-		GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node)
+		GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node, GError **error)
 {	
 	guint n_objects;
 	guint i;
@@ -290,7 +290,10 @@ _midgard_query_group_add_conditions_to_statement (MidgardQueryExecutor *executor
 
 	for (i = 0; i < n_objects; i++) {
 
-		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (constraints[i])->priv->add_conditions_to_statement (executor, MIDGARD_QUERY_CONSTRAINT_SIMPLE (constraints[i]), stmt, top_where);
+		GError *err = NULL;
+		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (constraints[i])->priv->add_conditions_to_statement (executor, MIDGARD_QUERY_CONSTRAINT_SIMPLE (constraints[i]), stmt, top_where, &err);
+		if (err)
+			g_propagate_error (error, err);
 	}
 
 	g_free (constraints);
