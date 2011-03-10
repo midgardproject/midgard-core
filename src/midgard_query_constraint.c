@@ -58,7 +58,8 @@ gboolean __query_constraint_operator_is_valid(const gchar *op, GdaSqlOperatorTyp
 	guint i;
 	for (i = 0; valid_operators[i].name != NULL; i++) {
 		if (g_str_equal(op, valid_operators[i].name)) {
-			*op_type = valid_operators[i].op_type;
+			if (op_type)
+				*op_type = valid_operators[i].op_type;
 			return TRUE;
 		}
 	}
