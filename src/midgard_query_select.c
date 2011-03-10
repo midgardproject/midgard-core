@@ -484,12 +484,10 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_start, 0);
 
 	GError *err = NULL;
-	if (!midgard_validable_is_valid (MIDGARD_VALIDABLE (self))) {
-		midgard_validable_validate (MIDGARD_VALIDABLE (self), &err);
-		if (err) {
-			g_propagate_error (error, err);
-			return;
-		}
+	midgard_validable_validate (MIDGARD_VALIDABLE (self), &err);
+	if (err) {
+		g_propagate_error (error, err);
+		return;
 	}
 
 	g_object_ref (self);
