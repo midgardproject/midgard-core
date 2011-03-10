@@ -190,7 +190,7 @@ _midgard_query_select_add_join (MidgardQueryExecutor *self, const gchar *join_ty
 	return TRUE;
 }
 
-gboolean __query_select_add_orders (MidgardQueryExecutor *self)
+gboolean __query_select_add_orders (MidgardQueryExecutor *self, GError **error)
 {
 	if (!self->priv->orders)
 		return TRUE;
@@ -223,7 +223,8 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self)
 		gchar *table_field = midgard_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval));
 
 		if (!table_field) {
-			g_warning ("Can not find table and column name for given '%s' property name", g_value_get_string (&rval));
+			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
+					"Can not find table and column name for given '%s' property name", g_value_get_string (&rval));
 			g_value_unset (&rval);
 			return FALSE;	
 		}
@@ -523,8 +524,11 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 	}
 
 	/* Add orders , ORDER BY t1.field... */
-	if (!__query_select_add_orders (executor)) 
+	if (!__query_select_add_orders (executor, &err)) { 
+		if (err)
+			g_propagate_error (error, err);
 		goto return_false;
+	}
 
 	/* Exclude deleted */
 	if (MGD_DBCLASS_METADATA_CLASS (klass) && !executor->priv->include_deleted)
