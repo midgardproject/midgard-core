@@ -317,14 +317,14 @@ _midgard_query_constraint_group_validable_iface_validate (MidgardValidable *ifac
 	/* group type */
 	if (self->priv->op_type == -1) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
-				"Invalid group operator type", NULL);
+				"Invalid group operator type");
 		return;
 	}
 
 	/* constraints */
 	if (!self->priv->constraints) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_ELEMENT_INVALID,
-				"Constraint group doesn't hold any constraints", NULL);
+				"Constraint group doesn't hold any constraints");
 		return;
 	}
 

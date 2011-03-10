@@ -70,14 +70,14 @@ _midgard_query_storage_validable_iface_validate (MidgardValidable *iface, GError
 
 	if (!self->priv->classname) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_VALUE_INVALID,
-				"No class associated with storage", NULL);
+				"No class associated with storage");
 		return;
 	}
 
 	MidgardDBObjectClass *dbklass = g_type_class_peek (g_type_from_name (self->priv->classname));
 	if (!dbklass || (dbklass && !MIDGARD_IS_DBOBJECT_CLASS (dbklass))) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
-				"Storage associated with class which is not DBObject derived.", NULL);
+				"Storage associated with class which is not DBObject derived.");
 		return;
 	}
 

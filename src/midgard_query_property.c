@@ -240,7 +240,7 @@ _midgard_query_property_validable_iface_validate (MidgardValidable *iface, GErro
 
 	if (!G_IS_VALUE (&self->priv->value) ||  !G_VALUE_HOLDS_STRING (&self->priv->value)) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_VALUE_INVALID,
-				"Invalid property's value type", NULL);
+				"Invalid property's value type");
 		return;
 	}
 

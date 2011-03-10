@@ -403,7 +403,7 @@ _midgard_query_select_validable_iface_validate (MidgardValidable *iface, GError 
 	/* Storage */
 	if (!storage) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
-				"No QueryStorage associated with QuerySelect", NULL);
+				"No QueryStorage associated with QuerySelect");
 		return;
 	}
 
@@ -577,7 +577,7 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 
 	if (!model && !err) {
 		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
-				"Execute error - Unknown reason, underlying error is NULL", NULL);
+				"Execute error - Unknown reason, underlying error is NULL");
 		goto return_false;
 	}
 
