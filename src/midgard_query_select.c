@@ -193,22 +193,8 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self, GError **error)
 	
 	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->orders; l != NULL; l = l->next) {
 
+		/* Proper asc type is set during validation phase */
 		qso *_so = (qso*) l->data;
-		
-		/* Validate order */
-		gboolean asc = FALSE;
-		gchar *lorder = g_ascii_strdown (_so->order_type, -1);
-		if (g_str_equal (lorder, "asc")) {
-			_so->asc = TRUE;
-		} else if (g_str_equal (lorder, "desc")) {
-			_so->asc = FALSE;
-		} else {
-			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_VALUE_INVALID,
-					"Invalid order type '%s'. Expected ASC or DESC", _so->order_type);
-			g_free (lorder); 
-			return FALSE;
-		}		
-		g_free (lorder);
 
 		/* Create new order */
 		order = gda_sql_select_order_new (GDA_SQL_ANY_PART (select));
@@ -404,7 +390,6 @@ _midgard_query_select_validable_iface_validate (MidgardValidable *iface, GError 
 	GError *err = NULL;
 	MidgardQueryStorage *storage = MIDGARD_QUERY_EXECUTOR (self)->priv->storage;
 
-
 	/* Storage */
 	if (!storage) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
@@ -418,12 +403,30 @@ _midgard_query_select_validable_iface_validate (MidgardValidable *iface, GError 
 		return;
 	}
 
+	/* Orders */
+	GSList *l = NULL;
+	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->orders; l != NULL; l = l->next) {
+		qso *_so = (qso*) l->data;
+		gboolean asc = FALSE;
+		gchar *lorder = g_ascii_strdown (_so->order_type, -1);
+		if (g_str_equal (lorder, "asc")) {
+			_so->asc = TRUE;
+		} else if (g_str_equal (lorder, "desc")) {
+			_so->asc = FALSE;
+		} else {
+			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_VALUE_INVALID,
+					"Invalid order type '%s'. Expected ASC or DESC", _so->order_type);
+			g_free (lorder); 
+			return;
+		}		
+		g_free (lorder);
+	}
+
 	/* Gather all objects required for execution */
 	GSList *o_list = NULL;
 	o_list = g_slist_prepend (o_list, storage);
 	_get_all_constraints (self, NULL, &o_list);
 
-	GSList *l = NULL;
 	for (l = o_list; l != NULL; l = l->next) {
 		if (!midgard_validable_is_valid (MIDGARD_VALIDABLE (l->data))) {
 			midgard_validable_validate (MIDGARD_VALIDABLE (l->data), &err);
