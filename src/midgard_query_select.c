@@ -84,6 +84,7 @@ _midgard_query_select_set_offset (MidgardQueryExecutor *self, guint offset)
 typedef struct {
 	MidgardQueryProperty *property;
 	gboolean asc;
+	gchar *order_type;
 } qso;
 
 gboolean
@@ -92,21 +93,9 @@ _midgard_query_select_add_order (MidgardQueryExecutor *self, MidgardQueryPropert
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (property != NULL, FALSE);
 
-	gboolean asc = FALSE;
-
-	gchar *lorder = g_ascii_strdown (type, -1);
-	if (g_str_equal (lorder, "asc")) {
-		asc = TRUE;
-	} else if (g_str_equal (lorder, "desc")) {
-		asc = FALSE;
-	} else {
-		g_warning ("Invalid order type '%s'. Expected ASC or DESC", type);
-	}
-
-	g_free (lorder);
-
 	qso *_qs = g_new (qso, 1);
-	_qs->asc = asc;
+	_qs->order_type = g_strdup (type);
+	_qs->asc = FALSE;
 	_qs->property = g_object_ref (property);
 
 	self->priv->orders = g_slist_append (self->priv->orders, _qs);
@@ -205,6 +194,21 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self, GError **error)
 	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->orders; l != NULL; l = l->next) {
 
 		qso *_so = (qso*) l->data;
+		
+		/* Validate order */
+		gboolean asc = FALSE;
+		gchar *lorder = g_ascii_strdown (_so->order_type, -1);
+		if (g_str_equal (lorder, "asc")) {
+			_so->asc = TRUE;
+		} else if (g_str_equal (lorder, "desc")) {
+			_so->asc = FALSE;
+		} else {
+			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_VALUE_INVALID,
+					"Invalid order type '%s'. Expected ASC or DESC", _so->order_type);
+			g_free (lorder); 
+			return FALSE;
+		}		
+		g_free (lorder);
 
 		/* Create new order */
 		order = gda_sql_select_order_new (GDA_SQL_ANY_PART (select));
@@ -781,6 +785,7 @@ _midgard_query_select_finalize (GObject *object)
 	GSList *l;
 	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->orders; l != NULL; l = l->next) {
 		qso *_so = (qso*) l->data;
+		g_free (_so->order_type);
 		g_object_unref (_so->property);
 	}
 
