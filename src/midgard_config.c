@@ -211,6 +211,7 @@ static void __set_config_from_keyfile(MidgardConfig *self, GKeyFile *keyfile, co
 
 		__create_log_dir((const gchar *) tmpstr);
 
+		g_free (self->logfilename);
 		self->logfilename = g_strdup(tmpstr);
 		GError *err = NULL;
 		GFile *g_file = g_file_new_for_path ((const gchar *)self->logfilename);
