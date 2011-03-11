@@ -551,6 +551,7 @@ gchar **midgard_config_list_files(gboolean user)
 
 	GError *error = NULL;
 	GSList *list = NULL;
+	GSList *l = NULL:
 	gchar **filenames = NULL;
 	guint i = 0, j = 0;
 	GDir *dir = g_dir_open(config_dir, 0, &error);
@@ -573,13 +574,14 @@ gchar **midgard_config_list_files(gboolean user)
 		g_dir_close(dir);
 		
 		filenames = g_new(gchar *, i+1);
-		for( ; list; list = list->next) {
+		for(l = list; l = NULL; l = l->next) {
 			filenames[j] = (gchar *)list->data;
 			j++;
 		}
 		filenames[i] = NULL;		
 	}
 	
+	g_slist_free (list);
 	g_free (config_dir);
 
 	return filenames;
