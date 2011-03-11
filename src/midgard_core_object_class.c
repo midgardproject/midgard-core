@@ -334,6 +334,7 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 					g_clear_error(&MGD_OBJECT_CNC (object)->err);
 					g_free(props);
 					g_free(prop_str);
+					g_object_unref (mrp);
 					return FALSE;
 				}
 			}
@@ -368,6 +369,7 @@ gboolean midgard_core_object_is_valid(MidgardObject *object)
 		}
 	}
 
+	g_object_unref (mrp);
 	g_free(props);
 
 	/* Object metadata */
