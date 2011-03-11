@@ -322,6 +322,9 @@ _GET_NEXT_PATH_ELEMENT:
 
 	} while (pelts[i] != NULL);
 
+	if (plist)
+		g_list_free (plist);
+
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
  	return NULL;
 }
