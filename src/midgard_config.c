@@ -551,7 +551,7 @@ gchar **midgard_config_list_files(gboolean user)
 
 	GError *error = NULL;
 	GSList *list = NULL;
-	GSList *l = NULL:
+	GSList *l = NULL;
 	gchar **filenames = NULL;
 	guint i = 0, j = 0;
 	GDir *dir = g_dir_open(config_dir, 0, &error);
