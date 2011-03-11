@@ -147,6 +147,7 @@ gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object)
 	if (ptype == G_TYPE_UINT) {
 		
 		guint i = g_value_get_uint(&gval);
+		g_value_unset (&gval);
 		if (i == 0)
 			return FALSE;
 
@@ -155,11 +156,15 @@ gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object)
 	} else if (ptype == G_TYPE_STRING) {
 
 		const gchar *s = g_value_get_string(&gval);
+		g_value_unset (&gval);
 		if (s == NULL || *s == '\0')
 			return FALSE;
 
 		return TRUE;
 	}
+
+	if (G_IS_VALUE (&gval))
+		g_value_unset (&gval);
 
 	return FALSE;
 }
