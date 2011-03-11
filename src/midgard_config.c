@@ -553,7 +553,7 @@ gchar **midgard_config_list_files(gboolean user)
 	GSList *list = NULL;
 	GSList *l = NULL;
 	gchar **filenames = NULL;
-	guint i = 0, j = 0;
+	guint i = 0;
 	GDir *dir = g_dir_open(config_dir, 0, &error);
 	if (dir != NULL) {
 		const gchar *file = g_dir_read_name(dir);
@@ -574,11 +574,11 @@ gchar **midgard_config_list_files(gboolean user)
 		g_dir_close(dir);
 		
 		filenames = g_new(gchar *, i+1);
-		for(l = list; l = NULL; l = l->next) {
-			filenames[j] = (gchar *)list->data;
-			j++;
+		guint j = 0;
+		for(l = list; l != NULL; l = l->next) {
+			filenames[j++] = (gchar *)l->data;
 		}
-		filenames[i] = NULL;		
+		filenames[j] = NULL;
 	}
 	
 	g_slist_free (list);
