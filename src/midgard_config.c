@@ -553,36 +553,37 @@ gchar **midgard_config_list_files(gboolean user)
 	GSList *list = NULL;
 	GSList *l = NULL;
 	gchar **filenames = NULL;
-	guint i = 0, j = 0;
+	guint i = 0;
 	GDir *dir = g_dir_open(config_dir, 0, &error);
-	if (dir != NULL) {
-		const gchar *file = g_dir_read_name(dir);
+
+	g_free (config_dir);
+
+	if (dir == NULL) 
+		return filenames;
 	
-		while (file != NULL) {
-			
-			if(!g_str_has_prefix(file, ".")
-					&& (!g_str_has_prefix(file, "#"))
-					&& (!g_str_has_suffix(file, "~"))
-					&& (!g_str_has_suffix(file, "example"))) {
-					
-				list = g_slist_append(list, (gpointer)g_strdup(file));
-				i++;
-			}
-			file = g_dir_read_name(dir);
+	const gchar *file = g_dir_read_name(dir);
+	while (file != NULL) {
+		if(!g_str_has_prefix(file, ".")
+				&& (!g_str_has_prefix(file, "#"))
+				&& (!g_str_has_suffix(file, "~"))
+				&& (!g_str_has_suffix(file, "example"))) {
+			list = g_slist_append(list, (gpointer)g_strdup(file));
+			i++;
 		}
-		
-		g_dir_close(dir);
-		
-		filenames = g_new(gchar *, i+1);
-		for(l = list; l = NULL; l = l->next) {
-			filenames[j] = (gchar *)list->data;
-			j++;
-		}
-		filenames[i] = NULL;		
+		file = g_dir_read_name(dir);
 	}
+
+	g_dir_close(dir);
+	
+	filenames = g_new(gchar *, i+1);
+
+	i = 0;
+	for(l = list; l = NULL; l = l->next, i++) 
+		filenames[i] = (gchar *)list->data;
+
+	filenames[i] = NULL;		
 	
 	g_slist_free (list);
-	g_free (config_dir);
 
 	return filenames;
 }
