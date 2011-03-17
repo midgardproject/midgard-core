@@ -151,9 +151,6 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 				if (prop_attr->table == NULL)
 					prop_attr->table = g_strdup (table);
 
-				/* Free old key and remove new one in hash table */
-				g_hash_table_remove(type->prophash, (gconstpointer) rprop[1]);
-
 				gchar *property_name = g_strdup ((gchar *)name);
 				g_hash_table_insert(type->prophash, property_name, prop_attr);
 
