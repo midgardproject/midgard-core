@@ -120,7 +120,7 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 
 			MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME(rprop[0]);		
 			if (!klass)
-				__view_error (cur, "Defined '%s' class is not registered as midagrd_object derived one", rprop[0]);
+				__view_error (cur, "Defined '%s' class is not registered as midgard_object derived one", rprop[0]);
 
 			const gchar *table = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS (klass));
 			if (table == NULL)
