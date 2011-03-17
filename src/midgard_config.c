@@ -578,7 +578,7 @@ gchar **midgard_config_list_files(gboolean user)
 	filenames = g_new(gchar *, i+1);
 
 	i = 0;
-	for(l = list; l = NULL; l = l->next, i++) 
+	for(l = list; l != NULL; l = l->next, i++) 
 		filenames[i] = (gchar *)list->data;
 
 	filenames[i] = NULL;		
