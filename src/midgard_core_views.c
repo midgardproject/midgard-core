@@ -175,8 +175,8 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 	MgdSchemaPropertyAttr *propright = NULL;
 	MgdSchemaPropertyAttr *propleft = NULL;
 	MidgardDBObjectClass *metadata_klass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (MIDGARD_TYPE_METADATA));
-	MidgardObjectClass *left_klass = NULL;
-	MidgardObjectClass *right_klass = NULL;
+	MidgardDBObjectClass *left_klass = NULL;
+	MidgardDBObjectClass *right_klass = NULL;
 	gchar *left_table = NULL;
 	gchar *right_table = NULL;
 	gchar *left_field = NULL;
@@ -243,6 +243,8 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				return;
 			}
 
+			MgdSchemaTypeAttr *type_attr = klass->dbpriv->storage_data;
+
 			/* Set left and right table and field explicitly.
 			 * It's important to ignore  MgdSchemaPropertyAttr in case of metadata usage.
 			 * For this class, we can use explicit table and tablefield, and setting such 
@@ -262,10 +264,10 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				propleft = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
 				if (!propleft)
 					__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]); 
-				left_table = g_strdup (propleft->table ? propleft->table : type->table);
+				left_table = g_strdup (type_attr->is_view ? type_attr->name : type_attr->table);
 				left_field = g_strdup (propleft->field);
 			}
-			left_klass = MIDGARD_OBJECT_CLASS (klass);
+			left_klass = MIDGARD_DBOBJECT_CLASS (klass);
 			g_strfreev(classprop);	
 
 			/* Get right property attribute */
@@ -281,6 +283,8 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				return;
 			}
 
+			type_attr = klass->dbpriv->storage_data;
+
 			/* Check reserved metadata property */
 			if (g_str_equal (classprop[1], "metadata")) {
 				if (classprop[2] == NULL)
@@ -294,10 +298,10 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				propright = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, classprop[1]);
 				if (!propright)
 					__view_error(cur, "Property %s not registered for %s", classprop[1], classprop[0]);
-				right_table = g_strdup (propright->table ? propright->table : type->table);
+				right_table = g_strdup (type_attr->is_view ? type_attr->name : type_attr->table);
 				right_field = g_strdup (propright->field);
 			}
-			right_klass = MIDGARD_OBJECT_CLASS (klass);
+			right_klass = MIDGARD_DBOBJECT_CLASS (klass);
 			g_strfreev(classprop);
 
 			MidgardDBJoin *mdbj = midgard_core_dbjoin_new();
