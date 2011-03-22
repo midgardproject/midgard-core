@@ -49,13 +49,13 @@ struct _MidgardDBJoin {
 	gchar *type;
 	guint typeid;
 	gchar *table;
-	MidgardObjectClass *klass;
+	MidgardDBObjectClass *klass;
 	gchar *left_table;
 	gchar *left_field;
-	MidgardObjectClass *left_klass;
+	MidgardDBObjectClass *left_klass;
 	gchar *right_table;
 	gchar *right_field;
-	MidgardObjectClass *right_klass;
+	MidgardDBObjectClass *right_klass;
 	gchar *left_tablefield;
 	gchar *right_tablefield;
 
