@@ -39,20 +39,27 @@ struct _MidgardDBObjectPrivate {
 	GdaDataModel *datamodel;
 	gint row;
 	gboolean is_in_storage;
+	gboolean uses_workspace;
 
 	/* GDA pointers */
-	GdaStatement *statement_insert;
-	GdaSet *statement_insert_params;
-	GdaStatement *statement_update;
-	GdaSet *statement_update_params;	
+	/* INSERT */
+	GdaStatement *_statement_insert;
+	GdaSet *_statement_insert_params;
+	GdaStatement *_workspace_statement_insert;
+	GdaSet *_workspace_statement_insert_params;
+	/* UPDATE */
+	GdaStatement *_statement_update;
+	GdaSet *_statement_update_params;	
+	GdaStatement *_workspace_statement_update;
+	GdaSet *_workspace_statement_update_params;	
 
 	/* GdaSql virtual helpers */
 	void			(*add_fields_to_select_statement)	(MidgardDBObjectClass *klass, 
-			GdaConnection *cnc, GdaSqlStatementSelect *select, const gchar *table_name);
+			MidgardConnection *mgd, GdaSqlStatementSelect *select, const gchar *table_name);
 
 	GSList 			*(*set_from_sql)	(MidgardConnection *mgd, GType type, const gchar *sql);	
 	void 			(*__set_from_sql)	(MidgardDBObject *self, GdaDataModel *model, gint row);
-	void 			(*set_from_data_model)	(MidgardDBObject *self, GdaDataModel *model, gint row);
+	void 			(*set_from_data_model)	(MidgardDBObject *self, GdaDataModel *model, gint row, guint column_id);
 	void 			(*set_from_xml_node)	(MidgardDBObject *self, xmlNode *node);
 	MidgardConnection 	*(*get_connection) 	(MidgardDBObject *self);
 	gboolean		(*create_storage)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
@@ -64,13 +71,17 @@ struct _MidgardDBObjectPrivate {
 
 	/* GDA helpers */
 	/* prepared statements */
-	void			(*set_statement_insert)	(MidgardDBObjectClass *klass);
-	void			(*set_statement_update)	(MidgardDBObjectClass *klass);
+	GdaStatement		*(*get_statement_insert)	(MidgardDBObjectClass *klass, MidgardConnection *mgd);
+	GdaSet			*(*get_statement_insert_params)	(MidgardDBObjectClass *klass, MidgardConnection *mgd);
+	GdaStatement		*(*get_statement_update)	(MidgardDBObjectClass *klass, MidgardConnection *mgd);
+	GdaSet			*(*get_statement_update_params)	(MidgardDBObjectClass *klass, MidgardConnection *mgd);
 	/* static SQL commands */
 	void 			(*set_static_sql_select)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
 
 
 };
+
+MidgardDBObjectPrivate	*midgard_core_dbobject_private_new 	(void);
 
 #define MGD_DBOBJECT_DBPRIV(__obj) (MIDGARD_DBOBJECT(__obj)->dbpriv)
 
@@ -97,7 +108,12 @@ struct _MidgardObjectPrivate{
 	gchar *imported;
 	GSList *parameters;
 	GHashTable *_params;
+	guint ws_id;
+	guint ws_object_id;
 };
+
+#define MGD_OBJECT_WS_ID(__obj) MIDGARD_OBJECT(__obj)->priv->ws_id
+#define MGD_OBJECT_WS_OID(__obj) MIDGARD_OBJECT(__obj)->priv->ws_object_id
 
 struct _MidgardObjectClassPrivate {
 	MgdSchemaTypeAttr *storage_data;
@@ -206,6 +222,12 @@ struct _MidgardConnectionPrivate {
 	gboolean enable_quota;
 	gboolean enable_debug;
 	gboolean enable_dbus;
+	gboolean enable_workspace;
+
+	gboolean has_workspace;
+	gpointer workspace;
+	GdaDataModel *workspace_model;
+	MidgardWorkspaceManager *workspace_manager;
 };
 
 #define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL
@@ -213,6 +235,10 @@ struct _MidgardConnectionPrivate {
 #define MGD_CNC_REPLICATION(_cnc) _cnc->priv->enable_replication
 #define	MGD_CNC_DEBUG(_cnc) _cnc->priv->enable_debug
 #define MGD_CNC_DBUS(_cnc) _cnc->priv->enable_dbus
+#define MGD_CNC_USES_WORKSPACE(_cnc) _cnc->priv->enable_workspace
+#define MGD_CNC_HAS_WORKSPACE(_cnc) _cnc->priv->has_workspace
+#define MGD_CNC_WORKSPACE(_cnc) (MidgardWorkspace *)_cnc->priv->workspace
+#define MGD_CNC_WORKSPACE_ID(_cnc) MIDGARD_WORKSPACE_STORAGE_GET_INTERFACE(MGD_CNC_WORKSPACE(_cnc))->priv->get_id(MIDGARD_WORKSPACE_STORAGE (MGD_CNC_WORKSPACE(_cnc)))
 
 struct _MidgardBlobPrivate {
 	MidgardObject *attachment;
@@ -229,7 +255,8 @@ struct _MidgardBlobPrivate {
 typedef enum {
 	OBJECT_UPDATE_NONE = 0,
 	OBJECT_UPDATE_EXPORTED,
-	OBJECT_UPDATE_IMPORTED
+	OBJECT_UPDATE_IMPORTED,
+	OBJECT_UPDATE_CREATE
 } _ObjectActionUpdate;
 
 
@@ -248,7 +275,7 @@ xmlNode *_get_type_node(xmlNode *node);
 GObject **midgard_core_object_from_xml(MidgardConnection *mgd, const gchar *xml, gboolean force);
 
 /* Object's routines */
-gboolean _midgard_object_update(MidgardObject *object, _ObjectActionUpdate replicate);
+gboolean _midgard_object_update(MidgardObject *object, _ObjectActionUpdate replicate, GError **error);
 gboolean _midgard_object_create(MidgardObject *object, const gchar *create_guid, _ObjectActionUpdate replicate);
 void _object_copy_properties(GObject *src, GObject *dest);
 

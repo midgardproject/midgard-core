@@ -122,11 +122,51 @@ midgard_sitegroup
 midgard_tree
 
 
+<!-- ##### MACRO MGD_GENERIC_ERROR ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### MACRO MGD_TYPE_SITEGROUP ##### -->
 <para>
 
 </para>
 
+
+<!-- ##### ENUM MgdErrorGeneric ##### -->
+<para>
+
+</para>
+
+@MGD_ERR_OK: 
+@MGD_ERR_ERROR: 
+@MGD_ERR_ACCESS_DENIED: 
+@MGD_ERR_NO_METADATA: 
+@MGD_ERR_NOT_OBJECT: 
+@MGD_ERR_NOT_EXISTS: 
+@MGD_ERR_INVALID_NAME: 
+@MGD_ERR_DUPLICATE: 
+@MGD_ERR_HAS_DEPENDANTS: 
+@MGD_ERR_RANGE: 
+@MGD_ERR_NOT_CONNECTED: 
+@MGD_ERR_SG_NOTFOUND: 
+@MGD_ERR_INVALID_OBJECT: 
+@MGD_ERR_QUOTA: 
+@MGD_ERR_INTERNAL: 
+@MGD_ERR_OBJECT_NAME_EXISTS: 
+@MGD_ERR_OBJECT_NO_STORAGE: 
+@MGD_ERR_OBJECT_NO_PARENT: 
+@MGD_ERR_INVALID_PROPERTY_VALUE: 
+@MGD_ERR_INVALID_PROPERTY: 
+@MGD_ERR_USER_DATA: 
+@MGD_ERR_OBJECT_DELETED: 
+@MGD_ERR_OBJECT_PURGED: 
+@MGD_ERR_OBJECT_EXPORTED: 
+@MGD_ERR_OBJECT_IMPORTED: 
+@MGD_ERR_MISSED_DEPENDENCE: 
+@MGD_ERR_TREE_IS_CIRCULAR: 
+@MGD_ERR_OBJECT_IS_LOCKED: 
 
 <!-- ##### STRUCT MgdObject ##### -->
 <para>
@@ -158,6 +198,12 @@ midgard_tree
 
 
 <!-- ##### STRUCT MidgardConnectionCache ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT MidgardConnectionPrivate ##### -->
 <para>
 
 </para>
@@ -1866,6 +1912,90 @@ midgard_tree
 
 </para>
 
+
+<!-- ##### FUNCTION midgard_workspace_context_create ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@path: 
+@error: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_workspace_context_exists ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@path: 
+@error: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_workspace_context_get_workspace_by_name ##### -->
+<para>
+
+</para>
+
+@self: 
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_workspace_context_list_workspace_names ##### -->
+<para>
+
+</para>
+
+@self: 
+@elements: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_workspace_get_by_path ##### -->
+<para>
+
+</para>
+
+@mgd: 
+@path: 
+@error: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_workspace_is_in_context ##### -->
+<para>
+
+</para>
+
+@self: 
+@context: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_workspace_list_children ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_workspace_storage_get_by_path ##### -->
+<para>
+
+</para>
+
+@self: 
+@path: 
+@error: 
+@Returns: 
+
+<!-- ##### FUNCTION midgard_workspace_update ##### -->
+<para>
+
+</para>
+
+@self: 
+@error: 
+@Returns: 
 
 <!-- ##### FUNCTION set_created ##### -->
 <para>

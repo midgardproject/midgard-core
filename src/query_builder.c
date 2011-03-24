@@ -88,7 +88,7 @@ static gboolean __type_is_valid(GType type)
 }
 
 /**
- * midgard_query_builder_new():
+ * midgard_query_builder_new:
  * @mgd: #MidgardConnection instance
  * @classname: any #MidgardDBObjectClass derived class' name
  *
@@ -177,7 +177,7 @@ void midgard_query_builder_free(MidgardQueryBuilder *builder)
 }
 
 /**
- * midgard_query_builder_add_constraint():
+ * midgard_query_builder_add_constraint:
  * @builder: #MidgardQueryBuilder instance
  * @name: property name used for this constraint 
  * @op: comparison operator

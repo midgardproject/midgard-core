@@ -320,6 +320,60 @@ midgard_test_connection_copy (void)
 	g_object_unref (mgd);
 }
 
+void    
+midgard_test_connection_enable_workspace (void)
+{
+	/* Get valid test connection */
+	MidgardConfig *config = NULL;
+	MidgardConnection *mgd = midgard_test_connection_open_user_config(CONFIG_CONFIG_NAME, &config);
+
+	midgard_connection_enable_workspace (mgd, TRUE);
+	gboolean workspace_enabled = FALSE;
+	workspace_enabled = midgard_connection_is_enabled_workspace (mgd);
+	g_assert (workspace_enabled == TRUE);
+
+	midgard_connection_enable_workspace (mgd, FALSE);
+	workspace_enabled = midgard_connection_is_enabled_workspace (mgd);
+	g_assert (workspace_enabled == FALSE);
+
+	g_object_unref (mgd);
+}
+
+void    
+midgard_test_connection_set_workspace (void)
+{
+	/* Get valid test connection */
+	MidgardConfig *config = NULL;
+	MidgardConnection *mgd = midgard_test_connection_open_user_config(CONFIG_CONFIG_NAME, &config);
+
+	MidgardWorkspace *workspace = midgard_workspace_new (mgd, NULL);
+	gboolean workspace_is_set = midgard_connection_set_workspace (mgd, MIDGARD_WORKSPACE_STORAGE (workspace));
+	g_assert (workspace_is_set == TRUE);
+
+	g_object_unref (mgd);
+}
+
+void    
+midgard_test_connection_get_workspace (void)
+{
+	/* Get valid test connection */
+	MidgardConfig *config = NULL;
+	MidgardConnection *mgd = midgard_test_connection_open_user_config(CONFIG_CONFIG_NAME, &config);
+
+	MidgardWorkspace *null_workspace = (MidgardWorkspace *)midgard_connection_get_workspace (mgd);
+	g_assert (null_workspace == NULL);
+
+	MidgardWorkspace *workspace = midgard_workspace_new (mgd, NULL);
+	gboolean workspace_is_set = midgard_connection_set_workspace (mgd, MIDGARD_WORKSPACE_STORAGE (workspace));
+	g_assert (workspace_is_set == TRUE);
+
+	MidgardWorkspace *connection_workspace = (MidgardWorkspace *)midgard_connection_get_workspace (mgd);
+	g_assert (connection_workspace == workspace);
+
+	g_object_unref (mgd);
+
+}
+
 static const gchar *__auth_changed_username = NULL;
 static void __auth_changed_callback (MidgardConnection *mgd, gpointer ud)
 {

@@ -156,11 +156,14 @@ gboolean midgard_core_object_prop_parent_is_set(MidgardObject *object)
 	} else if (ptype == G_TYPE_STRING) {
 
 		const gchar *s = g_value_get_string(&gval);
-		g_value_unset (&gval);
-		if (s == NULL || *s == '\0')
-			return FALSE;
+		gboolean _rv = TRUE;
 
-		return TRUE;
+		if (s == NULL || *s == '\0')
+			_rv = FALSE;
+
+		g_value_unset (&gval);
+
+		return _rv;
 	}
 
 	if (G_IS_VALUE (&gval))

@@ -159,6 +159,8 @@ gboolean midgard_object_lock(MidgardObject *self);
 gboolean midgard_object_is_locked(MidgardObject *self);
 gboolean midgard_object_unlock(MidgardObject *self);
 
+MidgardWorkspace	*midgard_object_get_workspace (MidgardObject *self);
+
 GValue *midgard_object_get_schema_property (MidgardObject *self, const gchar *property);
 void midgard_object_set_schema_property (MidgardObject *self, const gchar *property, GValue *value);
 

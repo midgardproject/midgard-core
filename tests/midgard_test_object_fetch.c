@@ -68,8 +68,8 @@ void midgard_test_object_get_by_id_created(MidgardObjectTest *mot, gconstpointer
 	MidgardObject *object = midgard_test_object_basic_new(mgd, G_OBJECT_TYPE_NAME(_object), NULL);
 	g_assert(object != NULL);
 	gboolean fetched_by_id = midgard_test_object_fetch_by_id(object, oid);
-	g_assert(fetched_by_id == TRUE);
 	MIDGARD_TEST_ERROR_OK(mgd);
+	g_assert(fetched_by_id == TRUE);
 
 	if (midgard_reflector_object_has_metadata_class (G_OBJECT_CLASS_NAME (klass))) {
 

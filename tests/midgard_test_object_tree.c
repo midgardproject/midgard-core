@@ -154,7 +154,7 @@ void midgard_test_object_tree_get_parent(MidgardObjectTest *mot, gconstpointer d
 	return;
 	g_assert(mot != NULL);
 	MidgardObject *_object = MIDGARD_OBJECT(mot->object);
-	MidgardConnection *mgd = MIDGARD_CONNECTION(midgard_object_get_connection(_object));
+	//MidgardConnection *mgd = MIDGARD_CONNECTION(midgard_object_get_connection(_object));
 	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS(_object);
 	
 	g_test_bug ("#1594");

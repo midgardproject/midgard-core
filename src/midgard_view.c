@@ -78,7 +78,7 @@ __midgard_view_derived_object_set_from_sql(MidgardConnection *mgd, GType type, c
 
 /* Create GdaSqlSelectField for every property registered for the class. */
 static void
-__midgard_view_derived_add_fields_to_select_statement (MidgardDBObjectClass *klass, GdaConnection *cnc, GdaSqlStatementSelect *select, const gchar *table_name)
+__midgard_view_derived_add_fields_to_select_statement (MidgardDBObjectClass *klass, MidgardConnection *mgd, GdaSqlStatementSelect *select, const gchar *table_name)
 {
 	guint n_prop;
 	guint i;
@@ -86,6 +86,8 @@ __midgard_view_derived_add_fields_to_select_statement (MidgardDBObjectClass *kla
 	GdaSqlExpr *expr;
 	GValue *val;
 	gchar *table_field;
+	GdaConnection *cnc = mgd->priv->connection;
+
 	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (klass), &n_prop);
 	if (!pspecs)
 		return;

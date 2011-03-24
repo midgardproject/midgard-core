@@ -34,13 +34,56 @@ MidgardConnection
 
 
 
-<!-- ##### TYPEDEF MidgardConnectionClass ##### -->
+<!-- ##### STRUCT MidgardConnection ##### -->
 <para>
 
 </para>
 
+@errnum: 
+@errstr: 
+@err: 
 
-<!-- ##### STRUCT MidgardConnectionPrivate ##### -->
+<!-- ##### SIGNAL MidgardConnection::auth-changed ##### -->
+<para>
+
+</para>
+
+@midgardconnection: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardConnection::connected ##### -->
+<para>
+
+</para>
+
+@midgardconnection: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardConnection::disconnected ##### -->
+<para>
+
+</para>
+
+@midgardconnection: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardConnection::error ##### -->
+<para>
+
+</para>
+
+@midgardconnection: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardConnection::lost-provider ##### -->
+<para>
+
+</para>
+
+@midgardconnection: the object which received the signal.
+
+<!-- ##### ARG MidgardConnection:config ##### -->
+<para>
+
+</para>
+
+<!-- ##### TYPEDEF MidgardConnectionClass ##### -->
 <para>
 
 </para>
@@ -213,6 +256,15 @@ MidgardConnection
 @toggle: 
 
 
+<!-- ##### FUNCTION midgard_connection_enable_workspace ##### -->
+<para>
+
+</para>
+
+@self: 
+@toggle: 
+
+
 <!-- ##### FUNCTION midgard_connection_is_enabled_replication ##### -->
 <para>
 
@@ -237,6 +289,34 @@ MidgardConnection
 </para>
 
 @self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_is_enabled_workspace ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_get_workspace ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
+<!-- ##### FUNCTION midgard_connection_set_workspace ##### -->
+<para>
+
+</para>
+
+@self: 
+@workspace: 
 @Returns: 
 
 

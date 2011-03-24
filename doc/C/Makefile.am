@@ -11,7 +11,7 @@ DOC_MODULE=midgard-2.0
 DOC_MAIN_SGML_FILE=$(DOC_MODULE)-docs.sgml
 
 # Extra options to supply to gtkdoc-scan
-#SCAN_OPTIONS=
+SCAN_OPTIONS=--deprecated-guards
 
 # Extra options to pass to gtkdoc-scangobj
 #SCANGOBJ_OPTIONS=--module=midgard --types=midgard.types

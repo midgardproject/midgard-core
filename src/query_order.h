@@ -29,7 +29,7 @@ typedef struct MidgardQueryOrder MidgardQueryOrder;
  * while adding special orders for types like 
  * metadata or referenced ones */
 
-/**
+/*
  * The opaque query order type.
  */
 struct MidgardQueryOrder {

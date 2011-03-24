@@ -6,22 +6,22 @@
 #include "midgard_md5.h"
 
 /*
- * The remaining code is the reference MIDGARD_MD5 code (md5c.c) from rfc1321
+ * The remaining code is the reference MD5 code (md5c.c) from rfc1321
  */
-/* MIDGARD_MD5C.C - RSA Data Security, Inc., MIDGARD_MD5 message-digest algorithm
+/* MD5C.C - RSA Data Security, Inc., MD5 message-digest algorithm
  */
 
 /* Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
    rights reserved.
 
    License to copy and use this software is granted provided that it
-   is identified as the "RSA Data Security, Inc. MIDGARD_MD5 Message-Digest
+   is identified as the "RSA Data Security, Inc. MD5 Message-Digest
    Algorithm" in all material mentioning or referencing this software
    or this function.
 
    License is also granted to make and use derivative works provided
    that such works are identified as "derived from the RSA Data
-   Security, Inc. MIDGARD_MD5 Message-Digest Algorithm" in all material
+   Security, Inc. MD5 Message-Digest Algorithm" in all material
    mentioning or referencing the derived work.
 
    RSA Data Security, Inc. makes no representations concerning either

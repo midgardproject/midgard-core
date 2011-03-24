@@ -199,7 +199,7 @@ midgard_metadata_new (MidgardDBObject *object)
 }
 
 void 
-_midgard_metadata_set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row)
+_midgard_metadata_set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, guint column_id)
 {
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (model != NULL);
@@ -209,103 +209,96 @@ _midgard_metadata_set_from_data_model (MidgardDBObject *self, GdaDataModel *mode
 	MgdSchemaTypeAttr *type_attr = MIDGARD_DBOBJECT_GET_CLASS (dbobject)->dbpriv->storage_data;
 	MidgardMetadata *metadata = MIDGARD_METADATA (self);
 
-	/* ignore metadata and action properties so decrease properties count */
-	guint n_props = type_attr->class_nprop - 2;
-	if (n_props< 1) {
-		g_warning ("Expected positive number of properties for given %s class", G_OBJECT_TYPE_NAME (G_OBJECT (dbobject)));
-		return;
-	}
-
 	/* creator */
-	const GValue *val = gda_data_model_get_value_at (model, n_props, row, NULL);
+	const GValue *val = gda_data_model_get_value_at (model, column_id, row, NULL);
 	midgard_core_metadata_set_creator (metadata, (GValue *) val);
 
 	/* created */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_created (metadata, val);
 
 	/* revisor */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_revisor (metadata, val);
 
 	/* revised */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_revised (metadata, val);
 	
 	/* revision */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_revision (metadata, val);
 	
 	/* locker */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_locker (metadata, val);
 
 	/* locked */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_locked (metadata, val);
 
 	/* approver */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_approver (metadata, val);
 
 	/* approved */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_approved (metadata, val);
 
 	/* authors */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_authors (metadata, val);
 
 	/* owner */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_owner (metadata, val);
 
 	/* schedule_start */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_schedule_start (metadata, val);
 
 	/* schedule_end */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_schedule_end (metadata, val);
 
 	/* hidden */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_hidden (metadata, val);
 
 	/* navnoentry */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_navnoentry (metadata, val);
 
 	/* size */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_size (metadata, val);
 
 	/* published */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_published (metadata, val);
 
 	/* score */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_score (metadata, val);
 
 	/* imported */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_imported (metadata, val);
 
 	/* exported */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_exported (metadata, val);
 
 	/* deleted */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_deleted (metadata, val);
 
 	/* isapproved */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_isapproved (metadata, val);
 
 	/* islocked */
-	val = gda_data_model_get_value_at (model, ++n_props, row, NULL);
+	val = gda_data_model_get_value_at (model, ++column_id, row, NULL);
 	midgard_core_metadata_set_islocked (metadata, val);
 }
 

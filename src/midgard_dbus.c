@@ -176,7 +176,7 @@ static void __unref_object(gpointer data, GClosure *closure)
  * 
  * @use_session, set to FALSE for session bus, TRUE for system one
  *
- * Returns: new #MidgardDBus instance, %NULL otherwise
+ * Returns: new #MidgardDbus instance, %NULL otherwise
  */
 MidgardDbus *
 midgard_dbus_new(MidgardConnection *mgd, const gchar *path, gboolean use_session)

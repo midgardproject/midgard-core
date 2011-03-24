@@ -26,19 +26,21 @@
 #include "midgard_error.h"
 #include "midgard_core_connection.h"
 #include "midgard_timestamp.h"
-#ifdef HAVE_LIBGDA_4
 #include <sql-parser/gda-sql-parser.h>
-#endif
 #include "midgard_metadata.h"
 #include "midgard_reflector_object.h"
+#include "midgard_query_value.h"
+#include "midgard_query_constraint.h"
+#include "midgard_query_select.h"
+#include "midgard_query_constraint_group.h"
+#include "midgard_executable.h"
 #include "midgard_validable.h"
+#include "midgard_core_workspace.h"
 
 /* Do not use _DB_DEFAULT_DATETIME.
  * Some databases (like MySQL) fails to create datetime column with datetime which included timezone. 
  */ 
 #define _DB_DEFAULT_DATETIME "0001-01-01 00:00:00"
-
-#ifdef HAVE_LIBGDA_4
 
 #define __get_query_string(__cnc, __str) \
 	__str = NULL; \
@@ -50,8 +52,6 @@
 			__str = gda_connection_event_get_description (__event); \
 		} \
 	}
-
-#endif 
 
 static void __check_property_index(MidgardDBObjectClass *klass, MidgardReflectionProperty *mrp,
 		const gchar *property, MidgardDBColumn *mdc);
@@ -75,6 +75,29 @@ MidgardDBColumn *midgard_core_dbcolumn_new(void)
 	return mdc;
 }
 
+static void
+_update_gda_meta_store_table (GdaConnection *cnc, const gchar *tablename, GError **error)
+{
+	GdaMetaContext mcontext = {"_tables", 1, NULL, NULL};
+	mcontext.column_names = g_new (gchar *, 1);
+	mcontext.column_names[0] = "table_name";
+	mcontext.column_values = g_new (GValue *, 1);
+	g_value_set_string ((mcontext.column_values[0] = gda_value_new (G_TYPE_STRING)), tablename);
+	
+	GError *err = NULL;
+	if (!gda_connection_update_meta_store (cnc, &mcontext, &err)) {
+		gda_value_free (mcontext.column_values[0]);
+		g_warning("Failed to update meta data for table '%s': %s", tablename, 
+				err && err->message ? err->message : "No detail");
+		g_propagate_error (error, err);
+		return;
+	}
+
+	gda_value_free (mcontext.column_values[0]);
+	g_free (mcontext.column_names);
+	g_free (mcontext.column_values);
+}
+
 gchar *midgard_core_query_where_guid(
 		const gchar *table, const gchar *guid)
 {
@@ -86,14 +109,12 @@ gchar *midgard_core_query_where_guid(
 	return g_string_free(where, FALSE);
 }
 
-gint midgard_core_query_execute(MidgardConnection *mgd,
-		const gchar *query,
-		gboolean ignore_error)
+gint 
+midgard_core_query_execute (MidgardConnection *mgd, const gchar *query, gboolean ignore_error)
 {
 	g_assert(mgd);
 	g_assert(query != NULL);
 
-#ifdef HAVE_LIBGDA_4
 	GdaStatement *stmt;
 	GError *lerror = NULL;
 	gint number = 0;
@@ -105,6 +126,9 @@ gint midgard_core_query_execute(MidgardConnection *mgd,
 			mgd->priv->parser = gda_sql_parser_new ();
 	}
 
+	if (MGD_CNC_DEBUG (mgd))
+		g_debug("query = %s", query);
+
 	/* create a new statement */
 	stmt = gda_sql_parser_parse_string (mgd->priv->parser, query, NULL, &lerror);
 	if (stmt) {
@@ -112,51 +136,33 @@ gint midgard_core_query_execute(MidgardConnection *mgd,
 								      NULL, NULL, &lerror);
 		g_object_unref (stmt);
 	}
-#else
-	GdaCommand *command;
-	gint number = 0;
-	command = gda_command_new(query, 
-			GDA_COMMAND_TYPE_SQL, 
-			GDA_COMMAND_OPTION_STOP_ON_ERRORS);
-	number  = gda_connection_execute_non_select_command(
-			mgd->priv->connection, command, NULL, NULL);	
-	gda_command_free(command);
-#endif
-
-	g_debug("query = %s", query);
 
 	if(!ignore_error){
 		
-#ifdef HAVE_LIBGDA_4
+
 		if (!stmt || (number == -1)) {
-#else
-		if (number == 0) {
-#endif
 			/* FIXME, error needed  */
 			//gchar *fixme = "fixme";
 			//g_warning("Single query failed: %s \n %s",
 			//		query,
 			//		fixme);
-#ifdef HAVE_LIBGDA_4
 			g_warning ("Error executing '%s': %s\n", query,
 				   lerror && lerror->message ? lerror->message : "No detail");
-#endif
 		}
 	}
-#ifdef HAVE_LIBGDA_4
+
 	if (lerror)
 		g_error_free (lerror);
-#endif
 
 	return (number);
 }
 
-GdaDataModel *midgard_core_query_get_model(MidgardConnection *mgd, const gchar *query)
+GdaDataModel *
+midgard_core_query_get_model (MidgardConnection *mgd, const gchar *query)
 {
 	g_assert(mgd != NULL);
 	GError *lerror = NULL;
 
-#ifdef HAVE_LIBGDA_4
 	GdaStatement *stmt;
 	GdaDataModel *model = NULL;
 
@@ -174,17 +180,6 @@ GdaDataModel *midgard_core_query_get_model(MidgardConnection *mgd, const gchar *
 								 NULL, &lerror);
 		g_object_unref (stmt);
 	}
-#else
-	GdaCommand *command;
-	command = gda_command_new (query, 
-			GDA_COMMAND_TYPE_SQL,
-			GDA_COMMAND_OPTION_STOP_ON_ERRORS);
-	GdaDataModel *model = 
-		gda_connection_execute_select_command(
-				mgd->priv->connection,
-				command, NULL, &lerror);
-	gda_command_free(command);
-#endif
 
 	if (MGD_CNC_DEBUG (mgd))
 		g_debug("Model query = %s", query);
@@ -263,6 +258,60 @@ GValue *midgard_core_query_get_field_value(
 	g_object_unref(model);
 
 	return new_value;
+}
+
+gboolean
+midgard_core_query_get_object_value (MidgardDBObject *dbobject, const gchar *column, GValue *value)
+{
+	g_return_val_if_fail (dbobject != NULL, FALSE);
+	MidgardConnection *mgd = MGD_OBJECT_CNC (dbobject);
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	const gchar *table = midgard_core_class_get_table (MIDGARD_DBOBJECT_GET_CLASS (dbobject));
+	g_return_val_if_fail (table != NULL, FALSE);
+	g_return_val_if_fail (column != NULL, FALSE);
+
+	GString *sql = g_string_new ("SELECT ");
+	g_string_append_printf (sql, " %s FROM %s WHERE guid='%s'",
+			column, table, MGD_OBJECT_GUID (dbobject));
+
+	if (MGD_CNC_USES_WORKSPACE (mgd)) {
+		g_string_append_printf (sql, " AND %s=%d", 
+				MGD_WORKSPACE_ID_FIELD,
+				MGD_CNC_WORKSPACE_ID(mgd));
+	}
+
+	GdaDataModel *model = midgard_core_query_get_model (mgd, sql->str);
+
+	if(!model)
+	       return FALSE;
+	
+	if (!GDA_IS_DATA_MODEL (model)) {
+		g_warning ("Returned model is not GDA_DATA_MODEL");
+		MIDGARD_ERRNO_SET (mgd, MGD_ERR_INTERNAL);
+		return FALSE;
+	}
+
+	const GValue *v = midgard_data_model_get_value_at(model, 0, 0);
+
+	if (!v) {
+		g_object_unref (model);
+		return FALSE;
+	}
+
+	if (G_VALUE_TYPE (v) == GDA_TYPE_NULL) {
+		g_object_unref (model);
+		g_warning ("Unexpected NULL type for returned value");
+		return FALSE;
+	}
+
+	if (G_VALUE_TYPE (v) != G_VALUE_TYPE (value))
+		g_value_transform (v, value);
+	else
+		g_value_copy (v, value);
+
+	g_object_unref (model);
+
+	return TRUE;
 }
 
 guint 
@@ -365,8 +414,6 @@ _add_value_type_update (GString *str, const gchar *name, GValue *value, gboolean
 	g_string_append_printf (str, "%s=##%s::%s", name, name, type);
 }
 
-#ifdef HAVE_LIBGDA_4
-
 static void 
 _add_value_type (GString *str, const gchar *name, GValue *value, gboolean add_comma)
 {
@@ -409,52 +456,6 @@ _add_value_type (GString *str, const gchar *name, GValue *value, gboolean add_co
 	g_string_append_printf (str, "##%s::%s", name, type);
 }
 
-#else 
-
-static void 
-_add_value_type (GString *str, const gchar *name, GValue *value, gboolean add_comma)
-{
-	if (add_comma) 
-		g_string_append (str, ", ");
-
-	const gchar *type = "invalid";
-
-	switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE(value))) {
-		
-		case G_TYPE_STRING:
-			type = "gchararray";
-			break;
-	
-		case G_TYPE_UINT:
-			type = "guint";
-			break;
-
-		case G_TYPE_INT:
-			type = "gint";
-			break;
-
-		case G_TYPE_BOOLEAN:
-			type = "gboolean";
-			break;	
-
-		case G_TYPE_BOXED:
-			if (G_VALUE_TYPE (value) == GDA_TYPE_TIMESTAMP) {
-				type = "timestamp";
-			} else {
-				g_warning ("_add_value_type: unhandled boxed value type (%s)", G_VALUE_TYPE_NAME (value));
-			}
-			break;	
-
-		default:
-			g_warning ("_add_value_type: unhandled value type (%s)", G_VALUE_TYPE_NAME (value));
-			break;
-	}
-
-	g_string_append_printf (str, "## /*name:'%s' type:%s*/", name, type);
-}
-
-#endif /* HAVE_LIBGDA_4 */
-
 GdaDataModel *
 midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectClass *klass, guint n_params, const GParameter *parameters)
 {
@@ -481,8 +482,6 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 
 	g_string_append_printf (select, " %s ", where->str);
 	g_string_free (where, TRUE);
-
-#ifdef HAVE_LIBGDA_4
 	
 	GError *error = NULL;
 	GdaDataModel *exec_res;
@@ -554,57 +553,6 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	g_object_unref (stmt);
 
 	return exec_res;
-#else 
-	GdaDict *dict = gda_dict_new ();
-	gda_dict_set_connection (dict, mgd->priv->connection);
-
-	GdaQuery *query = gda_query_new_from_sql (dict, select->str, NULL);
-
-	g_string_free (select, TRUE);
-
-        if (!query) {
-		g_warning ("Failed to create GdaQuery from sql");
-		return NULL;
-	}
-
-	GdaParameter *param = NULL;
-        GdaParameterList *plist = gda_query_get_parameter_list (query);
-
-	for (i = 0; i < n_params; i++) {
-
-        	param = gda_parameter_list_find_param (plist, parameters[i].name);
-		gda_parameter_set_value (param, (const GValue *) &parameters[i].value);
-	}
-
-	gda_connection_clear_events_list (gda_dict_get_connection (dict));
-
-	GError *error = NULL;
-	GdaObject *exec_res = gda_query_execute (query, plist, FALSE, &error);
-
-	if (MGD_CNC_DEBUG (mgd))
-		g_debug("%s", gda_query_get_sql_text(query));
-
-	if (!exec_res) {
-		
-		g_warning ("%s. Query %s failed", error && error->message ? error->message : "Unknown reason", gda_query_get_sql_text (query));
-		g_object_unref (dict);
-		g_object_unref (query);
-		return NULL;
-	}
-
-	g_object_unref (query);
-	g_object_unref (dict);	
-
-	if (!GDA_IS_DATA_MODEL (exec_res)) {
-
-		g_warning ("Failed to retrieve data model from query");
-		return NULL;
-	}
-	
-	return GDA_DATA_MODEL (exec_res);	
-
-#endif /* HAVE_LIBGDA_4 */
-
 }
 
 #define _SET_HOLDER_VALUE \
@@ -695,9 +643,9 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 		return FALSE;
 	}
 
-	GdaStatement *insert = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->statement_insert;
+	GdaStatement *insert = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->get_statement_insert (klass, mgd);
 	g_return_val_if_fail (insert != NULL, FALSE);
-	GdaSet *params = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->statement_insert_params;
+	GdaSet *params = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->get_statement_insert_params (klass, mgd);
 
 	guint n_props;
 	guint i;	
@@ -735,8 +683,12 @@ midgard_core_query_create_dbobject_record (MidgardDBObject *object)
 	return inserted;
 }
 
-gboolean 
-midgard_core_query_update_dbobject_record (MidgardDBObject *object)
+/* Return:
+ * positive or 0 - number of affected rows
+ * negative - error
+ */ 
+gint 
+midgard_core_query_update_dbobject_record (MidgardDBObject *object, GError **error)
 {
 	g_return_val_if_fail (object != NULL, FALSE);
 	
@@ -744,13 +696,14 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 	GdaConnection *cnc = mgd->priv->connection;
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_GET_CLASS (object);
 	if (!klass) {
-		g_warning ("Can not find class pointer for %s instance", G_OBJECT_TYPE_NAME (object));
-		return FALSE;
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, 
+				"Can not find class pointer for %s instance", G_OBJECT_TYPE_NAME (object));
+		return -1;
 	}
 
-	GdaStatement *update = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->statement_update;
+	GdaStatement *update = klass->dbpriv->get_statement_update (klass, mgd);
 	g_return_val_if_fail (update != NULL, FALSE);
-	GdaSet *params = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->statement_update_params;
+	GdaSet *params = klass->dbpriv->get_statement_update_params (klass, mgd);
 
 	guint n_props;
 	guint i;	
@@ -758,7 +711,7 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 	g_return_val_if_fail (pspecs != NULL, FALSE);
 
 	const gchar *pk = midgard_reflector_object_get_property_primary (G_OBJECT_CLASS_NAME (klass));
-	GError *error = NULL;
+	GError *err = NULL;
 
 	for (i = 0; i < n_props; i++) {
 		/* Ignore primary key and property of GObject type*/
@@ -778,17 +731,38 @@ midgard_core_query_update_dbobject_record (MidgardDBObject *object)
 		g_free (debug_sql);
 	}
 
-	gboolean updated = (gda_connection_statement_execute_non_select (cnc, update, params, NULL, &error) == -1) ? FALSE : TRUE;
+	gint updated = gda_connection_statement_execute_non_select (cnc, update, params, NULL, &err);
 
-	if (!updated) {
-		g_warning ("Query failed. %s", error && error->message ? error->message : "Unknown reason");
-		return FALSE;
+	if (updated == 0) {
+		/* If there's MySQL in use and object doesn't have metadata, we need to run
+		 * extra query to check if object's record exists and hasn't been updated or 
+		 * doesn't exist at all */
+		MidgardConfig *config = mgd->priv->config;
+		if (config->priv->dbtype == MIDGARD_DB_TYPE_MYSQL
+				&& (MGD_DBOBJECT_METADATA (object) == NULL)) {
+			GValue idv = {0, };
+			g_value_init (&idv, G_TYPE_UINT);
+			gboolean id_get = midgard_core_query_get_object_value (MIDGARD_DBOBJECT (object), "id", &idv);
+			g_value_unset (&idv);
+			if (id_get) 
+				return TRUE;
+		}	
+
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_NOT_EXISTS,
+				"Nothing to update.");
+		if (err)
+			g_clear_error (&err);
+	}
+
+	if (updated < 0) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL,
+				"UPDATE query failed. %s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
 	}
 
 	return updated;
 }
-
-#ifdef HAVE_LIBGDA_4
 
 gboolean 
 midgard_core_query_update_object_fields (MidgardDBObject *object, const gchar *field, ...)
@@ -907,55 +881,6 @@ midgard_core_query_update_object_fields (MidgardDBObject *object, const gchar *f
 	return FALSE;
 }
 
-#else 
-
-gboolean 
-midgard_core_query_update_object_fields (MidgardDBObject *object, const gchar *field, ...)
-{
-	g_assert(object != NULL);
-
-	const gchar *name = field;
-	va_list var_args;
-	va_start(var_args, field);	
-	GValue *value_arg;
-	GSList *cols = NULL;
-	GSList *values = NULL;
-	
-	while(name != NULL){
-		cols = g_slist_append(cols, (gpointer)name);
-		value_arg = va_arg(var_args, GValue*);
-		values = g_slist_append(values, (gpointer)value_arg);
-		name = va_arg(var_args, gchar*);
-	}
-	va_end(var_args);	
-
-	MidgardConnection *mgd = MGD_OBJECT_CNC(object);
-	const gchar *table = midgard_core_class_get_table(MIDGARD_DBOBJECT_GET_CLASS(object));
-
-	gchar *where = midgard_core_query_where_guid(table, MGD_OBJECT_GUID(object));
-
-#ifdef HAVE_LIBGDA_4
-	gint rv = midgard_core_query_insert_records(mgd, table, 
-			(GList *)cols, (GList *)values, GDA_SQL_STATEMENT_UPDATE, where);
-#else
-	gint rv = midgard_core_query_insert_records(mgd, table, 
-			(GList *)cols, (GList *)values, GDA_QUERY_TYPE_UPDATE, where);
-#endif
-
-	g_slist_free(cols);
-	g_slist_free(values);
-
-	g_free (where);
-
-	if(rv == 0)
-		return TRUE;
-
-	return FALSE;
-}
-#endif /* HAVE_LIBGDA_4 */
-
-#ifdef HAVE_LIBGDA_4
-
 gint 
 midgard_core_query_insert_records (MidgardConnection *mgd, 
 		const gchar *table, GList *cols, GList *values, 
@@ -1061,166 +986,8 @@ midgard_core_query_insert_records (MidgardConnection *mgd,
 	return FALSE;
 }
 
-#else 
-
-gint 
-midgard_core_query_insert_records (MidgardConnection *mgd, 
-		const gchar *table, GList *cols, GList *values, 
-		guint query_type, const gchar *where)
-{
-	g_assert(mgd != NULL);
-	guint ci = g_list_length(cols);
-	guint vi = g_list_length(values);
-
-	if(ci != vi) {
-
-		g_warning("%d != %d. Expected columns = values", ci, vi);
-		return -1;
-	}
-
-	/* Initialize GdaQuery */
-	GdaDict *dict = gda_dict_new();
-	gda_dict_set_connection(dict , mgd->priv->connection);
-	
-	GdaQuery *query = gda_query_new(dict);
-	gda_query_set_query_type(query, query_type);
-	
-	GdaQueryTarget *target = gda_query_target_new(query, table);
-	gda_query_add_target(query, target, NULL);
-	
-	while(cols != NULL) {
-
-		GdaQueryField *field = 
-			gda_query_field_field_new(query, 
-					(const gchar *) cols->data);
-		gda_entity_add_field (GDA_ENTITY(query), GDA_ENTITY_FIELD(field));
-		
-		GValue *val = (GValue *) values->data;
-		GdaQueryField *value;
-
-		if(G_VALUE_TYPE(val) == G_TYPE_BOOLEAN){
-			
-			GValue nval = {0, };
-			g_value_init(&nval, G_TYPE_UINT);
-			g_value_set_uint(&nval, 0);
-			if(g_value_get_boolean(val))
-				g_value_set_uint(&nval, 1);
-			
-			value = gda_query_field_value_new(query, G_TYPE_UINT);
-			gda_query_field_value_set_value(
-					GDA_QUERY_FIELD_VALUE(value), &nval);
-
-		} else if(G_VALUE_TYPE(val) == G_TYPE_FLOAT) {
-
-			/* We use dot as decimal separator. Always. */
-			GValue fval = {0, };
-			g_value_init(&fval, G_TYPE_FLOAT);
-			gchar *lstring = setlocale(LC_NUMERIC, "0");
-			setlocale(LC_NUMERIC, "C");
-			g_value_copy(val, &fval);
-			
-			value = gda_query_field_value_new(query, G_TYPE_FLOAT);
-			gda_query_field_value_set_value(
-					GDA_QUERY_FIELD_VALUE(value), &fval);
-
-			g_value_unset(&fval);
-			setlocale(LC_ALL, lstring);
-	
-		} else if (G_VALUE_TYPE(val) == MGD_TYPE_TIMESTAMP) {
-			
-			GValue tval = {0, };
-
-			/* GDA3 & SQLite workaround */
-			if (mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_SQLITE)
-				g_value_init(&tval, G_TYPE_STRING);
-			else
-				g_value_init(&tval, GDA_TYPE_TIMESTAMP);
-			
-			g_value_transform(val, &tval);
-		
-			/* GDA3 & SQLite workaround */
-			if (mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_SQLITE)
-				value = gda_query_field_value_new (query, G_TYPE_STRING);
-			else 
-				value = gda_query_field_value_new (query, GDA_TYPE_TIMESTAMP);
-
-			gda_query_field_value_set_value (GDA_QUERY_FIELD_VALUE (value), &tval);
-
-			g_value_unset(&tval);
-
-		} else if (G_VALUE_TYPE(val) == G_TYPE_STRING
-				|| G_VALUE_TYPE(val) == G_TYPE_UINT
-				|| G_VALUE_TYPE(val) == G_TYPE_INT) { 
-	
-			value = gda_query_field_value_new(query, G_VALUE_TYPE(val));
-			
-			if (!value)
-				g_warning("Can not create new field value for given %s value type", G_VALUE_TYPE_NAME(val));
-			else
-				gda_query_field_value_set_value(GDA_QUERY_FIELD_VALUE(value), val);
-
-		} else {
-
-			value = NULL;
-			/*
-			g_warning("Unsupported %s value type", G_VALUE_TYPE_NAME(val));
-			value = gda_query_field_value_new(query, G_VALUE_TYPE(val));
-			if (!value)
-				g_warning("Can not create new field value for given %s value type", G_VALUE_TYPE_NAME(val));
-			else
-				gda_query_field_value_set_value(GDA_QUERY_FIELD_VALUE(value), val);
-				*/
-		}
-
-		if (value != NULL) {
-			
-			gda_entity_add_field(GDA_ENTITY(query), GDA_ENTITY_FIELD(value));
-			g_object_set (field, "value-provider", value, NULL);
-			gda_query_field_set_visible (GDA_QUERY_FIELD (value), FALSE);
-			
-			g_object_unref(field);
-			g_object_unref(value);
-		}
-
-		cols = cols->next;
-		values = values->next;
-	}
-
-	gchar *full_query = NULL;
-
-	if(where != NULL) {		
-		
-		const gchar *sql = gda_query_get_sql_text (query);
-		full_query = g_strconcat (sql, " WHERE ", where, NULL);
-		gda_query_set_sql_text (query, full_query, NULL);
-	}
-
-	if (full_query) {
-
-		g_debug ("%s", full_query);
-		g_free (full_query);
-	}
-
-	GError *error = NULL;
-	gda_query_execute(query, NULL, FALSE, &error);
-
-	g_object_unref(target);
-	g_object_unref(dict);
-	g_object_unref(query); 
-	
-	if(error){
-		g_clear_error(&error);
-		return -1;
-	}
-	
-	return 0;
-}
-
-#endif /* HAVE_LIBGDA_4 */
-
 gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
 {
-#ifdef HAVE_LIBGDA_4
 	GdaMetaContext mcontext = {"_tables", 1, NULL, NULL};
         mcontext.column_names = g_new (gchar *, 1);
         mcontext.column_names[0] = "table_name";
@@ -1228,14 +995,7 @@ gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
         g_value_set_string ((mcontext.column_values[0] = gda_value_new (G_TYPE_STRING)), tablename);
 	GError *error = NULL;
 	
-	if (!gda_connection_update_meta_store (mgd->priv->connection, &mcontext, &error)) {
-		gda_value_free (mcontext.column_values[0]);
-		g_warning("Failed to update meta data for table '%s': %s", tablename, 
-				error && error->message ? error->message : "No detail");
-		if (error)
-			g_error_free(error);
-		return TRUE;
-	}
+	_update_gda_meta_store_table (mgd->priv->connection, tablename, NULL);
 
 	GdaDataModel *dm_schema =
 		gda_connection_get_meta_store_data (mgd->priv->connection,
@@ -1256,31 +1016,8 @@ gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
 	if (gda_data_model_get_n_rows (dm_schema) == 0)
 		retval = FALSE;
 	g_object_unref (dm_schema);
-	return retval;
-#else	
-	GdaDataModel *dm_schema =
-		gda_connection_get_schema(mgd->priv->connection,
-				GDA_CONNECTION_SCHEMA_TABLES, NULL ,NULL);
-	if(!dm_schema) {
-		g_error("Failed to retrieve tables schema");
-		return TRUE;
-	}
 
-	gint rows = gda_data_model_get_n_rows(dm_schema);
-	guint j;
-	const GValue *value;
-	
-	for(j = 0; j < rows; j++) {
-		value = gda_data_model_get_value_at(dm_schema, 0, j);
-		if(g_str_equal(g_value_get_string(value), tablename)){
-			g_object_unref(dm_schema);
-			return TRUE;
-		}
-	}
-	
-	g_object_unref(dm_schema);
-#endif
-	return FALSE;
+	return retval;
 }
 
 gboolean midgard_core_table_exists(MidgardConnection *mgd, const gchar *tablename)
@@ -1289,8 +1026,8 @@ gboolean midgard_core_table_exists(MidgardConnection *mgd, const gchar *tablenam
 }
 
 /* Add primary fieldname *only* when it's integer type, otherwise set to NULL */
-gboolean midgard_core_query_create_table(MidgardConnection *mgd, 
-		const gchar *descr, const gchar *tablename, const gchar *primary)
+gboolean 
+midgard_core_query_create_table (MidgardConnection *mgd, const gchar *descr, const gchar *tablename, const gchar *primary)
 {
 	if (primary == NULL)
 		primary = "id";
@@ -1309,12 +1046,7 @@ gboolean midgard_core_query_create_table(MidgardConnection *mgd,
 	GdaServerProvider *server;
 	GdaConnection *cnc = mgd->priv->connection;
 	
-#ifdef HAVE_LIBGDA_4
 	server = gda_connection_get_provider(cnc);
-#else
-	server = gda_connection_get_provider_obj(cnc);
-#endif
-
 	GError *error = NULL;
 	op = gda_server_provider_create_operation (server, cnc,
 			GDA_SERVER_OPERATION_CREATE_TABLE, NULL, &error);
@@ -1362,32 +1094,9 @@ gboolean midgard_core_query_create_table(MidgardConnection *mgd,
 	g_object_unref(op);
 	g_clear_error(&error);
 
-#ifdef HAVE_LIBGDA_4
-
 	/* Update meta store */
-	GdaMetaStruct *mstruct;
-	GdaMetaDbObject *dbo;
-	GValue *table_value;
-	GdaMetaStore *store = gda_connection_get_meta_store (cnc);
 
-	if (!gda_connection_update_meta_store (cnc, NULL, &error)) {
-		    /* FIXME, error message */
-		    return FALSE;
-	}
-
-	mstruct = gda_meta_struct_new (store, GDA_META_STRUCT_FEATURE_NONE);
-	table_value = gda_value_new (G_TYPE_STRING);
-	g_value_set_string (table_value, tablename);
-	dbo = gda_meta_struct_complement (mstruct, GDA_META_DB_TABLE, NULL, NULL, table_value, &error);
-	gda_value_free (table_value);
-	g_object_unref (mstruct);
-
-	if (!dbo) {
-		g_warning ("Failed to update %s table meta store.", error && error->message ? error->message : "Unknown reason");
-		return FALSE;
-	}
-
-#endif /* HAVE_LIBGDA_4 */
+	_update_gda_meta_store_table (cnc, tablename, NULL); 
 
 	return TRUE;
 }
@@ -1395,8 +1104,6 @@ gboolean midgard_core_query_create_table(MidgardConnection *mgd,
 static gboolean __mcq_column_exists(MidgardConnection *mgd,
 		MidgardDBColumn *mdc) 
 {
-#ifdef HAVE_LIBGDA_4
-
 	GdaMetaContext mcontext = {"_columns", 2, NULL, NULL};
         mcontext.column_names = g_new (gchar *, 2);
         mcontext.column_names[0] = "table_name";
@@ -1405,18 +1112,6 @@ static gboolean __mcq_column_exists(MidgardConnection *mgd,
         g_value_set_string ((mcontext.column_values[0] = gda_value_new (G_TYPE_STRING)), mdc->table_name);
         g_value_set_string ((mcontext.column_values[1] = gda_value_new (G_TYPE_STRING)), mdc->column_name);
 	GError *error = NULL;
-	/*if (!gda_connection_update_meta_store (mgd->priv->connection, &mcontext, &error)) {
-		gda_value_free (mcontext.column_values[0]);
-		//FIXME, there should be warning, but for some reason 
-		//either SQLite or gda-sqlite provider is buggy 
-		g_message ("Failed to update meta data for table '%s': %s", mdc->table_name, 
-				error && error->message ? error->message : "No detail");
-		if (error)
-			g_error_free(error);
-
-		return FALSE;
-	}*/
-
 	GdaDataModel *dm_schema =
 		gda_connection_get_meta_store_data (mgd->priv->connection,
 						    GDA_CONNECTION_META_FIELDS, NULL, 2,
@@ -1436,46 +1131,6 @@ static gboolean __mcq_column_exists(MidgardConnection *mgd,
 		retval = FALSE;
 	g_object_unref (dm_schema);
 	return retval;
-#else
-	GdaParameter *param, *col_param;
-	GdaConnection *cnc = mgd->priv->connection;
-	const GValue *value;
-	GError *error = NULL;
-	
-	GdaParameterList *paramlist = gda_parameter_list_new (NULL);
-	param = gda_parameter_new_string ("name", mdc->table_name);
-	col_param = gda_parameter_new_string (mdc->column_name, mdc->column_name);
-	gda_parameter_list_add_param (paramlist, param);
-	//gda_parameter_list_add_param (paramlist, col_param);
-	
-	GdaDataModel *dm_schema = gda_connection_get_schema (cnc,
-			GDA_CONNECTION_SCHEMA_FIELDS,
-			paramlist, &error);
-	
-	g_object_unref(param);
-	g_object_unref(paramlist);
-	g_object_unref(col_param);
-	
-	if(!dm_schema) {
-		g_debug("Couldn't find schema for %s", mdc->table_name);
-		return TRUE;
-	}
-
-	gint nbcols, ncol;
-	nbcols = gda_data_model_get_n_rows (dm_schema);
-	for(ncol = 0; ncol < nbcols; ncol++) {
-
-		value = gda_data_model_get_value_at(dm_schema , 0, ncol);
-		if(g_str_equal (mdc->column_name, 
-					g_value_get_string(value))) {
-			g_debug("Check table '%s'. Column '%s' exists",
-					mdc->table_name,
-					mdc->column_name);
-			return TRUE;
-		}
-	}
-#endif
-	return FALSE;
 }
 
 gboolean midgard_core_query_add_column(MidgardConnection *mgd,
@@ -1519,12 +1174,8 @@ gboolean midgard_core_query_add_column(MidgardConnection *mgd,
 	g_debug("Check if column '%s.%s' exists", mdc->table_name, mdc->column_name);
 	if(__mcq_column_exists(mgd, mdc))
 		return TRUE;
-#ifdef HAVE_LIBGDA_4
+
 	server = gda_connection_get_provider(cnc);
-#else
-	server = gda_connection_get_provider_obj(cnc);
-#endif
-	
 	op = gda_server_provider_create_operation (server, cnc,
 			GDA_SERVER_OPERATION_ADD_COLUMN, NULL, &error);
 	
@@ -1636,8 +1287,6 @@ gboolean midgard_core_query_add_column(MidgardConnection *mgd,
 
 gboolean __index_exists(MidgardConnection *mgd, MidgardDBColumn *mdc, const gchar *index_name)
 {
-#ifdef HAVE_LIBGDA_4
-
 	GdaConnection *cnc = mgd->priv->connection;
 	GdaMetaStore *store = gda_connection_get_meta_store (cnc);
 	const gchar *sql = "SELECT index_name FROM _table_indexes WHERE table_schema=##schema::string AND table_name=##tname::string";
@@ -1685,55 +1334,6 @@ gboolean __index_exists(MidgardConnection *mgd, MidgardDBColumn *mdc, const gcha
 	g_object_unref (data_model);
 
 	return index_exists;
-
-#else
-	g_assert(mgd != NULL);
-	g_assert(mdc != NULL);
-	g_assert(index_name != NULL);
-
-	GdaParameter *param;
-	GdaConnection *cnc = mgd->priv->connection;
-	GError *err = NULL;
-	GdaParameterList *paramlist = gda_parameter_list_new (NULL);
-	param = gda_parameter_new_string ("name", mdc->table_name);
-	gda_parameter_list_add_param (paramlist, param);
-
-	GdaDataModel *dm_schema =
-		gda_connection_get_schema(cnc,
-				GDA_CONNECTION_SCHEMA_FIELDS, paramlist ,&err);
-	if(!dm_schema) {
-
-		if(err)
-			g_warning("%s", err->message);
-
-		g_error("Failed to retrieve table schema");
-		return FALSE;
-	}
-
-	gint rows = gda_data_model_get_n_rows(dm_schema);
-	guint j;
-	const GValue *value;
-	gboolean index_exists = FALSE;
-
-	for(j = 0; j < rows; j++) {
-	
-		value = gda_data_model_get_value_at (dm_schema, 0, j);
-		if (!g_str_equal(mdc->column_name, g_value_get_string (value)))
-			continue;
-
-		value = gda_data_model_get_value_at(dm_schema, 4, j);
-		index_exists = g_value_get_boolean (value);
-		
-		if (index_exists) {
-			
-			g_object_unref(dm_schema);
-			return TRUE;
-		}
-	}
-	
-	g_object_unref(dm_schema);
-#endif
-	return FALSE;
 }
 
 gboolean midgard_core_query_add_index(MidgardConnection *mgd,
@@ -1767,12 +1367,8 @@ gboolean midgard_core_query_add_index(MidgardConnection *mgd,
 	GdaServerProvider *server;
 	GdaConnection *cnc = mgd->priv->connection;
 	
-#ifdef HAVE_LIBGDA_4
+
 	server = gda_connection_get_provider(cnc);
-#else
-	server = gda_connection_get_provider_obj(cnc);
-#endif
-	
 	GError *error = NULL;
 	op = gda_server_provider_create_operation (server, cnc,
 			GDA_SERVER_OPERATION_CREATE_INDEX, NULL, &error);
@@ -2223,8 +1819,8 @@ gboolean midgard_core_query_update_class_storage(MidgardConnection *mgd, Midgard
 	return TRUE;
 }
 
-gboolean midgard_core_query_create_class_storage(
-		MidgardConnection *mgd, MidgardDBObjectClass *klass)
+gboolean 
+midgard_core_query_create_class_storage (MidgardConnection *mgd, MidgardDBObjectClass *klass)
 {
 	g_return_val_if_fail(mgd != NULL, FALSE);
 	g_return_val_if_fail(klass != NULL, FALSE);
@@ -2414,6 +2010,9 @@ gboolean midgard_core_query_create_class_storage(
 
 	g_object_unref(mrp);
 	g_free(pspecs);
+
+	/* Update GDA meta store */
+	_update_gda_meta_store_table (mgd->priv->connection, tablename, NULL);
 
 	mgd_info ("%s - Table create: OK", g_type_name(G_OBJECT_CLASS_TYPE(klass)));
 
@@ -2750,3 +2349,114 @@ midgard_core_query_unescape_string (MidgardConnection *mgd, const gchar *string)
 	return retval;		
 }
 
+void
+midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, GError **error, const gchar *property, ...)
+{
+	if (mgd == NULL) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected MidgardConnection. Can not get object.");
+		return;
+	}
+
+	const gchar *cname = classname;
+	if (*object) 
+		cname = G_OBJECT_TYPE_NAME (*object);
+
+	if (cname == NULL) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected class name. Can not get object.");
+		return;
+	}
+
+	GSList *arg_list = NULL;
+	GSList *objects_list = NULL;
+	GSList *l = NULL;
+
+	/* Create all constraints if there are any arguments */
+	const gchar *property_name = property;
+	GValue *cnstr_value;
+	va_list args;
+	va_start (args, property);
+	while (property_name != NULL) {
+		cnstr_value = va_arg (args, GValue *);
+		MidgardQueryProperty *mqp = midgard_query_property_new (property_name, NULL);
+		objects_list = g_slist_prepend (objects_list, (gpointer) mqp);
+		MidgardQueryValue *mqv = midgard_query_value_create_with_value ((const GValue*) cnstr_value);
+		objects_list = g_slist_prepend (objects_list, (gpointer) mqv);
+		MidgardQueryConstraint *mqc = midgard_query_constraint_new (mqp, "=", MIDGARD_QUERY_HOLDER (mqv), NULL);
+		objects_list = g_slist_prepend (objects_list, (gpointer) mqc);
+		arg_list = g_slist_prepend (arg_list, mqc);
+		property_name = va_arg (args, gchar *);
+	}
+	va_end (args);
+
+	if (arg_list == NULL) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected at last one constraint to get object");
+		return;
+	}
+
+	/* We need either group or one constraint */
+	MidgardQueryConstraintSimple *constraint = NULL;
+	if (g_slist_length (arg_list) > 1) {
+		MidgardQueryConstraintGroup *cgroup = midgard_query_constraint_group_new ();
+		for (l = arg_list; l != NULL; l = l->next) {
+			midgard_query_constraint_group_add_constraint (cgroup, (MidgardQueryConstraintSimple *) l->data);
+		}
+		constraint = (MidgardQueryConstraintSimple*) cgroup;
+	} else {
+		constraint = (MidgardQueryConstraintSimple *) arg_list->data;
+	}
+	g_slist_free (arg_list);
+	
+	MidgardQueryStorage *storage = midgard_query_storage_new (cname);
+	MidgardQuerySelect *select = midgard_query_select_new (mgd, storage);
+	midgard_query_executor_set_constraint (MIDGARD_QUERY_EXECUTOR (select), constraint);
+	midgard_query_select_toggle_read_only (select, FALSE);
+
+	GError *err = NULL;
+	midgard_executable_execute (MIDGARD_EXECUTABLE (select), &err);
+	if (err) {
+		g_propagate_error (error, err);
+		goto free_objects_and_return;
+	}
+
+	/* There's no object given, so we initialize new object */
+	if (*object == NULL) {
+		guint i;
+		guint n_objects;
+		MidgardDBObject **_objects = midgard_query_select_list_objects (select, &n_objects);
+		if (n_objects > 1) {
+			g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Too many objects to get");
+			for (i = 0; i < n_objects; i++)
+				g_object_unref (_objects[i]);
+			if (_objects)
+				g_free (_objects);
+		} else if (n_objects == 1) {
+			*object = _objects[i];
+			g_free (_objects);
+		}
+
+		goto free_objects_and_return;
+	}
+
+	/* Object is given, so let's set its properties */
+	GdaDataModel *model = GDA_DATA_MODEL (MIDGARD_QUERY_EXECUTOR (select)->priv->resultset);
+	if (!model || (model && gda_data_model_get_n_rows (model) == 0)) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_NOT_EXISTS, "");
+		goto free_objects_and_return;
+	}
+
+	MGD_OBJECT_IN_STORAGE (*object) = TRUE;
+	/* Do not set datamodel, unless read only mode is fully tested and implemented */
+	/* MIDGARD_DBOBJECT(*object)->dbpriv->datamodel = g_object_ref (model);
+	MIDGARD_DBOBJECT(*object)->dbpriv->row = 0; */
+	MIDGARD_DBOBJECT_GET_CLASS (*object)->dbpriv->set_from_data_model (MIDGARD_DBOBJECT (*object), model, 0, 0);
+
+free_objects_and_return:
+	for (l = objects_list; l != NULL; l = l->next) {
+		g_object_unref ((GObject*) l->data);
+	}
+	g_slist_free (objects_list);
+	g_object_unref (storage);
+	g_object_unref (select);
+
+	return;
+}

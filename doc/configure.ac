@@ -29,7 +29,7 @@ dnl Checks for programs.
 AM_PROG_LIBTOOL
 
 dnl Checks for libraries.
-PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 libgda-4.0 gio-2.0 dbus-1 dbus-glib-1)
+PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 libgda-4.0 dbus-1 dbus-glib-1)
 
 PATH="${PATH}:${prefix}/bin"
 

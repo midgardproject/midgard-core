@@ -36,7 +36,7 @@ midgard_query_executor_new (MidgardConnection *mgd, MidgardQueryStorage *storage
 /**
  * midgard_query_executor_set_constraint:
  * @self: #MidgardQueryExecutor instance
- * @constraint: #MidgardConstraintSimple instance
+ * @constraint: #MidgardQueryConstraintSimple instance
  *
  * Set constraint object which will be used for query execution
  *

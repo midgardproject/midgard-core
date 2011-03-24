@@ -14,8 +14,18 @@
 #include "midgard_test_user.h"
 #include "midgard_test_schema_object_factory.h"
 #include "midgard_test_storage.h"
+#include "midgard_test_workspace_context.h"
+#include "midgard_test_workspace.h"
+#include "midgard_test_object_workspace.h"
 
+#define MISS_IMPL "MISSING IMPLEMENTATION "
 #define MGD_TEST_SITEGROUP_NAME "midgard_test_sitegroup"
+#define MGD_TEST_WORKSPACE_CONTEXT_PATH "/Stable/Testing/Private"
+#define MGD_TEST_WORKSPACE_PATH "/Stable/Testing/Private/Lancelot"
+#define MGD_TEST_WORKSPACE_NAME_STABLE "Stable"
+#define MGD_TEST_WORKSPACE_NAME_TESTING "Testing"
+#define MGD_TEST_WORKSPACE_NAME_PRIVATE "Private"
+#define MGD_TEST_WORKSPACE_NAME_LANCELOT "Lancelot"
 #define MIDGARD_TRAC_TICKET_BASE_URL "http:/""/trac.midgard-project.org/ticket/"
 #define MIDGARD_GITHUB_ISSUES_BASE_URL "https://github.com/midgardproject/midgard-core/issues/#issue/"
 

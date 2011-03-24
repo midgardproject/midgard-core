@@ -20,14 +20,14 @@ midgard_error
 <!-- ##### SECTION Image ##### -->
 
 
-<!-- ##### MACRO MGD_GENERIC_ERROR ##### -->
+<!-- ##### MACRO MIDGARD_GENERIC_ERROR ##### -->
 <para>
 
 </para>
 
 
 
-<!-- ##### ENUM MgdErrorGeneric ##### -->
+<!-- ##### ENUM MidgardErrorGeneric ##### -->
 <para>
 
 </para>

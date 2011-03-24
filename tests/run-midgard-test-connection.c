@@ -32,6 +32,9 @@ int main (int argc, char *argv[])
 	g_test_add_func("/midgard_connection/get_error_string", midgard_test_connection_get_error_string);
 	g_test_add_func("/midgard_connection/get_user", midgard_test_connection_get_user);
 	g_test_add_func("/midgard_connection/copy", midgard_test_connection_copy);
+	g_test_add_func("/midgard_connection/enable_workspace", midgard_test_connection_copy);	
+	g_test_add_func("/midgard_connection/set_workspace", midgard_test_connection_copy);
+	g_test_add_func("/midgard_connection/get_workspace", midgard_test_connection_copy);
 	g_test_add_func("/midgard_connection/signals/auth-changed", midgard_test_connection_signals_auth_changed);
 	g_test_add_func("/midgard_connection/signals/connected", midgard_test_connection_signals_connected);
 	g_test_add_func("/midgard_connection/signals/disconnected", midgard_test_connection_signals_disconnected);

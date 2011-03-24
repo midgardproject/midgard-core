@@ -47,6 +47,10 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_schema_object_factory.h"
 #include "midgard_schema_object_tree.h"
 #include <sql-parser/gda-sql-parser.h>
+#include "midgard_core_workspace.h"
+#include "midgard_workspace.h"
+#include "midgard_workspace_storage.h"
+#include "midgard_core_config.h"
 
 GType _midgard_attachment_type = 0;
 static gboolean signals_registered = FALSE;
@@ -152,6 +156,11 @@ __midgard_object_set_property (GObject *object, guint prop_id,
 
 	if (midgard_core_object_property_refuse_private (mgd, priv, MIDGARD_DBOBJECT (object), pspec->name))
 		return;
+
+	if (MIDGARD_DBOBJECT (self)->dbpriv->datamodel) {
+		g_object_unref (MIDGARD_DBOBJECT (self)->dbpriv->datamodel);
+		MIDGARD_DBOBJECT (self)->dbpriv->datamodel = NULL;
+	}
 
 	switch (prop_id) {
 			
@@ -554,97 +563,123 @@ gboolean midgard_object_set_guid(MidgardObject *self, const gchar *guid)
 	return TRUE;
 }
 
-gboolean _midgard_object_update(MidgardObject *gobj, 
-		_ObjectActionUpdate replicate)
+gboolean 
+_midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GError **error)
 {
-	g_assert(gobj != NULL);
+	g_return_val_if_fail (self != NULL, FALSE);
 	
 	gchar *fquery = "";
 	const gchar *table;
 	GString *sql = NULL;
 	guint object_init_size = 0;
+	GError *err = NULL;
 	
-	if (MGD_OBJECT_GUID (gobj) == NULL)
-		g_critical("Object's guid is NULL. Can not update");
-
-	/* Get object's size as it's needed for size' diff.
-	 * midgard_core_object_is_valid computes new size */
-	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (gobj);
-	if (metadata)
-		object_init_size = metadata->priv->size;		
-
-	if (!midgard_core_object_is_valid(gobj))
-		return FALSE;
-
-	MidgardConnection *mgd = MGD_OBJECT_CNC (gobj);
+	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (self);
 
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);	
 
-	/* Disable person check */
-	/*
-	if (gobj->person == NULL) {
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (gobj), MGD_ERR_ACCESS_DENIED);
+	if (MGD_OBJECT_GUID (self) == NULL) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INVALID_PROPERTY_VALUE, 
+				"Can not update '%s'. Object's guid is NULL.", G_OBJECT_TYPE_NAME (G_OBJECT (self)));
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY_VALUE, "%s", (*error)->message);
 		return FALSE;
 	}
-	*/
-	
-	if (MIDGARD_DBOBJECT (gobj)->dbpriv->storage_data == NULL) {
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (gobj), MGD_ERR_INTERNAL);
+
+	/* Get object's size as it's needed for size' diff.
+	 * midgard_core_object_is_valid computes new size */
+	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (self);
+	if (metadata)
+		object_init_size = metadata->priv->size;		
+
+	if (!midgard_core_object_is_valid(self))
+		return FALSE;
+
+	if (MIDGARD_DBOBJECT (self)->dbpriv->storage_data == NULL) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, 
+				"This is absolutely critical and internal error. No type metadata attributes for '%s' class.",
+				G_OBJECT_TYPE_NAME (G_OBJECT (self)));
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", (*error)->message);
 		return FALSE;
 	}
-	table = midgard_core_class_get_table(MIDGARD_DBOBJECT_GET_CLASS(gobj));
+
+	table = midgard_core_class_get_table(dbklass);
 	if (table  == NULL) {
-		/* Object has no storage defined. Return FALSE as there is nothing to update */
-		g_warning("Object '%s' has no table defined!", 
-				G_OBJECT_TYPE_NAME(gobj));
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (gobj), MGD_ERR_INTERNAL);
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, 
+				"Can not update. No table configured for '%s' class.",
+				G_OBJECT_TYPE_NAME (G_OBJECT (self)));
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", (*error)->message);
 		return FALSE;
 	}
 
 	/* Check duplicates and parent field */
-	if (_object_in_tree(gobj) == OBJECT_IN_TREE_DUPLICATE) 
+	if (_object_in_tree(self) == OBJECT_IN_TREE_DUPLICATE) 
 		return FALSE;
 
 	if (metadata) {
-	
-		guint object_size = metadata->priv->size;
-	
-		if (midgard_quota_size_is_reached(gobj, object_size)){
-	
-			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (gobj), MGD_ERR_QUOTA);
+		guint object_size = metadata->priv->size;	
+		if (midgard_quota_size_is_reached(self, object_size)){
+			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_QUOTA);
 			return FALSE;
 		}
 	}
-/*
-	gint updated;
-	gchar *where = midgard_core_query_where_guid(table, MGD_OBJECT_GUID (gobj));
 
-#ifdef HAVE_LIBGDA_4
-	updated = __insert_or_update_records(gobj, table, GDA_SQL_STATEMENT_UPDATE, (const gchar *)where);
-#else
-	updated = __insert_or_update_records(gobj, table, GDA_QUERY_TYPE_UPDATE, (const gchar *)where);
-#endif
-	
-	g_free(where);
-*/
-	gboolean updated = midgard_core_query_update_dbobject_record (MIDGARD_DBOBJECT (gobj));	
-	if (!updated) {
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (gobj), MGD_ERR_INTERNAL);
+	if (MGD_CNC_USES_WORKSPACE (mgd)) {
+      		/* Set workspace context */
+		GdaSet *params = dbklass->dbpriv->get_statement_update_params (dbklass, mgd);
+		if (!params) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+					"Failed to get parameters for prepared UPDATE statement (%s).",
+					G_OBJECT_CLASS_NAME (dbklass));
+			return FALSE;
+		}
+		/* Workspace id */
+		gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_ID_FIELD, MGD_CNC_WORKSPACE_ID(mgd));
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+					"Failed to set workspace id UPDATE parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
+		/* Workspace object id */
+		gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_OID_FIELD, MGD_OBJECT_WS_OID (self));
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+					"Failed to set object's workspace id UPDATE parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
+	}
+
+	gint updated = midgard_core_query_update_dbobject_record (MIDGARD_DBOBJECT (self), &err);
+
+	if (updated == 0) {
+		g_propagate_error (error, err);
 		return FALSE;
 	}
 
-	midgard_quota_update(gobj, object_init_size);  
+	if (updated < 0) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL,
+				"SQL query UPDATE failed: %s", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error (&err);
+		return FALSE;
+	}
+
+	midgard_quota_update(self, object_init_size);  
 
 	/* Do not touch repligard table if replication is disabled */
 	if (MGD_CNC_REPLICATION (mgd)) {
 		sql = g_string_new("UPDATE repligard SET ");
 		g_string_append_printf(sql,
 				"typename='%s', object_action=%d WHERE guid='%s' ",	
-				G_OBJECT_TYPE_NAME(gobj),
+				G_OBJECT_TYPE_NAME(self),
 				MGD_OBJECT_ACTION_UPDATE,
-				MGD_OBJECT_GUID (gobj));
+				MGD_OBJECT_GUID (self));
 		fquery = g_string_free(sql, FALSE);
-		midgard_core_query_execute (MGD_OBJECT_CNC (gobj), fquery, FALSE);
+		midgard_core_query_execute (MGD_OBJECT_CNC (self), fquery, FALSE);
 		g_free(fquery);
 	}
 
@@ -652,15 +687,15 @@ gboolean _midgard_object_update(MidgardObject *gobj,
 	switch(replicate){
 		
 		case OBJECT_UPDATE_NONE:
-			g_signal_emit(gobj, MIDGARD_OBJECT_GET_CLASS(gobj)->signal_action_updated, 0);
+			g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_updated, 0);
 			break;
 			
 		case OBJECT_UPDATE_EXPORTED:
-			g_signal_emit(gobj, MIDGARD_OBJECT_GET_CLASS(gobj)->signal_action_exported, 0);
+			g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_exported, 0);
 			break;
 			
 		case OBJECT_UPDATE_IMPORTED:
-			g_signal_emit(gobj, MIDGARD_OBJECT_GET_CLASS(gobj)->signal_action_imported, 0);
+			g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_imported, 0);
 			break;
 	}
 
@@ -704,16 +739,35 @@ gboolean _midgard_object_update(MidgardObject *gobj,
  * 
  * Returns: %TRUE if object's record(s) is successfully updated, %FALSE otherwise.
  */ 
-gboolean midgard_object_update(MidgardObject *self)
+gboolean 
+midgard_object_update (MidgardObject *self)
 {
 	g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_update, 0);
-	gboolean rv =  _midgard_object_update(self, OBJECT_UPDATE_NONE);
 
-	if (rv) {
-		__dbus_send(self, "update");
+	GError *error = NULL;
+	gboolean rv =  _midgard_object_update(self, OBJECT_UPDATE_NONE, &error);
+	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
+
+	/* If there's workspace enabled, try to create object's record,
+	 * if particular 'NOT_EXISTS' error is set. */
+	if (MGD_CNC_USES_WORKSPACE (MGD_OBJECT_CNC (self))
+			 && error 
+			 && error->domain == MIDGARD_GENERIC_ERROR
+			 && error->code == MGD_ERR_NOT_EXISTS) {
+		return _midgard_object_create (self, MGD_OBJECT_GUID (self), OBJECT_UPDATE_CREATE);
 	}
 
-	return rv;
+	if (!rv) {
+		MIDGARD_ERRNO_SET_STRING (MGD_OBJECT_CNC (self), MGD_ERR_INTERNAL, "%s", 
+				error && error->message ? error->message : "Unknown error");
+		g_clear_error (&error);
+		return FALSE;
+	}	
+
+	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
+	__dbus_send(self, "update");
+
+	return TRUE;
 }
 
 static GPtrArray *__get_glists(MidgardObject *object) 
@@ -863,7 +917,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	GString *query;
 	const gchar *tablename;
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);	
-	gint inserted;
+	GError *err = NULL;
 
 	if (MIDGARD_DBOBJECT (object)->dbpriv->storage_data == NULL)
 		return FALSE;
@@ -908,7 +962,8 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	}
 	*/
 
-	tablename = midgard_core_class_get_table(MIDGARD_DBOBJECT_GET_CLASS(object));	
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (object);
+	tablename = midgard_core_class_get_table (dbklass);	
 
 	/* FIXME , move this to object_is_valid */
 	if (tablename == NULL) {
@@ -936,13 +991,37 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		return FALSE;
 	}	
 
-#ifdef HAVE_LIBGDA_4
-	//inserted = __insert_or_update_records(object, tablename, GDA_SQL_STATEMENT_INSERT, NULL);
-	inserted = midgard_core_query_create_dbobject_record (MIDGARD_DBOBJECT (object));
-#else
-	inserted = __insert_or_update_records(object, tablename, GDA_QUERY_TYPE_INSERT, NULL);
-#endif
-	
+	if (MGD_CNC_USES_WORKSPACE (mgd)) {
+		/* Set workspace context */
+		GdaSet *params = dbklass->dbpriv->get_statement_insert_params (dbklass, MGD_OBJECT_CNC (object));
+		if (!params) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
+					"Failed to get parameters for prepared INSERT statement (%s).",  
+					G_OBJECT_CLASS_NAME (dbklass));
+			return FALSE;
+		}
+		/* Workspace id */
+		gda_set_set_holder_value (params, &err, MGD_WORKSPACE_ID_FIELD, MGD_CNC_WORKSPACE_ID(mgd));
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
+					"Failed to set workspace id parameter: %s.", 
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
+		/* Workspace object id */
+		gda_set_set_holder_value (params, &err, MGD_WORKSPACE_OID_FIELD, MGD_OBJECT_WS_OID (object));
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
+					"Failed to set object's workspace id parameter: %s.", 
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
+	}
+
+	gint inserted = midgard_core_query_create_dbobject_record (MIDGARD_DBOBJECT (object));
+
 	if (inserted == -1) {
 		_CLEAR_OBJECT_GUID (object);
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
@@ -951,45 +1030,43 @@ gboolean _midgard_object_create (	MidgardObject *object,
 
 	/* Always! get ID of newly created object */
 	/* See: http://mail.gnome.org/archives/gnome-db-list/2007-April/msg00020.html */
-	query = g_string_new("");
-	g_string_append_printf(query, "guid = '%s' ", MGD_OBJECT_GUID (object));
-	
-	GValue *idval =
-		midgard_core_query_get_field_value(
-				mgd, "id", tablename,
-				(const gchar*) query->str);
-	g_string_free(query, TRUE);
-	
 	guint new_id = 0;
-	if (G_IS_VALUE(idval)) {
-
-		if (G_VALUE_TYPE(idval) == G_TYPE_UINT)
-			new_id = g_value_get_uint(idval);
-		else if (G_VALUE_TYPE(idval) == G_TYPE_INT)
-			new_id = g_value_get_int(idval);
-		else 
-			g_warning("Unexpected type for primary key (%s)", G_VALUE_TYPE_NAME(idval));
-		
-		g_value_unset(idval);
-		g_free(idval);
+	GValue ov = {0, };
+	g_value_init (&ov, G_TYPE_UINT);
+	gboolean id_get = midgard_core_query_get_object_value (MIDGARD_DBOBJECT (object), "id", &ov);
+	if (id_get) {
+		new_id = g_value_get_uint (&ov);
 	}
+	g_value_unset (&ov);
 
-	GParamSpec *pspec = 
-		g_object_class_find_property(G_OBJECT_GET_CLASS(object), "id");
-	
+	GParamSpec *pspec = g_object_class_find_property(G_OBJECT_GET_CLASS(object), "id");
 	if (pspec) {		
-
 		if (new_id == 0) {
-
 			g_critical("Newly created %s object's id is 0! ( object's guid - %s )",
 					G_OBJECT_TYPE_NAME(G_OBJECT(object)),
 					MGD_OBJECT_GUID (object));
 			MIDGARD_ERRNO_SET (MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);    
 			return FALSE;
-
 		} else {
 
 			g_object_set(G_OBJECT(object), "id", new_id, NULL);
+		}
+	}
+
+	/* UPDATE object's workspace data */
+	/* If workspace object id is 0 we do fallback to self id, to keep unique
+	 * oid reference. This is typical create without workspace context */
+	if (MGD_CNC_USES_WORKSPACE (mgd)) {
+		MGD_OBJECT_WS_ID (object) = MGD_CNC_WORKSPACE_ID (mgd);
+		guint oid = MGD_OBJECT_WS_OID (object);
+		if (oid == 0) {
+			MGD_OBJECT_WS_OID (object) = new_id;
+			/* UPDATE WS object id field using newly created id value */
+			query = g_string_new ("UPDATE ");
+			g_string_append_printf (query, " %s SET %s=%d WHERE id=%d",
+					tablename, MGD_WORKSPACE_OID_FIELD, new_id, new_id);
+			midgard_core_query_execute(MGD_OBJECT_CNC (object), query->str, FALSE);
+			g_string_free(query, TRUE);
 		}
 	}
 
@@ -1009,6 +1086,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	switch(replicate){
 		
 		case OBJECT_UPDATE_NONE:
+		case OBJECT_UPDATE_CREATE:
 			g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_created, 0);
 			break;
 		
@@ -1199,45 +1277,62 @@ gboolean midgard_object_get_by_id(MidgardObject *object, guint id)
 	/* Stop when property is not uint type */
 	g_assert((prop->value_type == G_TYPE_UINT));
 	
-	/* Initialize QB */
-	MidgardQueryBuilder *builder =
-		midgard_query_builder_new(MGD_OBJECT_CNC (object), 
-				G_OBJECT_TYPE_NAME(object));
-	
-	if (!builder) {
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
-		g_warning("Invalid query builder configuration (%s)",
-				G_OBJECT_TYPE_NAME(object));
-		return FALSE;
-	}
-
 	/* Get primary's property value */
 	GValue pval = {0,};
 	g_value_init(&pval,prop->value_type);	
 	g_value_set_uint(&pval, id);
-	if (midgard_query_builder_add_constraint(builder,
-				"id",
-				"=", &pval)) {
-
-		GSList *olist =
-			midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, &object);
-		g_value_unset(&pval);
-		g_object_unref(G_OBJECT(builder));
-		
-		if (!olist) {
-			
-			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_NOT_EXISTS);
-			return FALSE;
-		}
-		
-		g_slist_free(olist);
-		
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_OK);
-		__dbus_send(object, "get");
-		return TRUE;
-	}
 	
-	return FALSE;
+	/* Get object using 'id' constraint */
+	GError *err = NULL;
+	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, &err, "id", &pval, NULL);
+	g_value_unset (&pval);
+	if (err) {
+		MIDGARD_ERRNO_SET_STRING (MGD_OBJECT_CNC(object), MGD_ERR_NOT_EXISTS, "%s", 
+				err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		return FALSE;
+	}
+
+	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_OK);
+	__dbus_send(object, "get");
+	return TRUE;
+}
+
+static gboolean
+__add_workspace_columns (MidgardConnection *mgd, MidgardDBObjectClass *klass)
+{
+	/* Workspace id */
+	const gchar *table = MGD_DBCLASS_TABLENAME (klass);
+	MidgardDBColumn *mdc = midgard_core_dbcolumn_new ();
+	mdc->table_name = table;
+	mdc->column_name = MGD_WORKSPACE_ID_FIELD;
+	mdc->index = TRUE;
+	mdc->dbtype = "int";
+	mdc->gtype = MGD_TYPE_INT;
+	mdc->unique = FALSE;
+	mdc->dvalue = "0";
+	
+	gboolean rv = midgard_core_query_add_column (mgd, mdc);
+	g_free (mdc);
+	if (!rv)
+		return FALSE;
+
+	/* Workspace object id */
+	mdc = midgard_core_dbcolumn_new ();
+	mdc->table_name = table;
+	mdc->column_name = MGD_WORKSPACE_OID_FIELD;
+	mdc->index = TRUE;
+	mdc->dbtype = "int";
+	mdc->gtype = MGD_TYPE_INT;
+	mdc->unique = FALSE;
+	mdc->dvalue = "0";
+	
+	rv = midgard_core_query_add_column (mgd, mdc);
+	g_free (mdc);
+	if (!rv)
+		return FALSE;
+
+	return TRUE;
 }
 
 static gboolean 
@@ -1245,8 +1340,14 @@ _object_create_storage(MidgardConnection *mgd, MidgardDBObjectClass *klass)
 {
 	g_return_val_if_fail(mgd != NULL, FALSE);
 	g_return_val_if_fail(klass != NULL, FALSE);
+	
+	if (!midgard_core_query_create_class_storage(mgd, klass))
+		return FALSE;
 
-	return midgard_core_query_create_class_storage(mgd, klass);
+	if (midgard_connection_is_enabled_workspace(mgd))
+		return __add_workspace_columns (mgd, klass);
+
+	return TRUE;
 }
 
 static gboolean 
@@ -1255,7 +1356,13 @@ _object_update_storage(MidgardConnection *mgd, MidgardDBObjectClass *klass)
 	g_return_val_if_fail(mgd != NULL, FALSE);
 	g_return_val_if_fail(klass != NULL, FALSE);
 
-	return midgard_core_query_update_class_storage(mgd, klass);
+	if (!midgard_core_query_update_class_storage(mgd, klass))
+		return FALSE;
+
+	if (midgard_connection_is_enabled_workspace(mgd))
+		return __add_workspace_columns (mgd, klass);
+
+	return TRUE;
 }
 
 static gboolean 
@@ -1336,6 +1443,177 @@ _mgdschema_class_set_static_sql_select (MidgardConnection *mgd, MidgardDBObjectC
 	g_free (pspecs);
 }
 
+static void
+__add_fields_to_select_statement (MidgardDBObjectClass *klass, MidgardConnection *mgd, GdaSqlStatementSelect *select, const gchar *table_name)
+{
+	GdaSqlSelectField *select_field;
+	GdaSqlExpr *expr;
+	GValue *val;
+	gchar *table_field;
+	GdaConnection *cnc = mgd->priv->connection;
+
+	MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement (klass, mgd, select, table_name);
+
+	if (mgd && !MGD_CNC_USES_WORKSPACE (mgd))
+		return;
+
+	/* Add workspace identifiers */
+
+	/* Root workspace ideintifier */
+	select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
+	select_field->as = g_strdup_printf (MGD_WORKSPACE_OID_FIELD);
+	select->expr_list = g_slist_append (select->expr_list, select_field);
+	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
+	val = g_new0 (GValue, 1);
+	g_value_init (val, G_TYPE_STRING);
+	table_field = g_strconcat (table_name, ".", MGD_WORKSPACE_OID_FIELD, NULL);
+	g_value_set_string (val, table_field);
+	g_free (table_field);
+	expr->value = val;
+	select_field->expr = expr;
+
+	/* Current workspace id */
+	select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
+	select_field->as = g_strdup_printf (MGD_WORKSPACE_ID_FIELD);
+	select->expr_list = g_slist_append (select->expr_list, select_field);
+	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
+	val = g_new0 (GValue, 1);
+	g_value_init (val, G_TYPE_STRING);
+	table_field = g_strconcat (table_name, ".", MGD_WORKSPACE_ID_FIELD, NULL);
+	g_value_set_string (val, table_field);
+	g_free (table_field);
+	expr->value = val;
+	select_field->expr = expr;
+}
+
+static void
+__set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, guint column_id)
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (model != NULL);
+	g_return_if_fail (row > -1);
+
+	GError *error = NULL;
+	const GValue *value;
+
+	/* guid */
+	value = gda_data_model_get_value_at (model, column_id, row, &error);
+	if (!value) {
+		g_warning ("Failed to get guid value: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		g_free ((gchar *)MGD_OBJECT_GUID (self));
+		MGD_OBJECT_GUID (self) = g_value_dup_string (value);
+	}
+	if (error) g_clear_error (&error);
+
+	column_id++;
+
+	MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model (self, model, row, column_id);
+
+	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
+	if (mgd && !MGD_CNC_USES_WORKSPACE (mgd)) 
+		return;
+
+	guint id;
+
+	/* object ws id */
+	gint ws_idx = gda_data_model_get_column_index (model, MGD_WORKSPACE_OID_FIELD);
+	value = gda_data_model_get_value_at (model, ws_idx, row, &error);
+	if (!value) {
+		g_warning ("Failed to get ws_root_id: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		if (G_VALUE_HOLDS_UINT (value))
+			id = g_value_get_uint (value);
+		else 
+			id = (guint) g_value_get_int (value);
+
+		MGD_OBJECT_WS_OID (self) = id;
+	}
+	if (error) g_clear_error (&error);
+
+	/* ws id */
+	ws_idx = gda_data_model_get_column_index (model, MGD_WORKSPACE_ID_FIELD);
+	value = gda_data_model_get_value_at (model, ws_idx, row, &error);
+	if (!value) {
+		g_warning ("Failed to get ws_id: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		if (G_VALUE_HOLDS_UINT (value))
+			id = g_value_get_uint (value);
+		else 
+			id = (guint) g_value_get_int (value);
+
+		MGD_OBJECT_WS_ID (self) = id;
+	}
+	if (error) g_clear_error (&error);
+}
+
+static void
+__statement_insert_add_metadata_fields (MidgardDBObjectClass *klass, GString *colnames, GString *values)
+{
+	MidgardMetadataClass *mklass = MGD_DBCLASS_METADATA_CLASS (klass);
+	if (!mklass)
+		return;
+
+	guint i;
+	guint n_prop;
+
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (mklass), &n_prop);
+	if (!pspecs)
+		return;
+
+	for (i = 0; i < n_prop; i++) {
+		const gchar *col_name = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), pspecs[i]->name);
+   		if (!col_name)
+			continue;
+		g_string_append (colnames, ", ");
+		g_string_append (values, ", ");
+		g_string_append (colnames, col_name);
+   
+		const gchar *type_name = g_type_name (pspecs[i]->value_type);
+    
+		if (pspecs[i]->value_type == MIDGARD_TYPE_TIMESTAMP)
+   			type_name = "string";
+
+		g_string_append_printf (values, "##%s::%s", col_name, type_name);
+	}
+	g_free (pspecs);
+}
+
+static void
+__statement_update_add_metadata_fields (MidgardDBObjectClass *klass, GString *sql)
+{
+	MidgardMetadataClass *mklass = MGD_DBCLASS_METADATA_CLASS (klass);
+	if (!mklass)
+		return;
+
+	guint i;
+	guint n_prop;
+
+	GParamSpec **pspecs = g_object_class_list_properties (G_OBJECT_CLASS (mklass), &n_prop);
+	if (!pspecs)
+		return;
+
+	for (i = 0; i < n_prop; i++) {
+		const gchar *col_name = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS (mklass), pspecs[i]->name);
+   		if (!col_name)
+			continue;
+   
+		const gchar *type_name = g_type_name (pspecs[i]->value_type);
+    
+		if (pspecs[i]->value_type == MIDGARD_TYPE_TIMESTAMP)
+   			type_name = "string";
+
+		g_string_append_printf (sql, ",%s=##%s::%s", col_name, col_name, type_name);
+	}
+	g_free (pspecs);
+}
+
 /* Initialize class. 
  * Properties setting follow data in class_data.
  */ 
@@ -1362,7 +1640,9 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 	if (mklass) {
 
 		mklass->priv = g_new (MidgardObjectClassPrivate, 1);
-		dbklass->dbpriv = g_new (MidgardDBObjectPrivate, 1);	
+		dbklass->dbpriv = midgard_core_dbobject_private_new ();	
+
+		dbklass->dbpriv->uses_workspace = TRUE;
 
 		/* Check metadata. No support for user declared one yet. */
 		if (data->metadata_class_name == NULL) 
@@ -1379,11 +1659,13 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv->update_storage = _object_update_storage;
 		dbklass->dbpriv->storage_exists = _object_storage_exists;
 		dbklass->dbpriv->delete_storage = _object_delete_storage;
-		dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement;
+		dbklass->dbpriv->add_fields_to_select_statement = __add_fields_to_select_statement ; 
 		dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_property;
-		dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model;
-		dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_statement_insert;
-		dbklass->dbpriv->set_statement_update = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_statement_update;
+		dbklass->dbpriv->set_from_data_model = __set_from_data_model;
+		dbklass->dbpriv->get_statement_insert = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_insert;
+		dbklass->dbpriv->get_statement_insert_params = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_insert_params;
+		dbklass->dbpriv->get_statement_update = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_update;
+		dbklass->dbpriv->get_statement_update_params = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_update_params;
 		dbklass->dbpriv->set_static_sql_select = _mgdschema_class_set_static_sql_select;
 	}	
 
@@ -1420,10 +1702,6 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 	/* Reset params spec */
 	g_free (data->params);
 	data->params = NULL;
-
-	/* Initialize persistent statements */
-	dbklass->dbpriv->set_statement_insert (dbklass);
-	dbklass->dbpriv->set_statement_update (dbklass);
 }
 
 static void
@@ -1628,8 +1906,10 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->add_fields_to_select_statement;
 	dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_property;
 	dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_from_data_model;
-	dbklass->dbpriv->set_statement_insert = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_statement_insert;
-	dbklass->dbpriv->set_statement_update = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_statement_update;
+	dbklass->dbpriv->get_statement_insert = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_insert;
+	dbklass->dbpriv->get_statement_insert_params = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_insert_params;
+	dbklass->dbpriv->get_statement_update = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_update;
+	dbklass->dbpriv->get_statement_update_params = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_update_params;
 	dbklass->dbpriv->set_static_sql_select = NULL;
 
 	if (!signals_registered && mklass) {
@@ -2071,7 +2351,7 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
 	GType type = g_type_from_name (name);
-	MidgardObject *self;
+	MidgardDBObject *self = NULL;
 	const gchar *field = "id";	
 
 	if (!type)
@@ -2113,38 +2393,32 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 			if (guidval && !midgard_is_guid (guidval))
 				goto return_null_with_error;
 		}
-		
-		MidgardQueryBuilder *builder = midgard_query_builder_new(mgd, name);
-		midgard_query_builder_add_constraint(builder, field, "=", value);
-		guint n_objects;
-		GObject **objects = midgard_query_builder_execute(builder, &n_objects);
-		g_object_unref(builder);
-
-		if (!objects) {
-			MIDGARD_ERRNO_SET(mgd, MGD_ERR_NOT_EXISTS);				
+	
+		GError *err = NULL;
+		midgard_core_query_get_object (mgd, name, &self, &err, field, value, NULL);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", 
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
 			return NULL;
 		}
-
-		self = MIDGARD_OBJECT(objects[0]);
-		g_free(objects);	
 
 		if (!self) {
-			MIDGARD_ERRNO_SET(mgd, MGD_ERR_INTERNAL);
+			MIDGARD_ERRNO_SET(mgd, MGD_ERR_NOT_EXISTS);
 			return NULL;
 		}
 
-		__dbus_send(self, "get");
-		MIDGARD_DBOBJECT (self)->dbpriv->storage_data = MIDGARD_DBOBJECT_GET_CLASS(self)->dbpriv->storage_data;
-		MGD_OBJECT_CNC (self) = mgd;	
+		__dbus_send(MIDGARD_OBJECT (self), "get");
+		MIDGARD_DBOBJECT (self)->dbpriv->storage_data = MIDGARD_DBOBJECT_GET_CLASS(self)->dbpriv->storage_data;	
 		
-		return self;
+		return MIDGARD_OBJECT (self);
 	}
 
 return_empty_object:
 	self = g_object_new(type, "connection", mgd, NULL);
 	MGD_OBJECT_CNC (self) = mgd;
 
-	return self;
+	return MIDGARD_OBJECT (self);
 
 return_null_with_error:
 	MIDGARD_ERRNO_SET_STRING(mgd, MGD_ERR_INVALID_PROPERTY_VALUE, "Invalid value. Expected NULL, valid guid or valid, positive integer");
@@ -2387,42 +2661,24 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 		return FALSE;
 	}
 	
-	MidgardQueryBuilder *builder =
-		midgard_query_builder_new(MGD_OBJECT_CNC (object),
-				G_OBJECT_TYPE_NAME(object));
-	if (!builder) {
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
+	GValue pval = {0,};
+	g_value_init(&pval,G_TYPE_STRING);
+	g_value_set_string(&pval, guid);
+
+	GError *err = NULL;
+	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, &err, "guid", &pval, NULL);
+	g_value_unset (&pval);
+
+	if (err) {
+		MIDGARD_ERRNO_SET_STRING (MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS, "%s", 
+				err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
 		return FALSE;
 	}
 
-	GValue pval = {0,};
-	g_value_init(&pval,G_TYPE_STRING);
-	g_value_set_string(&pval, guid);	
-	if (midgard_query_builder_add_constraint(builder,
-				"guid",
-				"=", &pval)) {
-	
-		GSList *olist =
-			midgard_core_qb_set_object_from_query(builder, MQB_SELECT_OBJECT, &object);
-		
-		g_value_unset(&pval);
-		g_object_unref(G_OBJECT(builder));
-		
-		if (!olist) {
-			
-			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_NOT_EXISTS);
-			return FALSE;
-		}
-
-		g_slist_free(olist);
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_OK);
-		__dbus_send(object, "get");
-		return TRUE;
-
-	} 
-	
-	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
-	return FALSE;	
+	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_OK);
+	__dbus_send(object, "get");
+	return TRUE;
 }
 
 
@@ -2943,8 +3199,8 @@ gboolean midgard_object_has_dependents(MidgardObject *self)
  * This function is slower than midgard_object_class_get_object_by_path, 
  * as it has to create new object instance and copy all properties.
  * 
- * #MidgardError is set by midgard_object_class_get_object_by_path in this case.
- * Read about midgard_object_class_get_object_by_path() for more details.
+ * #MidgardErrorGeneric is set by midgard_schema_object_factory_get_object_by_path in this case.
+ * Read about midgard_schema_object_factory_get_object_by_path() for more details.
  * 
  * Returns: %TRUE if object is found, %FALSE otherwise.
  */ 
@@ -3622,6 +3878,39 @@ gboolean midgard_object_unlock(MidgardObject *self)
 	g_object_unref (self);
 
 	return rv;
+}
+
+/**
+ * midgard_object_get_workspace:
+ * @self: #MidgardObject instance
+ *
+ * Returns: new #MidgardWorkspace object or %NULL
+ * 
+ * Since: 10.05.5
+ */
+MidgardWorkspace*
+midgard_object_get_workspace (MidgardObject *self)
+{
+	g_return_val_if_fail (self != NULL, NULL);
+
+	guint ws_id = MGD_OBJECT_WS_ID (self);
+	if (ws_id == 0)
+		return NULL;
+
+	guint row_id;
+	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
+	const GValue *val = midgard_core_workspace_get_value_by_id (MGD_OBJECT_CNC (self), MGD_WORKSPACE_FIELD_IDX_ID, ws_id, &row_id);
+	if (!val) {
+		/* FIXME critical error */
+		return NULL;
+	}
+
+#warning "Get workspace via WorkspaceManager"	
+	MidgardWorkspace *ws = midgard_workspace_new (mgd, NULL);
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (ws);
+	dbklass->dbpriv->set_from_data_model (MIDGARD_DBOBJECT (ws), mgd->priv->workspace_model, row_id, 0);
+
+	return ws;
 }
 
 /* C# helpers */

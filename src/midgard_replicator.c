@@ -80,7 +80,7 @@ midgard_replicator_export (MidgardDBObject *object)
 	if (MIDGARD_IS_OBJECT (object)) {
 		
 		g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_export, 0);
-		return _midgard_object_update(MIDGARD_OBJECT(object), OBJECT_UPDATE_EXPORTED);
+		return _midgard_object_update(MIDGARD_OBJECT(object), OBJECT_UPDATE_EXPORTED, NULL);
 	}
 	
 	return FALSE;
@@ -614,7 +614,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 			}
 
 			_update_object:
-			ret = _midgard_object_update (MIDGARD_OBJECT (object), OBJECT_UPDATE_IMPORTED);
+			ret = _midgard_object_update (MIDGARD_OBJECT (object), OBJECT_UPDATE_IMPORTED, NULL);
 			g_object_unref (dbobject);
 			return ret;
 		}		
@@ -752,7 +752,7 @@ midgard_replicator_import_from_xml (MidgardConnection *mgd,  const gchar *xml, g
 		attr = xmlGetProp(child, BAD_CAST "purge");
 		guid_attr = xmlGetProp(child, BAD_CAST "guid");
 
-		if(g_str_equal(attr, "yes")) {
+		if(attr && g_str_equal(attr, "yes")) {
 			
 			dbobject = midgard_schema_object_factory_get_object_by_guid (mgd, (const gchar *)guid_attr);
 
