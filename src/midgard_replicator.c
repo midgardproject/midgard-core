@@ -332,7 +332,6 @@ midgard_replicator_serialize_blob (MidgardObject *object)
 	gchar *content = midgard_blob_read_content(blob, &bytes_read);
 	
 	if(!content) {
-
 		g_object_unref(blob);
 		return NULL;
 	}
@@ -353,6 +352,7 @@ midgard_replicator_serialize_blob (MidgardObject *object)
 			BAD_CAST MGD_OBJECT_GUID (object));
 
 	g_free(encoded);
+	g_object_unref (blob);
 
 	xmlChar *buf;
 	gint size;
