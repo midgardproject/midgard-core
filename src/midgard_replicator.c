@@ -321,7 +321,7 @@ gchar *
 midgard_replicator_serialize_blob (MidgardObject *object)
 {	
 	GType attachment_type = g_type_from_name ("midgard_attachment");
-	g_return_val_if_fail (G_OBJECT_TYPE (object) == attachment_type, NULL);
+	g_return_val_if_fail (g_type_is_a (G_OBJECT_TYPE (object), attachment_type), NULL);
 
 	MidgardBlob *blob = midgard_blob_new(object, NULL);
 
