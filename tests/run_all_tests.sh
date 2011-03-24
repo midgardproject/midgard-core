@@ -56,6 +56,7 @@ if [ "$MIDGARD_TEST_DATABASE_TYPE" == "SQLite" ]
 then
     echo "-> Deleting sqlite database file"
     rm -f ~/.midgard2/data/${MIDGARD_TEST_DB}.db
+    rm -f ~/.midgard2/data/${MIDGARD_TEST_DB_PROVIDER}.db
 else
     echo "-> Droping database midgard_test"
     sudo mysqladmin -f drop midgard_test > /dev/null 2> /dev/null
