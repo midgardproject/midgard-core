@@ -615,6 +615,9 @@ void midgard_test_replicator_export_updated (MidgardObjectTest *mot, gconstpoint
 	g_value_unset (&tval);
 	g_value_unset (&strval);
 
+	/* Delay export, so it's done at least one second later.*/
+	g_usleep (G_USEC_PER_SEC * 2);
+
 	gboolean object_is_exported = midgard_replicator_export (MIDGARD_DBOBJECT(object));
 	MIDGARD_TEST_ERROR_OK (mgd);
 	g_assert (object_is_exported != FALSE);

@@ -2440,7 +2440,7 @@ midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, M
 	/* Object is given, so let's set its properties */
 	GdaDataModel *model = GDA_DATA_MODEL (MIDGARD_QUERY_EXECUTOR (select)->priv->resultset);
 	if (!model || (model && gda_data_model_get_n_rows (model) == 0)) {
-		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_NOT_EXISTS, "");
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_NOT_EXISTS, "Object doesn't exist");
 		goto free_objects_and_return;
 	}
 
