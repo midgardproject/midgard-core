@@ -52,6 +52,13 @@ struct _MidgardDBObjectPrivate {
 	GdaSet *_statement_update_params;	
 	GdaStatement *_workspace_statement_update;
 	GdaSet *_workspace_statement_update_params;	
+	/* DELETE (UPDATE) */
+	GdaStatement *_statement_delete;
+	GdaSet *_statement_delete_params;	
+	GdaStatement *_workspace_statement_delete;
+	GdaSet *_workspace_statement_delete_params;
+	/* PURGE */
+	/* TODO */	
 
 	/* GdaSql virtual helpers */
 	void			(*add_fields_to_select_statement)	(MidgardDBObjectClass *klass, 
@@ -75,6 +82,8 @@ struct _MidgardDBObjectPrivate {
 	GdaSet			*(*get_statement_insert_params)	(MidgardDBObjectClass *klass, MidgardConnection *mgd);
 	GdaStatement		*(*get_statement_update)	(MidgardDBObjectClass *klass, MidgardConnection *mgd);
 	GdaSet			*(*get_statement_update_params)	(MidgardDBObjectClass *klass, MidgardConnection *mgd);
+	GdaStatement		*(*get_statement_delete)	(MidgardDBObjectClass *klass, MidgardConnection *mgd);
+	GdaSet			*(*get_statement_delete_params)	(MidgardDBObjectClass *klass, MidgardConnection *mgd);
 	/* static SQL commands */
 	void 			(*set_static_sql_select)	(MidgardConnection *mgd, MidgardDBObjectClass *klass);
 

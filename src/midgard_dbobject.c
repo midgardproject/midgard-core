@@ -403,7 +403,7 @@ __get_statement_insert_params (MidgardDBObjectClass *klass, MidgardConnection *m
 {
 	GdaStatement *stmt = klass->dbpriv->get_statement_insert (klass, mgd);
 	if (!stmt) {
-		g_error ("Failed to get GdaStatement and GdaSet (%s)", G_OBJECT_CLASS_NAME (klass));
+		g_error ("Failed to get UPDATE GdaStatement and GdaSet (%s)", G_OBJECT_CLASS_NAME (klass));
 		return NULL;
 	}
 
@@ -449,14 +449,14 @@ __initialize_statement_update_query_parameters (MidgardDBObjectClass *klass, con
 	stmt = gda_sql_parser_parse_string (parser, query_string, NULL, &error);
 
 	if (!stmt) {
-		g_error ("Couldn't create %s class prepared statement. %s", 
+		g_error ("Couldn't create %s class UPDATE prepared statement. %s", 
 				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
 		return;
 	}
 
 	GdaSet *params; 
 	if (!gda_statement_get_parameters (stmt, &params, &error)) {
-		g_error ("Failed to create GdaSet for %s class. %s", 
+		g_error ("Failed to create UPDATE GdaSet for %s class. %s", 
 				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
 	}
 	
@@ -565,6 +565,110 @@ __get_statement_update_params (MidgardDBObjectClass *klass, MidgardConnection *m
 		return klass->dbpriv->_workspace_statement_update_params;
 
 	return klass->dbpriv->_statement_update_params;
+}
+
+static void
+__initialize_statement_delete_query_parameters (MidgardDBObjectClass *klass, const gchar *query_string, gboolean add_workspace)
+{
+	GdaSqlParser *parser = gda_sql_parser_new ();
+	GdaStatement *stmt;
+	GError *error = NULL;
+	stmt = gda_sql_parser_parse_string (parser, query_string, NULL, &error);
+
+	if (!stmt) {
+		g_error ("Couldn't create %s class DELETE(UPDATE) prepared statement. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+		return;
+	}
+
+	GdaSet *params; 
+	if (!gda_statement_get_parameters (stmt, &params, &error)) {
+		g_error ("Failed to create DELETE(UPDATE) GdaSet for %s class. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+	}
+	
+	if (add_workspace) {
+		klass->dbpriv->_workspace_statement_delete = stmt;
+		klass->dbpriv->_workspace_statement_delete_params = params;
+		return;
+	}
+	
+	klass->dbpriv->_statement_delete = stmt;
+	klass->dbpriv->_statement_delete_params = params;
+
+	return;
+}
+
+static gchar *
+__initialize_statement_delete_query_string (MidgardDBObjectClass *klass, gboolean add_workspace)
+{
+	const gchar *table = MGD_DBCLASS_TABLENAME (klass);
+	MidgardMetadata *metadata = MGD_DBCLASS_METADATA (klass);
+	g_return_val_if_fail (table != NULL, NULL);
+
+	GString *sql = g_string_new ("");
+	g_string_append_printf (sql, "UPDATE %s SET ", table); 
+
+	if (metadata) {
+		g_string_append (sql, 
+				"metadata_revisor=##revisor::string, "
+				"metadata_revised=##revised::string, "
+				"metadata_revision=##revision::guint, "
+				"metadata_deleted=##deleted::guint ");
+	} else {
+		g_string_append_printf (sql,
+				"%s=deleted::guint ",
+				midgard_core_object_get_deleted_field (klass));
+	}
+
+	if (add_workspace) 
+		g_string_append_printf (sql, " WHERE guid=##guid::string  AND %s=##%s::guint", 
+				MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_ID_FIELD);
+	else 
+		g_string_append (sql, " WHERE guid=##guid::string ");		
+
+	return g_string_free (sql, FALSE);
+}
+
+static GdaStatement *
+__get_statement_delete (MidgardDBObjectClass *klass, MidgardConnection *mgd)
+{
+	gchar *query = NULL;
+
+	/* Try workspace statement first */
+	if (klass->dbpriv->uses_workspace && (mgd && MGD_CNC_USES_WORKSPACE (mgd))) {
+		
+		if (!klass->dbpriv->_workspace_statement_delete) {
+			query = __initialize_statement_delete_query_string (klass, TRUE);
+			__initialize_statement_delete_query_parameters (klass, query, TRUE);
+			g_free (query);
+		}
+
+		return klass->dbpriv->_workspace_statement_delete;
+	}
+
+	if (!klass->dbpriv->_statement_delete) {
+		query = __initialize_statement_delete_query_string (klass, FALSE);
+		__initialize_statement_delete_query_parameters (klass, query, FALSE);
+		g_free (query);
+	}
+
+	return klass->dbpriv->_statement_delete;
+}
+
+static GdaSet *
+__get_statement_delete_params (MidgardDBObjectClass *klass, MidgardConnection *mgd)
+{	
+	GdaStatement *stmt = klass->dbpriv->get_statement_delete (klass, mgd);
+	if (!stmt) {
+		g_error ("Failed to get DELETE(UPDATE) GdaStatement and GdaSet (%s)", G_OBJECT_CLASS_NAME (klass));
+		return NULL;
+	}
+
+	if (klass->dbpriv->uses_workspace && (mgd && MGD_CNC_USES_WORKSPACE (mgd)))
+		return klass->dbpriv->_workspace_statement_delete_params;
+
+	return klass->dbpriv->_statement_delete_params;
 }
 
 GParamSpec**
@@ -758,6 +862,12 @@ midgard_core_dbobject_private_new ()
 	dbpriv->_workspace_statement_update_params = NULL;
 	dbpriv->get_statement_update = NULL;
 	dbpriv->get_statement_update_params = NULL;	
+	dbpriv->_statement_delete = NULL;
+	dbpriv->_statement_delete_params = NULL;
+	dbpriv->_workspace_statement_delete = NULL;
+	dbpriv->_workspace_statement_delete_params = NULL;
+	dbpriv->get_statement_delete = NULL;
+	dbpriv->get_statement_delete_params = NULL;	
 	dbpriv->set_static_sql_select = NULL;
 	dbpriv->uses_workspace = FALSE;
 
