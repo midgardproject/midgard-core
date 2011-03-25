@@ -606,13 +606,14 @@ __initialize_statement_delete_query_string (MidgardDBObjectClass *klass, gboolea
 
 	if (metadata) {
 		g_string_append (sql, 
-				"metadata_revisor=##revisor::string, "
-				"metadata_revised=##revised::string, "
-				"metadata_revision=##revision::guint, "
-				"metadata_deleted=##deleted::guint ");
+				"metadata_revisor=##metadata_revisor::string, "
+				"metadata_revised=##metadata_revised::string, "
+				"metadata_revision=##metadata_revision::guint, "
+				"metadata_deleted=##metadata_deleted::guint ");
 	} else {
 		g_string_append_printf (sql,
-				"%s=deleted::guint ",
+				"%s=%s::guint ",
+				midgard_core_object_get_deleted_field (klass),
 				midgard_core_object_get_deleted_field (klass));
 	}
 

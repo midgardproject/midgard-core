@@ -2729,6 +2729,8 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	}
 	
 	GValue tval = {0, };
+	g_value_init (&tval, MGD_TYPE_TIMESTAMP);
+	midgard_timestamp_set_current_time(&tval);
 	GError *err = NULL;	
 	gchar *person_guid = "";
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
@@ -2737,7 +2739,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 
 	if (metadata) {
 		/* Revisor */
-		gda_set_set_holder_value (params, &err, "revisor", person_guid);
+		gda_set_set_holder_value (params, &err, "metadata_revisor", person_guid);
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
 					"Failed to set revisor DELETE(UPDATE) parameter: %s.",
@@ -2746,12 +2748,9 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 			return FALSE;
 		}
 		/* Revised */
-		GValue tval = {0, };
 		gchar *timeupdated = NULL;
-		g_value_init (&tval, MGD_TYPE_TIMESTAMP);
-		midgard_timestamp_set_current_time(&tval);
 		timeupdated = midgard_timestamp_get_string_from_value (&tval);	
-		gda_set_set_holder_value (params, &err, "revised", timeupdated);
+		gda_set_set_holder_value (params, &err, "metadata_revised", timeupdated);
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
 					"Failed to set revised DELETE(UPDATE) parameter: %s.",
@@ -2762,7 +2761,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 		g_free (timeupdated);
 		/* Revision */
 		midgard_core_metadata_increase_revision (MGD_DBOBJECT_METADATA (object));
-		gda_set_set_holder_value (params, &err, "revision", MGD_DBOBJECT_METADATA (object)->priv->revision);
+		gda_set_set_holder_value (params, &err, "metadata_revision", MGD_DBOBJECT_METADATA (object)->priv->revision);
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
 					"Failed to set revision DELETE(UPDATE) parameter: %s.",
@@ -2770,16 +2769,27 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 			g_clear_error (&err);
 			return FALSE;
 		}
-	}
+		/* Deleted */
+		gda_set_set_holder_value (params, &err, "metadata_deleted", 1);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+					"Failed to set deleted DELETE(UPDATE) parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
 
-	/* Deleted */
-	gda_set_set_holder_value (params, &err, "deleted", 1);
-	if (err) {
-		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
-				"Failed to set deleted DELETE(UPDATE) parameter: %s.",
-				err && err->message ? err->message : "Unknown reason");
-		g_clear_error (&err);
-		return FALSE;
+	} else {
+
+		/* Deleted */
+		gda_set_set_holder_value (params, &err, deleted_field, 1);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+					"Failed to set deleted DELETE(UPDATE) parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
 	}
 
 	/* Guid */
