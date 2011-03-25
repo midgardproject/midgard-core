@@ -280,11 +280,12 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 	join->expr = expr;
 	join->position = ++executor->priv->joinid;
 
+	const gchar *deleted_field = midgard_core_object_get_deleted_field (klass);
 	GString *table = g_string_new ("(SELECT DISTINCT MAX");
 	g_string_append_printf (table, "(%s) AS %s, %s %s%s FROM %s WHERE %s IN (", 
 			MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_OID_FIELD, 
-			MGD_DBCLASS_METADATA_CLASS (klass) ? "," : "",
-			MGD_DBCLASS_METADATA_CLASS (klass) ? "metadata_deleted" : "",
+			deleted_field ? "," : "",
+			deleted_field ? deleted_field : "",
 			klass_table, MGD_WORKSPACE_ID_FIELD);
 
 	const MidgardWorkspaceStorage *ws = midgard_connection_get_workspace (mgd);
@@ -300,7 +301,10 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 			id = (guint) g_value_get_int (id_val);
 		g_string_append_printf (table, "%s%d", i > 0 ? "," : "", id);
 	}
-	g_string_append_printf (table, ") GROUP BY %s)", MGD_WORKSPACE_OID_FIELD);
+	g_string_append (table, ") ");  
+	if (deleted_field)
+		g_string_append_printf (table, "AND %s = 0 ", deleted_field);
+	g_string_append_printf (table, "GROUP BY %s)", MGD_WORKSPACE_OID_FIELD);
 	g_slist_free (list);
 
 	gda_sql_select_from_take_new_join (from , join);
