@@ -518,11 +518,6 @@ __initialize_statement_update_query_string (MidgardDBObjectClass *klass, gboolea
 	else 
 		g_string_append (sql, " WHERE guid=##guid::string ");		
 
-	GdaSqlParser *parser = gda_sql_parser_new ();
-	GdaStatement *stmt;
-	GError *error = NULL;
-	stmt = gda_sql_parser_parse_string (parser, sql->str, NULL, &error);	
-
 	return g_string_free (sql, FALSE);
 }
 
