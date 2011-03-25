@@ -598,7 +598,7 @@ static gchar *
 __initialize_statement_delete_query_string (MidgardDBObjectClass *klass, gboolean add_workspace)
 {
 	const gchar *table = MGD_DBCLASS_TABLENAME (klass);
-	MidgardMetadata *metadata = MGD_DBCLASS_METADATA (klass);
+	MidgardMetadataClass *metadata = MGD_DBCLASS_METADATA_CLASS (klass);
 	g_return_val_if_fail (table != NULL, NULL);
 
 	GString *sql = g_string_new ("");
@@ -905,6 +905,12 @@ midgard_dbobject_class_init (MidgardDBObjectClass *klass, gpointer g_class_data)
 	klass->dbpriv->_workspace_statement_update_params = NULL;
 	klass->dbpriv->get_statement_update = __get_statement_update;
 	klass->dbpriv->get_statement_update_params = __get_statement_update_params;	
+	klass->dbpriv->_statement_delete = NULL;
+	klass->dbpriv->_statement_delete_params = NULL;
+	klass->dbpriv->_workspace_statement_delete = NULL;
+	klass->dbpriv->_workspace_statement_delete_params = NULL;
+	klass->dbpriv->get_statement_delete = __get_statement_delete;
+	klass->dbpriv->get_statement_delete_params = __get_statement_delete_params;	
 	klass->dbpriv->set_static_sql_select = NULL;
 	klass->dbpriv->uses_workspace = FALSE;
 

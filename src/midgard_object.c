@@ -1666,6 +1666,8 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv->get_statement_insert_params = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_insert_params;
 		dbklass->dbpriv->get_statement_update = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_update;
 		dbklass->dbpriv->get_statement_update_params = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_update_params;
+		dbklass->dbpriv->get_statement_delete = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_delete;
+		dbklass->dbpriv->get_statement_delete_params = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_delete_params;
 		dbklass->dbpriv->set_static_sql_select = _mgdschema_class_set_static_sql_select;
 	}	
 
@@ -1910,6 +1912,8 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	dbklass->dbpriv->get_statement_insert_params = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_insert_params;
 	dbklass->dbpriv->get_statement_update = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_update;
 	dbklass->dbpriv->get_statement_update_params = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_update_params;
+	dbklass->dbpriv->get_statement_delete = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_delete;
+	dbklass->dbpriv->get_statement_delete_params = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_delete_params;
 	dbklass->dbpriv->set_static_sql_select = NULL;
 
 	if (!signals_registered && mklass) {
@@ -2682,92 +2686,110 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 }
 
 
-gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents)
+gboolean 
+_midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 {
 	g_assert(object);
 	
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_delete, 0);		
-	
-	if (MIDGARD_DBOBJECT (object)->dbpriv->storage_data == NULL) {
-		g_warning("No schema attributes for class %s",
-				G_OBJECT_TYPE_NAME(object));
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
-		return FALSE;
-	}
-
-	const gchar *table =
-		midgard_core_class_get_table(MIDGARD_DBOBJECT_GET_CLASS(object));
-	
-	if (table  == NULL) {
-		/* Object has no storage defined. Return FALSE as there is nothing to update */
-		g_warning("Object '%s' has no table defined!", G_OBJECT_TYPE_NAME(object));
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OBJECT_NO_STORAGE);
-		return FALSE;
-	}
-
+		
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
-	const gchar *deleted_field = midgard_core_object_get_deleted_field (MIDGARD_DBOBJECT_CLASS (MIDGARD_OBJECT_GET_CLASS (object)));
+	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_GET_CLASS (MIDGARD_DBOBJECT (object));
+	const gchar *deleted_field = midgard_core_object_get_deleted_field (klass);
 	
 	if (!metadata && !deleted_field) {
-		midgard_set_error(MGD_OBJECT_CNC(object),
+		midgard_set_error (MGD_OBJECT_CNC(object),
 				MGD_GENERIC_ERROR,
 				MGD_ERR_INVALID_PROPERTY_VALUE, 
 				"Object has neither metadata nor deleted property installed");
 		return FALSE;
 	}
 
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	GdaStatement *update = klass->dbpriv->get_statement_update (klass, mgd);
+	GdaSet *params = klass->dbpriv->get_statement_update_params (klass, mgd);
+	if (!params) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+				"Can not delete %s. Missed delete prepared statement or parameters", G_OBJECT_TYPE_NAME (object));
+		return FALSE;
+	}	
+
 	const gchar *guid = MGD_OBJECT_GUID(object);
 	
 	if (!guid){
-		midgard_set_error(MGD_OBJECT_CNC(object),
-				MGD_GENERIC_ERROR,
-				MGD_ERR_INVALID_PROPERTY_VALUE, 
-				"Guid property is NULL. ");
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY_VALUE, 
+				"Can not delete %s. Guid property is NULL.", G_OBJECT_TYPE_NAME (object));
 		return FALSE;
 	}
 	
 	if (check_dependents && midgard_object_has_dependents(object)) {		
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_HAS_DEPENDANTS);
+		MIDGARD_ERRNO_SET (MGD_OBJECT_CNC(object), MGD_ERR_HAS_DEPENDANTS);
 		return FALSE;
 	}
 	
-	GString *sql = g_string_new("UPDATE ");
-	g_string_append_printf(sql, "%s SET ", table);
-	
+	GValue tval = {0, };
+	GError *err = NULL;	
 	gchar *person_guid = "";
-
-	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
 	if (person)
 		person_guid = (gchar *)MGD_OBJECT_GUID(person);
 
-	GValue tval = {0, };
-	gchar *timeupdated = NULL;
-
 	if (metadata) {
+		/* Revisor */
+		gda_set_set_holder_value (params, &err, "revisor", person_guid);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+					"Failed to set revisor DELETE(UPDATE) parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
+		/* Revised */
+		GValue tval = {0, };
+		gchar *timeupdated = NULL;
 		g_value_init (&tval, MGD_TYPE_TIMESTAMP);
 		midgard_timestamp_set_current_time(&tval);
-		timeupdated = midgard_timestamp_get_string_from_value (&tval);
+		timeupdated = midgard_timestamp_get_string_from_value (&tval);	
+		gda_set_set_holder_value (params, &err, "revised", timeupdated);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+					"Failed to set revised DELETE(UPDATE) parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
+		g_free (timeupdated);
+		/* Revision */
 		midgard_core_metadata_increase_revision (MGD_DBOBJECT_METADATA (object));
-		g_string_append_printf(sql,
-				"metadata_revisor='%s', metadata_revised='%s',"
-				"metadata_revision=%d, "
-				"metadata_deleted=1 ",
-				person_guid, timeupdated, 
-				MGD_DBOBJECT_METADATA (object)->priv->revision);
-	} else if (deleted_field) {
-		g_string_append_printf (sql, "%s = 1", deleted_field);
+		gda_set_set_holder_value (params, &err, "revision", MGD_DBOBJECT_METADATA (object)->priv->revision);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+					"Failed to set revision DELETE(UPDATE) parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
 	}
 
-	g_string_append_printf(sql, " WHERE guid = '%s' ",  MGD_OBJECT_GUID(object));
-        gint qr = midgard_core_query_execute(MGD_OBJECT_CNC (object), sql->str, FALSE);
+	/* Deleted */
+	gda_set_set_holder_value (params, &err, "deleted", 1);
+	if (err) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+				"Failed to set deleted DELETE(UPDATE) parameter: %s.",
+				err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		return FALSE;
+	}
 
-	g_string_free(sql, TRUE);
-	g_free (timeupdated);
+	GdaConnection *cnc = mgd->priv->connection;
+	gint qr = gda_connection_statement_execute_non_select (cnc, update, params, NULL, &err);	
 
-	if (qr == 0) {
-		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
+	if (qr < 0) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+				"Failed to delete(update) %s. %s",
+				G_OBJECT_TYPE_NAME (object),
+				err && err->message ? err->message : "Unknown reason");
 		if (G_IS_VALUE (&tval))
 			g_value_unset(&tval);
 		
@@ -2778,7 +2800,7 @@ gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependents
 	} 
 
 	if (MGD_CNC_REPLICATION (mgd)) {
-		sql = g_string_new("UPDATE repligard SET ");
+		GString *sql = g_string_new("UPDATE repligard SET ");
 		g_string_append_printf(sql,
 				"object_action = %d "
 				"WHERE guid = '%s' AND typename = '%s' ",
