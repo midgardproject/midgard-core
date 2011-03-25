@@ -22,6 +22,7 @@
 #include "midgard_core_object_class.h"
 #include <sql-parser/gda-sql-parser.h>
 #include "midgard_core_workspace.h"
+#include "midgard_core_query.h"
 
 static GObjectClass *parent_class= NULL;
 
@@ -232,10 +233,19 @@ _midgard_dbobject_set_from_data_model (MidgardDBObject *self, GdaDataModel *mode
 			continue;
 		}
 		/* Overwrite NULL values */
-		if (G_VALUE_TYPE (pval) == GDA_TYPE_NULL && pspecs[i]->value_type == G_TYPE_STRING)
+		if (G_VALUE_TYPE (pval) == GDA_TYPE_NULL && pspecs[i]->value_type == G_TYPE_STRING) {
 			g_object_set (G_OBJECT (self), pname, "", NULL);
-		else
+
+		} else if (G_VALUE_TYPE (pval) == GDA_TYPE_BLOB
+				&& G_TYPE_FUNDAMENTAL (pspecs[i]->value_type) == G_TYPE_STRING) {
+
+			gchar *stringified = midgard_core_query_binary_stringify ((GValue*)pval);
+			g_object_set (G_OBJECT (self), pname, stringified, NULL);
+			g_free (stringified);
+
+		} else {
 			g_object_set_property (G_OBJECT (self), pname, pval);
+		}
 
 		column_id++;
 	}
