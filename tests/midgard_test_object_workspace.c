@@ -21,7 +21,9 @@
 #define _OBJECT_CLASS "midgard_person"
 #define _NAME_LANCELOT "Sir Lancelot"
 #define _NAME_ARTHUR "King Arthur"
+#define _NAME_GRAIL "Holy Grail"
 
+gchar *grail_guid = NULL;
 gchar *lancelot_guid = NULL;
 gchar *arthur_guid = NULL;
 
@@ -32,21 +34,35 @@ midgard_test_object_workspace_create (MidgardObjectWorkspaceTest *mwt, gconstpoi
         const MidgardWorkspaceManager *manager = midgard_connection_get_workspace_manager (mgd);
         g_assert (manager != NULL);
 
-	MidgardWorkspace *workspace = midgard_workspace_new ();
-	GError *error = NULL;
-	gboolean get_by_path = midgard_workspace_manager_get_workspace_by_path (manager, MIDGARD_WORKSPACE_STORAGE (workspace), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
-	g_assert (get_by_path == TRUE);
-
-	midgard_connection_set_workspace (mgd, MIDGARD_WORKSPACE_STORAGE (workspace));
 	midgard_connection_enable_workspace (mgd, TRUE);
 	g_assert (midgard_connection_is_enabled_workspace (mgd) == TRUE);
 
 	gboolean storage_updated = midgard_storage_update (mgd, _OBJECT_CLASS);
 	g_assert (storage_updated == TRUE);
 
+	/* Create object in root "/" workspace. */
 	MidgardObject *person = midgard_object_new (mgd, _OBJECT_CLASS, NULL);
-	g_object_set (person, "firstname", _NAME_ARTHUR, NULL);
+	g_object_set (person, "firstname", _NAME_GRAIL, NULL);
 	gboolean object_created = midgard_object_create (person);
+	MIDGARD_TEST_ERROR_OK(mgd);
+	g_assert (object_created == TRUE);
+
+	/* Keep Grail's guid */
+	g_object_get (person, "guid", &grail_guid, NULL);
+	g_object_unref (person);
+
+	/* Set workspace /Stable/Testing/Private */
+	MidgardWorkspace *workspace = midgard_workspace_new ();
+	GError *error = NULL;
+	gboolean get_by_path = midgard_workspace_manager_get_workspace_by_path (manager, MIDGARD_WORKSPACE_STORAGE (workspace), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
+	g_assert (get_by_path == TRUE);
+
+	midgard_connection_set_workspace (mgd, MIDGARD_WORKSPACE_STORAGE (workspace));
+	g_assert (midgard_connection_is_enabled_workspace (mgd) == TRUE);
+
+	person = midgard_object_new (mgd, _OBJECT_CLASS, NULL);
+	g_object_set (person, "firstname", _NAME_ARTHUR, NULL);
+	object_created = midgard_object_create (person);
 	MIDGARD_TEST_ERROR_OK(mgd);
 	g_assert (object_created == TRUE);
 
