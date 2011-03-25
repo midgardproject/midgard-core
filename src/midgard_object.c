@@ -2782,6 +2782,29 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 		return FALSE;
 	}
 
+	/* Guid */
+	gda_set_set_holder_value (params, &err, "guid", guid);
+	if (err) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+				"Failed to set guid DELETE(UPDATE) parameter: %s.",
+				err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		return FALSE;
+	}
+
+	/* Workspace ID */
+	if (MGD_CNC_USES_WORKSPACE (mgd)) {
+		gda_set_set_holder_value (params, &err, MGD_WORKSPACE_ID_FIELD, MGD_CNC_WORKSPACE_ID(mgd));
+
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
+					"Failed to set workspace ID DELETE(UPDATE) parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
+	}
+	
 	GdaConnection *cnc = mgd->priv->connection;
 	gint qr = gda_connection_statement_execute_non_select (cnc, update, params, NULL, &err);	
 
