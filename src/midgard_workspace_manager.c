@@ -21,6 +21,8 @@
 #include "midgard_workspace_storage.h"
 #include "midgard_workspace.h"
 #include "midgard_core_object.h"
+#include "midgard_error.h"
+#include "midgard_core_object_class.h"
 
 /* This is not nice. Can be done as iface's private virtual method. */
 #define __SET_MANAGER(__obj, __mngr) \
@@ -226,6 +228,110 @@ midgard_workspace_manager_get_workspace_by_path (const MidgardWorkspaceManager *
 		__SET_MANAGER (ws, self);
 	}
 	return rv;
+}
+
+/** 
+ * midgard_workspace_manager_purge_content:
+ * @self: #MidgardWorkspaceManager instance
+ * @type: the type name
+ * @ws: #MidgardWorkspace instance
+ *
+ * From given @ws workspace, removes entire content of given @type name.
+ * There's no undelete available for this operation.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05.5
+ */ 
+gboolean                
+midgard_workspace_manager_purge_content (const MidgardWorkspaceManager *self, const gchar *type, MidgardWorkspace *ws, GError **error)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (type != NULL, FALSE);
+	g_return_val_if_fail (ws != NULL, FALSE);
+
+	MidgardDBObjectClass *dbklass = g_type_class_peek (g_type_from_name (type));
+	if (!dbklass) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR,
+				MIDGARD_GENERIC_ERROR_INVALID_NAME,
+				"'%s' is not registered in GType system", type);
+		return FALSE;
+	}
+
+	const gchar *table = midgard_core_class_get_table (dbklass);
+	if (!table) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR,
+				MIDGARD_GENERIC_ERROR_OBJECT_NO_STORAGE,
+				"No table defined for '%s'", type);
+		return FALSE;
+	}
+	
+	GString *query = g_string_new ("DELETE FROM ");
+	g_string_append_printf (query, "%s WHERE midgard_ws_id = %d", 
+			table, ws->priv->id);
+
+	gint rv = midgard_core_query_execute (self->priv->mgd, query->str, FALSE);
+	g_string_free (query, TRUE);
+
+	if (rv == 0) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL, NULL);
+		return FALSE;
+	}
+	
+	return TRUE;
+}
+
+/**
+ * midgard_workspace_manager_move_content:
+ * @self: #MidgardWorkspaceManager instance
+ * @type: the type name
+ * @src: source #MidgardWorkspace 
+ * @dest: destination #MidgardWorkspace
+ *
+ * Moves the content of given #type name from @src, source #MidgardWorkspace to 
+ * @dest, destination one.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05.5
+ */ 
+gboolean
+midgard_workspace_manager_move_content (const MidgardWorkspaceManager *self, const gchar *type, MidgardWorkspace *src, MidgardWorkspace *dest, GError **error) 
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (type != NULL, FALSE);
+	g_return_val_if_fail (src != NULL, FALSE);
+	g_return_val_if_fail (dest != NULL, FALSE);
+
+	MidgardDBObjectClass *dbklass = g_type_class_peek (g_type_from_name (type));
+	if (!dbklass) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR,
+				MIDGARD_GENERIC_ERROR_INVALID_NAME,
+				"'%s' is not registered in GType system", type);
+		return FALSE;
+	}
+
+	const gchar *table = midgard_core_class_get_table (dbklass);
+	if (!table) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR,
+				MIDGARD_GENERIC_ERROR_OBJECT_NO_STORAGE,
+				"No table defined for '%s'", type);
+		return FALSE;
+	}
+	
+	GString *query = g_string_new ("UPDATE ");
+	g_string_append_printf (query, "table SET midgard_ws_id = %d WHERE midgard_ws_id = %d", 
+			table, dest->priv->id, src->priv->id);
+
+	gint rv = midgard_core_query_execute (self->priv->mgd, query->str, FALSE);
+	g_string_free (query, TRUE);
+
+	if (rv == 0) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL, NULL);
+		return FALSE;
+	}
+	
+	return TRUE;
 }
 
 /* GOBJECT ROUTINES */

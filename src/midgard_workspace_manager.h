@@ -57,6 +57,9 @@ gboolean 		midgard_workspace_manager_purge_workspace	(const MidgardWorkspaceMana
 gboolean 		midgard_workspace_manager_path_exists		(const MidgardWorkspaceManager *self, const gchar *path);
 gboolean		midgard_workspace_manager_get_workspace_by_path (const MidgardWorkspaceManager *self, MidgardWorkspaceStorage *ws, const gchar *path, GError **error);
 
+gboolean 		midgard_workspace_manager_purge_content		(const MidgardWorkspaceManager *self, const gchar *type, MidgardWorkspace *ws, GError **error);
+gboolean 		midgard_workspace_manager_move_content		(const MidgardWorkspaceManager *self, const gchar *type, MidgardWorkspace *src, MidgardWorkspace *dest, GError **error);
+
 G_END_DECLS
 
 #endif /* MIDGARD_WORKSPACE_MANAGER_H */
