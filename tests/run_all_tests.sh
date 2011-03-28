@@ -52,11 +52,10 @@ gtester -k -o midgard-test.xml \
 
 
 echo "\nCleanup…"
-if [ "$MIDGARD_TEST_DATABASE_TYPE" == "SQLite" ]
+if [ "${MIDGARD_TEST_DATABASE_TYPE}" == "SQLite" ]
 then
     echo "-> Deleting sqlite database file"
     rm -f ~/.midgard2/data/${MIDGARD_TEST_DB}.db
-    rm -f ~/.midgard2/data/${MIDGARD_TEST_DB_PROVIDER}.db
 else
     echo "-> Droping database midgard_test"
     sudo mysqladmin -f drop midgard_test > /dev/null 2> /dev/null
@@ -67,6 +66,9 @@ else
     echo "-> Droping database midgard_test_database_provider"
     sudo mysqladmin -f drop midgard_test_database_provider > /dev/null 2> /dev/null
 fi
+
+echo "-> Deleting sqlite provider test database file"
+rm -f ~/.midgard2/data/${MIDGARD_TEST_DB_PROVIDER}.db
 
 echo "\nGenerating report… "
 gtester-report midgard-test.xml > midgard-test.html
