@@ -56,7 +56,39 @@ typedef enum
 	MGD_ERR_MISSED_DEPENDENCE = -25, /**< Missed dependence for object   <br /> */
 	MGD_ERR_TREE_IS_CIRCULAR = -26, /**< Circular reference found in object's tree <br />*/
 	MGD_ERR_OBJECT_IS_LOCKED = -27 /**< Object is locked */
-}MidgardErrorGeneric;
+}MgdErrorGeneric;
+
+typedef enum
+{
+	MIDGARD_GENERIC_ERROR_OK = -0, /**< MD_ERR_OK  <br /> */ 
+	MIDGARD_GENERIC_ERROR_ERROR = -1, /**<  <br />*/ 
+	MIDGARD_GENERIC_ERROR_ACCESS_DENIED = -2, /**< Access denied *  <br /> */
+	MIDGARD_GENERIC_ERROR_NO_METADATA = -3,
+	MIDGARD_GENERIC_ERROR_NOT_OBJECT = -4, /**< Not Midgard Object   <br /> */
+	MIDGARD_GENERIC_ERROR_NOT_EXISTS = -5, /**< Object does not exist   <br /> */
+	MIDGARD_GENERIC_ERROR_INVALID_NAME = -6 , /**<   <br /> */
+	MIDGARD_GENERIC_ERROR_DUPLICATE = -7 , /**< Object already exist   <br /> */
+	MIDGARD_GENERIC_ERROR_HAS_DEPENDANTS = -8 , /**< Object has dependants   <br /> */
+	MIDGARD_GENERIC_ERROR_RANGE = -9, /**<   <br /> */
+	MIDGARD_GENERIC_ERROR_NOT_CONNECTED = -10, /**< Not connected to the Midgard database   <br /> */
+	MIDGARD_GENERIC_ERROR_SG_NOTFOUND = -11, /**< Sitegroup not found   <br /> */
+	MIDGARD_GENERIC_ERROR_INVALID_OBJECT = -12, /**< Object not registered as Midgard Object   <br /> */ 
+	MIDGARD_GENERIC_ERROR_QUOTA = -13, /**< Quota limit reached   <br /> */
+	MIDGARD_GENERIC_ERROR_INTERNAL = -14, /**< Critical internal error   <br /> */
+	MIDGARD_GENERIC_ERROR_OBJECT_NAME_EXISTS = -15, /**< Object with such name exists in tree   <br /> */
+	MIDGARD_GENERIC_ERROR_OBJECT_NO_STORAGE = -16, /**< Storage table not defined for object   <br /> */
+	MIDGARD_GENERIC_ERROR_OBJECT_NO_PARENT= -17, /**< Parent object in tree not defined   <br /> */
+	MIDGARD_GENERIC_ERROR_INVALID_PROPERTY_VALUE = -18, /**< Invalid property value   <br /> */
+	MIDGARD_GENERIC_ERROR_INVALID_PROPERTY = -19, /**<Invalid property <br />*/
+	MIDGARD_GENERIC_ERROR_USER_DATA = -20, /**< Empty error message reserved for application's developers   <br /> */
+	MIDGARD_GENERIC_ERROR_OBJECT_DELETED = -21, /**< Object deleted   <br /> */
+	MIDGARD_GENERIC_ERROR_OBJECT_PURGED = -22, /**< Object purged   <br /> */
+	MIDGARD_GENERIC_ERROR_OBJECT_EXPORTED = -23, /**< Object already exported   <br /> */
+	MIDGARD_GENERIC_ERROR_OBJECT_IMPORTED = -24, /**< Object already imported   <br /> */
+	MIDGARD_GENERIC_ERROR_MISSED_DEPENDENCE = -25, /**< Missed dependence for object   <br /> */
+	MIDGARD_GENERIC_ERROR_TREE_IS_CIRCULAR = -26, /**< Circular reference found in object's tree <br />*/
+	MIDGARD_GENERIC_ERROR_OBJECT_IS_LOCKED = -27 /**< Object is locked */
+} MidgardGenericError;
 
 GQuark 		midgard_error_generic		(void);
 const gchar 	*midgard_error_string		(GQuark domain, gint errcode);
