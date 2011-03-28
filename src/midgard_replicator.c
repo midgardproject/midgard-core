@@ -435,6 +435,7 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 		return ret_val;
 	}
 
+	MidgardMetadata *dbmetadata = NULL;
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
 	if (!metadata) {
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_NO_METADATA, "Metadata class not available.");
@@ -512,11 +513,12 @@ midgard_replicator_import_object (MidgardDBObject *object, gboolean force)
 		g_value_init (&dbupdated_timestamp, MGD_TYPE_TIMESTAMP);
 		
 		metadata = MGD_DBOBJECT_METADATA (object);
+		dbmetadata = MGD_DBOBJECT_METADATA (dbobject);
 
 		/* Compare revised datetimes. We must know if imported 
 		 * object is newer than that one which exists in database */
 		g_object_get_property (G_OBJECT (metadata), "revised", &updated_timestamp);
-		g_object_get_property (G_OBJECT (metadata), "revised", &dbupdated_timestamp);
+		g_object_get_property (G_OBJECT (dbmetadata), "revised", &dbupdated_timestamp);
 
 		updated = midgard_timestamp_get_string_from_value ((const GValue *)&updated_timestamp);
 		dbupdated = midgard_timestamp_get_string_from_value ((const GValue *)&dbupdated_timestamp);
