@@ -537,8 +537,7 @@ gboolean _nodes2object(GObject *object, xmlNode *node, gboolean force)
 						parser = xmlNewParserCtxt();
 						decoded = 
 							xmlStringDecodeEntities(parser,
-									(const xmlChar *) nodeprop, 
-									XML_SUBSTITUTE_PEREF |
+									(const xmlChar *) nodeprop, 	
 									XML_SUBSTITUTE_REF, 
 									0, 0, 0);
 						g_value_set_string(&pval, 
