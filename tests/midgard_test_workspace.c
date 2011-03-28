@@ -40,7 +40,7 @@ midgard_test_workspace_create (MidgardWorkspaceTest *mwt, gconstpointer data)
 	MidgardWorkspace *workspace = midgard_workspace_new ();
 	g_object_set (workspace, "name", MGD_TEST_WORKSPACE_NAME_LANCELOT, NULL);
 	GError *error = NULL;
-	gboolean workspace_created = midgard_workspace_manager_create (manager, MIDGARD_WORKSPACE_STORAGE (workspace), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
+	gboolean workspace_created = midgard_workspace_manager_create_workspace (manager, MIDGARD_WORKSPACE_STORAGE (workspace), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
 	g_assert (workspace_created == TRUE);
 	g_assert (error == NULL);
 	g_object_unref (workspace);
@@ -50,7 +50,7 @@ midgard_test_workspace_create (MidgardWorkspaceTest *mwt, gconstpointer data)
 	/* Empty Name */
 	workspace = midgard_workspace_new ();
 	g_object_set (workspace, "name", "", NULL);
-	workspace_created = midgard_workspace_manager_create (manager, MIDGARD_WORKSPACE_STORAGE (workspace), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
+	workspace_created = midgard_workspace_manager_create_workspace (manager, MIDGARD_WORKSPACE_STORAGE (workspace), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
 	g_assert (workspace_created == FALSE);
 	g_assert (error != NULL);
 	g_assert (error->code == MIDGARD_WORKSPACE_STORAGE_ERROR_INVALID_VALUE);
@@ -60,7 +60,7 @@ midgard_test_workspace_create (MidgardWorkspaceTest *mwt, gconstpointer data)
 	/* Name exists */
 	workspace = midgard_workspace_new ();
 	g_object_set (workspace, "name", MGD_TEST_WORKSPACE_NAME_LANCELOT, NULL);
-	workspace_created = midgard_workspace_manager_create (manager, MIDGARD_WORKSPACE_STORAGE (workspace), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
+	workspace_created = midgard_workspace_manager_create_workspace (manager, MIDGARD_WORKSPACE_STORAGE (workspace), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
 	g_assert (workspace_created == FALSE);
 	g_assert (error != NULL);
 	g_assert (error->code == MIDGARD_WORKSPACE_STORAGE_ERROR_NAME_EXISTS);
@@ -81,7 +81,7 @@ midgard_test_workspace_update (MidgardWorkspaceTest *mwt, gconstpointer data)
 	g_assert (got_by_path == TRUE);
 	g_assert (error == NULL);
 
-	gboolean workspace_updated = midgard_workspace_manager_update (manager, MIDGARD_WORKSPACE_STORAGE (workspace), &error);
+	gboolean workspace_updated = midgard_workspace_manager_update_workspace (manager, MIDGARD_WORKSPACE_STORAGE (workspace), &error);
 	if (error)
 		g_assert_cmpstr (error->message, ==, "");
 	g_assert (workspace_updated == TRUE);
@@ -92,7 +92,7 @@ midgard_test_workspace_update (MidgardWorkspaceTest *mwt, gconstpointer data)
 	/* FAIL */
 	workspace = midgard_workspace_new ();
 	/* Invalid ID */
-	workspace_updated = midgard_workspace_manager_update (manager, MIDGARD_WORKSPACE_STORAGE (workspace), &error);
+	workspace_updated = midgard_workspace_manager_update_workspace (manager, MIDGARD_WORKSPACE_STORAGE (workspace), &error);
 	g_assert (workspace_updated == FALSE);
 	g_assert (error != NULL);
 	g_assert (error->code == MIDGARD_WORKSPACE_STORAGE_ERROR_INVALID_VALUE);

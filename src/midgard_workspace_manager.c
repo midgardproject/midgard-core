@@ -47,7 +47,7 @@ midgard_workspace_manager_new (MidgardConnection *mgd)
 }
 
 /**
- * midgard_workspace_manager_create:
+ * midgard_workspace_manager_create_workspace:
  * @self: #MidgardWorkspaceManager instance
  * @ws: #MidgardWorkspaceStorage instance to create
  * @path: path at which workspace object should be created
@@ -78,7 +78,7 @@ midgard_workspace_manager_new (MidgardConnection *mgd)
  * Since: 10.05.5
  */ 
 gboolean
-midgard_workspace_manager_create (const MidgardWorkspaceManager *self, MidgardWorkspaceStorage *ws, const gchar *path, GError **error)
+midgard_workspace_manager_create_workspace (const MidgardWorkspaceManager *self, MidgardWorkspaceStorage *ws, const gchar *path, GError **error)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (ws != NULL, FALSE);
@@ -93,7 +93,7 @@ midgard_workspace_manager_create (const MidgardWorkspaceManager *self, MidgardWo
 }
 
 /**
- * midgard_workspace_manager_update:
+ * midgard_workspace_manager_update_workspace:
  * @self: #MidgardWorkspaceManager instance
  * @ws: #MidgardWorkspaceStorage instance 
  * @error: (error-domains MIDGARD_WORKSPACE_STORAGE_ERROR): pointer to store error
@@ -119,7 +119,7 @@ midgard_workspace_manager_create (const MidgardWorkspaceManager *self, MidgardWo
  * Since: 10.05.5
  */ 
 gboolean
-midgard_workspace_manager_update (const MidgardWorkspaceManager *self, MidgardWorkspaceStorage *ws, GError **error)
+midgard_workspace_manager_update_workspace (const MidgardWorkspaceManager *self, MidgardWorkspaceStorage *ws, GError **error)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (ws != NULL, FALSE);
@@ -134,7 +134,7 @@ midgard_workspace_manager_update (const MidgardWorkspaceManager *self, MidgardWo
 }
 
 /**
- * midgard_workspace_manager_purge:
+ * midgard_workspace_manager_purge_workspace:
  * @self: #MidgardWorkspaceManager instance
  * @ws: #MidgardWorkspaceStorage instance 
  * @error: (error-domains MIDGARD_WORKSPACE_STORAGE_ERROR): pointer to store error
@@ -154,7 +154,7 @@ midgard_workspace_manager_update (const MidgardWorkspaceManager *self, MidgardWo
  * Since: 10.05.5
  */ 
 gboolean
-midgard_workspace_manager_purge (const MidgardWorkspaceManager *self, MidgardWorkspaceStorage *ws, GError **error)
+midgard_workspace_manager_purge_workspace (const MidgardWorkspaceManager *self, MidgardWorkspaceStorage *ws, GError **error)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (ws != NULL, FALSE);

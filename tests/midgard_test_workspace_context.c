@@ -30,7 +30,7 @@ midgard_test_workspace_context_create (MidgardWorkspaceContextTest *mwct, gconst
 	g_assert (workspace_context != NULL);
 	g_assert (MIDGARD_IS_WORKSPACE_CONTEXT (workspace_context));
 	
-	gboolean workspace_context_created = midgard_workspace_manager_create (manager, MIDGARD_WORKSPACE_STORAGE (workspace_context), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
+	gboolean workspace_context_created = midgard_workspace_manager_create_workspace (manager, MIDGARD_WORKSPACE_STORAGE (workspace_context), MGD_TEST_WORKSPACE_CONTEXT_PATH, &error);
 	g_assert (workspace_context_created == TRUE);
 	g_assert (error == NULL);
 
@@ -38,7 +38,7 @@ midgard_test_workspace_context_create (MidgardWorkspaceContextTest *mwct, gconst
 
 	/* FAIL */
 	MidgardWorkspaceContext *dummy_context = midgard_workspace_context_new ();
-	workspace_context_created = midgard_workspace_manager_create (manager, MIDGARD_WORKSPACE_STORAGE (dummy_context), "", &error);
+	workspace_context_created = midgard_workspace_manager_create_workspace (manager, MIDGARD_WORKSPACE_STORAGE (dummy_context), "", &error);
 	g_assert (workspace_context_created == FALSE);
 	g_assert (error != NULL);
 	g_assert (error->code == MIDGARD_WORKSPACE_STORAGE_ERROR_INVALID_PATH);
@@ -62,7 +62,7 @@ midgard_test_workspace_context_update (MidgardWorkspaceContextTest *mwct, gconst
 	g_assert (error == NULL);
 
 	/* COre doesn't update context, FAIL */
-	gboolean update = midgard_workspace_manager_update (manager, MIDGARD_WORKSPACE_STORAGE (context), &error);
+	gboolean update = midgard_workspace_manager_update_workspace (manager, MIDGARD_WORKSPACE_STORAGE (context), &error);
 	g_assert (update == FALSE);
 	g_assert (error != NULL);
 	g_assert (error->code == MIDGARD_WORKSPACE_STORAGE_ERROR_CONTEXT_VIOLATION);

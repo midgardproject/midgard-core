@@ -92,7 +92,7 @@ _midgard_workspace_context_create (const MidgardWorkspaceManager *manager, Midga
 		/* Try to create workspace */
 		ws = midgard_workspace_new ();
 		g_object_set (ws, "name", name, NULL);	
-		if (!midgard_workspace_manager_create (manager, MIDGARD_WORKSPACE_STORAGE (ws), dpath->str, &err)) {
+		if (!midgard_workspace_manager_create_workspace (manager, MIDGARD_WORKSPACE_STORAGE (ws), dpath->str, &err)) {
 			if (err && (err->code == MIDGARD_WORKSPACE_STORAGE_ERROR_PATH_EXISTS
 						|| err->code == MIDGARD_WORKSPACE_STORAGE_ERROR_NAME_EXISTS)) {
 				rv = FALSE;		
