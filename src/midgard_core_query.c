@@ -1501,6 +1501,21 @@ __create_repligard_table (MidgardConnection *mgd)
 	if (!rv) 
 		return FALSE;
 
+	/* OBJECT WORKSPACE */
+	mdc = midgard_core_dbcolumn_new ();
+	mdc->table_name = table;
+	mdc->column_name = "workspace_id";
+	mdc->index = FALSE;
+	mdc->dbtype = "int";
+	mdc->gtype = MGD_TYPE_INT;
+	mdc->unique = FALSE;
+	mdc->dvalue = "0";
+
+	rv = midgard_core_query_add_column (mgd, mdc);
+	g_free (mdc);
+	if (!rv) 
+		return FALSE;
+
 	return TRUE;
 }
 
