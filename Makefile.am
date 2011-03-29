@@ -72,6 +72,7 @@ midgard_public_h = \
 	src/midgard_reflector_object.h \
 	src/midgard_reflector_property.h \
 	src/midgard_replicator.h \
+	src/midgard_repligard.h \
 	src/midgard_schema_object_factory.h \
 	src/midgard_schema_object_tree.h \
 	src/midgard_blob.h \
@@ -189,6 +190,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_reflector_object.c \
 	src/midgard_reflector_property.c \
 	src/midgard_replicator.c \
+	src/midgard_repligard.c \
 	src/midgard_user.c \
 	src/midgard_schema_object_factory.c \
 	src/midgard_schema_object_factory.h \
