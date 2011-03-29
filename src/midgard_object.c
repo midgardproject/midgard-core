@@ -51,6 +51,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_workspace.h"
 #include "midgard_workspace_storage.h"
 #include "midgard_core_config.h"
+#include "midgard_repligard.h"
 
 GType _midgard_attachment_type = 0;
 static gboolean signals_registered = FALSE;
@@ -1072,15 +1073,19 @@ gboolean _midgard_object_create (	MidgardObject *object,
 
 	/* INSERT repligard's record */
 	if (MGD_CNC_REPLICATION (mgd)) {
-		query = g_string_new("INSERT INTO repligard ");
-		g_string_append_printf(query,
-				"(guid, typename, object_action) "
-				"VALUES ('%s', '%s', %d)",
-				MGD_OBJECT_GUID (object), G_OBJECT_TYPE_NAME(object), 
-				MGD_OBJECT_ACTION_CREATE);
-	
-		midgard_core_query_execute(MGD_OBJECT_CNC (object), query->str, FALSE);
-		g_string_free(query, TRUE);
+		MidgardRepligard *repligard = midgard_repligard_new (mgd);
+		if (!repligard) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard table");
+			return FALSE;
+		}
+		midgard_repligard_create_object_info (repligard, object, &err);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
+					"Couldn't create repligard record info for '%s': %s", 
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
 	}
 
 	switch(replicate){
