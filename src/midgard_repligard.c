@@ -22,6 +22,7 @@
 #include "guid.h"
 #include "midgard_error.h"
 #include "midgard_core_workspace.h"
+#include <sql-parser/gda-sql-parser.h>
 
 #define MGD_REPLIGARD_TABLE "repligard"
 
@@ -134,10 +135,88 @@ midgard_repligard_create_object_info (MidgardRepligard *self, MidgardObject *obj
 	return inserted;
 }
 
+/**
+ * midgard_repligard_update_object_info:
+ * @self: #MidgardRepligard instance
+ * @object: #MidgardObject to create record info 
+ * @action: action to set 
+ * @error: pointer to store error
+ *
+ * For given @object, updates replication record info. 
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05.5
+ */
 gboolean
 midgard_repligard_update_object_info (MidgardRepligard *self, MidgardObject *object, guint action, GError **error)
 {
-	return FALSE;
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (object != NULL, FALSE);
+
+	GError *err = NULL;
+	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
+	GdaConnection *cnc = mgd->priv->connection; 
+	MidgardDBObjectClass *rklass = MIDGARD_DBOBJECT_GET_CLASS (self);
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (object);
+
+	GdaStatement *insert = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->get_statement_insert (rklass, mgd);
+	g_return_val_if_fail (insert != NULL, FALSE);
+	GdaSet *params = rklass->dbpriv->get_statement_insert_params (rklass, mgd);
+	if (!params) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
+				"Failed to get parameters for prepared INSERT statement (%s).",
+				G_OBJECT_CLASS_NAME (rklass));
+		return FALSE;
+	}
+
+	/* Guid */
+	gda_set_set_holder_value (params, &err, "guid", MGD_OBJECT_GUID (object));
+	if (err) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
+				"Failed to set guid INSERT parameter: %s.",
+				err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		return FALSE;
+	}
+
+	/* Object action */
+	gda_set_set_holder_value (params, &err, "object_action", MGD_OBJECT_ACTION_CREATE);
+	if (err) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
+				"Failed to set object_action INSERT parameter: %s.",
+				err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		return FALSE;
+	}
+
+	if (MGD_CNC_USES_WORKSPACE (mgd) && dbklass->dbpriv->uses_workspace) {
+		guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
+		/* workspace_id */
+		gda_set_set_holder_value (params, &err, "workspace_id", ws_id);
+		if (err) {
+			g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
+					"Failed to set workspace_id INSERT parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
+	}
+
+	if (MGD_CNC_DEBUG (mgd)) {
+		gchar *debug_sql = gda_connection_statement_to_sql (cnc, insert, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+		g_debug ("Update repligard record info: %s", debug_sql);
+		g_free (debug_sql);
+	}
+
+	gboolean updated = (gda_connection_statement_execute_non_select (cnc, insert, params, NULL, &err) == -1) ? FALSE : TRUE;
+	
+	if (!updated) {
+		g_propagate_error (error, err);
+		return FALSE;
+	}
+	
+	return updated;
 }
 
 gboolean
@@ -298,6 +377,182 @@ _set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, guin
 	return;
 }
 
+static void
+__initialize_statement_insert_query_parameters (MidgardDBObjectClass *klass, const gchar *query_string, gboolean add_workspace)
+{
+	GdaSqlParser *parser = gda_sql_parser_new ();
+	GdaStatement *stmt;
+	GError *error = NULL;
+	stmt = gda_sql_parser_parse_string (parser, query_string, NULL, &error);
+
+	if (!stmt) {
+		g_error ("Couldn't create %s class prepared statement. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+		return;
+	}
+
+	GdaSet *params; 
+	if (!gda_statement_get_parameters (stmt, &params, &error)) {
+		g_error ("Failed to create GdaSet for %s class. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+	}
+	
+	if (add_workspace) {
+		klass->dbpriv->_workspace_statement_insert = stmt;
+		klass->dbpriv->_workspace_statement_insert_params = params;
+		return;
+	}
+	
+	klass->dbpriv->_statement_insert = stmt;
+	klass->dbpriv->_statement_insert_params = params;
+
+	return;
+}
+
+static gchar *
+__initialize_statement_insert_query_string (MidgardDBObjectClass *klass, gboolean add_workspace)
+{
+	GString *sql = g_string_new ("INSERT INTO ");
+
+	g_string_append (sql, MGD_REPLIGARD_TABLE);
+	if (!add_workspace) {	
+		g_string_append (sql, "(guid, typename, object_action) VALUES (##guid::string, ##typename::string, ##object_action::guint)");
+	} else {
+		g_string_append (sql, "(guid, typename, object_action, workspace_id) "
+				"VALUES (##guid::string, ##typename::string, ##object_action::guint, ##workspace_id::guint)");
+	}
+
+	return g_string_free (sql, FALSE);
+}
+
+static GdaStatement *
+__get_statement_insert (MidgardDBObjectClass *klass, MidgardConnection *mgd)
+{
+	gchar *query = NULL;
+
+	/* Try workspace statement first */
+	if (klass->dbpriv->uses_workspace && (mgd && MGD_CNC_USES_WORKSPACE (mgd))) {		
+		if (!klass->dbpriv->_workspace_statement_insert) {
+			query = __initialize_statement_insert_query_string (klass, TRUE);
+			__initialize_statement_insert_query_parameters (klass, query, TRUE);
+			g_free (query);
+		}
+
+		return klass->dbpriv->_workspace_statement_insert;
+	}
+
+	if (!klass->dbpriv->_statement_insert) {
+		query = __initialize_statement_insert_query_string (klass, FALSE);
+		__initialize_statement_insert_query_parameters (klass, query, FALSE);
+		g_free (query);
+	}
+
+	return klass->dbpriv->_statement_insert;
+}
+
+static GdaSet *
+__get_statement_insert_params (MidgardDBObjectClass *klass, MidgardConnection *mgd)
+{
+	GdaStatement *stmt = klass->dbpriv->get_statement_insert (klass, mgd);
+	if (!stmt) {
+		g_error ("Failed to get UPDATE GdaStatement and GdaSet (%s)", G_OBJECT_CLASS_NAME (klass));
+		return NULL;
+	}
+
+	if (klass->dbpriv->uses_workspace && (mgd && MGD_CNC_USES_WORKSPACE (mgd)))
+		return klass->dbpriv->_workspace_statement_insert_params;
+
+	return klass->dbpriv->_statement_insert_params;
+}
+
+static void
+__initialize_statement_update_query_parameters (MidgardDBObjectClass *klass, const gchar *query_string, gboolean add_workspace)
+{
+	GdaSqlParser *parser = gda_sql_parser_new ();
+	GdaStatement *stmt;
+	GError *error = NULL;
+	stmt = gda_sql_parser_parse_string (parser, query_string, NULL, &error);
+
+	if (!stmt) {
+		g_error ("Couldn't create %s class UPDATE prepared statement. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+		return;
+	}
+
+	GdaSet *params; 
+	if (!gda_statement_get_parameters (stmt, &params, &error)) {
+		g_error ("Failed to create UPDATE GdaSet for %s class. %s", 
+				G_OBJECT_CLASS_NAME (klass), error && error->message ? error->message : "Unknown reason");
+	}
+	
+	if (add_workspace) {
+		klass->dbpriv->_workspace_statement_update = stmt;
+		klass->dbpriv->_workspace_statement_update_params = params;
+		return;
+	}
+	
+	klass->dbpriv->_statement_update = stmt;
+	klass->dbpriv->_statement_update_params = params;
+
+	return;
+}
+
+static gchar *
+__initialize_statement_update_query_string (MidgardDBObjectClass *klass, gboolean add_workspace)
+{
+	GString *sql = g_string_new ("");
+	g_string_append_printf (sql, "UPDATE %s SET object_action=##object_action::guint ", MGD_REPLIGARD_TABLE);
+
+	if (add_workspace) 
+		g_string_append (sql, "WHERE guid=##guid::string AND workspace_id=##workspace_id::guint ");
+	else 
+		g_string_append (sql, "WHERE guid=##guid::string ");		
+
+	return g_string_free (sql, FALSE);
+}
+
+static GdaStatement *
+__get_statement_update (MidgardDBObjectClass *klass, MidgardConnection *mgd)
+{
+	gchar *query = NULL;
+
+	/* Try workspace statement first */
+	if (klass->dbpriv->uses_workspace && (mgd && MGD_CNC_USES_WORKSPACE (mgd))) {
+		
+		if (!klass->dbpriv->_workspace_statement_update) {
+			query = __initialize_statement_update_query_string (klass, TRUE);
+			__initialize_statement_update_query_parameters (klass, query, TRUE);
+			g_free (query);
+		}
+
+		return klass->dbpriv->_workspace_statement_update;
+	}
+
+	if (!klass->dbpriv->_statement_update) {
+		query = __initialize_statement_update_query_string (klass, FALSE);
+		__initialize_statement_update_query_parameters (klass, query, FALSE);
+		g_free (query);
+	}
+
+	return klass->dbpriv->_statement_update;
+}
+
+static GdaSet *
+__get_statement_update_params (MidgardDBObjectClass *klass, MidgardConnection *mgd)
+{	
+	GdaStatement *stmt = klass->dbpriv->get_statement_update (klass, mgd);
+	if (!stmt) {
+		g_error ("Failed to get GdaStatement and GdaSet (%s)", G_OBJECT_CLASS_NAME (klass));
+		return NULL;
+	}
+
+	if (klass->dbpriv->uses_workspace && (mgd && MGD_CNC_USES_WORKSPACE (mgd)))
+		return klass->dbpriv->_workspace_statement_update_params;
+
+	return klass->dbpriv->_statement_update_params;
+}
+
+
 static void _midgard_repligard_class_init(
 		gpointer g_class, gpointer g_class_data)
 {
@@ -389,10 +644,10 @@ static void _midgard_repligard_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->update_storage = midgard_core_query_update_class_storage;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_exists = _repligard_storage_exists;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->delete_storage = _repligard_storage_delete;
-	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_insert = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->get_statement_insert;
-	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_insert_params = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->get_statement_insert_params;
-	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_update = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->get_statement_update;
-	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_update_params = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->get_statement_update_params;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_insert = __get_statement_insert;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_insert_params = __get_statement_insert_params;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_update = __get_statement_update;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_update_params = __get_statement_update_params;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->add_fields_to_select_statement;	
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_data_model = NULL;
 }
