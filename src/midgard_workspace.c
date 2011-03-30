@@ -459,6 +459,8 @@ _midgard_workspace_iface_list_ids (MidgardWorkspaceStorage *self)
 {
 	MidgardWorkspace *ws = MIDGARD_WORKSPACE (self);
 	const MidgardWorkspaceManager *manager = ws->priv->manager;
+	if (!manager || (manager && !manager->priv))
+		return NULL;
 	MidgardConnection *mgd = manager->priv->mgd;
 	guint id = ws->priv->id;
 	if (id == 0)
