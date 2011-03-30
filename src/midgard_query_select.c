@@ -301,6 +301,8 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 			id = (guint) g_value_get_int (id_val);
 		g_string_append_printf (table, "%s%d", i > 0 ? "," : "", id);
 	}
+	if (!list) 
+		g_string_append (table, "0");
 	g_string_append (table, ") ");  
 	if (deleted_field)
 		g_string_append_printf (table, "AND %s = 0 ", deleted_field);
