@@ -1088,8 +1088,8 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		g_object_unref (repligard);
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
-					G_OBJECT_TYPE_NAME (object), 
-					"Couldn't create repligard record info for '%s': %s", 
+					"Couldn't create repligard record info for '%s': %s",
+					G_OBJECT_TYPE_NAME (object), 					
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
 			return FALSE;
