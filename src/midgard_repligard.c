@@ -109,14 +109,24 @@ midgard_repligard_create_object_info (MidgardRepligard *self, MidgardObject *obj
 	if (MGD_CNC_USES_WORKSPACE (mgd) && dbklass->dbpriv->uses_workspace) {
 		guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
 		/* workspace_id */
-		gda_set_set_holder_value (params, &err, "workspace_id", ws_id);
+		gda_set_set_holder_value (params, &err, "midgard_ws_id", ws_id);
 		if (err) {
 			g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
-					"Failed to set workspace_id INSERT parameter: %s.",
+					"Failed to set midgard_ws_id INSERT parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
 			return FALSE;
 		}
+		/* workspace_oid */
+		gda_set_set_holder_value (params, &err, "midgard_ws_oid_id", MGD_OBJECT_WS_ID (object));
+		if (err) {
+			g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
+					"Failed to set midgard_ws_oid_id INSERT parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
+
 	}
 
 	if (MGD_CNC_DEBUG (mgd)) {
@@ -193,10 +203,10 @@ midgard_repligard_update_object_info (MidgardRepligard *self, MidgardObject *obj
 	if (MGD_CNC_USES_WORKSPACE (mgd) && dbklass->dbpriv->uses_workspace) {
 		guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
 		/* workspace_id */
-		gda_set_set_holder_value (params, &err, "workspace_id", ws_id);
+		gda_set_set_holder_value (params, &err, "midgard_ws_id", ws_id);
 		if (err) {
 			g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
-					"Failed to set workspace_id INSERT parameter: %s.",
+					"Failed to set midgard_ws_id INSERT parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
 			return FALSE;
@@ -418,8 +428,8 @@ __initialize_statement_insert_query_string (MidgardDBObjectClass *klass, gboolea
 	if (!add_workspace) {	
 		g_string_append (sql, "(guid, typename, object_action) VALUES (##guid::string, ##typename::string, ##object_action::guint)");
 	} else {
-		g_string_append (sql, "(guid, typename, object_action, workspace_id) "
-				"VALUES (##guid::string, ##typename::string, ##object_action::guint, ##workspace_id::guint)");
+		g_string_append (sql, "(guid, typename, object_action, midgard_ws_id, midgard_ws_oid_id) "
+				"VALUES (##guid::string, ##typename::string, ##object_action::guint, ##midgard_ws_id::guint, ##midgard_ws_oid_id::guint)");
 	}	
 
 	return g_string_free (sql, FALSE);
@@ -627,9 +637,24 @@ static void _midgard_repligard_class_init(
 	g_object_class_install_property (gobject_class,	PROPERTY_WORKSPACE_ID, pspec);
 	prop_attr = midgard_core_schema_type_property_attr_new();
 	prop_attr->gtype = MGD_TYPE_UINT;
-	prop_attr->field = g_strdup ("workspace_id");
+	prop_attr->field = g_strdup ("midgard_ws_id");
 	prop_attr->table = g_strdup (MGD_REPLIGARD_TABLE);
-	prop_attr->tablefield = g_strjoin (".", MGD_REPLIGARD_TABLE, "workspace_id", NULL);
+	prop_attr->tablefield = g_strjoin (".", MGD_REPLIGARD_TABLE, "midgard_ws_id", NULL);
+	g_hash_table_insert (type_attr->prophash, g_strdup ((gchar *)property_name), prop_attr);
+	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, (gpointer) property_name);
+
+	/* Workspace OID */
+	property_name = "workspacepoid";
+	pspec = g_param_spec_uint (property_name,
+			"Workspace OID",
+			"",
+			0, G_MAXUINT32, 0, G_PARAM_READWRITE);
+	g_object_class_install_property (gobject_class,	PROPERTY_WORKSPACE_ID, pspec);
+	prop_attr = midgard_core_schema_type_property_attr_new();
+	prop_attr->gtype = MGD_TYPE_UINT;
+	prop_attr->field = g_strdup ("midgard_ws_oid_id");
+	prop_attr->table = g_strdup (MGD_REPLIGARD_TABLE);
+	prop_attr->tablefield = g_strjoin (".", MGD_REPLIGARD_TABLE, "midgard_ws_oid_id", NULL);
 	g_hash_table_insert (type_attr->prophash, g_strdup ((gchar *)property_name), prop_attr);
 	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, (gpointer) property_name);
 

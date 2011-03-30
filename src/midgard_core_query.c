@@ -1523,8 +1523,7 @@ gboolean
 midgard_core_query_create_basic_db (MidgardConnection *mgd)
 {
 	g_return_val_if_fail(mgd != NULL, FALSE);
-
-	return __create_repligard_table (mgd);	
+	return midgard_storage_create (mgd, "MidgardRepligard");	
 }
 
 gboolean midgard_core_query_create_metadata_columns(
