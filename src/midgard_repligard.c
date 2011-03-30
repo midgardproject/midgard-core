@@ -181,7 +181,7 @@ midgard_repligard_update_object_info (MidgardRepligard *self, MidgardObject *obj
 	}
 
 	/* Object action */
-	gda_set_set_holder_value (params, &err, "object_action", MGD_OBJECT_ACTION_CREATE);
+	gda_set_set_holder_value (params, &err, "object_action", action);
 	if (err) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
 				"Failed to set object_action INSERT parameter: %s.",
