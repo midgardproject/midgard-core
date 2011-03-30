@@ -105,18 +105,17 @@ midgard_repligard_create_object_info (MidgardRepligard *self, MidgardObject *obj
 		return FALSE;
 	}
 
-	guint ws_id = 0;
-	if (MGD_CNC_USES_WORKSPACE (mgd) && dbklass->dbpriv->uses_workspace) 
-		ws_id = MIDGARD_WORKSPACE (midgard_connection_get_workspace (mgd))->priv->id;
-
-	/* workspace_id */
-	gda_set_set_holder_value (params, &err, "workspace_id", ws_id);
-	if (err) {
-		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
-				"Failed to set workspace_id INSERT parameter: %s.",
-				err && err->message ? err->message : "Unknown reason");
-		g_clear_error (&err);
-		return FALSE;
+	if (MGD_CNC_USES_WORKSPACE (mgd) && dbklass->dbpriv->uses_workspace) {
+		guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
+		/* workspace_id */
+		gda_set_set_holder_value (params, &err, "workspace_id", ws_id);
+		if (err) {
+			g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
+					"Failed to set workspace_id INSERT parameter: %s.",
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
 	}
 
 	if (MGD_CNC_DEBUG (mgd)) {
