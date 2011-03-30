@@ -66,7 +66,7 @@ midgard_repligard_create_object_info (MidgardRepligard *self, MidgardObject *obj
 	MidgardDBObjectClass *rklass = MIDGARD_DBOBJECT_GET_CLASS (self);
 	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (object);
 
-	GdaStatement *insert = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->get_statement_insert (rklass, mgd);
+	GdaStatement *insert = rklass->dbpriv->get_statement_insert (rklass, mgd);
 	g_return_val_if_fail (insert != NULL, FALSE);
 	GdaSet *params = rklass->dbpriv->get_statement_insert_params (rklass, mgd);
 	if (!params) {
@@ -160,9 +160,9 @@ midgard_repligard_update_object_info (MidgardRepligard *self, MidgardObject *obj
 	MidgardDBObjectClass *rklass = MIDGARD_DBOBJECT_GET_CLASS (self);
 	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (object);
 
-	GdaStatement *insert = MIDGARD_DBOBJECT_GET_CLASS (object)->dbpriv->get_statement_insert (rklass, mgd);
+	GdaStatement *insert = rklass->dbpriv->get_statement_update (rklass, mgd);
 	g_return_val_if_fail (insert != NULL, FALSE);
-	GdaSet *params = rklass->dbpriv->get_statement_insert_params (rklass, mgd);
+	GdaSet *params = rklass->dbpriv->get_statement_update_params (rklass, mgd);
 	if (!params) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
 				"Failed to get parameters for prepared INSERT statement (%s).",
@@ -420,7 +420,7 @@ __initialize_statement_insert_query_string (MidgardDBObjectClass *klass, gboolea
 	} else {
 		g_string_append (sql, "(guid, typename, object_action, workspace_id) "
 				"VALUES (##guid::string, ##typename::string, ##object_action::guint, ##workspace_id::guint)");
-	}
+	}	
 
 	return g_string_free (sql, FALSE);
 }
@@ -632,7 +632,6 @@ static void _midgard_repligard_class_init(
 	prop_attr->tablefield = g_strjoin (".", MGD_REPLIGARD_TABLE, "workspace_id", NULL);
 	g_hash_table_insert (type_attr->prophash, g_strdup ((gchar *)property_name), prop_attr);
 	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, (gpointer) property_name);
-
 
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv = midgard_core_dbobject_private_new ();
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data = type_attr;
