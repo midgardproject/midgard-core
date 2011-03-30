@@ -320,7 +320,7 @@ midgard_workspace_manager_move_content (const MidgardWorkspaceManager *self, con
 	}
 	
 	GString *query = g_string_new ("UPDATE ");
-	g_string_append_printf (query, "table SET midgard_ws_id = %d WHERE midgard_ws_id = %d", 
+	g_string_append_printf (query, "%s SET midgard_ws_id = %d WHERE midgard_ws_id = %d", 
 			table, dest->priv->id, src->priv->id);
 
 	gint rv = midgard_core_query_execute (self->priv->mgd, query->str, FALSE);
