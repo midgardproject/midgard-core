@@ -18,14 +18,11 @@ AC_CONFIG_SRCDIR(src/midgard.c)
 
 dnl Automake is needed for the build system.
 dnl
-AM_INIT_AUTOMAKE([-Wno-portability])
+AM_INIT_AUTOMAKE([-Wno-portability -Wall])
 AM_MAINTAINER_MODE
 GOBJECT_INTROSPECTION_CHECK([0.6.5])
 
-AM_PROG_LEX
-AC_PROG_YACC
-AC_PROG_CC(gcc cc)
-AM_PROG_CC_C_O
+AC_PROG_CC(clang gcc cc)
 AC_LANG(C)
 
 dnl Checks for programs.
