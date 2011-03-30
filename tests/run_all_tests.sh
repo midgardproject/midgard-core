@@ -39,13 +39,13 @@ echo "\nRunning tests…\n"
 gtester -k -o midgard-test.xml \
 	./run-midgard-test-config \
 	./run-midgard-test-connection \
+	./run-midgard-test-workspace-context \
+	./run-midgard-test-workspace \
 	./run-midgard-test-object \
 	./run-midgard-test-tree \
 	./run-midgard-test-replicator \
 	./run-midgard-test-user \
 	./run-midgard-test-user-bugs \
-	./run-midgard-test-workspace-context \
-	./run-midgard-test-workspace \
 	./run-midgard-test-object-workspace \
 	./run-midgard-test-database-provider \
 	# ./run-midgard-test-replicator-import

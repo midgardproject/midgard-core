@@ -40,6 +40,18 @@ MidgardConnection *midgard_test_connection_open_user_config(const gchar *name, M
 	/* Fail if midgard error is not OK */
 	MIDGARD_TEST_ERROR_OK(mgd);
 
+	/* Enable workspace if requested */
+	const gchar *workspace_path = g_getenv ("MIDGARD_TEST_WORKSPACE_PATH");
+	if (workspace_path) {
+		const MidgardWorkspaceManager *manager = midgard_connection_get_workspace_manager (mgd);
+		g_assert (manager != NULL);
+		midgard_connection_enable_workspace (mgd, TRUE);
+		MidgardWorkspace *workspace = midgard_workspace_new ();
+		GError *error = NULL;
+		midgard_workspace_manager_get_workspace_by_path (manager, MIDGARD_WORKSPACE_STORAGE (workspace), workspace_path, &error);
+		midgard_connection_set_workspace (mgd, MIDGARD_WORKSPACE_STORAGE (workspace));
+	}
+
 	return mgd;
 }
 
