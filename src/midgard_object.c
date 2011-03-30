@@ -673,15 +673,21 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 
 	/* Do not touch repligard table if replication is disabled */
 	if (MGD_CNC_REPLICATION (mgd)) {
-		sql = g_string_new("UPDATE repligard SET ");
-		g_string_append_printf(sql,
-				"typename='%s', object_action=%d WHERE guid='%s' ",	
-				G_OBJECT_TYPE_NAME(self),
-				MGD_OBJECT_ACTION_UPDATE,
-				MGD_OBJECT_GUID (self));
-		fquery = g_string_free(sql, FALSE);
-		midgard_core_query_execute (MGD_OBJECT_CNC (self), fquery, FALSE);
-		g_free(fquery);
+		MidgardRepligard *repligard = midgard_repligard_new (mgd);
+		if (!repligard) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard object");
+			return FALSE;
+		}
+		midgard_repligard_update_object_info (repligard, self, MGD_OBJECT_ACTION_UPDATE, &err);
+		g_object_unref (repligard);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
+					"Couldn't update repligard record info for '%s': %s", 
+					G_OBJECT_TYPE_NAME (self),
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
 	}
 
 	/* Success, emit done signals */
@@ -1075,13 +1081,14 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	if (MGD_CNC_REPLICATION (mgd)) {
 		MidgardRepligard *repligard = midgard_repligard_new (mgd);
 		if (!repligard) {
-			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard table");
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard object");
 			return FALSE;
 		}
 		midgard_repligard_create_object_info (repligard, object, &err);
 		g_object_unref (repligard);
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
+					G_OBJECT_TYPE_NAME (object), 
 					"Couldn't create repligard record info for '%s': %s", 
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
@@ -2839,16 +2846,21 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	} 
 
 	if (MGD_CNC_REPLICATION (mgd)) {
-		GString *sql = g_string_new("UPDATE repligard SET ");
-		g_string_append_printf(sql,
-				"object_action = %d "
-				"WHERE guid = '%s' AND typename = '%s' ",
-				MGD_OBJECT_ACTION_DELETE,
-				guid,
-				G_OBJECT_TYPE_NAME(G_OBJECT(object)));
-		
-		midgard_core_query_execute(MGD_OBJECT_CNC(object), sql->str, FALSE);
-		g_string_free(sql, TRUE);
+		MidgardRepligard *repligard = midgard_repligard_new (mgd);
+		if (!repligard) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard object");
+			return FALSE;
+		}
+		midgard_repligard_update_object_info (repligard, object, MGD_OBJECT_ACTION_DELETE, &err);
+		g_object_unref (repligard);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
+					"Couldn't update repligard record info for '%s': %s", 
+					G_OBJECT_TYPE_NAME (object),
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
 	}
 
 	/* Set metadata properties */
@@ -2963,6 +2975,7 @@ gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 	GString *dsql;
 	const gchar *guid, *table;
 	gchar *tmpstr;
+	GError *err = NULL;
 	
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purge, 0);	
@@ -3019,22 +3032,21 @@ gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 	midgard_quota_remove(object, size);
 	
 	if (MGD_CNC_REPLICATION (mgd)) {
-		GValue tval = {0, };
-		g_value_init(&tval, MIDGARD_TYPE_TIMESTAMP);
-		midgard_timestamp_set_current_time(&tval);
-		gchar *timedeleted = midgard_timestamp_get_string_from_value (&tval);	
-		dsql = g_string_new("UPDATE repligard SET ");
-		g_string_append_printf(dsql,
-				"object_action = %d, object_action_date = '%s' "
-				"WHERE typename='%s' AND guid='%s' ",	
-				MGD_OBJECT_ACTION_PURGE, timedeleted,
-				G_OBJECT_TYPE_NAME(object),
-				MGD_OBJECT_GUID(object));
-
-		rv = midgard_core_query_execute(MGD_OBJECT_CNC (object), dsql->str, FALSE);
-		g_string_free(dsql, TRUE);
-		g_free (timedeleted);	
-		g_value_unset(&tval);
+		MidgardRepligard *repligard = midgard_repligard_new (mgd);
+		if (!repligard) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard object");
+			return FALSE;
+		}
+		midgard_repligard_update_object_info (repligard, object, MGD_OBJECT_ACTION_PURGE, &err);
+		g_object_unref (repligard);
+		if (err) {
+			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
+					"Couldn't update repligard record info for '%s': %s", 
+					G_OBJECT_TYPE_NAME (object),
+					err && err->message ? err->message : "Unknown reason");
+			g_clear_error (&err);
+			return FALSE;
+		}
 	}
 
 	if (rv == 0) {
