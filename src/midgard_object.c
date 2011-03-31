@@ -2720,8 +2720,8 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	}
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
-	GdaStatement *update = klass->dbpriv->get_statement_update (klass, mgd);
-	GdaSet *params = klass->dbpriv->get_statement_update_params (klass, mgd);
+	GdaStatement *update = klass->dbpriv->get_statement_delete (klass, mgd);
+	GdaSet *params = klass->dbpriv->get_statement_delete_params (klass, mgd);
 	if (!params) {
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
 				"Can not delete %s. Missed delete prepared statement or parameters", G_OBJECT_TYPE_NAME (object));
