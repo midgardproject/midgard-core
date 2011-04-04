@@ -52,6 +52,11 @@ MidgardConnection *midgard_test_connection_open_user_config(const gchar *name, M
 		midgard_connection_set_workspace (mgd, MIDGARD_WORKSPACE_STORAGE (workspace));
 	}
 
+	/* Enable replication, dbus and quota */
+	midgard_connection_enable_replication (mgd, TRUE);
+	midgard_connection_enable_dbus (mgd, TRUE);\
+	midgard_connection_enable_quota (mgd, TRUE);
+
 	return mgd;
 }
 
