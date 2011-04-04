@@ -43,9 +43,7 @@
       <xi:include href="xml/query_builder.xml"/>
       <xi:include href="xml/midgard_user.xml"/>
       <xi:include href="xml/midgard_collector.xml"/> 
-      <xi:include href="xml/midgard_blob.xml"/>
-      <xi:include href="xml/midgard_reflection_property.xml"/>
-      <xi:include href="xml/midgard_replicator.xml"/>
+      <xi:include href="xml/midgard_blob.xml"/> 
       <xi:include href="xml/midgard_quota.xml"/>
       <xi:include href="xml/midgard_error.xml"/>
       <xi:include href="xml/midgard_schema_object_tree.xml"/>
@@ -53,7 +51,6 @@
       <xi:include href="xml/midgard_dbobject.xml"/>    
       <xi:include href="xml/midgard_schema.xml"/>
       <xi:include href="xml/midgard_transaction.xml"/>
-      <xi:include href="xml/midgard_dbus.xml"/>
     </chapter>
 
     <chapter id="midgard-Midgard-Schema-User-Defined-Types">
@@ -90,6 +87,13 @@
       <title>Reflection types for Midgard Schema User Defined types</title>
       <xi:include href="xml/midgard_reflector_property.xml"/>
       <xi:include href="xml/midgard_reflector_object.xml"/>
+    </chapter>
+
+    <chapter id="midgard-Replication-And-Events">
+	 <title>Replication and events</title> 
+	 <xi:include href="xml/midgard_replicator.xml"/>
+	 <xi:include href="xml/midgard_repligard.xml"/>
+	 <xi:include href="xml/midgard_dbus.xml"/>
     </chapter>
 
     <chapter id="midgard-Types">

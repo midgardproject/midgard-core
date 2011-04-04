@@ -836,3 +836,21 @@ MIDGARD_IS_WORKSPACE_MANAGER_CLASS
 MIDGARD_WORKSPACE_MANAGER_GET_CLASS
 </SECTION>
 
+<SECTION>
+<INCLUDE>midgard/midgard.h</INCLUDE>
+<FILE>midgard_repligard</FILE>
+<TITLE>MidgardRepligard</TITLE>
+MidgardRepligard
+MidgardRepligardClass
+midgard_repligard_new
+midgard_repligard_create_object_info
+midgard_repligard_update_object_info
+<SUBSECTION Standard>
+MIDGARD_REPLIGARD
+MIDGARD_IS_REPLIGARD
+MIDGARD_TYPE_REPLIGARD
+midgard_repligard_get_type
+MIDGARD_REPLIGARD_CLASS
+MIDGARD_IS_REPLIGARD_CLASS
+MIDGARD_REPLIGARD_GET_CLASS
+</SECTION>
