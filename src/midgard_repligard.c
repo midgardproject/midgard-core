@@ -644,7 +644,7 @@ static void _midgard_repligard_class_init(
 	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, (gpointer) property_name);
 
 	/* Workspace OID */
-	property_name = "workspacepoid";
+	property_name = "workspaceoid";
 	pspec = g_param_spec_uint (property_name,
 			"Workspace OID",
 			"",
