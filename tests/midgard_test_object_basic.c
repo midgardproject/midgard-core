@@ -157,10 +157,10 @@ void midgard_test_object_basic_update(MidgardObjectTest *mot, gconstpointer data
 	_MGD_TEST_MOT (mot);
 
 	gboolean object_updated = midgard_object_update (object);
-
-	g_assert (object_updated == TRUE);
-	MIDGARD_TEST_ERROR_OK (mgd);
 	
+	MIDGARD_TEST_ERROR_OK (mgd);
+	g_assert (object_updated == TRUE);
+
 	/* Check known metadata properties */
 	midgard_test_metadata_check_update(object);
 
