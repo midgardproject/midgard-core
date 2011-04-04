@@ -282,7 +282,7 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 
 	const gchar *deleted_field = midgard_core_object_get_deleted_field (klass);
 	GString *table = g_string_new ("(SELECT DISTINCT MAX");
-	g_string_append_printf (table, "(%s) AS %s, %s %s%s FROM %s WHERE %s IN (", 
+	g_string_append_printf (table, "(%s) AS %s, %s %s%s FROM %s WHERE %s IN (0,", 
 			MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_OID_FIELD, 
 			deleted_field ? "," : "",
 			deleted_field ? deleted_field : "",
