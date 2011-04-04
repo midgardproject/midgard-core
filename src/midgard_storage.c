@@ -24,11 +24,18 @@
 #include "midgard_core_query.h"
 #include "midgard_user.h"
 #include "midgard_core_connection.h"
+#include "midgard_core_metadata.h"
+#include "midgard_replicator.h"
+#include "midgard_core_workspace.h"
 
 #define ADMIN_USER_GUID "f4edf43cc32a11deb15c11e64583ae10ae10"
-#define ADMIN_PERSON_GUID "f6b665f1984503790ed91f39b11b5392"
 #define ADMIN_USER_LOGIN "admin"
 #define ADMIN_USER_PASSWORD "password"
+
+#define ADMIN_PERSON_GUID "f6b665f1984503790ed91f39b11b5392"
+#define ADMIN_PERSON_CREATED "1999-05-18 14:40:01"
+#define ADMIN_PERSON_FIRSTNAME "Midgard"
+#define ADMIN_PERSON_LASTNAME "Administrator"
 
 #define DEFAULT_AUTH_TYPE "Plaintext"
 
@@ -102,16 +109,30 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 		ret_rows = gda_data_model_get_n_rows(model);
 
 	if(!model || ret_rows == 0) {
-			
-		sql = "INSERT INTO person (guid, metadata_creator, lastname, firstname, metadata_created, metadata_revision) "
-			"VALUES ('f6b665f1984503790ed91f39b11b5392', 'f6b665f1984503790ed91f39b11b5392', "
-			"'Administrator', 'Midgard', '1999-05-18 14:40:01', 0 )";
-		midgard_core_query_execute(mgd, sql, TRUE);
+		
+		MidgardObject *person = midgard_object_new (mgd, "midgard_person", NULL);
+		/* guid */
+		g_free ((gchar *)MGD_OBJECT_GUID (person));
+		MGD_OBJECT_GUID (person) = g_strdup (ADMIN_PERSON_GUID);
+		/* lastname and firstname */
+		g_object_set (G_OBJECT (person), 
+			"lastname", ADMIN_PERSON_LASTNAME,
+			"firstname", ADMIN_PERSON_FIRSTNAME, NULL);
+		/* metadata creator */
+		GValue val = {0, };
+		g_value_init (&val, G_TYPE_STRING);
+		g_value_set_string (&val, ADMIN_PERSON_GUID);
+		midgard_core_metadata_set_creator (MGD_DBOBJECT_METADATA (person), &val);
+		g_value_unset (&val);
+		//midgard_object_create (person);
 
-		/* Create root's repligard entry */
-		sql = "INSERT INTO repligard (guid, typename, object_action) "
-			"VALUES ('f6b665f1984503790ed91f39b11b5392', 'midgard_person', 0)";
-		midgard_core_query_execute(mgd, sql, TRUE);		
+		/* metadata created */
+		g_value_init (&val, G_TYPE_STRING);
+		g_value_set_string (&val, ADMIN_PERSON_CREATED);
+		midgard_core_metadata_set_created (MGD_DBOBJECT_METADATA (person), &val);
+		g_value_unset (&val);
+
+		midgard_replicator_import_object (MIDGARD_DBOBJECT (person), TRUE);
 	}
 
 	if(model)
