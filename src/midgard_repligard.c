@@ -514,7 +514,7 @@ __initialize_statement_update_query_string (MidgardDBObjectClass *klass, gboolea
 	g_string_append_printf (sql, "UPDATE %s SET object_action=##object_action::guint ", MGD_REPLIGARD_TABLE);
 
 	if (add_workspace) 
-		g_string_append (sql, "WHERE guid=##guid::string AND workspace_id=##workspace_id::guint ");
+		g_string_append (sql, "WHERE guid=##guid::string AND midgard_ws_id=##midgard_ws_id::guint ");
 	else 
 		g_string_append (sql, "WHERE guid=##guid::string ");		
 
