@@ -170,8 +170,8 @@ midgard_repligard_update_object_info (MidgardRepligard *self, MidgardObject *obj
 	MidgardDBObjectClass *rklass = MIDGARD_DBOBJECT_GET_CLASS (self);
 	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (object);
 
-	GdaStatement *insert = rklass->dbpriv->get_statement_update (rklass, mgd);
-	g_return_val_if_fail (insert != NULL, FALSE);
+	GdaStatement *update = rklass->dbpriv->get_statement_update (rklass, mgd);
+	g_return_val_if_fail (update != NULL, FALSE);
 	GdaSet *params = rklass->dbpriv->get_statement_update_params (rklass, mgd);
 	if (!params) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
@@ -184,7 +184,7 @@ midgard_repligard_update_object_info (MidgardRepligard *self, MidgardObject *obj
 	gda_set_set_holder_value (params, &err, "guid", MGD_OBJECT_GUID (object));
 	if (err) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
-				"Failed to set guid INSERT parameter: %s.",
+				"Failed to set guid UPDATE parameter: %s.",
 				err && err->message ? err->message : "Unknown reason");
 		g_clear_error (&err);
 		return FALSE;
@@ -194,7 +194,7 @@ midgard_repligard_update_object_info (MidgardRepligard *self, MidgardObject *obj
 	gda_set_set_holder_value (params, &err, "object_action", action);
 	if (err) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
-				"Failed to set object_action INSERT parameter: %s.",
+				"Failed to set object_action UPDATE parameter: %s.",
 				err && err->message ? err->message : "Unknown reason");
 		g_clear_error (&err);
 		return FALSE;
@@ -206,7 +206,7 @@ midgard_repligard_update_object_info (MidgardRepligard *self, MidgardObject *obj
 		gda_set_set_holder_value (params, &err, "midgard_ws_id", ws_id);
 		if (err) {
 			g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL,
-					"Failed to set midgard_ws_id INSERT parameter: %s.",
+					"Failed to set midgard_ws_id UPDATE parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
 			return FALSE;
@@ -214,12 +214,12 @@ midgard_repligard_update_object_info (MidgardRepligard *self, MidgardObject *obj
 	}
 
 	if (MGD_CNC_DEBUG (mgd)) {
-		gchar *debug_sql = gda_connection_statement_to_sql (cnc, insert, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+		gchar *debug_sql = gda_connection_statement_to_sql (cnc, update, params, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 		g_debug ("Update repligard record info: %s", debug_sql);
 		g_free (debug_sql);
 	}
 
-	gboolean updated = (gda_connection_statement_execute_non_select (cnc, insert, params, NULL, &err) == -1) ? FALSE : TRUE;
+	gboolean updated = (gda_connection_statement_execute_non_select (cnc, update, params, NULL, &err) == -1) ? FALSE : TRUE;
 	
 	if (!updated) {
 		g_propagate_error (error, err);
