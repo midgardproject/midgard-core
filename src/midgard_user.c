@@ -33,6 +33,11 @@
 #include "guid.h"
 #include "midgard_core_object_class.h"
 #include "midgard_core_connection.h"
+#include "midgard_query_value.h"
+#include "midgard_query_constraint.h"
+#include "midgard_query_constraint_group.h"
+#include "midgard_query_select.h"
+#include "midgard_executable.h"
 
 #if HAVE_CRYPT_H
 # include <crypt.h>
@@ -282,12 +287,6 @@ __midgard_user_get (MidgardConnection *mgd, guint n_params, const GParameter *pa
  * Cases to return %NULL:
  * <itemizedlist> 
  * <listitem><para>
- * There's attempt to query users in anonymous mode or logged in user is not admin (MGD_ERR_ACCESS_DENIED)
- * </para></listitem>
- * <listitem><para>
- * 'login' or 'authtype' properties do not exist in given parameters (MGD_ERR_INVALID_PROPERTY_VALUE)
- * </para></listitem>
- * <listitem><para>
  * There are no user objects which match given parameters (MGD_ERR_NOT_EXISTS)
  * </para></listitem>
  * </itemizedlist>
@@ -310,67 +309,70 @@ __midgard_user_query (MidgardConnection *mgd, guint n_params, const GParameter *
 {
 	g_return_val_if_fail (mgd != NULL, NULL);
 	g_return_val_if_fail (parameters != NULL, NULL);
+	MidgardUser **result = NULL;
+
+	if (n_params == 0) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Expected one parameter (at least) to get user object");
+		return result;
+	}
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
 
-	/* Deny queries for non admin user*/
-	MidgardUser *cuser = midgard_connection_get_user (mgd);
-	if (!cuser || (cuser && !midgard_user_is_admin (cuser))) {
-
-		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_ACCESS_DENIED, "Not allowed to query users for non admin users.");
-		return NULL;
-	}
-
 	guint i;
+	GSList *constraints = NULL;
+	GSList *objects_list = NULL;
 	MidgardUserClass *klass = g_type_class_peek (MIDGARD_TYPE_USER);
 
-	/* Validate properties and find required ones */
-	if (!__validate_parameters(mgd, n_params, parameters, 1)) 
-		return NULL;
-
-	/* Create new parameters. We need to pass column names instead of properties */
-	GValue idval = {0, };
-	g_value_init (&idval, G_TYPE_UINT);
-	GParameter *tbl_params = __convert_to_storage_parameters (mgd, n_params, parameters, klass, idval);
-	if (!tbl_params) {
-		
-		g_value_unset (&idval);
-		return NULL;
-	}
-	GdaDataModel *model = midgard_core_query_get_dbobject_model (mgd, MIDGARD_DBOBJECT_CLASS (klass), n_params, tbl_params);
-
-	g_free (tbl_params);
-	g_value_unset (&idval);
-
-	if (!model) {
-
-		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
-		return NULL;
+	for (i = 0; i < n_params; i++) {
+		MidgardQueryProperty *mqp = midgard_query_property_new (parameters[i].name, NULL);
+		objects_list = g_slist_prepend (objects_list, (gpointer) mqp);
+		MidgardQueryValue *mqv = midgard_query_value_create_with_value (((const GValue *) &parameters[i].value));
+		objects_list = g_slist_prepend (objects_list, (gpointer) mqv);
+		MidgardQueryConstraint *mqc = midgard_query_constraint_new (mqp, "=", MIDGARD_QUERY_HOLDER (mqv), NULL);
+		objects_list = g_slist_prepend (objects_list, (gpointer) mqc);
+		constraints = g_slist_prepend (constraints, mqc);
 	}
 
-	guint rows = gda_data_model_get_n_rows(model);
-	if(rows == 0) {
-
-		if (model) {
-			g_object_unref(model);
-			model = NULL;
+	/* We need either group or one constraint */
+	MidgardQueryConstraintSimple *constraint = NULL;
+	GSList *l = NULL;
+	if (g_slist_length (constraints) > 1) {
+		MidgardQueryConstraintGroup *cgroup = midgard_query_constraint_group_new ();
+		for (l = constraints; l != NULL; l = l->next) {
+			midgard_query_constraint_group_add_constraint (cgroup, (MidgardQueryConstraintSimple *) l->data);
 		}
-
-		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
-		return NULL;
+		constraint = (MidgardQueryConstraintSimple*) cgroup;
+	} else {
+		constraint = (MidgardQueryConstraintSimple *) constraints->data;
 	}
+	g_slist_free (constraints);
 
-	MidgardUser **users = g_new (MidgardUser*, rows+1);
-
-	for (i = 0; i < rows; i++) {
+	MidgardQueryStorage *storage = midgard_query_storage_new (g_type_name (MIDGARD_TYPE_USER));
+	MidgardQuerySelect *select = midgard_query_select_new (mgd, storage);
+	midgard_query_executor_set_constraint (MIDGARD_QUERY_EXECUTOR (select), constraint);
+	midgard_query_select_toggle_read_only (select, FALSE);
 	
-		users[i] = g_object_new (MIDGARD_TYPE_USER, "connection", mgd, NULL);
-		MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql (MIDGARD_DBOBJECT (users[i]), model, i);
+	GError *err = NULL;
+	midgard_executable_execute (MIDGARD_EXECUTABLE (select), &err);
+	if (err) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
+				"Failed to query user. %s", err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		goto free_objects_and_return;
 	}
 
-	users[i] = NULL;
+	guint n_objects;
+	result = (MidgardUser **) midgard_query_select_list_objects (select, &n_objects);
 
-	return users;
+free_objects_and_return:
+	for (l = objects_list; l != NULL; l = l->next) {
+		g_object_unref ((GObject*) l->data);
+	}
+        g_slist_free (objects_list);
+        g_object_unref (storage);
+        g_object_unref (select);
+
+        return result;
 }	
 
 /** 
@@ -1507,6 +1509,7 @@ static void _midgard_user_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->has_metadata = FALSE;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->uses_workspace = FALSE;
 
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->add_fields_to_select_statement;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql = __set_from_sql;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_sql = NULL;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->create_storage = midgard_core_query_create_class_storage;	
