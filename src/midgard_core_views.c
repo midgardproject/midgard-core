@@ -168,6 +168,8 @@ static void __get_view_properties(xmlNode *node, MgdSchemaTypeAttr *type)
 
 static const gchar *__allowed_joins[] = {"left", "right", "inner", "inner left", "inner right", "outer", NULL };
 
+#define __DBOBJECT_CLASS_PTR(__name) g_type_from_name (__name) == 0 ? NULL : MIDGARD_DBOBJECT_CLASS (g_type_class_peek (g_type_from_name (__name)))
+
 static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 {
 	xmlNode *cur;
@@ -214,7 +216,7 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 			MidgardDBObjectClass *joinklass = NULL;
 
 			if (classname) 
-				joinklass = MIDGARD_DBOBJECT_CLASS(MIDGARD_OBJECT_GET_CLASS_BY_NAME((const gchar *)classname));
+				joinklass = __DBOBJECT_CLASS_PTR ((gchar *)classname);
 
 			if (!joinklass) {
 				g_warning ("%s is not registered in GType system", classname);
@@ -237,7 +239,7 @@ static void __get_view_joins(xmlNode *node, MgdSchemaTypeAttr *type)
 				return;
 			}
 
-			klass = MIDGARD_DBOBJECT_CLASS(MIDGARD_OBJECT_GET_CLASS_BY_NAME((const gchar *)classprop[0]));
+			klass = __DBOBJECT_CLASS_PTR ((gchar *)classprop[0]);
 			if (!klass) {
 				__view_error(cur, "Class %s not registered", classprop[0]);
 				return;
