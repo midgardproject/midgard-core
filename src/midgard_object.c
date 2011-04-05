@@ -704,6 +704,10 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 		case OBJECT_UPDATE_IMPORTED:
 			g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_imported, 0);
 			break;
+
+		case OBJECT_UPDATE_CREATE:
+			/* DO nothing, satisfy compiler */
+			break;
 	}
 
 	return TRUE;

@@ -36,6 +36,7 @@
 #include "midgard_executable.h"
 #include "midgard_validable.h"
 #include "midgard_core_workspace.h"
+#include "midgard_storage.h"
 
 /* Do not use _DB_DEFAULT_DATETIME.
  * Some databases (like MySQL) fails to create datetime column with datetime which included timezone. 

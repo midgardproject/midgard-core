@@ -23,6 +23,7 @@
 #include "midgard_core_object.h"
 #include "midgard_error.h"
 #include "midgard_core_object_class.h"
+#include "midgard_core_query.h"
 
 /* This is not nice. Can be done as iface's private virtual method. */
 #define __SET_MANAGER(__obj, __mngr) \
@@ -274,7 +275,7 @@ midgard_workspace_manager_purge_content (const MidgardWorkspaceManager *self, co
 	g_string_free (query, TRUE);
 
 	if (rv == 0) {
-		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL, NULL);
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL, " ");
 		return FALSE;
 	}
 	
@@ -327,7 +328,7 @@ midgard_workspace_manager_move_content (const MidgardWorkspaceManager *self, con
 	g_string_free (query, TRUE);
 
 	if (rv == 0) {
-		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL, NULL);
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MIDGARD_GENERIC_ERROR_INTERNAL, " ");
 		return FALSE;
 	}
 	
