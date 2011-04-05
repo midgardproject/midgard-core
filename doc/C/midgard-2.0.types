@@ -4,6 +4,7 @@ midgard_object_get_type
 midgard_config_get_type
 midgard_connection_get_type
 midgard_dbobject_get_type
+midgard_executable_get_type
 midgard_query_builder_get_type
 midgard_collector_get_type
 midgard_metadata_get_type
@@ -27,6 +28,7 @@ midgard_query_select_get_type
 midgard_query_storage_get_type
 midgard_schema_get_type
 midgard_schema_object_factory_get_type
+midgard_validable_get_type
 midgard_workspace_storage_get_type
 midgard_workspace_context_get_type
 midgard_workspace_get_type

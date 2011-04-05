@@ -96,6 +96,12 @@
 	 <xi:include href="xml/midgard_dbus.xml"/>
     </chapter>
 
+    <chapter id="midgard-Execution-And-Validation">
+	 <title>Common interfaces to validate and execute operations</title> 
+	 <xi:include href="xml/midgard_validable.xml"/>
+	 <xi:include href="xml/midgard_executable.xml"/>
+    </chapter>
+
     <chapter id="midgard-Types">
       <title>Types</title> 
       <xi:include href="xml/midgard_type.xml"/>
