@@ -280,7 +280,7 @@ gboolean midgard_query_builder_add_constraint(
 	if(!midgard_core_query_constraint_add_value(constraint, value))
 		goto return_false;
 	
-	if (!midgard_core_query_constraint_build_condition(constraint))
+	if (!midgard_core_query_constraint_build_condition(NULL, constraint))
 		goto return_false;
 
 	/* FIXME, table should be stored per every constraint, order, whatever */
@@ -356,7 +356,7 @@ gboolean midgard_query_builder_add_constraint_with_property(
 
 	constraint->priv->condition_operator = g_strdup(op);
 
-	if (!midgard_core_query_constraint_build_condition(constraint))
+	if (!midgard_core_query_constraint_build_condition(NULL, constraint))
 		goto return_false;
 
 	midgard_core_qb_add_table(builder, constraint->priv->prop_left->table);

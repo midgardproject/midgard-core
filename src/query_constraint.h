@@ -67,7 +67,7 @@ gboolean 	midgard_core_query_constraint_add_operator		(MidgardCoreQueryConstrain
 void 		midgard_core_query_constraint_add_sql			(MidgardCoreQueryConstraint *self, GString *sql);
 gboolean 	midgard_core_query_constraint_operator_is_valid		(const gchar *op);
 gboolean 	midgard_core_query_constraint_add_value			(MidgardCoreQueryConstraint *self, const GValue *value);
-gboolean 	midgard_core_query_constraint_build_condition		(MidgardCoreQueryConstraint *self);
+gboolean 	midgard_core_query_constraint_build_condition		(MidgardConnection *mgd, MidgardCoreQueryConstraint *self);
 gboolean	midgard_core_query_constraint_parse_property		(MidgardCoreQueryConstraint **self, MidgardDBObjectClass *klass, const gchar *name);
 void		midgard_core_query_constraint_set_builder		(MidgardCoreQueryConstraint *self, MidgardQueryBuilder *builder);
 void		midgard_core_query_constraint_set_class			(MidgardCoreQueryConstraint *self, MidgardDBObjectClass *klass);

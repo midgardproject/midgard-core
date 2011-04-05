@@ -26,6 +26,7 @@
 #include "midgard_connection.h"
 #include "midgard_core_config.h"
 #include "midgard_error.h"
+#include "query_constraint.h"
 
 static GObjectClass *__view_parent_class= NULL;
 
@@ -201,7 +202,13 @@ _midgard_view_derived_create_storage (MidgardConnection *mgd, MidgardDBObjectCla
 	g_return_val_if_fail(klass != NULL, FALSE);
 
 	MgdSchemaTypeAttr *type_attr = midgard_core_class_get_type_attr(klass);
-	
+
+	/* Build view condition if there's at least one constraint defined. */
+	GSList *l;
+	for (l = type_attr->constraints; l != NULL; l =l->next) {
+		midgard_core_query_constraint_build_condition (mgd, (MidgardCoreQueryConstraint *)l->data);
+	}	
+
 	/* Do not depend on CREATE VIEW IF NOT EXISTS */
 	if (_midgard_view_derived_storage_exists (mgd, klass)) {
 

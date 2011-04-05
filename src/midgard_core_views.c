@@ -402,7 +402,7 @@ static void __get_view_constraints(xmlNode *node, MgdSchemaTypeAttr *type)
 			g_value_transform((const GValue *) &strval, &val);
 		
 			midgard_core_query_constraint_add_value(constraint, &val);
-			midgard_core_query_constraint_build_condition(constraint);
+			//midgard_core_query_constraint_build_condition(constraint);
 
 			type->constraints = g_slist_append(type->constraints, (gpointer) constraint);
 			
@@ -594,9 +594,11 @@ midgard_core_view_build_create_view_command (MidgardConnection *mgd, MidgardDBOb
 
 	for (list = type->constraints; list != NULL; list = list->next) {
 		
-		g_string_append(query, " AND ");
+		if (i > 0)
+			g_string_append(query, " AND ");
 		g_string_append(query,
 				MIDGARD_CORE_QUERY_CONSTRAINT(list->data)->priv->condition);
+		i++;
 	}
 
 	return g_string_free(query, FALSE);

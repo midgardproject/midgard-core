@@ -302,13 +302,17 @@ static void __transform_value(MidgardCoreQueryConstraint *self)
 	return;
 }
 
-gboolean midgard_core_query_constraint_build_condition(
-		MidgardCoreQueryConstraint *constraint)
+gboolean 
+midgard_core_query_constraint_build_condition (MidgardConnection *mgd_cnc, MidgardCoreQueryConstraint *constraint)
 {
 	g_assert(constraint != NULL);
 	
 	MidgardQueryBuilder *builder = constraint->priv->builder;
-	MidgardConnection *mgd = builder->priv->mgd;
+	MidgardConnection *mgd = mgd_cnc;
+	if (mgd == NULL)
+		mgd = builder->priv->mgd;
+	g_return_val_if_fail (mgd != NULL, FALSE);
+
 	GdaConnection *cnc = mgd->priv->connection;
 	gchar *q_table = NULL;
 	gchar *q_field = NULL;
