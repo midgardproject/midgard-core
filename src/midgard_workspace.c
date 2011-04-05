@@ -861,10 +861,6 @@ static void _midgard_workspace_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_update_params = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->get_statement_update_params;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->add_fields_to_select_statement;	
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_data_model = _set_from_data_model;
-
-	/* Set sql for select queries */
-#warning SET STATIC SQL
-	//midgard_core_dbobject_class_set_full_select (MIDGARD_DBOBJECT_CLASS (klass));
 }
 
 GType 
