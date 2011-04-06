@@ -306,6 +306,15 @@ MidgardObject
 @Returns: 
 
 
+<!-- ##### FUNCTION midgard_object_save ##### -->
+<para>
+
+</para>
+
+@self: 
+@Returns: 
+
+
 <!-- ##### FUNCTION midgard_object_update ##### -->
 <para>
 
