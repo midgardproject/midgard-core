@@ -400,34 +400,21 @@ static gboolean __set_schema_property_attr(
 	const gchar *target_property = NULL;
 	const gchar *link_property = NULL;
 
-	/*
-	GParamSpec *pspec = 
-		g_object_class_find_property(G_OBJECT_CLASS(*klass), name);
-
-	if(!pspec) {
-
-		g_warning("%s is not registered property of %s class",
-				name, G_OBJECT_CLASS_NAME(*klass)); 
-		return FALSE;
-	}*/
-
 	/* Set klass and property so later we use this info when 
 	 * gvalue typecasting should be done */
 	(*constraint)->priv->klass = G_OBJECT_CLASS(*klass);
 	(*constraint)->priv->propname = name;
-	//(*constraint)->priv->pspec = pspec;
 
 	/* Reserved properties */
-	if(g_str_equal("metadata", name)) {
-		
+	/* METADATA */
+	if (g_str_equal("metadata", name)) {	
 		*klass = g_type_class_peek(MIDGARD_TYPE_METADATA);
 		return TRUE;
-	} 
-	
-	if(g_str_equal(_RESERVED_BLOB_NAME, name)) {
+	}
 
+	/* ATTACHMENT */
+	if (g_str_equal(_RESERVED_BLOB_NAME, name)) {
 		if (builder && !builder->priv->blob_join_exists) {
-
 			__join_reference(builder, (const gchar *)(*constraint)->priv->current->table, _RESERVED_BLOB_TABLE);
 			builder->priv->blob_join_exists = TRUE;
 		}
@@ -437,17 +424,16 @@ static gboolean __set_schema_property_attr(
 		(*constraint)->priv->current->table = _RESERVED_BLOB_TABLE;
 		
 		return TRUE;
-	
-	} else 	if(g_str_equal(_RESERVED_PARAM_NAME, name)) {
-		
-		if (builder && !builder->priv->param_join_exists) {
+	}
 
+	/* PARAMETER */
+	if (g_str_equal(_RESERVED_PARAM_NAME, name)) {
+		if (builder && !builder->priv->param_join_exists) {
 			__join_reference(builder, (const gchar *)(*constraint)->priv->current->table, _RESERVED_PARAM_TABLE);
 			builder->priv->param_join_exists = TRUE;
 		}
 
-		*klass = 
-			g_type_class_peek(g_type_from_name("midgard_parameter"));
+		*klass = g_type_class_peek(g_type_from_name("midgard_parameter"));
 		(*constraint)->priv->current->table = _RESERVED_PARAM_TABLE;
 
 		/* Select DISTINCT.
@@ -458,110 +444,81 @@ static gboolean __set_schema_property_attr(
 		}
 
 		return TRUE;
+	}
 	
 	/* User defined properties */
-	} else {
-
-		GParamSpec *pspec = 
-			g_object_class_find_property(G_OBJECT_CLASS(*klass), name);
-		
-		if(!pspec) {
-			
-			g_warning("%s is not registered property of %s class",
-					name, G_OBJECT_CLASS_NAME(*klass)); 
-			return FALSE;
-		}
-		
-		/* Set klass and property so later we use this info when 
-		 * * gvalue typecasting should be done */
-		(*constraint)->priv->klass = G_OBJECT_CLASS(*klass);
-		(*constraint)->priv->propname = name;
-		(*constraint)->priv->pspec = pspec;
-
-		attr = midgard_core_class_get_property_attr(
-				MIDGARD_DBOBJECT_CLASS(*klass), name);
-
-		target_property = NULL;
-		link_property = NULL;
-
-		MidgardReflectionProperty *mrp =
-			midgard_reflection_property_new(MIDGARD_DBOBJECT_CLASS(*klass));
-		
-		if(midgard_reflection_property_is_link(mrp, name) && do_link) {
-
-			const gchar *target_property = 
-				midgard_reflection_property_get_link_target(mrp, name);
-			const gchar *link_klass = 
-				midgard_reflection_property_get_link_name(mrp, name);
-			gboolean is_link = TRUE;
-
-			if((*constraint)->priv->current->link_target == NULL) {
-				
-				MidgardCoreQueryConstraintPrivate *mqcp =
-					midgard_core_query_constraint_private_new();
-
-				mqcp->current->is_link = is_link;
-				mqcp->current->link_target = target_property;
-				mqcp->condition_operator = g_strdup("=");
-
-				mqcp->prop_left->table =
-					midgard_core_class_get_property_table(
-							MIDGARD_DBOBJECT_CLASS(*klass), name);
-				mqcp->prop_left->field =
-					midgard_core_class_get_property_colname(
-							MIDGARD_DBOBJECT_CLASS(*klass), name);
-				MidgardObjectClass *lclass = 
-					g_type_class_peek(g_type_from_name(link_klass));
-				mqcp->prop_right->table =
-					midgard_core_class_get_property_table(
-							MIDGARD_DBOBJECT_CLASS(lclass), target_property);
-				mqcp->prop_right->field = 
-					midgard_core_class_get_property_colname(
-							MIDGARD_DBOBJECT_CLASS(lclass), target_property);
-
-				GString *cond = g_string_new("");
-				g_string_append_printf(cond, 
-						"%s.%s %s %s.%s",
-						mqcp->prop_left->table,
-						mqcp->prop_left->field,
-						mqcp->condition_operator,
-						mqcp->prop_right->table,
-						mqcp->prop_right->field);
-
-				mqcp->condition = g_string_free(cond, FALSE);
-
-				if (builder) {
-					midgard_core_qb_add_table(builder, mqcp->prop_left->table);
-					midgard_core_qb_add_table(builder, mqcp->prop_right->table);
-				}
-
-				if (builder) {
-					if(!__add_join(&builder->priv->joins, mqcp)) {
-						midgard_core_query_constraint_private_free(mqcp);
-					}
-				}
-			}
-
-			*klass = (MidgardDBObjectClass *) midgard_reflection_property_get_link_class(mrp, name);
-			(*constraint)->priv->current->table =
-				midgard_core_class_get_table(MIDGARD_DBOBJECT_CLASS(*klass));
-
-			g_object_unref(mrp);
-			return TRUE;
-		}
-		
-		g_object_unref(mrp);
+	GParamSpec *pspec = g_object_class_find_property(G_OBJECT_CLASS(*klass), name);
+	if(!pspec) {
+		g_warning("%s is not registered property of %s class", name, G_OBJECT_CLASS_NAME(*klass)); 
+		return FALSE;
 	}
 
+	/* Set klass and property so later we use this info when gvalue typecasting should be done */
+	(*constraint)->priv->klass = G_OBJECT_CLASS(*klass);
+	(*constraint)->priv->propname = pspec->name;
+	(*constraint)->priv->pspec = pspec;
+
+	attr = midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS(*klass), name);
+	target_property = NULL;
+	link_property = NULL;
+
+	MidgardReflectionProperty *mrp = midgard_reflection_property_new (MIDGARD_DBOBJECT_CLASS (*klass));
+		
+	if (midgard_reflection_property_is_link (mrp, name) && do_link) {
+		const gchar *target_property = midgard_reflection_property_get_link_target(mrp, name);
+		const gchar *link_klass = midgard_reflection_property_get_link_name(mrp, name);
+		gboolean is_link = TRUE;
+	
+		if ((*constraint)->priv->current->link_target == NULL) {
+			MidgardCoreQueryConstraintPrivate *mqcp = midgard_core_query_constraint_private_new();
+			mqcp->current->is_link = is_link;
+			mqcp->current->link_target = target_property;
+			mqcp->condition_operator = g_strdup("=");
+	
+			mqcp->prop_left->table = midgard_core_class_get_property_table (MIDGARD_DBOBJECT_CLASS(*klass), name);
+			mqcp->prop_left->field = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS(*klass), name); 
+			MidgardObjectClass *lclass = g_type_class_peek (g_type_from_name(link_klass));
+			mqcp->prop_right->table = midgard_core_class_get_property_table (MIDGARD_DBOBJECT_CLASS(lclass), target_property);
+			mqcp->prop_right->field = midgard_core_class_get_property_colname (MIDGARD_DBOBJECT_CLASS(lclass), target_property);
+
+			GString *cond = g_string_new ("");
+			g_string_append_printf (cond, 
+					"%s.%s %s %s.%s",
+					mqcp->prop_left->table,
+					mqcp->prop_left->field,
+					mqcp->condition_operator,
+					mqcp->prop_right->table,
+					mqcp->prop_right->field);
+
+			mqcp->condition = g_string_free (cond, FALSE);
+
+			if (builder) {
+				midgard_core_qb_add_table(builder, mqcp->prop_left->table);
+				midgard_core_qb_add_table(builder, mqcp->prop_right->table);
+			}
+
+			if (builder) {
+				if(!__add_join(&builder->priv->joins, mqcp)) {
+					midgard_core_query_constraint_private_free(mqcp);
+				}
+			}
+		}
+			
+
+		*klass = (MidgardDBObjectClass *) midgard_reflection_property_get_link_class(mrp, name);
+		(*constraint)->priv->current->table = midgard_core_class_get_table(MIDGARD_DBOBJECT_CLASS(*klass));
+		g_object_unref(mrp);
+		return TRUE;
+	}	
+	
+	g_object_unref(mrp);
+	
 	const gchar *table, *field;
 
-	if (g_str_equal(name, "guid")) {
-		
+	if (g_str_equal (name, "guid")) {	
 		table = midgard_core_class_get_table(MIDGARD_DBOBJECT_CLASS(*klass));
 		field = "guid";
-	
 	} else {
-		
 		table = attr->table;
 		field = attr->field;
 	}
@@ -647,23 +604,14 @@ midgard_core_query_constraint_parse_property (MidgardCoreQueryConstraint **const
 		if(j+1 == i)
 			do_link = FALSE;
 
-		parsed = __set_schema_property_attr(
-				builder, &klass, 
-				constraint, (const gchar *) spltd[j], do_link);
+		parsed = __set_schema_property_attr (builder, &klass, constraint, (const gchar *) spltd[j], do_link);
 		
 		if(!parsed) {
-			
 			g_strfreev(spltd);
 			return FALSE;
 		}
-		
 		j++;
 	}
-
-	/* Keep property name alive */
-	/* TODO, Remove priv->propname access and replace it with paramspec's name */
-	(*constraint)->priv->pspec = g_object_class_find_property (G_OBJECT_CLASS (klass), (*constraint)->priv->propname);
-       	(*constraint)->priv->propname = (*constraint)->priv->pspec->name;
 
 	g_strfreev(spltd);
 
