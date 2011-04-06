@@ -90,6 +90,7 @@ MidgardObjectPrivate
 MidgardObjectClassPrivate
 midgard_object_new
 midgard_object_get_by_id
+midgard_object_save
 midgard_object_update
 midgard_object_create
 midgard_object_get_by_guid

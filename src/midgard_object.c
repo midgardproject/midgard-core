@@ -781,6 +781,49 @@ midgard_object_update (MidgardObject *self)
 	return TRUE;
 }
 
+/**
+ * midgard_object_save:
+ * @self: #MidgardObject instance
+ *
+ * This method combines update and create routines.
+ * It tries to update object, and if this one fails because object's record doesn't exist, 
+ * it creates it. It's helper routine for application which needs to store object, though
+ * it might be a bit slower than create or update method.
+ *
+ * Returns: %TRUE on success, %FALSE otherwise
+ *
+ * Since: 10.05.5
+ */ 
+gboolean 
+midgard_object_save (MidgardObject *self)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+
+	g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_update, 0);
+
+	GError *error = NULL;
+	gboolean rv =  _midgard_object_update(self, OBJECT_UPDATE_NONE, &error);
+	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
+
+	if (error 
+			&& error->domain == MIDGARD_GENERIC_ERROR
+			&& error->code == MGD_ERR_NOT_EXISTS) {
+		return _midgard_object_create (self, MGD_OBJECT_GUID (self), OBJECT_UPDATE_CREATE);
+	}
+
+	if (!rv) {
+		MIDGARD_ERRNO_SET_STRING (MGD_OBJECT_CNC (self), MGD_ERR_INTERNAL, "%s", 
+				error && error->message ? error->message : "Unknown error");
+		g_clear_error (&error);
+		return FALSE;
+	}	
+
+	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
+	__dbus_send(self, "update");
+
+	return TRUE;
+}
+
 static GPtrArray *__get_glists(MidgardObject *object) 
 {
 	GPtrArray *gparray = g_ptr_array_new();

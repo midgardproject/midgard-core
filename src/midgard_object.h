@@ -139,6 +139,7 @@ gboolean midgard_object_get_by_id(MidgardObject *object, guint id);
 gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid);
 gboolean midgard_object_get_by_path(MidgardObject *self, const gchar *path);
 
+gboolean midgard_object_save(MidgardObject *self);
 gboolean midgard_object_update(MidgardObject *self);
 gboolean midgard_object_create(MidgardObject *object);
 gboolean midgard_object_delete(MidgardObject *object, gboolean check_dependents);
