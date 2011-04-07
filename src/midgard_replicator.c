@@ -28,6 +28,7 @@
 #include "midgard_core_query.h"
 #include "guid.h"
 #include "midgard_schema_object_factory.h"
+#include "midgard_repligard.h"
 
 #define __mr_dbus_send(_obj, _action) \
 	gchar *_dbus_path = g_strconcat("/replication/", \
@@ -117,55 +118,51 @@ midgard_replicator_export_by_guid (MidgardConnection *mgd, const gchar *guid)
 	g_return_val_if_fail (mgd != NULL, FALSE);
 
 	if(guid == NULL || (guid && (*guid == '\0'))) {
-
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY_VALUE, "Empty or NULL guid given");
 		return FALSE;
 	}
 
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
-	GString *sql = g_string_new("SELECT ");
-	g_string_append_printf(sql,
-			"typename, object_action FROM repligard "
-			"WHERE guid = '%s' ",
-			guid);
-	
-	GdaDataModel *model =
-		midgard_core_query_get_model(mgd, sql->str);
-	guint rows = gda_data_model_get_n_rows(model);
-	g_string_free(sql, TRUE);
-	
-	if(rows == 0) {
-		
-		MIDGARD_ERRNO_SET(mgd, MGD_ERR_NOT_EXISTS);
-		g_object_unref(model);
+	MidgardDBObject *repligard = NULL;
+	GError *error = NULL;
+	GValue gval = {0, };
+	g_value_init (&gval, G_TYPE_STRING);
+	g_value_set_string (&gval, guid);
+	midgard_core_query_get_object (mgd, g_type_name (MIDGARD_TYPE_REPLIGARD), &repligard, &error, "guid", &gval, NULL);
+	g_value_unset (&gval);
+
+	if (error) {
+		MIDGARD_ERRNO_SET_STRING (mgd, error->code, "%s", error->message);
+		g_clear_error (&error);
+		if (repligard)
+			g_object_unref (G_OBJECT (repligard));
 		return FALSE;
 	}
-	
-	const GValue *value = midgard_data_model_get_value_at(model, 0, 0);
-	const gchar *classname = g_value_get_string(value);
-	value = midgard_data_model_get_value_at(model, 0, 1);
-	guint action = MGD_OBJECT_ACTION_NONE;
-	MIDGARD_GET_UINT_FROM_VALUE(action, value);
 
-	MidgardObjectClass *klass = 
-		MIDGARD_OBJECT_GET_CLASS_BY_NAME(classname);
+	guint action;
+	gchar *classname;
+	g_object_get (repligard, 
+			"action", &action,
+			"type", &classname, NULL);
+	g_object_unref (repligard);
+
+	MidgardObjectClass *klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME(classname);
 
 	if(klass == NULL) {
-	
 		g_warning("Failed to get class pointer for '%s', an object identified with '%s'", classname, guid);
-		g_object_unref(model);
 		MIDGARD_ERRNO_SET(mgd, MGD_ERR_INTERNAL);
+		g_free (classname);
 		return FALSE;
 	}
 
-	g_object_unref(model);
+	g_free (classname);
 
-	const gchar *table = 
-		midgard_core_class_get_table(MIDGARD_DBOBJECT_CLASS(klass)); 
+	const gchar *table = midgard_core_class_get_table(MIDGARD_DBOBJECT_CLASS(klass)); 
 	GValue tval = {0, };
 	gchar *timeupdated;
 	gint qr;
+	GString *sql = NULL;
 
 	switch(action) {
 		
@@ -175,11 +172,8 @@ midgard_replicator_export_by_guid (MidgardConnection *mgd, const gchar *guid)
 			break;
 
 		default:
-			sql = g_string_new("UPDATE ");
-			g_string_append_printf(sql,
-					"%s SET ",
-					table);
-
+			sql = g_string_new ("UPDATE ");
+			g_string_append_printf(sql, "%s SET ", table);
 
 			midgard_timestamp_new_current (&tval);
 			timeupdated = midgard_timestamp_get_string_from_value (&tval);

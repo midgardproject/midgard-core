@@ -492,7 +492,7 @@ midgard_collector_get_subkey (MidgardCollector *self, const gchar *key, const gc
 
 	GValue *value =  g_datalist_id_get_data (
 			&valueslist, 
-			g_quark_from_string(subkey));
+			g_quark_from_string(subkey));	
 
 	return value;
 }

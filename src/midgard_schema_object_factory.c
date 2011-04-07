@@ -24,6 +24,7 @@
 #include "midgard_core_query.h"
 #include "midgard_core_object.h"
 #include "midgard_core_object_class.h"
+#include "midgard_repligard.h"
 
 /**
  * midgard_schema_object_factory_get_object_by_guid:
@@ -66,48 +67,38 @@ midgard_schema_object_factory_get_object_by_guid (MidgardConnection *mgd, const 
 		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
 		return NULL;
 	}
-	
+
 	MidgardObject *object = NULL;
-        GString *sql = g_string_new ("SELECT ");
-	g_string_append_printf(sql, "typename, object_action FROM repligard WHERE guid = '%s' ", guid);
 
-	GdaDataModel *model = midgard_core_query_get_model(mgd, sql->str);
-	g_string_free (sql, TRUE);
-	GValue pval = {0, };
-
-	if (!model) {		
-		MIDGARD_ERRNO_SET(mgd, MGD_ERR_NOT_EXISTS);
-		return NULL;
+	MidgardDBObject *repligard = NULL;
+	GError *error = NULL;
+	GValue gval = {0, };
+	g_value_init (&gval, G_TYPE_STRING);
+	g_value_set_string (&gval, guid);
+	midgard_core_query_get_object (mgd, g_type_name (MIDGARD_TYPE_REPLIGARD), &repligard, &error, "guid", &gval, NULL);
+	g_value_unset (&gval);
+	
+	if (error) {
+		MIDGARD_ERRNO_SET_STRING (mgd, error->code, "%s", error->message);
+		g_clear_error (&error);
+		if (repligard)
+			g_object_unref (G_OBJECT (repligard));
+		return FALSE;
 	}
 
-	gint rows = gda_data_model_get_n_rows(model);
+	guint action = 0;
+	gchar *classname;
+	g_object_get (repligard,
+			"action", &action,
+			"type", &classname, NULL);
+	g_object_unref (repligard);
 
-	if (rows == 0) {
-		g_object_unref (model);
-		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
-		return NULL;
-	}
-
-	const GValue *action_value = midgard_data_model_get_value_at_col_name (model, "object_action", 0);
-	const GValue *type_value = midgard_data_model_get_value_at_col_name (model, "typename", 0);
-
-	if (action_value == NULL
-			|| type_value == NULL ) {
-		g_object_unref (model);
-		g_warning("NULL value returned from correctly allocated data model.");
-		return NULL;
-	}
-
-	if (!type_value
-			|| (type_value && !G_VALUE_HOLDS_STRING (type_value))) {
+	if (!classname || (classname && *classname == '\0')) {
 		g_warning("Database inconsistency!. Expected classname string in repligard typename (%s)", guid);
 		return NULL;
 	}
 
-	guint aval = 0;
-	MIDGARD_GET_UINT_FROM_VALUE (aval, action_value);
-
-	switch (aval) {
+	switch (action) {
 
 		case MGD_OBJECT_ACTION_DELETE:
 			MIDGARD_ERRNO_SET (mgd, MGD_ERR_OBJECT_DELETED);
@@ -118,17 +109,17 @@ midgard_schema_object_factory_get_object_by_guid (MidgardConnection *mgd, const 
 			break;
 
 		default:
-			g_value_init(&pval, G_TYPE_STRING);
-    			g_value_set_string (&pval, guid);
-			object = midgard_object_new (mgd, g_value_get_string ((GValue*)type_value), &pval);
-	   		g_value_unset (&pval);
+			g_value_init(&gval, G_TYPE_STRING);
+    			g_value_set_string (&gval, guid);
+			object = midgard_object_new (mgd, g_value_get_string ((GValue*)classname), &gval);
+	   		g_value_unset (&gval);
 			if (!object) {
 				MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
 		       	}
 			break;
 	}
-	
-	g_object_unref (model);
+
+	g_free (classname);
 
 	return object;	
 }
@@ -361,33 +352,37 @@ midgard_schema_object_factory_object_undelete (MidgardConnection *mgd, const gch
 
 	MidgardObjectClass *klass;
 	gint rv;
+	gboolean ret;
 
 	MIDGARD_ERRNO_SET (mgd, MGD_ERR_OK);
-	GString *sql = g_string_new ("SELECT typename, object_action FROM repligard ");
-	g_string_append_printf (sql, "WHERE guid = '%s'", guid);
-	gchar *query = g_string_free (sql, FALSE);
-	GdaDataModel *model = midgard_core_query_get_model (mgd, query);
-	g_free (query);
-	gboolean ret = FALSE;
 
-	if (!model) {
-		MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
-		return ret;
+	MidgardDBObject *repligard = NULL;
+	GError *error = NULL;
+	GValue gval = {0, };
+	g_value_init (&gval, G_TYPE_STRING);
+	g_value_set_string (&gval, guid);
+	midgard_core_query_get_object (mgd, g_type_name (MIDGARD_TYPE_REPLIGARD), &repligard, &error, "guid", &gval, NULL);
+	g_value_unset (&gval);
+	
+	if (error) {
+		MIDGARD_ERRNO_SET_STRING (mgd, error->code, "%s", error->message);
+		g_clear_error (&error);
+		if (repligard)
+			g_object_unref (G_OBJECT (repligard));
+		return FALSE;
 	}
 
-	const GValue *action_value = midgard_data_model_get_value_at (model, 1, 0);
- 	const GValue *type_value = midgard_data_model_get_value_at (model, 0, 0);
+	guint action = 0;
+	gchar *classname;
+	g_object_get (repligard,
+			"action", &action,
+			"type", &classname, NULL);
+	g_object_unref (repligard);
 
-	guint aval = 0;
-	if (G_VALUE_HOLDS_UINT (action_value))
-		aval = g_value_get_uint ((GValue *) action_value);
-	if (G_VALUE_HOLDS_INT (action_value))
-		aval = (guint) g_value_get_int ((GValue *) action_value);
-
-	switch (aval) {
+	switch (action) {
 
 		case MGD_OBJECT_ACTION_DELETE:
-			klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME (g_value_get_string ((GValue *)type_value));
+			klass = MIDGARD_OBJECT_GET_CLASS_BY_NAME (classname);
 			const gchar *tablename = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS(klass));
 			const gchar *deleted_field = midgard_core_object_get_deleted_field (MIDGARD_DBOBJECT_CLASS (klass));
 			if (!deleted_field) {
@@ -396,7 +391,7 @@ midgard_schema_object_factory_object_undelete (MidgardConnection *mgd, const gch
 				return FALSE;
 			}
 			/* Update object's metadata */
-	   		sql = g_string_new ("UPDATE ");
+	   		GString *sql = g_string_new ("UPDATE ");
 			g_string_append_printf (sql, "%s SET metadata_deleted=0 WHERE guid = '%s'", tablename, guid);
   			rv = midgard_core_query_execute (mgd, sql->str, FALSE);
 			g_string_free (sql, TRUE);
@@ -423,7 +418,7 @@ midgard_schema_object_factory_object_undelete (MidgardConnection *mgd, const gch
 			break;
 	}
 
-	g_object_unref (model);
+	g_free (classname);
 
 	return ret;
 }
