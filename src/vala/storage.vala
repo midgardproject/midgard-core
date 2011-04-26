@@ -118,6 +118,11 @@ namespace MidgardCR {
 		public abstract unowned ObjectManager object_manager			{ get; }
 
 		/**
+		 * Get {@link ReplicationManager} object
+		 */
+		//public abstract unowned ReplicationManager? replication_manager		{ get; }
+
+		/**
 		 * Get {@link Profiler} object
 		 */
 		public abstract unowned Profiler              	profiler        	{ get; }
