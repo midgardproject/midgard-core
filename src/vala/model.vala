@@ -18,17 +18,6 @@
 
 namespace MidgardCR {
 
-	public errordomain ValidationError {
-		NAME_INVALID,
-		NAME_DUPLICATED,
-		TYPE_INVALID,
-		VALUE_INVALID,
-		REFERENCE_INVALID,
-		PARENT_INVALID,
-		LOCATION_INVALID,
-		INTERNAL
-	}	
-
 	/**
 	 * Basic interface, which is a metadata for any kind of type described by model.
 	 * 
