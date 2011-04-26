@@ -54,6 +54,10 @@ libmidgardvala_la_SOURCES = \
 			  rdf_sql_query_storage.vala \
 			  rdf_sql_query_manager.vala \
 			  rdf_sql_namespace_manager.vala \
+			  queue.vala \
+			  replication.vala \
+			  serializer.vala \
+			  validable.vala \
 			  $(NULL)
 			  
 libmidgardvala_la_LDFLAGS = -module -export-dynamic
