@@ -37,7 +37,7 @@ src_libmidgardcr_la_LDFLAGS = -version-info @MIDGARD_ABI_MAJOR@:0:0 $(no_undefin
 
 src_libmidgardcr_la_public_SOURCES = \
 				    src/midgard.c 
- 
+
 pkgdatadir = $(datadir)/midgardcr
 pkglibdir = $(libdir)/midgardcr
 libmidgardincludedir = $(includedir)/midgard/midgardcr/
@@ -56,24 +56,23 @@ vapi_DATA = \
 	    $(NULL)
 
 -include $(INTROSPECTION_MAKEFILE)
-INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir)
 INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
-introspection_sources = $(src_libmidgardcr_la_public_SOURCES) $(midgardcr_public_h)
+introspection_sources = $(src_libmidgardcr_la_public_SOURCES)
 MidgardCR-3.0.gir: $(lib_LTLIBRARIES)
 MidgardCR_3_0_gir_INCLUDES = GObject-2.0 Gda-4.0
 MidgardCR_3_0_gir_CFLAGS = $(AM_CFLAGS)
 MidgardCR_3_0_gir_LIBS = $(lib_LTLIBRARIES) 
 MidgardCR_3_0_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
 MidgardCR_3_0_gir_PACKAGES = gobject-2.0 libgda-4.0
-INTROSPECTION_GIRS = MidgardCR-3.0.gir
+introspection_file = src/vala/MidgardCR-3.0.gir
 girdir = $(datadir)/gir-1.0
-gir_DATA = $(INTROSPECTION_GIRS)
+gir_DATA = $(introspection_file)
 
 typelibsdir = $(libdir)/girepository-1.0
-typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
+typelibs_DATA = $(introspection_file:.gir=.typelib)
 CLEANFILES = $(dist_gir_DATA) $(typelib_DATA)
 endif
 

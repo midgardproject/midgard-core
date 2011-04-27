@@ -12,6 +12,7 @@ AM_LDFLAGS = @MIDGARD_LIBS@
 
 midgardcr_header = $(top_srcdir)/src/core/midgardcr.h
 midgardcr_vapi_file = MidgardCR-3.0.vapi
+midgardcr_gir_file = MidgardCR-3.0.gir
 
 libmidgardvala_la_SOURCES = \
 			  config.vala \
@@ -74,7 +75,7 @@ EXTRA_DIST = \
 	     examples/rdf_example.vala \
 	     $(NULL)
 
-VALAFLAGS = --vapi=$(midgardcr_vapi_file) --vapidir=$(top_srcdir)/src/core --pkg=MidgardCRCore  -H $(midgardcr_header) 
+VALAFLAGS = --vapi=$(midgardcr_vapi_file) --vapidir=$(top_srcdir)/src/core --pkg=MidgardCRCore  -H $(midgardcr_header) --gir=$(midgardcr_gir_file) --library midgardcr
 
 CLEANFILES = \
 	     $(midgardcr_vapi_file) \
