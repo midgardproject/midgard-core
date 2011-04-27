@@ -21,7 +21,7 @@ namespace MidgardCR {
 	/**
 	 * Serialize (and unserialize) {@link RepositoryObject}
 	 */
-	public abstract interface Serializer : Validable {
+	public interface Serializer : GLib.Object {
 	
 		/**
 		 * Serialize object to string
