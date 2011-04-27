@@ -42,7 +42,7 @@ namespace MidgardCR {
 	 *
 	 * In any other case, implementation shall depend only on values of object type added to queue.
 	 */
-	public abstract interface ReplicationQueue : GLib.Object, Queue, Executable, Validable {
+	public interface ReplicationQueue : Queue, Executable, Validable {
 		
 		/**
 		 * Serializer used by queue.
