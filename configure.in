@@ -22,7 +22,7 @@ AM_INIT_AUTOMAKE([-Wno-portability -Wall])
 AM_MAINTAINER_MODE
 GOBJECT_INTROSPECTION_CHECK([0.6.5])
 
-AC_PROG_CC(clang gcc cc)
+AC_PROG_CC(gcc cc)
 AC_LANG(C)
 
 dnl Checks for programs.
