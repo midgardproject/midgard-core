@@ -31,7 +31,7 @@ void midgardcr_test_add_rdf_sql_content_manager () {
 		assert (global_content_manager != null);
 
 		try {
-			global_repository_object = (RepositoryObject) global_storage_manager.object_manager.factory (RDF_OWL_PREFIX_THING, null);
+			global_repository_object = global_storage_manager.object_manager.factory (RDF_OWL_PREFIX_THING, null);
 		} catch (ObjectManagerError e) {
 			warning (e.message);
 		} catch (ValidationError e) {
