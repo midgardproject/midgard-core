@@ -42,9 +42,9 @@ namespace MidgardCRCore {
 	}
 
 	public class SQLStorageContentManager {
-		public static void storable_insert (MidgardCR.Storable storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
-		public static void storable_update (MidgardCR.Storable storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
-		public static void storable_purge (MidgardCR.Storable storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
+		public static void storable_insert (MidgardCR.RepositoryObject storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
+		public static void storable_update (MidgardCR.RepositoryObject storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
+		public static void storable_purge (MidgardCR.RepositoryObject storable, MidgardCR.SQLStorageManager manager, MidgardCR.ObjectModel object_model, MidgardCR.SQLTableModel table_model) throws MidgardCR.StorageContentManagerError;
 	}
 
 	public class ObjectBuilder {
@@ -108,7 +108,7 @@ namespace MidgardCRCore {
 
 	public class QuerySelect : MidgardCRCore.QueryExecutor {
 		public static MidgardCRCore.QuerySelect create_static (MidgardCR.StorageManager manager, MidgardCRCore.QueryStorage storage);
-		public MidgardCR.Storable[]? list_objects ();
+		public MidgardCR.RepositoryObject[]? list_objects ();
 	}
 
 	public class Transaction : GLib.Object {
