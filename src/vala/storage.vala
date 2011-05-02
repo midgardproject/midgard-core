@@ -285,14 +285,14 @@ namespace MidgardCR {
 	}
 
 	/**
-	 * Basic interface which provides mathods for {@link Storable} objects' operations.
+	 * Basic interface which provides mathods for {@link RepositoryObject} objects' operations.
 	 *
-	 * Any Storable derived object is volatile (on application level) data presentation and holder.
+	 * Any RepositoryObject derived object is volatile (on application level) data presentation and holder.
 	 * Content manager is responsible to make such object persistant in underlying storage.
 	 * For example create method can perform SQL INSERT query using object's properties as values, 
 	 * or write serialized object to a file.
 	 *
-	 * Any content manager implementation shall not associate given Storable object with particular 
+	 * Any content manager implementation shall not associate given RepositoryObject object with particular 
 	 * storage, as any object could be stored with any content manager implementation.
 	 * 
 	 */
@@ -313,19 +313,19 @@ namespace MidgardCR {
 		/* per object methods */
 
 		/**
-		 * Check if given Storable object exists.
+		 * Check if given RepositoryObject object exists.
 		 */
-		public abstract bool exists (Storable object);
+		public abstract bool exists (RepositoryObject object);
 
 		/**
 		 * Create object in storage.
 		 */
-		public abstract void create (Storable object) throws StorageContentManagerError;
+		public abstract void create (RepositoryObject object) throws StorageContentManagerError;
 
 		/**
 		 * Update object in storage.
 		 */
-		public abstract void update (Storable object) throws StorageContentManagerError;
+		public abstract void update (RepositoryObject object) throws StorageContentManagerError;
 
 		/**
 		 * Save object in storage.
@@ -333,17 +333,17 @@ namespace MidgardCR {
 		 * This method shall create object if doesn't exist or update if it does.
 		 * The complexity (and performance) of this method depend on implementation.
 		 */
-		public abstract void save (Storable object) throws StorageContentManagerError; 
+		public abstract void save (RepositoryObject object) throws StorageContentManagerError; 
 
 		/**
 		 * Mark object as deleted. 
 		 */
-		public abstract void remove (Storable object) throws StorageContentManagerError;
+		public abstract void remove (RepositoryObject object) throws StorageContentManagerError;
 
 		/**
 		 * Removes object from storage.
 		 */
-		public abstract void purge (Storable object) throws StorageContentManagerError;
+		public abstract void purge (RepositoryObject object) throws StorageContentManagerError;
 
 		/**
 		 * Get {@link StorageManager} object.
