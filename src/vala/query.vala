@@ -100,7 +100,7 @@ namespace MidgardCR
 	public interface QuerySelect : QueryExecutor {
 		
 		public abstract void add_join (string type, QueryProperty left_property, QueryProperty right_property);		
-		public abstract Storable[]? list_objects ();
+		public abstract RepositoryObject[]? list_objects ();
 		public abstract void toggle_read_only (bool toggle);
 	}
 	

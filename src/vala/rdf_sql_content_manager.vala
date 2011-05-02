@@ -45,31 +45,51 @@ namespace MidgardCR {
 			base (manager);
 		}
 
-		public override bool exists (Storable object) {
+		public override bool exists (RepositoryObject object) {
 			return false;
 		}	
 
-		public override void create (Storable object) throws StorageContentManagerError {
+		private void _create_repository_object (RDFGenericObject rdf_object, RepositoryObject object) throws StorageContentManagerError {
+			RDFSQLNamespaceManager nsm = (RDFSQLNamespaceManager) this.namespace_manager;
+			foreach (RepositoryObject triple in rdf_object.list_triples ()) {
+				string pname;
+				string _sv = null;
+				string _v;
+				triple.get ("property", out pname, "value", out _v, "literal", out _sv);
+				//string _sv = triple.get_property_literal (pname);
+				//Value _v = triple.get_property_value (pname);
+				string[] prefix_tokens = nsm.get_prefix_tokens (pname);
+				object.set_property_literal (prefix_tokens[1], _sv);
+				print ("SET OBJECT, PROP %s (%s), (%s) (%s)[%p] \n", pname, prefix_tokens[1], (string) _v, _sv, _sv);	
+			}
+		}
+
+		public override void create (RepositoryObject object) throws StorageContentManagerError {
 
 			/* RDFGenericObject object with RDFObjectModel for RepositoryObject available */
 
-			/* Repository object */
-
-			/* RDFGenericObject */
 			if (!(object is RDFGenericObject))
 				throw new StorageContentManagerError.OBJECT_INVALID ("Expected RDFGenericObject");
 
+			/* Decorated repository object */
+			RepositoryObject ro = ((RDFGenericObject)object).repository_object;
+			if (ro != null) {
+				this._create_repository_object ((RDFGenericObject) object, ro);
+				return;
+			}
+
+			/* RDF generic object with triples */
 			var rdf_object = (RDFGenericObject) object;
 			foreach (RepositoryObject triple in rdf_object.list_triples ()) {
 				base.create (triple);
 			}
 		}	
 	
-		public override void update (Storable object) throws StorageContentManagerError {
+		public override void update (RepositoryObject object) throws StorageContentManagerError {
 			this.save (object);
 		}		
 
-		public override void save (Storable object) throws StorageContentManagerError {
+		public override void save (RepositoryObject object) throws StorageContentManagerError {
 
 			if (!(object is RDFGenericObject))
 				throw new StorageContentManagerError.OBJECT_INVALID ("Expected RDFGenericObject");
@@ -80,7 +100,7 @@ namespace MidgardCR {
 			}
 		}		
 
-		public override void purge (Storable object) throws StorageContentManagerError {
+		public override void purge (RepositoryObject object) throws StorageContentManagerError {
 
 			if (!(object is RDFGenericObject))
 				throw new StorageContentManagerError.OBJECT_INVALID ("Expected RDFGenericObject");
@@ -91,7 +111,7 @@ namespace MidgardCR {
 			}
 		}	
 	
-		public override void remove (Storable object) throws StorageContentManagerError {
+		public override void remove (RepositoryObject object) throws StorageContentManagerError {
 			return;
 		}		
 	}

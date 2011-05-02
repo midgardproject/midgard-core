@@ -60,7 +60,7 @@ namespace MidgardCR {
 		 *  1. foaf:Person
 		 *  1. http:\/\/xmlns.com\/foaf\/0.1\/Person (fixme)
 		 */
-		public override Storable? factory (string classname, string? guid = null) throws ObjectManagerError, ValidationError {
+		public override RepositoryObject? factory (string classname, string? guid = null) throws ObjectManagerError, ValidationError {
 			if (this._storage_manager == null)
 				throw new ValidationError.INTERNAL ("No StorageManager associated with objectManager");
 
@@ -85,7 +85,7 @@ namespace MidgardCR {
 				
 			/* There's no namespace registered, try generic rdf object */
 			if (guid == null)
-				return (Storable) new RDFGenericObject (classname, null, null);		
+				return (RepositoryObject) new RDFGenericObject (classname, null, null);		
 			
 			/* Initialize QuerySelect to fetch object's data from SQL table */
 			var qst = new SQLQueryStorage (classname);
@@ -111,7 +111,7 @@ namespace MidgardCR {
 			if (q.resultscount > 1)
 				throw new ObjectManagerError.OBJECT_DUPLICATE ("%d objects identified by the same %s guid", q.resultscount, guid);
 
-			Storable[] objects = q.list_objects ();
+			RepositoryObject[] objects = q.list_objects ();
 			return objects[0];
 		}
 	}

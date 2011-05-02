@@ -123,7 +123,7 @@ namespace MidgardCR
 			(this._core_query_select as MidgardCRCore.QuerySelect).add_join (type, left_property._core_query_holder as MidgardCRCore.QueryProperty, right_property._core_query_holder as MidgardCRCore.QueryProperty);
 		}
 		
-		public virtual Storable[]? list_objects () {
+		public virtual RepositoryObject[]? list_objects () {
 			this._create_core_query_select ();	
 			return ((MidgardCRCore.QuerySelect)this._core_query_select).list_objects ();
 		}

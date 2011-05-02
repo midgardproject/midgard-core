@@ -20,7 +20,7 @@ namespace MidgardCR {
 
 	/**
 	 * SQLContentManager's purpose is to create, update, or delete object's data
-	 * in underlying SQL database. Any {@link Storable} object is volatile data, and once 
+	 * in underlying SQL database. Any {@link RepositoryObject} object is volatile data, and once 
 	 * created with content manager becomes persistant.
 	 */	 
 	public class SQLContentManager : GLib.Object, StorageContentManager {
@@ -62,7 +62,7 @@ namespace MidgardCR {
 			return this._storage_manager;
 		}
 
-		public virtual bool exists (Storable object) {
+		public virtual bool exists (RepositoryObject object) {
 			this._storage_manager.operation_start ();
 			this._storage_manager.operation_end ();
 			return false;
@@ -78,9 +78,9 @@ namespace MidgardCR {
 		 * If given object is {@link RepositoryObject}, valid SQL INSERT prepared statament is generated for
 		 * object's class and stored as permanent statement available for every class instance.
 		 * 
-		 * @param object Storable object
+		 * @param object RepositoryObject object
 		 */
-		public virtual void create (Storable object) throws StorageContentManagerError {
+		public virtual void create (RepositoryObject object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				(SQLTableModel) ((SQLModelManager)this
@@ -105,9 +105,9 @@ namespace MidgardCR {
 		 * If given object is {@link RepositoryObject}, valid SQL UPDATE prepared statament is generated for 
 		 * object's class and stored as permanent statement available for every class instance.
 		 *
-		 * @param object Storable object
+		 * @param object RepositoryObject object
 		 */
-		public virtual void update (Storable object) throws StorageContentManagerError {
+		public virtual void update (RepositoryObject object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				(SQLTableModel) ((SQLModelManager)this
@@ -136,9 +136,9 @@ namespace MidgardCR {
 		 * non exisiting record identified by object's guid. 
 		 * In case of other failure, particular exception is thrown.
 		 *
-		 * @param object Storable object
+		 * @param object RepositoryObject object
 		 */
-		public virtual void save (Storable object) throws StorageContentManagerError {
+		public virtual void save (RepositoryObject object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				(SQLTableModel) ((SQLModelManager)this
@@ -172,9 +172,9 @@ namespace MidgardCR {
 		 * If given object is {@link RepositoryObject}, valid SQL DELETE prepared statament is generated for 
 		 * object's class and stored as permanent statement available for every class instance.
 		 *
-		 * @param object Storable object
+		 * @param object RepositoryObject object
 		 */
-		public virtual void purge (Storable object) throws StorageContentManagerError {
+		public virtual void purge (RepositoryObject object) throws StorageContentManagerError {
 			string name = object.get_type().name();
 			SQLTableModel table_model = 
 				(SQLTableModel) ((SQLModelManager)this
@@ -189,7 +189,7 @@ namespace MidgardCR {
 
 		}	
 	
-		public virtual void remove (Storable object) throws StorageContentManagerError {
+		public virtual void remove (RepositoryObject object) throws StorageContentManagerError {
 			this._storage_manager.operation_start ();
 			//this.purge (object);
 			this._storage_manager.operation_end ();

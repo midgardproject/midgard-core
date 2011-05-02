@@ -74,7 +74,7 @@ namespace MidgardCR {
 		}	
 
 		/**
-		 * Construct {@link Storable} object.
+		 * Construct {@link RepositoryObject} object.
 		 *
 		 * Creates new instance of given classname. If second (optional) guid argument is not null, it's value
 		 * is set as object's guid. If required, application is responsible to set unique guid.
@@ -87,16 +87,16 @@ namespace MidgardCR {
 		 * @param guid, guid or uuid which should identify object
 		 */
 
-		public virtual Storable? factory (string classname, string? guid = null) throws ObjectManagerError, ValidationError { 
+		public virtual RepositoryObject? factory (string classname, string? guid = null) throws ObjectManagerError, ValidationError { 
 			GLib.Type type_id = GLib.Type.from_name (classname);	
 			if (type_id == 0)
 				throw new ValidationError.NAME_INVALID ("%s is not registered class", classname);
 			
-			GLib.Type storable_id = GLib.Type.from_name ("MidgardCRStorable");
+			GLib.Type storable_id = GLib.Type.from_name ("MidgardCRRepositoryObject");
 			if (type_id.is_a (storable_id) == false)
-				throw new ValidationError.TYPE_INVALID ("%s is not Storable derived class", classname);
+				throw new ValidationError.TYPE_INVALID ("%s is not RepositoryObject derived class", classname);
 
-			Storable obj = (Storable) GLib.Object.new (type_id);
+			RepositoryObject obj = (RepositoryObject) GLib.Object.new (type_id);
 			return obj;	 
 		}
 		
