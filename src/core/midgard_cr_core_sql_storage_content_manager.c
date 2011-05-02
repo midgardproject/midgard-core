@@ -185,7 +185,7 @@ __set_query_insert_parameters (MidgardCRStorageModel *table_model, GObjectClass 
 
 void 
 midgard_cr_core_sql_storage_content_manager_storable_insert (
-		MidgardCRStorable *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, 
+		MidgardCRRepositoryObject *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, 
 		MidgardCRSQLTableModel *table_model, GError **error) 
 {
 	/* Allow NULL object_model.
@@ -356,7 +356,7 @@ __initialize_statement_update (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 
 void 
 midgard_cr_core_sql_storage_content_manager_storable_update (
-		MidgardCRStorable *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, 
+		MidgardCRRepositoryObject *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, 
 		MidgardCRSQLTableModel *table_model, GError **error) 
 {
 	/* Allow NULL object_model.
@@ -490,7 +490,7 @@ __initialize_statement_delete (MidgardCRRepositoryObjectClass *klass, MgdSchemaT
 
 void 
 midgard_cr_core_sql_storage_content_manager_storable_purge (
-		MidgardCRStorable *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, 
+		MidgardCRRepositoryObject *storable, MidgardCRSQLStorageManager *manager,  MidgardCRObjectModel *object_model, 
 		MidgardCRSQLTableModel *table_model, GError **error) 
 {
 	/* Allow NULL object_model.
