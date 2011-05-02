@@ -257,18 +257,10 @@ midgard_cr_core_schema_object_register_type (MgdSchemaTypeAttr *type_data, GType
                 midgard_type_info->instance_init = NULL;
                 midgard_type_info->value_table = NULL;
                
-		static const GInterfaceInfo property_info = {
-			NULL,	/* interface init */
-			NULL,   /* interface_finalize */
-			NULL    /* interface_data */
-		};
-
 		GType type = g_type_register_static (parent_type, classname, midgard_type_info, 0);
-		g_type_add_interface_static (type, MIDGARD_CR_TYPE_STORABLE, &property_info);
-
-                g_free (midgard_type_info);
-
 		g_type_add_class_private (type, sizeof(MgdSchemaTypeAttr));
+
+		g_free (midgard_type_info);
 
                 return type;   
         }                      
