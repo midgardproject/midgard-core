@@ -81,4 +81,8 @@ CLEANFILES = \
 	     $(midgardcr_vapi_file) \
 	     $(midgardcr_header) \
 	     libmidgardvala_la_vala.stamp \
-	     $(libmidgardvala_la_SOURCES:.vala=.c)
+	     $(libmidgardvala_la_SOURCES:.vala=.c) \
+	     $(midgardcr_vapi_file) \
+	     $(midgardcr_gir_file) \
+	     $(NULL)
+

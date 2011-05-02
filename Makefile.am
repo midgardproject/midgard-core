@@ -73,7 +73,7 @@ gir_DATA = $(introspection_file)
 
 typelibsdir = $(libdir)/girepository-1.0
 typelibs_DATA = $(introspection_file:.gir=.typelib)
-CLEANFILES = $(dist_gir_DATA) $(typelib_DATA)
+CLEANFILES = $(dist_gir_DATA) $(typelibs_DATA)
 endif
 
 doc:
