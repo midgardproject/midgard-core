@@ -191,7 +191,7 @@ midgard_cr_core_sql_storage_content_manager_storable_insert (
 	/* Allow NULL object_model.
 	 * We need to follow table_model which describes table we want insert record into */
 	g_return_if_fail (storable != NULL);
-	g_return_if_fail (MIDGARD_CR_IS_STORABLE (storable));
+	g_return_if_fail (MIDGARD_CR_IS_REPOSITORY_OBJECT (storable));
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (table_model != NULL);
 	g_return_if_fail (error == NULL || *error == NULL);
@@ -199,6 +199,7 @@ midgard_cr_core_sql_storage_content_manager_storable_insert (
 	GError *err = NULL;
 
 	/* If this is StorageObject, create SQL query on demand (until something faster is implemented) */
+	/*
 	if (MIDGARD_CR_IS_STORAGE_OBJECT (storable)) {
 		gchar *query = midgard_cr_core_storage_sql_create_query_insert (G_OBJECT (storable), object_model, MIDGARD_CR_STORAGE_MODEL (table_model));
 		if (!query) {
@@ -216,6 +217,7 @@ midgard_cr_core_sql_storage_content_manager_storable_insert (
 			return;
 		}
 	}
+	*/
 
 	/* RepositoryObject */
 	if (!MIDGARD_CR_IS_REPOSITORY_OBJECT (storable)) {
@@ -362,7 +364,7 @@ midgard_cr_core_sql_storage_content_manager_storable_update (
 	/* Allow NULL object_model.
 	 * We need to follow table_model which describes table we want insert record into */
 	g_return_if_fail (storable != NULL);
-	g_return_if_fail (MIDGARD_CR_IS_STORABLE (storable));
+	g_return_if_fail (MIDGARD_CR_IS_REPOSITORY_OBJECT (storable));
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (table_model != NULL);
 	g_return_if_fail (error == NULL || *error == NULL);
@@ -370,7 +372,7 @@ midgard_cr_core_sql_storage_content_manager_storable_update (
 	GError *err = NULL;
 
 	/* If this is StorageObject, create SQL query on demand (until something faster is implemented) */
-	if (MIDGARD_CR_IS_STORAGE_OBJECT (storable)) {
+	/* if (MIDGARD_CR_IS_STORAGE_OBJECT (storable)) {
 		gchar *query = midgard_cr_core_storage_sql_create_query_update (G_OBJECT (storable), object_model, MIDGARD_CR_STORAGE_MODEL (table_model));
 		if (!query) {
 			*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
@@ -387,6 +389,7 @@ midgard_cr_core_sql_storage_content_manager_storable_update (
 			return;
 		}
 	}
+	*/
 
 	/* RepositoryObject */
 	if (!MIDGARD_CR_IS_REPOSITORY_OBJECT (storable)) {
@@ -496,7 +499,7 @@ midgard_cr_core_sql_storage_content_manager_storable_purge (
 	/* Allow NULL object_model.
 	 * We need to follow table_model which describes table we want insert record into */
 	g_return_if_fail (storable != NULL);
-	g_return_if_fail (MIDGARD_CR_IS_STORABLE (storable));
+	g_return_if_fail (MIDGARD_CR_IS_REPOSITORY_OBJECT (storable));
 	g_return_if_fail (manager != NULL);
 	g_return_if_fail (table_model != NULL);
 	g_return_if_fail (error == NULL || *error == NULL);
@@ -504,8 +507,7 @@ midgard_cr_core_sql_storage_content_manager_storable_purge (
 	GError *err = NULL;
 
 	/* If this is StorageObject, create SQL query on demand (until something faster is implemented) */
-	if (MIDGARD_CR_IS_STORAGE_OBJECT (storable)) {
-		/* FIXME
+	/* if (MIDGARD_CR_IS_STORAGE_OBJECT (storable)) {
 		gchar *query = midgard_cr_core_storage_sql_create_query_delete (G_OBJECT (storable), object_model, MIDGARD_CR_STORAGE_MODEL (table_model));
 		if (!query) {
 			*error = g_error_new (MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR, MIDGARD_CR_STORAGE_CONTENT_MANAGER_ERROR_INTERNAL,
@@ -520,8 +522,9 @@ midgard_cr_core_sql_storage_content_manager_storable_purge (
 					G_OBJECT_TYPE_NAME (G_OBJECT (storable)), err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
 			return;
-		} */
+		} 
 	}
+	*/
 
 	/* RepositoryObject */
 	if (!MIDGARD_CR_IS_REPOSITORY_OBJECT (storable)) {
