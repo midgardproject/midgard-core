@@ -671,7 +671,7 @@ static void __set_object_from_data_model (MidgardCRModel *table_model, MidgardCR
 	}
 }
 
-MidgardCRStorable **
+MidgardCRRepositoryObject **
 _midgard_cr_core_query_select_list_objects (MidgardCRCoreQuerySelect *self, guint *n_objects)
 {
 	g_return_val_if_fail (self != NULL, NULL);
@@ -694,7 +694,7 @@ _midgard_cr_core_query_select_list_objects (MidgardCRCoreQuerySelect *self, guin
 	MidgardCRObjectModel *object_model = 
  		(MidgardCRObjectModel *) midgard_cr_storage_model_manager_get_type_model_by_name (model_manager, "ObjectModel", classname);
 
-	MidgardCRStorable **objects = g_new (MidgardCRStorable *, rows+1);	
+	MidgardCRRepositoryObject **objects = g_new (MidgardCRRepositoryObject *, rows+1);	
 
 	for (i = 0; i < rows; i++) {	
 		objects[i] = g_object_new (G_OBJECT_CLASS_TYPE (klass), NULL);
@@ -755,10 +755,10 @@ midgard_cr_core_query_select_include_deleted (MidgardCRCoreQuerySelect *self, gb
  *
  * List all objects for which data has been returned during execution.
  *
- * Returns: (element-type MidgardCRCoreDBObject) (array length=1): newly allocated array of #MidgardCRCoreDBObject
+ * Returns: (element-type MidgardCRRepositoryObject) (array length=1): newly allocated array of #MidgardCRRepositoryObject
  * Since: 10.05
  */ 
-MidgardCRStorable **
+MidgardCRRepositoryObject **
 midgard_cr_core_query_select_list_objects (MidgardCRCoreQuerySelect *self, guint *n_objects)
 {
 	return MIDGARD_CR_CORE_QUERY_SELECT_GET_CLASS (self)->list_objects (self, n_objects);
