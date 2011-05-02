@@ -204,10 +204,6 @@ namespace MidgardCR {
 		}
 	}
 
-	public abstract class StorageObject : GLib.Object, Storable {
-
-	}
-
 	public class ReferenceObject : GLib.Object {
 
 		/* properties */
