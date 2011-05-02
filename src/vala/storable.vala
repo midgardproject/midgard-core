@@ -30,7 +30,7 @@ namespace MidgardCR {
 	/**
 	 * Basic interface for metadata objects.
 	 */
-	public abstract class Metadata : GLib.Object, Storable {
+	public abstract class Metadata : GLib.Object {
 
 		/* proprties */
 		public abstract string parent { get; construct; }	
@@ -42,7 +42,7 @@ namespace MidgardCR {
 	/**
 	 * Abstract class for objects which can be stored in repository.
 	 */
-	public abstract class RepositoryObject : GLib.Object, Storable {
+	public abstract class RepositoryObject : GLib.Object {
 
 		/* internal properties */
 		internal string _guid = null;
