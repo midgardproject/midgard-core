@@ -84,7 +84,7 @@ void midgardcr_test_add_schema_builder_tests () {
 			GLib.warning (e.message);
 		}
 		
-		GLib.Type storable_type = GLib.Type.from_name ("MidgardCRStorable");
+		GLib.Type storable_type = GLib.Type.from_name ("MidgardCRRepositoryObject");
 		GLib.Type typeid = GLib.Type.from_name (DEFAULT_CLASSNAME);
 		assert (typeid != 0);
 		assert (typeid.is_a (storable_type));
@@ -117,7 +117,7 @@ void midgardcr_test_add_schema_builder_tests () {
 	Test.add_func ("/ObjectManager/factory", () => {
 		MidgardCR.ObjectManager builder = new MidgardCR.ObjectManager ();
 		assert (builder != null);
-		Storable obj = null;
+		RepositoryObject obj = null;
 
 		/* SUCCESS */
 		try {
@@ -127,10 +127,8 @@ void midgardcr_test_add_schema_builder_tests () {
 		} 	 
 
 		GLib.Type type = obj.get_type ();
-		GLib.Type storable_type = GLib.Type.from_name ("MidgardCRStorable");
 		GLib.Type repo_object_type = GLib.Type.from_name ("MidgardCRRepositoryObject");
 		assert (type == GLib.Type.from_name (DEFAULT_CLASSNAME));
-		assert (type.is_a (storable_type));
 		assert (type.is_a (repo_object_type));
 
 		/* Check if our default property is installed for default class */
@@ -139,8 +137,6 @@ void midgardcr_test_add_schema_builder_tests () {
 		/* Check metadata property */
 		pspec = obj.get_class ().find_property ("metadata");
 		assert (pspec != null);
-	
-	
 	});
 }
 
