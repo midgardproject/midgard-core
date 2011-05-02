@@ -21,44 +21,6 @@ using GLib;
 namespace MidgardCR {
 
 	/**
-	 * Basic interface for objects which can be stored with {@link StorageContentManager}
-	 */
-	public interface Storable : GLib.Object {
-
-		/* signals */
-
-		/**
-		 * The signal which shall be emitted before object's creation.
-		 */
-		public abstract signal void create ();
-		
-		/**
-		 * The signal which shall be emitted after object has been created.
-		 */
-		public abstract signal void created ();
-
-		/**
-		 * The signal which shall be emitted before object's update.
-		 */
-		public abstract signal void update ();
-
-		/**
-		 * The signal which shall be emitted after object has been emitted.
-		 */
-		public abstract signal void updated ();
-	
-		/**
-		 * The signal which shall be emitted before object's removal.
-		 */ 
-		public abstract signal void remove ();
-
-		/**
-		 * The signal which shall be emitted after object has been removed.
-		 */
-		public abstract signal void removed ();
-	}
-
-	/**
  	 * Basic interface to implement objects which hold datetime.
 	 */
 	public abstract class Timestamp : GLib.Object {
@@ -129,6 +91,38 @@ namespace MidgardCR {
 			get {  return this._metadata; }	
 		}
 
+		/* signals */
+
+		/**
+		 * The signal which shall be emitted before object's creation.
+		 */
+		public abstract signal void create ();
+		
+		/**
+		 * The signal which shall be emitted after object has been created.
+		 */
+		public abstract signal void created ();
+
+		/**
+		 * The signal which shall be emitted before object's update.
+		 */
+		public abstract signal void update ();
+
+		/**
+		 * The signal which shall be emitted after object has been emitted.
+		 */
+		public abstract signal void updated ();
+	
+		/**
+		 * The signal which shall be emitted before object's removal.
+		 */ 
+		public abstract signal void remove ();
+
+		/**
+		 * The signal which shall be emitted after object has been removed.
+		 */
+		public abstract signal void removed ();
+
 		/* methods */
 
 		/**
@@ -197,7 +191,8 @@ namespace MidgardCR {
 		/**
 		 * List names of all properties registered for object's class.
 		 * 
-		 * Simple wrapper for GLib.Object.list_properties()
+		 * By default it's simple wrapper for GLib.Object.list_properties().
+		 * Derived class can provide own implementation if only required.
 		 */
 		public virtual string[]? list_all_properties () {
 			ParamSpec[] pspecs = this.get_class ().list_properties ();
