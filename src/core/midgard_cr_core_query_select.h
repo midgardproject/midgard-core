@@ -39,7 +39,7 @@ typedef struct _MidgardCRCoreQuerySelectClass MidgardCRCoreQuerySelectClass;
 struct _MidgardCRCoreQuerySelectClass {
 	MidgardCRCoreQueryExecutorClass parent;
 
-	struct _MidgardCRStorable	**(*list_objects)		(MidgardCRCoreQuerySelect *self, guint *n_objects);
+	struct _MidgardCRRepositoryObject	**(*list_objects)		(MidgardCRCoreQuerySelect *self, guint *n_objects);
 	void		(*toggle_read_only)		(MidgardCRCoreQuerySelect *self, gboolean toggle);
 	void		(*include_deleted)		(MidgardCRCoreQuerySelect *self, gboolean toggle);
 };
@@ -50,12 +50,12 @@ struct _MidgardCRCoreQuerySelect {
 
 struct _MidgardCRSQLStorageManager;
 struct _MidgardCRSQLQueryStorage;
-struct _MidgardCRSQLStorable;
+struct _MidgardCRSQLRepositoryObject;
 
 GType 			midgard_cr_core_query_select_get_type		(void);
 MidgardCRCoreQuerySelect	*midgard_cr_core_query_select_new 		(struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRCoreQueryStorage *storage);
 MidgardCRCoreQuerySelect	*midgard_cr_core_query_create_static 		(struct _MidgardCRSQLStorageManager *manager, struct _MidgardCRCoreQueryStorage *storage);
-struct _MidgardCRStorable			**midgard_cr_core_query_select_list_objects	(MidgardCRCoreQuerySelect *self, guint *n_objects);
+struct _MidgardCRRepositoryObject			**midgard_cr_core_query_select_list_objects	(MidgardCRCoreQuerySelect *self, guint *n_objects);
 void			midgard_cr_core_query_select_toggle_read_only	(MidgardCRCoreQuerySelect *self, gboolean toggle);	
 void			midgard_cr_core_query_select_include_deleted	(MidgardCRCoreQuerySelect *self, gboolean toggle);
 
