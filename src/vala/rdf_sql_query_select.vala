@@ -203,8 +203,8 @@ namespace MidgardCR
 			return null;
 		}
 
-		public override Storable[]? list_objects () {
-			Storable[]? objects = base.list_objects ();
+		public override RepositoryObject[]? list_objects () {
+			RepositoryObject[]? objects = base.list_objects ();
 			if (objects == null)
 				return null;
 			/* Initialize new RDFGenericObject instances, from all triple objects
@@ -212,7 +212,7 @@ namespace MidgardCR
 			 * object and added to specific rdf object if both holds the same 
 			 * guid and objectguid properties values */
 			RDFGenericObject[]? rdf_objects = null;
-			foreach (Storable object in objects) {
+			foreach (RepositoryObject object in objects) {
 				string classname;
 				string guid;
 				object.get ("classname", out classname, "objectguid", out guid);
@@ -223,7 +223,7 @@ namespace MidgardCR
 				}
 				rdf_object.add_triple ((RepositoryObject)object);
 			}
-			return (Storable[]) rdf_objects;
+			return (RepositoryObject[]) rdf_objects;
 		}
 	}
 }
