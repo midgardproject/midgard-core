@@ -77,14 +77,20 @@ rdf_sql_content_manager.o: rdf_sql_content_manager.c \
  /usr/include/glib-2.0/gobject/gtypemodule.h \
  /usr/include/glib-2.0/gobject/gtypeplugin.h \
  /usr/include/glib-2.0/gobject/gvaluearray.h \
- /usr/include/glib-2.0/gobject/gvaluetypes.h /usr/include/stdlib.h \
+ /usr/include/glib-2.0/gobject/gvaluetypes.h \
+ /usr/local/include/midgard/midgardcr.h \
+ /usr/local/include/midgard/midgardcr/midgardcr.h /usr/include/stdlib.h \
  /usr/include/sys/types.h /usr/include/endian.h \
  /usr/include/bits/endian.h /usr/include/bits/byteswap.h \
  /usr/include/sys/select.h /usr/include/bits/select.h \
  /usr/include/sys/sysmacros.h /usr/include/alloca.h \
  /usr/include/bits/stdlib.h /usr/include/string.h \
  /usr/include/bits/string.h /usr/include/bits/string2.h \
- /usr/include/bits/string3.h
+ /usr/include/bits/string3.h /usr/include/math.h \
+ /usr/include/bits/huge_val.h /usr/include/bits/huge_valf.h \
+ /usr/include/bits/huge_vall.h /usr/include/bits/inf.h \
+ /usr/include/bits/nan.h /usr/include/bits/mathdef.h \
+ /usr/include/bits/mathcalls.h /usr/include/bits/mathinline.h
 
 /usr/include/glib-2.0/glib.h:
 
@@ -300,6 +306,10 @@ rdf_sql_content_manager.o: rdf_sql_content_manager.c \
 
 /usr/include/glib-2.0/gobject/gvaluetypes.h:
 
+/usr/local/include/midgard/midgardcr.h:
+
+/usr/local/include/midgard/midgardcr/midgardcr.h:
+
 /usr/include/stdlib.h:
 
 /usr/include/sys/types.h:
@@ -327,3 +337,21 @@ rdf_sql_content_manager.o: rdf_sql_content_manager.c \
 /usr/include/bits/string2.h:
 
 /usr/include/bits/string3.h:
+
+/usr/include/math.h:
+
+/usr/include/bits/huge_val.h:
+
+/usr/include/bits/huge_valf.h:
+
+/usr/include/bits/huge_vall.h:
+
+/usr/include/bits/inf.h:
+
+/usr/include/bits/nan.h:
+
+/usr/include/bits/mathdef.h:
+
+/usr/include/bits/mathcalls.h:
+
+/usr/include/bits/mathinline.h:

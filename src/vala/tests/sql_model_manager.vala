@@ -15,8 +15,6 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 
 	/* constructor */
 	Test.add_func ("/SQLModelManager/constructor", () => {
-		MidgardCR.SQLModelManager mm = new MidgardCR.SQLModelManager ();
-		assert (mm != null);	
 	
 		MidgardCR.SQLStorageManager storage_manager = null;
 		MidgardCR.Config config = new MidgardCR.Config ();	
@@ -40,6 +38,9 @@ void midgardcr_test_add_sql_storage_model_manager_tests () {
 		MidgardCR.StorageModelManager model_manager = storage_manager.model_manager;
 		assert (model_manager != null);
 		assert (model_manager is MidgardCR.SQLModelManager);
+
+		MidgardCR.SQLModelManager mm = new MidgardCR.SQLModelManager (storage_manager);
+		assert (mm != null);	
 	});
 
 	Test.add_func ("/SQLModelManager/prepare_create", () => {	
