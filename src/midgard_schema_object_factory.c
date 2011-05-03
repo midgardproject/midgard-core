@@ -91,7 +91,7 @@ midgard_schema_object_factory_get_object_by_guid (MidgardConnection *mgd, const 
 	g_object_get (repligard,
 			"action", &action,
 			"type", &classname, NULL);
-	g_object_unref (repligard);
+	g_object_unref (repligard);	
 
 	if (!classname || (classname && *classname == '\0')) {
 		g_warning("Database inconsistency!. Expected classname string in repligard typename (%s)", guid);
@@ -111,7 +111,7 @@ midgard_schema_object_factory_get_object_by_guid (MidgardConnection *mgd, const 
 		default:
 			g_value_init(&gval, G_TYPE_STRING);
     			g_value_set_string (&gval, guid);
-			object = midgard_object_new (mgd, g_value_get_string ((GValue*)classname), &gval);
+			object = midgard_object_new (mgd, classname, &gval);
 	   		g_value_unset (&gval);
 			if (!object) {
 				MIDGARD_ERRNO_SET (mgd, MGD_ERR_NOT_EXISTS);
