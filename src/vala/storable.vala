@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * 
- * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
+ * Copyright (C) 2010, 2011 Piotr Pokora <piotrek.pokora@gmail.com>
  */
 
 using GLib;
@@ -189,12 +189,22 @@ namespace MidgardCR {
 		}
 
 		/**
-		 * List names of all properties registered for object's class.
+		 * Get an array of GLib.ParamSpec for all properties registered for object's class.
 		 * 
 		 * By default it's simple wrapper for GLib.Object.list_properties().
 		 * Derived class can provide own implementation if only required.
 		 */
-		public virtual string[]? list_all_properties () {
+		public virtual unowned GLib.ParamSpec[]? list_all_properties () {
+			return this.get_class ().list_properties ();
+		}
+
+		/**
+		 * Get an array of names for all properties registered for object's class.
+		 * 
+		 * By default it's simple wrapper for GLib.Object.list_properties().
+		 * Derived class can provide own implementation if only required.
+		 */
+		public virtual string[]? list_all_properties_names () {
 			ParamSpec[] pspecs = this.get_class ().list_properties ();
 			string[] props = null;
 			foreach (weak ParamSpec p in pspecs) {

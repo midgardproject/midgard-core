@@ -170,7 +170,7 @@ namespace MidgardCR {
 			return val;	
 		}
 
-		public override string[]? list_all_properties () {
+		public override string[]? list_all_properties_names () {
 			if (this._triples == null)
 				return null;
 			string[] propnames = null;
@@ -180,6 +180,10 @@ namespace MidgardCR {
 				propnames += name;
 			}
 			return propnames;
+		}
+
+		public override unowned GLib.ParamSpec[]? list_all_properties () {
+			return null;	
 		}
 
 		public unowned RepositoryObject[]? list_triples () {
