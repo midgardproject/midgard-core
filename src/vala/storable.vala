@@ -49,6 +49,7 @@ namespace MidgardCR {
 		internal int _id = 0;
 		internal Metadata _metadata = null;	
 		internal string _identifier = null;
+		internal StorageManager _storage_manager = null;
 
 		/* properties */
 
@@ -59,12 +60,8 @@ namespace MidgardCR {
 		 * It's internally set in any other case.
 		 */
 		public string guid { 
-			get { 
-				return this._guid; 
-			}
-			construct {
-				this._guid = value;
-			}
+			get { return this._guid; }
+			construct { this._guid = value; }
 		}
 
 		/**
@@ -89,6 +86,15 @@ namespace MidgardCR {
 
 		public Metadata? metadata { 
 			get {  return this._metadata; }	
+		}
+
+		/**
+		 * Storage manager for which current instance has been initialized.
+		 * It's not mandatory to set storage manager.
+		 */
+		public StorageManager storage_manager {
+			get { return this._storage_manager; }
+			construct { this._storage_manager = value; }	
 		}
 
 		/* signals */
