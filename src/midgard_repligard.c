@@ -673,7 +673,7 @@ static void _midgard_repligard_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_update = __get_statement_update;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->get_statement_update_params = __get_statement_update_params;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->add_fields_to_select_statement;	
-	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_data_model = NULL;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_from_data_model;
 }
 
 GType 
