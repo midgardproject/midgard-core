@@ -172,9 +172,6 @@ midgard_core_config_build_viewdir_path (const gchar *dirname)
 	}
 
 	if (!g_file_test (lview_dir, G_FILE_TEST_IS_DIR)) {
-
-		/* Do not throw any warning when view directory is missing */
-		g_warning("Ignored missed %s view directory", lview_dir);
 		
 		if (lview_dir)
 			g_free(lview_dir);
