@@ -1520,6 +1520,7 @@ static void _midgard_user_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->add_fields_to_select_statement;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql = __set_from_sql;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_sql = NULL;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_from_data_model;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->create_storage = midgard_core_query_create_class_storage;	
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->update_storage = midgard_core_query_update_class_storage;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_exists = _user_storage_exists; 
