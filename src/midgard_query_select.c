@@ -980,7 +980,7 @@ _midgard_query_select_class_init (MidgardQuerySelectClass *klass, gpointer class
 	executor_class->add_order = _midgard_query_select_add_order;
 	executor_class->add_join = _midgard_query_select_add_join;
 	executor_class->get_results_count = _midgard_query_select_get_results_count;
-	
+
 	klass->list_objects = _midgard_query_select_list_objects;
 	klass->toggle_read_only = _midgard_query_select_toggle_read_only;
 	klass->include_deleted = _midgard_query_select_include_deleted;
