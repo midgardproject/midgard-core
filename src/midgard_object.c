@@ -769,9 +769,10 @@ midgard_object_update (MidgardObject *self)
 	}
 
 	if (!rv) {
-		MIDGARD_ERRNO_SET_STRING (MGD_OBJECT_CNC (self), MGD_ERR_INTERNAL, "%s", 
-				error && error->message ? error->message : "Unknown error");
-		g_clear_error (&error);
+		if (midgard_connection_get_error (mgd) == MGD_ERR_OK) 
+			MIDGARD_ERRNO_SET (mgd, MGD_ERR_INTERNAL);
+		if (error)
+			g_clear_error (&error);
 		return FALSE;
 	}	
 
