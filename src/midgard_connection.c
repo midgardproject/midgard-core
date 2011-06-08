@@ -1260,7 +1260,8 @@ MidgardConnection *midgard_connection_copy(MidgardConnection *self)
 	 * Copy will be used for this. Do not duplicate callbacks invokation */
 	midgard_core_connection_disconnect_error_callback(self);
 
-	#warning implement workspace_model copy 
+	new_mgd->priv->workspace_model = self->priv->workspace_model;
+		
 	/* Increase workspace reference count.
 	 * For example, connection might be copied to new thread, so we 
 	 * need to ensure, workspace object is valid */
