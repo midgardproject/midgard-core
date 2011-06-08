@@ -289,7 +289,7 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 			klass_table, MGD_WORKSPACE_ID_FIELD);
 
 	const MidgardWorkspaceStorage *ws = midgard_connection_get_workspace (mgd);
-	GSList *list = MIDGARD_WORKSPACE_STORAGE_GET_INTERFACE (ws)->priv->list_ids (MIDGARD_WORKSPACE_STORAGE (ws));
+	GSList *list = MIDGARD_WORKSPACE_STORAGE_GET_INTERFACE (ws)->priv->list_ids (mgd, MIDGARD_WORKSPACE_STORAGE (ws));
 	GSList *l = NULL;
 	guint i = 0;
 	guint id;

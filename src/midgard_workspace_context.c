@@ -319,7 +319,7 @@ midgard_workspace_context_has_workspace (MidgardWorkspaceContext *self, MidgardW
 	g_return_val_if_fail (workspace != NULL, FALSE);
 
 	gboolean rv = FALSE;
-	GSList *ids = MIDGARD_WORKSPACE_STORAGE_GET_INTERFACE (self)->priv->list_ids (MIDGARD_WORKSPACE_STORAGE (self));
+	GSList *ids = MIDGARD_WORKSPACE_STORAGE_GET_INTERFACE (self)->priv->list_ids (NULL, MIDGARD_WORKSPACE_STORAGE (self));
 	if (!ids)
 		return rv;
 
@@ -343,11 +343,12 @@ midgard_workspace_context_has_workspace (MidgardWorkspaceContext *self, MidgardW
 }
 
 static GSList*
-_midgard_workspace_context_iface_list_ids (MidgardWorkspaceStorage *self)
+_midgard_workspace_context_iface_list_ids (MidgardConnection *mgd, MidgardWorkspaceStorage *self)
 {
 	MidgardWorkspaceContext *ctx = MIDGARD_WORKSPACE_CONTEXT (self);
 	const MidgardWorkspaceManager *manager = ctx->priv->manager;
-	MidgardConnection *mgd = manager->priv->mgd;
+	if (mgd == NULL)
+		mgd = manager->priv->mgd;
 	return midgard_core_workspace_get_context_ids (mgd, ctx->priv->id);
 }
 

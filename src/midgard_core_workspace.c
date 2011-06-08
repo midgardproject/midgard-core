@@ -180,6 +180,7 @@ const GValue *
 midgard_core_workspace_get_value_by_id (MidgardConnection *mgd, guint col_idx, guint id, guint *row_id)
 {
 	g_return_val_if_fail (mgd != NULL, NULL);
+	g_return_val_if_fail (MIDGARD_IS_CONNECTION(mgd), NULL);
 
 	guint row;
 	if (row_id)

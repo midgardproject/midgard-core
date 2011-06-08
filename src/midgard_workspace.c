@@ -455,13 +455,14 @@ _midgard_workspace_list_children (MidgardWorkspaceStorage *wss, guint *n_objects
 }
 
 static GSList*
-_midgard_workspace_iface_list_ids (MidgardWorkspaceStorage *self)
+_midgard_workspace_iface_list_ids (MidgardConnection *mgd, MidgardWorkspaceStorage *self)
 {
 	MidgardWorkspace *ws = MIDGARD_WORKSPACE (self);
 	const MidgardWorkspaceManager *manager = ws->priv->manager;
 	if (!manager || (manager && !manager->priv))
 		return NULL;
-	MidgardConnection *mgd = manager->priv->mgd;
+	if (mgd == NULL)
+		mgd = manager->priv->mgd;
 	guint id = ws->priv->id;
 	if (id == 0)
 		return NULL;
