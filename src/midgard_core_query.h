@@ -295,5 +295,6 @@ gchar                   *midgard_core_query_binary_stringify            (GValue 
 gchar 			*midgard_core_query_compute_constraint_property	(MidgardQueryExecutor *executor, MidgardQueryStorage *storage, const gchar *name, GError **error);
 gchar 			*midgard_core_query_unescape_string (MidgardConnection *mgd, const gchar *str);
 void			midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, GError **error, const gchar *property, ...);
+MidgardDBObject 	**midgard_core_query_get_objects (MidgardConnection *mgd, const gchar *classname, GError **error, const gchar *property, ...);
 
 #endif /* MIDGARD_CORE_QUERY_H */

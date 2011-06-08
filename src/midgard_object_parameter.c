@@ -23,6 +23,7 @@
 #include "guid.h"
 #include "midgard_core_object_parameter.h"
 #include "midgard_blob.h"
+#include "midgard_core_query.h"
 
 static MidgardCollector *__create_domain_collector(MidgardConnection *mgd, const gchar *domain)
 {
@@ -453,24 +454,21 @@ MidgardObject **midgard_core_object_parameters_list(
 	g_assert(class_name != NULL);
 	g_assert(guid != NULL);
 
-	MidgardQueryBuilder *builder =
-		midgard_query_builder_new(mgd, class_name);
-
-	if(!builder)
-		return NULL;
-
 	GValue gval = {0, };
 	g_value_init(&gval, G_TYPE_STRING);
 	g_value_set_string(&gval, guid);
-	midgard_query_builder_add_constraint(builder,
-			"parentguid", "=", &gval);
+	GError *err = NULL;
+	
+	MidgardDBObject **objects = midgard_core_query_get_objects (mgd, class_name, &err, "parentguid", &gval, NULL);
+
 	g_value_unset(&gval);
-
-	guint n_objects;	
-	GObject **objects =
-		midgard_query_builder_execute(builder, &n_objects);
-
-	g_object_unref(builder);
+	
+	if (err) {
+		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_NOT_EXISTS, "%s",
+				err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+		return NULL;
+	}
 
 	return (MidgardObject **)objects;
 }

@@ -2475,3 +2475,82 @@ free_objects_and_return:
 
 	return;
 }
+
+MidgardDBObject **
+midgard_core_query_get_objects (MidgardConnection *mgd, const gchar *classname, GError **error, const gchar *property, ...)
+{
+	if (mgd == NULL) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected MidgardConnection. Can not get object.");
+		return;
+	}
+
+	if (classname == NULL) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected class name. Can not get object.");
+		return;
+	}
+
+	GSList *arg_list = NULL;
+	GSList *objects_list = NULL;
+	GSList *l = NULL;
+
+	/* Create all constraints if there are any arguments */
+	const gchar *property_name = property;
+	GValue *cnstr_value;
+	va_list args;
+	va_start (args, property);
+	while (property_name != NULL) {
+		cnstr_value = va_arg (args, GValue *);
+		MidgardQueryProperty *mqp = midgard_query_property_new (property_name, NULL);
+		objects_list = g_slist_prepend (objects_list, (gpointer) mqp);
+		MidgardQueryValue *mqv = midgard_query_value_create_with_value ((const GValue*) cnstr_value);
+		objects_list = g_slist_prepend (objects_list, (gpointer) mqv);
+		MidgardQueryConstraint *mqc = midgard_query_constraint_new (mqp, "=", MIDGARD_QUERY_HOLDER (mqv), NULL);
+		objects_list = g_slist_prepend (objects_list, (gpointer) mqc);
+		arg_list = g_slist_prepend (arg_list, mqc);
+		property_name = va_arg (args, gchar *);
+	}
+	va_end (args);
+
+	if (arg_list == NULL) {
+		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected at last one constraint to get object");
+		return;
+	}
+
+	/* We need either group or one constraint */
+	MidgardQueryConstraintSimple *constraint = NULL;
+	if (g_slist_length (arg_list) > 1) {
+		MidgardQueryConstraintGroup *cgroup = midgard_query_constraint_group_new ();
+		for (l = arg_list; l != NULL; l = l->next) {
+			midgard_query_constraint_group_add_constraint (cgroup, (MidgardQueryConstraintSimple *) l->data);
+		}
+		constraint = (MidgardQueryConstraintSimple*) cgroup;
+	} else {
+		constraint = (MidgardQueryConstraintSimple *) arg_list->data;
+	}
+	g_slist_free (arg_list);
+	
+	MidgardQueryStorage *storage = midgard_query_storage_new (classname);
+	MidgardQuerySelect *select = midgard_query_select_new (mgd, storage);
+	midgard_query_executor_set_constraint (MIDGARD_QUERY_EXECUTOR (select), constraint);
+	midgard_query_select_toggle_read_only (select, FALSE);
+
+	MidgardDBObject **_objects = NULL;
+	GError *err = NULL;
+	midgard_executable_execute (MIDGARD_EXECUTABLE (select), &err);
+	if (err) {
+		g_propagate_error (error, err);
+	} else {
+		guint i;
+		guint n_objects;
+		_objects = midgard_query_select_list_objects (select, &n_objects);
+	}
+
+	for (l = objects_list; l != NULL; l = l->next) {
+		g_object_unref ((GObject*) l->data);
+	}
+	g_slist_free (objects_list);
+	g_object_unref (storage);
+	g_object_unref (select);
+
+	return _objects;
+}
