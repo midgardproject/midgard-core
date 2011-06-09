@@ -127,11 +127,6 @@ static void _midgard_connection_finalize(GObject *object)
 			g_object_unref(self->priv->config);
 			self->priv->config = NULL;
 		}
-		/* Free workspace model */
-		if (self->priv->workspace_model && G_IS_OBJECT (self->priv->workspace_model)) {
-			g_object_unref (self->priv->workspace_model);
-			self->priv->workspace_model = NULL;
-		}
 	}
 
 	if (self->priv->workspace_manager)
@@ -614,7 +609,7 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError *
 	midgard_core_connection_initialize_auth_types(mgd);
 
 	/* Loads all available workspaces */
-	midgard_core_workspace_list_all (mgd);
+	midgard_core_workspace_list_all (mgd, TRUE);
 
 	g_signal_emit (mgd, MIDGARD_CONNECTION_GET_CLASS (mgd)->signal_id_connected, 0);
 
@@ -1260,7 +1255,7 @@ MidgardConnection *midgard_connection_copy(MidgardConnection *self)
 	 * Copy will be used for this. Do not duplicate callbacks invokation */
 	midgard_core_connection_disconnect_error_callback(self);
 
-	new_mgd->priv->workspace_model = self->priv->workspace_model;
+	midgard_core_workspace_list_all (new_mgd, TRUE);
 		
 	/* Increase workspace reference count.
 	 * For example, connection might be copied to new thread, so we 

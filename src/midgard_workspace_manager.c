@@ -27,8 +27,8 @@
 
 /* This is not nice. Can be done as iface's private virtual method. */
 #define __SET_MANAGER(__obj, __mngr) \
-	if (MIDGARD_IS_WORKSPACE (__obj)) MIDGARD_WORKSPACE (__obj)->priv->manager = __mngr; \
-	if (MIDGARD_IS_WORKSPACE_CONTEXT (__obj)) MIDGARD_WORKSPACE_CONTEXT (__obj)->priv->manager = __mngr; 
+	if (MIDGARD_IS_WORKSPACE (__obj)) MIDGARD_WORKSPACE (__obj)->priv->manager = g_object_ref(__mngr); \
+	if (MIDGARD_IS_WORKSPACE_CONTEXT (__obj)) MIDGARD_WORKSPACE_CONTEXT (__obj)->priv->manager = g_object_ref(__mngr); 
 
 /**
  * midgard_workspace_manager_new:
@@ -89,7 +89,7 @@ midgard_workspace_manager_create_workspace (const MidgardWorkspaceManager *self,
 	gboolean rv = MIDGARD_WORKSPACE_STORAGE_GET_INTERFACE (ws)->priv->create (self, ws, path, error);
 	if (rv) {
 		__SET_MANAGER (ws, self);
-		midgard_core_workspace_list_all (self->priv->mgd);
+		midgard_core_workspace_list_all (self->priv->mgd, FALSE);
 		/* TODO, emit signal */
 	}
 	return rv;

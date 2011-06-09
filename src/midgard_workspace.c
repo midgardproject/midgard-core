@@ -141,7 +141,7 @@ _midgard_workspace_create (const MidgardWorkspaceManager *manager, MidgardWorksp
 	if (midgard_core_query_create_dbobject_record (MIDGARD_DBOBJECT (self))) {
 		/* TODO ?, emit created signal */
 		/* Refresh available workspaces model */
-		midgard_core_workspace_list_all (mgd);
+		midgard_core_workspace_list_all (mgd, FALSE);
 
 		/* Get id of newly created object */
 		guint row_id;
@@ -218,7 +218,7 @@ _midgard_workspace_update (const MidgardWorkspaceManager *manager, MidgardWorksp
 	}
 
 	if (midgard_core_query_update_dbobject_record (MIDGARD_DBOBJECT (self), NULL)) {
-		midgard_core_workspace_list_all (mgd);
+		midgard_core_workspace_list_all (mgd, FALSE);
 		return TRUE;
 	}
 

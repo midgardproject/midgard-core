@@ -57,6 +57,8 @@ midgard_core_workspace_private_free (MidgardWorkspacePrivate *ws_priv)
 	ws_priv->id = 0;
 	ws_priv->up_id = 0;
 
+	if (ws_priv->manager && G_IS_OBJECT(ws_priv->manager))
+		g_object_unref (ws_priv->manager);
 	ws_priv->manager = NULL;
 	
 	if (ws_priv->context)
@@ -68,12 +70,15 @@ midgard_core_workspace_private_free (MidgardWorkspacePrivate *ws_priv)
 }
 
 void
-midgard_core_workspace_list_all (MidgardConnection *mgd)
+midgard_core_workspace_list_all (MidgardConnection *mgd, gboolean check_table)
 {
 	g_return_if_fail (mgd != NULL);
 
-	if (!midgard_storage_exists (mgd, "MidgardWorkspace"))
-		return;
+	/* Check table if requested */
+	if (check_table) {
+		if (!midgard_storage_exists (mgd, "MidgardWorkspace"))
+			return;
+	}
 
 	/* TODO, provide statement with parameters */
 	GString *sql = g_string_new ("SELECT ");
@@ -92,6 +97,8 @@ midgard_core_workspace_list_all (MidgardConnection *mgd)
 	if (!model)
 		return;
 
+	if (mgd->priv->workspace_model && G_IS_OBJECT(mgd->priv->workspace_model))
+		g_object_unref (mgd->priv->workspace_model);
 	mgd->priv->workspace_model = model;
 }
 
