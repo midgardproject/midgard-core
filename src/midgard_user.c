@@ -1510,7 +1510,7 @@ static void _midgard_user_class_init(
 	g_hash_table_insert(type_attr->prophash, g_strdup((gchar *)property_name), prop_attr);
 	type_attr->_properties_list = g_slist_append (type_attr->_properties_list, property_name);
 
-	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv = g_new(MidgardDBObjectPrivate, 1);
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv = midgard_core_dbobject_private_new ();
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data = type_attr;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data->table = g_strdup(MIDGARD_USER_TABLE);
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data->tables = g_strdup(MIDGARD_USER_TABLE);
