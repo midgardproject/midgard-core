@@ -1323,6 +1323,57 @@ _user_storage_delete (MidgardConnection *mgd, MidgardDBObjectClass *klass)
 	return FALSE;
 }
 
+static void
+__set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, guint column_id)
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (model != NULL);
+	g_return_if_fail (row > -1);
+	
+	GError *error = NULL;
+	const GValue *value;
+
+	/* guid */
+	value = gda_data_model_get_value_at (model, column_id, row, &error);
+	if (!value) {
+		g_warning ("Failed to get guid value: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		g_free ((gchar *)MGD_OBJECT_GUID (self));
+		MGD_OBJECT_GUID (self) = g_value_dup_string (value);
+	}
+	if (error) g_clear_error (&error);
+	
+	/* FIXME, add column indexes (or constants) for easier data fetching, COL_ID_PERSON instead of 7, etc */ 
+	/* person */
+	value = gda_data_model_get_value_at (model, 7, row, &error);
+	if (!value) {
+		g_warning ("Failed to get person value: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		g_free(MIDGARD_USER(self)->priv->person_guid);
+		MIDGARD_USER(self)->priv->person_guid = g_value_dup_string (value);
+	}
+	if (error) g_clear_error (&error);
+
+	/* authtypeid */
+	value = gda_data_model_get_value_at (model, 5, row, &error);
+	if (!value) {
+		g_warning ("Failed to get auth type id  value: %s", error && error->message ? error->message : "Unknown reason");
+		if (error)
+			g_clear_error (&error);
+	} else {
+		MIDGARD_USER(self)->priv->auth_type_id = g_value_get_int (value);
+	}
+	if (error) g_clear_error (&error);
+
+	column_id++;
+	
+	MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_from_data_model (self, model, row, column_id);
+}
+
 static void _midgard_user_class_init(
 		gpointer g_class, gpointer g_class_data)
 {
@@ -1520,7 +1571,7 @@ static void _midgard_user_class_init(
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->add_fields_to_select_statement;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql = __set_from_sql;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_sql = NULL;
-	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->set_from_data_model;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_data_model = __set_from_data_model;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->create_storage = midgard_core_query_create_class_storage;	
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->update_storage = midgard_core_query_update_class_storage;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_exists = _user_storage_exists; 
