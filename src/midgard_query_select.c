@@ -635,8 +635,10 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint) {
 		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement 			(MIDGARD_QUERY_EXECUTOR (self), MIDGARD_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where, &err);
-		if (err)
-			g_propagate_error (error, err);
+		if (err) {
+			g_set_error(error, err->domain, err->code, "%s", err->message ? err->message : "Unknown error");
+			g_clear_error(&err);
+		}
 		if (MIDGARD_QUERY_EXECUTOR (self)->priv->n_constraints == 1) 
 			__add_second_dummy_constraint (sss, operation);
 		/* Add dummy constraint if operation has only one operand */
@@ -681,10 +683,16 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 
 	/* Check structure */
 	if (!gda_sql_statement_check_structure (sql_stm, &err)) {
+		gchar *err_message = NULL;
+		if (error) {
+			err_message = g_strdup ((*error)->message);
+			g_clear_error(error);
+		}
 		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
-				"Can't build SELECT statement: %s)", err && err->message ? err->message : _("Unknown reason"));
+				"Can't build SELECT statement: %s %s)", err_message, err && err->message ? err->message : _("Unknown reason"));
 		if (err)
-			g_error_free (err);
+			g_clear_error (&err);
+		g_free(err_message);
 		goto return_false;
 	} 
 
