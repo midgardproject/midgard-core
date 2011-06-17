@@ -2271,7 +2271,7 @@ midgard_core_query_compute_constraint_property (MidgardQueryExecutor *executor,
 		const gchar *property_field = midgard_core_class_get_property_colname (klass, name);
 		if (!property_field) {
 			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL, 
-					"%s doesn't seem to be registered for %s", name, G_OBJECT_CLASS_NAME (klass));
+					"Property '%s' doesn't seem to be registered for '%s' class", name, G_OBJECT_CLASS_NAME (klass));
 			g_strfreev (spltd);
 			return NULL;
 		}
