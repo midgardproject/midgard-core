@@ -249,13 +249,16 @@ _midgard_query_constraint_list_constraints (MidgardQueryConstraintSimple *self, 
 }
 
 static void 
-__get_expression_value (GValue *src, GString *str)
+__get_expression_value (GdaConnection *cnc, GValue *src, GString *str)
 {
+	gchar *escaped_string = NULL;
 	switch (G_TYPE_FUNDAMENTAL (G_VALUE_TYPE (src))) {
 	
 		case G_TYPE_STRING:
-			  g_string_append_printf (str, "'%s'", g_value_get_string (src));
-			  break;
+			escaped_string = gda_connection_value_to_sql_string(cnc, src);
+			g_string_append_printf (str, "%s", escaped_string);
+			g_free(escaped_string);
+			break;
 
 		case G_TYPE_UINT:
 			  g_string_append_printf (str, "%d", g_value_get_uint (src));
@@ -285,7 +288,7 @@ __get_expression_value (GValue *src, GString *str)
 				for (i = 0; i < array->n_values; i++) {
 					if (i > 0)
 						g_string_append (str, ", ");
-					__get_expression_value (g_value_array_get_nth (array, i), str);
+					__get_expression_value (cnc, g_value_array_get_nth (array, i), str);
 				}
 			} else {
 				/*FIXME, add this to validate */
@@ -304,7 +307,7 @@ void
 _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQueryConstraintSimple *constraint_simple, GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node, GError **error)
 {	
 	MidgardQueryConstraint *self = MIDGARD_QUERY_CONSTRAINT (constraint_simple);
-	//GdaConnection *cnc = executor->priv->mgd->priv->connection;
+	GdaConnection *cnc = executor->priv->mgd->priv->connection;
 	MidgardDBObjectClass *dbklass = NULL;	
        	if (self->priv->storage && (self->priv->storage != MIDGARD_QUERY_EXECUTOR (executor)->priv->storage)) {
 	       dbklass = self->priv->storage->priv->klass;
@@ -369,7 +372,7 @@ _midgard_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *exe
 	//expr->param_spec->g_type = v_type;
 	expr->value = gda_value_new (G_TYPE_STRING);
 	GString *str = g_string_new ("");
-	__get_expression_value (&val, str);
+	__get_expression_value (cnc, &val, str);
 	g_value_take_string (expr->value, g_string_free (str, FALSE));
 	g_value_unset (&val);
 	cond->operands = g_slist_append (cond->operands, expr);
