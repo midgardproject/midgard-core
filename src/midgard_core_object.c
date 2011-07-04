@@ -778,7 +778,8 @@ midgard_core_object_property_refuse_private (MidgardConnection *mgd, MgdSchemaTy
 		MidgardDBObject *object, const gchar *property)
 {
 	/* Unknown case, no connection  */
-	g_return_val_if_fail (mgd != NULL, TRUE);
+	if (mgd == NULL)
+		return FALSE;
 	g_return_val_if_fail (property != NULL, FALSE);
 
 	MgdSchemaTypeAttr *type_attr = type;
