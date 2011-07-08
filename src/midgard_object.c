@@ -3133,6 +3133,20 @@ GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
 	const gchar *primary_prop = 
 		midgard_reflector_object_get_property_primary(classname);
 
+	GValue pval = {0,};
+	g_value_init(&pval,fprop->value_type);
+	g_object_get_property(G_OBJECT(object), primary_prop, &pval);
+
+	/* If primary property holds uint and its value is 0, do not try to return objects */
+	if (G_VALUE_HOLDS_UINT(&pval))
+	{
+		if (g_value_get_uint(&pval) == 0)
+		{
+			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
+			return NULL;
+		}
+	}
+
 	if (midgard_reflector_object_get_property_up(classname) == NULL) 
 		return NULL;
 	
@@ -3155,10 +3169,6 @@ GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
 			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
 			return NULL;
 		}
-
-		GValue pval = {0,};
-		g_value_init(&pval,fprop->value_type);
-		g_object_get_property(G_OBJECT(object), primary_prop, &pval);
 		
 		midgard_query_builder_add_constraint(builder,
 				midgard_reflector_object_get_property_up(classname), "=", &pval);
@@ -4060,4 +4070,3 @@ void midgard_object_set_schema_property (MidgardObject *self, const gchar *prope
 	g_object_set_property (G_OBJECT (self), property, value);
 	return;
 }
-
