@@ -1405,8 +1405,10 @@ _object_create_storage(MidgardConnection *mgd, MidgardDBObjectClass *klass)
 	if (!midgard_core_query_create_class_storage(mgd, klass))
 		return FALSE;
 
-	if (midgard_connection_is_enabled_workspace(mgd))
-		return __add_workspace_columns (mgd, klass);
+	if (midgard_connection_is_enabled_workspace(mgd)) {
+		if (midgard_core_class_get_table(klass) != NULL)
+			return __add_workspace_columns (mgd, klass);
+	}
 
 	return TRUE;
 }
