@@ -71,4 +71,9 @@
     <id>14</id>
   </type>
 
+	<type name="BrowserID">
+		<description/>
+		<id>15</id>
+	</type>
+
 </Authentication>
