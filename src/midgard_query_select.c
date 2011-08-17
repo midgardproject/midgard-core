@@ -683,16 +683,10 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 
 	/* Check structure */
 	if (!gda_sql_statement_check_structure (sql_stm, &err)) {
-		gchar *err_message = NULL;
-		if (error) {
-			err_message = g_strdup ((*error)->message);
-			g_clear_error(error);
-		}
 		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
-				"Can't build SELECT statement: %s %s)", err_message, err && err->message ? err->message : _("Unknown reason"));
+				"Can't build SELECT statement: %s)", err && err->message ? err->message : _("Unknown reason"));
 		if (err)
 			g_clear_error (&err);
-		g_free(err_message);
 		goto return_false;
 	} 
 
