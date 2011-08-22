@@ -242,7 +242,10 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 		/* Abstract  */
 		attrval = xmlGetProp(node, (const xmlChar *)TYPE_RW_ABSTRACT);
 		if (attrval) {
-			if (*attrval == 'y' || *attrval == 'Y') {
+			if (*attrval == 'y' 
+					|| *attrval == 'Y'
+					|| *attrval == 't'
+					|| *attrval == 'T') {
 				type_attr->is_abstract = TRUE;
 			}
 			xmlFree(attrval);			
