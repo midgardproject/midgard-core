@@ -484,7 +484,7 @@ midgard_core_schema_type_initialize_paramspec (MgdSchemaTypeAttr *type)
 					property, nick, prop_attr->description,
 					"", G_PARAM_READWRITE);
 		}
-	}	
+	}
 }
 
 void			

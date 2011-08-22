@@ -1501,19 +1501,25 @@ static void __register_schema_type (gpointer key, gpointer val, gpointer user_da
 	}
 
 	GType new_type;
-	new_type = midgard_type_register(type_attr, type_attr->is_abstract ? MIDGARD_TYPE_BASE_ABSTRACT : MIDGARD_TYPE_OBJECT);
+	if (type_attr->is_abstract)
+		new_type = midgard_type_register_abstract (type_attr, MIDGARD_TYPE_BASE_ABSTRACT);
+	else
+		new_type = midgard_type_register(type_attr, MIDGARD_TYPE_OBJECT);
 
 	if (new_type) {
 
-		GObject *foo = g_object_new(new_type, NULL);
+		/* Create new instance to ensure class is initialized */
+		if (!type_attr->is_abstract) {
+			GObject *foo = g_object_new(new_type, NULL);
+			g_object_unref (foo);
+		}
+		GObjectClass *klass = g_type_class_peek (new_type);
+		if (!klass)
+			klass = g_type_class_ref (new_type);
 		/* Set number of properties.
 		 * This way we gain performance for instance_init call */
-		GParamSpec **pspecs = 
-			g_object_class_list_properties(
-					G_OBJECT_GET_CLASS(G_OBJECT(foo)), 
-					&type_attr->class_nprop);
+		GParamSpec **pspecs = g_object_class_list_properties (klass, &type_attr->class_nprop);
 		g_free(pspecs);
-		g_object_unref(foo); 
 	}
 }
 
