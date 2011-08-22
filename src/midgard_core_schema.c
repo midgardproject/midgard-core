@@ -413,9 +413,8 @@ midgard_core_schema_type_initialize_paramspec (MgdSchemaTypeAttr *type)
 	guint n = g_hash_table_size(hash);
 	guint m = n+1;
 
-	if (n < 1) {
-		
-		g_warning("Initializing '%s' type without properties", type->name);
+	if (n < 1) {	
+		g_debug ("Initializing '%s' type without properties", type->name);
 		return;
 	}
 
