@@ -34,6 +34,7 @@
 #include "midgard_metadata.h"
 #include "midgard_workspace.h"
 #include "midgard_repligard.h"
+#include "midgard_base_abstract.h"
 
 #include <locale.h>
 
@@ -186,6 +187,10 @@ midgard_init()
 	g_assert (type != 0);
 	g_type_class_ref (type);
 
+	type = MIDGARD_TYPE_BASE_ABSTRACT;
+	g_assert (type != 0);
+	g_type_class_ref (type);
+
 	/* Register transform function explicitly, we need own routine */
 	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_FLOAT, __transform_string_to_float);
   	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_BOOLEAN, __transform_string_to_boolean);
@@ -241,6 +246,10 @@ midgard_close(void)
 		g_type_class_unref (klass);
 
 	klass = g_type_class_peek (MIDGARD_TYPE_REPLIGARD);
+	if (klass)
+		g_type_class_unref (klass);
+
+	klass = g_type_class_peek (MIDGARD_TYPE_BASE_ABSTRACT);
 	if (klass)
 		g_type_class_unref (klass);
 }
