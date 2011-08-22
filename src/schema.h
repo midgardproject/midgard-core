@@ -84,7 +84,8 @@ struct _MgdSchemaTypeAttr {
 	gchar *sql_create_view;
 	gchar *metadata_class_name;
 	MidgardMetadataClass *metadata_class_ptr;
-	GHashTable *user_values;	
+	GHashTable *user_values;
+	gboolean is_abstract;	
 };
 
 #define MGD_TYPE_ATTR_METADATA_CLASS(__typeattr) (__typeattr->metadata_class_name)
@@ -127,6 +128,7 @@ GType 			midgard_core_schema_gtype_from_string		(const gchar *type);
 #define TYPE_RW_METADATA 	"metadata"
 #define TYPE_RW_USERVALUES	"user_values"
 #define TYPE_RW_PROPERTY	"property"
+#define TYPE_RW_ABSTRACT	"abstract"
 
 #define PROP_RW_PRIVATE		"private"
 #define PROP_RW_FIELD		"field"

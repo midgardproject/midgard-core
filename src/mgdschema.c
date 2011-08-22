@@ -111,6 +111,7 @@ static const gchar *mgd_complextype[] = {
 	"include", 
 	"copy", 
 	"extends", 
+	TYPE_RW_ABSTRACT,
 	TYPE_RW_USERVALUES,
 	NULL 
 };
@@ -236,6 +237,15 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 			midgard_core_schema_type_set_table (type_attr, (const gchar *)attrval);				
 			xmlFree(attrval);	
 		
+		}
+
+		/* Abstract  */
+		attrval = xmlGetProp(node, (const xmlChar *)TYPE_RW_ABSTRACT);
+		if (attrval) {
+			if (*attrval == 'y' || *attrval == 'Y') {
+				type_attr->is_abstract = TRUE;
+			}
+			xmlFree(attrval);			
 		}
 
 		/* parent */
