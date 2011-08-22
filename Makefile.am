@@ -37,6 +37,7 @@ viewsdir = $(datadir)/midgard2/views
 views_DATA = views/README-views.txt
 
 midgard_public_h = \
+	src/midgard_base_abstract.h \
 	src/midgard_config.h \
 	src/midgard_config_auto.h \
 	src/midgard_dbobject.h \
@@ -155,6 +156,7 @@ src_libmidgard2_la_core_SOURCES = \
 
 src_libmidgard2_la_public_SOURCES = \
 	src/midgard.c \
+	src/midgard_base_abstract.c \
 	src/midgard_key_config.c \
 	src/midgard_key_config_context.c \
 	src/midgard_key_config_file.c \
