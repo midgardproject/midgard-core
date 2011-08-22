@@ -35,6 +35,7 @@
 #include "midgard_core_xml.h"
 #include "midgard_metadata.h"
 #include "midgard_reflector_object.h"
+#include "midgard_base_abstract.h"
 
 /* TODO tune header files , no need to include string.h while we need to include midgard.h in almost every case */
 
@@ -123,6 +124,7 @@ static const gchar *mgd_attribute[] = {
 	TYPE_RW_EXTENDS,
 	TYPE_RW_COPY,
 	TYPE_RW_METADATA,
+	TYPE_RW_ABSTRACT,
 	"parent", 
 	"parentfield", 
 	"link", 
@@ -1499,7 +1501,7 @@ static void __register_schema_type (gpointer key, gpointer val, gpointer user_da
 	}
 
 	GType new_type;
-	new_type = midgard_type_register(type_attr, MIDGARD_TYPE_OBJECT);
+	new_type = midgard_type_register(type_attr, type_attr->is_abstract ? MIDGARD_TYPE_BASE_ABSTRACT : MIDGARD_TYPE_OBJECT);
 
 	if (new_type) {
 
