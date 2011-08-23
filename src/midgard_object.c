@@ -1829,40 +1829,6 @@ __mgdschema_object_constructor (GType type,
 }
 
 GType
-midgard_type_register_abstract (MgdSchemaTypeAttr *type_data, GType parent_type)
-{
-	gchar *classname = type_data->name;
-
-	GType class_type = g_type_from_name (classname);
-
-        if (class_type) 
-                return class_type;
-
-        {
-                GTypeInfo *midgard_type_info = g_new0 (GTypeInfo, 1);
-
-                /* our own class size is 0 but it should include space for a parent, therefore add it */
-                midgard_type_info->class_size = sizeof (MidgardBaseAbstractClass);
-                midgard_type_info->base_init = NULL;
-                midgard_type_info->base_finalize = NULL;
-                midgard_type_info->class_init  = NULL;
-                midgard_type_info->class_finalize  = NULL;
-                midgard_type_info->class_data = type_data;
-                /* our own instance size is 0 but it should include space for a parent,
-                 * therefore add it */
-                midgard_type_info->instance_size = sizeof (MidgardBaseAbstract);
-                midgard_type_info->n_preallocs = 0;
-                midgard_type_info->instance_init = NULL;
-                midgard_type_info->value_table = NULL;
-                
-		GType type = g_type_register_static (parent_type, classname, midgard_type_info, G_TYPE_FLAG_ABSTRACT);
-               
-                g_free (midgard_type_info);
-                return type;   
-        }                      
-}
-
-GType
 midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
 {
 	gchar *classname = type_data->name;
