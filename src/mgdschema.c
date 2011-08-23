@@ -268,8 +268,10 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 
 			type_attr->extends = g_strdup ((gchar *)attrval);
 			xmlChar *table_name = (xmlChar *) xmlGetProp (node, (const xmlChar *)"table");	
+			MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, (gchar *)attrval);
 
-			if (table_name != NULL) {
+			if (table_name != NULL
+					&& !src->is_abstract) {
 
 				__warn_msg (node, "Can not define 'table' and 'extends' attributes together");
 				xmlFree (table_name);
@@ -278,11 +280,8 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 				g_free (type_attr->extends);
 				type_attr->extends = NULL;
 			
-			} else {
-
-				MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, (gchar *)attrval);
-				if (src)
-					midgard_core_schema_type_attr_extend (src, type_attr);
+			} else if (src) {
+				midgard_core_schema_type_attr_extend (src, type_attr);
 			}
 
 			xmlFree (table_name);
