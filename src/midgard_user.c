@@ -1025,6 +1025,95 @@ static void __set_from_sql(MidgardDBObject *object,
 	}
 }
 
+xmlNode *__lookup_node(xmlNode *node, const gchar *name)
+{
+	xmlNode *cur = NULL;
+	
+	for (cur = node; cur; cur = cur->next) {
+		if (cur->type == XML_ELEMENT_NODE) {
+			if (g_str_equal (cur->name, name))
+				return cur;
+    		}
+	}
+	return NULL;
+}
+
+static void 
+__set_from_xml_node (MidgardDBObject *object, xmlNode *node)
+{
+	g_assert (object != NULL);
+	g_assert (node != NULL);
+
+	MidgardUser *self = MIDGARD_USER (object);
+	xmlNode *lnode = NULL;
+	gchar *content;
+
+	/* guid */
+	lnode = __lookup_node (node, "guid");
+	g_free ((gchar*) MIDGARD_DBOBJECT (self)->dbpriv->guid);
+	//self->dbpriv->guid = ;
+
+	/* login */
+	lnode = __lookup_node (node, "login");
+	content = (gchar *)xmlNodeGetContent (lnode);
+	if (content != NULL) {
+		g_free (self->priv->login);
+		self->priv->login = g_strdup (content);
+		g_free (content);
+	}
+
+	/* password */
+	lnode = __lookup_node (node, "password");
+	content = (gchar *)xmlNodeGetContent (lnode);
+	if (content != NULL) {
+		g_free (self->priv->password);
+		self->priv->password = g_strdup (content);
+		g_free (content);
+	}
+
+	/* active */
+	lnode = __lookup_node (node, "active");
+	content = (gchar *)xmlNodeGetContent (lnode);
+	if (content != NULL) {
+		self->priv->active = (gboolean)atoi (content);
+		g_free (content);
+	}
+
+	/* authtype */
+	lnode = __lookup_node (node, "authtype");
+	content = (gchar *)xmlNodeGetContent (lnode);
+	if (content != NULL) {
+		g_free (self->priv->auth_type);
+		self->priv->auth_type = g_strdup (content);
+		g_free (content);
+	}
+
+	/* authtypeid */
+	lnode = __lookup_node (node, "authtypeid");
+	content = (gchar *)xmlNodeGetContent (lnode);
+	if (content != NULL) {
+		self->priv->auth_type_id = atoi (content);
+		g_free (content);
+	}
+
+	/* usertype */
+	lnode = __lookup_node (node, "usertype");
+	content = (gchar *)xmlNodeGetContent (lnode);
+	if (content != NULL) {
+		self->priv->user_type = atoi (content);
+		g_free (content);
+	}
+
+	/* person */
+	lnode = __lookup_node (node, "person");
+	content = (gchar *)xmlNodeGetContent (lnode);
+	if (content != NULL) {
+		g_free (self->priv->person_guid);
+		self->priv->person_guid = g_strdup (content);
+		g_free (content);
+	}
+}
+
 /**
  * midgard_user_set_person:
  * @self: #MidgardUser instance
@@ -1570,6 +1659,7 @@ static void _midgard_user_class_init(
 
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__parent_class)->dbpriv->add_fields_to_select_statement;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->__set_from_sql = __set_from_sql;
+	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_xml_node = __set_from_xml_node;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_sql = NULL;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->set_from_data_model = __set_from_data_model;
 	MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->create_storage = midgard_core_query_create_class_storage;	

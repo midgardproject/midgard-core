@@ -699,10 +699,12 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd,
 		} else {
 
 			xmlChar *attr = xmlGetProp(child, BAD_CAST "purge");
-			if(g_str_equal(attr, "yes") && MIDGARD_IS_DBOBJECT(object)){
-				g_object_set(object, "action", "purged", NULL);
-				xmlFree(attr);
-				attr = NULL;
+			if(g_str_equal(attr, "yes") && MIDGARD_IS_DBOBJECT(object)) {
+				if (MIDGARD_IS_OBJECT (object)) {
+					g_object_set(object, "action", "purged", NULL);
+					xmlFree(attr);
+					attr = NULL;
+				}
 				
 				attr = xmlGetProp(child, BAD_CAST "guid");
 				MIDGARD_DBOBJECT(object)->dbpriv->guid = 
@@ -728,10 +730,11 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd,
 			if(attr)
 				xmlFree(attr);
 
-			xmlChar *action_attr = xmlGetProp(child, BAD_CAST "action");
-			g_object_set(G_OBJECT(object), "action", 
-					(gchar *) action_attr, NULL);
-			xmlFree(action_attr);
+			if (MIDGARD_IS_OBJECT (object)) {
+				xmlChar *action_attr = xmlGetProp(child, BAD_CAST "action");
+				g_object_set(G_OBJECT(object), "action", (gchar *) action_attr, NULL);
+				xmlFree(action_attr);
+			}
 
 			olist = g_slist_prepend(olist, object);
 			_n_nodes++;	
