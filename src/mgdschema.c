@@ -1525,6 +1525,7 @@ static void __register_schema_type (gpointer key, gpointer val, gpointer user_da
 	{
 		g_warning ("Can not register '%s' type, which is derived from '%s' abstract template", 
 				type_attr->name, g_type_name (g_type_parent (new_type)));
+		return;
 	}
 
 	if (new_type) {
