@@ -1422,10 +1422,26 @@ static void __extend_type_foreach(gpointer key, gpointer val, gpointer userdata)
 
 	MgdSchemaTypeAttr *parent_type_attr = 
 		midgard_schema_lookup_type(schema, type_attr->extends);
+	GType parent_type = g_type_from_name (type_attr->extends);
 
-	if (!parent_type_attr)
+	/* Try to get type from class' data */
+	if (!parent_type_attr) {
+		GObjectClass *klass = g_type_class_peek (parent_type);
+		if (klass && MIDGARD_IS_DBOBJECT_CLASS(klass)) {
+			parent_type_attr = MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data;
+		}
+	}
+
+	if (!parent_type_attr && 
+			(parent_type != G_TYPE_NONE && !G_TYPE_IS_ABSTRACT(parent_type))) {
 		g_error("Type information for %s (%s's parent) not found", 
 				type_attr->extends, type_attr->name);
+	}
+
+	/* We do not need to start inheritance chain, if it's abstract type 
+	 * or type without storage or properties defined */
+	if (!parent_type_attr)
+		return;
 
 	midgard_core_schema_type_attr_extend (type_attr, parent_type_attr);
 
@@ -1503,7 +1519,13 @@ static void __register_schema_type (gpointer key, gpointer val, gpointer user_da
 	if (type_attr->is_abstract)
 		new_type = midgard_type_register_abstract (type_attr, MIDGARD_TYPE_BASE_ABSTRACT);
 	else
-		new_type = midgard_type_register(type_attr, MIDGARD_TYPE_OBJECT);
+		new_type = midgard_type_register(type_attr, type_attr->extends ? g_type_from_name (type_attr->extends) : MIDGARD_TYPE_OBJECT);
+
+	if (!type_attr->is_abstract && g_type_is_a (new_type, MIDGARD_TYPE_BASE_ABSTRACT)) 
+	{
+		g_warning ("Can not register '%s' type, which is derived from '%s' abstract template", 
+				type_attr->name, g_type_name (g_type_parent (new_type)));
+	}
 
 	if (new_type) {
 
