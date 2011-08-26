@@ -29,10 +29,7 @@ dnl Checks for programs.
 AM_PROG_LIBTOOL
 
 dnl Checks for libraries.
-AC_MSG_CHECKING([whether to use Libgda4 (libgda3 by default)])
-AC_ARG_WITH(libgda4, [  --with-libgda4], gdamodule="libgda-4.0", gdamodule="libgda-3.0")
 gdamodule="libgda-4.0"
-AC_MSG_RESULT($gdamodule)
 
 _MIDGARD_DBUS_SUPPORT=yes
 dbus_libs="dbus-1 dbus-glib-1"
