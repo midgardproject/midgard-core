@@ -177,6 +177,15 @@ static const gchar *rcolumns[] = {
 	NULL
 };
 
+/* RESERVED abstract names */
+static const gchar *rabstract_names[] = {
+	"true",
+	"yes",
+	"interface",
+	"mixin",	
+	NULL
+};
+
 static gboolean strv_contains(const char **strv, const xmlChar *str) {
         g_assert(strv != NULL);
         g_assert(str != NULL);
@@ -244,12 +253,17 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 		/* Abstract  */
 		attrval = xmlGetProp(node, (const xmlChar *)TYPE_RW_ABSTRACT);
 		if (attrval) {
-			if (*attrval == 'y' 
-					|| *attrval == 'Y'
-					|| *attrval == 't'
-					|| *attrval == 'T') {
-				type_attr->is_abstract = TRUE;
+			if (!strv_contains (rabstract_names, attrval)) {
+				__warn_msg (node, "Invalid abstract type");
+                                g_error ("Invalid abstract type");
 			}
+			if (g_str_equal (attrval, "true")
+					|| g_str_equal (attrval, "yes"))
+				type_attr->is_abstract = TRUE;
+			else if (g_str_equal (attrval, "interface"))
+				type_attr->is_iface = TRUE;
+			else if (g_str_equal (attrval, "mixin"))
+				type_attr->is_mixin = TRUE;
 			xmlFree(attrval);			
 		}
 
@@ -1516,10 +1530,15 @@ static void __register_schema_type (gpointer key, gpointer val, gpointer user_da
 	}
 
 	GType new_type;
-	if (type_attr->is_abstract)
+	if (type_attr->is_abstract) {
 		new_type = midgard_type_register_abstract (type_attr, MIDGARD_TYPE_BASE_ABSTRACT);
-	else
+	} else if (type_attr->is_mixin 
+			|| type_attr->is_iface) {
+		new_type = midgard_core_type_register_interface (type_attr);
+		return;
+	} else {
 		new_type = midgard_type_register(type_attr, type_attr->extends ? g_type_from_name (type_attr->extends) : MIDGARD_TYPE_OBJECT);
+	}
 
 	if (!type_attr->is_abstract && g_type_is_a (new_type, MIDGARD_TYPE_BASE_ABSTRACT)) 
 	{

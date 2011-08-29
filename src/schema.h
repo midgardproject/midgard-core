@@ -85,7 +85,9 @@ struct _MgdSchemaTypeAttr {
 	gchar *metadata_class_name;
 	MidgardMetadataClass *metadata_class_ptr;
 	GHashTable *user_values;
-	gboolean is_abstract;	
+	gboolean is_abstract;
+	gboolean is_iface;
+	gboolean is_mixin;	
 };
 
 #define MGD_TYPE_ATTR_METADATA_CLASS(__typeattr) (__typeattr->metadata_class_name)
@@ -94,6 +96,7 @@ struct _MgdSchemaTypeAttr {
 MgdSchemaTypeAttr 	*midgard_schema_lookup_type		(MidgardSchema *schema, gchar *type);
 GType			midgard_type_register			(MgdSchemaTypeAttr *data, GType parent_type);
 GType			midgard_type_register_abstract		(MgdSchemaTypeAttr *data, GType parent_type);
+GType 			midgard_core_type_register_interface 	(MgdSchemaTypeAttr *type_attr);
 
 MgdSchemaTypeAttr	*midgard_core_schema_type_attr_new	(void);
 void 			midgard_core_schema_type_attr_free	(MgdSchemaTypeAttr *prop);
@@ -130,6 +133,8 @@ GType 			midgard_core_schema_gtype_from_string		(const gchar *type);
 #define TYPE_RW_USERVALUES	"user_values"
 #define TYPE_RW_PROPERTY	"property"
 #define TYPE_RW_ABSTRACT	"abstract"
+#define TYPE_RW_IFACE		"interface"
+#define TYPE_RW_MIXIN		"mixin"
 
 #define PROP_RW_PRIVATE		"private"
 #define PROP_RW_FIELD		"field"

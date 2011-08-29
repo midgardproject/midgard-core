@@ -66,6 +66,7 @@
 #include <midgard/midgard_workspace_context.h>
 #include <midgard/midgard_workspace_storage.h>
 #include <midgard/midgard_base_abstract.h>
+#include <midgard/midgard_base_interface.h>
 
 #endif /* _MIDGARD_API_H_ */
 
