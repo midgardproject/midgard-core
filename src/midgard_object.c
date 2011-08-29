@@ -1858,8 +1858,31 @@ midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
                 midgard_type_info->n_preallocs = 0;
                 midgard_type_info->instance_init = __midgard_object_instance_init;
                 midgard_type_info->value_table = NULL;
-                
-		GType type = g_type_register_static (parent_type, classname, midgard_type_info, type_data->is_abstract ? G_TYPE_FLAG_ABSTRACT : 0);
+               
+		gboolean add_interface = FALSE;
+		GType real_parent_type = parent_type = G_TYPE_NONE ? MIDGARD_TYPE_OBJECT : parent_type;	
+		if (type_data->extends != NULL) {
+			GType tmp_type = g_type_from_name (type_data->extends);
+			if (tmp_type == G_TYPE_NONE) {
+				g_warning ("Failed to get type of '%s', which is parent of '%s'", type_data->extends, type_data->name);
+				g_error ("Invalid parent type");
+			}
+			if (G_TYPE_IS_INTERFACE (tmp_type)) {
+				real_parent_type = MIDGARD_TYPE_OBJECT;
+				add_interface = TRUE;
+			}	
+		}
+
+		GType type = g_type_register_static (real_parent_type, classname, midgard_type_info, type_data->is_abstract ? G_TYPE_FLAG_ABSTRACT : 0);
+
+		if (add_interface) {
+			 static const GInterfaceInfo iface_info = {
+				 NULL,   /* interface_init */
+				 NULL,   /* interface_finalize */
+				 NULL    /* interface_data */
+			 };
+ 			 g_type_add_interface_static (type, g_type_from_name (type_data->extends), &iface_info);
+		}
                
 	        /* FIXME, MidgardAttachment should be registered directly in core, instead of schema */	
 		if (g_str_equal (classname, "midgard_attachment"))
