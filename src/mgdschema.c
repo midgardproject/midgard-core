@@ -979,13 +979,11 @@ void __get_tdata_foreach(gpointer key, gpointer value, gpointer user_data)
 	np = g_hash_table_size(type_attr->prophash);
 
 	if (np > 0) {
-
 		if (type_attr->table)
-			g_hash_table_foreach(type_attr->prophash, __get_pdata_foreach, type_attr);
-		
+			g_hash_table_foreach(type_attr->prophash, __get_pdata_foreach, type_attr);	
 	} else {
 
-		g_warning("Type %s has less than 1 property!", (gchar *)key);
+		g_debug("Type %s has less than 1 property!", (gchar *)key);
 	}
 }
 
