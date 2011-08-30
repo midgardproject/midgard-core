@@ -53,6 +53,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #include "midgard_core_config.h"
 #include "midgard_repligard.h"
 #include "midgard_base_abstract.h"
+#include "midgard_base_interface.h"
 
 GType _midgard_attachment_type = 0;
 static gboolean signals_registered = FALSE;
@@ -1828,11 +1829,16 @@ __mgdschema_object_constructor (GType type,
 	return object;
 }
 
+static void 
+__midgard_object_iface_init (MidgardBaseInterfaceIFace *iface)
+{
+
+}
+
 GType
-midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
+midgard_type_register (MgdSchemaTypeAttr *type_data)
 {
 	gchar *classname = type_data->name;
-
 	GType class_type = g_type_from_name (classname);
 
         if (class_type) 
@@ -1859,31 +1865,48 @@ midgard_type_register (MgdSchemaTypeAttr *type_data, GType parent_type)
                 midgard_type_info->instance_init = __midgard_object_instance_init;
                 midgard_type_info->value_table = NULL;
                
-		gboolean add_interface = FALSE;
-		GType real_parent_type = parent_type = G_TYPE_NONE ? MIDGARD_TYPE_OBJECT : parent_type;	
+		GSList *ifaces = NULL;
+		gchar **extends = NULL;
+		GType real_parent_type = MIDGARD_TYPE_OBJECT;
 		if (type_data->extends != NULL) {
-			GType tmp_type = g_type_from_name (type_data->extends);
-			if (tmp_type == G_TYPE_NONE) {
-				g_warning ("Failed to get type of '%s', which is parent of '%s'", type_data->extends, type_data->name);
-				g_error ("Invalid parent type");
+
+			guint n_types;
+			guint i;
+			extends = midgard_core_schema_type_list_extends (type_data, &n_types);
+			
+			for (i = 0; i < n_types; i++) {
+				GType tmp_type = g_type_from_name (extends[i]);
+				if (tmp_type == G_TYPE_NONE) {
+					g_warning ("Failed to get type of '%s', which is parent of '%s'", extends[i], type_data->name);
+					g_error ("Invalid parent type");
+				}
+				if (G_TYPE_IS_INTERFACE (tmp_type)) {
+					ifaces = g_slist_append (ifaces, extends[i]);
+				} else if G_TYPE_IS_OBJECT (tmp_type) {
+					/* TODO, check if it's valid MidgardObject derived type */
+					real_parent_type = tmp_type;
+				} 
 			}
-			if (G_TYPE_IS_INTERFACE (tmp_type)) {
-				real_parent_type = MIDGARD_TYPE_OBJECT;
-				add_interface = TRUE;
-			}	
 		}
 
 		GType type = g_type_register_static (real_parent_type, classname, midgard_type_info, type_data->is_abstract ? G_TYPE_FLAG_ABSTRACT : 0);
 
-		if (add_interface) {
+		if (ifaces != NULL) {
 			 static const GInterfaceInfo iface_info = {
-				 NULL,   /* interface_init */
+				 (GInterfaceInitFunc)__midgard_object_iface_init, 
 				 NULL,   /* interface_finalize */
 				 NULL    /* interface_data */
 			 };
- 			 g_type_add_interface_static (type, g_type_from_name (type_data->extends), &iface_info);
+			 GSList *l;
+			 for (l = ifaces; l != NULL; l = l->next) {			
+				 g_type_add_interface_static (type, g_type_from_name ((gchar *)l->data), &iface_info);
+			 }
+			 g_slist_free (ifaces);
 		}
                
+		if (extends)
+			g_strfreev (extends);
+
 	        /* FIXME, MidgardAttachment should be registered directly in core, instead of schema */	
 		if (g_str_equal (classname, "midgard_attachment"))
 			_midgard_attachment_type = type;

@@ -34,6 +34,7 @@ typedef struct _MidgardBaseInterfacePrivate MidgardBaseInterfacePrivate;
 
 struct _MidgardBaseInterfaceIFace {
 	GTypeInterface  parent;
+	MidgardBaseInterfacePrivate *priv;
 };
 
 GType	midgard_base_interface_get_type	(void);

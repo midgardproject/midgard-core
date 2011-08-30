@@ -94,13 +94,14 @@ struct _MgdSchemaTypeAttr {
 
 /* MgdSchema storage utilities */
 MgdSchemaTypeAttr 	*midgard_schema_lookup_type		(MidgardSchema *schema, gchar *type);
-GType			midgard_type_register			(MgdSchemaTypeAttr *data, GType parent_type);
+GType			midgard_type_register			(MgdSchemaTypeAttr *data);
 GType			midgard_type_register_abstract		(MgdSchemaTypeAttr *data, GType parent_type);
 GType 			midgard_core_type_register_interface 	(MgdSchemaTypeAttr *type_attr);
 
 MgdSchemaTypeAttr	*midgard_core_schema_type_attr_new	(void);
 void 			midgard_core_schema_type_attr_free	(MgdSchemaTypeAttr *prop);
 void                    midgard_core_schema_type_attr_extend	(MgdSchemaTypeAttr *src, MgdSchemaTypeAttr *dst);
+gchar 			**midgard_core_schema_type_list_extends (MgdSchemaTypeAttr *type_attr, guint *n_types);
 
 void			midgard_core_schema_type_set_table	 	(MgdSchemaTypeAttr *prop, const gchar *table);
 void 			midgard_core_schema_type_add_table 		(MgdSchemaTypeAttr *type, const gchar *table);

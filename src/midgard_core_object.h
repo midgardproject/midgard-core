@@ -309,4 +309,7 @@ gboolean midgard_core_object_property_refuse_private (MidgardConnection *self, M
 /* D-Bus */
 void midgard_core_dbus_send_serialized_object(MidgardObject *object, const gchar *path);
 
+/* Interfaces */
+void midgard_core_interface_add_prerequisites (GType type, GType iface_type);
+
 #endif /* MIDGARD_CORE_OBJECT_H */

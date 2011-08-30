@@ -211,6 +211,36 @@ midgard_core_schema_type_attr_new (void)
 	return type;
 }
 
+gchar **
+midgard_core_schema_type_list_extends (MgdSchemaTypeAttr *type_attr, guint *n_types)
+{
+	g_assert (type_attr != NULL);
+	*n_types = 0;
+
+	if (type_attr->extends == NULL)
+		return NULL;
+
+	guint i = 0;
+	gchar **tmp = g_strsplit (type_attr->extends, ",", 0);
+	while (tmp[i] != NULL) {
+		*n_types = i;
+		g_strstrip (tmp[i]);
+		i++;
+	}
+
+	gchar **extends = g_new (gchar*, i+1);
+	i = 0;
+	while (tmp[i] != NULL) {
+		extends[i] = tmp[i];
+	       i++;	
+	}
+
+	extends[i] = NULL;
+
+	g_free (tmp);
+	return extends;
+}
+
 void
 midgard_core_schema_type_attr_extend (MgdSchemaTypeAttr *src, MgdSchemaTypeAttr *dst)
 {

@@ -282,20 +282,25 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 
 			type_attr->extends = g_strdup ((gchar *)attrval);
 			xmlChar *table_name = (xmlChar *) xmlGetProp (node, (const xmlChar *)"table");	
-			MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, (gchar *)attrval);
+			guint i;
+			guint n_types;
+			gchar **extends = midgard_core_schema_type_list_extends (type_attr, &n_types);
 
-			if (table_name != NULL
-					&& !src->is_abstract) {
-
-				__warn_msg (node, "Can not define 'table' and 'extends' attributes together");
-				xmlFree (table_name);
-
-				/* This might be undefined result, so we fallback to NULL default */
-				g_free (type_attr->extends);
-				type_attr->extends = NULL;
-			
-			} else if (src) {
-				midgard_core_schema_type_attr_extend (src, type_attr);
+			for (i = 0; i < n_types; i++) {
+				MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, extends[i]);
+				if (!src->is_iface
+						&& !src->is_mixin
+						&& !src->is_abstract
+						&& table_name) {
+					__warn_msg (node, "Can not define 'table' and 'extends' attributes together");
+					/* This might be undefined result, so we fallback to NULL default */
+					g_free (type_attr->extends);
+					type_attr->extends = NULL;
+				} else {
+					midgard_core_schema_type_attr_extend (src, type_attr);
+				}
+				if (extends)
+					g_strfreev (extends);
 			}
 
 			xmlFree (table_name);
@@ -1432,42 +1437,51 @@ static void __extend_type_foreach(gpointer key, gpointer val, gpointer userdata)
 	if (val == NULL) return;
 	if (type_attr->extends == NULL) return;
 
-	MgdSchemaTypeAttr *parent_type_attr = 
-		midgard_schema_lookup_type(schema, type_attr->extends);
-	GType parent_type = g_type_from_name (type_attr->extends);
+	guint n_types;
+	guint i;
+	gchar **extends = midgard_core_schema_type_list_extends (type_attr, &n_types);
 
-	/* Try to get type from class' data */
-	if (!parent_type_attr) {
-		GObjectClass *klass = g_type_class_peek (parent_type);
-		if (klass && MIDGARD_IS_DBOBJECT_CLASS(klass)) {
-			parent_type_attr = MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data;
-		}
-	}
-
-	if (!parent_type_attr && 
-			(parent_type != G_TYPE_NONE && !G_TYPE_IS_ABSTRACT(parent_type))) {
-		g_error("Type information for %s (%s's parent) not found", 
-				type_attr->extends, type_attr->name);
-	}
-
-	/* We do not need to start inheritance chain, if it's abstract type 
-	 * or type without storage or properties defined */
-	if (!parent_type_attr)
+	if (n_types == 0)
 		return;
 
-	midgard_core_schema_type_attr_extend (type_attr, parent_type_attr);
+	for (i = 0; i < n_types; i++) {
+		MgdSchemaTypeAttr *parent_type_attr = midgard_schema_lookup_type(schema, extends[i]);
+		GType parent_type = g_type_from_name (extends[i]);
 
-	/* Use parent's storage */
-	type_attr->table = g_strdup(parent_type_attr->table);
-	type_attr->tables = g_strdup(parent_type_attr->tables);
+		/* Try to get type from class' data */
+		if (!parent_type_attr) {
+			GObjectClass *klass = g_type_class_peek (parent_type);
+			if (klass && MIDGARD_IS_DBOBJECT_CLASS(klass)) {
+				parent_type_attr = MIDGARD_DBOBJECT_CLASS (klass)->dbpriv->storage_data;
+			}
+		}
+		
+		if (!parent_type_attr && 
+				(parent_type != G_TYPE_NONE && !G_TYPE_IS_ABSTRACT(parent_type))) {
+			g_error("Type information for %s (%s's parent) not found", 
+					extends[i], type_attr->name);
+		}
 
-        GSList *slist = NULL;
-
-	for (slist = parent_type_attr->_properties_list; slist != NULL; slist = slist->next) {
-		type_attr->_properties_list = g_slist_prepend (type_attr->_properties_list, slist->data);
+		/* We do not need to start inheritance chain, if it's abstract type 
+		 * or type without storage or properties defined */
+		if (!parent_type_attr)
+			return;
+		
+		midgard_core_schema_type_attr_extend (type_attr, parent_type_attr);
+		
+		/* Use parent's storage */
+		type_attr->table = g_strdup(parent_type_attr->table);
+		type_attr->tables = g_strdup(parent_type_attr->tables);
+		
+		GSList *slist = NULL;
+		
+		for (slist = parent_type_attr->_properties_list; slist != NULL; slist = slist->next) {
+			type_attr->_properties_list = g_slist_prepend (type_attr->_properties_list, slist->data);
+		}	
+		g_hash_table_foreach(parent_type_attr->prophash, __extend_type_attr, type_attr);	
 	}
 
-	g_hash_table_foreach(parent_type_attr->prophash, __extend_type_attr, type_attr);	
+	g_strfreev (extends);
 }
 
 static void __copy_type_attr(gpointer key, gpointer val, gpointer userdata)
@@ -1535,7 +1549,7 @@ static void __register_schema_type (gpointer key, gpointer val, gpointer user_da
 		new_type = midgard_core_type_register_interface (type_attr);
 		return;
 	} else {
-		new_type = midgard_type_register(type_attr, type_attr->extends ? g_type_from_name (type_attr->extends) : MIDGARD_TYPE_OBJECT);
+		new_type = midgard_type_register(type_attr);
 	}
 
 	if (!type_attr->is_abstract && g_type_is_a (new_type, MIDGARD_TYPE_BASE_ABSTRACT)) 
