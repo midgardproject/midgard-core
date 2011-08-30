@@ -15,6 +15,10 @@ AM_LDFLAGS = @MIDGARD_LIBS@
 TEST_PROGS = 
 noinst_PROGRAMS  = $(TEST_PROGS)
 
+common_sources = \
+		 midgard_test_connection.c \
+		 midgard_test_config.c
+
 nobase_SOURCES = \
 	midgard_test.c \
 	midgard_test_config.c \
@@ -101,6 +105,14 @@ TEST_PROGS	+= run-midgard-test-object-workspace
 bin_PROGRAMS	+= run-midgard-test-object-workspace
 run_midgard_test_object_workspace_SOURCES = run-midgard-test-object-workspace.c $(nobase_SOURCES)
 run_midgard_test_object_workspace_CPPFLAGS = $(nobase_CPPFLAGS)
+
+TEST_PROGS	+= run-midgard-test-types-and-extending
+bin_PROGRAMS	+= run-midgard-test-types-and-extending
+run_midgard_test_types_and_extending_SOURCES = \
+					    run-midgard-test-types-and-extending.c \
+					    midgard_test_types_and_extending.c \
+					    $(common_sources) 
+run_midgard_test_types_and_extending_CPPFLAGS = $(nobase_CPPFLAGS)
 
 TEST_PROGS      += run-midgard-test-database-provider
 bin_PROGRAMS    += run-midgard-test-database-provider
