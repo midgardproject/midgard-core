@@ -1898,7 +1898,8 @@ midgard_type_register (MgdSchemaTypeAttr *type_data)
 				 NULL    /* interface_data */
 			 };
 			 GSList *l;
-			 for (l = ifaces; l != NULL; l = l->next) {			
+			 for (l = ifaces; l != NULL; l = l->next) {
+				 midgard_core_interface_add_prerequisites (type, g_type_from_name ((gchar *)l->data));
 				 g_type_add_interface_static (type, g_type_from_name ((gchar *)l->data), &iface_info);
 			 }
 			 g_slist_free (ifaces);
