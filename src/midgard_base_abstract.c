@@ -114,10 +114,50 @@ midgard_type_register_abstract (MgdSchemaTypeAttr *type_data, GType parent_type)
                 midgard_type_info->n_preallocs = 0;
                 midgard_type_info->instance_init = NULL;
                 midgard_type_info->value_table = NULL;
-                
-		GType type = g_type_register_static (parent_type, classname, midgard_type_info, G_TYPE_FLAG_ABSTRACT);
-               
+
+ 		GType tmp_type;		
+		guint n_types;
+		guint i;
+		gchar **extends = midgard_core_schema_type_list_extends (type_data, &n_types);
+		GType real_parent_type = MIDGARD_TYPE_BASE_ABSTRACT;
+
+		for (i = 0; i < n_types; i++) {
+			tmp_type = g_type_from_name (extends[i]);
+			if (!G_TYPE_IS_INTERFACE (tmp_type) && tmp_type != G_TYPE_INVALID) { 
+				real_parent_type = tmp_type;
+				continue;
+			}
+		}
+
+		GType type = g_type_register_static (real_parent_type, classname, midgard_type_info, G_TYPE_FLAG_ABSTRACT);
+		
+		static const GInterfaceInfo iface_info = {
+			NULL,	/* interface initialize */
+			NULL,   /* interface_finalize */
+			NULL    /* interface_data */
+		};
+
+		for (i = 0; i < n_types; i++) {
+			tmp_type = g_type_from_name (extends[i]);
+			/* Implicitly register interface, if such is not registered in GType system.
+			 * If it's defined in schema we collected all rquired metadata.
+			 * If not, we have to throw error */
+			if (g_type_from_name (extends[i]) == G_TYPE_INVALID) {
+				MgdSchemaTypeAttr *iface_attr = midgard_schema_lookup_type (type_data->schema, extends[i]);
+				if (!iface_attr)
+					g_error ("Can not find '%s' definition", extends[i]);
+				if (iface_attr->is_iface)
+					tmp_type = midgard_core_type_register_interface (iface_attr);
+			}
+
+			midgard_core_interface_add_prerequisites (type, tmp_type);				
+			g_type_add_interface_static (type, tmp_type, &iface_info);
+		}
+
+		if (extends)
+			g_strfreev (extends);
                 g_free (midgard_type_info);
+
                 return type;   
         }                      
 }
