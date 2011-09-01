@@ -75,7 +75,9 @@ __midgard_base_interface_derived_class_init (gpointer *klass, gpointer class_dat
 	MgdSchemaTypeAttr *type_attr = (MgdSchemaTypeAttr *) class_data;
 	guint i;
 	for (i = 0; i < type_attr->num_properties; i++) {
-		g_object_interface_install_property (klass, type_attr->params[i]);
+		GParamSpec *pspec = g_object_interface_find_property (klass, type_attr->params[i]->name);
+		if (!pspec)
+			g_object_interface_install_property (klass, type_attr->params[i]);
 	}
 }
 
@@ -86,6 +88,21 @@ midgard_core_type_register_interface (MgdSchemaTypeAttr *type_attr)
 	/* FIXME, throw warning if type is registered and it's not interface */
 	if (type != G_TYPE_NONE && G_TYPE_IS_INTERFACE(type))
 		return type;
+
+	/* First, chain up. If prerequisite is not yet registered, attempt to do so */
+	guint i;
+	guint n_types;
+	gchar **extends = midgard_core_schema_type_list_extends (type_attr, &n_types);
+	for (i = 0; i < n_types; i++) {
+		if (g_type_from_name (extends[i]) == G_TYPE_INVALID) {
+			MgdSchemaTypeAttr *parent_attr = midgard_schema_lookup_type (type_attr->schema, extends[i]);
+			if (!parent_attr)
+				g_error ("Can not find '%s' definition", extends[i]);
+			midgard_core_type_register_interface (parent_attr);
+		}
+	}
+	if (extends)
+		g_strfreev (extends);
 
 	GTypeInfo info = {
 		sizeof (MidgardBaseInterfaceIFace),
@@ -103,9 +120,7 @@ midgard_core_type_register_interface (MgdSchemaTypeAttr *type_attr)
 	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 
 	GType parent_type = MIDGARD_TYPE_BASE_INTERFACE;
-	guint i;
-	guint n_types;
-	gchar **extends = midgard_core_schema_type_list_extends (type_attr, &n_types);
+	extends = midgard_core_schema_type_list_extends (type_attr, &n_types);
 	
 	if (n_types == 0) {
 		g_type_interface_add_prerequisite (type, parent_type);
@@ -114,7 +129,7 @@ midgard_core_type_register_interface (MgdSchemaTypeAttr *type_attr)
 
 	for (i = 0; i < n_types; i++) {
 		parent_type = g_type_from_name (extends[i]);
-		if (parent_type == G_TYPE_NONE) {
+		if (parent_type == G_TYPE_INVALID) {
 			g_warning ("Failed to get type of '%s', defined as parent of '%s'", type_attr->extends, type_attr->name);
 			g_error ("Invalid parent type");
 		}
