@@ -10,7 +10,7 @@
 		<property name="SecondIfaceFirstProperty" />
 	</type>
 
-	<type name="FirstTestMixin" metadata="false" abstract="interface">
+	<type name="FirstTestMixin" metadata="false" abstract="mixin">
 		<property name="FirstMixinFirstProperty" />
 	</type>
 
