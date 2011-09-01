@@ -101,13 +101,64 @@ midgard_test_types_and_extending_base_abstract_derived_type_with_interfaces (Mid
 void 	
 midgard_test_types_and_extending_interfaces (MidgardBaseAbstractTest *mwct, gconstpointer data)
 {
+	GType first_iface_type = g_type_from_name ("FirstTestIface");
+	g_assert (first_iface_type != G_TYPE_INVALID);
+	g_assert (G_TYPE_IS_INTERFACE (first_iface_type) == TRUE);
 
+	GType second_iface_type = g_type_from_name ("SecondTestIface");
+	g_assert (second_iface_type != G_TYPE_INVALID);
+	g_assert (G_TYPE_IS_INTERFACE (second_iface_type) == TRUE);
+
+	GType first_mixin_type = g_type_from_name ("FirstTestMixin");
+	g_assert (first_mixin_type != G_TYPE_INVALID);
+	g_assert (G_TYPE_IS_INTERFACE (first_mixin_type) == TRUE);
 }
 
 void 	
 midgard_test_types_and_extending_dbobject_with_interfaces (MidgardBaseAbstractTest *mwct, gconstpointer data)
 {
+	GType test_type = g_type_from_name ("TestTypeWithInterfaces");
+	g_assert (test_type != G_TYPE_INVALID);
+	g_assert (G_TYPE_IS_INTERFACE (test_type) == FALSE);
 
+	gboolean extends_dbobject = g_type_is_a (test_type, MIDGARD_TYPE_DBOBJECT);
+	g_assert (extends_dbobject == TRUE);
+
+	gboolean extends_object = g_type_is_a (test_type, MIDGARD_TYPE_OBJECT);
+	g_assert (extends_object == TRUE);
+
+	/* test derived properties */
+	GObjectClass *klass = g_type_class_ref (test_type);
+        g_assert (klass != NULL);
+
+	/* Check implemented interfaces */
+	guint n_types;
+	guint i;
+	GType *ifaces = g_type_interfaces (test_type, &n_types);
+	g_assert_cmpuint (n_types, ==, N_IMPLEMENTED);
+
+	for (i = 0; i < n_types; i++) {
+		const gchar *implemented_interface_name = g_type_name (ifaces[i]);
+		gchar *implemented = g_strstr_len (abstract_type_implements, -1, implemented_interface_name);
+		g_assert_cmpstr (implemented, !=, NULL);
+	}
+
+	g_free (ifaces);
+
+	/* Test derived properties */
+	GParamSpec *f_iface_f_prop = g_object_class_find_property (klass, "FirstIfaceFirstProperty");
+	g_assert (f_iface_f_prop != NULL);
+
+	GParamSpec *f_iface_s_prop = g_object_class_find_property (klass, "FirstIfaceSecondProperty");
+	g_assert (f_iface_s_prop != NULL);
+
+	GParamSpec *s_iface_f_prop = g_object_class_find_property (klass, "SecondIfaceFirstProperty");
+	g_assert (s_iface_f_prop != NULL);
+
+	GParamSpec *f_mixin_f_prop = g_object_class_find_property (klass, "FirstMixinFirstProperty");
+	g_assert (f_mixin_f_prop != NULL);
+
+	g_type_class_unref (klass);
 }
 
 

@@ -17,7 +17,7 @@
 	<type name="AbstractTypeWithInterfaces" metadata="false" abstract="true" extends="SecondTestIface, FirstTestMixin">
 	</type>
 
-	<type name="TestTypeWithInterfaces" metadata="false" extends="SecondIface, FirstTestMixin">
+	<type name="TestTypeWithInterfaces" metadata="false" extends="SecondTestIface, FirstTestMixin">
 	</type>
 
 </Schema>
