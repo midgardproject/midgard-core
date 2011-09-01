@@ -207,6 +207,7 @@ midgard_core_schema_type_attr_new (void)
 	type->is_abstract = FALSE;
 	type->is_iface = FALSE;
 	type->is_mixin = FALSE;
+	type->schema = NULL;
 
 	return type;
 }
@@ -223,16 +224,16 @@ midgard_core_schema_type_list_extends (MgdSchemaTypeAttr *type_attr, guint *n_ty
 	guint i = 0;
 	gchar **tmp = g_strsplit (type_attr->extends, ",", 0);
 	while (tmp[i] != NULL) {
-		*n_types = i;
 		g_strstrip (tmp[i]);
 		i++;
+		*n_types = i;
 	}
 
 	gchar **extends = g_new (gchar*, i+1);
 	i = 0;
 	while (tmp[i] != NULL) {
 		extends[i] = tmp[i];
-	       i++;	
+	        i++;	
 	}
 
 	extends[i] = NULL;
@@ -357,6 +358,11 @@ midgard_core_schema_type_attr_free (MgdSchemaTypeAttr *type)
 
 	g_hash_table_destroy (type->user_values);
         type->user_values = NULL;
+
+	type->is_iface = FALSE;
+	type->is_mixin = FALSE;
+	type->is_abstract = FALSE;
+	type->schema = NULL;
 
 	g_free (type);
 
