@@ -266,7 +266,8 @@ __mgdschema_object_dispose (GObject *object)
 		self->priv->parameters = NULL;
 	}
 
-	__mgdschema_parent_class->dispose (object);
+	GObjectClass *parent_class = g_type_class_peek_parent (G_OBJECT_GET_CLASS (object));
+	parent_class->dispose (object);
 }
 
 /* 
@@ -1791,9 +1792,12 @@ static GObject *
 __mgdschema_object_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties)
-{	
+{
+	/* If MgdSchema type extends MgdSchema one, invoke constructor using proper class and type */
+	GType parent_type = g_type_parent (type);
+	GObjectClass *parent_class = g_type_class_peek (parent_type);
 	GObject *object = (GObject *)
-		G_OBJECT_CLASS (__mgdschema_parent_class)->constructor (type,
+		G_OBJECT_CLASS (parent_class)->constructor (parent_type == MIDGARD_TYPE_OBJECT ? type : parent_type,
 				n_construct_properties,
 				construct_properties);
 	
@@ -1888,7 +1892,7 @@ midgard_type_register (MgdSchemaTypeAttr *type_data)
 				} 
 			}
 		}
-
+		
 		GType type = g_type_register_static (real_parent_type, classname, midgard_type_info, type_data->is_abstract ? G_TYPE_FLAG_ABSTRACT : 0);
 
 		if (ifaces != NULL) {
@@ -1900,7 +1904,7 @@ midgard_type_register (MgdSchemaTypeAttr *type_data)
 			 GSList *l;
 			 for (l = ifaces; l != NULL; l = l->next) {
 				 midgard_core_interface_add_prerequisites (type, g_type_from_name ((gchar *)l->data));
-				 g_type_add_interface_static (type, g_type_from_name ((gchar *)l->data), &iface_info);
+				 //g_type_add_interface_static (type, g_type_from_name ((gchar *)l->data), &iface_info);
 			 }
 			 g_slist_free (ifaces);
 		}
@@ -1967,13 +1971,21 @@ __midgard_object_constructor (GType type,
 static void 
 __midgard_object_dispose (GObject *object)
 {
-	__midgard_object_parent_class->dispose (object);
+	GType parent_type = g_type_parent (G_OBJECT_TYPE(object));
+	GObjectClass *parent_class = g_type_class_peek_parent (G_OBJECT_GET_CLASS (object));
+	if (parent_type == MIDGARD_TYPE_OBJECT)
+		parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
+	parent_class->dispose (object);
 }
 
 static void 
 __midgard_object_finalize (GObject *object)
 {
-	__midgard_object_parent_class->finalize (object);
+	GType parent_type = g_type_parent (G_OBJECT_TYPE(object));
+	GObjectClass *parent_class = g_type_class_peek_parent (G_OBJECT_GET_CLASS (object));
+	if (parent_type == MIDGARD_TYPE_OBJECT)
+		parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
+	parent_class->finalize (object);
 }
 
 static void
@@ -1981,7 +1993,6 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 {
 	GObjectClass *g_class = G_OBJECT_CLASS (klass);
 	__midgard_object_parent_class = g_type_class_peek_parent (klass);
-
 
 	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (klass);
 	
