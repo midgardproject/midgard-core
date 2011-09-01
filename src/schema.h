@@ -87,7 +87,8 @@ struct _MgdSchemaTypeAttr {
 	GHashTable *user_values;
 	gboolean is_abstract;
 	gboolean is_iface;
-	gboolean is_mixin;	
+	gboolean is_mixin;
+	MidgardSchema *schema;	
 };
 
 #define MGD_TYPE_ATTR_METADATA_CLASS(__typeattr) (__typeattr->metadata_class_name)

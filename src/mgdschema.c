@@ -262,8 +262,8 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 				type_attr->is_abstract = TRUE;
 			else if (g_str_equal (attrval, "interface"))
 				type_attr->is_iface = TRUE;
-			else if (g_str_equal (attrval, "mixin"))
-				type_attr->is_mixin = TRUE;
+			else if (g_str_equal (attrval, "mixin")) 
+				type_attr->is_iface = type_attr->is_mixin = TRUE;
 			xmlFree(attrval);			
 		}
 
@@ -288,6 +288,10 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 
 			for (i = 0; i < n_types; i++) {
 				MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, extends[i]);
+				if (!src) {
+					__warn_msg (node, "Can not find declared type");
+					continue;
+				}
 				if (!src->is_iface
 						&& !src->is_mixin
 						&& !src->is_abstract
@@ -299,9 +303,10 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 				} else {
 					midgard_core_schema_type_attr_extend (src, type_attr);
 				}
-				if (extends)
-					g_strfreev (extends);
 			}
+			
+			if (extends)
+				g_strfreev (extends);
 
 			xmlFree (table_name);
 			xmlFree (attrval);
@@ -901,6 +906,7 @@ _get_element_names (xmlNode *curn , MgdSchemaTypeAttr *type_attr, MidgardSchema 
 
 		type_attr = midgard_core_schema_type_attr_new();
 		type_attr->name = g_strdup((gchar *)nv);
+		type_attr->schema = schema;
 		g_hash_table_insert(schema->types, g_strdup((gchar *)nv), type_attr);
 		_get_type_attributes (obj, type_attr, schema);
 
@@ -982,14 +988,11 @@ void __get_tdata_foreach(gpointer key, gpointer value, gpointer user_data)
 		return;
 	
 	np = g_hash_table_size(type_attr->prophash);
+	if (np < 1)
+		return;
 
-	if (np > 0) {
-		if (type_attr->table)
-			g_hash_table_foreach(type_attr->prophash, __get_pdata_foreach, type_attr);	
-	} else {
-
-		g_debug("Type %s has less than 1 property!", (gchar *)key);
-	}
+	if (type_attr->table)
+		g_hash_table_foreach(type_attr->prophash, __get_pdata_foreach, type_attr);	
 }
 
 /* Copy source schema types ( class names ) and its MgdSchemaType structures
@@ -1473,11 +1476,11 @@ static void __extend_type_foreach(gpointer key, gpointer val, gpointer userdata)
 		type_attr->table = g_strdup(parent_type_attr->table);
 		type_attr->tables = g_strdup(parent_type_attr->tables);
 		
-		GSList *slist = NULL;
-		
+		GSList *slist = NULL;		
 		for (slist = parent_type_attr->_properties_list; slist != NULL; slist = slist->next) {
-			type_attr->_properties_list = g_slist_prepend (type_attr->_properties_list, slist->data);
-		}	
+			if (g_slist_find_custom (type_attr->_properties_list, slist->data, (GCompareFunc) g_ascii_strcasecmp) == NULL)
+				type_attr->_properties_list = g_slist_prepend (type_attr->_properties_list, slist->data);
+		}
 		g_hash_table_foreach(parent_type_attr->prophash, __extend_type_attr, type_attr);	
 	}
 
@@ -1562,7 +1565,7 @@ static void __register_schema_type (gpointer key, gpointer val, gpointer user_da
 	if (new_type) {
 
 		/* Create new instance to ensure class is initialized */
-		if (!type_attr->is_abstract) {
+		if (!G_TYPE_IS_ABSTRACT (new_type)) {
 			GObject *foo = g_object_new(new_type, NULL);
 			g_object_unref (foo);
 		}
