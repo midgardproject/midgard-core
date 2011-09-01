@@ -1903,8 +1903,10 @@ midgard_type_register (MgdSchemaTypeAttr *type_data)
 			 };
 			 GSList *l;
 			 for (l = ifaces; l != NULL; l = l->next) {
-				 midgard_core_interface_add_prerequisites (type, g_type_from_name ((gchar *)l->data));
-				 //g_type_add_interface_static (type, g_type_from_name ((gchar *)l->data), &iface_info);
+				 GType iface_type =g_type_from_name ((gchar *)l->data);
+				 midgard_core_interface_add_prerequisites (type, iface_type);
+				 if (!g_type_is_a (type, iface_type))
+					 g_type_add_interface_static (type, iface_type, &iface_info);
 			 }
 			 g_slist_free (ifaces);
 		}
