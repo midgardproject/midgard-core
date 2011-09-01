@@ -43,6 +43,9 @@ midgard_test_types_and_extending_base_abstract_derived_type	(MidgardBaseAbstract
 	g_type_class_unref (klass);
 }
 
+#define N_IMPLEMENTED 4
+const gchar *abstract_type_implements = "MidgardBaseInterface, FirstTestIface, SecondTestIface, FirstTestMixin";
+
 void 	
 midgard_test_types_and_extending_base_abstract_derived_type_with_interfaces (MidgardBaseAbstractTest *mwct, gconstpointer data)
 {
@@ -56,11 +59,28 @@ midgard_test_types_and_extending_base_abstract_derived_type_with_interfaces (Mid
 	guint n_types;
 	guint i;
 	GType *ifaces = g_type_interfaces (abstract_type, &n_types);
-	g_assert_cmpuint (n_types, ==, 3);
+	g_assert_cmpuint (n_types, ==, N_IMPLEMENTED);
 
 	for (i = 0; i < n_types; i++) {
-		g_warning ("TODO");
+		const gchar *implemented_interface_name = g_type_name (ifaces[i]);
+		gchar *implemented = g_strstr_len (abstract_type_implements, -1, implemented_interface_name);
+		g_assert_cmpstr (implemented, !=, NULL);
 	}
+
+	g_free (ifaces);
+
+	/* Check every single interface */
+	gboolean implements_base_iface = g_type_is_a (abstract_type, MIDGARD_TYPE_BASE_INTERFACE);
+	g_assert (implements_base_iface == TRUE);
+
+	gboolean implements_first_iface = g_type_is_a (abstract_type, g_type_from_name ("FirstTestIface"));
+	g_assert (implements_first_iface == TRUE);
+
+	gboolean implements_second_iface = g_type_is_a (abstract_type, g_type_from_name ("SecondTestIface"));
+	g_assert (implements_second_iface == TRUE);
+
+	gboolean implements_mixin_iface = g_type_is_a (abstract_type, g_type_from_name ("FirstTestMixin"));
+	g_assert (implements_mixin_iface == TRUE);
 
 	/* Find properties from implemented interfaces */
 	GParamSpec *f_iface_f_prop = g_object_class_find_property (klass, "FirstIfaceFirstProperty");
@@ -76,7 +96,6 @@ midgard_test_types_and_extending_base_abstract_derived_type_with_interfaces (Mid
 	g_assert (f_mixin_f_prop != NULL);
 
 	g_type_class_unref (klass);
-
 }
 
 void 	
