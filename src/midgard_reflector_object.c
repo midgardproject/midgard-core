@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2010 Piotr Pokora <piotrek.pokora@gmail.com>
+ * Copyright (C) 2010, 2011 Piotr Pokora <piotrek.pokora@gmail.com>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,14 +21,15 @@
 #include "midgard_object.h"
 #include "midgard_core_object_class.h"
 #include "midgard_core_object.h"
+#include "midgard_base_abstract.h"
+#include "midgard_base_interface.h"
 
-#define _GET_CLASS_BY_NAME(__name, __retval) \
-	GObjectClass *klass = g_type_class_peek (g_type_from_name (__name)); \
+#define _GET_CLASS_BY_NAME(__name, __retval) 					\
+	GObjectClass *klass = g_type_class_peek (g_type_from_name (__name)); 	\
 	g_return_val_if_fail (MIDGARD_IS_DBOBJECT_CLASS (klass), __retval);
 
-#define _GET_TYPE_ATTR(__klass) \
-	 MgdSchemaTypeAttr *type_attr = \
-		midgard_core_class_get_type_attr(MIDGARD_DBOBJECT_CLASS(__klass))
+#define _GET_TYPE_ATTR(__klass) 					\
+	MgdSchemaTypeAttr *type_attr = midgard_core_class_get_type_attr(MIDGARD_DBOBJECT_CLASS(__klass)); 
 
 /**
  * midgard_reflector_object_get_property_primary:
@@ -197,6 +198,110 @@ midgard_reflector_object_get_schema_value (const gchar *classname, const gchar *
 	_GET_TYPE_ATTR (klass);
 
 	return (const gchar *) g_hash_table_lookup (type_attr->user_values, (gpointer) name);
+}
+
+/**
+ * midgard_reflector_object_is_mixin:
+ * @mgd: #MidgardConnection instance
+ * @classname: Name of the class
+ *
+ * Returns: %TRUE if given type name is a mixin, %FALSE otherwise
+ * Since: 10.05.5
+ */ 
+gboolean
+midgard_reflector_object_is_mixin (MidgardConnection *mgd, const gchar *classname)
+{
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	g_return_val_if_fail (classname != NULL, FALSE);
+
+	MgdSchemaTypeAttr *type_attr = midgard_schema_lookup_type (mgd->priv->schema, (gchar *)classname);
+	if (!type_attr)
+		return FALSE;
+
+	return type_attr->is_mixin;
+}
+
+/**
+ * midgard_reflector_object_is_interface:
+ * @mgd: #MidgardConnection instance
+ * @classname: Name of the class
+ *
+ * Returns: %TRUE if given type name is an interface, %FALSE otherwise
+ * Since: 10.05.5
+ */ 
+gboolean
+midgard_reflector_object_is_interface (MidgardConnection *mgd, const gchar *classname)
+{
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	g_return_val_if_fail (classname != NULL, FALSE);
+
+	MgdSchemaTypeAttr *type_attr = midgard_schema_lookup_type (mgd->priv->schema, (gchar *)classname);
+	if (!type_attr)
+		return FALSE;
+
+	return type_attr->is_iface;
+}
+
+/**
+ * midgard_reflector_object_is_abstract:
+ * @mgd: #MidgardConnection instance
+ * @classname: Name of the class
+ *
+ * Returns: %TRUE if given type name is an abstract one, %FALSE otherwise
+ * Since: 10.05.5
+ */ 
+gboolean
+midgard_reflector_object_is_abstract (MidgardConnection *mgd, const gchar *classname)
+{
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	g_return_val_if_fail (classname != NULL, FALSE);
+
+	MgdSchemaTypeAttr *type_attr = midgard_schema_lookup_type (mgd->priv->schema, (gchar *)classname);
+	if (!type_attr)
+		return FALSE;
+
+	return type_attr->is_abstract;
+}
+
+/**
+ * midgard_reflector_object_list_defined_properties:
+ * @mgd: #MidgardConnection instance
+ * @classname: Name of the class
+ * @n_prop: a pointer to store number of returned properties
+ * 
+ * Returns newly allocated, array of properties. 
+ * Returned array should be freed if no longer needed without freeing array's elements. 
+ *
+ * Returns: (transfer container): array of strings or %NULL.
+ * 
+ * Since: 10.05.5
+ */ 
+gchar **
+midgard_reflector_object_list_defined_properties (MidgardConnection *mgd, const gchar *classname, guint *n_prop)
+{
+	g_return_val_if_fail (mgd != NULL, FALSE);
+	g_return_val_if_fail (classname != NULL, FALSE);
+
+	MgdSchemaTypeAttr *type_attr = midgard_schema_lookup_type (mgd->priv->schema, (gchar *)classname);
+	if (!type_attr)
+		return FALSE;
+
+	*n_prop = 0;
+	guint length = g_slist_length (type_attr->_properties_list);
+	if (length < 1)
+		return NULL;
+
+	GSList *l;
+	gchar **names = g_new (gchar *, length + 1);
+	guint i = 0;
+	for (l = type_attr->_properties_list; l != NULL; l = l->next, i++) {
+		names[i] = (gchar *)l->data;
+	}
+	
+	*n_prop = i;
+	names[i] = NULL;
+
+	return names;
 }
 
 /* GOBJECT ROUTINES */
