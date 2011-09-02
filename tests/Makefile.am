@@ -114,6 +114,14 @@ run_midgard_test_types_and_extending_SOURCES = \
 					    $(common_sources) 
 run_midgard_test_types_and_extending_CPPFLAGS = $(nobase_CPPFLAGS)
 
+TEST_PROGS	+= run-midgard-test-reflector-object
+bin_PROGRAMS	+= run-midgard-test-reflector-object
+run_midgard_test_reflector_object_SOURCES = \
+					    run-midgard-test-reflector-object.c \
+					    midgard_test_reflector_object.c \
+					    $(common_sources) 
+run_midgard_test_reflector_object_CPPFLAGS = $(nobase_CPPFLAGS)
+
 TEST_PROGS      += run-midgard-test-database-provider
 bin_PROGRAMS    += run-midgard-test-database-provider
 run_midgard_test_database_provider_SOURCES = run-midgard-test-database-provider.c $(nobase_SOURCES)
