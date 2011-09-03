@@ -39,4 +39,5 @@ struct _MidgardBaseInterfaceIFace {
 
 GType	midgard_base_interface_get_type	(void);
 
+G_END_DECLS
 #endif /* MIDGARD_BASE_INTERFACE_H */
