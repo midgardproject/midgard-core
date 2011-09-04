@@ -18,6 +18,7 @@
 
 #include "midgard_base_interface.h"
 #include "schema.h"
+#include "midgard_base_mixin.h"
 
 void
 midgard_core_interface_add_prerequisites (GType type, GType iface_type)
@@ -120,6 +121,8 @@ midgard_core_type_register_interface (MgdSchemaTypeAttr *type_attr)
 	g_type_interface_add_prerequisite (type, G_TYPE_OBJECT);
 
 	GType parent_type = MIDGARD_TYPE_BASE_INTERFACE;
+	if (type_attr->is_mixin)
+		parent_type = MIDGARD_TYPE_BASE_MIXIN;
 	extends = midgard_core_schema_type_list_extends (type_attr, &n_types);
 	
 	if (n_types == 0) {

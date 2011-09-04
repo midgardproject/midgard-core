@@ -35,6 +35,8 @@
 #include "midgard_workspace.h"
 #include "midgard_repligard.h"
 #include "midgard_base_abstract.h"
+#include "midgard_base_interface.h"
+#include "midgard_base_mixin.h"
 
 #include <locale.h>
 
@@ -190,6 +192,12 @@ midgard_init()
 	type = MIDGARD_TYPE_BASE_ABSTRACT;
 	g_assert (type != 0);
 	g_type_class_ref (type);
+
+	type = MIDGARD_TYPE_BASE_INTERFACE;
+	g_assert (type != 0);
+
+	type = MIDGARD_TYPE_BASE_MIXIN;
+	g_assert (type != 0);
 
 	/* Register transform function explicitly, we need own routine */
 	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_FLOAT, __transform_string_to_float);
