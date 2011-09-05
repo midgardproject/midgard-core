@@ -187,7 +187,10 @@ midgard_storage_create (MidgardConnection *mgd, const gchar *name)
 	g_return_val_if_fail (name != NULL, FALSE);
 
 	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (name));
-	g_return_val_if_fail(MIDGARD_IS_DBOBJECT_CLASS (klass), FALSE);
+	if (!MIDGARD_IS_DBOBJECT_CLASS (klass)) {
+		g_warning ("Expected DBObject derived instance. '%s' given", name);
+		return FALSE;
+	}
 
 	if (klass->dbpriv->create_storage == NULL)
 		return FALSE;
@@ -218,7 +221,10 @@ midgard_storage_update (MidgardConnection *mgd, const gchar *name)
 	g_return_val_if_fail (name != NULL, FALSE);
 
 	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (name));
-	g_return_val_if_fail(MIDGARD_IS_DBOBJECT_CLASS (klass), FALSE);
+	if (!MIDGARD_IS_DBOBJECT_CLASS (klass)) {
+		g_warning ("Expected DBObject derived instance. '%s' given", name);
+		return FALSE;
+	}
 
 	if (klass->dbpriv->update_storage == NULL)
 		return FALSE;
@@ -244,7 +250,10 @@ midgard_storage_exists (MidgardConnection *mgd, const gchar *name)
 	g_return_val_if_fail (name != NULL, FALSE);
 
 	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (name));
-	g_return_val_if_fail(MIDGARD_IS_DBOBJECT_CLASS (klass), FALSE);
+	if (!MIDGARD_IS_DBOBJECT_CLASS (klass)) {
+		g_warning ("Expected DBObject derived instance. '%s' given", name);
+		return FALSE;
+	}
 
 	if (klass->dbpriv->storage_exists == NULL)
 		return FALSE;
@@ -269,7 +278,10 @@ gboolean midgard_storage_delete (MidgardConnection *mgd, const gchar *name)
 	g_return_val_if_fail (name != NULL, FALSE);
 
 	MidgardDBObjectClass *klass = g_type_class_peek (g_type_from_name (name));
-	g_return_val_if_fail(MIDGARD_IS_DBOBJECT_CLASS (klass), FALSE);
+	if (!MIDGARD_IS_DBOBJECT_CLASS (klass)) {
+		g_warning ("Expected DBObject derived instance. '%s' given", name);
+		return FALSE;
+	}
 
 	if (klass->dbpriv->delete_storage == NULL)
 		return FALSE;
