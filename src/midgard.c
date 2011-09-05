@@ -185,6 +185,9 @@ midgard_init()
 	g_assert (type != 0);
 	g_type_class_ref (type);
 
+	type = MIDGARD_TYPE_WORKSPACE_STORAGE;
+	g_assert (type != 0);
+
 	type = MIDGARD_TYPE_REPLIGARD;
 	g_assert (type != 0);
 	g_type_class_ref (type);
