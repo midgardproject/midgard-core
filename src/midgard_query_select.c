@@ -254,8 +254,11 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 		return;
 
 	MidgardConnection *mgd = MIDGARD_QUERY_EXECUTOR (self)->priv->mgd;
-	gboolean has_ws = MGD_CNC_HAS_WORKSPACE (mgd);
-	if (!has_ws)
+	/* Do not take worskpace into account if if it's disabled 
+	 * or enabled and none set */
+	if (!MGD_CNC_USES_WORKSPACE (mgd))
+		return;
+	if (!MGD_CNC_HAS_WORKSPACE (mgd))
 		return;
 
 	guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
