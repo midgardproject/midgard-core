@@ -501,6 +501,15 @@ _midgard_query_select_validable_iface_validate (MidgardValidable *iface, GError 
 
 	GError *err = NULL;
 	MidgardQueryStorage *storage = MIDGARD_QUERY_EXECUTOR (self)->priv->storage;
+	GObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
+	const gchar *table = midgard_core_class_get_table (klass);
+
+	/* Class table */
+	if (!table) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
+				"No SQL table defined for '%s' class", G_OBJECT_CLASS_NAME (klass));
+		return;
+	}
 
 	/* Storage */
 	if (!storage) {
