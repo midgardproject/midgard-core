@@ -21,13 +21,13 @@ midgard_test_reflector_object_is_mixin (MidgardReflectorObjectTest *mwct, gconst
 	g_assert (g_type_is_a (mixin_type, MIDGARD_TYPE_BASE_INTERFACE));
 	g_assert (g_type_is_a (mixin_type, MIDGARD_TYPE_BASE_MIXIN));
 
-	gboolean is_mixin = midgard_reflector_object_is_mixin (mgd, MIXIN_NAME);
+	gboolean is_mixin = midgard_reflector_object_is_mixin (MIXIN_NAME);
 	g_assert (is_mixin == TRUE);
 
-	gboolean is_interface = midgard_reflector_object_is_interface (mgd, MIXIN_NAME);
+	gboolean is_interface = midgard_reflector_object_is_interface (MIXIN_NAME);
 	g_assert (is_interface == TRUE);
 
-	gboolean is_abstract = midgard_reflector_object_is_abstract (mgd, MIXIN_NAME);
+	gboolean is_abstract = midgard_reflector_object_is_abstract (MIXIN_NAME);
 	g_assert (is_abstract == FALSE);
 }
 
@@ -44,13 +44,13 @@ midgard_test_reflector_object_is_interface (MidgardReflectorObjectTest *mwct, gc
 	g_assert (g_type_is_a (f_iface_type, G_TYPE_INTERFACE));
 	g_assert (g_type_is_a (f_iface_type, MIDGARD_TYPE_BASE_INTERFACE));
 
-	gboolean is_interface = midgard_reflector_object_is_interface (mgd, FIRST_IFACE_NAME);
+	gboolean is_interface = midgard_reflector_object_is_interface (FIRST_IFACE_NAME);
 	g_assert (is_interface == TRUE);
 
-	gboolean is_abstract = midgard_reflector_object_is_abstract (mgd, FIRST_IFACE_NAME);
+	gboolean is_abstract = midgard_reflector_object_is_abstract (FIRST_IFACE_NAME);
 	g_assert (is_abstract == FALSE);
 
-	gboolean is_mixin = midgard_reflector_object_is_mixin (mgd, FIRST_IFACE_NAME);
+	gboolean is_mixin = midgard_reflector_object_is_mixin (FIRST_IFACE_NAME);
 	g_assert (is_mixin == FALSE);
 
 	GType s_iface_type = g_type_from_name (SECOND_IFACE_NAME);
@@ -60,13 +60,13 @@ midgard_test_reflector_object_is_interface (MidgardReflectorObjectTest *mwct, gc
 	g_assert (g_type_is_a (s_iface_type, G_TYPE_INTERFACE));
 	g_assert (g_type_is_a (s_iface_type, MIDGARD_TYPE_BASE_INTERFACE));
 
-	is_interface = midgard_reflector_object_is_interface (mgd, SECOND_IFACE_NAME);
+	is_interface = midgard_reflector_object_is_interface (SECOND_IFACE_NAME);
 	g_assert (is_interface == TRUE);
 
-	is_abstract = midgard_reflector_object_is_abstract (mgd, SECOND_IFACE_NAME);
+	is_abstract = midgard_reflector_object_is_abstract (SECOND_IFACE_NAME);
 	g_assert (is_abstract == FALSE);
 
-	is_mixin = midgard_reflector_object_is_mixin (mgd, SECOND_IFACE_NAME);
+	is_mixin = midgard_reflector_object_is_mixin (SECOND_IFACE_NAME);
 	g_assert (is_mixin == FALSE);
 }
 
@@ -81,13 +81,13 @@ midgard_test_reflector_object_is_abstract (MidgardReflectorObjectTest *mwct, gco
 
 	g_assert (G_TYPE_IS_ABSTRACT (abstract_type) == TRUE);
 
-	gboolean is_abstract = midgard_reflector_object_is_abstract (mgd, ABSTRACT_NAME);
+	gboolean is_abstract = midgard_reflector_object_is_abstract (ABSTRACT_NAME);
 	g_assert (is_abstract == TRUE);
 
-	gboolean is_mixin = midgard_reflector_object_is_mixin (mgd, ABSTRACT_NAME);
-	g_assert (is_mixin == FALSE);
+	gboolean is_mixin = midgard_reflector_object_is_mixin (ABSTRACT_NAME);
+	g_assert (is_mixin == TRUE);
 
-	gboolean is_interface = midgard_reflector_object_is_interface (mgd, ABSTRACT_NAME);
+	gboolean is_interface = midgard_reflector_object_is_interface (ABSTRACT_NAME);
 	g_assert (is_interface == FALSE);
 }
 
@@ -117,7 +117,7 @@ midgard_test_reflector_object_list_defined_properties (MidgardReflectorObjectTes
 		g_assert_cmpstr (implemented, !=, NULL);
 	}
 
-	gchar **properties = midgard_reflector_object_list_defined_properties (mgd, ABSTRACT_NAME, &n_prop);
+	gchar **properties = midgard_reflector_object_list_defined_properties (ABSTRACT_NAME, &n_prop);
 	g_assert (properties != NULL);
 	g_assert_cmpuint (n_prop, ==, N_PROPS);
 	for (i = 0; i < n_prop; i++) {
