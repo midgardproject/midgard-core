@@ -51,9 +51,9 @@ gchar 			**midgard_reflector_object_list_children		(const gchar *classname, guin
 gboolean		midgard_reflector_object_has_metadata_class		(const gchar *classname);
 const gchar 		*midgard_reflector_object_get_metadata_class		(const gchar *classname);
 const gchar 		*midgard_reflector_object_get_schema_value		(const gchar *classname, const gchar *name);
-gboolean		midgard_reflector_object_is_mixin			(MidgardConnection *mgd, const gchar *classname);
-gboolean		midgard_reflector_object_is_interface			(MidgardConnection *mgd, const gchar *classname);
-gboolean		midgard_reflector_object_is_abstract			(MidgardConnection *mgd, const gchar *classname);
-gchar			**midgard_reflector_object_list_defined_properties	(MidgardConnection *mgd, const gchar *classname, guint *n_prop);
+gboolean		midgard_reflector_object_is_mixin			(const gchar *classname);
+gboolean		midgard_reflector_object_is_interface			(const gchar *classname);
+gboolean		midgard_reflector_object_is_abstract			(const gchar *classname);
+gchar			**midgard_reflector_object_list_defined_properties	(const gchar *classname, guint *n_prop);
 
 #endif /* MIDGARD_REFLECTOR_OBJECT_H */

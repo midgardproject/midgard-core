@@ -23,6 +23,7 @@
 #include "midgard_core_object.h"
 #include "midgard_base_abstract.h"
 #include "midgard_base_interface.h"
+#include "midgard_base_mixin.h"
 
 #define _GET_CLASS_BY_NAME(__name, __retval) 					\
 	GObjectClass *klass = g_type_class_peek (g_type_from_name (__name)); 	\
@@ -202,70 +203,63 @@ midgard_reflector_object_get_schema_value (const gchar *classname, const gchar *
 
 /**
  * midgard_reflector_object_is_mixin:
- * @mgd: #MidgardConnection instance
  * @classname: Name of the class
  *
  * Returns: %TRUE if given type name is a mixin, %FALSE otherwise
  * Since: 10.05.5
  */ 
 gboolean
-midgard_reflector_object_is_mixin (MidgardConnection *mgd, const gchar *classname)
+midgard_reflector_object_is_mixin (const gchar *classname)
 {
-	g_return_val_if_fail (mgd != NULL, FALSE);
 	g_return_val_if_fail (classname != NULL, FALSE);
 
-	MgdSchemaTypeAttr *type_attr = midgard_schema_lookup_type (mgd->priv->schema, (gchar *)classname);
-	if (!type_attr)
+	GType class_type  = g_type_from_name (classname);
+	if (class_type == G_TYPE_INVALID) 
 		return FALSE;
 
-	return type_attr->is_mixin;
+	return g_type_is_a (class_type, MIDGARD_TYPE_BASE_MIXIN);
 }
 
 /**
  * midgard_reflector_object_is_interface:
- * @mgd: #MidgardConnection instance
  * @classname: Name of the class
  *
  * Returns: %TRUE if given type name is an interface, %FALSE otherwise
  * Since: 10.05.5
  */ 
 gboolean
-midgard_reflector_object_is_interface (MidgardConnection *mgd, const gchar *classname)
+midgard_reflector_object_is_interface (const gchar *classname)
 {
-	g_return_val_if_fail (mgd != NULL, FALSE);
 	g_return_val_if_fail (classname != NULL, FALSE);
 
-	MgdSchemaTypeAttr *type_attr = midgard_schema_lookup_type (mgd->priv->schema, (gchar *)classname);
-	if (!type_attr)
+	GType class_type  = g_type_from_name (classname);
+	if (class_type == G_TYPE_INVALID) 
 		return FALSE;
 
-	return type_attr->is_iface;
+	return G_TYPE_IS_INTERFACE (class_type);
 }
 
 /**
  * midgard_reflector_object_is_abstract:
- * @mgd: #MidgardConnection instance
  * @classname: Name of the class
  *
  * Returns: %TRUE if given type name is an abstract one, %FALSE otherwise
  * Since: 10.05.5
  */ 
 gboolean
-midgard_reflector_object_is_abstract (MidgardConnection *mgd, const gchar *classname)
+midgard_reflector_object_is_abstract (const gchar *classname)
 {
-	g_return_val_if_fail (mgd != NULL, FALSE);
 	g_return_val_if_fail (classname != NULL, FALSE);
 
-	MgdSchemaTypeAttr *type_attr = midgard_schema_lookup_type (mgd->priv->schema, (gchar *)classname);
-	if (!type_attr)
+	GType class_type  = g_type_from_name (classname);
+	if (class_type == G_TYPE_INVALID) 
 		return FALSE;
 
-	return type_attr->is_abstract;
+	return G_TYPE_IS_ABSTRACT (class_type);
 }
 
 /**
  * midgard_reflector_object_list_defined_properties:
- * @mgd: #MidgardConnection instance
  * @classname: Name of the class
  * @n_prop: a pointer to store number of returned properties
  * 
@@ -277,30 +271,34 @@ midgard_reflector_object_is_abstract (MidgardConnection *mgd, const gchar *class
  * Since: 10.05.5
  */ 
 gchar **
-midgard_reflector_object_list_defined_properties (MidgardConnection *mgd, const gchar *classname, guint *n_prop)
+midgard_reflector_object_list_defined_properties (const gchar *classname, guint *n_prop)
 {
-	g_return_val_if_fail (mgd != NULL, FALSE);
 	g_return_val_if_fail (classname != NULL, FALSE);
 
-	MgdSchemaTypeAttr *type_attr = midgard_schema_lookup_type (mgd->priv->schema, (gchar *)classname);
-	if (!type_attr)
-		return FALSE;
+	GType class_type  = g_type_from_name (classname);
+	if (class_type == G_TYPE_INVALID) {
+		return NULL;
+	}
 
-	*n_prop = 0;
-	guint length = g_slist_length (type_attr->_properties_list);
-	if (length < 1)
+	GParamSpec **pspecs = NULL;
+	if (G_TYPE_IS_INTERFACE (class_type)) {
+		pspecs = g_object_interface_list_properties (g_type_default_interface_peek (class_type), n_prop);
+	} else if (G_TYPE_IS_CLASSED (class_type)) {
+		pspecs = g_object_class_list_properties (g_type_class_peek (class_type), n_prop);
+	}
+
+	if (*n_prop == 0)
 		return NULL;
 
-	GSList *l;
-	gchar **names = g_new (gchar *, length + 1);
-	guint i = 0;
-	for (l = type_attr->_properties_list; l != NULL; l = l->next, i++) {
-		names[i] = (gchar *)l->data;
+	gchar **names = g_new (gchar *, *n_prop + 1);
+	guint i;
+	for (i = 0; i < *n_prop; i++)
+	{
+		names[i] = pspecs[i]->name;
 	}
-	
-	*n_prop = i;
-	names[i] = NULL;
 
+	g_free(pspecs);
+	names[i] = NULL;
 	return names;
 }
 
