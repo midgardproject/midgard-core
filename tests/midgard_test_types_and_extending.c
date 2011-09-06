@@ -127,6 +127,15 @@ midgard_test_types_and_extending_dbobject_with_interfaces (MidgardBaseAbstractTe
 	gboolean extends_object = g_type_is_a (test_type, MIDGARD_TYPE_OBJECT);
 	g_assert (extends_object == TRUE);
 
+	gboolean extends_first_test_iface = g_type_is_a (test_type, g_type_from_name ("FirstTestIface"));
+	g_assert (extends_first_test_iface == TRUE);
+
+	gboolean extends_second_test_iface = g_type_is_a (test_type, g_type_from_name ("SecondTestIface"));
+	g_assert (extends_second_test_iface == TRUE);
+
+	gboolean extends_first_test_mixin = g_type_is_a (test_type, g_type_from_name ("FirstTestMixin"));
+	g_assert (extends_first_test_mixin == TRUE);
+
 	/* test derived properties */
 	GObjectClass *klass = g_type_class_ref (test_type);
         g_assert (klass != NULL);
