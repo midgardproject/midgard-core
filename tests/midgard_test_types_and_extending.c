@@ -43,8 +43,8 @@ midgard_test_types_and_extending_base_abstract_derived_type	(MidgardBaseAbstract
 	g_type_class_unref (klass);
 }
 
-#define N_IMPLEMENTED 4
-const gchar *abstract_type_implements = "MidgardBaseInterface, FirstTestIface, SecondTestIface, FirstTestMixin";
+#define N_IMPLEMENTED 5
+const gchar *abstract_type_implements = "MidgardBaseInterface, MidgardBaseMixin, FirstTestIface, SecondTestIface, FirstTestMixin";
 
 void 	
 midgard_test_types_and_extending_base_abstract_derived_type_with_interfaces (MidgardBaseAbstractTest *mwct, gconstpointer data)
