@@ -1758,9 +1758,9 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 
 	/* Note, that we start numbering from 1 , not from 0. property_id must be > 0 */
 	for (idx = 1; idx <= data->num_properties; idx++) {
-		/*gchar *pname = data->params[idx-1]->name;
+		 /*gchar *pname = data->params[idx-1]->name;
 		 g_print ("Installing property id %d :: %s.%s \n",
-				idx, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (g_class)), pname); */
+				idx, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (g_class)), pname);  */
 		g_object_class_install_property(
 				gobject_class, 
 				data->base_index + idx , 
@@ -1848,6 +1848,23 @@ midgard_type_register (MgdSchemaTypeAttr *type_data)
         if (class_type) 
                 return class_type;
 
+	/* First of all, if parent type (either interface or classed one) is not registered, 
+	 * chain up and implicitly register */
+	gchar **extends = NULL;
+	guint n_types;
+	guint i;
+	GType tmp_type;
+	if (type_data->extends != NULL) {
+		extends = midgard_core_schema_type_list_extends (type_data, &n_types);
+		for (i = 0; i < n_types; i++) {
+			GType tmp_type = g_type_from_name (extends[i]);	
+			if (tmp_type == G_TYPE_INVALID) {
+				MgdSchemaTypeAttr *parent_attr = midgard_schema_lookup_type (type_data->schema, extends[i]);
+				midgard_core_schema_register_type (parent_attr);
+			}
+		}
+	}
+
         {
                 GTypeInfo *midgard_type_info = g_new0 (GTypeInfo, 1);
 
@@ -1870,17 +1887,13 @@ midgard_type_register (MgdSchemaTypeAttr *type_data)
                 midgard_type_info->value_table = NULL;
                
 		GSList *ifaces = NULL;
-		gchar **extends = NULL;
 		GType real_parent_type = MIDGARD_TYPE_OBJECT;
 		if (type_data->extends != NULL) {
-
-			guint n_types;
-			guint i;
 			extends = midgard_core_schema_type_list_extends (type_data, &n_types);
 			
 			for (i = 0; i < n_types; i++) {
 				GType tmp_type = g_type_from_name (extends[i]);
-				if (tmp_type == G_TYPE_NONE) {
+				if (tmp_type == G_TYPE_INVALID) {
 					g_warning ("Failed to get type of '%s', which is parent of '%s'", extends[i], type_data->name);
 					g_error ("Invalid parent type");
 				}
@@ -1903,7 +1916,7 @@ midgard_type_register (MgdSchemaTypeAttr *type_data)
 			 };
 			 GSList *l;
 			 for (l = ifaces; l != NULL; l = l->next) {
-				 GType iface_type =g_type_from_name ((gchar *)l->data);
+				 GType iface_type = g_type_from_name ((gchar *)l->data);
 				 midgard_core_interface_add_prerequisites (type, iface_type);
 				 if (!g_type_is_a (type, iface_type))
 					 g_type_add_interface_static (type, iface_type, &iface_info);

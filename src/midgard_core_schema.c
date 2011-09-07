@@ -18,6 +18,7 @@
 
 #include "midgard_core_object.h"
 #include "schema.h"
+#include "midgard_base_abstract.h"
 
 typedef struct {
 	GString *string;
@@ -728,4 +729,19 @@ midgard_core_schema_type_property_lookup (MgdSchemaTypeAttr *type, const gchar *
 		return NULL;
 
 	return g_hash_table_lookup (type->prophash, name);
+}
+
+GType
+midgard_core_schema_register_type (MgdSchemaTypeAttr *type_attr)
+{
+       	GType new_type;
+	if (type_attr->is_abstract) {
+		new_type = midgard_type_register_abstract (type_attr, MIDGARD_TYPE_BASE_ABSTRACT);
+	} else if (type_attr->is_mixin 
+			|| type_attr->is_iface) {
+		new_type = midgard_core_type_register_interface (type_attr);
+	} else {
+		new_type = midgard_type_register(type_attr);
+	}
+	return new_type;
 }

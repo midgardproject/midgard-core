@@ -95,6 +95,7 @@ struct _MgdSchemaTypeAttr {
 
 /* MgdSchema storage utilities */
 MgdSchemaTypeAttr 	*midgard_schema_lookup_type		(MidgardSchema *schema, gchar *type);
+GType			midgard_core_schema_register_type 	(MgdSchemaTypeAttr *type);
 GType			midgard_type_register			(MgdSchemaTypeAttr *data);
 GType			midgard_type_register_abstract		(MgdSchemaTypeAttr *data, GType parent_type);
 GType 			midgard_core_type_register_interface 	(MgdSchemaTypeAttr *type_attr);

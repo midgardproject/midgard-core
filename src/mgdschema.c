@@ -1432,14 +1432,11 @@ static void __extend_type_attr(gpointer key, gpointer val, gpointer userdata)
 	midgard_core_schema_type_property_copy(parent_attr, type);
 }
 
-static void __extend_type_foreach(gpointer key, gpointer val, gpointer userdata)
+static void __extend_type(MgdSchemaTypeAttr *type_attr, MidgardSchema *schema)
 {
-	MgdSchemaTypeAttr *type_attr = (MgdSchemaTypeAttr *) val;
-	MidgardSchema *schema = (MidgardSchema*) userdata;
-
-	if (val == NULL) return;
 	if (type_attr->extends == NULL) return;
 
+	MgdSchemaTypeAttr *parent_type_attr = NULL;
 	guint n_types;
 	guint i;
 	gchar **extends = midgard_core_schema_type_list_extends (type_attr, &n_types);
@@ -1470,6 +1467,9 @@ static void __extend_type_foreach(gpointer key, gpointer val, gpointer userdata)
 		if (!parent_type_attr)
 			return;
 		
+		/* Chain up */	
+		__extend_type (parent_type_attr, schema);
+
 		midgard_core_schema_type_attr_extend (type_attr, parent_type_attr);
 		
 		/* Use parent's storage */
@@ -1485,6 +1485,20 @@ static void __extend_type_foreach(gpointer key, gpointer val, gpointer userdata)
 	}
 
 	g_strfreev (extends);
+}
+
+static void __extend_type_foreach(gpointer key, gpointer val, gpointer userdata)
+{
+	if (val == NULL)
+		return;
+
+	MgdSchemaTypeAttr *type_attr = (MgdSchemaTypeAttr *) val;
+	MidgardSchema *schema = (MidgardSchema*) userdata;
+
+	if (type_attr->extends == NULL) 
+		return;
+
+	__extend_type (type_attr, schema);
 }
 
 static void __copy_type_attr(gpointer key, gpointer val, gpointer userdata)
@@ -1533,17 +1547,8 @@ static void __copy_type_foreach(gpointer key, gpointer val, gpointer userdata)
 	g_hash_table_foreach(parent_type_attr->prophash, __copy_type_attr, type_attr);	
 }
 
-static void __register_schema_type (gpointer key, gpointer val, gpointer user_data)
+static void __register_schema_type (MgdSchemaTypeAttr *type_attr)
 {
-	MgdSchemaTypeAttr *type_attr = (MgdSchemaTypeAttr *) val;
-
-	if (val == NULL) return;
-	if (type_attr->params == NULL) {
-
-		g_warning("No parameters found for %s schema type. Not registering.", type_attr->name);
-		return;
-	}
-
 	GType new_type;
 	if (type_attr->is_abstract) {
 		new_type = midgard_type_register_abstract (type_attr, MIDGARD_TYPE_BASE_ABSTRACT);
@@ -1579,6 +1584,35 @@ static void __register_schema_type (gpointer key, gpointer val, gpointer user_da
 	}
 }
 
+static void __register_schema_type_foreach (gpointer key, gpointer val, gpointer user_data)
+{
+	if (val == NULL)
+		return;
+	__register_schema_type ((MgdSchemaTypeAttr *) val);
+}
+
+static void __get_interfaces (gpointer key, gpointer val, gpointer user_data)
+{
+	GSList **ifaces = (GSList **) user_data;
+	MgdSchemaTypeAttr *type_attr = (MgdSchemaTypeAttr *) val;
+
+	if (type_attr->is_iface 
+			|| type_attr->is_mixin)
+		*ifaces = g_slist_append (*ifaces, type_attr);
+}
+
+static void __midgard_schema_register_interfaces (MidgardSchema *self)
+{
+	GSList *ifaces = NULL;
+	g_hash_table_foreach (self->types, __get_interfaces, &ifaces);
+
+	GSList *l = NULL;
+	for (l = ifaces; l != NULL; l = l->next) {	
+		__register_schema_type ((MgdSchemaTypeAttr *) l->data);
+	}
+	g_slist_free (ifaces);
+}
+
 static void __build_static_sql (gpointer key, gpointer val, gpointer userdata)
 {
 	MgdSchemaTypeAttr *type_attr = (MgdSchemaTypeAttr *)val;
@@ -1607,7 +1641,8 @@ static void __midgard_schema_postconfig(MidgardSchema *self)
 	g_hash_table_foreach (self->types, __initialize_paramspec, NULL);
 	g_hash_table_foreach (self->types, __build_static_sql, NULL);
 	g_hash_table_foreach (self->types, __validate_fields, NULL);
-	g_hash_table_foreach (self->types, __register_schema_type, NULL);
+	__midgard_schema_register_interfaces (self);
+	g_hash_table_foreach (self->types, __register_schema_type_foreach, NULL);
 }
 
 /**
