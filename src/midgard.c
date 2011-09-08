@@ -37,6 +37,8 @@
 #include "midgard_base_abstract.h"
 #include "midgard_base_interface.h"
 #include "midgard_base_mixin.h"
+#include "midgard_query_executor.h"
+#include "midgard_query_select.h"
 
 #include <locale.h>
 
@@ -196,6 +198,14 @@ midgard_init()
 	g_assert (type != 0);
 	g_type_class_ref (type);
 
+	type = MIDGARD_TYPE_QUERY_EXECUTOR;
+	g_assert (type != 0);
+	g_type_class_ref (type);
+
+	type = MIDGARD_TYPE_QUERY_SELECT;
+	g_assert (type != 0);
+	g_type_class_ref (type);
+
 	type = MIDGARD_TYPE_BASE_INTERFACE;
 	g_assert (type != 0);
 
@@ -261,6 +271,14 @@ midgard_close(void)
 		g_type_class_unref (klass);
 
 	klass = g_type_class_peek (MIDGARD_TYPE_BASE_ABSTRACT);
+	if (klass)
+		g_type_class_unref (klass);
+
+	klass = g_type_class_peek (MIDGARD_TYPE_QUERY_EXECUTOR);
+	if (klass)
+		g_type_class_unref (klass);
+
+	klass = g_type_class_peek (MIDGARD_TYPE_QUERY_SELECT);
 	if (klass)
 		g_type_class_unref (klass);
 }
