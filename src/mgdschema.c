@@ -281,34 +281,6 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 		if (attrval) { 
 
 			type_attr->extends = g_strdup ((gchar *)attrval);
-			xmlChar *table_name = (xmlChar *) xmlGetProp (node, (const xmlChar *)"table");	
-			guint i;
-			guint n_types;
-			gchar **extends = midgard_core_schema_type_list_extends (type_attr, &n_types);
-
-			for (i = 0; i < n_types; i++) {
-				MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, extends[i]);
-				if (!src) {
-					__warn_msg (node, "Can not find declared type");
-					continue;
-				}
-				if (!src->is_iface
-						&& !src->is_mixin
-						&& !src->is_abstract
-						&& table_name) {
-					__warn_msg (node, "Can not define 'table' and 'extends' attributes together");
-					/* This might be undefined result, so we fallback to NULL default */
-					g_free (type_attr->extends);
-					type_attr->extends = NULL;
-				} else {
-					midgard_core_schema_type_attr_extend (src, type_attr);
-				}
-			}
-			
-			if (extends)
-				g_strfreev (extends);
-
-			xmlFree (table_name);
 			xmlFree (attrval);
 		}
 
@@ -1470,7 +1442,7 @@ static void __extend_type(MgdSchemaTypeAttr *type_attr, MidgardSchema *schema)
 		/* Chain up */	
 		__extend_type (parent_type_attr, schema);
 
-		midgard_core_schema_type_attr_extend (type_attr, parent_type_attr);
+		midgard_core_schema_type_attr_extend (parent_type_attr, type_attr);
 		
 		/* Use parent's storage */
 		type_attr->table = g_strdup(parent_type_attr->table);
