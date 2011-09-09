@@ -266,7 +266,7 @@ __mgdschema_object_dispose (GObject *object)
 		self->priv->parameters = NULL;
 	}
 
-	GObjectClass *parent_class = g_type_class_peek_parent (G_OBJECT_GET_CLASS (object));
+	GObjectClass *parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
 	parent_class->dispose (object);
 }
 
@@ -319,7 +319,7 @@ static void __mgdschema_object_finalize (GObject *object)
 		
 	/* Call parent's finalizer if it is there */
 	{
-		GObjectClass *parent_class = g_type_class_ref (current_type);		
+		GObjectClass *parent_class = g_type_class_ref (MIDGARD_TYPE_OBJECT);		
 		if (parent_class->finalize) {
 			parent_class->finalize (object);
 		}
@@ -1721,6 +1721,8 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv->__set_from_sql = NULL;
 		dbklass->dbpriv->set_from_xml_node = NULL;
 
+		GObjectClass *parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
+
 		dbklass->dbpriv->create_storage = _object_create_storage;
 		dbklass->dbpriv->update_storage = _object_update_storage;
 		dbklass->dbpriv->storage_exists = _object_storage_exists;
@@ -1728,8 +1730,8 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 		dbklass->dbpriv->add_fields_to_select_statement = __add_fields_to_select_statement ; 
 		dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_property;
 		dbklass->dbpriv->set_from_data_model = __set_from_data_model;
-		dbklass->dbpriv->get_statement_insert = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_insert;
-		dbklass->dbpriv->get_statement_insert_params = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_insert_params;
+		dbklass->dbpriv->get_statement_insert = MIDGARD_DBOBJECT_CLASS (parent_class)->dbpriv->get_statement_insert;
+		dbklass->dbpriv->get_statement_insert_params = MIDGARD_DBOBJECT_CLASS (parent_class)->dbpriv->get_statement_insert_params;
 		dbklass->dbpriv->get_statement_update = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_update;
 		dbklass->dbpriv->get_statement_update_params = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_update_params;
 		dbklass->dbpriv->get_statement_delete = MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->get_statement_delete;
@@ -1792,18 +1794,14 @@ static GObject *
 __mgdschema_object_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties)
-{
-	/* If MgdSchema type extends MgdSchema one, invoke constructor using proper class and type */
-	GType parent_type = g_type_parent (type);
-	GObjectClass *parent_class = g_type_class_peek (parent_type);
+{ 
+	/* If MgdSchema type extends MgdSchema one, invoke constructor using proper class and type */	
+	GObjectClass *parent_class = g_type_class_peek (MIDGARD_TYPE_OBJECT);
 	GObject *object = (GObject *)
-		G_OBJECT_CLASS (parent_class)->constructor (parent_type == MIDGARD_TYPE_OBJECT ? type : parent_type,
-				n_construct_properties,
-				construct_properties);
-	
+		G_OBJECT_CLASS (parent_class)->constructor (type, n_construct_properties, construct_properties);
+
 	/* Workaround to set default values for every property.
 	 * I have no idea why we get 0 n_construct_properties and null GObjectConstructParam */
-	//GObjectClass *g_class = g_type_class_peek (type);
 	GObjectClass *g_class = G_OBJECT_GET_CLASS (object);
 	guint n_prop, i;
 	GParamSpec **pspecs = g_object_class_list_properties(g_class, &n_prop);
@@ -1986,20 +1984,14 @@ __midgard_object_constructor (GType type,
 static void 
 __midgard_object_dispose (GObject *object)
 {
-	GType parent_type = g_type_parent (G_OBJECT_TYPE(object));
-	GObjectClass *parent_class = g_type_class_peek_parent (G_OBJECT_GET_CLASS (object));
-	if (parent_type == MIDGARD_TYPE_OBJECT)
-		parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
+	GObjectClass *parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
 	parent_class->dispose (object);
 }
 
 static void 
 __midgard_object_finalize (GObject *object)
 {
-	GType parent_type = g_type_parent (G_OBJECT_TYPE(object));
-	GObjectClass *parent_class = g_type_class_peek_parent (G_OBJECT_GET_CLASS (object));
-	if (parent_type == MIDGARD_TYPE_OBJECT)
-		parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
+	GObjectClass *parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
 	parent_class->finalize (object);
 }
 
@@ -2040,13 +2032,14 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	}
 
 	MidgardObjectClass *mklass = klass;
+	MidgardDBObjectClass *parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
 
 	mklass->get_connection = MIDGARD_DBOBJECT_CLASS(mklass)->get_connection;
 	dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->add_fields_to_select_statement;
 	dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_property;
 	dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_from_data_model;
-	dbklass->dbpriv->get_statement_insert = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_insert;
-	dbklass->dbpriv->get_statement_insert_params = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_insert_params;
+	dbklass->dbpriv->get_statement_insert = MIDGARD_DBOBJECT_CLASS (parent_class)->dbpriv->get_statement_insert;
+	dbklass->dbpriv->get_statement_insert_params = MIDGARD_DBOBJECT_CLASS (parent_class)->dbpriv->get_statement_insert_params;
 	dbklass->dbpriv->get_statement_update = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_update;
 	dbklass->dbpriv->get_statement_update_params = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_update_params;
 	dbklass->dbpriv->get_statement_delete = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_statement_delete;
