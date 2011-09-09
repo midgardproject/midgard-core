@@ -205,6 +205,14 @@ midgard_schema_object_factory_get_object_by_path (MidgardConnection *mgd, const 
 	g_return_val_if_fail (classname != NULL, NULL);
 	g_return_val_if_fail (path != NULL, NULL);
 
+	GType class_type = g_type_from_name (classname);
+	if (class_type == G_TYPE_INVALID
+			|| !g_type_is_a (class_type, MIDGARD_TYPE_DBOBJECT)) {
+		g_warning ("Invalid '%s' classname. Expected MidgardDBObject derived one");
+		/* TODO, add error */
+		return NULL;
+	}
+
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
 	gchar *object_path = NULL;
