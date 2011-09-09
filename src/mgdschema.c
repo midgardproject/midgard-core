@@ -287,23 +287,7 @@ _get_type_attributes(xmlNode * node, MgdSchemaTypeAttr *type_attr, MidgardSchema
 		/* copy */
 		attrval = xmlGetProp(node, (const xmlChar *)TYPE_RW_COPY);
 		if (attrval) {
-
-			type_attr->copy_from = g_strdup((gchar *)attrval);
-			xmlChar *table_name = (xmlChar *)xmlGetProp(node, (const xmlChar *)"table");	
-
-			if (table_name == NULL) {
-
-				__warn_msg(node, "Can not copy MgdSchema type without storage defined");
-				g_error("Table definition missed");
-			
-			} else {
-
-				MgdSchemaTypeAttr *src = midgard_schema_lookup_type (schema, (gchar *)attrval);
-				if (src)
-					midgard_core_schema_type_attr_extend (src, type_attr);
-			}
-	
-			xmlFree(table_name);
+			g_warning ("'copy' attribute is obsolete. Please add 'table' and 'extends' attributes");
 			xmlFree(attrval);
 		}
 
@@ -1445,8 +1429,10 @@ static void __extend_type(MgdSchemaTypeAttr *type_attr, MidgardSchema *schema)
 		midgard_core_schema_type_attr_extend (parent_type_attr, type_attr);
 		
 		/* Use parent's storage */
-		type_attr->table = g_strdup(parent_type_attr->table);
-		type_attr->tables = g_strdup(parent_type_attr->tables);
+		if (type_attr->table == NULL)
+			type_attr->table = g_strdup(parent_type_attr->table);
+		if (type_attr->tables == NULL)
+			type_attr->tables = g_strdup(parent_type_attr->tables);
 		
 		GSList *slist = NULL;		
 		for (slist = parent_type_attr->_properties_list; slist != NULL; slist = slist->next) {
