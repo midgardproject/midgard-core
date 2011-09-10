@@ -550,7 +550,15 @@ _get_property_attributes(xmlNode * node,
 		prop_attr->field = g_ascii_strdown ((gchar *)attrval, -1);
 		xmlFree (attrval);
 	} else {
-		prop_attr->field = g_ascii_strdown (prop_attr->name, -1);
+		gchar *dash = g_strstr_len (prop_attr->name, -1, "-");
+		if (dash != NULL) {
+			gchar *tmp = g_strdup (prop_attr->name);
+			prop_attr->field = g_ascii_strdown (g_strdelimit (tmp, "-", '_'), -1);
+			g_free (tmp);
+		}
+		else {
+			prop_attr->field = g_ascii_strdown (prop_attr->name, -1);
+		}
 	}
 		
 	/* index */
