@@ -249,20 +249,47 @@ midgard_core_schema_type_attr_extend (MgdSchemaTypeAttr *src, MgdSchemaTypeAttr 
      	g_return_if_fail (src != NULL);
 	g_return_if_fail (dst != NULL);
 
-	g_free (dst->parentfield);
-	dst->parentfield = src->parentfield ? g_strdup (src->parentfield) : NULL;
-	g_free (dst->upfield);
-	dst->upfield = src->upfield ? g_strdup (src->upfield) : NULL;
-	g_free ((gchar *)dst->parent);
-	dst->parent = src->parent ? g_strdup (src->parent) : NULL;
-	g_free ((gchar *)dst->primary);
-	dst->primary = src->primary ? g_strdup (src->primary) : NULL;
-	g_free ((gchar *)dst->primaryfield);
-	dst->primaryfield = src->primaryfield ? g_strdup (src->primaryfield) : NULL;
-	g_free ((gchar *)dst->property_up);
-	dst->property_up = src->property_up ? g_strdup (src->property_up) : NULL;
-	g_free ((gchar *)dst->property_parent);
-	dst->property_parent = src->property_parent ? g_strdup (src->property_parent) : NULL;
+	/* PARENT FIELD */
+	if (src->parentfield) {
+		g_free (dst->parentfield);
+		dst->parentfield = g_strdup (src->parentfield);
+	}
+
+	/* UP FIELD */
+	if (src->upfield) {
+		g_free (dst->upfield);
+		dst->upfield = g_strdup (src->upfield);
+	}
+
+	/* PARENT */
+	if (src->parent) {
+		g_free ((gchar *)dst->parent);
+		dst->parent = g_strdup (src->parent);
+	}
+
+	/* PRIMARY */
+	if (src->primary) {
+		g_free ((gchar *)dst->primary);
+		dst->primary = g_strdup (src->primary);
+	}
+
+	/* PRIMARY FIELD */
+	if (src->primaryfield) {
+		g_free ((gchar *)dst->primaryfield);
+		dst->primaryfield = g_strdup (src->primaryfield);
+	}
+
+	/* PROPERTY UP */
+	if (src->property_up) {
+		g_free ((gchar *)dst->property_up);
+		dst->property_up = g_strdup (src->property_up);
+	}
+
+	/* PROPERTY PARENT */
+	if (src->property_parent) {
+		g_free ((gchar *)dst->property_parent);
+		dst->property_parent = g_strdup (src->property_parent);
+	}
 	
 	if (src->children) {
 		GSList *children;
@@ -271,11 +298,18 @@ midgard_core_schema_type_attr_extend (MgdSchemaTypeAttr *src, MgdSchemaTypeAttr 
 		}
 	}
 
-	g_free ((gchar *)dst->unique_name);
-	dst->unique_name = src->unique_name ? g_strdup (src->unique_name) : NULL;
-	g_free ((gchar *)dst->metadata_class_name);
-	dst->metadata_class_name = src->metadata_class_name ? g_strdup (src->metadata_class_name) : NULL;
-	dst->metadata_class_ptr = src->metadata_class_ptr ? src->metadata_class_ptr : NULL;
+	/* UNIQUE NAME */
+	if (src->unique_name) {
+		g_free ((gchar *)dst->unique_name);
+		dst->unique_name = g_strdup (src->unique_name);
+	}
+
+	/* METADATA */
+	if (src->metadata_class_name) {
+		g_free ((gchar *)dst->metadata_class_name);
+		dst->metadata_class_name = g_strdup (src->metadata_class_name);
+		dst->metadata_class_ptr = src->metadata_class_ptr;
+	}
 }
 
 void 
