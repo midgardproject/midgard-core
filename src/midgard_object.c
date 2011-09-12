@@ -59,6 +59,8 @@ GType _midgard_attachment_type = 0;
 static gboolean signals_registered = FALSE;
 
 static GObjectClass *__mgdschema_parent_class = NULL;
+static GObjectClass *__db_object_class = NULL;
+static GObjectClass *__object_class = NULL;
 static GObject *__mgdschema_object_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties);
@@ -1518,7 +1520,7 @@ __add_fields_to_select_statement (MidgardDBObjectClass *klass, MidgardConnection
 	gchar *table_field;
 	GdaConnection *cnc = mgd->priv->connection;
 
-	MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->add_fields_to_select_statement (klass, mgd, select, table_name);
+	MIDGARD_DBOBJECT_CLASS (__db_object_class)->dbpriv->add_fields_to_select_statement (klass, mgd, select, table_name);
 
 	if (mgd && !MGD_CNC_USES_WORKSPACE (mgd))
 		return;
@@ -1576,7 +1578,7 @@ __set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, gui
 
 	column_id++;
 
-	MIDGARD_DBOBJECT_CLASS (__mgdschema_parent_class)->dbpriv->set_from_data_model (self, model, row, column_id);
+	MIDGARD_DBOBJECT_CLASS (__db_object_class)->dbpriv->set_from_data_model (self, model, row, column_id);
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
 	if (mgd && !MGD_CNC_USES_WORKSPACE (mgd)) 
@@ -1999,7 +2001,8 @@ static void
 __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 {
 	GObjectClass *g_class = G_OBJECT_CLASS (klass);
-	__midgard_object_parent_class = g_type_class_peek_parent (klass);
+	__midgard_object_parent_class = __db_object_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
+	__object_class = klass;
 
 	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (klass);
 	
@@ -2035,7 +2038,7 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 	MidgardDBObjectClass *parent_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
 
 	mklass->get_connection = MIDGARD_DBOBJECT_CLASS(mklass)->get_connection;
-	dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->add_fields_to_select_statement;
+	dbklass->dbpriv->add_fields_to_select_statement = MIDGARD_DBOBJECT_CLASS (__db_object_class)->dbpriv->add_fields_to_select_statement;
 	dbklass->dbpriv->get_property = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->get_property;
 	dbklass->dbpriv->set_from_data_model = MIDGARD_DBOBJECT_CLASS (__midgard_object_parent_class)->dbpriv->set_from_data_model;
 	dbklass->dbpriv->get_statement_insert = MIDGARD_DBOBJECT_CLASS (parent_class)->dbpriv->get_statement_insert;
