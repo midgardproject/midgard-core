@@ -19,6 +19,7 @@
 #include "midgard_base_interface.h"
 #include "schema.h"
 #include "midgard_base_mixin.h"
+#include "midgard_core_object.h"
 
 void
 midgard_core_interface_add_prerequisites (GType type, GType iface_type)
@@ -80,6 +81,9 @@ __midgard_base_interface_derived_class_init (gpointer *klass, gpointer class_dat
 		if (!pspec)
 			g_object_interface_install_property (klass, type_attr->params[i]);
 	}
+
+	((MidgardBaseInterfaceIFace *)klass)->priv = g_new (MidgardBaseInterfacePrivate, 1);
+	((MidgardBaseInterfaceIFace *)klass)->priv->type_data = class_data;
 }
 
 GType 

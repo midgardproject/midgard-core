@@ -261,6 +261,10 @@ struct _MidgardBlobPrivate {
 	gchar *encoding;
 };
 
+struct _MidgardBaseInterfacePrivate {
+	MgdSchemaTypeAttr *type_data;
+};
+
 typedef enum {
 	OBJECT_UPDATE_NONE = 0,
 	OBJECT_UPDATE_EXPORTED,
