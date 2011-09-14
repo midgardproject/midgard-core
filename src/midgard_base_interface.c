@@ -86,6 +86,14 @@ __midgard_base_interface_derived_class_init (gpointer *klass, gpointer class_dat
 	((MidgardBaseInterfaceIFace *)klass)->priv->type_data = class_data;
 }
 
+static void 
+__midgard_base_interface_derived_finalize (gpointer *klass) 
+{
+	g_free (((MidgardBaseInterfaceIFace *)klass)->priv);
+	((MidgardBaseInterfaceIFace *)klass)->priv = NULL;
+}
+
+
 GType 
 midgard_core_type_register_interface (MgdSchemaTypeAttr *type_attr)
 {
@@ -112,7 +120,7 @@ midgard_core_type_register_interface (MgdSchemaTypeAttr *type_attr)
 	GTypeInfo info = {
 		sizeof (MidgardBaseInterfaceIFace),
 		(GBaseInitFunc) __midgard_base_interface_derived_init,
-		NULL,   /* base_finalize */
+		(GBaseFinalizeFunc) __midgard_base_interface_derived_finalize,
 		(GClassInitFunc) __midgard_base_interface_derived_class_init,	
 		NULL,   /* class_finalize */
 		(const MgdSchemaTypeAttr *) type_attr,   /* class_data */
