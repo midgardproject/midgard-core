@@ -25,12 +25,33 @@
 #include "midgard_base_interface.h"
 #include "midgard_base_mixin.h"
 
-#define _GET_CLASS_BY_NAME(__name, __retval) 					\
-	GObjectClass *klass = g_type_class_peek (g_type_from_name (__name)); 	\
-	g_return_val_if_fail (MIDGARD_IS_DBOBJECT_CLASS (klass), __retval);
+#define _GET_CLASS_BY_NAME(__name, __retval) 						\
+	gpointer *klass = NULL;								\
+	gboolean is_iface = FALSE;							\
+	GType __class_type = g_type_from_name (__name);					\
+	if (g_type_is_a (__class_type, MIDGARD_TYPE_DBOBJECT)				\
+			|| g_type_is_a (__class_type, MIDGARD_TYPE_BASE_ABSTRACT)) {	\
+		klass = g_type_class_peek (__class_type);				\
+	} else if (g_type_is_a (__class_type, MIDGARD_TYPE_BASE_INTERFACE)) {		\
+			klass = g_type_default_interface_ref (__class_type);		\
+			is_iface = TRUE;						\
+	} else {									\
+		g_warning ("Invalid '%s' class name ", __name);				\
+		return __retval;							\
+	}
 
-#define _GET_TYPE_ATTR(__klass) 					\
-	MgdSchemaTypeAttr *type_attr = midgard_core_class_get_type_attr(MIDGARD_DBOBJECT_CLASS(__klass)); 
+#define _GET_TYPE_ATTR(__klass) 									\
+	MgdSchemaTypeAttr *type_attr = NULL;								\
+	if (is_iface) {											\
+		gpointer *ifaceptr = g_type_default_interface_ref (__class_type);			\
+		type_attr = ((MidgardBaseInterfaceIFace *)ifaceptr)->priv->type_data;			\
+	} else {											\
+		type_attr = midgard_core_class_get_type_attr(MIDGARD_DBOBJECT_CLASS(__klass)); 		\
+	} 												\
+	if (type_attr == NULL) {									\
+		g_warning ("Failed to find attributes for '%s' type", g_type_name (__class_type));	\
+	}
+	
 
 /**
  * midgard_reflector_object_get_property_primary:
