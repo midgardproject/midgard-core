@@ -35,6 +35,9 @@
  *
  * #MidgardStorage @storage represents storage which is queried during execution
  *
+ * By default, for performance reason, MidgardQuerySelect is instantiated in read only mode.
+ * See: midgard_query_select_read_only().
+ *
  * Returns: new #MidgardQuerySelect instance or %NULL on failure
  * Since: 10.05
  */ 
@@ -869,6 +872,8 @@ _midgard_query_select_toggle_read_only (MidgardQuerySelect *self, gboolean toggl
  * This method switch #MidgardQuerySelect to read only mode.
  * It should be enabled when returned objects will be used only to read properties.
  * It improves performance, but it's impossible to write returned object's properties.
+ *
+ * By default, for performance reason, MidgardQuerySelect is instantiated in read only mode.
  *
  * Since: 10.05
  */ 
