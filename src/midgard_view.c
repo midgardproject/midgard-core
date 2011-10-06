@@ -174,6 +174,11 @@ _midgard_view_derived_object_get_property (GObject *object, guint prop_id,
 	const GValue *dvalue = 
 		midgard_data_model_get_value_at_col_name(self->dbpriv->datamodel, pspec->name, self->dbpriv->row);
 
+	/* There migh be explicit NULL returned from query in case of used join(s).
+	 * Ignore it silently */
+	if (!G_IS_VALUE (dvalue))
+		return;
+
 	// Hack to workaround bug in gda-sqlite (returns INVALID for empty strings)
 	if (G_VALUE_HOLDS (dvalue, G_TYPE_INVALID) && G_VALUE_HOLDS_STRING (value)) {
 
