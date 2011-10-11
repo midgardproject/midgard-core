@@ -219,8 +219,11 @@ src_libmidgard2_la_public_SOURCES = \
 
 pkgdatadir = $(datadir)/midgard2
 pkglibdir = $(libdir)/midgard2
-libmidgardincludedir = $(includedir)/midgard2/midgard
-libmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h 
+libmidgardincludedir = $(includedir)/midgard2
+libmidgardinclude_HEADERS =  src/midgard2.h 
+
+libsubmidgardincludedir = $(includedir)/midgard2/midgard
+libsubmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h 
 
 src_libmidgard2_la_SOURCES = $(src_libmidgard2_la_public_SOURCES) $(src_libmidgard2_la_core_SOURCES)
 
