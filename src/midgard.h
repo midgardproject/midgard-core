@@ -68,6 +68,8 @@
 #include <midgard/midgard_base_abstract.h>
 #include <midgard/midgard_base_interface.h>
 #include <midgard/midgard_base_mixin.h>
+#include <midgard/midgard_executable.h>
+#include <midgard/midgard_validable.h>
 
 #endif /* _MIDGARD_API_H_ */
 
