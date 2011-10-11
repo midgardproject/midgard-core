@@ -1001,7 +1001,7 @@ static void __set_from_sql(MidgardDBObject *object,
 	/* ACTIVE */
 	value = midgard_data_model_get_value_at_col_name (model, "active", row);
 	if (value) {
-		self->priv->active = g_value_get_boolean (value);
+		MIDGARD_GET_BOOLEAN_FROM_VALUE (self->priv->active, value);
 	}
 
 	/* AUTH TYPE */
@@ -1284,7 +1284,7 @@ _midgard_user_set_property (GObject *object, guint property_id,
 			break;
 
 		case MIDGARD_USER_ACTIVE:
-			self->priv->active = g_value_get_boolean (value);
+			MIDGARD_GET_BOOLEAN_FROM_VALUE (self->priv->active, value);
 			break;
 
 		case MIDGARD_USER_AUTH_TYPE:

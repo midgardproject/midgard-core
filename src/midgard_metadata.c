@@ -361,11 +361,13 @@ _metadata_set_property (GObject *object, guint property_id,
 			break;
 		
 		case MIDGARD_METADATA_HIDDEN:
-			self->priv->hidden = g_value_get_boolean (value);
+			if (G_VALUE_HOLDS_BOOLEAN (value))
+				self->priv->hidden = g_value_get_boolean (value);
 			break;
 			
 		case MIDGARD_METADATA_NAV_NOENTRY:
-			self->priv->nav_noentry = g_value_get_boolean (value);
+			if (G_VALUE_HOLDS_BOOLEAN (value))
+				self->priv->nav_noentry = g_value_get_boolean (value);
 			break;
 						
 		case MIDGARD_METADATA_PUBLISHED:	    
