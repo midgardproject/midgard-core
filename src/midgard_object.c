@@ -2460,6 +2460,7 @@ GType midgard_object_get_type(void)
  * weather passed string is a guid , in any other case id property is used 
  * with #G_TYPE_UINT type. New "empty" instance is created (without fetching 
  * data from database) if @value parameter is explicitly set to NULL.
+ * Or if given string is empty one, or given integer is 0.
  * 
  * Any object instance created with this function should be freed using typical
  * #g_object_unref function.
@@ -2512,11 +2513,13 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 
 		if (G_VALUE_TYPE(value) == G_TYPE_UINT) {
 			if (g_value_get_uint(value) == 0) {
-				goto return_null_with_error;
+				goto return_empty_object;
 			}
 		}	
 
 		if (G_VALUE_TYPE(value) == G_TYPE_INT) {
+			if (g_value_get_int(value) == 0)
+				goto return_empty_object;
 			if (g_value_get_int(value) < 1) {
 				goto return_null_with_error;
 			}
@@ -2525,7 +2528,7 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 		if (G_VALUE_TYPE(value) == G_TYPE_STRING) {
 			const gchar *guidval = g_value_get_string(value);
 			field = "guid";
-			if (!guidval)
+			if (!guidval || *guidval == '\0')
 				goto return_empty_object;
 			if (guidval && !midgard_is_guid (guidval))
 				goto return_null_with_error;
