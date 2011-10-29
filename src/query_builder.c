@@ -65,26 +65,10 @@ static gboolean __type_is_valid(GType type)
 	if(!_type)
 		return FALSE;
 
-	if(type == MIDGARD_TYPE_DBOBJECT 
-			|| type == MIDGARD_TYPE_OBJECT)
+	if (g_type_is_a (type, MIDGARD_TYPE_DBOBJECT))
 		return TRUE;
 
-	/* check MIDGARD_TYPE_OBJECT */
-	if(g_type_parent(_type) != MIDGARD_TYPE_DBOBJECT) {
-		
-		/* if fails, try MIDGARD_TYPE_DBOBJECT */
-		if(g_type_parent(_type) == MIDGARD_TYPE_OBJECT
-				|| g_type_parent(_type) == MIDGARD_TYPE_VIEW) {
-			
-			return TRUE;
-		
-		} else {
-
-			return FALSE;
-		}
-	}
-
-	return TRUE;
+	return FALSE;
 }
 
 /**
