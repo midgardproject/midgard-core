@@ -1757,13 +1757,10 @@ gboolean midgard_core_query_update_class_storage(MidgardConnection *mgd, Midgard
 		mgd_type = midgard_reflection_property_get_midgard_type (mrp, pspecs[i]->name);
 		mdc->gtype = mgd_type;
 		
-		switch(pspecs[i]->value_type) {
+		switch(G_TYPE_FUNDAMENTAL (pspecs[i]->value_type)) {
 
 			case G_TYPE_STRING:
-				if (mgd_type == MGD_TYPE_TIMESTAMP) {
-					mdc->dvalue = _DB_DEFAULT_DATETIME;
-					mdc->dbtype = "datetime";
-				} else if (mgd_type == MGD_TYPE_LONGTEXT) {
+				if (mgd_type == MGD_TYPE_LONGTEXT) {
 					mdc->dvalue = "";
 					mdc->dbtype = "longtext";
 				} else if (mgd_type == MGD_TYPE_GUID) {
@@ -1774,7 +1771,6 @@ gboolean midgard_core_query_update_class_storage(MidgardConnection *mgd, Midgard
 					mdc->dvalue = "";
 					mdc->dbtype = "varchar(255)";
 				}
-				
 				break;
 
 			case G_TYPE_UINT:
@@ -1798,6 +1794,7 @@ gboolean midgard_core_query_update_class_storage(MidgardConnection *mgd, Midgard
 					mdc->dvalue = _DB_DEFAULT_DATETIME;
 					mdc->dbtype = "datetime";
 				}
+				break;
 
 			default:
 				mdc->dbtype = "varchar(255)";
