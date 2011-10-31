@@ -70,6 +70,7 @@
 #include <midgard/midgard_base_mixin.h>
 #include <midgard/midgard_executable.h>
 #include <midgard/midgard_validable.h>
+#include <midgard/midgard_repligard.h>
 
 #endif /* _MIDGARD_API_H_ */
 
