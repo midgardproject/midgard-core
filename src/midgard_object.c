@@ -1767,7 +1767,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 				idx, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (g_class)), pname);  */
 		g_object_class_install_property(
 				gobject_class, 
-				data->base_index + idx , 
+				G_OBJECT_CLASS_TYPE (g_class) == MIDGARD_TYPE_OBJECT ? data->base_index + idx : idx, 
 				data->params[idx-1]);
 	}
 
