@@ -48,11 +48,12 @@ gtester -k -o midgard-test.xml \
 	./run-midgard-test-user-bugs \
 	./run-midgard-test-object-workspace \
 	./run-midgard-test-database-provider \
+	./run-midgard-test-types-and-extending \
 	# ./run-midgard-test-replicator-import
 
 
 echo "\nCleanup…"
-if [ "${MIDGARD_TEST_DATABASE_TYPE}" == "SQLite" ]
+if [ "${MIDGARD_TEST_DATABASE_TYPE}" == "SQLite" ] ;
 then
     echo "-> Deleting sqlite database file"
     rm -f ~/.midgard2/data/${MIDGARD_TEST_DB}.db
