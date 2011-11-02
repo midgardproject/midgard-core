@@ -1749,8 +1749,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 	
 	/* List parent class properties so we can set current class base_index */
 	guint n_prop;
-	GParamSpec **pspecs =
-		g_object_class_list_properties (g_type_class_peek_parent(g_class), &n_prop);
+	GParamSpec **pspecs = g_object_class_list_properties (g_type_class_peek (MIDGARD_TYPE_OBJECT), &n_prop);
 	g_free(pspecs);
 
 	if (data)
@@ -1767,7 +1766,7 @@ __mgdschema_class_init(gpointer g_class, gpointer class_data)
 				idx, G_OBJECT_CLASS_NAME (G_OBJECT_CLASS (g_class)), pname);  */
 		g_object_class_install_property(
 				gobject_class, 
-				G_OBJECT_CLASS_TYPE (g_class) == MIDGARD_TYPE_OBJECT ? data->base_index + idx : idx, 
+				data->base_index + idx,
 				data->params[idx-1]);
 	}
 
