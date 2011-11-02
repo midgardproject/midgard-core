@@ -10,7 +10,7 @@ dnl If the version contains user visible changes then you should
 dnl have updated the NEWS file. Remember also to test the release
 dnl before committing.
 dnl
-AC_INIT([midgard2-core],[10.05.5])
+AC_INIT([midgard2-core],[10.05.6])
 AC_PREREQ(2.50)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
