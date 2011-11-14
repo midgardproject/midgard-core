@@ -11,7 +11,8 @@ void	midgard_test_database_provider_sqlite_double_escape	(void);
 void	midgard_test_database_provider_mysql_complex_escape	(void);
 void	midgard_test_database_provider_sqlite_complex_escape	(void);
 
-void	midgard_test_database_sql_injection 			(void);
+void 	midgard_test_database_provider_mysql_sql_injection_drop_table	(void);
+void 	midgard_test_database_provider_sqlite_sql_injection_drop_table	(void);
 
 void	midgard_test_database_provider_sqlite_utf8_chars 	(void);
 void	midgard_test_database_provider_mysql_utf8_chars 	(void);

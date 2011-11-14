@@ -471,6 +471,67 @@ _midgard_test_database_provider_complex_escape (const gchar *provider)
 	g_object_unref (config_global);
 }
 
+static void 
+_midgard_test_database_provider_sql_injection_drop_table (const gchar *provider)
+{
+	midgard_test_database_provider_connection_init (provider);
+
+	MidgardQueryStorage *storage = midgard_query_storage_new (TEST_CLASS_NAME);
+	MidgardQuerySelect *select = midgard_query_select_new (mgd_global, storage);
+
+	MidgardQueryConstraintGroup *group = midgard_query_constraint_group_new ();
+
+	MidgardQueryProperty *mqp = midgard_query_property_new ("name", NULL);
+	GValue strval = {0, };
+	g_value_init (&strval, G_TYPE_STRING);
+	g_value_set_string (&strval, "fake); DROP TABLE snippet;");
+	MidgardQueryValue *mqv = midgard_query_value_create_with_value ((const GValue*) &strval);
+	g_value_unset (&strval);
+	MidgardQueryConstraint *mqc = midgard_query_constraint_new (mqp, "=", MIDGARD_QUERY_HOLDER (mqv), NULL);
+	midgard_query_constraint_group_add_constraint (group, MIDGARD_QUERY_CONSTRAINT_SIMPLE (mqc));
+
+	g_value_init (&strval, G_TYPE_STRING);
+	g_value_set_string (&strval, "fake'); DROP TABLE snippet;");
+	MidgardQueryValue *mqvA = midgard_query_value_create_with_value ((const GValue*) &strval);
+	g_value_unset (&strval);
+	MidgardQueryConstraint *mqcA = midgard_query_constraint_new (mqp, "=", MIDGARD_QUERY_HOLDER (mqvA), NULL);
+	midgard_query_constraint_group_add_constraint (group, MIDGARD_QUERY_CONSTRAINT_SIMPLE (mqcA));
+
+	g_value_init (&strval, G_TYPE_STRING);
+	g_value_set_string (&strval, "fake'; DROP TABLE snippet;");
+	MidgardQueryValue *mqvB = midgard_query_value_create_with_value ((const GValue*) &strval);
+	g_value_unset (&strval);
+	MidgardQueryConstraint *mqcB = midgard_query_constraint_new (mqp, "=", MIDGARD_QUERY_HOLDER (mqvB), NULL);
+	midgard_query_constraint_group_add_constraint (group, MIDGARD_QUERY_CONSTRAINT_SIMPLE (mqcB));
+
+	g_value_init (&strval, G_TYPE_STRING);
+	g_value_set_string (&strval, "fake; DROP TABLE snippet;");
+	MidgardQueryValue *mqvC = midgard_query_value_create_with_value ((const GValue*) &strval);
+	g_value_unset (&strval);
+	MidgardQueryConstraint *mqcC = midgard_query_constraint_new (mqp, "=", MIDGARD_QUERY_HOLDER (mqvC), NULL);
+	midgard_query_constraint_group_add_constraint (group, MIDGARD_QUERY_CONSTRAINT_SIMPLE (mqcC));
+
+	midgard_query_executor_set_constraint (MIDGARD_QUERY_EXECUTOR (select), MIDGARD_QUERY_CONSTRAINT_SIMPLE (group));
+
+	GError *err = NULL;
+	midgard_executable_execute (MIDGARD_EXECUTABLE (select), &err);
+
+	g_object_unref (storage);
+	g_object_unref (select);
+	g_object_unref (mqp);
+	g_object_unref (mqv);
+	g_object_unref (mqc);
+	g_object_unref (mqvA);
+	g_object_unref (mqcA);
+	g_object_unref (mqvB);
+	g_object_unref (mqcB);
+	g_object_unref (mqvC);
+	g_object_unref (mqcC);
+	g_object_unref (group);
+
+	g_assert (err == NULL);
+}
+
 void	
 midgard_test_database_provider_mysql_escape (void)
 {
@@ -508,10 +569,15 @@ midgard_test_database_provider_sqlite_complex_escape (void)
 }
 
 void	
-midgard_test_database_provider_sql_injection (void)
+midgard_test_database_provider_sqlite_sql_injection_drop_table (void)
 {
-	/* TODO */
-	return;
+	_midgard_test_database_provider_sql_injection_drop_table ("SQLite");
+}
+
+void	
+midgard_test_database_provider_mysql_sql_injection_drop_table (void)
+{
+	_midgard_test_database_provider_sql_injection_drop_table ("MySQL");
 }
 
 static void 
