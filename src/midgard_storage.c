@@ -86,14 +86,17 @@ midgard_storage_create_base_storage(MidgardConnection *mgd)
 
 		/* Enable admin login */
 		GString *query = g_string_new ("INSERT INTO midgard_user (login, password, user_type, auth_type, auth_type_id, guid, person_guid, active)");
-		g_string_append_printf (query, "VALUES ('%s', '%s', %d, '%s', %d, '%s', '%s', %d)",
+		g_string_append_printf (query, "VALUES ('%s', '%s', %d, '%s', %d, '%s', '%s', ##active::boolean)",
 				ADMIN_USER_LOGIN, ADMIN_USER_PASSWORD,
 				MIDGARD_USER_TYPE_ADMIN, DEFAULT_AUTH_TYPE, 
 				midgard_core_auth_type_id_from_name (mgd, DEFAULT_AUTH_TYPE), 
-				ADMIN_USER_GUID, ADMIN_PERSON_GUID, 1);
+				ADMIN_USER_GUID, ADMIN_PERSON_GUID);
 		
 		sql = query->str;
-		midgard_core_query_execute(mgd, sql, TRUE);
+		GValue *bval = g_new0 (GValue, 1);
+		g_value_init (bval, G_TYPE_BOOLEAN);
+		g_value_set_boolean (bval, TRUE);
+		midgard_core_query_execute_statement (mgd, sql, TRUE, "active", bval, NULL);
 		g_string_free (query, TRUE);
 	}
 
