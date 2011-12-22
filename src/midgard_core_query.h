@@ -222,6 +222,12 @@ gint midgard_core_query_execute(
 			const gchar *query,
 			gboolean ignore_error);
 
+gint midgard_core_query_execute_statement(
+			MidgardConnection *mgd, 
+			const gchar *query,
+			gboolean ignore_error,
+			gchar *holder_id, ...);
+
 GdaDataModel *midgard_core_query_get_model(
 			MidgardConnection *mgd, 
 			const gchar *query);

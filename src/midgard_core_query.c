@@ -111,6 +111,71 @@ gchar *midgard_core_query_where_guid(
 }
 
 gint 
+midgard_core_query_execute_statement (MidgardConnection *mgd, const gchar *query, gboolean ignore_error, gchar *holder_id, ...)
+{
+	g_return_val_if_fail (mgd != NULL, -1);
+	g_return_val_if_fail (query != NULL, -1);
+
+	GdaStatement *stmt;
+	GError *lerror = NULL;
+	gint number = 0;
+
+	/* create a parser if necessary */
+	if (!mgd->priv->parser) {
+		mgd->priv->parser = gda_connection_create_parser (mgd->priv->connection);
+		if (!mgd->priv->parser)
+			mgd->priv->parser = gda_sql_parser_new ();
+	}
+
+	if (MGD_CNC_DEBUG (mgd))
+		g_debug ("query = %s", query);
+
+	/* create a new statement */
+	stmt = gda_sql_parser_parse_string (mgd->priv->parser, query, NULL, &lerror);
+	if (stmt) {
+		gchar *tmp_holder = holder_id;
+		va_list args;
+		GValue *value_arg = NULL;
+		GdaHolder *gda_holder = NULL;
+
+		GdaSet *params;
+	       	if (!gda_statement_get_parameters (stmt, &params, &lerror)) {
+			g_object_unref (stmt);
+			g_warning ("Error while preparing statement '%s': %s\n", query, lerror && lerror->message ? lerror->message : "No detail");
+			if (lerror)
+				g_error_free (lerror);
+			return -1;
+		}
+
+		va_start (args, holder_id);
+
+		while (tmp_holder != NULL) {
+		       	g_return_val_if_fail (tmp_holder != NULL, -1);
+       			value_arg = va_arg (args, GValue*);
+			g_return_val_if_fail (value_arg != NULL, -1);
+			gda_holder = gda_set_get_holder (params, (const gchar *)holder_id);
+			gda_holder_take_value (gda_holder, value_arg, NULL);
+			tmp_holder = va_arg (args, gchar*);
+		}
+		va_end (args);
+
+		number = gda_connection_statement_execute_non_select (mgd->priv->connection, stmt, NULL, NULL, &lerror);
+		g_object_unref (stmt);
+	}
+
+	if(!ignore_error) {
+		if (!stmt || (number == -1)) {
+			g_warning ("Error executing '%s': %s\n", query, lerror && lerror->message ? lerror->message : "No detail");
+		}
+	}
+
+	if (lerror)
+		g_error_free (lerror);
+
+	return (number);
+}
+
+gint 
 midgard_core_query_execute (MidgardConnection *mgd, const gchar *query, gboolean ignore_error)
 {
 	g_assert(mgd);
