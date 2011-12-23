@@ -27,6 +27,7 @@
 #include <sql-parser/gda-sql-parser.h>
 #include "midgard_core_workspace.h"
 #include "midgard_workspace_storage.h"
+#include "midgard_core_config.h"
 
 /**
  * midgard_query_select_new:
@@ -273,25 +274,35 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 	const gchar *klass_table = MGD_DBCLASS_TABLENAME (klass);
 
 	gchar *left_table = executor->priv->table_alias;
-	gchar *right_table = g_strdup_printf ("t%d", ++executor->priv->tableid);
+	//gchar *right_table = g_strdup_printf ("t%d", ++executor->priv->tableid);
+	gchar *right_table = g_strdup ("midgard_ws_tmp_table");
 
 	join = gda_sql_select_join_new (GDA_SQL_ANY_PART (from));
 	join->type = GDA_SQL_SELECT_JOIN_INNER;
 
 	GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (join));
 	expr->value = gda_value_new (G_TYPE_STRING);
-	g_value_take_string (expr->value, g_strdup_printf ("%s.%s = %s.%s", 
+	g_value_take_string (expr->value, g_strdup_printf ("%s.%s = %s.%s",
 				left_table, MGD_WORKSPACE_ID_FIELD, right_table, MGD_WORKSPACE_ID_FIELD));
 
 	join->expr = expr;
 	join->position = ++executor->priv->joinid;
 
-	const gchar *deleted_field = midgard_core_object_get_deleted_field (klass);
+	MidgardConfig *config = mgd->priv->config;
+	const gchar *sql_part_bool_func_start = "";
+	const gchar *sql_part_bool_func_end = "";
+	const gchar *deleted_field = midgard_core_object_get_deleted_field (klass);	
 	GString *table = g_string_new ("(SELECT DISTINCT MAX");
-	g_string_append_printf (table, "(%s) AS %s, %s %s%s FROM %s WHERE %s IN (0,", 
+	if (config->priv->dbtype == MIDGARD_DB_TYPE_POSTGRES && deleted_field) {
+		sql_part_bool_func_start = " bool_or(";
+		sql_part_bool_func_end = ") AS metadata_deleted";
+	}
+	g_string_append_printf (table, "(%s) AS %s, %s %s%s%s%s FROM %s WHERE %s IN (0,",
 			MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_OID_FIELD, 
 			deleted_field ? "," : "",
+			sql_part_bool_func_start,
 			deleted_field ? deleted_field : "",
+			sql_part_bool_func_end,
 			klass_table, MGD_WORKSPACE_ID_FIELD);
 
 	const MidgardWorkspaceStorage *ws = midgard_connection_get_workspace (mgd);
