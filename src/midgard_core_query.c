@@ -1683,8 +1683,8 @@ gboolean midgard_core_query_create_metadata_columns(
 		mdc = midgard_core_dbcolumn_new();
 		mdc->table_name = tablename;
 		mdc->column_name = bool_columns[i];
-		mdc->gtype = MGD_TYPE_INT;
-		mdc->dbtype = "int";
+		mdc->gtype = G_TYPE_BOOLEAN;
+		mdc->dbtype = "bool";
 		mdc->dvalue = "0";
 
 		rv = midgard_core_query_add_column(mgd, mdc);
