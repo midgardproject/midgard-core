@@ -296,7 +296,7 @@ gchar *midgard_core_qb_get_sql(
 		if (deleted_field) {
 			g_string_append(sql, " AND ");
 			g_string_append_printf(sql,
-					" %s.%s = 0",
+					" %s.%s = FALSE",
 					builder->priv->schema->table, 
 					deleted_field);
 		}

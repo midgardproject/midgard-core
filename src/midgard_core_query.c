@@ -2239,7 +2239,7 @@ __exclude_deleted_constraint (MidgardQueryExecutor *executor, const gchar *table
 
 	GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
 	expr->value = gda_value_new (G_TYPE_STRING);
-	g_value_set_string (expr->value, "t1.metadata_deleted = 0");
+	g_value_set_string (expr->value, "t1.metadata_deleted = FALSE");
 	operation->operands = g_slist_append (operation->operands, expr);
 }
 
