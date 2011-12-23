@@ -311,7 +311,7 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 		g_string_append (table, "0");
 	g_string_append (table, ") ");  
 	if (deleted_field)
-		g_string_append_printf (table, "AND %s = 0 ", deleted_field);
+		g_string_append_printf (table, "AND %s = FALSE ", deleted_field);
 	g_string_append_printf (table, "GROUP BY %s)", MGD_WORKSPACE_OID_FIELD);
 	g_slist_free (list);
 
@@ -425,7 +425,7 @@ __add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperatio
 		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
 		expr->value = gda_value_new (G_TYPE_STRING);
-		g_value_take_string (expr->value, g_strdup_printf ("%s.%s = 0", target->as, deleted_field));
+		g_value_take_string (expr->value, g_strdup_printf ("%s.%s = FALSE", target->as, deleted_field));
 		operation->operands = g_slist_append (operation->operands, expr);
 
 		return;
@@ -444,7 +444,7 @@ __add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperatio
 		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
         	expr->value = gda_value_new (G_TYPE_STRING);
-        	g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = 0", target->as));
+        	g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = FALSE", target->as));
         	deleted_operation->operands = g_slist_append (deleted_operation->operands, expr);
 	}
 }
