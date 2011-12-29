@@ -248,6 +248,8 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self, GError **error)
 	return TRUE;
 }
 
+#define __BOOL_VALUE(__bool)(__bool ? "0" : "FALSE")
+
 static void
 __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operation)
 {
@@ -264,6 +266,8 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 		return;
 	if (!MGD_CNC_HAS_WORKSPACE (mgd))
 		return;
+
+	gboolean bool_is_int = MIDGARD_QUERY_EXECUTOR (self)->priv->bool_is_int;
 
 	guint ws_id = MGD_CNC_WORKSPACE_ID (mgd);
 	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
@@ -322,7 +326,7 @@ __add_implicit_workspace_join (MidgardQuerySelect *self, GdaSqlOperation *operat
 		g_string_append (table, "0");
 	g_string_append (table, ") ");  
 	if (deleted_field)
-		g_string_append_printf (table, "AND %s = FALSE ", deleted_field);
+		g_string_append_printf (table, "AND %s = %s ", deleted_field, __BOOL_VALUE (bool_is_int));
 	g_string_append_printf (table, "GROUP BY %s)", MGD_WORKSPACE_OID_FIELD);
 	g_slist_free (list);
 
@@ -422,10 +426,11 @@ gboolean __query_select_add_joins (MidgardQuerySelect *self, GdaSqlOperation *op
 }
 
 static void 
-__add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperation *operation, MidgardDBObjectClass *dbklass)
+__add_exclude_deleted_constraints (MidgardQueryExecutor *self, GdaSqlStatementSelect *select, GdaSqlOperation *operation, MidgardDBObjectClass *dbklass)
 {
 	GSList *l = select->from->targets;
 	const gchar *deleted_field = midgard_core_object_get_deleted_field (dbklass);
+	gboolean bool_is_int = MIDGARD_QUERY_EXECUTOR (self)->priv->bool_is_int;
 
 	/* We have only one target table, so create one expression and add to top operation */
 	if (g_slist_length (l) == 1) {
@@ -436,7 +441,7 @@ __add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperatio
 		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
 		expr->value = gda_value_new (G_TYPE_STRING);
-		g_value_take_string (expr->value, g_strdup_printf ("%s.%s = FALSE", target->as, deleted_field));
+		g_value_take_string (expr->value, g_strdup_printf ("%s.%s = %s", target->as, deleted_field, __BOOL_VALUE (bool_is_int)));
 		operation->operands = g_slist_append (operation->operands, expr);
 
 		return;
@@ -455,7 +460,7 @@ __add_exclude_deleted_constraints (GdaSqlStatementSelect *select, GdaSqlOperatio
 		GdaSqlSelectTarget *target = (GdaSqlSelectTarget *) l->data;
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (operation));
         	expr->value = gda_value_new (G_TYPE_STRING);
-        	g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = FALSE", target->as));
+        	g_value_take_string (expr->value, g_strdup_printf ("%s.metadata_deleted = %s", target->as, __BOOL_VALUE (bool_is_int)));
         	deleted_operation->operands = g_slist_append (deleted_operation->operands, expr);
 	}
 }
@@ -515,7 +520,7 @@ _midgard_query_select_validable_iface_validate (MidgardValidable *iface, GError 
 
 	GError *err = NULL;
 	MidgardQueryStorage *storage = MIDGARD_QUERY_EXECUTOR (self)->priv->storage;
-	GObjectClass *klass = MIDGARD_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
+	GObjectClass *klass = (GObjectClass *) MIDGARD_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
 	const gchar *table = midgard_core_class_get_table (klass);
 
 	/* Class table */
@@ -685,7 +690,7 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 
 	/* Exclude deleted */
 	if (MGD_DBCLASS_METADATA_CLASS (klass) && !executor->priv->include_deleted)
-		__add_exclude_deleted_constraints (sss, operation, klass);
+		__add_exclude_deleted_constraints (executor, sss, operation, klass);
 
 	/* Add limit, LIMIT x */
 	if (executor->priv->limit > 0) {
@@ -978,7 +983,12 @@ __midgard_query_select_set_property (GObject *object, guint property_id,
 		case PROPERTY_CONNECTION:
 			if (!G_VALUE_HOLDS_OBJECT (value))
 				return;
-			MIDGARD_QUERY_EXECUTOR (self)->priv->mgd = g_value_dup_object (value);	
+			MIDGARD_QUERY_EXECUTOR (self)->priv->mgd = g_value_dup_object (value);
+			/* In case of SQLite provider, use integer instead of boolean type,
+			 * which is not supported in SQLite */ 
+			MidgardConfig *config = MIDGARD_QUERY_EXECUTOR (self)->priv->mgd->priv->config;
+			if (config->priv->dbtype == MIDGARD_DB_TYPE_SQLITE)
+				MIDGARD_QUERY_EXECUTOR (self)->priv->bool_is_int = TRUE;	
 			break;
 
 		case PROPERTY_STORAGE:

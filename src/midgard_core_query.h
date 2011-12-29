@@ -102,6 +102,7 @@ struct _MidgardQueryExecutorPrivate {
 	gboolean read_only;
 	gboolean include_deleted;
 	gboolean is_valid;
+	gboolean bool_is_int;
 };
 
 struct _MidgardQueryConstraintSimplePrivate {
