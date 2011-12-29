@@ -579,7 +579,9 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 	GString *sql = NULL;
 	guint object_init_size = 0;
 	GError *err = NULL;
-	
+
+	g_debug ("UPDATE OBJECT WITH WS_OID (%i) ", MGD_OBJECT_WS_OID (self));
+
 	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
 	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (self);
 
@@ -649,6 +651,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 			return FALSE;
 		}
 		/* Workspace object id */
+		g_debug ("UPDATE OBJECT, SET PARAM WS_OID (%i) ", MGD_OBJECT_WS_OID (self));
 		gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_OID_FIELD, MGD_OBJECT_WS_OID (self));
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
