@@ -127,6 +127,35 @@ class TestQuerySelect(unittest.TestCase):
     self.assertEqual(l[1].get_property("firstname"), "John")
     self.assertEqual(l[2].get_property("firstname"), "Alice")
 
+  def testJoin(self):
+    storage_one = Midgard.QueryStorage(dbclass = "midgard_person")
+    storage_two = Midgard.QueryStorage(dbclass = "midgard_person")
+    qs = Midgard.QuerySelect(connection = self.mgd, storage = storage_one)
+    group = Midgard.QueryConstraintGroup(grouptype = "AND")
+    constraint_one = Midgard.QueryConstraint(
+      property = Midgard.QueryProperty(property = "firstname"),
+      operator = "=",
+      holder = Midgard.QueryValue.create_with_value("Alice")
+    )
+    constraint_two = Midgard.QueryConstraint(
+      property = Midgard.QueryProperty(property = "firstname", storage = storage_two),
+      operator = "=",
+      holder = Midgard.QueryValue.create_with_value("John")
+    )
+    group.add_constraint(constraint_one)
+    group.add_constraint(constraint_two)
+    qs.set_constraint(group)
+    qs.add_join(
+      "LEFT",
+      Midgard.QueryProperty(property = "lastname"),
+      Midgard.QueryProperty(property = "lastname", storage = storage_two)
+    )
+    qs.execute()
+    # We expect Alice person only
+    self.assertEqual(qs.get_results_count(), 1)
+    objects = qs.list_objects()
+    self.assertEqual(objects[0].get_property("firstname"), "Alice")
+
   def testInheritance(self):
     qs = Midgard.QuerySelect(connection = self.mgd)
     self.assertIsInstance(qs, Midgard.QueryExecutor)
