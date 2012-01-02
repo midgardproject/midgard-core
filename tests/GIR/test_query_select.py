@@ -54,6 +54,34 @@ class TestQuerySelect(unittest.TestCase):
     # Expect admin person and Smith family
     self.assertEqual(len(objects), 4);
 
+  def testSelectSmithFamily(self):
+    st = Midgard.QueryStorage(dbclass = "midgard_person")
+    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
+    qs.set_constraint(
+      Midgard.QueryConstraint(
+        property = Midgard.QueryProperty(property = "lastname"),
+        operator = "=",
+        holder = Midgard.QueryValue.create_with_value("Smith")
+      )
+    )
+    qs.execute()
+    # Expect Smith family - 3 persons
+    self.assertEqual(qs.get_results_count(), 3);
+
+  def testSelectNothing(self):
+    st = Midgard.QueryStorage(dbclass = "midgard_person")
+    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
+    qs.set_constraint(
+      Midgard.QueryConstraint(
+        property = Midgard.QueryProperty(property = "firstname"),
+        operator = "=",
+        holder = Midgard.QueryValue.create_with_value("Sir Lancelot")
+      )
+    )
+    qs.execute()
+    # Do not expect persons
+    self.assertEqual(qs.get_results_count(), 0);
+
   def testSelectInvalidType(self): 
     st = Midgard.QueryStorage(dbclass = "NotExists")
     qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
