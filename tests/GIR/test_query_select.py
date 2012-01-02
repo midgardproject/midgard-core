@@ -10,30 +10,41 @@ from gi.repository import Midgard
 from gi.repository import GObject
 
 class TestQuerySelect(unittest.TestCase):
+  mgd = None
+
   def setUp(self):
-    self.mgd = TestConnection.openConnection()
-    tr = Midgard.Transaction(connection = self.mgd)
+    if self.mgd == None:
+      self.mgd = TestConnection.openConnection()
+
+  # Create three persons for *all* tests 
+  @staticmethod
+  def setUpClass():
+    mgd = TestConnection.openConnection()
+    tr = Midgard.Transaction(connection = mgd)
     tr.begin()
     # Create three persons for tests 
-    a = Midgard.Object.factory(self.mgd, "midgard_person", None)
+    a = Midgard.Object.factory(mgd, "midgard_person", None)
     a.set_property("firstname", "Alice")
     a.set_property("lastname", "Smith")
     a.create()
-    b = Midgard.Object.factory(self.mgd, "midgard_person", None)
+    b = Midgard.Object.factory(mgd, "midgard_person", None)
     b.set_property("firstname", "John")
     b.set_property("lastname", "Smith")
     b.create()
-    c = Midgard.Object.factory(self.mgd, "midgard_person", None)
+    c = Midgard.Object.factory(mgd, "midgard_person", None)
     c.set_property("firstname", "Marry")
     c.set_property("lastname", "Smith")
     c.create()
     tr.commit()
 
-  def tearDown(self):
-    tr = Midgard.Transaction(connection = self.mgd)
+  # Purge three persons after all tests are done
+  @staticmethod
+  def tearDownClass():
+    mgd = TestConnection.openConnection()
+    tr = Midgard.Transaction(connection = mgd)
     tr.begin()
     st = Midgard.QueryStorage(dbclass = "midgard_person")
-    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
+    qs = Midgard.QuerySelect(connection = mgd, storage = st)
     qs.set_constraint(
       Midgard.QueryConstraint(
         property = Midgard.QueryProperty(property = "lastname"),
