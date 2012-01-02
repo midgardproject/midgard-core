@@ -37,17 +37,16 @@ class TestQuerySelect(unittest.TestCase):
       )
     )
     qs.execute()
-    print qs.get_results_count()
     for person in qs.list_objects(): 
       person.purge(False)
 
-  def testSelectAdminPerson(self):
+  def testSelectAllPersons(self):
     st = Midgard.QueryStorage(dbclass = "midgard_person")
     qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     qs.execute()
     objects = qs.list_objects()
-    # Expect one person only 
-    self.assertEqual(len(objects), 1);
+    # Expect admin person and Smith family
+    self.assertEqual(len(objects), 4);
 
   def testSelectInvalidType(self): 
     st = Midgard.QueryStorage(dbclass = "NotExists")
