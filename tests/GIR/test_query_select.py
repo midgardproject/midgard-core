@@ -10,19 +10,23 @@ from gi.repository import Midgard
 from gi.repository import GObject
 
 class TestQuerySelect(unittest.TestCase):
+  def setUp(self):
+    self.mgd = TestConnection.openConnection()
+
+  def tearDown(self):
+    return
+
   def testSelectAdminPerson(self):
-    mgd = TestConnection.openConnection()
     st = Midgard.QueryStorage(dbclass = "midgard_person")
-    qs = Midgard.QuerySelect(connection = mgd, storage = st)
+    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     qs.execute()
     objects = qs.list_objects()
     # Expect one person only 
     self.assertEqual(len(objects), 1);
 
-  def testSelectInvalidType(self):
-    mgd = TestConnection.openConnection()
+  def testSelectInvalidType(self): 
     st = Midgard.QueryStorage(dbclass = "NotExists")
-    qs = Midgard.QuerySelect(connection = mgd, storage = st)
+    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     # Check if we have GError 
     self.assertRaises(GObject.GError, qs.execute)
     # Check if we have correct domain 
@@ -33,12 +37,10 @@ class TestQuerySelect(unittest.TestCase):
       self.assertEqual(e.code, Midgard.ValidationError.TYPE_INVALID)
 
   def testOrder(self):
-    mgd = TestConnection.openConnection()
     self.assertEqual("ok", "NOT IMPLEMENTED")
 
   def testInheritance(self):
-    mgd = TestConnection.openConnection()
-    qs = Midgard.QuerySelect(connection = mgd)
+    qs = Midgard.QuerySelect(connection = self.mgd)
     self.assertIsInstance(qs, Midgard.QueryExecutor)
 
 if __name__ == "__main__":
