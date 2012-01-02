@@ -12,9 +12,34 @@ from gi.repository import GObject
 class TestQuerySelect(unittest.TestCase):
   def setUp(self):
     self.mgd = TestConnection.openConnection()
+    # Create three persons for tests 
+    a = Midgard.Object.factory(self.mgd, "midgard_person", None)
+    a.set_property("firstname", "Alice")
+    a.set_property("lastname", "Smith")
+    a.create()
+    b = Midgard.Object.factory(self.mgd, "midgard_person", None)
+    b.set_property("firstname", "John")
+    b.set_property("lastname", "Smith")
+    b.create()
+    c = Midgard.Object.factory(self.mgd, "midgard_person", None)
+    c.set_property("firstname", "Marry")
+    c.set_property("lastname", "Smith")
+    c.create()
 
   def tearDown(self):
-    return
+    st = Midgard.QueryStorage(dbclass = "midgard_person")
+    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
+    qs.set_constraint(
+      Midgard.QueryConstraint(
+        property = Midgard.QueryProperty(property = "lastname"),
+        operator = "=",
+        holder = Midgard.QueryValue.create_with_value("Smith")
+      )
+    )
+    qs.execute()
+    print qs.get_results_count()
+    for person in qs.list_objects(): 
+      person.purge(False)
 
   def testSelectAdminPerson(self):
     st = Midgard.QueryStorage(dbclass = "midgard_person")
