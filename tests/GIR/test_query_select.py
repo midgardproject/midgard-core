@@ -65,7 +65,7 @@ class TestQuerySelect(unittest.TestCase):
     # Expect admin person and Smith family
     self.assertEqual(len(objects), 4);
 
-  def testSelectSmithFamily(self):
+  def getQSForSmiths(self):
     st = Midgard.QueryStorage(dbclass = "midgard_person")
     qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     qs.set_constraint(
@@ -75,6 +75,10 @@ class TestQuerySelect(unittest.TestCase):
         holder = Midgard.QueryValue.create_with_value("Smith")
       )
     )
+    return qs
+
+  def testSelectSmithFamily(self):
+    qs = self.getQSForSmiths()
     qs.execute()
     # Expect Smith family - 3 persons
     self.assertEqual(qs.get_results_count(), 3);
@@ -105,8 +109,23 @@ class TestQuerySelect(unittest.TestCase):
       self.assertEqual(e.domain, "midgard-validation-error-quark")
       self.assertEqual(e.code, Midgard.ValidationError.TYPE_INVALID)
 
-  def testOrder(self):
-    self.assertEqual("ok", "NOT IMPLEMENTED")
+  def testOrderASC(self):
+    qs = self.getQSForSmiths()
+    qs.add_order(Midgard.QueryProperty(property = "firstname"), "ASC")
+    qs.execute()
+    l = qs.list_objects()
+    self.assertEqual(l[0].get_property("firstname"), "Alice")
+    self.assertEqual(l[1].get_property("firstname"), "John")
+    self.assertEqual(l[2].get_property("firstname"), "Marry")
+
+  def testOrderDESC(self):
+    qs = self.getQSForSmiths()
+    qs.add_order(Midgard.QueryProperty(property = "firstname"), "DESC")
+    qs.execute()
+    l = qs.list_objects()
+    self.assertEqual(l[0].get_property("firstname"), "Marry")
+    self.assertEqual(l[1].get_property("firstname"), "John")
+    self.assertEqual(l[2].get_property("firstname"), "Alice")
 
   def testInheritance(self):
     qs = Midgard.QuerySelect(connection = self.mgd)
