@@ -520,8 +520,13 @@ _midgard_query_select_validable_iface_validate (MidgardValidable *iface, GError 
 
 	GError *err = NULL;
 	MidgardQueryStorage *storage = MIDGARD_QUERY_EXECUTOR (self)->priv->storage;
-	GObjectClass *klass = (GObjectClass *) MIDGARD_QUERY_EXECUTOR (self)->priv->storage->priv->klass;
-	const gchar *table = midgard_core_class_get_table (klass);
+	GObjectClass *klass = (GObjectClass *) storage->priv->klass;
+	if (klass == NULL || (!G_IS_OBJECT_CLASS(klass))) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
+				"Invalid '%s' classname associated with QueryStorage", storage->priv->classname);
+		return;
+	}
+	const gchar *table = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS (klass));
 
 	/* Class table */
 	if (!table) {
