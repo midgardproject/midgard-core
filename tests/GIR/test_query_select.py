@@ -12,6 +12,8 @@ from gi.repository import GObject
 class TestQuerySelect(unittest.TestCase):
   def setUp(self):
     self.mgd = TestConnection.openConnection()
+    tr = Midgard.Transaction(connection = self.mgd)
+    tr.begin()
     # Create three persons for tests 
     a = Midgard.Object.factory(self.mgd, "midgard_person", None)
     a.set_property("firstname", "Alice")
@@ -25,8 +27,11 @@ class TestQuerySelect(unittest.TestCase):
     c.set_property("firstname", "Marry")
     c.set_property("lastname", "Smith")
     c.create()
+    tr.commit()
 
   def tearDown(self):
+    tr = Midgard.Transaction(connection = self.mgd)
+    tr.begin()
     st = Midgard.QueryStorage(dbclass = "midgard_person")
     qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     qs.set_constraint(
@@ -39,6 +44,7 @@ class TestQuerySelect(unittest.TestCase):
     qs.execute()
     for person in qs.list_objects(): 
       person.purge(False)
+    tr.commit()
 
   def testSelectAllPersons(self):
     st = Midgard.QueryStorage(dbclass = "midgard_person")
