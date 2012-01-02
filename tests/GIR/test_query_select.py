@@ -3,8 +3,8 @@
 import sys
 import struct
 import unittest
-from test_config import TestConfig
-from test_connection import TestConnection
+from test_000_config import TestConfig
+from test_001_connection import TestConnection
 
 from gi.repository import Midgard
 from gi.repository import GObject
@@ -23,7 +23,14 @@ class TestQuerySelect(unittest.TestCase):
     mgd = TestConnection.openConnection()
     st = Midgard.QueryStorage(dbclass = "NotExists")
     qs = Midgard.QuerySelect(connection = mgd, storage = st)
-    self.assertRaises(Midgard.ValidationError, qs.execute())
+    # Check if we have GError 
+    self.assertRaises(GObject.GError, qs.execute)
+    # Check if we have correct domain 
+    try:
+      qs.execute()
+    except GObject.GError as e:
+      self.assertEqual(e.domain, "midgard-validation-error-quark")
+      self.assertEqual(e.code, Midgard.ValidationError.TYPE_INVALID)
 
   def testOrder(self):
     mgd = TestConnection.openConnection()

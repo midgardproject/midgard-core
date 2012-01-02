@@ -3,7 +3,7 @@
 import sys
 import struct
 import unittest
-from test_config import TestConfig
+from test_000_config import TestConfig
 
 from gi.repository import Midgard
 from gi.repository import GObject
