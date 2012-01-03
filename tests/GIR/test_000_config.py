@@ -38,7 +38,19 @@ class TestProperties(unittest.TestCase):
     self.assertNotEqual(config.get_property("dbdir"), "/tmp/test")
     self.assertFalse(hasattr(config.props, "notexists"))
 
-  def testObject(self):
+  def testReadFileAtPath(self):
+    config = Midgard.Config()
+    self.assertTrue(config.read_file_at_path("./test_SQLITE.conf"));
+    self.assertRaises(GObject.GError, config.read_file_at_path, "notexists")
+
+  def testSaveFile(self):
+    self.assertEqual("ok", "NOT SUPPORTED BY CORE")
+
+  def testBlobDir(self):
+    config = TestConfig()
+    self.assertTrue(config.create_blobdir())
+
+  def testInheritance(self):
     config = TestConfig()
     self.assertIsInstance(config, GObject.Object)
 
