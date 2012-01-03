@@ -109,7 +109,7 @@ class TestQuerySelect(unittest.TestCase):
       self.assertEqual(e.domain, "midgard-validation-error-quark")
       self.assertEqual(e.code, Midgard.ValidationError.TYPE_INVALID)
 
-  def testOrderASC(self):
+  def testSelectOrderASC(self):
     qs = self.getQSForSmiths()
     qs.add_order(Midgard.QueryProperty(property = "firstname"), "ASC")
     qs.execute()
@@ -118,7 +118,7 @@ class TestQuerySelect(unittest.TestCase):
     self.assertEqual(l[1].get_property("firstname"), "John")
     self.assertEqual(l[2].get_property("firstname"), "Marry")
 
-  def testOrderDESC(self):
+  def testSelectOrderDESC(self):
     qs = self.getQSForSmiths()
     qs.add_order(Midgard.QueryProperty(property = "firstname"), "DESC")
     qs.execute()
@@ -126,6 +126,25 @@ class TestQuerySelect(unittest.TestCase):
     self.assertEqual(l[0].get_property("firstname"), "Marry")
     self.assertEqual(l[1].get_property("firstname"), "John")
     self.assertEqual(l[2].get_property("firstname"), "Alice")
+
+  def testSelectLimit(self):
+    qs = self.getQSForSmiths()
+    qs.add_order(Midgard.QueryProperty(property = "firstname"), "DESC")
+    qs.set_limit(1)
+    qs.execute()
+    self.assertEqual(qs.get_results_count(), 1)
+    l = qs.list_objects()
+    self.assertEqual(l[0].get_property("firstname"), "Marry")
+
+  def testSelectOffset(self):
+    qs = self.getQSForSmiths()
+    qs.add_order(Midgard.QueryProperty(property = "firstname"), "DESC")
+    qs.set_limit(1)
+    qs.set_offset(2)
+    qs.execute()
+    self.assertEqual(qs.get_results_count(), 1)
+    l = qs.list_objects()
+    self.assertEqual(l[0].get_property("firstname"), "Alice")
 
   def testJoin(self):
     storage_one = Midgard.QueryStorage(dbclass = "midgard_person")
