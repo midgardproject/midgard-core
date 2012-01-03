@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import os
 import sys
 import struct
 import unittest
@@ -10,7 +11,10 @@ from gi.repository import GObject
 class TestConfig(Midgard.Config):
   def __init__(self):
     Midgard.Config.__init__(self)
-    self.setProperties()
+    config_file = os.getenv("MIDGARD_TEST_CONFIGURATION_FILE")
+    if config_file == "" or config_file == None:
+      config_file = "./test_SQLITE.conf"
+    self.read_file_at_path(config_file)
 
   def setProperties(self):
     self.set_property("dbdir", "/tmp")
@@ -21,6 +25,7 @@ class TestConfig(Midgard.Config):
 class TestProperties(unittest.TestCase):
   def testProperties(self):
     config = TestConfig()
+    config.setProperties()
     self.assertEqual(config.get_property("dbdir"), "/tmp") 
     self.assertEqual(config.get_property("dbtype"), "SQLite") 
     self.assertEqual(config.get_property("database"), "phpcr") 
