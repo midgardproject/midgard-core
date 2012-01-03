@@ -156,6 +156,51 @@ class TestQuerySelect(unittest.TestCase):
     objects = qs.list_objects()
     self.assertEqual(objects[0].get_property("firstname"), "Alice")
 
+  def testConstraintGroupType(self):
+    group = Midgard.QueryConstraintGroup(grouptype = "AND")
+    self.assertEqual(group.get_property("grouptype"), "AND")
+    self.assertEqual(group.get_group_type(), "AND")
+    self.assertTrue(group.set_group_type("OR"))
+    self.assertFalse(group.set_group_type("INVALID"))
+
+  def testConstraint(self):
+    person_storage = Midgard.QueryStorage(dbclass = "midgard_person")
+    prop = Midgard.QueryProperty(property = "firstname", storage = person_storage) 
+    constraint = Midgard.QueryConstraint(
+        storage = person_storage, 
+        operator = "=", 
+        property = prop
+    )
+    # test if we get the same 
+    self.assertEqual(constraint.get_storage(), person_storage)
+    self.assertEqual(constraint.get_operator(), "=")
+    self.assertEqual(constraint.get_property(), prop)
+    # then set new ones and test again
+    new_storage = Midgard.QueryStorage(dbclass = "midgard_person")
+    new_prop = Midgard.QueryProperty(property = "firstname", storage = person_storage) 
+    new_operator = "<>"
+    constraint.set_storage(new_storage)
+    constraint.set_operator(new_operator)
+    constraint.set_property(new_prop)
+    self.assertEqual(constraint.get_storage(), new_storage)
+    self.assertEqual(constraint.get_operator(), new_operator)
+    self.assertEqual(constraint.get_property(), new_prop)
+
+  def testProperty(self):
+    storage = Midgard.QueryStorage(dbclass = "midgard_person")
+    prop = Midgard.QueryProperty(property = "firstname", storage = storage)
+    self.assertEqual(prop.get_property("storage"), storage)
+    self.assertEqual(prop.get_property("property"), "firstname")
+
+  def testStorage(self):
+    storage = Midgard.QueryStorage(dbclass = "midgard_person")
+    self.assertEqual(storage.get_property("dbclass"), "midgard_person")
+    storage.set_property("dbclass", "midgard_snippet")
+    self.assertEqual(storage.get_property("dbclass"), "midgard_snippet")
+
+  def testValue(self):
+    self.assertEqual("ok", "Not supported by core")
+
   def testInheritance(self):
     qs = Midgard.QuerySelect(connection = self.mgd)
     self.assertIsInstance(qs, Midgard.QueryExecutor)
