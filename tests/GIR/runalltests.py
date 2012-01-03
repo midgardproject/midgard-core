@@ -3,6 +3,7 @@
 import os
 import glob
 import sys
+import shutil
 
 import unittest
 
@@ -20,7 +21,7 @@ result = runner.run(testSuite)
 
 # Cleanup
 try:
-  os.rmdir("./test_data/blobs")
+  shutil.rmtree("./test_data/blobs")
 except OSError:
   pass
 
