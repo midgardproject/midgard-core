@@ -67,6 +67,8 @@ class TestObjectCrud(unittest.TestCase):
     self.assertEqual(new_obj.get_property("sold"), sold)
     self.assertEqual(new_obj.get_property("description"), description)
 
+    # TODO, metadata
+
     # Cleanup 
     obj.purge(False)
 
@@ -103,6 +105,40 @@ class TestObjectCrud(unittest.TestCase):
     self.assertEqual(new_obj.get_property("edition"), edition)
     self.assertEqual(new_obj.get_property("sold"), sold)
     self.assertEqual(new_obj.get_property("description"), description)
+
+    # TODO, metadata
+
+    # Cleanup 
+    obj.purge(False)
+
+  def testDelete(self):
+    obj = self.getNewBook()
+
+    title = "The Holly Grail 2"
+    author = "Sir Lancelot"
+    price = 09.099
+    serial = Midgard.TypeGuid.new(self.mgd)
+    edition = 2
+    sold = True
+    description = "The true story of white rabbit. Part 2"
+
+    obj.set_property("title", title)
+    obj.set_property("author", author)
+    obj.set_property("price", price)
+    obj.set_property("serial", serial)
+    obj.set_property("edition", edition)
+    obj.set_property("sold", sold)
+    obj.set_property("description", description)
+
+    self.assertTrue(obj.create())
+    self.assertTrue(Midgard.is_guid(obj.get_property("guid")))
+
+    self.assertTrue(obj.delete(False))
+
+    # TODO metadata
+
+    new_obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", obj.get_property("guid"))
+    self.assertIsNone(new_obj)
 
     # Cleanup 
     obj.purge(False)
