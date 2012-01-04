@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Schema xmlns="http://www.midgard-project.org/repligard/1.4">
+	<type name="gir_test_book_crud" table="gir_test_book_crud">
+			<property name="id" type="unsigned integer" primaryfield="id" />
+			<property name="title" type="string" />
+			<property name="author" type="string" />
+			<property name="price" type="float" />
+			<property name="serial" type="guid" />
+			<property name="edition" type="unsigned integer" />
+			<property name="sold" type="bool" />
+			<property name="description" type="text" />
+    </type>
+</Schema>
