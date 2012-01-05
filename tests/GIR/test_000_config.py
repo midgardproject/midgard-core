@@ -5,8 +5,7 @@ import sys
 import struct
 import unittest
 
-from gi.repository import Midgard
-from gi.repository import GObject
+from gi.repository import Midgard, GObject
 
 class TestConfig(Midgard.Config):
   def __init__(self):
@@ -52,7 +51,7 @@ class TestProperties(unittest.TestCase):
 
   def testInheritance(self):
     config = TestConfig()
-    self.assertIsInstance(config, GObject.Object)
+    self.assertIsInstance(config, GObject.Object.__class__)
 
 if __name__ == "__main__":
     unittest.main()
