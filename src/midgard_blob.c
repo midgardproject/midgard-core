@@ -133,7 +133,7 @@ static void __get_channel(MidgardBlob *self, const gchar *mode)
 /**
  * midgard_blob_new: 
  * @attachment: #MidgardObject of MIDGARD_TYPE_ATTACHMENT type.
- * @encoding: file encoding
+ * @encoding: (allow-none): file encoding
  * 
  * Default encoding is UTF-8. Set NULL @encoding if such is required. 
  *
