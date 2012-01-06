@@ -105,8 +105,9 @@ static void __get_channel(MidgardBlob *self, const gchar *mode)
 				MGD_GENERIC_ERROR,
 				MGD_ERR_USER_DATA,
 				" %s ",
-				err->message);
-		g_clear_error(&err);
+				err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error(&err);
 		return;
 	}
 	
@@ -211,7 +212,7 @@ midgard_blob_create_blob (MidgardObject *attachment, const gchar *encoding)
 /**
  * midgard_blob_read_content:
  * @self: MidgardBlob self instance
- * @bytes_read: number of bytes read
+ * @bytes_read: (out): number of bytes read
  *
  * Returned content should be freed when no longer needed.
  * @bytes_read holds size of returned content. 
