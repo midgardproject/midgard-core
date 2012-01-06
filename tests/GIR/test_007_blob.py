@@ -32,6 +32,14 @@ class TestBlob(unittest.TestCase):
     self.assertIsNot(self.blob, None)
     self.assertIsNot(self.attachment, None)
 
+  def testWriteContent(self):
+    self.assertTrue(self.blob.write_content("Bździna wybżdziła"))
+   
+  def testReadContent(self):
+    content = "Bździna wybżdziła"
+    self.assertTrue(self.blob.write_content(content))
+    self.assertEqual(self.blob.read_content(), content)
+
   def testInheritance(self): 
     self.assertIsInstance(self.blob, GObject.Object)
     self.assertIsInstance(self.attachment, Midgard.DBObject)
