@@ -196,6 +196,8 @@ MidgardBlob *midgard_blob_new (MidgardObject *attachment, const gchar *encoding)
 
 /**
  * midgard_blob_create_blob:
+ * @attachment: #MidgardObject of MIDGARD_TYPE_ATTACHMENT type.
+ * @encoding: (allow-none): file encoding
  *
  * Invokes midgard_blob_new() and it's designed for language bindings, in whic, 
  * that function can not be invoked explicitly.
@@ -229,6 +231,7 @@ gchar *midgard_blob_read_content(MidgardBlob *self, gsize *bytes_read)
 
 	MidgardConnection *mgd = self->priv->mgd;
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
+	*bytes_read = 0;
 
 	__get_filepath(self);
 
@@ -241,75 +244,16 @@ gchar *midgard_blob_read_content(MidgardBlob *self, gsize *bytes_read)
 		 return NULL;
 	}	
 
-	__get_channel(self, "r");
-	if(!self->priv->channel)
-		return NULL;
-
-	GIOChannel *channel = self->priv->channel;
-
 	gchar *content = NULL;
 	GError *err = NULL;
-	GIOStatus status;
-	const gchar *err_msg = "";
 
-	/* Rewind. Channel could be already used for writing. */
-	status = g_io_channel_seek_position(channel, 0, G_SEEK_SET, &err);
-	if(status != G_IO_STATUS_NORMAL) {
-		
-		if(err != NULL) 
-			err_msg = err->message;
-		
-		midgard_set_error(self->priv->mgd,
-				MGD_GENERIC_ERROR,
-				MGD_ERR_INTERNAL,
-				" %s ",
-				err_msg);
-
-		return NULL;
-	}
-	g_clear_error(&err);
-
-	g_io_channel_set_encoding (channel, NULL, NULL);
-	status =
-		g_io_channel_read_to_end(channel,
-				&content,
-				bytes_read,
-				&err);
-	
-	/* FIXME, I have no idea how to determine file encoding */
-	/* Let's set UTF-8 and try again */
-	if(status == G_IO_STATUS_ERROR) {
-
-		if(err && err->domain == G_CONVERT_ERROR){
-			g_io_channel_set_encoding (channel, "UTF-8", NULL);
+	if (!g_file_get_contents(self->priv->filepath, &content, bytes_read, &err)) {
+		midgard_set_error(self->priv->mgd, MGD_GENERIC_ERROR, MGD_ERR_INTERNAL,
+				" %s ",	err&& err->message ? err->message : "Unknown reason");
+		if (err)
 			g_clear_error(&err);
-			status =
-				g_io_channel_read_to_end(channel,
-						&content,
-						bytes_read,
-						&err);
-		}
-	}	
-
-	if(err) g_clear_error(&err);
-
-	err_msg = "";
-
-	if(status == G_IO_STATUS_NORMAL && *bytes_read == 0){	
-		
-		if(err != NULL)
-			err_msg = err->message;
-
-		midgard_set_error(self->priv->mgd,
-				MGD_GENERIC_ERROR,
-				MGD_ERR_INTERNAL,
-				" %s ",
-				err_msg);
-
 		return NULL;
 	}
-	
-	if(err) g_clear_error(&err);
 
 	return content;
 }
@@ -342,26 +286,12 @@ gboolean  midgard_blob_write_content(MidgardBlob *self,	const gchar *content)
 		return FALSE;
 	}
 
-	__get_channel(self, "w");
-	if(!self->priv->channel)
-		return FALSE;
-
-	GIOChannel *channel = self->priv->channel;
-	GIOStatus status;
 	GError *err = NULL;
-
-	status = g_io_channel_write_chars(channel, content,
-			strlen(content), NULL, &err);
-
-	g_io_channel_flush(channel, NULL);
-
-	if(status != G_IO_STATUS_NORMAL) {
-		midgard_set_error(self->priv->mgd,
-				MGD_GENERIC_ERROR,
-				MGD_ERR_INTERNAL,
-				" %s ",
-				err->message);
-		g_clear_error(&err);
+	if (!g_file_set_contents(self->priv->filepath, content, -1, &err)) {
+		midgard_set_error(self->priv->mgd, MGD_GENERIC_ERROR, MGD_ERR_INTERNAL,
+				" %s ", err && err->message ? err->message : "Unknown reason");
+		if (err)
+			g_clear_error(&err);
 
 		return FALSE;
 	}
