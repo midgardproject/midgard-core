@@ -20,7 +20,7 @@ class TestBlob(unittest.TestCase):
     self.attachment.set_property("title", "TestTitle")
     self.attachment.set_property("name", "TestName")
     self.attachment.create()
-    self.blob = Midgard.Blob.create_blob(self.attachment, "UTF-8")
+    self.blob = Midgard.Blob.create_blob(self.attachment, None)
 
   def tearDown(self):
     if self.blob is not None:
@@ -38,7 +38,8 @@ class TestBlob(unittest.TestCase):
   def testReadContent(self):
     content = "Bździna wybżdziła"
     self.assertTrue(self.blob.write_content(content))
-    self.assertEqual(self.blob.read_content(), content)
+    c = self.blob.read_content()
+    self.assertEqual(c[0], content)
 
   def testInheritance(self): 
     self.assertIsInstance(self.blob, GObject.Object)
