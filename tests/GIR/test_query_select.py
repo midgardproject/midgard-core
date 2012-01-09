@@ -218,7 +218,21 @@ class TestQuerySelect(unittest.TestCase):
     self.assertEqual(storage.get_property("dbclass"), "midgard_snippet")
 
   def testValue(self):
-    self.assertEqual("ok", "Not supported by core")
+    query_value = Midgard.QueryValue()
+    # No idea how to test it
+    #self.assertIs(query_value.get_value(), None)
+    some_string = "Some String"
+    query_value.set_value(some_string)
+    self.assertEqual(query_value.get_value(), some_string)
+    some_int = 777
+    query_value.set_value(some_int)
+    self.assertEqual(query_value.get_value(), some_int)
+    some_bool = True
+    query_value.set_value(some_bool)
+    self.assertEqual(query_value.get_value(), some_bool)
+    some_float = 99.999
+    query_value.set_value(some_float)
+    self.assertEqual(query_value.get_value(), some_float)
 
   def testInheritance(self):
     qs = Midgard.QuerySelect(connection = self.mgd)
