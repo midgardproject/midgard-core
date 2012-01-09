@@ -119,7 +119,7 @@ midgard_query_constraint_group_new_valist (const gchar *type, MidgardQueryConstr
 		return NULL;
 
 	MidgardQueryConstraintGroup *self = g_object_new (MIDGARD_TYPE_QUERY_CONSTRAINT_GROUP, NULL);
-	self->priv->type = g_ascii_strdown (type, -1);
+	self->priv->type = g_strdup (type);
 	self->priv->op_type = op_type;
 
 	MidgardQueryConstraintSimple *cnstr = constraint;
@@ -169,7 +169,7 @@ midgard_query_constraint_group_set_group_type (MidgardQueryConstraintGroup *self
 		return FALSE;
 
 	g_free (self->priv->type);
-	self->priv->type = g_ascii_strdown (type, -1);
+	self->priv->type = g_strdup (type);
 	self->priv->op_type = op_type;
 
 	return TRUE;
