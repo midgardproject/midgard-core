@@ -25,7 +25,7 @@ struct _MidgardQueryHolder {
 /**
  * midgard_query_holder_get_value:
  * @self: #MidgardQueryHolder instance
- * @value: pointer to store returned value
+ * @value: (out): pointer to store returned value
  *
  * Since: 10.05
  */ 
