@@ -123,8 +123,8 @@ static void __get_channel(MidgardBlob *self, const gchar *mode, GError **error)
 				MGD_ERR_USER_DATA,
 				" %s ",
 				err && err->message ? err->message : "Unknown reason");
-		if (err)
-			g_clear_error(&err);
+		if (err) 
+			g_propagate_error(error, err);
 		return;
 	}
 	
@@ -140,7 +140,7 @@ static void __get_channel(MidgardBlob *self, const gchar *mode, GError **error)
 				MGD_ERR_USER_DATA,
 				" %s ",
 				err->message);
-		g_clear_error(&err);
+		g_propagate_error(error, err);
 		g_io_channel_shutdown(channel, TRUE, NULL);
 		return;
 	}
