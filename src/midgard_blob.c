@@ -26,7 +26,9 @@
 /* Properties */
 enum {
 	MIDGARD_BLOB_PGUID = 1,
-	MIDGARD_BLOB_CONTENT
+	MIDGARD_BLOB_CONTENT,
+	MIDGARD_BLOB_ATTACHMENT,
+	MIDGARD_BLOB_ENCODING
 };
 
 /* Build attachment's full path. 
@@ -139,8 +141,6 @@ static void __get_channel(MidgardBlob *self, const gchar *mode)
  * Default encoding is UTF-8. Set NULL @encoding if such is required. 
  *
  * Instatiate new Midgard Blob object for the given midgard_attachment object. 
- * This is almost the same constructor as g_object_new, but unlike that one,
- * midgard_blob_new requires MidgardObject (midgard_attachment) object's pointer.
  *
  * This constructor defines new relative path for attachment, if midgard_attachment 
  * is associated with midgard_blob and its location is empty. 
@@ -150,47 +150,11 @@ static void __get_channel(MidgardBlob *self, const gchar *mode)
  */
 MidgardBlob *midgard_blob_new (MidgardObject *attachment, const gchar *encoding)
 {
-	g_assert(attachment != NULL);
-	
-	MidgardConnection *mgd = MGD_OBJECT_CNC (attachment);
+	g_return_val_if_fail (attachment != NULL, NULL);
 
-	if(mgd == NULL) {
-		g_critical("MidgardConnection not found for given attachment");
-		return NULL;
-	}
+	MidgardBlob *self = g_object_new (MIDGARD_TYPE_BLOB,
+		"attachment", attachment, "encoding", encoding ? encoding : "UTF-8", NULL);
 
-	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
-
-	const gchar *blobdir = MIDGARD_DBOBJECT (attachment)->dbpriv->mgd->priv->config->blobdir;
-	if(!g_file_test(blobdir,G_FILE_TEST_EXISTS)) {
-		midgard_set_error(mgd,
-				MGD_GENERIC_ERROR,
-				MGD_ERR_INTERNAL,
-				" Blobs directory doesn't exist. %s", blobdir);
-		return NULL;
-	}
-
-	if(!g_file_test(blobdir,G_FILE_TEST_IS_DIR)) {
-		g_warning("Defined blobs directory is not directory");
-		return NULL;
-	}
-
-	MidgardBlob *self = g_object_new(MIDGARD_TYPE_BLOB, NULL);
-	self->priv->attachment = attachment;
-	self->priv->mgd = mgd;
-	self->priv->blobdir = g_strdup(blobdir);
-	self->priv->channel = NULL;
-	self->priv->encoding = NULL;
-	if(encoding != NULL)
-		self->priv->encoding = g_strdup(encoding);
-	
-	__get_filepath(self);
-
-	if(self->priv->filepath == NULL) {		
-		g_object_unref(self);
-		return NULL;
-	}
-	
 	return self;
 }
 
@@ -430,6 +394,54 @@ gboolean midgard_blob_remove_file(MidgardBlob *self)
 
 /* GOBJECT ROUTINES */
 
+static GObjectClass *parent_class= NULL;
+
+static GObject *
+_midgard_blob_constructor (GType type,
+		guint n_construct_properties,
+		GObjectConstructParam *construct_properties)
+{
+	GObject *object = (GObject *)
+		G_OBJECT_CLASS (parent_class)->constructor (type,
+				n_construct_properties,
+				construct_properties);
+
+	MidgardBlob *self = MIDGARD_BLOB(object);
+	if (self->priv->attachment)
+		self->priv->mgd = MGD_OBJECT_CNC (self->priv->attachment);
+
+	if (self->priv->mgd == NULL) {
+		g_critical("MidgardConnection not found for given attachment");
+		return NULL;
+	}
+
+	const gchar *blobdir = self->priv->mgd->priv->config->blobdir;
+	if (!g_file_test(blobdir,G_FILE_TEST_EXISTS)) {
+		midgard_set_error(self->priv->mgd,
+				MGD_GENERIC_ERROR,
+				MGD_ERR_INTERNAL,
+				" Blobs directory doesn't exist. %s", blobdir);
+		return NULL;
+	}
+
+	if(!g_file_test(blobdir,G_FILE_TEST_IS_DIR)) {
+		g_warning("Defined blobs directory is not directory");
+		return NULL;
+	}
+
+	self->priv->blobdir = g_strdup(blobdir);
+	self->priv->channel = NULL;
+	
+	__get_filepath(self);
+
+	if(self->priv->filepath == NULL) {		
+		g_critical("File path not found");
+		return NULL;
+	}
+
+	return G_OBJECT(self);
+}
+
 static void _midgard_blob_instance_init(
 		 GTypeInstance *instance, gpointer g_class)
 {
@@ -472,6 +484,11 @@ static void _midgard_blob_finalize(GObject *object)
 	g_free(self->priv->encoding);
 	self->priv->encoding = NULL;
 
+	if (self->priv->attachment) {
+		g_object_unref(self->priv->attachment);
+		self->priv->attachment = NULL;
+	}
+
 	g_free(self->priv);
 }
 
@@ -490,7 +507,15 @@ _midgard_blob_get_property (GObject *object, guint property_id,
 		case MIDGARD_BLOB_CONTENT:
 			g_value_set_string(value, self->priv->content);
 			break;
-			
+	
+		case MIDGARD_BLOB_ENCODING:
+			g_value_set_string(value, self->priv->encoding);
+			break;
+	
+		case MIDGARD_BLOB_ATTACHMENT:
+			g_value_set_object(value, g_object_ref(self->priv->attachment));
+			break;
+	
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(object,property_id,pspec);
 			break;
@@ -514,7 +539,18 @@ _midgard_blob_set_property (GObject *object, guint property_id,
 			g_free(self->priv->content);
 			self->priv->content = g_value_dup_string(value);
 			break;
-			
+	
+		case MIDGARD_BLOB_ENCODING:
+			g_free(self->priv->encoding);
+			self->priv->encoding = g_value_dup_string(value);
+			break;
+	
+		case MIDGARD_BLOB_ATTACHMENT:
+			g_free(self->priv->attachment);
+			self->priv->attachment = g_value_dup_object(value);
+			self->priv->mgd = MGD_OBJECT_CNC(self->priv->attachment);
+			break;
+	
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(object,property_id,pspec);
 			break;
@@ -526,7 +562,9 @@ static void _midgard_blob_class_init(
 {
 	GObjectClass *gobject_class = G_OBJECT_CLASS (g_class);
 	MidgardBlobClass *klass = MIDGARD_BLOB_CLASS (g_class);
-	
+	parent_class = g_type_class_peek_parent (klass);
+
+	gobject_class->constructor = _midgard_blob_constructor;
 	gobject_class->finalize = _midgard_blob_finalize;
 	gobject_class->set_property = _midgard_blob_set_property;
 	gobject_class->get_property = _midgard_blob_get_property;
@@ -554,6 +592,23 @@ static void _midgard_blob_class_init(
 			G_PARAM_READWRITE);
 	g_object_class_install_property (gobject_class,
 			MIDGARD_BLOB_CONTENT,
+			pspec);
+
+	pspec = g_param_spec_string ("encoding",
+			"",
+			"",
+			"",
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
+	g_object_class_install_property (gobject_class,
+			MIDGARD_BLOB_ENCODING,
+			pspec);
+
+	pspec = g_param_spec_object ("attachment",
+			"MidgardObject midgard_attachment", "",
+			MIDGARD_TYPE_OBJECT,
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
+	g_object_class_install_property (gobject_class,
+			MIDGARD_BLOB_ATTACHMENT,
 			pspec);
 }
 
