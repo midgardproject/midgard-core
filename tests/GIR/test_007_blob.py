@@ -6,8 +6,7 @@ import unittest
 from test_000_config import TestConfig
 from test_001_connection import TestConnection
 
-from gi.repository import Midgard
-from gi.repository import GObject
+from gi.repository import Midgard, GObject, GLib
 
 class TestBlob(unittest.TestCase):
   mgd = None
@@ -20,7 +19,7 @@ class TestBlob(unittest.TestCase):
     self.attachment.set_property("title", "TestTitle")
     self.attachment.set_property("name", "TestName")
     self.attachment.create()
-    self.blob = Midgard.Blob.create_blob(self.attachment, None)
+    self.blob = Midgard.Blob(attachment = self.attachment)
 
   def tearDown(self):
     if self.blob is not None:
@@ -40,6 +39,40 @@ class TestBlob(unittest.TestCase):
     self.assertTrue(self.blob.write_content(content))
     c = self.blob.read_content()
     self.assertEqual(c[0], content)
+
+  def testFileExists(self):
+    self.assertFalse(self.blob.exists())
+    content = "File exists?"
+    self.assertTrue(self.blob.write_content(content))
+    self.assertTrue(self.blob.exists())
+
+  def testFileExists(self):
+    self.assertIsNot(self.blob.get_path(), None)
+    content = "File exists?"
+    self.assertTrue(self.blob.write_content(content))
+    self.assertIsNot(self.blob.get_path(), None)
+
+  def testRemoveFile(self):
+    self.assertFalse(self.blob.exists())
+    content = "Remove file"
+    self.assertFalse(self.blob.remove_file())
+    self.assertTrue(self.blob.write_content(content))
+    self.assertTrue(self.blob.remove_file())
+    self.assertFalse(self.blob.exists())
+
+  def testGetHandler(self):
+    try: 
+      handler = self.blob.get_handler("oops")
+    except GObject.GError as e:
+      self.assertEqual(e.message, "Invalid mode 'oops'")
+    # This is new blob so fail on read attepmt */
+    try:
+      handler = self.blob.get_handler("r")
+    except GObject.GError as e:
+      self.assertEqual(e.domain, "g-file-error-quark")
+      self.assertEqual(e.code, GLib.FileError.NOENT)
+    valid_handler = self.blob.get_handler("w")
+    self.assertIsNot(valid_handler, None)
 
   def testInheritance(self): 
     self.assertIsInstance(self.blob, GObject.Object)
