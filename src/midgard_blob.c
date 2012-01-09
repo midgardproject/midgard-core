@@ -90,7 +90,7 @@ static void __get_filepath(MidgardBlob *self)
 }
 
 /* Create private channel */
-static void __get_channel(MidgardBlob *self, const gchar *mode)
+static void __get_channel(MidgardBlob *self, const gchar *mode, GError **error)
 {
 	if(self->priv->channel)
 		return;
@@ -98,6 +98,21 @@ static void __get_channel(MidgardBlob *self, const gchar *mode)
 	GError *err = NULL;
 	GIOChannel *channel = self->priv->channel;
 	gchar *filepath = self->priv->filepath;
+
+	/* Avoid warning being thrown from gio */
+	switch (mode[0]) {
+		case 'r':
+		case 'w':
+		case 'a':
+			/* Do nothing, it's OK */
+			break;
+
+		default:
+			g_set_error (error, MGD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Invalid mode '%s'", mode);
+			midgard_set_error(self->priv->mgd, MGD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Invalid mode '%s'", mode);
+			return;
+	}
+
 	if(channel == NULL)
 		channel = g_io_channel_new_file(filepath, mode ? mode : "w", &err);
 	/* Keep "binary" mode. It's useless on *nix but needed for WIN32 */
@@ -267,6 +282,7 @@ gboolean  midgard_blob_write_content(MidgardBlob *self,	const gchar *content)
  * midgard_blob_get_handler:
  * @self: #MidgardBlob instance
  * @mode: fopen mode (r, w, a, b). Default is 'w'.
+ * @error: (allow-none): a pointer to store error 
  *
  * The main idea is to get file handler. On C level it returns
  * GIOChannel, but language bindings could return typical file handler 
@@ -277,14 +293,20 @@ gboolean  midgard_blob_write_content(MidgardBlob *self,	const gchar *content)
  *
  * Returns: (transfer none): GIOChannel or %NULL
  */
-GIOChannel *midgard_blob_get_handler(MidgardBlob *self, const gchar *mode)
+GIOChannel *midgard_blob_get_handler(MidgardBlob *self, const gchar *mode, GError **error)
 {
 	g_assert(self != NULL);
 		
 	MidgardConnection *mgd = self->priv->mgd;
 	MIDGARD_ERRNO_SET(mgd, MGD_ERR_OK);
 
-	__get_channel(self, mode);
+	GError *err = NULL;
+	__get_channel(self, mode, &err);
+	if (err) {
+		g_propagate_error (error, err);
+		return NULL;
+	}
+
 	if(!self->priv->channel)
 		return NULL;
 

@@ -49,7 +49,7 @@ struct MidgardBlobClass {
 	gboolean (*remove_file) (MidgardBlob *self);
 	gboolean (*exists) (MidgardBlob *self);
 	const gchar *(*get_path) (MidgardBlob *self);
-	GIOChannel *(*get_handler) (MidgardBlob *self, const gchar *mode);
+	GIOChannel *(*get_handler) (MidgardBlob *self, const gchar *mode, GError **error);
 };
 
 struct MidgardBlob {
@@ -63,7 +63,7 @@ MidgardBlob 	*midgard_blob_new		(MidgardObject *attachment, const gchar *encodin
 MidgardBlob 	*midgard_blob_create_blob	(MidgardObject *attachment, const gchar *encoding);
 gchar 		*midgard_blob_read_content	(MidgardBlob *self, gsize *bytes_read);
 gboolean 	midgard_blob_write_content	(MidgardBlob *self, const gchar *content);
-GIOChannel 	*midgard_blob_get_handler	(MidgardBlob *self, const gchar *mode);
+GIOChannel 	*midgard_blob_get_handler	(MidgardBlob *self, const gchar *mode, GError **error);
 const gchar 	*midgard_blob_get_path		(MidgardBlob *self);
 gboolean 	midgard_blob_exists		(MidgardBlob *self);
 gboolean 	midgard_blob_remove_file	(MidgardBlob *self);
