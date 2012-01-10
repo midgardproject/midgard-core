@@ -6,7 +6,7 @@ import struct
 import unittest
 import inspect
 
-from gi.repository import Midgard, GObject
+from gi.repository import Midgard, GObject, GLib
 from gi import _gobject
 
 class TestConfig(Midgard.Config):
@@ -41,12 +41,28 @@ class TestProperties(unittest.TestCase):
 
   def testReadFileAtPath(self):
     config = Midgard.Config()
-    self.assertTrue(config.read_file_at_path("./test_SQLITE.conf"));
+    self.assertTrue(config.read_file_at_path("./test_SQLITE.conf"))
     self.assertRaises(GObject.GError, config.read_file_at_path, "notexists")
 
   def testSaveFile(self):
-    self.assertEqual("ok", "NOT SUPPORTED BY CORE")
-
+    filepath = "/tmp/midgard_gir_test.conf"
+    config = Midgard.Config()
+    try:
+      self.assertTrue(config.save_file_at_path("/This/path/not/exists.conf"))
+    except GObject.GError as e:
+      self.assertEqual(e.domain, "g-file-error-quark")
+      self.assertEqual(e.code, GLib.FileError.NOENT)
+    dbname = "SaveDBName"
+    config.set_property("database", dbname)
+    blobdir = "SaveBlobDir"
+    config.set_property("blobdir", blobdir)
+    self.assertTrue(config.save_file_at_path(filepath))
+    # test values
+    new_config = Midgard.Config()
+    self.assertTrue(new_config.read_file_at_path(filepath))
+    self.assertEqual(new_config.get_property("database"), dbname)
+    self.assertEqual(new_config.get_property("blobdir"), blobdir)
+   
   def testBlobDir(self):
     config = TestConfig()
     self.assertTrue(config.create_blobdir())
