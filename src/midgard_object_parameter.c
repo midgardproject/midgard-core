@@ -671,7 +671,7 @@ gboolean midgard_core_object_parameters_purge_with_blob(
 		}
 
 		if(midgard_blob_exists(blob))
-			midgard_blob_remove_file(blob);
+			midgard_blob_remove_file(blob, NULL);
 		
 		midgard_object_purge(MIDGARD_OBJECT(objects[i]), FALSE);
 

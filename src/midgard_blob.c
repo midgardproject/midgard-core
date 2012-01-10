@@ -381,7 +381,7 @@ gboolean midgard_blob_exists(MidgardBlob *self)
  *
  * Returns: %TRUE on success, %FALSE otherwise
  */ 
-gboolean midgard_blob_remove_file(MidgardBlob *self)
+gboolean midgard_blob_remove_file(MidgardBlob *self, GError **error)
 {
 	g_assert(self != NULL);
 
@@ -391,15 +391,15 @@ gboolean midgard_blob_remove_file(MidgardBlob *self)
 	__get_filepath(self);
 	if(!self->priv->filepath) {
 		MIDGARD_ERRNO_SET(self->priv->mgd, MGD_ERR_INTERNAL);
-		g_warning("Can not delete '%s'. No file location",
-				self->priv->filepath);
+		g_set_error (error, MGD_GENERIC_ERROR, MGD_ERR_INTERNAL, 
+				"Can not delete '%s'. No file location", self->priv->filepath);
 		return FALSE;
 	}
 	
 	if(!midgard_blob_exists(self)) {
 		MIDGARD_ERRNO_SET(self->priv->mgd, MGD_ERR_INTERNAL);
-		g_warning("Can not delete '%s'. File doesn't exists",
-				self->priv->filepath);	
+		g_set_error (error, MGD_GENERIC_ERROR, MGD_ERR_INTERNAL,
+				"Can not delete '%s'. File doesn't exists", self->priv->filepath);	
 		return FALSE;
 	}
 
@@ -408,7 +408,7 @@ gboolean midgard_blob_remove_file(MidgardBlob *self)
 	if(deleted == 0)
 		return TRUE;
 
-	g_warning("Can not delete '%s'. Unknown reason", self->priv->filepath);
+	g_set_error (error, MGD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Can not delete '%s'. Unknown reason", self->priv->filepath);
 	MIDGARD_ERRNO_SET(self->priv->mgd, MGD_ERR_INTERNAL);
 
 	return FALSE;

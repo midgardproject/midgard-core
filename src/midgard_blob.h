@@ -46,7 +46,7 @@ struct MidgardBlobClass {
 
 	gchar *(*read_content) (MidgardBlob *self, gsize *bytes_read);
 	gboolean (*write_content) (MidgardBlob *self, const gchar *content);
-	gboolean (*remove_file) (MidgardBlob *self);
+	gboolean (*remove_file) (MidgardBlob *self, GError **error);
 	gboolean (*exists) (MidgardBlob *self);
 	const gchar *(*get_path) (MidgardBlob *self);
 	GIOChannel *(*get_handler) (MidgardBlob *self, const gchar *mode, GError **error);
@@ -66,7 +66,7 @@ gboolean 	midgard_blob_write_content	(MidgardBlob *self, const gchar *content);
 GIOChannel 	*midgard_blob_get_handler	(MidgardBlob *self, const gchar *mode, GError **error);
 const gchar 	*midgard_blob_get_path		(MidgardBlob *self);
 gboolean 	midgard_blob_exists		(MidgardBlob *self);
-gboolean 	midgard_blob_remove_file	(MidgardBlob *self);
+gboolean 	midgard_blob_remove_file	(MidgardBlob *self, GError **error);
 
 G_END_DECLS
 #endif /* _MIDGARD_BLOB_H */
