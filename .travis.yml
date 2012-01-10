@@ -11,7 +11,7 @@ env:
 before_script:
   - ./travis_midgard.sh
 
-script: python tests/GIR/runalltests.py 
+script: sh -c "cd tests/GIR&&python runalltests.py" 
 
 notifications:
     irc: "irc.freenode.org#midgard"
