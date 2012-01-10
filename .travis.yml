@@ -1,0 +1,14 @@
+language: python
+
+python:
+  - 2.7
+
+env:
+  - MIDGARD_TEST_CONFIGURATION_FILE=test_SQLITE.conf
+  - MIDGARD_TEST_CONFIGURATION_FILE=test_MYSQL.conf
+  - MIDGARD_TEST_CONFIGURATION_FILE=test_POSTGRES.conf
+
+script: python tests/GIR/runalltests.py 
+
+notifications:
+    irc: "irc.freenode.org#midgard"
