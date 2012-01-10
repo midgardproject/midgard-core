@@ -7,6 +7,7 @@ from test_000_config import TestConfig
 from test_001_connection import TestConnection
 
 from gi.repository import Midgard, GObject, GLib
+from gi import _gobject
 
 class TestBlob(unittest.TestCase):
   mgd = None
@@ -55,7 +56,11 @@ class TestBlob(unittest.TestCase):
   def testRemoveFile(self):
     self.assertFalse(self.blob.exists())
     content = "Remove file"
-    self.assertFalse(self.blob.remove_file())
+    try:
+      self.blob.remove_file()
+    except GObject.GError as e:
+      self.assertEqual(e.domain, "midgard-generic-error-quark")
+      self.assertEqual(e.code, Midgard.GenericError.INTERNAL)
     self.assertTrue(self.blob.write_content(content))
     self.assertTrue(self.blob.remove_file())
     self.assertFalse(self.blob.exists())
@@ -75,7 +80,7 @@ class TestBlob(unittest.TestCase):
     self.assertIsNot(valid_handler, None)
 
   def testInheritance(self): 
-    self.assertIsInstance(self.blob, GObject.Object)
+    self.assertIsInstance(self.blob, _gobject.GObject)
     self.assertIsInstance(self.attachment, Midgard.DBObject)
     self.assertIsInstance(self.attachment, Midgard.Object)
 
