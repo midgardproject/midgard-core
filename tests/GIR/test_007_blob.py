@@ -78,6 +78,7 @@ class TestBlob(unittest.TestCase):
       self.assertEqual(e.code, GLib.FileError.NOENT)
     # There seems to be an issue with GIOChannel which is expected to be a boxed type.
     # python-gobject doesn't set channel as boxed type derived
+    # https://bugzilla.gnome.org/show_bug.cgi?id=667647
     # valid_handler = self.blob.get_handler("w")
     # self.assertIsNot(valid_handler, None)
 
