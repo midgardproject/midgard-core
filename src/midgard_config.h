@@ -87,6 +87,7 @@ GType midgard_config_get_type(void);
 MidgardConfig 	*midgard_config_new			(void);
 gboolean 	midgard_config_read_file		(MidgardConfig *self, const gchar *filename, gboolean user, GError **error);
 gboolean 	midgard_config_read_file_at_path	(MidgardConfig *self, const gchar *filepath, GError **error);
+gboolean 	midgard_config_save_file_at_path	(MidgardConfig *self, const gchar *filepath, GError **error);
 gboolean 	midgard_config_read_data		(MidgardConfig *self, const gchar *data, GError **error);
 gchar 		**midgard_config_list_files		(gboolean user);
 gboolean 	midgard_config_save_file		(MidgardConfig *self, const gchar *name, gboolean user, GError **error);

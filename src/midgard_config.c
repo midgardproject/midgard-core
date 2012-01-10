@@ -588,6 +588,75 @@ gchar **midgard_config_list_files(gboolean user)
 	return filenames;
 }
 
+static void __set_keyfile(MidgardConfig *self)
+{
+	guint n_props, i;
+	GValue pval = {0,};
+	const gchar *nick = NULL;
+	gchar *tmpstr;
+	GParamSpec **props = g_object_class_list_properties(
+			G_OBJECT_GET_CLASS(G_OBJECT(self)), &n_props);
+
+	/* It should not happen */
+	if(!props)
+		g_error("Midgard Config class has no members registered");
+
+	if(self->priv->keyfile == NULL)
+		self->priv->keyfile = g_key_file_new();
+
+	for(i = 0; i < n_props; i++) {
+		
+		nick = g_param_spec_get_nick (props[i]);
+
+		g_value_init(&pval,props[i]->value_type); 
+		g_object_get_property(G_OBJECT(self), (gchar*)props[i]->name, &pval);
+
+		const gchar *keygroup = "MidgardDatabase";
+
+		if (g_str_equal(props[i]->name, "sharedir")
+				|| g_str_equal(props[i]->name, "vardir")
+				|| g_str_equal(props[i]->name, "cachedir")
+				|| g_str_equal(props[i]->name, "blobdir")) 
+		{	
+			keygroup = "MidgardDir";
+		}
+
+
+		switch(props[i]->value_type){
+	
+			case G_TYPE_STRING:
+				tmpstr = (gchar *)g_value_get_string (&pval);
+				if(!tmpstr)
+					tmpstr = "";
+				g_key_file_set_string (self->priv->keyfile,
+						keygroup,
+						nick, tmpstr);
+				break;
+
+			case G_TYPE_BOOLEAN:
+				g_key_file_set_boolean(self->priv->keyfile,
+						keygroup, 
+						nick, 
+						g_value_get_boolean(&pval));
+				break;
+
+			case G_TYPE_UINT:
+				g_key_file_set_integer (self->priv->keyfile,
+						keygroup, 
+						nick, 
+						g_value_get_uint (&pval));
+				break;
+
+		}
+
+		g_key_file_set_comment(self->priv->keyfile, keygroup, nick,
+				g_param_spec_get_blurb(props[i]), NULL);
+		g_value_unset(&pval);
+	}
+
+	g_free (props);
+}
+
 /**
  * midgard_config_save_file:
  * @self: #MidgardConfig instance
@@ -620,9 +689,6 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 		g_warning ("Can not save configuration file without a name");
 		return FALSE;
 	}
-
-	if(self->priv->keyfile == NULL)
-		self->priv->keyfile = g_key_file_new();
 
 	/* Check configuration directory.
 	 * If user's conf.d dir doesn't exist, create it */
@@ -692,68 +758,8 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 
 	}
 
-	guint n_props, i;
-	GValue pval = {0,};
-	const gchar *nick = NULL;
-	gchar *tmpstr;
-	GParamSpec **props = g_object_class_list_properties(
-			G_OBJECT_GET_CLASS(G_OBJECT(self)), &n_props);
-
-	/* It should not happen */
-	if(!props)
-		g_error("Midgard Config class has no members registered");
-
-	for(i = 0; i < n_props; i++) {
-		
-		nick = g_param_spec_get_nick (props[i]);
-
-		g_value_init(&pval,props[i]->value_type); 
-		g_object_get_property(G_OBJECT(self), (gchar*)props[i]->name, &pval);
-
-		const gchar *keygroup = "MidgardDatabase";
-
-		if (g_str_equal(props[i]->name, "sharedir")
-				|| g_str_equal(props[i]->name, "vardir")
-				|| g_str_equal(props[i]->name, "cachedir")
-				|| g_str_equal(props[i]->name, "blobdir")) 
-		{	
-			keygroup = "MidgardDir";
-		}
-
-
-		switch(props[i]->value_type){
-	
-			case G_TYPE_STRING:
-				tmpstr = (gchar *)g_value_get_string (&pval);
-				if(!tmpstr)
-					tmpstr = "";
-				g_key_file_set_string (self->priv->keyfile,
-						keygroup,
-						nick, tmpstr);
-				break;
-
-			case G_TYPE_BOOLEAN:
-				g_key_file_set_boolean(self->priv->keyfile,
-						keygroup, 
-						nick, 
-						g_value_get_boolean(&pval));
-				break;
-
-			case G_TYPE_UINT:
-				g_key_file_set_integer (self->priv->keyfile,
-						keygroup, 
-						nick, 
-						g_value_get_uint (&pval));
-				break;
-
-		}
-
-		g_key_file_set_comment(self->priv->keyfile, keygroup, nick,
-				g_param_spec_get_blurb(props[i]), NULL);
-		g_value_unset(&pval);
-	}
-
-	g_free (props);
+	/* Set GKeyFile */
+	__set_keyfile (self);
 
 	gsize length;
 	GError *kf_error = NULL;
@@ -791,6 +797,51 @@ gboolean midgard_config_save_file(MidgardConfig *self,
 #endif /* G_OS_WIN32 */
 
 	g_free (cnfpath);
+
+	return TRUE;
+}
+
+/**
+ * midgard_config_save_file_at_path:
+ * @self: #MidgardConfig instance
+ * @filepath: file location 
+ * @error: a pointer to store error
+ *
+ * Saves configuration at specified path
+ *
+ * Returns: %TRUE on success or %FALSE otherwise
+ */ 
+gboolean midgard_config_save_file_at_path (MidgardConfig *self, 
+		const gchar *filepath, GError **error)
+{
+	g_return_val_if_fail (self != NULL, FALSE);
+	g_return_val_if_fail (filepath != NULL, FALSE);
+
+	/* Set GKeyFile */
+	__set_keyfile (self);
+
+	gsize length;
+	GError *err = NULL;
+	
+	gchar *content = g_key_file_to_data (self->priv->keyfile, &length, &err);
+
+	if (length < 1) {
+		if (err)
+			g_propagate_error (error, err);	
+		return FALSE;
+	}
+
+	if (err)
+		g_clear_error(&err);
+
+	gboolean saved = g_file_set_contents(filepath, content, length, &err);
+	g_free (content);
+
+	if (!saved) {
+		if (err)
+			g_propagate_error (error, err);
+		return FALSE;
+	}
 
 	return TRUE;
 }
