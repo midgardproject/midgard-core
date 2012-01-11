@@ -25,6 +25,7 @@ class TestMethods(unittest.TestCase):
     mgd = TestConnection()
     self.assertEqual(mgd.get_error_string(), "MGD_ERR_OK")
     self.assertTrue(mgd.open_config(config))
+    print mgd.get_error_string()
     self.assertEqual(mgd.get_error_string(), "MGD_ERR_OK")
 
   def testInheritance(self):
