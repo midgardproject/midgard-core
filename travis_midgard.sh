@@ -8,6 +8,4 @@ make
 sudo make install
 
 sudo mysql -e 'create database test_gir;'
-sudo mysql -e "GRANT all ON test_gir.*  to 'midgard'@'localhost' identified by 'midgard'";
-sudo mysql -e " FLUSH PRIVILEGES";
 psql -c 'create database test_gir;' -U postgres
