@@ -7,7 +7,6 @@ from test_000_config import TestConfig
 from test_001_connection import TestConnection
 
 from gi.repository import Midgard, GObject, GLib
-from gi import _gobject
 
 class TestBlob(unittest.TestCase):
   mgd = None
@@ -83,7 +82,7 @@ class TestBlob(unittest.TestCase):
     # self.assertIsNot(valid_handler, None)
 
   def testInheritance(self): 
-    self.assertIsInstance(self.blob, _gobject.GObject)
+    self.assertIsInstance(self.blob, GObject.GObject)
     self.assertIsInstance(self.attachment, Midgard.DBObject)
     self.assertIsInstance(self.attachment, Midgard.Object)
 
