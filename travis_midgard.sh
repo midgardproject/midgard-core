@@ -9,3 +9,5 @@ sudo make install
 
 mysql -e 'create database test_gir;'
 psql -c 'create database test_gir;' -U postgres
+
+cat /usr/share/gir-1.0/Midgard-10.05.gir 
