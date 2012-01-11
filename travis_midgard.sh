@@ -7,7 +7,7 @@ sudo apt-get install -y dbus libglib2.0-dev libgda-4.0-4 libgda-4.0-dev libxml2-
 make
 sudo make install
 
-mysql -e 'create database test_gir;'
-mysql -e "GRANT all ON test_gir.*  to 'midgard'@'localhost' identified by 'midgard'";
-mysql -e " FLUSH PRIVILEGES";
+sudo mysql -e 'create database test_gir;'
+sudo mysql -e "GRANT all ON test_gir.*  to 'midgard'@'localhost' identified by 'midgard'";
+sudo mysql -e " FLUSH PRIVILEGES";
 psql -c 'create database test_gir;' -U postgres
