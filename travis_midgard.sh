@@ -6,3 +6,6 @@ sudo apt-get install -y dbus libglib2.0-dev libgda-4.0-4 libgda-4.0-dev libxml2-
 ./autogen.sh --prefix=/usr 
 make
 sudo make install
+
+mysql -e 'create database test_gir;'
+psql -c 'create database test_gir;' -U postgres
