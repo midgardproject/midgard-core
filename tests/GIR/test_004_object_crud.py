@@ -21,7 +21,7 @@ class TestObjectCrud(unittest.TestCase):
     title = "The Holly Grail"
     author = "Sir Lancelot"
     price = 999.999
-    serial = Midgard.TypeGuid.new(self.mgd)
+    serial = Midgard.Guid.new(self.mgd)
     edition = 1
     sold = False
     description = "The true story of white rabbit"
@@ -42,7 +42,7 @@ class TestObjectCrud(unittest.TestCase):
     title = "The Holly Grail"
     author = "Sir Lancelot"
     price = 999.999
-    serial = Midgard.TypeGuid.new(self.mgd)
+    serial = Midgard.Guid.new(self.mgd)
     edition = 1
     sold = False
     description = "The true story of white rabbit"
@@ -78,7 +78,7 @@ class TestObjectCrud(unittest.TestCase):
     title = "The Holly Grail 2"
     author = "Sir Lancelot"
     price = 09.099
-    serial = Midgard.TypeGuid.new(self.mgd)
+    serial = Midgard.Guid.new(self.mgd)
     edition = 2
     sold = True
     description = "The true story of white rabbit. Part 2"
