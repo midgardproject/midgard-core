@@ -16,12 +16,19 @@ class TestObjectCrud(unittest.TestCase):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
 
+  def createGuid(self):
+    try:
+      guid = Midgard.Guid.new(self.mgd)
+    except AttributeError:
+      guid = Midgard.guid_new(self.mgd)
+    return guid
+
   def getNewBook(self):
     obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
     title = "The Holly Grail"
     author = "Sir Lancelot"
     price = 999.999
-    serial = Midgard.Guid.new(self.mgd)
+    serial = self.createGuid()
     edition = 1
     sold = False
     description = "The true story of white rabbit"
@@ -42,7 +49,7 @@ class TestObjectCrud(unittest.TestCase):
     title = "The Holly Grail"
     author = "Sir Lancelot"
     price = 999.999
-    serial = Midgard.Guid.new(self.mgd)
+    serial = self.createGuid()
     edition = 1
     sold = False
     description = "The true story of white rabbit"
@@ -78,7 +85,7 @@ class TestObjectCrud(unittest.TestCase):
     title = "The Holly Grail 2"
     author = "Sir Lancelot"
     price = 09.099
-    serial = Midgard.Guid.new(self.mgd)
+    serial = self.createGuid()
     edition = 2
     sold = True
     description = "The true story of white rabbit. Part 2"
