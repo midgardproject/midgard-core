@@ -23,5 +23,35 @@ class TestReflectorObject(unittest.TestCase):
     self.assertEqual(Midgard.ReflectorObject.get_property_primary(self.file_type), "id")
     self.assertEqual(Midgard.ReflectorObject.get_property_primary(self.resource_type), "id")
 
+  def testPropertyUp(self):
+    self.assertEqual(Midgard.ReflectorObject.get_property_up(self.person_type), None)
+    self.assertEqual(Midgard.ReflectorObject.get_property_up(self.file_type), None)
+    self.assertEqual(Midgard.ReflectorObject.get_property_up(self.resource_type), None)
+
+  def testPropertyParent(self):
+    self.assertEqual(Midgard.ReflectorObject.get_property_parent(self.person_type), None)
+    self.assertEqual(Midgard.ReflectorObject.get_property_parent(self.file_type), None)
+    self.assertEqual(Midgard.ReflectorObject.get_property_parent(self.resource_type), None)
+
+  def testPropertyUnique(self):
+    self.assertEqual(Midgard.ReflectorObject.get_property_unique(self.person_type), "firstname")
+    self.assertEqual(Midgard.ReflectorObject.get_property_unique(self.file_type), None)
+    self.assertEqual(Midgard.ReflectorObject.get_property_unique(self.resource_type), None)
+
+  def testListChildren(self):
+    self.assertEqual(len(Midgard.ReflectorObject.list_children(self.person_type)), 0)
+    self.assertEqual(len(Midgard.ReflectorObject.list_children(self.file_type)), 0)
+    self.assertEqual(len(Midgard.ReflectorObject.list_children(self.resource_type)), 0)
+
+  def testHasMetadata(self):
+    self.assertTrue(Midgard.ReflectorObject.has_metadata_class(self.person_type))
+    self.assertFalse(Midgard.ReflectorObject.has_metadata_class(self.file_type))
+    self.assertFalse(Midgard.ReflectorObject.has_metadata_class(self.resource_type))
+ 
+  def testGetMetadataClass(self):
+    self.assertEqual(Midgard.ReflectorObject.get_metadata_class(self.person_type), "MidgardMetadata")
+    self.assertIsNone(Midgard.ReflectorObject.get_metadata_class(self.file_type))
+    self.assertIsNone(Midgard.ReflectorObject.get_metadata_class(self.resource_type))
+
 if __name__ == "__main__":
     unittest.main()
