@@ -133,7 +133,7 @@ midgard_reflector_object_get_property_parent (const gchar *classname)
  * Returns newly allocated, children ( in midgard tree ) classes' names. 
  * Returned array should be freed if no longer needed without freeing array's elements. 
  *
- * Returns: (transfer container): array of strings or %NULL.
+ * Returns: (array length=n_children) (transfer container): array of strings or %NULL.
  * Since: 10.05
  */  
 gchar**
