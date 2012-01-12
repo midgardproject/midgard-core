@@ -64,5 +64,26 @@ class TestReflectorObject(unittest.TestCase):
     self.assertIsNone(Midgard.ReflectorObject.get_metadata_class(self.resource_type))
     self.assertEqual(Midgard.ReflectorObject.get_metadata_class(self.snippet_type), "MidgardMetadata")
 
+  @staticmethod
+  def getSchemaValue(schema_type, name):
+    return Midgard.ReflectorObject.get_schema_value(schema_type, name)
+
+  def testGetSchemaValueSuperType(self):
+    self.assertEqual(self.getSchemaValue(self.file_type, "Supertypes"), "nt:hierarchyNode")
+    self.assertEqual(self.getSchemaValue(self.resource_type, "SuperTypes"), None)
+    self.assertEqual(self.getSchemaValue(self.person_type, "NotExists"), None)
+
+  def testGetSchemaValueIsMixin(self):
+    self.assertEqual(self.getSchemaValue(self.file_type, "isMixin"), "false")
+    self.assertEqual(self.getSchemaValue(self.resource_type, "isMixin"), "false")
+    self.assertEqual(self.getSchemaValue("mix_title", "isMixin"), "true")
+
+  def testGetSchemaValueOnParentVersion(self):
+    self.assertEqual(self.getSchemaValue(self.file_type, "OnParentVersion"), "COPY")
+    self.assertEqual(self.getSchemaValue(self.resource_type, "OnParentVersion"), "VERSION")
+    self.assertEqual(self.getSchemaValue("mix_title", "OnParentVersion"), None)
+
+  
+
 if __name__ == "__main__":
     unittest.main()
