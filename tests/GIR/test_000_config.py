@@ -7,7 +7,6 @@ import unittest
 import inspect
 
 from gi.repository import Midgard, GObject, GLib
-from gi import _gobject
 
 class TestConfig(Midgard.Config):
   def __init__(self):
@@ -69,7 +68,7 @@ class TestProperties(unittest.TestCase):
 
   def testInheritance(self):
     config = TestConfig()
-    self.assertIsInstance(config, _gobject.GObject)
+    self.assertIsInstance(config, GObject.GObject)
 
 if __name__ == "__main__":
     unittest.main()
