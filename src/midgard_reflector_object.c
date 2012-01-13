@@ -133,13 +133,16 @@ midgard_reflector_object_get_property_parent (const gchar *classname)
  * Returns newly allocated, children ( in midgard tree ) classes' names. 
  * Returned array should be freed if no longer needed without freeing array's elements. 
  *
- * Returns: (transfer container): array of strings or %NULL.
+ * Returns: (array length=n_children) (transfer container): array of strings or %NULL.
  * Since: 10.05
  */  
 gchar**
 midgard_reflector_object_list_children (const gchar *classname, guint *n_children)
 {
 	g_return_val_if_fail (classname != NULL, NULL);
+	g_return_val_if_fail (n_children != NULL, NULL);
+
+	*n_children = 0;
 
 	_GET_CLASS_BY_NAME (classname, NULL);
 	_GET_TYPE_ATTR (klass);
@@ -150,13 +153,15 @@ midgard_reflector_object_list_children (const gchar *classname, guint *n_childre
 	 GSList *list;
 	 GSList *children = type_attr->children;
 	 guint i = 0;
+	 guint length = g_slist_length (children);
 
-	 gchar **children_class = g_new (gchar*, g_slist_length (children));
+	 gchar **children_class = g_new (gchar*, length);
 
 	 for (list = children; list != NULL; list = list->next, i++) 
 		 children_class[i] = (gchar *) list->data;
 
-	 *n_children = i;
+	 *n_children = length;
+	 children_class[length] = NULL;
 	 
 	 return children_class;
 }
@@ -315,7 +320,7 @@ midgard_reflector_object_list_defined_properties (const gchar *classname, guint 
 	guint i;
 	for (i = 0; i < *n_prop; i++)
 	{
-		names[i] = pspecs[i]->name;
+		names[i] = (gchar*) pspecs[i]->name;
 	}
 
 	g_free(pspecs);

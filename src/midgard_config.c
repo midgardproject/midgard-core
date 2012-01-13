@@ -969,8 +969,8 @@ static void __config_struct_new(MidgardConfig *self)
 	self->host = g_strdup("localhost");
 	self->database = g_strdup("midgard");
 	self->dbport = 0;	
-	self->dbuser = g_strdup("midgard");
-	self->dbpass = g_strdup("midgard");
+	self->dbuser = g_strdup("");
+	self->dbpass = g_strdup("");
 	self->dbdir = g_strdup ("");
 	self->logfilename = g_strdup ("");;
 	self->loglevel = g_strdup("warn");

@@ -110,7 +110,7 @@ GType midgard_longtext_get_type(void) {
                         G_TYPE_FLAG_DERIVABLE
                 };
                 type = g_type_register_fundamental(
-                                g_type_fundamental_next(), "MgdTypeLongtext",
+                                g_type_fundamental_next(), "MidgardLongtext",
                                 &info, &finfo, 0);
         }
         return type;
@@ -253,10 +253,7 @@ GType midgard_guid_get_type(void)
 			0,             /* n_preallocs */
 			NULL 	       /* instance_init */
 		};
-		type = g_type_register_static(
-				G_TYPE_STRING, 
-				"MidgardTypeGuid", 
-				&info, 0);
+		type = g_type_register_static(G_TYPE_STRING, "MidgardGuid", &info, 0);
 	}
 	return type;
 }

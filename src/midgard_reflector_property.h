@@ -60,6 +60,6 @@ gboolean			midgard_reflector_property_is_private 		(MidgardReflectorProperty *se
 gboolean			midgard_reflector_property_is_unique		(MidgardReflectorProperty *self, const gchar *property);
 gboolean			midgard_reflector_property_is_primary		(MidgardReflectorProperty *self, const gchar *property);
 gboolean			midgard_reflector_property_has_default_value	(MidgardReflectorProperty *self, const gchar *property);
-gboolean			midgard_reflector_property_get_default_value	(MidgardReflectorProperty *self, const gchar *property, GValue *value);
+GValue 				*midgard_reflector_property_get_default_value	(MidgardReflectorProperty *self, const gchar *property);
 
 #endif /* MIDGARD_REFLECTOR_PROPERTY_H */

@@ -5,9 +5,7 @@ import struct
 import unittest
 from test_000_config import TestConfig
 
-from gi.repository import Midgard
-from gi.repository import GObject
-from gi import _gobject
+from gi.repository import Midgard, GObject
 
 class TestConnection(Midgard.Connection):
   def __init__(self):
@@ -31,7 +29,7 @@ class TestMethods(unittest.TestCase):
 
   def testInheritance(self):
     mgd = TestConnection()
-    self.assertIsInstance(mgd, _gobject.GObject)
+    self.assertIsInstance(mgd, GObject.GObject)
 
 if __name__ == "__main__":
     unittest.main()
