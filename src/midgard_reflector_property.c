@@ -368,34 +368,31 @@ midgard_reflector_property_has_default_value (MidgardReflectorProperty *self, co
  * midgard_reflector_property_get_default_value:
  * @self: #MidgardReflectorProperty instance
  * @property: property name to check
- * @value: (inout): value which stores default value defined for given property
  *
- * @value should not be initialized for particular type. It's a copy of original value, 
- * so it should be unset when no longer needed.
- *
- * Returns: %TRUE, if property has default value and its copy has been made, %FALSE otherwise
+ * Returns: #GValue value or %NULL if property is not registered for the class or there's no default value for the given property 
  *
  * Since: 10.05
  */
-gboolean
-midgard_reflector_property_get_default_value (MidgardReflectorProperty *self, const gchar *property, GValue *value)
+GValue *
+midgard_reflector_property_get_default_value (MidgardReflectorProperty *self, const gchar *property)
 {
-	g_return_val_if_fail (self != NULL, FALSE);
-	g_return_val_if_fail (property != NULL, FALSE);	
-	g_return_val_if_fail (self->priv->klass != NULL, FALSE);
+	g_return_val_if_fail (self != NULL, NULL);
+	g_return_val_if_fail (property != NULL, NULL);	
+	g_return_val_if_fail (self->priv->klass != NULL, NULL);
 
 	MgdSchemaPropertyAttr *prop_attr = 
 		midgard_core_class_get_property_attr (MIDGARD_DBOBJECT_CLASS (self->priv->klass), property);
 	if (prop_attr == NULL)
-		return FALSE;
+		return NULL;
 	
 	if (!prop_attr->default_value)
-		return FALSE;
+		return NULL;
 
+	GValue *value = g_new0 (GValue *, 1);
 	g_value_init (value, G_VALUE_TYPE (prop_attr->default_value));
 	g_value_copy (prop_attr->default_value, value);
 
-	return TRUE;
+	return value;
 }
 
 /* GOBJECT ROUTINES */
