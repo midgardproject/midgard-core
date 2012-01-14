@@ -30,13 +30,11 @@ class TestWorkspaceManager(unittest.TestCase):
       self.assertEqual(e.message, "Invalid (empty or null) workspace's name")
 
   def testCreateWorkspace(self):
-    wa = Midgard.Workspace()
-    wa.set_property("name", "devel")
+    wa = Midgard.Workspace(name = "devel")
     self.assertTrue(self.manager.create_workspace(wa, ""))
  
   def testCreateWorkspaceDuplicate(self):
-    wa = Midgard.Workspace()
-    wa.set_property("name", "devel")
+    wa = Midgard.Workspace(name = "devel")
     try:
       self.manager.create_workspace(wa, "")
     except GObject.GError as e:
