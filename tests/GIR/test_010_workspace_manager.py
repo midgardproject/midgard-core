@@ -100,18 +100,18 @@ class TestWorkspaceManager(unittest.TestCase):
     self.assertTrue(self.manager.path_exists("/devel/testing/stable"))
     self.assertFalse(self.manager.path_exists("/the/path/not/exists"))
 
+  @unittest.skip("Not implemented in core")
   def testPurgeWorkspace(self):
-    # FIXME NOT IMPLEMENTED IN CORE
-    #wa = Midgard.Workspace(name = "a")
-    #self.assertTrue(self.manager.create_workspace(wa, ""))
-    #wb = Midgard.Workspace(name = "b")
-    #self.assertTrue(self.manager.create_workspace(wb, "/a"))
-    #wc = Midgard.Workspace(name = "c")
-    #self.assertTrue(self.manager.create_workspace(wc, "/a/b"))
+    wa = Midgard.Workspace(name = "a")
+    self.assertTrue(self.manager.create_workspace(wa, ""))
+    wb = Midgard.Workspace(name = "b")
+    self.assertTrue(self.manager.create_workspace(wb, "/a"))
+    wc = Midgard.Workspace(name = "c")
+    self.assertTrue(self.manager.create_workspace(wc, "/a/b"))
     # purge
-    #self.assertTrue(self.manager.purge_workspace(wc))
-    #self.assertTrue(self.manager.purge_workspace(wb))
-    #self.assertTrue(self.manager.purge_workspace(wa))
+    self.assertTrue(self.manager.purge_workspace(wc))
+    self.assertTrue(self.manager.purge_workspace(wb))
+    self.assertTrue(self.manager.purge_workspace(wa))
     
     # Invalid workspace
     wd = Midgard.Workspace(name = "d")
