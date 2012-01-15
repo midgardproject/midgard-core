@@ -170,7 +170,7 @@ MidgardObject *midgard_object_create_attachment(MidgardObject *self,
  * midgard_object_delete_attachments:
  * @self: #MidgardObject instance
  * @n_params: number of properties
- * @parameters: properties list
+ * @parameters: (allow-none): properties list
  *
  * Delete object's attachments(s) which match given properties' values.
  * Properties list in @parameters is optional. All object's attachments are 
@@ -199,7 +199,7 @@ gboolean midgard_object_delete_attachments(MidgardObject *self,
  * @self: #MidgardObject instance
  * @delete_blob: whether blob should be deleted as well
  * @n_params: number of properties
- * @parameters: properties list
+ * @parameters: (allow-none): properties list
  *
  * Purge object's attachments(s) which match given properties' values.
  * Properties list in @parameters is optional. All object's attachments are 
