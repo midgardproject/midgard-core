@@ -27,8 +27,8 @@
 
 /* This is not nice. Can be done as iface's private virtual method. */
 #define __SET_MANAGER(__obj, __mngr) \
-	if (MIDGARD_IS_WORKSPACE (__obj)) MIDGARD_WORKSPACE (__obj)->priv->manager = g_object_ref(__mngr); \
-	if (MIDGARD_IS_WORKSPACE_CONTEXT (__obj)) MIDGARD_WORKSPACE_CONTEXT (__obj)->priv->manager = g_object_ref(__mngr); 
+	if (MIDGARD_IS_WORKSPACE (__obj)) MIDGARD_WORKSPACE (__obj)->priv->manager = g_object_ref((GObject*)__mngr); \
+	if (MIDGARD_IS_WORKSPACE_CONTEXT (__obj)) MIDGARD_WORKSPACE_CONTEXT (__obj)->priv->manager = g_object_ref((GObject*)__mngr); 
 
 /**
  * midgard_workspace_manager_new:
@@ -43,9 +43,7 @@ midgard_workspace_manager_new (MidgardConnection *mgd)
 {
 	g_return_val_if_fail (mgd != NULL, NULL);
 
-	MidgardWorkspaceManager *self = g_object_new (MIDGARD_TYPE_WORKSPACE_MANAGER, NULL);
-	self->priv->mgd = mgd;
-
+	MidgardWorkspaceManager *self = g_object_new (MIDGARD_TYPE_WORKSPACE_MANAGER, "connection", mgd, NULL);
 	return self;
 }
 
@@ -339,6 +337,10 @@ midgard_workspace_manager_move_content (const MidgardWorkspaceManager *self, con
 
 static GObjectClass *parent_class = NULL;
 
+enum {
+	PROPERTY_CONNECTION = 1
+};
+
 static void
 _midgard_workspace_manager_instance_init (GTypeInstance *instance, gpointer g_class)
 {
@@ -362,8 +364,13 @@ _midgard_workspace_manager_constructor (GType type,
 
 static void
 _midgard_workspace_manager_dispose (GObject *object)
-{	
-	return;
+{
+	MidgardWorkspaceManager *self = (MidgardWorkspaceManager *)object;	
+	if (self->priv->mgd)
+		g_object_ref (self->priv->mgd);
+	self->priv->mgd = NULL;
+
+	parent_class->dispose(object);
 }
 
 static void
@@ -378,6 +385,45 @@ _midgard_workspace_manager_finalize (GObject *object)
 }
 
 static void
+_midgard_workspace_manager_get_property (GObject *object, guint property_id,
+		GValue *value, GParamSpec *pspec)
+{
+	MidgardWorkspaceManager *self = (MidgardWorkspaceManager *) object;
+	
+	switch (property_id) {
+
+		case PROPERTY_CONNECTION:
+			/* write and constructor only */
+			break;
+		
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+			break;
+	}
+}
+
+static void
+_midgard_workspace_manager_set_property (GObject *object, guint property_id,
+		const GValue *value, GParamSpec *pspec)
+{
+	MidgardWorkspaceManager *self = (MidgardWorkspaceManager *) (object);
+	GObject *mgd;
+
+ 	switch (property_id) {
+
+		case PROPERTY_CONNECTION:
+			if (!G_VALUE_HOLDS_OBJECT (value))
+				return;
+			self->priv->mgd = g_value_dup_object (value);
+			break;
+		
+		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
+    			break;
+	}
+}
+
+static void
 _midgard_workspace_manager_class_init (MidgardWorkspaceManagerClass *klass, gpointer class_data)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS (klass);
@@ -386,6 +432,21 @@ _midgard_workspace_manager_class_init (MidgardWorkspaceManagerClass *klass, gpoi
 	object_class->constructor = _midgard_workspace_manager_constructor;
 	object_class->dispose = _midgard_workspace_manager_dispose;
 	object_class->finalize = _midgard_workspace_manager_finalize;
+
+	object_class->set_property = _midgard_workspace_manager_set_property;
+	object_class->get_property = _midgard_workspace_manager_get_property;
+
+	 /* Properties */
+	GParamSpec *pspec = g_param_spec_object ("connection",
+			"MidgardConnection", 
+			"Pointer to a connection, WorkspaceManager has been initialized for",
+			MIDGARD_TYPE_CONNECTION,
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+	/**
+	 * MidgardWorkspaceManager:connection:
+	 * Pointer to a connection, #MidgardWorkspaceManager has been initialized for
+	 */
+	g_object_class_install_property (object_class, PROPERTY_CONNECTION, pspec);
 }
 
 GType
