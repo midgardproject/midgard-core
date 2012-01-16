@@ -95,5 +95,18 @@ class TestReflectorObject(unittest.TestCase):
     self.assertFalse(self.rfl_snippetdir.has_default_value("id"))
     self.assertFalse(self.rfl_resource.has_default_value("notexists"))
 
+  def testGetDefaultValue(self):
+    self.assertFalse(self.rfl_person.get_default_value("id"), None)
+    self.assertEqual(self.rfl_person.get_default_value("firstname"), None)
+    self.assertEqual(self.rfl_snippet.get_default_value("snippetdir"), None)
+    self.assertEqual(self.rfl_resource.get_default_value("notexists"), None)
+
+  def testGetUserValue(self):
+    self.assertEqual(self.rfl_person.get_user_value("id", "notexists"), None)
+    self.assertEqual(self.rfl_person.get_user_value("firstname", "property"), "foaf:firstName")
+    self.assertEqual(self.rfl_resource.get_user_value("notexists", "notexists"), None)
+    self.assertEqual(self.rfl_resource.get_user_value("jcr-data", "RequiredType"), "BINARY")
+    self.assertEqual(self.rfl_resource.get_user_value("jcr-data", "isMultiple"), "false")
+
 if __name__ == "__main__":
     unittest.main()

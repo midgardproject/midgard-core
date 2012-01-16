@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-MidgardObject	**midgard_object_list_attachments	(MidgardObject *self);
+MidgardObject	**midgard_object_list_attachments	(MidgardObject *self, guint *n_objects);
 MidgardObject 	*midgard_object_create_attachment	(MidgardObject *self, const gchar *name, const gchar *title, const gchar *mimetype);
 gboolean 	midgard_object_delete_attachments	(MidgardObject *self, guint n_params, const GParameter *parameters);
 gboolean 	midgard_object_purge_attachments	(MidgardObject *self, gboolean delete_blob, guint n_params, const GParameter *parameters);

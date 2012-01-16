@@ -23,7 +23,8 @@
 
 /**
  * midgard_object_list_attachments: 
- * @self: a #MidgardObject self instance 
+ * @self: a #MidgardObject self instance
+ * @n_objects: (out): pointer to store number of returned objects 
  * 
  * Returned objects are midgard_attachment class. Attachments objects are 
  * fetched from database unconditionally. 
@@ -31,19 +32,25 @@
  *
  * Returned array should be freed when no longer needed.
  * 
- * Returns: (transfer full): Newly allocated and NULL terminated array of midgard_attachment objects. 
+ * Returns: (array length=n_objects) (transfer full): Newly allocated and NULL terminated array of midgard_attachment objects. 
  */
-MidgardObject **midgard_object_list_attachments(MidgardObject *self)
+MidgardObject **midgard_object_list_attachments(MidgardObject *self, guint *n_objects)
 {
 	g_return_val_if_fail(self != NULL, NULL);
 	g_return_val_if_fail(MGD_OBJECT_GUID (self) != NULL, NULL);
 	g_return_val_if_fail(MGD_OBJECT_CNC (self) != NULL, NULL);
 
 	MidgardObject **objects = NULL;
+	guint i = 0;
 
 	objects = midgard_core_object_parameters_list(
 			MGD_OBJECT_CNC (self), "midgard_attachment", MGD_OBJECT_GUID (self));
-		
+
+	while(objects[i] != NULL)
+		i++;
+
+	*n_objects = i;
+	
 	return objects;
 }
 
@@ -163,7 +170,7 @@ MidgardObject *midgard_object_create_attachment(MidgardObject *self,
  * midgard_object_delete_attachments:
  * @self: #MidgardObject instance
  * @n_params: number of properties
- * @parameters: properties list
+ * @parameters: (allow-none): properties list
  *
  * Delete object's attachments(s) which match given properties' values.
  * Properties list in @parameters is optional. All object's attachments are 
@@ -192,7 +199,7 @@ gboolean midgard_object_delete_attachments(MidgardObject *self,
  * @self: #MidgardObject instance
  * @delete_blob: whether blob should be deleted as well
  * @n_params: number of properties
- * @parameters: properties list
+ * @parameters: (allow-none): properties list
  *
  * Purge object's attachments(s) which match given properties' values.
  * Properties list in @parameters is optional. All object's attachments are 
