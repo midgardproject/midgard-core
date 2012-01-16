@@ -210,8 +210,6 @@ gboolean __query_select_add_orders (MidgardQueryExecutor *self, GError **error)
 		
 		if (property->priv && property->priv->storage)
 			storage = property->priv->storage;
-		else 
-			storage = MIDGARD_QUERY_EXECUTOR (self)->priv->storage;
 
 		/* Compute table.colname for given property name */
 		GValue rval = {0, };
