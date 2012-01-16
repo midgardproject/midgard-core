@@ -3197,11 +3197,10 @@ gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
  */
 GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
 {
+	g_return_val_if_fail (self != NULL, NULL);
 	MidgardObject *object = self;
 
 	*n_objects = 0;
-
-	g_assert(object != NULL);
 	GParamSpec *fprop;
 	const gchar *classname = G_OBJECT_TYPE_NAME (object);
 
@@ -3215,47 +3214,47 @@ GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
 	g_object_get_property(G_OBJECT(object), primary_prop, &pval);
 
 	/* If primary property holds uint and its value is 0, do not try to return objects */
-	if (G_VALUE_HOLDS_UINT(&pval))
-	{
-		if (g_value_get_uint(&pval) == 0)
-		{
+	if (G_VALUE_HOLDS_UINT(&pval)) {
+		if (g_value_get_uint(&pval) == 0) {
 			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
 			return NULL;
 		}
 	}
 
-	if (midgard_reflector_object_get_property_up(classname) == NULL) 
+	const gchar *up_property = midgard_reflector_object_get_property_up(classname);
+	if (up_property == NULL) 
 		return NULL;
-	
-	if ((fprop = g_object_class_find_property(
-					G_OBJECT_GET_CLASS(G_OBJECT(object)),
-					primary_prop)) != NULL){
-		
-		if (g_object_class_find_property(
-						G_OBJECT_GET_CLASS(G_OBJECT(object)),
-						midgard_reflector_object_get_property_up(classname)) == NULL ) {
-			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
-			return NULL;
-		}
 
-		MidgardQueryBuilder *builder =
-			midgard_query_builder_new(MGD_OBJECT_CNC (object), 
-					G_OBJECT_TYPE_NAME(object));
+	fprop = g_object_class_find_property(
+			G_OBJECT_GET_CLASS(G_OBJECT(object)), primary_prop);
+	if (!fprop)
+		return NULL;
 
-		if (!builder) {
-			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
-			return NULL;
-		}
-		
-		midgard_query_builder_add_constraint(builder,
-				midgard_reflector_object_get_property_up(classname), "=", &pval);
-		
-		g_value_unset(&pval);
-		GObject **objects = midgard_query_builder_execute(builder, n_objects);
-		g_object_unref(builder);
-				
-		return objects;
+	if (g_object_class_find_property(
+				G_OBJECT_GET_CLASS(G_OBJECT(object)),
+				up_property) == NULL ) {
+		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
+		return NULL;
 	}
+	
+	GError *err = NULL;
+	MidgardDBObject **objects = midgard_core_query_get_objects (MGD_OBJECT_CNC (object), 
+			classname, &err, up_property, &pval, NULL);
+
+	if (objects) {
+		guint i = 0;
+		while (objects[i] != NULL)
+			i++;
+		*n_objects = i;
+		return (GObject **) objects;
+	}
+
+	if (err) {
+		MIDGARD_ERRNO_SET_STRING (MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+	}
+
 	return NULL;
 }
 
@@ -3268,16 +3267,17 @@ GObject **midgard_object_list(MidgardObject *self, guint *n_objects)
  * Returns: newly allocated, %NULL terminated children objects array 
  */
 GObject **midgard_object_list_children(MidgardObject *object, 
-		const gchar *childcname, guint *n_objects)
+		const gchar *childname, guint *n_objects)
 {
-	*n_objects = 0;
+	g_return_val_if_fail (object != NULL, NULL);
+	g_return_val_if_fail (childname != NULL, NULL);
 
+	*n_objects = 0;
 	GParamSpec *fprop ;
 	const gchar *primary_prop = MIDGARD_DBOBJECT (object)->dbpriv->storage_data->primary;
 
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
-
-	if ((childcname == NULL) || (MIDGARD_DBOBJECT (object)->dbpriv->storage_data->children == NULL)) {
+	if ((childname == NULL) || (MIDGARD_DBOBJECT (object)->dbpriv->storage_data->children == NULL)) {
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);    
 		return NULL;
 	}
@@ -3287,62 +3287,49 @@ GObject **midgard_object_list_children(MidgardObject *object,
 	gboolean found = FALSE;
 
 	for (list = children; list != NULL; list = list->next) {
-
-		if (list->data && g_str_equal(list->data, childcname))
+		if (list->data && g_str_equal(list->data, childname))
 			found = TRUE;
 	}
 
 	if (!found) {
-
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
 		g_log(G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,
 				"Child type (%s) is not a child type of (%s)", 
-				childcname, G_OBJECT_TYPE_NAME(object));
+				childname, G_OBJECT_TYPE_NAME(object));
 		return NULL;
 	}
-	
-	MidgardObject *child = midgard_object_new(MGD_OBJECT_CNC (object), childcname, NULL);	
 
-	if (midgard_reflector_object_get_property_parent(childcname) == NULL) {
-		g_object_unref(child);
+	const gchar *property_parent = midgard_reflector_object_get_property_parent(childname);
+	if (property_parent == NULL) {
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);
 		return NULL;
 	}
-	
-	if ((fprop = g_object_class_find_property(
-					G_OBJECT_GET_CLASS(object),
-					primary_prop)) != NULL){
-		
-		MidgardQueryBuilder *builder =
-			midgard_query_builder_new(MGD_OBJECT_CNC (object), 
-					G_OBJECT_TYPE_NAME(child));
-		
-		if (!builder) {
-			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
-			return NULL;
-		}
-		
-		GValue pval = {0,};
-		g_value_init(&pval,fprop->value_type);
-		g_object_get_property(G_OBJECT(object), primary_prop, &pval);
-		
-		if (midgard_query_builder_add_constraint(builder, 
-					midgard_reflector_object_get_property_parent(childcname)
-					, "=", &pval)) {
 
-			g_value_unset(&pval);
-			GObject **objects = midgard_query_builder_execute(builder, n_objects);
-			g_object_unref(builder);
-						
-			return objects;
-			
-		} else {
-			
-			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
-			g_value_unset(&pval);         
-			return NULL;                        
-		}                            
+	fprop = g_object_class_find_property(G_OBJECT_GET_CLASS(object),primary_prop);
+	if (fprop == NULL)
+		return;
+
+	GValue pval = {0,};
+	g_value_init(&pval,fprop->value_type);
+	g_object_get_property(G_OBJECT(object), primary_prop, &pval);
+
+	GError *err = NULL;
+	MidgardDBObject **objects = midgard_core_query_get_objects (MGD_OBJECT_CNC (object),
+			childname, &err, property_parent, &pval, NULL);
+	if (objects) {
+		guint i = 0;
+		while (objects[i] != NULL)
+			i++;
+		*n_objects = i;
+		return (GObject **) objects;
 	}
+
+	if (err) {
+		MIDGARD_ERRNO_SET_STRING (MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL,
+				"%s", err && err->message ? err->message : "Unknown reason");
+		g_clear_error (&err);
+	}
+
 	return NULL;
 }
 
