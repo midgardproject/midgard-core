@@ -1,0 +1,74 @@
+# coding=utf-8
+
+import sys
+import struct
+import unittest
+from test_000_config import TestConfig
+from test_001_connection import TestConnection
+
+from gi.repository import Midgard
+from gi.repository import GObject
+
+class TestSchemaObjectTree(unittest.TestCase):
+  mgd = None
+
+  def setUp(self):
+    if self.mgd == None:
+      self.mgd = TestConnection.openConnection()
+
+  def testObjectList(self):
+    # Create object and two child ones
+    sdirA = Midgard.Object.factory(self.mgd, "midgard_snippetdir", None)
+    sdirA.set_property("name", "A")
+    self.assertTrue(sdirA.create())
+    idA = sdirA.get_property("id")
+
+    sdirB = Midgard.Object.factory(self.mgd, "midgard_snippetdir", None)
+    sdirB.set_property("name", "B")
+    sdirB.set_property("up", idA)
+    self.assertTrue(sdirB.create())
+    
+    sdirC = Midgard.Object.factory(self.mgd, "midgard_snippetdir", None)
+    sdirC.set_property("name", "C")
+    sdirC.set_property("up", idA)
+    self.assertTrue(sdirC.create())
+
+    # check if we can get child ones
+    ret = Midgard.SchemaObjectTree.list_objects(sdirA)
+    self.assertEqual(len(ret), 2)
+    names = {"B", "C"}
+    self.assertIn(ret[0].get_property("name"), names)
+    self.assertIn(ret[1].get_property("name"), names)
+
+  def testObjectListChildren(self):
+    # Create object and two child ones
+    sdirA = Midgard.Object.factory(self.mgd, "midgard_snippetdir", None)
+    sdirA.set_property("name", "Dir with snippets")
+    self.assertTrue(sdirA.create())
+    idA = sdirA.get_property("id")
+
+    sA = Midgard.Object.factory(self.mgd, "midgard_snippet", None)
+    sA.set_property("name", "A")
+    sA.set_property("snippetdir", idA)
+    self.assertTrue(sA.create())
+    
+    sB = Midgard.Object.factory(self.mgd, "midgard_snippet", None)
+    sB.set_property("name", "B")
+    sB.set_property("snippetdir", idA)
+    self.assertTrue(sB.create())
+
+    sC = Midgard.Object.factory(self.mgd, "midgard_snippet", None)
+    sC.set_property("name", "C")
+    sC.set_property("snippetdir", idA)
+    self.assertTrue(sC.create())
+
+    # check if we can get child ones
+    ret = Midgard.SchemaObjectTree.list_children_objects(sdirA, "midgard_snippet")
+    self.assertEqual(len(ret), 3)
+    names = {"A", "B", "C"}
+    self.assertIn(ret[0].get_property("name"), names)
+    self.assertIn(ret[1].get_property("name"), names)
+    self.assertIn(ret[2].get_property("name"), names)
+
+if __name__ == "__main__":
+    unittest.main()
