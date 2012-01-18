@@ -43,14 +43,16 @@ MidgardObject **midgard_object_list_attachments(MidgardObject *self, guint *n_ob
 	MidgardObject **objects = NULL;
 	guint i = 0;
 
-	objects = midgard_core_object_parameters_list(
-			MGD_OBJECT_CNC (self), "midgard_attachment", MGD_OBJECT_GUID (self));
+	objects = midgard_core_object_parameters_list (MGD_OBJECT_CNC (self), "midgard_attachment", MGD_OBJECT_GUID (self));
 
-	while(objects[i] != NULL)
+	if (!objects)
+		return NULL;
+
+	while (objects[i] != NULL) 
 		i++;
 
 	*n_objects = i;
-	
+
 	return objects;
 }
 
