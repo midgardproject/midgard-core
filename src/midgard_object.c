@@ -60,7 +60,6 @@ static gboolean signals_registered = FALSE;
 
 static GObjectClass *__mgdschema_parent_class = NULL;
 static GObjectClass *__db_object_class = NULL;
-static GObjectClass *__object_class = NULL;
 static GObject *__mgdschema_object_constructor (GType type,
 		guint n_construct_properties,
 		GObjectConstructParam *construct_properties);
@@ -1800,7 +1799,7 @@ __mgdschema_object_constructor (GType type,
 		GObjectConstructParam *construct_properties)
 { 
 	/* If MgdSchema type extends MgdSchema one, invoke constructor using proper class and type */	
-	GObjectClass *parent_class = g_type_class_peek (MIDGARD_TYPE_OBJECT);
+	GObjectClass *parent_class = g_type_class_peek (MIDGARD_TYPE_OBJECT);	
 	GObject *object = (GObject *)
 		G_OBJECT_CLASS (parent_class)->constructor (type, n_construct_properties, construct_properties);
 
@@ -2004,7 +2003,6 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 {
 	GObjectClass *g_class = G_OBJECT_CLASS (klass);
 	__midgard_object_parent_class = __db_object_class = g_type_class_peek (MIDGARD_TYPE_DBOBJECT);
-	__object_class = klass;
 
 	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_CLASS (klass);
 	
