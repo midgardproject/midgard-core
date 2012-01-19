@@ -71,6 +71,8 @@
 #include <midgard/midgard_executable.h>
 #include <midgard/midgard_validable.h>
 #include <midgard/midgard_repligard.h>
+#include <midgard/midgard_query_row.h>
+#include <midgard/midgard_query_column.h>
 
 #endif /* _MIDGARD_API_H_ */
 
