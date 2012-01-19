@@ -34,7 +34,7 @@ G_BEGIN_DECLS
 typedef struct _MidgardQueryResult MidgardQueryResult;
 typedef struct _MidgardQueryResultIFace MidgardQueryResultIFace;
 
-struct _MidgardQueryResultIface {
+struct _MidgardQueryResultIFace {
 	GTypeInterface parent;
 
 	GObject**		(*get_objects)		(MidgardQueryResult *self, guint *n_objects);
@@ -47,7 +47,7 @@ GType 			midgard_query_result_get_type		(void);
 GObject**		midgard_query_result_get_objects	(MidgardQueryResult *self, guint *n_objects);
 MidgardQueryColumn**	midgard_query_result_get_columns	(MidgardQueryResult *self, guint *n_objects);
 MidgardQueryRow**	midgard_query_result_get_rows		(MidgardQueryResult *self, guint *n_objects);
-gchar**			midgard_query_result_get_column_names	(MidgardQueryResult *self, guint *n_objects);
+gchar**			midgard_query_result_get_column_names	(MidgardQueryResult *self, guint *n_names);
 
 G_END_DECLS
 
