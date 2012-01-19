@@ -74,6 +74,7 @@
 #include <midgard/midgard_query_row.h>
 #include <midgard/midgard_query_column.h>
 #include <midgard/midgard_query_selector.h>
+#include <midgard/midgard_query_result.h>
 
 #endif /* _MIDGARD_API_H_ */
 
