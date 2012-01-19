@@ -36,7 +36,7 @@ typedef struct _MidgardQuerySelectorIFace MidgardQuerySelectorIFace;
 struct _MidgardQuerySelectorIFace {
 	GTypeInterface parent;
 
-	MidgardQueryResult	(*get_query_result)	(MidgardQuerySelector *self, GError **error);
+	MidgardQueryResult*	(*get_query_result)	(MidgardQuerySelector *self, GError **error);
 };
 
 GType 			midgard_query_selector_get_type		(void);
