@@ -91,6 +91,7 @@ midgard_public_h = \
 	src/midgard_workspace_storage.h \
 	src/midgard_query_row.h \
 	src/midgard_query_column.h \
+	src/midgard_query_selector.h \
 	$(NULL)
 
 man_MANS = man/midgard2-schema.1 \
@@ -197,6 +198,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_query_value.c \
 	src/midgard_query_row.c \
 	src/midgard_query_column.c \
+	src/midgard_query_selector.c \
 	src/midgard_reflector_object.c \
 	src/midgard_reflector_property.c \
 	src/midgard_replicator.c \
