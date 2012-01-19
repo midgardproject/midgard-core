@@ -73,6 +73,7 @@
 #include <midgard/midgard_repligard.h>
 #include <midgard/midgard_query_row.h>
 #include <midgard/midgard_query_column.h>
+#include <midgard/midgard_query_selector.h>
 
 #endif /* _MIDGARD_API_H_ */
 
