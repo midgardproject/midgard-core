@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include <libgda/libgda.h>
 #include "midgard_sql_query_row.h"
 #include "../midgard_query_row.h"
 #include "../midgard_validable.h"

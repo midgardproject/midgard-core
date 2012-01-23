@@ -20,7 +20,6 @@
 #define MIDGARD_SQL_QUERY_ROW_H
 
 #include <glib-object.h>
-#include <libgda/libgda.h>
 #include "../midgard_connection.h"
 
 G_BEGIN_DECLS
