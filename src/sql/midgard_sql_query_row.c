@@ -21,7 +21,8 @@
 
 /**
  * midgard_sql_query_row_new:
- * @model_row: a GObject which represents data model's row
+ * @model: a GObject which represents data model
+ * @row: Row's index in a given model
  *
  * This constructor should be used by #MidgardQueryResult implementation
  *
@@ -30,10 +31,10 @@
  * Since: 10.05.6
  */ 
 MidgardSqlQueryRow *             
-midgard_sql_query_row_new (GObject *model_row)
+midgard_sql_query_row_new (GObject *model, guint row)
 {
-	g_return_val_if_fail (model_row != NULL, NULL);
-	MidgardSqlQueryRow *self = g_object_new (MIDGARD_TYPE_SQL_QUERY_ROW, "modelrow", model_row, NULL);
+	g_return_val_if_fail (model != NULL, NULL);
+	MidgardSqlQueryRow *self = g_object_new (MIDGARD_TYPE_SQL_QUERY_ROW, "model", model, "row", row, NULL);
 	return self;
 }
 
@@ -61,7 +62,8 @@ _midgard_sql_query_row_get_object (MidgardQueryRow *self, const gchar *column_na
 static GObjectClass *__parent_class= NULL;
 
 enum {
-	PROPERTY_MODEL_ROW = 1
+	PROPERTY_MODEL = 1,
+	PROPERTY_ROW
 };
 
 static void
@@ -84,7 +86,7 @@ static void
 _midgard_sql_query_row_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	MidgardSqlQueryRow *self = (MidgardSqlQueryRow*) instance;
-	self->model_row = NULL;
+	self->model = NULL;
 
 	return;
 }
@@ -105,9 +107,9 @@ static void
 _midgard_sql_query_row_dispose (GObject *object)
 {
 	MidgardSqlQueryRow *self = MIDGARD_SQL_QUERY_ROW (object);
-	if (self->model_row) 
-		g_object_unref (self->model_row);
-	self->model_row = NULL;
+	if (self->model) 
+		g_object_unref (self->model);
+	self->model = NULL;
 
 	__parent_class->dispose (object);
 }
@@ -125,8 +127,12 @@ _midgard_sql_query_row_set_property (GObject *object, guint property_id, const G
 
 	switch (property_id) {
 		
-		case PROPERTY_MODEL_ROW:
-			self->model_row = g_value_dup_object (value);
+		case PROPERTY_MODEL:
+			self->model = g_value_dup_object (value);
+			break;
+
+		case PROPERTY_ROW:
+			self->row = g_value_get_uint (value);
 			break;
 
 		default:
@@ -142,7 +148,8 @@ _midgard_sql_query_row_get_property (GObject *object, guint property_id, GValue 
 	
 	switch (property_id) {
 		
-		case PROPERTY_MODEL_ROW:
+		case PROPERTY_MODEL:
+		case PROPERTY_ROW:
 			/* Write only */ 
 			break;
 
@@ -171,14 +178,22 @@ static void _midgard_sql_query_row_class_init(
 	GParamSpec *pspec;
 	const gchar *property_name;
 
-	/* queryproperty */
-	property_name = "modelrow";
+	/* model */
+	property_name = "model";
 	pspec = g_param_spec_object (property_name,
 			"Data model's row",
 			"Holds a reference to data model",
-			G_TYPE_OBJECT,
+			GDA_TYPE_DATA_MODEL,
 			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
-	g_object_class_install_property (gobject_class, PROPERTY_MODEL_ROW, pspec);	 
+	g_object_class_install_property (gobject_class, PROPERTY_MODEL, pspec);	 
+
+	property_name = "row";
+	pspec = g_param_spec_uint (property_name, 
+			"Rows' index", 
+			"Index of a row in a model",
+			0, G_MAXUINT32, 0, 
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+	g_object_class_install_property (gobject_class, PROPERTY_ROW, pspec);	 
 }
 
 GType 
