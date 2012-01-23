@@ -39,7 +39,7 @@ midgard_sql_query_row_new (GObject *model, guint row)
 }
 
 
-GValue *                 
+const GValue *                 
 _midgard_sql_query_row_get_value (MidgardQueryRow *self, const gchar *column_name, GError **error)
 {
 

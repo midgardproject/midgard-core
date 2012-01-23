@@ -33,7 +33,7 @@ struct _MidgardQueryRow {
  *
  * Since: 10.05.6
  */ 
-GValue*
+const GValue*
 midgard_query_row_get_value (MidgardQueryRow *self, const gchar *column_name, GError **error)
 {
 	MIDGARD_QUERY_ROW_GET_INTERFACE (self)->get_value (self, column_name, error);
