@@ -16,7 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "midgard_query_column.h"
+#include "midgard_sql_query_column.h"
+#include "../midgard_query_column.h"
 
 /**
  * midgard_sql_query_column_new:
@@ -62,7 +63,7 @@ enum {
 };
 
 static void
-_midgard_sql_query_column_iface_init (MidgardSqlQueryColumnIFace *iface)
+_midgard_sql_query_column_iface_init (MidgardQueryColumnIFace *iface)
 {
 	iface->get_query_property = _midgard_sql_query_column_get_query_property;
 	iface->get_name = _midgard_sql_query_column_get_name;
@@ -70,7 +71,7 @@ _midgard_sql_query_column_iface_init (MidgardSqlQueryColumnIFace *iface)
 }
 
 static void
-_midgard_sql_query_column_iface_finalize (MidgardSqlQueryColumnIFace *iface)
+_midgard_sql_query_column_iface_finalize (MidgardQueryColumnIFace *iface)
 {
 	return;
 }
@@ -184,7 +185,7 @@ static void _midgard_sql_query_column_class_init(
 			"QueryProperty",
 			"Holds a reference to property name and it's storage",
 			MIDGARD_TYPE_SQL_QUERY_COLUMN,
-			G_PARAM_READABLE | G_PARAM_CONSTRUCT_ONLY);
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_QUERY_PROP, pspec);	 
 
 	/* name */
@@ -193,7 +194,7 @@ static void _midgard_sql_query_column_class_init(
 			"SqlQueryColumn name",
 			"",
 			"",
-			G_PARAM_READABLE | G_PARAM_CONSTRUCT_ONLY);
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_NAME, pspec);
 }
 
@@ -220,8 +221,8 @@ midgard_sql_query_column_get_type(void)
 			NULL    /* interface_data */
 		};
 
-		type = g_type_register_static (MIDGARD_TYPE_DBOBJECT, "MidgardSqlQueryColumn", &info, 0);
-		g_type_add_interface_static (type, MIDGARD_TYPE_SQL_QUERY_COLUMN_STORAGE, &iface_info);
+		type = g_type_register_static (G_TYPE_OBJECT, "MidgardSqlQueryColumn", &info, 0);
+		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_COLUMN, &iface_info);
 	}
 	return type;
 }
