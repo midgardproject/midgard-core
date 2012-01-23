@@ -42,15 +42,16 @@ midgard_query_row_get_value (MidgardQueryRow *self, const gchar *column_name, GE
 /**
  * midgard_query_row_get_values:
  * @self: #MidgardQueryRow instance
+ * @error: a pointer to store error
  *
  * Returns array of values stored in a row or %NULL.
  *
  * Since: 10.05.6
  */ 
 GValueArray*
-midgard_query_row_get_values (MidgardQueryRow *self)
+midgard_query_row_get_values (MidgardQueryRow *self, GError **error)
 {
-	MIDGARD_QUERY_ROW_GET_INTERFACE (self)->get_values (self);
+	MIDGARD_QUERY_ROW_GET_INTERFACE (self)->get_values (self, error);
 }
 
 /**

@@ -21,6 +21,7 @@
 
 #include <glib-object.h>
 #include <libgda/libgda.h>
+#include "../midgard_connection.h"
 
 G_BEGIN_DECLS
 
@@ -42,12 +43,13 @@ struct _MidgardSqlQueryRowClass{
 struct _MidgardSqlQueryRow{
 	GObject parent;
 
+	MidgardConnection *mgd;
 	GObject *model;
 	guint row;
 };
 
 GType 				midgard_sql_query_row_get_type		(void);
-MidgardSqlQueryRow*		midgard_sql_query_row_new		(GObject *model, guint row);
+MidgardSqlQueryRow*		midgard_sql_query_row_new		(MidgardConnection *mgd, GObject *model, guint row);
 
 G_END_DECLS
 

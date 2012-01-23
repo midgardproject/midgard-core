@@ -35,14 +35,14 @@ typedef struct _MidgardQueryRowIFace MidgardQueryRowIFace;
 struct _MidgardQueryRowIFace {
 	GTypeInterface parent;
 
-	const GValue*		(*get_value)		(MidgardQueryRow *self, const gchar *column_name, GError **error);
-	GValueArray*	(*get_values)		(MidgardQueryRow *self);
+	const GValue*	(*get_value)		(MidgardQueryRow *self, const gchar *column_name, GError **error);
+	GValueArray*	(*get_values)		(MidgardQueryRow *self, GError **error);
 	GObject*	(*get_object)		(MidgardQueryRow *self, const gchar *column_name, GError **error);
 };
 
 GType 			midgard_query_row_get_type		(void);
 const GValue*		midgard_query_row_get_value		(MidgardQueryRow *self, const gchar *column_name, GError **error);
-GValueArray*		midgard_query_row_get_values		(MidgardQueryRow *self);
+GValueArray*		midgard_query_row_get_values		(MidgardQueryRow *self, GError **error);
 GObject*		midgard_query_row_get_object		(MidgardQueryRow *self, const gchar *column_name, GError **error);
 
 G_END_DECLS

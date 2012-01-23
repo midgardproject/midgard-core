@@ -18,9 +18,11 @@
 
 #include "midgard_sql_query_row.h"
 #include "../midgard_query_row.h"
+#include "../midgard_validable.h"
 
 /**
  * midgard_sql_query_row_new:
+ * @mgd: #MidgardConnection instance
  * @model: a GObject which represents data model
  * @row: Row's index in a given model
  *
@@ -31,10 +33,10 @@
  * Since: 10.05.6
  */ 
 MidgardSqlQueryRow *             
-midgard_sql_query_row_new (GObject *model, guint row)
+midgard_sql_query_row_new (MidgardConnection *mgd, GObject *model, guint row)
 {
 	g_return_val_if_fail (model != NULL, NULL);
-	MidgardSqlQueryRow *self = g_object_new (MIDGARD_TYPE_SQL_QUERY_ROW, "model", model, "row", row, NULL);
+	MidgardSqlQueryRow *self = g_object_new (MIDGARD_TYPE_SQL_QUERY_ROW, "connection", mgd, "model", model, "row", row, NULL);
 	return self;
 }
 
@@ -42,19 +44,66 @@ midgard_sql_query_row_new (GObject *model, guint row)
 const GValue *                 
 _midgard_sql_query_row_get_value (MidgardQueryRow *self, const gchar *column_name, GError **error)
 {
+	g_return_val_if_fail (self != NULL, NULL);
+	g_return_val_if_fail (column_name != NULL, NULL);
+	GdaDataModel *model = GDA_DATA_MODEL (MIDGARD_SQL_QUERY_ROW(self)->model);
+	g_return_val_if_fail (model != NULL, NULL);
 
+	if (!(gda_data_model_get_access_flags (model) & GDA_DATA_MODEL_ACCESS_CURSOR)) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
+				"Expected data model iterator");
+		return NULL;
+	}
+
+	return gda_data_model_iter_get_value_for_field (GDA_DATA_MODEL_ITER (model), column_name);
 }
 
 GValueArray *
-_midgard_sql_query_row_get_values (MidgardQueryRow *self)
+_midgard_sql_query_row_get_values (MidgardQueryRow *self, GError **error)
 {
+	g_return_val_if_fail (self != NULL, NULL);
+	GdaDataModel *model = GDA_DATA_MODEL (MIDGARD_SQL_QUERY_ROW (self)->model);
+	g_return_val_if_fail (model != NULL, NULL);
 
+	GdaDataModelIter *iter = GDA_DATA_MODEL_ITER (model);
+	if (gda_data_model_iter_move_to_row (iter, 0)) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
+				"Can not reset model iterator");
+	}
+
+	guint cols = gda_data_model_get_n_columns (model);
+	GValueArray *varray = g_value_array_new (cols);
+
+	while (gda_data_model_iter_move_next (iter) == TRUE) {
+		gint row_id = gda_data_model_iter_get_row (iter);
+		g_value_array_append (varray, gda_data_model_iter_get_value_at (iter, row_id));
+	}
+
+	return varray;
 }
 
 GObject *
 _midgard_sql_query_row_get_object (MidgardQueryRow *self, const gchar *column_name, GError **error)
 {
+	GError *err = NULL;
+	const GValue *val = midgard_query_row_get_value (self, column_name, &err);
+	if (val == NULL) {
+		g_propagate_error (error, &err);
+		return NULL;
+	}
 
+	/* TODO, get storage and class name 
+	const gchar *classname = NULL; 
+	MidgardObject *object = midgard_object_new(self->connection, classname, val);
+	if (!object) {
+		g_set_error (MIDGARD_GENERIC_ERROR, MIDGARD_ERR_NOT_EXISTS,
+				"Can not fetch object for given '%s' column name", column_name);
+		return NULL;
+	}
+	return object;
+	*/
+
+	return NULL;
 }
 
 /* GOBJECT ROUTINES */
@@ -63,7 +112,8 @@ static GObjectClass *__parent_class= NULL;
 
 enum {
 	PROPERTY_MODEL = 1,
-	PROPERTY_ROW
+	PROPERTY_ROW, 
+	PROPERTY_CONNECTION
 };
 
 static void
@@ -111,6 +161,10 @@ _midgard_sql_query_row_dispose (GObject *object)
 		g_object_unref (self->model);
 	self->model = NULL;
 
+	if (self->mgd)
+		g_object_unref (self->mgd);
+	self->mgd = NULL;
+
 	__parent_class->dispose (object);
 }
 
@@ -129,6 +183,10 @@ _midgard_sql_query_row_set_property (GObject *object, guint property_id, const G
 		
 		case PROPERTY_MODEL:
 			self->model = g_value_dup_object (value);
+			break;
+
+		case PROPERTY_CONNECTION:
+			self->mgd = g_value_dup_object (value);
 			break;
 
 		case PROPERTY_ROW:
@@ -150,6 +208,7 @@ _midgard_sql_query_row_get_property (GObject *object, guint property_id, GValue 
 		
 		case PROPERTY_MODEL:
 		case PROPERTY_ROW:
+		case PROPERTY_CONNECTION:
 			/* Write only */ 
 			break;
 
@@ -187,6 +246,16 @@ static void _midgard_sql_query_row_class_init(
 			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_MODEL, pspec);	 
 
+	/* connection */
+	property_name = "connection";
+	pspec = g_param_spec_object (property_name,
+			"Connection",
+			"Connection to underlying database",
+			MIDGARD_TYPE_CONNECTION,
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
+	g_object_class_install_property (gobject_class, PROPERTY_MODEL, pspec);	 
+
+	/* row */
 	property_name = "row";
 	pspec = g_param_spec_uint (property_name, 
 			"Rows' index", 
