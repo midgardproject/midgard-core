@@ -26,7 +26,7 @@
  * 
  * Returns: #MidgardSqlQueryColumn instance
  * 
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 MidgardSqlQueryColumn *
 midgard_sql_query_column_new (MidgardQueryProperty *query_property, const gchar *name)
