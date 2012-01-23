@@ -37,17 +37,17 @@ typedef struct _MidgardQueryResultIFace MidgardQueryResultIFace;
 struct _MidgardQueryResultIFace {
 	GTypeInterface parent;
 
-	GObject**		(*get_objects)		(MidgardQueryResult *self, guint *n_objects);
-	MidgardQueryColumn**	(*get_columns)		(MidgardQueryResult *self, guint *n_objects);
-	MidgardQueryRow**	(*get_rows)		(MidgardQueryResult *self, guint *n_objects);
-	gchar**			(*get_column_names)	(MidgardQueryResult *self, guint *n_names);
+	GObject**		(*get_objects)		(MidgardQueryResult *self, guint *n_objects, GError **error);
+	MidgardQueryColumn**	(*get_columns)		(MidgardQueryResult *self, guint *n_objects, GError **error);
+	MidgardQueryRow**	(*get_rows)		(MidgardQueryResult *self, guint *n_objects, GError **error);
+	gchar**			(*get_column_names)	(MidgardQueryResult *self, guint *n_names, GError **error);
 };
 
 GType 			midgard_query_result_get_type		(void);
-GObject**		midgard_query_result_get_objects	(MidgardQueryResult *self, guint *n_objects);
-MidgardQueryColumn**	midgard_query_result_get_columns	(MidgardQueryResult *self, guint *n_objects);
-MidgardQueryRow**	midgard_query_result_get_rows		(MidgardQueryResult *self, guint *n_objects);
-gchar**			midgard_query_result_get_column_names	(MidgardQueryResult *self, guint *n_names);
+GObject**		midgard_query_result_get_objects	(MidgardQueryResult *self, guint *n_objects, GError **error);
+MidgardQueryColumn**	midgard_query_result_get_columns	(MidgardQueryResult *self, guint *n_objects, GError **error);
+MidgardQueryRow**	midgard_query_result_get_rows		(MidgardQueryResult *self, guint *n_objects, GError **error);
+gchar**			midgard_query_result_get_column_names	(MidgardQueryResult *self, guint *n_names, GError **error);
 
 G_END_DECLS
 

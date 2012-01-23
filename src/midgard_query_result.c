@@ -26,60 +26,64 @@ struct _MidgardQueryResult {
  * midgard_query_result_get_objects:
  * @self: #MidgardQueryResult instance
  * @n_objects: (element-type GObject) (array length=n_objects) (transfer full): pointer to store number of returned objects
+ * @error: pointer to store returned error
  *
  * Returns: array of objects available in this result or %NULL
  *
  * Since: 10.06
  */ 
 GObject**
-midgard_query_result_get_objects (MidgardQueryResult *self, guint *n_objects)
+midgard_query_result_get_objects (MidgardQueryResult *self, guint *n_objects, GError **error)
 {
-	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_objects (self, n_objects);
+	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_objects (self, n_objects, error);
 }
 
 /**
  * midgard_query_result_get_columns:
  * @self: #MidgardQueryResult instance
  * @n_objects: (element-type MidgardQueryColumn) (array length=n_objects) (transfer full): pointer to store number of returned objects
+ * @error: pointer to store returned error
  *
  * Returns: array of #MidgardQueryColumn columns available in this result or %NULL
  *
  * Since: 10.06
  */ 
 MidgardQueryColumn**
-midgard_query_result_get_columns (MidgardQueryResult *self, guint *n_objects)
+midgard_query_result_get_columns (MidgardQueryResult *self, guint *n_objects, GError **error)
 {
-	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_columns (self, n_objects);
+	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_columns (self, n_objects, error);
 }
 
 /**
  * midgard_query_result_get_rows:
  * @self: #MidgardQueryResult instance
  * @n_objects: (element-type MidgardQueryRow) (array length=n_objects) (transfer full): pointer to store number of returned objects
+ * @error: pointer to store returned error
  *
  * Returns: array of #MidgardQueryRow rows available in this result or %NULL
  *
  * Since: 10.06
  */ 
 MidgardQueryRow**
-midgard_query_result_get_rows (MidgardQueryResult *self, guint *n_objects)
+midgard_query_result_get_rows (MidgardQueryResult *self, guint *n_objects, GError **error)
 {
-	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_rows (self, n_objects);
+	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_rows (self, n_objects, error);
 }
 
 /**
  * midgard_query_result_get_column_names:
  * @self: #MidgardQueryResult instance
  * @n_names: (array length=n_names) (transfer container): pointer to store number of returned names
+ * @error: pointer to store returned error
  *
  * Returns: array of column names available in this result or %NULL
  *
  * Since: 10.06
  */ 
 gchar**
-midgard_query_result_get_column_names (MidgardQueryResult *self, guint *n_names)
+midgard_query_result_get_column_names (MidgardQueryResult *self, guint *n_names, GError **error)
 {
-	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_column_names (self, n_names);
+	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_column_names (self, n_names, error);
 }
 
 /* GOBJECT ROUTINES */
