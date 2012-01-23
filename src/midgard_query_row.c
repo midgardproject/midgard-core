@@ -31,7 +31,7 @@ struct _MidgardQueryRow {
  * Returns value for specified column.
  * @column_name can be ommited if column name is uniqe in the #MidgardQueryResult
  *
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 GValue*
 midgard_query_row_get_value (MidgardQueryRow *self, const gchar *column_name, GError **error)
@@ -45,7 +45,7 @@ midgard_query_row_get_value (MidgardQueryRow *self, const gchar *column_name, GE
  *
  * Returns array of values stored in a row or %NULL.
  *
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 GValueArray*
 midgard_query_row_get_values (MidgardQueryRow *self)
@@ -62,7 +62,7 @@ midgard_query_row_get_values (MidgardQueryRow *self)
  * Returns an object for specified column.
  * @column_name can be ommited if column name is uniqe in the #MidgardQueryResult
  *
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 GObject*
 midgard_query_row_get_object (MidgardQueryRow *self, const gchar *column_name, GError **error)
