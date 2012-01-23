@@ -95,6 +95,7 @@ midgard_public_h = \
 	src/midgard_query_result.h \
 	src/sql/midgard_sql_query_column.h \
 	src/sql/midgard_sql_query_row.h \
+	src/sql/midgard_sql_query_result.h \
 	$(NULL)
 
 man_MANS = man/midgard2-schema.1 \
@@ -227,6 +228,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_workspace_storage.c \
 	src/sql/midgard_sql_query_column.c \
 	src/sql/midgard_sql_query_row.c \
+	src/sql/midgard_sql_query_result.c \
 	$(NULL)
 
 pkgdatadir = $(datadir)/midgard2
