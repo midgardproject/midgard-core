@@ -89,7 +89,7 @@ _midgard_sql_query_row_get_object (MidgardQueryRow *self, const gchar *column_na
 	GError *err = NULL;
 	const GValue *val = midgard_query_row_get_value (self, column_name, &err);
 	if (val == NULL) {
-		g_propagate_error (error, &err);
+		g_propagate_error (error, err);
 		return NULL;
 	}
 
