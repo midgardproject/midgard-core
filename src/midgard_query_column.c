@@ -28,7 +28,7 @@ struct _MidgardQueryColumn {
  * @error: pointer to store error
  *
  * Returns: (transfer full): #MidgardQueryProperty associated with the column or %NULL
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 MidgardQueryProperty*
 midgard_query_column_get_query_property (MidgardQueryColumn *self, GError **error)
@@ -43,9 +43,9 @@ midgard_query_column_get_query_property (MidgardQueryColumn *self, GError **erro
  *
  * Returns: (transfer none): the name of the column
  *
- * Since: 10.06
+ * Since: 10.05.6
  */ 
-gchar*
+const gchar*
 midgard_query_column_get_name (MidgardQueryColumn *self, GError **error)
 {
 	return MIDGARD_QUERY_COLUMN_GET_INTERFACE (self)->get_name (self, error);
