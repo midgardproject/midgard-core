@@ -29,12 +29,26 @@ struct _MidgardQuerySelector {
  *
  * Returns: #MidgardQueryResult or %NULL on failure
  *
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 MidgardQueryResult*
 midgard_query_selector_get_query_result (MidgardQuerySelector *self, GError **error)
 {
 	MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_query_result (self, error);
+}
+
+/**
+ * midgard_query_selector_get_connection:
+ * @self: #MidgardQuerySelector instance
+ *
+ * Returns: #MidgardConnection or %NULL
+ *
+ * Since: 10.05.6
+ */ 
+MidgardConnection*
+midgard_query_selector_get_connection (MidgardQuerySelector *self)
+{
+	MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_connection (self);
 }
 
 /* GOBJECT ROUTINES */

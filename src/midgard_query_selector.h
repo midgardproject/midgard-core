@@ -37,10 +37,12 @@ struct _MidgardQuerySelectorIFace {
 	GTypeInterface parent;
 
 	MidgardQueryResult*	(*get_query_result)	(MidgardQuerySelector *self, GError **error);
+	MidgardConnection*	(*get_connection)	(MidgardQuerySelector *self);
 };
 
 GType 			midgard_query_selector_get_type		(void);
 MidgardQueryResult*	midgard_query_selector_get_query_result	(MidgardQuerySelector *self, GError **error);
+MidgardConnection*	midgard_query_selector_get_connection	(MidgardQuerySelector *self);
 
 G_END_DECLS
 
