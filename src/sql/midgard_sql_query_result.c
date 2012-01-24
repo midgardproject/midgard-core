@@ -22,6 +22,7 @@
 #include "../midgard_query_column.h"
 #include "../midgard_query_result.h"
 #include "../midgard_validable.h"
+#include "../midgard_query_selector.h"
 
 /**
  * midgard_sql_query_result_new:
@@ -35,36 +36,135 @@
  * Since: 10.05.6
  */ 
 MidgardSqlQueryResult *             
-midgard_sql_query_result_new (MidgardConnection *mgd, GObject *model)
+midgard_sql_query_result_new (MidgardQuerySelector *selector, GObject *model)
 {
 	g_return_val_if_fail (model != NULL, NULL);
-	MidgardSqlQueryResult *self = g_object_new (MIDGARD_TYPE_SQL_QUERY_RESULT, "connection", mgd, "model", model, NULL);
+	MidgardSqlQueryResult *self = g_object_new (MIDGARD_TYPE_SQL_QUERY_RESULT, "selector", selector, "model", model, NULL);
 	return self;
 }
 
+void                 
+_propagate_columns (MidgardSqlQueryResult *self, guint *n_objects, GError **error)
+{
+	/* No model, no columns. Return NULL and set error */
+	if (self->model == NULL || self->n_columns == 0) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
+				"QueryResult holds empty data model"); 
+		return;
+	}
+
+	/* We have columns, so add new reference to each and return all of them */
+	guint i = 0;
+	if (self->columns != NULL) {
+		*n_objects = self->n_columns;
+		for (i = 0; i < self->n_columns; i++) 
+			g_object_ref(self->columns[i]);			
+		return;
+	}
+
+	GdaDataModel *model = GDA_DATA_MODEL (self->model);
+	self->n_columns = gda_data_model_get_n_columns (model);
+	if (self->n_columns == 0)
+		return;
+
+	self->columns = g_new (MidgardSqlQueryColumn*, self->n_columns);
+	for (i = 0; i < self->n_columns; i++) {
+		MidgardQueryProperty *query_property = 
+			midgard_query_property_new (gda_data_model_get_column_title (model, i), NULL);
+		self->columns[i] = midgard_sql_query_column_new (query_property, 
+			gda_data_model_get_column_name (model, i));
+	}
+
+	*n_objects = self->n_columns;
+	return;
+}
 
 GObject **                 
 _midgard_sql_query_result_get_objects (MidgardQueryResult *self, guint *n_objects, GError **error)
 {
-
+	/* TODO */
+	return NULL;
 }
 
 MidgardQueryColumn **                 
-_midgard_sql_query_result_get_columns (MidgardQueryResult *self, guint *n_objects, GError **error)
+_midgard_sql_query_result_get_columns (MidgardQueryResult *result, guint *n_objects, GError **error)
 {
+	MidgardSqlQueryResult *self = MIDGARD_SQL_QUERY_RESULT (result);
+	_propagate_columns (self, n_objects, error);
+	if (self->columns == NULL || error != NULL)
+		return NULL;
 
+	/* Add new reference to returned columns, caller should unref them */
+	guint i;
+	for (i = 0; i < self->n_columns; i++) {
+		g_object_ref (self->columns[i]);
+	}
+	
+	return (MidgardQueryColumn **) self->columns;
 }
 
 MidgardQueryRow **                 
-_midgard_sql_query_result_get_rows (MidgardQueryResult *self, guint *n_objects, GError **error)
+_midgard_sql_query_result_get_rows (MidgardQueryResult *result, guint *n_objects, GError **error)
 {
+	MidgardSqlQueryResult *self = MIDGARD_SQL_QUERY_RESULT (result);
+	/* No model, no rows. Return NULL and set error */
+	if (self->model == NULL || self->n_rows == 0) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
+				"QueryResult holds empty data model"); 
+		return;
+	}
 
+	/* We have rows, so add new reference to each and return all of them */
+	guint i = 0;
+	if (self->rows != NULL) {
+		*n_objects = self->n_rows;
+		for (i = 0; i < self->n_rows; i++) 
+			g_object_ref(self->rows[i]);			
+		return (MidgardQueryRow **) self->rows[i];
+	}
+
+	GdaDataModel *model = GDA_DATA_MODEL (self->model);
+	self->n_rows = gda_data_model_get_n_rows (model);
+	if (self->n_rows == 0)
+		return NULL;
+
+	self->rows = g_new (MidgardSqlQueryRow*, self->n_rows);
+	for (i = 0; i < self->n_rows; i++) {
+		MidgardConnection *mgd = midgard_query_selector_get_connection (self->selector);
+		self->rows[i] = midgard_sql_query_row_new (mgd, G_OBJECT (model), i);
+		/* Row constructor holds new reference on connection, therefore decrease current one */
+		g_object_unref (mgd);
+	}
+	
+	*n_objects = self->n_rows;
+	return (MidgardQueryRow **) self->rows;
 }
 
 gchar **                 
-_midgard_sql_query_result_get_column_names (MidgardQueryResult *self, guint *n_names, GError **error)
+_midgard_sql_query_result_get_column_names (MidgardQueryResult *result, guint *n_names, GError **error)
 {
+	MidgardSqlQueryResult *self = MIDGARD_SQL_QUERY_RESULT (result);
+	/* No model, no columns. Return NULL and set error */
+	if (self->model == NULL || self->n_columns == 0) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
+				"QueryResult holds empty data model"); 
+		return NULL;
+	}
 
+	*n_names = 0;
+	if (self->n_columns == 0)
+		return NULL;
+
+	GdaDataModel *model = GDA_DATA_MODEL (self->model);
+	*n_names = gda_data_model_get_n_columns (model);
+	gchar **names = g_new (gchar *, *n_names + 1);
+
+	guint i;
+	for (i = 0; i < *n_names; i++) {
+		names[i] = (gchar *) gda_data_model_get_column_name (model, i);
+	}
+	
+	return names;
 }
 
 /* GOBJECT ROUTINES */
@@ -73,7 +173,7 @@ static GObjectClass *__parent_class= NULL;
 
 enum {
 	PROPERTY_MODEL = 1,
-	PROPERTY_CONNECTION
+	PROPERTY_SELECTOR
 };
 
 static void
@@ -97,7 +197,12 @@ static void
 _midgard_sql_query_result_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	MidgardSqlQueryResult *self = (MidgardSqlQueryResult*) instance;
+	self->selector = NULL;
 	self->model = NULL;
+	self->columns = NULL;
+	self->rows = NULL;
+	self->n_columns = 0;
+	self->n_rows = 0;
 
 	return;
 }
@@ -122,24 +227,25 @@ _midgard_sql_query_result_dispose (GObject *object)
 		g_object_unref (self->model);
 	self->model = NULL;
 
-	if (self->mgd)
-		g_object_unref (self->mgd);
-	self->mgd = NULL;
+	if (self->selector)
+		g_object_unref (self->selector);
+	self->selector = NULL;
 
-	guint i = 0;
-	GObject **objects = NULL;
+	guint i;
 	if (self->columns != NULL) {
-		for (objects = (GObject **)self->columns; objects[i] != NULL; i++)
-			g_object_unref (objects[i]);
+		for (i = 0; i < self->n_columns; i++)
+			g_object_unref (self->columns[i]);
 	}
 	self->columns = NULL;
 
-	i = 0;
 	if (self->rows != NULL) {
-		for (objects = (GObject **)self->rows; objects[i] != NULL; i++)
-			g_object_unref (objects[i]);
+		for (i = 0; i < self->n_rows; i++)
+			g_object_unref (self->rows[i]);
 	}
 	self->rows = NULL;
+
+	self->n_columns = 0;
+	self->n_rows = 0;
 
 	__parent_class->dispose (object);
 }
@@ -161,8 +267,8 @@ _midgard_sql_query_result_set_property (GObject *object, guint property_id, cons
 			self->model = g_value_dup_object (value);
 			break;
 
-		case PROPERTY_CONNECTION:
-			self->mgd = g_value_dup_object (value);
+		case PROPERTY_SELECTOR:
+			self->selector = g_value_dup_object (value);
 			break;
 
 		default:
@@ -179,7 +285,7 @@ _midgard_sql_query_result_get_property (GObject *object, guint property_id, GVal
 	switch (property_id) {
 		
 		case PROPERTY_MODEL:
-		case PROPERTY_CONNECTION:
+		case PROPERTY_SELECTOR:
 			/* Write only */ 
 			break;
 
@@ -217,14 +323,14 @@ static void _midgard_sql_query_result_class_init(
 			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_MODEL, pspec);	 
 
-	/* connection */
-	property_name = "connection";
+	/* selector */
+	property_name = "selector";
 	pspec = g_param_spec_object (property_name,
-			"Connection",
-			"Connection to underlying database",
-			MIDGARD_TYPE_CONNECTION,
+			"QuerySelector",
+			"SQL query select executor",
+			MIDGARD_TYPE_QUERY_SELECTOR,
 			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
-	g_object_class_install_property (gobject_class, PROPERTY_MODEL, pspec);	 
+	g_object_class_install_property (gobject_class, PROPERTY_SELECTOR, pspec);	 
 }
 
 GType 

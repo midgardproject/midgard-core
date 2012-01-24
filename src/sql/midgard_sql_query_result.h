@@ -22,7 +22,8 @@
 #include <glib-object.h>
 #include "midgard_sql_query_row.h"
 #include "midgard_sql_query_column.h"
-#include "../midgard_connection.h"
+#include "../midgard_query_selector.h"
+
 
 G_BEGIN_DECLS
 
@@ -44,14 +45,16 @@ struct _MidgardSqlQueryResultClass{
 struct _MidgardSqlQueryResult{
 	GObject parent;
 
-	MidgardConnection *mgd;
+	MidgardQuerySelector *selector;
 	GObject *model;
 	MidgardSqlQueryRow** rows;
+	guint n_rows;
 	MidgardSqlQueryColumn **columns;	
+	guint n_columns;
 };
 
 GType 				midgard_sql_query_result_get_type	(void);
-MidgardSqlQueryResult*		midgard_sql_query_result_new		(MidgardConnection *mgd, GObject *model);
+MidgardSqlQueryResult*		midgard_sql_query_result_new		(MidgardQuerySelector *selector, GObject *model);
 
 G_END_DECLS
 
