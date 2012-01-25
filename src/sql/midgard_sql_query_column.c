@@ -44,13 +44,21 @@ _midgard_sql_query_column_get_query_property (MidgardQueryColumn *iface, GError 
 	return g_object_ref (self->query_property);
 }
 
-gchar *
+const gchar *
 _midgard_sql_query_column_get_name (MidgardQueryColumn *iface, GError **error)
 {
 	MidgardSqlQueryColumn *self = (MidgardSqlQueryColumn*) iface;
 	g_return_val_if_fail (self != NULL, NULL);
 	/* TODO, set error if name is NULL */
-	return self->name;
+	return (const gchar*) self->name;
+}
+
+const gchar *
+_midgard_sql_query_column_get_qualifier (MidgardQueryColumn *iface, GError **error)
+{
+	MidgardSqlQueryColumn *self = (MidgardSqlQueryColumn*) iface;
+	g_return_val_if_fail (self != NULL, NULL);
+	return (const gchar*) self->qualifier;
 }
 
 /* GOBJECT ROUTINES */
@@ -59,7 +67,8 @@ static GObjectClass *__parent_class= NULL;
 
 enum {
 	PROPERTY_QUERY_PROP = 1,
-	PROPERTY_NAME
+	PROPERTY_NAME,
+	PROPERTY_QUALIFIER
 };
 
 static void
@@ -83,6 +92,7 @@ _midgard_sql_query_column_instance_init (GTypeInstance *instance, gpointer g_cla
 	MidgardSqlQueryColumn *self = (MidgardSqlQueryColumn*) instance;
 	self->query_property = NULL;
 	self->name = NULL;
+	self->qualifier = NULL;
 
 	return;
 }
@@ -107,16 +117,21 @@ _midgard_sql_query_column_dispose (GObject *object)
 		g_object_unref (self->query_property);
 	self->query_property = NULL;
 
-	if (self->name)
-		g_free(self->name);
-	self->name = NULL;
-
 	__parent_class->dispose (object);
 }
 
 static void 
 _midgard_sql_query_column_finalize (GObject *object)
 {
+	MidgardSqlQueryColumn *self = MIDGARD_SQL_QUERY_COLUMN (object);
+	if (self->name)
+		g_free(self->name);
+	self->name = NULL;
+
+	if (self->qualifier)
+		g_free(self->qualifier);
+	self->qualifier = NULL;
+
 	__parent_class->finalize (object);
 }
 
@@ -136,6 +151,11 @@ _midgard_sql_query_column_set_property (GObject *object, guint property_id, cons
 			self->name = g_value_dup_string (value);
 			break;
 
+		case PROPERTY_QUALIFIER:
+			g_free (self->qualifier);
+			self->qualifier = g_value_dup_string (value);
+			break;
+
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID (self, property_id, pspec);
 			break;		
@@ -151,6 +171,7 @@ _midgard_sql_query_column_get_property (GObject *object, guint property_id, GVal
 		
 		case PROPERTY_QUERY_PROP:
 		case PROPERTY_NAME:
+		case PROPERTY_QUALIFIER:
 			/* Read only */ 
 			break;
 
@@ -196,6 +217,15 @@ static void _midgard_sql_query_column_class_init(
 			"",
 			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_NAME, pspec);
+
+	/* qualififer */
+	property_name = "qualifier";
+	pspec = g_param_spec_string (property_name,
+			"Qualifier of a column",
+			"",
+			"",
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
+	g_object_class_install_property (gobject_class, PROPERTY_QUALIFIER, pspec);
 }
 
 GType 

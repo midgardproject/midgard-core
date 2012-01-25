@@ -42,6 +42,7 @@ struct _MidgardSqlQueryColumn{
 	GObject parent;
 
 	gchar *name;
+	gchar *qualifier;
 	MidgardQueryProperty *query_property;
 };
 
