@@ -29,9 +29,10 @@
  * Since: 10.05.6
  */ 
 MidgardSqlQueryColumn *
-midgard_sql_query_column_new (MidgardQueryProperty *query_property, const gchar *name)
+midgard_sql_query_column_new (MidgardQueryProperty *query_property, const gchar *qualifier, const gchar *name)
 {
-	MidgardSqlQueryColumn *self = g_object_new (MIDGARD_TYPE_SQL_QUERY_COLUMN, "query_property", query_property, "name", name, NULL);
+	MidgardSqlQueryColumn *self = g_object_new (MIDGARD_TYPE_SQL_QUERY_COLUMN, 
+			"query_property", query_property, "quaifier", qualifier, "name", name, NULL);
 	return self;
 }
 
@@ -205,7 +206,7 @@ static void _midgard_sql_query_column_class_init(
 	pspec = g_param_spec_object (property_name,
 			"QueryProperty",
 			"Holds a reference to property name and it's storage",
-			MIDGARD_TYPE_SQL_QUERY_COLUMN,
+			MIDGARD_TYPE_QUERY_PROPERTY,
 			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_QUERY_PROP, pspec);	 
 
