@@ -43,12 +43,13 @@ struct _MidgardSqlQuerySelectDataClass{
 struct _MidgardSqlQuerySelectData{
 	MidgardQueryExecutor parent;
 
-	MidgardConnection *mgd;
-	MidgardSqlQueryColumn** columns;
+	GSList *columns;
 };
 
 GType 				midgard_sql_query_select_data_get_type		(void);
 MidgardSqlQuerySelectData*	midgard_sql_query_select_data_new		(MidgardConnection *mgd);
+void				midgard_sql_query_select_data_add_column	(MidgardSqlQuerySelectData *self, MidgardSqlQueryColumn *column);
+MidgardSqlQueryColumn**		midgard_sql_query_select_data_get_columns	(MidgardSqlQuerySelectData *self, guint *n_objects, GError **error);
 
 G_END_DECLS
 

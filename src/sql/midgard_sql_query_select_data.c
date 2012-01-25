@@ -47,6 +47,59 @@ midgard_sql_query_select_data_new (MidgardConnection *mgd)
 	return self;
 }
 
+/**
+ * midgard_sql_query_select_data_add_column:
+ * @self: #MidgardSqlQuerySelectData instance
+ * @column: #MidgardSqlQueryColumn to add
+ *
+ * Adds a new column, which will be available in #MidgardSqlQueryResult 
+ *
+ * Since: 10.05.6
+ */ 
+void
+midgard_sql_query_select_data_add_column (MidgardSqlQuerySelectData *self, MidgardSqlQueryColumn *column)
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (column != NULL);
+
+	self->columns = g_slist_append (self->columns, g_object_ref (column));
+}
+
+/**
+ * midgard_sql_query_select_data_get_columns:
+ * @self: #MidgardSqlQuerySelectData instance
+ * @n_objects: pointer to store number of returned columns
+ * @error: pointer to store returned error
+ *
+ * Returns all collumns added to given instance.
+ *
+ * Returns: (element-type MidgardSqlQueryColumn) (array length=n_objects) (transfer full): array of #MidgardSqlQueryColumn objects or %NULL
+ *
+ * Since: 10.05.6
+ */
+MidgardSqlQueryColumn**         
+midgard_sql_query_select_data_get_columns (MidgardSqlQuerySelectData *self, guint *n_objects, GError **error)
+{
+	g_return_val_if_fail (self != NULL, NULL);
+	*n_objects = 0;
+	
+	if (self->columns == NULL)
+		return NULL;
+
+	guint n = g_slist_length (self->columns);
+	if (n == 0)
+		return NULL;
+
+	MidgardSqlQueryColumn **columns = g_new (MidgardSqlQueryColumn*, n);
+	GSList *l;
+	guint i = 0;
+	for (l = self->columns; l != NULL; l = l->next, i++) {
+		columns[i] = g_object_ref (G_OBJECT (l->data));
+	}
+
+	return columns;
+}
+
 gboolean
 _midgard_sql_query_select_data_set_constraint (MidgardQueryExecutor *self, MidgardQueryConstraintSimple *constraint)
 {
@@ -765,9 +818,25 @@ _midgard_sql_query_select_data_constructor (GType type,
 }
 
 static void
+_midgard_sql_query_select_data_instance_init (GTypeInstance *instance, gpointer g_class)
+{
+	MidgardSqlQuerySelectData *self = MIDGARD_SQL_QUERY_SELECT_DATA (instance);
+	self->columns = NULL;
+}
+
+static void
 _midgard_sql_query_select_data_dispose (GObject *object)
 {	
 	parent_class->dispose (object);
+
+	MidgardSqlQuerySelectData *self = MIDGARD_SQL_QUERY_SELECT_DATA (object);
+	if (self->columns != NULL) {
+		GSList *l = NULL;
+		for (l = self->columns; l != NULL; l = l->next) {
+			g_object_ref (G_OBJECT (l->data));
+		}
+	}
+	self->columns = NULL;
 }
 
 static void 
@@ -912,7 +981,7 @@ midgard_sql_query_select_data_get_type (void)
 			NULL,           /* class_data */
 			sizeof (MidgardSqlQuerySelectData),
 			0,              /* n_preallocs */
-			NULL /* instance_init */
+			_midgard_sql_query_select_data_instance_init /* instance_init */
 		};
 
 		static const GInterfaceInfo executable_info = {
