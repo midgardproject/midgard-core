@@ -57,7 +57,7 @@ midgard_query_column_get_name (MidgardQueryColumn *self, GError **error)
  * @error:pointer to store error
  *
  * Qualifier is a trait, which is a common among particular columns.
- * Usually it is a prefix for column's name (e.g. 'a.id', 'a,title'). 
+ * Usually it is a prefix for column's name (e.g. 'a.id', 'a.title'). 
  *
  * Returns: (transfer none): qualifier name or %NULL
  *
