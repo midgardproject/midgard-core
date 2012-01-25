@@ -25,7 +25,7 @@
 G_BEGIN_DECLS
 
 /* convention macros */
-#define MIDGARD_TYPE_QUERY_SELECTOR (midgard_query_select_get_type()) 
+#define MIDGARD_TYPE_QUERY_SELECTOR (midgard_query_selector_get_type()) 
 #define MIDGARD_QUERY_SELECTOR(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_QUERY_SELECTOR, MidgardQuerySelector))
 #define MIDGARD_IS_QUERY_SELECTOR(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_QUERY_SELECTOR))
 #define MIDGARD_QUERY_SELECTOR_GET_INTERFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), MIDGARD_TYPE_QUERY_SELECTOR, MidgardQuerySelectorIFace))
