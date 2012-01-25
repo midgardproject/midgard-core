@@ -19,7 +19,7 @@ class TestSqlQueryColumn(unittest.TestCase):
       self.mgd = TestConnection.openConnection()
     if self.column is None:
       self.queryproperty = Midgard.QueryProperty(property = "title")
-      self.column = Midgard.SqlQueryColumn(queryproperty = qp, name = "The title", qualifier = "t1")
+      self.column = Midgard.SqlQueryColumn(queryproperty = self.queryproperty, name = "The title", qualifier = "t1")
 
   def testQueryProperty(self):
     self.assertEqual(self.column.get_query_property(), self.queryproperty)
