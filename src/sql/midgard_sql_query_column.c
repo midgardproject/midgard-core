@@ -77,6 +77,7 @@ _midgard_sql_query_column_iface_init (MidgardQueryColumnIFace *iface)
 {
 	iface->get_query_property = _midgard_sql_query_column_get_query_property;
 	iface->get_name = _midgard_sql_query_column_get_name;
+	iface->get_qualifier = _midgard_sql_query_column_get_qualifier;
 	return;
 }
 
