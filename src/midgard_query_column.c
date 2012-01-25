@@ -51,6 +51,24 @@ midgard_query_column_get_name (MidgardQueryColumn *self, GError **error)
 	return MIDGARD_QUERY_COLUMN_GET_INTERFACE (self)->get_name (self, error);
 }
 
+/**
+ * midgard_query_column_get_qualifier:
+ * @self: #MidgardQueryColumn instance
+ * @error:pointer to store error
+ *
+ * Qualifier is a trait, which is a common among particular columns.
+ * Usually it is a prefix for column's name (e.g. 'a.id', 'a,title'). 
+ *
+ * Returns: (transfer none): qualifier name or %NULL
+ *
+ * Since: 10.05.6
+ */ 
+const gchar*
+midgard_query_column_get_qualifier (MidgardQueryColumn *self, GError **error)
+{
+	return MIDGARD_QUERY_COLUMN_GET_INTERFACE (self)->get_qualifier (self, error);
+}
+
 /* GOBJECT ROUTINES */
 
 GType

@@ -39,12 +39,14 @@ struct _MidgardQueryColumnIFace {
 	GTypeInterface parent;
 
 	MidgardQueryProperty*	(*get_query_property)	(MidgardQueryColumn *self, GError **error);
-	gchar*			(*get_name)		(MidgardQueryColumn *self, GError **error);
+	const gchar*		(*get_name)		(MidgardQueryColumn *self, GError **error);
+	const gchar*		(*get_qualifier)	(MidgardQueryColumn *self, GError **error);
 };
 
 GType 			midgard_query_column_get_type		(void);
 MidgardQueryProperty*	midgard_query_column_get_query_property	(MidgardQueryColumn *self, GError **error);
 const gchar*		midgard_query_column_get_name		(MidgardQueryColumn *self, GError **error);
+const gchar*		midgard_query_column_get_qualifier	(MidgardQueryColumn *self, GError **error);
 
 G_END_DECLS
 
