@@ -47,7 +47,7 @@ struct _MidgardSqlQueryColumn{
 };
 
 GType 				midgard_sql_query_column_get_type		(void);
-MidgardSqlQueryColumn*		midgard_sql_query_column_new			(MidgardQueryProperty *query_property, const gchar *name);
+MidgardSqlQueryColumn*		midgard_sql_query_column_new			(MidgardQueryProperty *query_property, const gchar *qualifier, const gchar *name);
 
 G_END_DECLS
 

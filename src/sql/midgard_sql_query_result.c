@@ -71,7 +71,7 @@ _propagate_columns (MidgardSqlQueryResult *self, guint *n_objects, GError **erro
 	for (i = 0; i < self->n_columns; i++) {
 		MidgardQueryProperty *query_property = 
 			midgard_query_property_new (gda_data_model_get_column_title (model, i), NULL);
-		self->columns[i] = midgard_sql_query_column_new (query_property, 
+		self->columns[i] = midgard_sql_query_column_new (query_property, "FIXME", 
 			gda_data_model_get_column_name (model, i));
 	}
 
