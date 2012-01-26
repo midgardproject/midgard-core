@@ -97,6 +97,7 @@ midgard_sql_query_select_data_get_columns (MidgardSqlQuerySelectData *self, guin
 		columns[i] = g_object_ref (G_OBJECT (l->data));
 	}
 
+	*n_objects = n;
 	return columns;
 }
 
