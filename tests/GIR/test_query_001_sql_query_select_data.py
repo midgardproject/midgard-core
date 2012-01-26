@@ -56,6 +56,25 @@ class TestSqlQuerySelectData(unittest.TestCase):
       self.assertIn(column.get_name(), names)
       self.assertIn(column.get_qualifier(), qualifiers)
 
+  def testExecute(self):
+    # SELECT p.firstname AS firstname, p.lastname AS lastname FROM person AS p
+    storage = Midgard.QueryStorage(dbclass = "midgard_person")
+    column = Midgard.SqlQueryColumn(
+      queryproperty = Midgard.QueryProperty(property = "firstname", storage = storage), 
+      name = "name", 
+      qualifier = "p"
+    )
+    self.select.add_column(column)
+    column = Midgard.SqlQueryColumn(
+      queryproperty = Midgard.QueryProperty(property = "lastname", storage = storage), 
+      name = "lastname", 
+      qualifier = "p"
+    )
+    self.select.add_column(column)
+    self.select.execute()
+    query = "SELECT \n\tp.firstname AS firstname, \n\tp.lastname AS lastname\nFROM person AS p\nWHERE 1=1 AND 0<1"
+    self.assertEqual(self.select.get_query_string(), query)
+
   def testInheritance(self): 
     self.assertIsInstance(self.select, Midgard.QueryExecutor)
 
