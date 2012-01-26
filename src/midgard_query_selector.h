@@ -38,11 +38,13 @@ struct _MidgardQuerySelectorIFace {
 
 	MidgardQueryResult*	(*get_query_result)	(MidgardQuerySelector *self, GError **error);
 	MidgardConnection*	(*get_connection)	(MidgardQuerySelector *self);
+	const gchar*		(*get_query_string)	(MidgardQuerySelector *self);
 };
 
 GType 			midgard_query_selector_get_type		(void);
 MidgardQueryResult*	midgard_query_selector_get_query_result	(MidgardQuerySelector *self, GError **error);
 MidgardConnection*	midgard_query_selector_get_connection	(MidgardQuerySelector *self);
+const gchar*		midgard_query_selector_get_query_string	(MidgardQuerySelector *self);
 
 G_END_DECLS
 

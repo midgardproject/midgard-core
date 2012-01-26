@@ -51,6 +51,24 @@ midgard_query_selector_get_connection (MidgardQuerySelector *self)
 	MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_connection (self);
 }
 
+/**
+ * midgard_query_selector_get_query_string:
+ * @self: #MidgardQuerySelector instance
+ *
+ * To get query string, execute() must be invoked first.
+ * This method doesn't do any validation of a query.
+ *
+ * Returns: (transfer none): query string or %NULL
+ *
+ * Since: 10.05.6
+ */ 
+const gchar*
+midgard_query_selector_get_query_string (MidgardQuerySelector *self)
+{
+	MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_query_string (self);
+}
+
+
 /* GOBJECT ROUTINES */
 
 GType
