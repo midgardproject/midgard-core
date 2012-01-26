@@ -514,6 +514,11 @@ _get_all_constraints (MidgardSqlQuerySelectData *self, MidgardQueryConstraintSim
 	g_free (constraints);
 }
 
+#define __FREE() \
+	g_object_unref (storage); \
+	g_object_unref (columns[i]); \
+	free (columns);
+
 static void
 _midgard_sql_query_select_data_validable_iface_validate (MidgardValidable *iface, GError **error)
 {
@@ -522,34 +527,57 @@ _midgard_sql_query_select_data_validable_iface_validate (MidgardValidable *iface
 	MIDGARD_QUERY_EXECUTOR (self)->priv->is_valid = FALSE;
 
 	GError *err = NULL;
-	MidgardQueryStorage *storage = MIDGARD_QUERY_EXECUTOR (self)->priv->storage;
-	GObjectClass *klass = (GObjectClass *) storage->priv->klass;
-	if (klass == NULL || (!G_IS_OBJECT_CLASS(klass))) {
-		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
-				"Invalid '%s' classname associated with QueryStorage", storage->priv->classname);
-		return;
-	}
-	const gchar *table = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS (klass));
-
-	/* Class table */
-	if (!table) {
+	guint n_objects;
+	guint i;
+	MidgardSqlQueryColumn **columns = midgard_sql_query_select_data_get_columns (self, &n_objects, NULL);
+	
+	/* No single column added to selector */
+	if (!columns) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
-				"No SQL table defined for '%s' class", G_OBJECT_CLASS_NAME (klass));
+				"No single column added to selector");
 		return;
 	}
 
-	/* Storage */
-	if (!storage) {
-		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
-				"No QueryStorage associated with QuerySelectData");
-		return;
-	}
+	for (i = 0; i < n_objects; i++) {
 
-	if (storage->priv->klass && !storage->priv->klass->dbpriv->add_fields_to_select_statement) {
-		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
-				"'%s' DBObjectClass doesn't provide select statement.", G_OBJECT_CLASS_NAME (storage->priv->klass));
-		return;
+		MidgardQueryProperty *qprop = midgard_query_column_get_query_property (MIDGARD_QUERY_COLUMN(columns[i]), NULL);
+		MidgardQueryStorage *storage = NULL;
+		g_object_get (G_OBJECT (qprop), "storage", &storage, NULL);
+		g_object_unref (qprop);
+		
+		/* No storage */
+		if (!storage) {
+			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
+					"No QueryStorage associated with QuerySelectData");
+			__FREE();	
+			return;
+		}
+
+		/* No GObject derived class */
+		GObjectClass *klass = (GObjectClass *) storage->priv->klass;
+		if (klass == NULL || (!G_IS_OBJECT_CLASS(klass))) {
+			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
+					"Invalid '%s' classname associated with QueryStorage", storage->priv->classname);
+			__FREE();
+			return;
+		}
+		
+		const gchar *table = midgard_core_class_get_table (MIDGARD_DBOBJECT_CLASS (klass));
+		
+		/* No class table */
+		if (!table) {
+			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
+					"No SQL table defined for '%s' class", G_OBJECT_CLASS_NAME (klass));
+			__FREE();
+			return;
+		}
+
+		g_object_unref (columns[i]);
 	}
+	g_free (columns);
+
+	/* COMMON WITH QUERYEXECUTOR */
+	/* TODO: Consider executorClass->validate() */
 
 	/* Limit */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->limit == 0) {
@@ -579,7 +607,7 @@ _midgard_sql_query_select_data_validable_iface_validate (MidgardValidable *iface
 
 	/* Gather all objects required for execution */
 	GSList *o_list = NULL;
-	o_list = g_slist_prepend (o_list, storage);
+	//o_list = g_slist_prepend (o_list, storage);
 	_get_all_constraints (self, NULL, &o_list);
 
 	for (l = o_list; l != NULL; l = l->next) {
@@ -621,11 +649,11 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 	if (err) {
 		g_propagate_error (error, err);
 		return;
-	}
+	} 	
 
 	g_object_ref (self);
 
-	MidgardDBObjectClass *klass = executor->priv->storage->priv->klass;
+	//MidgardDBObjectClass *klass = executor->priv->storage->priv->klass;
 	MidgardConnection *mgd = executor->priv->mgd;
 	GdaConnection *cnc = mgd->priv->connection;
 	GdaSqlStatement *sql_stm;
@@ -644,32 +672,80 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 	base_where->cond = base_operation;
 	gda_sql_statement_select_take_where_cond (sql_stm, base_where);
 
-	/* Create targets (FROM) */
-	GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (sss->from));
-	s_target->table_name = g_strdup (midgard_core_class_get_table (klass));
-	s_target->as = g_strdup_printf ("t%d", ++MIDGARD_QUERY_EXECUTOR (self)->priv->tableid);
-	MIDGARD_QUERY_EXECUTOR (self)->priv->table_alias = g_strdup (s_target->as);
-	gda_sql_select_from_take_new_target (sss->from, s_target);
+	/* Create SELECT a.t, b.t... FROM ... */
+	GSList *table_list = NULL;
+	guint n_objects;
+	guint i;
+	MidgardSqlQueryColumn **columns = midgard_sql_query_select_data_get_columns (self, &n_objects, NULL);
 
-	/* Set target expression */	
-	GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
-	GValue *tval = g_new0 (GValue, 1);
-	g_value_init (tval, G_TYPE_STRING);
-	g_value_set_string (tval, s_target->table_name);
-	texpr->value = tval;
-	s_target->expr = texpr;
+	for (i = 0; i < n_objects; i++) {
 
+		MidgardQueryProperty *qprop = midgard_query_column_get_query_property (MIDGARD_QUERY_COLUMN(columns[i]), NULL);
+		MidgardQueryStorage *storage = NULL;
+		g_object_get (G_OBJECT (qprop), "storage", &storage, NULL);
+		g_object_unref (qprop);
+		gchar *property;
+		g_object_get (qprop, "property", &property, NULL);
+		MidgardDBObjectClass *dbklass = storage->priv->klass;
+		const gchar *table_alias = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN(columns[i]), NULL);
+		const gchar *property_table = midgard_core_class_get_table (dbklass);
+		const gchar *property_field = midgard_core_class_get_property_colname (dbklass, property);
+
+		/* Create SELECT a.t, b.t... */
+		GdaSqlSelectField *select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (sss));
+		select_field->as = gda_connection_quote_sql_identifier (cnc, property);
+		sss->expr_list = g_slist_append (sss->expr_list, select_field);
+		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
+		GValue *val = g_new0 (GValue, 1);
+		g_value_init (val, G_TYPE_STRING);
+		gchar *q_table = gda_connection_quote_sql_identifier (cnc, table_alias);
+		gchar *q_field = gda_connection_quote_sql_identifier (cnc, property_field);
+		g_value_take_string (val, g_strconcat (q_table, ".", q_field, NULL));
+		g_free (q_table);
+		g_free (q_field);
+		expr->value = val;
+		select_field->expr = expr;
+
+		g_free (property);
+		g_object_unref (storage);
+
+		if (table_list != NULL && g_slist_find_custom (table_list, property_table, 
+					(GCompareFunc) g_strcmp0) != NULL)
+			continue;
+
+		/* Create targets, FROM */
+		GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (sss->from));
+		s_target->table_name = g_strdup (property_table);
+		s_target->as = g_strdup (midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN(columns[i]), NULL));
+		MIDGARD_QUERY_EXECUTOR (self)->priv->table_alias = g_strdup (s_target->as);
+		gda_sql_select_from_take_new_target (sss->from, s_target);
+		g_object_unref (columns[i]);
+
+		/* Set target expression */	
+		GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
+		GValue *tval = g_new0 (GValue, 1);
+		g_value_init (tval, G_TYPE_STRING);
+		g_value_set_string (tval, s_target->table_name);
+		texpr->value = tval;
+		s_target->expr = texpr;
+
+		table_list = g_slist_append (table_list, (gpointer) property_table);
+	}
+
+	g_slist_free (table_list);
+
+	/* TODO, REMOVE */
 	/* Add fields for all properties registered per class (SELECT a,b,c...) */
-	klass->dbpriv->add_fields_to_select_statement (klass, mgd, sss, s_target->as);
+	//klass->dbpriv->add_fields_to_select_statement (klass, mgd, sss, s_target->as);
 
 	GdaSqlExpr *where = sss->where_cond;
 	GdaSqlOperation *operation = where->cond;
 	/* Add joins, LEFT JOIN tbl2 ON... */
-	__query_select_data_add_joins (MIDGARD_SQL_QUERY_SELECT_DATA (self), operation, &err);
+	/*__query_select_data_add_joins (MIDGARD_SQL_QUERY_SELECT_DATA (self), operation, &err);
 	if (err) {
 	 	g_propagate_error (error, err);
 		goto return_false;
-	}
+	}*/
 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint) {
@@ -732,11 +808,10 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 	gda_sql_statement_free (sql_stm);
 	sql_stm = NULL;
 
-	if (MGD_CNC_DEBUG (mgd)) {
-		gchar *debug_sql = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
-		g_debug ("QuerySelectData: %s", debug_sql);
-		g_free (debug_sql);
-	}
+	g_free (self->query_string);
+	self->query_string = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
+	if (MGD_CNC_DEBUG (mgd)) 
+		g_debug ("QuerySelectData: %s", self->query_string);
 
 	/* execute statement */
 	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
@@ -796,6 +871,14 @@ _midgard_sql_query_select_data_selector_get_connection (MidgardQuerySelector *se
 	return g_object_ref (MIDGARD_QUERY_EXECUTOR(self)->priv->mgd);
 }
 
+const gchar *
+_midgard_sql_query_select_data_selector_get_query_string (MidgardQuerySelector *selector)
+{
+	MidgardSqlQuerySelectData *self = MIDGARD_SQL_QUERY_SELECT_DATA (selector);
+	g_return_val_if_fail (selector != NULL, NULL);
+	return self->query_string;
+}
+
 /* GOBJECT ROUTINES */
 
 enum {
@@ -823,6 +906,7 @@ _midgard_sql_query_select_data_instance_init (GTypeInstance *instance, gpointer 
 {
 	MidgardSqlQuerySelectData *self = MIDGARD_SQL_QUERY_SELECT_DATA (instance);
 	self->columns = NULL;
+	self->query_string = NULL;
 }
 
 static void
@@ -844,6 +928,8 @@ static void
 _midgard_sql_query_select_data_finalize (GObject *object)
 {
 	MidgardSqlQuerySelectData *self = MIDGARD_SQL_QUERY_SELECT_DATA (object);
+
+	g_free (self->query_string);
 
 	/* DO NOT nullify resultset object, other objects might still hold 
 	 * reference to it. */
@@ -966,6 +1052,7 @@ _midgard_sql_query_select_data_selector_iface_init (MidgardQuerySelectorIFace *i
 {
 	iface->get_query_result = _midgard_sql_query_select_data_selector_get_query_result;
 	iface->get_connection = _midgard_sql_query_select_data_selector_get_connection;
+	iface->get_query_string = _midgard_sql_query_select_data_selector_get_query_string;
 }
 
 GType

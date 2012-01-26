@@ -44,6 +44,7 @@ struct _MidgardSqlQuerySelectData{
 	MidgardQueryExecutor parent;
 
 	GSList *columns;
+	gchar *query_string;
 };
 
 GType 				midgard_sql_query_select_data_get_type		(void);
