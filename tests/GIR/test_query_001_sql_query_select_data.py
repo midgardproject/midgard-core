@@ -72,8 +72,9 @@ class TestSqlQuerySelectData(unittest.TestCase):
     )
     self.select.add_column(column)
     self.select.execute()
-    query = "SELECT \n\tp.firstname AS firstname, \n\tp.lastname AS lastname\nFROM person AS p\nWHERE 1=1 AND 0<1"
-    self.assertEqual(self.select.get_query_string(), query)
+    # Do not test unpredictable query string. If must be tested, move it to particular test
+    #query = "SELECT \n\tp.firstname AS firstname, \n\tp.lastname AS lastname\nFROM person AS p\nWHERE 1=1 AND 0<1"
+    #self.assertEqual(self.select.get_query_string(), query)
 
   def testInheritance(self): 
     self.assertIsInstance(self.select, Midgard.QueryExecutor)
