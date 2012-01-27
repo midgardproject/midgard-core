@@ -855,8 +855,9 @@ _midgard_sql_query_select_data_get_results_count (MidgardQueryExecutor *self)
 MidgardQueryResult *
 _midgard_sql_query_select_data_selector_get_query_result (MidgardQuerySelector *selector, GError **error)
 {
-	/* TODO */
-	return NULL;
+	g_return_val_if_fail (selector != NULL, NULL);
+	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (selector);
+	return (MidgardQueryResult *) midgard_sql_query_result_new (selector, G_OBJECT (executor->priv->resultset));
 }
 
 MidgardConnection *
