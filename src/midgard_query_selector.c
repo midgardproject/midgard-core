@@ -27,7 +27,7 @@ struct _MidgardQuerySelector {
  * @self: #MidgardQuerySelector instance
  * @error: pointer to store error 
  *
- * Returns: #MidgardQueryResult or %NULL on failure
+ * Returns: (transfer full): #MidgardQueryResult or %NULL on failure
  *
  * Since: 10.05.6
  */ 
@@ -41,7 +41,7 @@ midgard_query_selector_get_query_result (MidgardQuerySelector *self, GError **er
  * midgard_query_selector_get_connection:
  * @self: #MidgardQuerySelector instance
  *
- * Returns: #MidgardConnection or %NULL
+ * Returns: (transfer full): #MidgardConnection or %NULL
  *
  * Since: 10.05.6
  */ 
