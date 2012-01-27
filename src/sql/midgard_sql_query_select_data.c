@@ -683,9 +683,9 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 		MidgardQueryProperty *qprop = midgard_query_column_get_query_property (MIDGARD_QUERY_COLUMN(columns[i]), NULL);
 		MidgardQueryStorage *storage = NULL;
 		g_object_get (G_OBJECT (qprop), "storage", &storage, NULL);
-		g_object_unref (qprop);
 		gchar *property;
 		g_object_get (qprop, "property", &property, NULL);
+		g_object_unref (qprop);
 		MidgardDBObjectClass *dbklass = storage->priv->klass;
 		const gchar *table_alias = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN(columns[i]), NULL);
 		const gchar *property_table = midgard_core_class_get_table (dbklass);
@@ -733,10 +733,6 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 	}
 
 	g_slist_free (table_list);
-
-	/* TODO, REMOVE */
-	/* Add fields for all properties registered per class (SELECT a,b,c...) */
-	//klass->dbpriv->add_fields_to_select_statement (klass, mgd, sss, s_target->as);
 
 	GdaSqlExpr *where = sss->where_cond;
 	GdaSqlOperation *operation = where->cond;
