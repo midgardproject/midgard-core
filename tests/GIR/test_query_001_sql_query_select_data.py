@@ -56,8 +56,7 @@ class TestSqlQuerySelectData(unittest.TestCase):
       self.assertIn(column.get_name(), names)
       self.assertIn(column.get_qualifier(), qualifiers)
 
-  def testExecute(self):
-    # SELECT p.firstname AS firstname, p.lastname AS lastname FROM person AS p
+  def addColumns(self):
     storage = Midgard.QueryStorage(dbclass = "midgard_person")
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "firstname", storage = storage), 
@@ -71,10 +70,25 @@ class TestSqlQuerySelectData(unittest.TestCase):
       qualifier = "p"
     )
     self.select.add_column(column)
+
+
+  def testExecute(self):
+    # SELECT p.firstname AS firstname, p.lastname AS lastname FROM person AS p
+    self.addColumns()
     self.select.execute()
     # Do not test unpredictable query string. If must be tested, move it to particular test
     #query = "SELECT \n\tp.firstname AS firstname, \n\tp.lastname AS lastname\nFROM person AS p\nWHERE 1=1 AND 0<1"
     #self.assertEqual(self.select.get_query_string(), query)
+
+  @unittest.skip("To implement")
+  def testExecuteInvalid(self):
+    pass
+
+  def testGetQueryResult(self):
+    self.addColumns()
+    self.select.execute()
+    query_result = self.select.get_query_result()
+    self.assertIsInstance(query_result, Midgard.SqlQueryResult)
 
   def testInheritance(self): 
     self.assertIsInstance(self.select, Midgard.QueryExecutor)
