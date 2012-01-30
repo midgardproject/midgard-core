@@ -32,7 +32,7 @@ MidgardSqlQueryColumn *
 midgard_sql_query_column_new (MidgardQueryProperty *query_property, const gchar *qualifier, const gchar *name)
 {
 	MidgardSqlQueryColumn *self = g_object_new (MIDGARD_TYPE_SQL_QUERY_COLUMN, 
-			"query_property", query_property, "quaifier", qualifier, "name", name, NULL);
+			"queryproperty", query_property, "qualifier", qualifier, "name", name, NULL);
 	return self;
 }
 
