@@ -693,7 +693,7 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 
 		/* Create SELECT a.t, b.t... */
 		GdaSqlSelectField *select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (sss));
-		select_field->as = gda_connection_quote_sql_identifier (cnc, property);
+		select_field->as = gda_connection_quote_sql_identifier (cnc, midgard_query_column_get_name (MIDGARD_QUERY_COLUMN(columns[i]), NULL));
 		sss->expr_list = g_slist_append (sss->expr_list, select_field);
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
 		GValue *val = g_new0 (GValue, 1);
