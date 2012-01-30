@@ -106,8 +106,8 @@ _midgard_sql_query_result_get_columns (MidgardQueryResult *result, guint *n_obje
 	return columns;
 }
 
-MidgardQueryRow **                 
-_midgard_sql_query_result_get_rows (MidgardQueryResult *result, guint *n_objects, GError **error)
+void
+_propagate_rows (MidgardQueryResult *result, guint *n_objects, GError **error)
 {
 	MidgardSqlQueryResult *self = MIDGARD_SQL_QUERY_RESULT (result);
 	/* No model, no rows. Return NULL and set error */
@@ -123,13 +123,13 @@ _midgard_sql_query_result_get_rows (MidgardQueryResult *result, guint *n_objects
 		*n_objects = self->n_rows;
 		for (i = 0; i < self->n_rows; i++) 
 			g_object_ref(self->rows[i]);			
-		return (MidgardQueryRow **) self->rows[i];
+		return; 
 	}
 
 	GdaDataModel *model = GDA_DATA_MODEL (self->model);
 	self->n_rows = gda_data_model_get_n_rows (model);
 	if (self->n_rows == 0)
-		return NULL;
+		return ;
 
 	self->rows = g_new (MidgardSqlQueryRow*, self->n_rows);
 	for (i = 0; i < self->n_rows; i++) {
@@ -140,7 +140,29 @@ _midgard_sql_query_result_get_rows (MidgardQueryResult *result, guint *n_objects
 	}
 	
 	*n_objects = self->n_rows;
-	return (MidgardQueryRow **) self->rows;
+}
+
+MidgardQueryRow **
+_midgard_sql_query_result_get_rows (MidgardQueryResult *result, guint *n_objects, GError **error)
+{
+	MidgardSqlQueryResult *self = MIDGARD_SQL_QUERY_RESULT (result);
+        GError *err = NULL;
+               _propagate_rows (self, n_objects, &err);
+               *n_objects = self->n_rows;
+        if (self->rows == NULL) {
+                 if (err)
+			 g_propagate_error (error, err);
+                return NULL;
+        }
+
+        /* Create new rows array, add new reference to returned rows, caller should free array and unref objects */
+        guint i;
+        MidgardSqlQueryRow **rows = g_new (MidgardSqlQueryRow *, self->rows);
+        for (i = 0; i < self->n_rows; i++) {
+		rows[i] = (MidgardQueryRow *) g_object_ref (self->rows[i]);
+	}
+
+        return (MidgardQueryRow **) rows;
 }
 
 gchar **                 
