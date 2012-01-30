@@ -53,17 +53,15 @@ _propagate_columns (MidgardSqlQueryResult *self, guint *n_objects, GError **erro
 		return;
 	}
 
-	/* We have columns, so add new reference to each and return all of them */
 	guint i = 0;
 	if (self->columns != NULL) {
 		*n_objects = self->n_columns;
-		for (i = 0; i < self->n_columns; i++) 
-			g_object_ref(self->columns[i]);			
 		return;
 	}
 
 	GdaDataModel *model = GDA_DATA_MODEL (self->model);
 	self->n_columns = gda_data_model_get_n_columns (model);
+	*n_objects = self->n_columns;
 	if (self->n_columns == 0)
 		return;
 
@@ -75,7 +73,6 @@ _propagate_columns (MidgardSqlQueryResult *self, guint *n_objects, GError **erro
 			gda_data_model_get_column_name (model, i));
 	}
 
-	*n_objects = self->n_columns;
 	return;
 }
 
@@ -90,17 +87,23 @@ MidgardQueryColumn **
 _midgard_sql_query_result_get_columns (MidgardQueryResult *result, guint *n_objects, GError **error)
 {
 	MidgardSqlQueryResult *self = MIDGARD_SQL_QUERY_RESULT (result);
-	_propagate_columns (self, n_objects, error);
-	if (self->columns == NULL || error != NULL)
+	GError *err = NULL;
+	_propagate_columns (self, n_objects, &err);
+	*n_objects = self->n_columns;
+	if (self->columns == NULL) {
+		if (err)
+			g_propagate_error (error, err);
 		return NULL;
+	}
 
-	/* Add new reference to returned columns, caller should unref them */
+	/* Create new columns array, add new reference to returned columns, caller should free array and unref objects */
 	guint i;
+	MidgardQueryColumn **columns = g_new (MidgardQueryColumn *, self->n_columns);
 	for (i = 0; i < self->n_columns; i++) {
-		g_object_ref (self->columns[i]);
+		columns[i] = (MidgardQueryColumn *) g_object_ref (self->columns[i]);	
 	}
 	
-	return (MidgardQueryColumn **) self->columns;
+	return columns;
 }
 
 MidgardQueryRow **                 
@@ -192,7 +195,6 @@ _midgard_sql_query_result_iface_finalize (MidgardQueryResultIFace *iface)
 	return;
 }
 
-
 static void 
 _midgard_sql_query_result_instance_init (GTypeInstance *instance, gpointer g_class)
 {
@@ -233,7 +235,7 @@ _midgard_sql_query_result_dispose (GObject *object)
 
 	guint i;
 	if (self->columns != NULL) {
-		for (i = 0; i < self->n_columns; i++)
+		for (i = 0; i < self->n_columns; i++) 
 			g_object_unref (self->columns[i]);
 	}
 	self->columns = NULL;
@@ -265,6 +267,8 @@ _midgard_sql_query_result_set_property (GObject *object, guint property_id, cons
 		
 		case PROPERTY_MODEL:
 			self->model = g_value_dup_object (value);
+			self->n_columns = gda_data_model_get_n_columns (GDA_DATA_MODEL (self->model));
+			self->n_rows = gda_data_model_get_n_rows (GDA_DATA_MODEL (self->model));
 			break;
 
 		case PROPERTY_SELECTOR:
@@ -294,8 +298,6 @@ _midgard_sql_query_result_get_property (GObject *object, guint property_id, GVal
 			break;
 	}
 }
-
-
 
 static void _midgard_sql_query_result_class_init(
 		gpointer g_class, gpointer g_class_data)
