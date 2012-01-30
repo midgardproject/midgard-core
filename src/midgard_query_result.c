@@ -25,10 +25,10 @@ struct _MidgardQueryResult {
 /**
  * midgard_query_result_get_objects:
  * @self: #MidgardQueryResult instance
- * @n_objects: (element-type GObject) (array length=n_objects) (transfer full): pointer to store number of returned objects
+ * @n_objects: pointer to store number of returned objects
  * @error: pointer to store returned error
  *
- * Returns: array of objects available in this result or %NULL
+ * Returns: (element-type GObject) (array length=n_objects) (transfer full): array of objects available in this result or %NULL
  *
  * Since: 10.06
  */ 
@@ -41,10 +41,10 @@ midgard_query_result_get_objects (MidgardQueryResult *self, guint *n_objects, GE
 /**
  * midgard_query_result_get_columns:
  * @self: #MidgardQueryResult instance
- * @n_objects: (element-type MidgardQueryColumn) (array length=n_objects) (transfer full): pointer to store number of returned objects
+ * @n_objects: pointer to store number of returned objects
  * @error: pointer to store returned error
  *
- * Returns: array of #MidgardQueryColumn columns available in this result or %NULL
+ * Returns: (element-type MidgardQueryColumn) (array length=n_objects) (transfer full): array of #MidgardQueryColumn columns available in this result or %NULL
  *
  * Since: 10.06
  */ 
@@ -57,10 +57,10 @@ midgard_query_result_get_columns (MidgardQueryResult *self, guint *n_objects, GE
 /**
  * midgard_query_result_get_rows:
  * @self: #MidgardQueryResult instance
- * @n_objects: (element-type MidgardQueryRow) (array length=n_objects) (transfer full): pointer to store number of returned objects
+ * @n_objects: pointer to store number of returned objects
  * @error: pointer to store returned error
  *
- * Returns: array of #MidgardQueryRow rows available in this result or %NULL
+ * Returns: (element-type MidgardQueryRow) (array length=n_objects) (transfer full): array of #MidgardQueryRow rows available in this result or %NULL
  *
  * Since: 10.06
  */ 
@@ -73,10 +73,10 @@ midgard_query_result_get_rows (MidgardQueryResult *self, guint *n_objects, GErro
 /**
  * midgard_query_result_get_column_names:
  * @self: #MidgardQueryResult instance
- * @n_names: (array length=n_names) (transfer container): pointer to store number of returned names
+ * @n_names: pointer to store number of returned names
  * @error: pointer to store returned error
  *
- * Returns: array of column names available in this result or %NULL
+ * Returns: (transfer container) (array length=n_names): array of column names available in this result or %NULL
  *
  * Since: 10.06
  */ 
