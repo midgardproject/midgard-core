@@ -43,7 +43,8 @@ class TestSqlQueryResult(unittest.TestCase):
     self.select.execute()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
-    self.assertEqual(len(rows), 2)
+    # There should be default, administrator person only 
+    self.assertEqual(len(rows), 1)
 
   def testGetColumns(self):
     self.addColumns()
@@ -58,6 +59,9 @@ class TestSqlQueryResult(unittest.TestCase):
     query_result = self.select.get_query_result()
     names = query_result.get_column_names()
     self.assertEqual(len(names), 2)
+    colnames = {"name", "lastname"}
+    self.assertIn(names[0], colnames)
+    self.assertIn(names[1], colnames)
 
   def testInheritance(self):
     self.addColumns()
