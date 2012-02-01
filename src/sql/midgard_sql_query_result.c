@@ -66,7 +66,7 @@ _propagate_columns (MidgardSqlQueryResult *self, guint *n_objects, GError **erro
 		return;
 
 	self->columns = g_new (MidgardSqlQueryColumn*, self->n_columns);
-	for (i = 0; i < self->n_columns; i++) {
+	for (i = 0; i < self->n_columns; i++) {	
 		MidgardQueryProperty *query_property = 
 			midgard_query_property_new (gda_data_model_get_column_title (model, i), NULL);
 		self->columns[i] = midgard_sql_query_column_new (query_property, "FIXME", 
@@ -107,9 +107,8 @@ _midgard_sql_query_result_get_columns (MidgardQueryResult *result, guint *n_obje
 }
 
 void
-_propagate_rows (MidgardQueryResult *result, guint *n_objects, GError **error)
+_propagate_rows (MidgardSqlQueryResult *self, guint *n_objects, GError **error)
 {
-	MidgardSqlQueryResult *self = MIDGARD_SQL_QUERY_RESULT (result);
 	/* No model, no rows. Return NULL and set error */
 	if (self->model == NULL || self->n_rows == 0) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
@@ -159,7 +158,7 @@ _midgard_sql_query_result_get_rows (MidgardQueryResult *result, guint *n_objects
         guint i;
         MidgardSqlQueryRow **rows = g_new (MidgardSqlQueryRow *, self->rows);
         for (i = 0; i < self->n_rows; i++) {
-		rows[i] = (MidgardQueryRow *) g_object_ref (self->rows[i]);
+		rows[i] = (MidgardSqlQueryRow *) g_object_ref (self->rows[i]);
 	}
 
         return (MidgardQueryRow **) rows;
