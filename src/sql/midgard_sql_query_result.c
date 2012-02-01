@@ -43,6 +43,34 @@ midgard_sql_query_result_new (MidgardQuerySelector *selector, GObject *model)
 	return self;
 }
 
+/* This is workaround function to set columns.
+ * With GDA API, we can not introspect table column using GdaDataModel and GdaColumn */
+void
+midgard_sql_query_result_set_columns (MidgardSqlQueryResult *self, MidgardSqlQueryColumn **columns, guint n_columns, GError **error)
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (columns != NULL);
+	g_return_if_fail (n_columns != 0);
+
+	if (self->columns != NULL) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
+				"QueryResult holds columns already");
+		return;
+	}
+
+	self->columns = g_new (MidgardSqlQueryColumn*, n_columns);
+	self->n_columns = n_columns;
+	guint i;
+
+	for (i = 0; i < n_columns; i++) {
+		if (columns[i] != NULL)
+			self->columns[i] = g_object_ref (columns[i]);
+		else 
+			self->columns[i] = NULL;
+	}
+	return;
+}
+
 void                 
 _propagate_columns (MidgardSqlQueryResult *self, guint *n_objects, GError **error)
 {
@@ -58,6 +86,10 @@ _propagate_columns (MidgardSqlQueryResult *self, guint *n_objects, GError **erro
 		*n_objects = self->n_columns;
 		return;
 	}
+
+	g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
+			"Columns should be propagated with temporary midgard_sql_query_result_set_columns()");
+	return;
 
 	GdaDataModel *model = GDA_DATA_MODEL (self->model);
 	self->n_columns = gda_data_model_get_n_columns (model);

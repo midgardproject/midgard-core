@@ -55,6 +55,7 @@ struct _MidgardSqlQueryResult{
 
 GType 				midgard_sql_query_result_get_type	(void);
 MidgardSqlQueryResult*		midgard_sql_query_result_new		(MidgardQuerySelector *selector, GObject *model);
+void				midgard_sql_query_result_set_columns	(MidgardSqlQueryResult *self, MidgardSqlQueryColumn **columns, guint n_columns, GError **error);
 
 G_END_DECLS
 
