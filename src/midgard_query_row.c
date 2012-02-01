@@ -60,7 +60,7 @@ midgard_query_row_get_values (MidgardQueryRow *self, GError **error)
  * @column_name: (allow-none): Column name which holds value
  * @error: pointer to store error
  *
- * Returns an object for specified column.
+ * Returns: (transfer full): an object for specified column.
  * @column_name can be ommited if column name is uniqe in the #MidgardQueryResult
  *
  * Since: 10.05.6
