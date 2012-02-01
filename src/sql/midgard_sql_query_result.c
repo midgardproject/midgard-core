@@ -26,7 +26,7 @@
 
 /**
  * midgard_sql_query_result_new:
- * @mgd: #MidgardConnection instance
+ * @selector: #MidgardQuerySelector instance
  * @model: a GObject which represents data model
  *
  * This constructor should be used by #MidgardQuerySelector implementation
