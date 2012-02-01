@@ -53,6 +53,25 @@ class TestSqlQueryResult(unittest.TestCase):
     columns = query_result.get_columns()
     self.assertEqual(len(columns), 2)
 
+  def testGetColumnsQualifier(self):
+    self.addColumns()
+    self.select.execute()
+    query_result = self.select.get_query_result()
+    columns = query_result.get_columns()
+    for column in columns:
+      self.assertEqual(column.get_qualifier(), "p")
+
+  def testGetColumnPropertyName(self):
+    self.addColumns()
+    self.select.execute()
+    query_result = self.select.get_query_result()
+    columns = query_result.get_columns()
+    names = {"firstname", "lastname"}
+    for column in columns:
+      query_property = column.get_query_property()
+      prop = query_property.get_property("property")
+      self.assertIn(prop, names)
+
   def testGetColumnNames(self):
     self.addColumns()
     self.select.execute()
