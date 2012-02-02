@@ -20,7 +20,7 @@ class TestSqlQueryResult(unittest.TestCase):
       self.select = Midgard.SqlQuerySelectData(connection = self.mgd)
 
   def tearDown(self):
-    self.mgd.dispose()
+    self.mgd.close()
     self.mgd = None
 
   def addColumns(self):
