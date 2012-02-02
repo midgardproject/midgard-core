@@ -16,6 +16,10 @@ class TestSchemaObjectTree(unittest.TestCase):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
 
+  def tearDown(self):        
+    self.mgd.close()
+    self.mgd = None
+
   def testObjectList(self):
     # Create object and two child ones
     sdirA = Midgard.Object.factory(self.mgd, "midgard_snippetdir", None)

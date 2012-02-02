@@ -16,6 +16,10 @@ class TestObjectMetadataCrud(unittest.TestCase):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
 
+  def tearDown(self):
+    self.mgd.close()
+    self.mgd = None
+
   def getNewBook(self):
     obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
     title = "The Metadata of a Holly Grail"

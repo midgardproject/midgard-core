@@ -24,6 +24,10 @@ class TestReflectorObject(unittest.TestCase):
       self.rfl_activity = Midgard.ReflectorProperty(dbclass = "midgard_activity")
       self.reflectors = True
 
+  def tearDown(self):        
+    self.mgd.close()
+    self.mgd = None
+
   def testGetMidgardType(self):
     self.assertEqual(self.rfl_person.get_midgard_type("guid"), GObject.GType.from_name("MidgardGuid"))
 

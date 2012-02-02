@@ -16,6 +16,10 @@ class TestObjectCrud(unittest.TestCase):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
 
+  def tearDown(self):
+    self.mgd.close()
+    self.mgd = None
+
   def createGuid(self):
     try:
       guid = Midgard.Guid.new(self.mgd)

@@ -20,6 +20,10 @@ class TestAttachment(unittest.TestCase):
       self.obj.set_property("title", "The Hoy Grail and Attachments")
       self.assertTrue(self.obj.create())
 
+  def tearDown(self):        
+    self.mgd.close()
+    self.mgd = None
+
   def getBook(self):
     st = Midgard.QueryStorage(dbclass = "gir_test_book_crud")
     qs = Midgard.QuerySelect(connection = self.mgd, storage = st)

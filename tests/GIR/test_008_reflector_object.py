@@ -20,6 +20,10 @@ class TestReflectorObject(unittest.TestCase):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
 
+  def tearDown(self):
+    self.mgd.close()
+    self.mgd = None
+
   def testPropertyPrimary(self):
     self.assertEqual(Midgard.ReflectorObject.get_property_primary(self.person_type), "id")
     self.assertEqual(Midgard.ReflectorObject.get_property_primary(self.file_type), "id")
@@ -82,8 +86,6 @@ class TestReflectorObject(unittest.TestCase):
     self.assertEqual(self.getSchemaValue(self.file_type, "OnParentVersion"), "COPY")
     self.assertEqual(self.getSchemaValue(self.resource_type, "OnParentVersion"), "VERSION")
     self.assertEqual(self.getSchemaValue("mix_title", "OnParentVersion"), None)
-
-  
 
 if __name__ == "__main__":
     unittest.main()

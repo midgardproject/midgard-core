@@ -19,6 +19,10 @@ class TestWorkspaceManager(unittest.TestCase):
     if self.manager is None:
       self.manager = Midgard.WorkspaceManager(connection = self.mgd)
 
+  def tearDown(self):        
+    self.mgd.close()
+    self.mgd = None
+
   def testCreateInvalidWorkspace(self):
     # Attempt to create nameless workspace should fail 
     fake_ws = Midgard.Workspace()

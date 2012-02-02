@@ -16,6 +16,10 @@ class TestUser(unittest.TestCase):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
 
+  def tearDown(self):        
+    self.mgd.close()
+    self.mgd = None
+
   def getNewUser(self):
     user = Midgard.User(connection = self.mgd, login = "John", authtype = "Plaintext", active = True)
     return user
