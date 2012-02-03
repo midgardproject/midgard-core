@@ -19,7 +19,7 @@ class TestSchemaObjectTree(unittest.TestCase):
   def purgeSnippets(self):
     tr = Midgard.Transaction(connection = self.mgd)
     tr.begin()
-    st = Midgard.QueryStorage(dbclass = "midgard_snippetdir")
+    st = Midgard.QueryStorage(dbclass = "midgard_snippet")
     qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     qs.execute()
     for s in qs.list_objects():
