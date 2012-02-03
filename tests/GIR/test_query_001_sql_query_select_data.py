@@ -19,6 +19,10 @@ class TestSqlQuerySelectData(unittest.TestCase):
     if self.select is None:
       self.select = Midgard.SqlQuerySelectData(connection = self.mgd)
 
+  def tearDown(self):
+    self.mgd.close()
+    self.mgd = None
+
   def testAddColumn(self): 
     column = Midgard.SqlQueryColumn(
         queryproperty = Midgard.QueryProperty(property = "title"), 
