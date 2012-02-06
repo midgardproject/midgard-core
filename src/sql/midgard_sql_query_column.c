@@ -18,6 +18,7 @@
 
 #include "midgard_sql_query_column.h"
 #include "../midgard_query_column.h"
+#include "../midgard_query_holder.h"
 
 /**
  * midgard_sql_query_column_new:
@@ -183,8 +184,6 @@ _midgard_sql_query_column_get_property (GObject *object, guint property_id, GVal
 	}
 }
 
-
-
 static void _midgard_sql_query_column_class_init(
 		gpointer g_class, gpointer g_class_data)
 {
@@ -230,6 +229,40 @@ static void _midgard_sql_query_column_class_init(
 	g_object_class_install_property (gobject_class, PROPERTY_QUALIFIER, pspec);
 }
 
+static void
+__get_value (MidgardQueryHolder *self, GValue *value)
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (self != NULL);
+
+	if (!G_VALUE_HOLDS_STRING (value))
+		g_value_init (value, G_TYPE_STRING);
+
+	g_value_take_string (
+		value,
+		g_strjoin(
+			midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (self), NULL),
+			".",
+			midgard_query_column_get_name (MIDGARD_QUERY_COLUMN (self), NULL),
+			NULL
+		)
+	);
+}
+
+static gboolean
+__set_value (MidgardQueryHolder *self, const GValue *value)
+{
+	g_warning ("Setting SqlQueryColumn value, not supported");
+	return FALSE;
+}
+
+static void
+_midgard_sql_query_holder_iface_init (MidgardQueryHolderIFace *iface)
+{
+	iface->get_value = __get_value;
+	iface->set_value = __set_value;
+}
+
 GType 
 midgard_sql_query_column_get_type(void)
 {
@@ -247,14 +280,21 @@ midgard_sql_query_column_get_type(void)
 			_midgard_sql_query_column_instance_init /* instance_init */
 		};
 
-		static const GInterfaceInfo iface_info = {
+		static const GInterfaceInfo column_info = {
 			(GInterfaceInitFunc) _midgard_sql_query_column_iface_init,
 			(GInterfaceFinalizeFunc) _midgard_sql_query_column_iface_finalize,	
 			NULL    /* interface_data */
 		};
 
+		static const GInterfaceInfo holder_info = {
+			(GInterfaceInitFunc) _midgard_sql_query_holder_iface_init,
+			NULL, 	/* interface finalize */	
+			NULL    /* interface_data */
+		};
+
 		type = g_type_register_static (G_TYPE_OBJECT, "MidgardSqlQueryColumn", &info, 0);
-		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_COLUMN, &iface_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_COLUMN, &column_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_QUERY_HOLDER, &holder_info);
 	}
 	return type;
 }
