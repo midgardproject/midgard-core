@@ -135,12 +135,19 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.addColumns()
     self.select.set_constraint(
       Midgard.SqlQueryConstraint(
-        column = Midgard.SqlQueryColumn(name = "sname"),
+        column = Midgard.SqlQueryColumn(
+          queryproperty = Midgard.QueryProperty(property = "name"),
+          qualifier = "s"
+        ),
         operator = "=",
         holder = Midgard.QueryValue.create_with_value("A")
       )
     )
-    self.select.execute()
+    try:
+      self.select.execute()
+    except GObject.GError as e:
+      print self.select.get_query_string()
+      raise e
     print self.select.get_query_string()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
