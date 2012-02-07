@@ -31,6 +31,7 @@
 #include "midgard_core_config.h"
 #include "../midgard_query_result.h"
 #include "midgard_sql_query_result.h"
+#include "midgard_sql_query_constraint.h"
 
 /**
  * midgard_sql_query_select_data_new:
@@ -578,7 +579,7 @@ _midgard_sql_query_select_data_validable_iface_validate (MidgardValidable *iface
 	g_free (columns);
 
 	/* COMMON WITH QUERYEXECUTOR */
-	/* TODO: Consider executorClass->validate() */
+	/* TODO: Consider executor->validate() */
 
 	/* Limit */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->limit == 0) {
@@ -612,13 +613,22 @@ _midgard_sql_query_select_data_validable_iface_validate (MidgardValidable *iface
 	_get_all_constraints (self, NULL, &o_list);
 
 	for (l = o_list; l != NULL; l = l->next) {
-		if (!midgard_validable_is_valid (MIDGARD_VALIDABLE (l->data))) {
-			midgard_validable_validate (MIDGARD_VALIDABLE (l->data), &err);
+
+		if (MIDGARD_IS_SQL_QUERY_CONSTRAINT (l->data)
+				/* || MIDGARD_IS_SQL_QUERY_CONSTRAINT_GROUP (l->data)) */
+				&& (!midgard_validable_is_valid (MIDGARD_VALIDABLE (l->data)))) {
+			//midgard_validable_validate (MIDGARD_VALIDABLE (l->data), &err);
 			if (err) {
 				g_propagate_error (error, err);
 				g_slist_free (o_list);
 				return;
 			}
+		} else {
+			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
+					"Invalid constraint type '%s'. Expected SqlQueryConstraint or SqlQueryConstraintGroup", 
+					G_OBJECT_TYPE_NAME (G_OBJECT (l->data)));
+			g_slist_free (o_list);
+			return;
 		}
 	}
 
@@ -647,14 +657,13 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 
 	GError *err = NULL;
 	midgard_validable_validate (MIDGARD_VALIDABLE (self), &err);
-	if (err) {
+	if (err) {	
 		g_propagate_error (error, err);
 		return;
 	} 	
 
 	g_object_ref (self);
-
-	//MidgardDBObjectClass *klass = executor->priv->storage->priv->klass;
+	
 	MidgardConnection *mgd = executor->priv->mgd;
 	GdaConnection *cnc = mgd->priv->connection;
 	GdaSqlStatement *sql_stm;
@@ -733,7 +742,8 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 		table_list = g_slist_append (table_list, (gpointer) property_table);
 	}
 
-	g_slist_free (table_list);
+	if (table_list)
+		g_slist_free (table_list);
 
 	GdaSqlExpr *where = sss->where_cond;
 	GdaSqlOperation *operation = where->cond;
@@ -832,7 +842,6 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 		g_object_unref (G_OBJECT (executor->priv->resultset));
 	executor->priv->resultset = (gpointer) model;
 	g_object_unref (self);
-	
 	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
 	return;
 
