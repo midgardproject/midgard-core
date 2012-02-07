@@ -21,6 +21,10 @@ class TestSqlQueryColumn(unittest.TestCase):
       self.queryproperty = Midgard.QueryProperty(property = "title")
       self.column = Midgard.SqlQueryColumn(queryproperty = self.queryproperty, name = "The title", qualifier = "t1")
 
+  def tearDown(self):
+    self.mgd.close()
+    self.mgd = None
+
   def testQueryProperty(self):
     self.assertEqual(self.column.get_query_property(), self.queryproperty)
 
