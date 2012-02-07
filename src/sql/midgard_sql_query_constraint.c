@@ -303,13 +303,22 @@ _midgard_sql_query_constraint_add_conditions_to_statement (MidgardQueryExecutor 
 
 	/* Create table_alias.field name */
 	MidgardSqlQueryColumn *column = midgard_sql_query_constraint_get_column (self);
+	MidgardQueryProperty *qproperty = midgard_query_column_get_query_property (MIDGARD_QUERY_COLUMN(column), NULL);
+	gchar *fieldname = NULL;
+	if (qproperty) {
+		g_object_get (qproperty, "property", &fieldname, NULL);
+	}
+	/* TODO , set real field name, only if storage is available */
 	const gchar *qualifier = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (column), NULL);
 	if (*qualifier == '\0')
 		qualifier = NULL;
 	gchar *table_alias_field = g_strdup_printf("%s%s%s",
 			qualifier ? qualifier : "", 
 			qualifier ? "." : "",
-			midgard_query_column_get_name (MIDGARD_QUERY_COLUMN (column), NULL), NULL);
+			fieldname);
+	g_free (fieldname);
+	g_object_unref (column);
+	g_object_unref (qproperty);
 	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
 	g_value_take_string ((value = gda_value_new (G_TYPE_STRING)), table_alias_field);
 	expr->value = value;
