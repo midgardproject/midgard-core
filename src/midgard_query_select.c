@@ -670,8 +670,8 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint) {
 		MIDGARD_QUERY_CONSTRAINT_SIMPLE_GET_INTERFACE (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint)->priv->add_conditions_to_statement 			(MIDGARD_QUERY_EXECUTOR (self), MIDGARD_QUERY_EXECUTOR (self)->priv->constraint, sql_stm, base_where, &err);
 		if (err) {
-			g_set_error(error, err->domain, err->code, "%s", err->message ? err->message : "Unknown error");
-			g_clear_error(&err);
+			g_propagate_error (error, err);
+			goto return_false;
 		}
 		if (MIDGARD_QUERY_EXECUTOR (self)->priv->n_constraints == 1) 
 			__add_second_dummy_constraint (sss, operation);
