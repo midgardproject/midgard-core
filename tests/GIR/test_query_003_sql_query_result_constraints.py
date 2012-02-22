@@ -9,43 +9,48 @@ from test_001_connection import TestConnection
 from gi.repository import Midgard
 from gi.repository import GObject
 
+book_qualifier = "book"
+book_title = "btitle"
+
 class TestSqlQueryResultConstraints(unittest.TestCase):
   mgd = None
   select = None
 
-  def createSnippets(self):
+  def createStore(self):
     tr = Midgard.Transaction(connection = self.mgd)
     tr.begin()
-    sdirA = Midgard.Object.factory(self.mgd, "midgard_snippetdir", None)
-    sdirA.set_property("name", "Dir with snippets")
+
+    sdirA = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
+    sdirA.set_property("name", "Bookstore")
     self.assertTrue(sdirA.create())
     idA = sdirA.get_property("id")
     
-    sA = Midgard.Object.factory(self.mgd, "midgard_snippet", None)
-    sA.set_property("name", "A")
-    sA.set_property("snippetdir", idA)
+    sA = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
+    sA.set_property("title", "Book A")
+    sA.set_property("store", idA)
     self.assertTrue(sA.create())
     
-    sB = Midgard.Object.factory(self.mgd, "midgard_snippet", None)
-    sB.set_property("name", "B")
-    sB.set_property("snippetdir", idA)
+    sB = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
+    sB.set_property("title", "Book B")
+    sB.set_property("store", idA)
     self.assertTrue(sB.create())
-    
-    sC = Midgard.Object.factory(self.mgd, "midgard_snippet", None)
-    sC.set_property("name", "C")
-    sC.set_property("snippetdir", idA)
-    self.assertTrue(sC.create()) 
+  
+    sC = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
+    sC.set_property("title", "Book C")
+    sC.set_property("store", idA)
+    self.assertTrue(sC.create())
+
     tr.commit()
 
-  def purgeSnippets(self):
+  def purgeStore(self):
     tr = Midgard.Transaction(connection = self.mgd)
     tr.begin()
-    st = Midgard.QueryStorage(dbclass = "midgard_snippet")
+    st = Midgard.QueryStorage(dbclass = "gir_test_book_crud")
     qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     qs.execute()
     for s in qs.list_objects():
       s.purge(False)
-    st = Midgard.QueryStorage(dbclass = "midgard_snippetdir")
+    st = Midgard.QueryStorage(dbclass = "gir_test_book_store")
     qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     qs.execute()
     for s in qs.list_objects():
@@ -57,33 +62,33 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
       self.mgd = TestConnection.openConnection()
     if self.select is None:
       self.select = Midgard.SqlQuerySelectData(connection = self.mgd)
-    self.createSnippets()
+    self.createStore()
 
   def tearDown(self):
-    self.purgeSnippets()
+    self.purgeStore()
     self.mgd.close()
     self.mgd = None
 
   def addColumns(self):
-    storage = Midgard.QueryStorage(dbclass = "midgard_snippet")
+    storage = Midgard.QueryStorage(dbclass = "gir_test_book_crud")
     column = Midgard.SqlQueryColumn(
-      queryproperty = Midgard.QueryProperty(property = "name", storage = storage), 
-      name = "sname", 
-      qualifier = "s"
+      queryproperty = Midgard.QueryProperty(property = "title", storage = storage), 
+      name = "btitle", 
+      qualifier = "book"
     )
     self.select.add_column(column)
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "id", storage = storage), 
       name = "sid", 
-      qualifier = "s"
+      qualifier = "book"
     )
     self.select.add_column(column)
 
   def addSDirColumns(self):
-    storage = Midgard.QueryStorage(dbclass = "midgard_snippet")
+    storage = Midgard.QueryStorage(dbclass = "gir_test_book_crud")
     column = Midgard.SqlQueryColumn(
-      queryproperty = Midgard.QueryProperty(property = "name", storage = storage), 
-      name = "sname", 
+      queryproperty = Midgard.QueryProperty(property = "title", storage = storage), 
+      name = "bookname", 
       qualifier = "s"
     )
     self.select.add_column(column)
@@ -93,11 +98,11 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
       qualifier = "s"
     )
     self.select.add_column(column)
-    sdir_storage = Midgard.QueryStorage(dbclass = "midgard_snippetdir")
+    sdir_storage = Midgard.QueryStorage(dbclass = "gir_test_book_store")
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "name", storage = sdir_storage), 
-      name = "sdirname", 
-      qualifier = "sdir"
+      name = "storename", 
+      qualifier = "bookstore"
     )
     self.select.add_column(column)
 
@@ -115,11 +120,12 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.assertEqual(len(rows), 1)
 
   def testExecuteInvalidConstraint(self):
+    pass 
     self.addColumns()
     # SqlQueryConstraint expected
     self.select.set_constraint(
       Midgard.QueryConstraint(
-        property = Midgard.QueryProperty(property = "sname"),
+        property = Midgard.QueryProperty(property = "name"),
         operator = "=",
         holder = Midgard.QueryValue.create_with_value("B")
       )
@@ -136,8 +142,8 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.select.set_constraint(
       Midgard.SqlQueryConstraint(
         column = Midgard.SqlQueryColumn(
-          queryproperty = Midgard.QueryProperty(property = "name"),
-          qualifier = "s"
+          queryproperty = Midgard.QueryProperty(property = "title"),
+          qualifier = book_qualifier
         ),
         operator = "=",
         holder = Midgard.QueryValue.create_with_value("A")
@@ -175,14 +181,14 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     query_result = self.select.get_query_result()
     columns = query_result.get_columns()
     for column in columns:
-      self.assertEqual(column.get_qualifier(), "s")
+      self.assertEqual(column.get_qualifier(), book_qualifier)
 
   def testGetColumnPropertyName(self):
     self.addColumns()
     self.select.execute()
     query_result = self.select.get_query_result()
     columns = query_result.get_columns()
-    names = {"name", "id"}
+    names = {"title", "id"}
     for column in columns:
       query_property = column.get_query_property()
       prop = query_property.get_property("property")
@@ -194,7 +200,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     query_result = self.select.get_query_result()
     names = query_result.get_column_names()
     self.assertEqual(len(names), 2)
-    colnames = {"sname", "sid"}
+    colnames = {book_title, "sid"}
     self.assertIn(names[0], colnames)
     self.assertIn(names[1], colnames)
 
