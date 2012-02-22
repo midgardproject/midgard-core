@@ -23,6 +23,7 @@
 #include "../midgard_core_query.h"
 #include "../midgard_query_column.h"
 #include "../midgard_core_object.h"
+#include "../midgard_core_object_class.h"
 #include "../midgard_validable.h"
 
 struct _MidgardSqlQueryConstraintPrivate {
@@ -275,16 +276,77 @@ __get_expression_value (GdaConnection *cnc, GValue *src, GString *str)
 	return;
 }
 
+gchar*
+get_real_table_field (MidgardQueryExecutor *executor, MidgardSqlQueryColumn *column)
+{
+	g_return_val_if_fail (executor != NULL, NULL);
+	g_return_val_if_fail (column != NULL, NULL);
+
+	MidgardConnection *mgd = executor->priv->mgd;
+	g_return_val_if_fail (executor != NULL, NULL);
+	
+	/* Set default dbclass by default */
+	MidgardDBObjectClass *dbklass = NULL;
+	if (executor->priv->storage)
+		dbklass = executor->priv->storage->priv->klass;
+
+       	gchar *classname = NULL;
+	gchar *pname = NULL;
+	MidgardQueryStorage *storage = NULL;
+
+	/* Set property's dbclass if defined */
+	MidgardQueryProperty *qproperty = midgard_query_column_get_query_property (MIDGARD_QUERY_COLUMN(column), NULL);
+	g_object_get (qproperty, "storage", &storage, "property", &pname, NULL);
+	if (storage)
+		g_object_get (storage, "dbclass", &classname, NULL);
+	g_object_unref (qproperty);
+	if (classname) {
+		GType dbtype = g_type_from_name (classname);
+		/* TODO , handle invalid type error */
+		dbklass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (dbtype));
+	}	
+
+	/* Get real fieldname */
+	const gchar *fieldname = (const gchar *)pname;
+	if (dbklass)
+		fieldname = midgard_core_class_get_property_colname (dbklass, pname);
+
+	const gchar *qualifier = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (column), NULL);
+	if (*qualifier == '\0')
+		qualifier = NULL;
+
+	gchar *table_alias_field = g_strdup_printf("%s%s%s",
+			qualifier ? qualifier : "",
+			qualifier ? "." : "",
+			fieldname);
+
+	g_free (classname);
+	g_free (pname);	
+
+	return table_alias_field;
+}
+
 void 
 _midgard_sql_query_constraint_add_conditions_to_statement (MidgardQueryExecutor *executor, MidgardQueryConstraintSimple *constraint_simple, GdaSqlStatement *stmt, GdaSqlExpr *where_expr_node, GError **error)
 {	
 	MidgardSqlQueryConstraint *self = MIDGARD_SQL_QUERY_CONSTRAINT (constraint_simple);
-	GdaConnection *cnc = executor->priv->mgd->priv->connection;
+	MidgardConnection *mgd = executor->priv->mgd;
+	GdaConnection *cnc = mgd->priv->connection;
 
 	GdaSqlStatementSelect *select = stmt->contents;
 	GdaSqlExpr *top_where, *where, *expr;
 	GdaSqlOperation *top_operation, *cond;
 	GValue *value;
+
+	/* Create table_alias.field name */
+	MidgardSqlQueryColumn *column = midgard_sql_query_constraint_get_column (self);
+	gchar *table_alias_field = get_real_table_field (executor, column);
+	g_object_unref (column);
+
+	if (!table_alias_field) {
+		/* TODO */
+		/* Handle error */
+	}
 
 	if (where_expr_node) {
 		top_where = where_expr_node;
@@ -301,24 +363,6 @@ _midgard_sql_query_constraint_add_conditions_to_statement (MidgardQueryExecutor 
 	where->cond = cond;	
 	cond->operator_type = self->priv->op_type;
 
-	/* Create table_alias.field name */
-	MidgardSqlQueryColumn *column = midgard_sql_query_constraint_get_column (self);
-	MidgardQueryProperty *qproperty = midgard_query_column_get_query_property (MIDGARD_QUERY_COLUMN(column), NULL);
-	gchar *fieldname = NULL;
-	if (qproperty) {
-		g_object_get (qproperty, "property", &fieldname, NULL);
-	}
-	/* TODO , set real field name, only if storage is available */
-	const gchar *qualifier = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (column), NULL);
-	if (*qualifier == '\0')
-		qualifier = NULL;
-	gchar *table_alias_field = g_strdup_printf("%s%s%s",
-			qualifier ? qualifier : "", 
-			qualifier ? "." : "",
-			fieldname);
-	g_free (fieldname);
-	g_object_unref (column);
-	g_object_unref (qproperty);
 	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (cond));
 	g_value_take_string ((value = gda_value_new (G_TYPE_STRING)), table_alias_field);
 	expr->value = value;
