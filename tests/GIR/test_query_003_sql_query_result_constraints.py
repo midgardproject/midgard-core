@@ -9,13 +9,15 @@ from test_001_connection import TestConnection
 from gi.repository import Midgard
 from gi.repository import GObject
 
-book_qualifier = "book"
+book_qualifier = "book_q"
 book_title = "btitle"
 book_a_title = "Book A"
 
 class TestSqlQueryResultConstraints(unittest.TestCase):
   mgd = None
   select = None
+  default_book_storage = None
+  default_store_storage = None
 
   def createStore(self):
     tr = Midgard.Transaction(connection = self.mgd)
@@ -63,6 +65,8 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
       self.mgd = TestConnection.openConnection()
     if self.select is None:
       self.select = Midgard.SqlQuerySelectData(connection = self.mgd)
+    self.default_book_storage = Midgard.QueryStorage(dbclass = "gir_test_book_crud")
+    self.default_store_storage = Midgard.QueryStorage(dbclass = "gir_test_book_store")
     self.createStore()
 
   def tearDown(self):
@@ -71,22 +75,22 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.mgd = None
 
   def addColumns(self):
-    storage = Midgard.QueryStorage(dbclass = "gir_test_book_crud")
+    storage = self.default_book_storage
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "title", storage = storage), 
       name = "btitle", 
-      qualifier = "book"
+      qualifier = book_qualifier
     )
     self.select.add_column(column)
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "id", storage = storage), 
       name = "sid", 
-      qualifier = "book"
+      qualifier = book_qualifier
     )
     self.select.add_column(column)
 
   def addSDirColumns(self):
-    storage = Midgard.QueryStorage(dbclass = "gir_test_book_crud")
+    storage = self.default_book_storage
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "title", storage = storage), 
       name = "bookname", 
@@ -99,9 +103,9 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
       qualifier = "s"
     )
     self.select.add_column(column)
-    sdir_storage = Midgard.QueryStorage(dbclass = "gir_test_book_store")
+    store_storage = self.default_store_storage
     column = Midgard.SqlQueryColumn(
-      queryproperty = Midgard.QueryProperty(property = "name", storage = sdir_storage), 
+      queryproperty = Midgard.QueryProperty(property = "name", storage = store_storage), 
       name = "storename", 
       qualifier = "bookstore"
     )
@@ -124,7 +128,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     except GObject.GError as e:
       self.assertEqual(e.domain, "midgard-execution-error-quark")
       self.assertEqual(e.code, Midgard.ValidationError.TYPE_INVALID)
-      self.assertEqual(e.message, "Execute error - no such column: book.title")
+      self.assertEqual(e.message, "Execute error - no such column: book_q.title")
 
   def testGetRowsLimit(self):
     self.addColumns()
