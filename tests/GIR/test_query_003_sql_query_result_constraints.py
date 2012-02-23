@@ -11,6 +11,7 @@ from gi.repository import GObject
 
 book_qualifier = "book"
 book_title = "btitle"
+book_a_title = "Book A"
 
 class TestSqlQueryResultConstraints(unittest.TestCase):
   mgd = None
@@ -26,7 +27,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     idA = sdirA.get_property("id")
     
     sA = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
-    sA.set_property("title", "Book A")
+    sA.set_property("title", book_a_title)
     sA.set_property("store", idA)
     self.assertTrue(sA.create())
     
@@ -106,9 +107,24 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     )
     self.select.add_column(column)
 
-  @unittest.skip("To implement")
-  def testExecuteInvalid(self):
-    pass
+  def testExecuteInvalidQuery(self):
+    self.addColumns()
+    self.select.set_constraint(
+      Midgard.SqlQueryConstraint(
+        column = Midgard.SqlQueryColumn(
+          queryproperty = Midgard.QueryProperty(property = "title"),
+          qualifier = book_qualifier
+        ),
+        operator = "=",
+        holder = Midgard.QueryValue.create_with_value(book_a_title)
+      )
+    )
+    try:
+      self.select.execute()
+    except GObject.GError as e:
+      self.assertEqual(e.domain, "midgard-execution-error-quark")
+      self.assertEqual(e.code, Midgard.ValidationError.TYPE_INVALID)
+      self.assertEqual(e.message, "Execute error - no such column: book.title")
 
   def testGetRowsLimit(self):
     self.addColumns()
@@ -146,7 +162,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
           qualifier = book_qualifier
         ),
         operator = "=",
-        holder = Midgard.QueryValue.create_with_value("A")
+        holder = Midgard.QueryValue.create_with_value(book_a_title)
       )
     )
     try:
