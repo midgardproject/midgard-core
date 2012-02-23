@@ -162,7 +162,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.select.set_constraint(
       Midgard.SqlQueryConstraint(
         column = Midgard.SqlQueryColumn(
-          queryproperty = Midgard.QueryProperty(property = "title"),
+          queryproperty = Midgard.QueryProperty(property = "title", storage = self.default_book_storage),
           qualifier = book_qualifier
         ),
         operator = "=",
@@ -174,6 +174,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     except GObject.GError as e:
       print self.select.get_query_string()
       raise e
+    print self.select.get_query_string()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
     # There should be one snippet
