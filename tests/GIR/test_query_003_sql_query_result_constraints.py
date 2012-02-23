@@ -13,6 +13,8 @@ book_qualifier = "book_q"
 book_title = "btitle"
 book_a_title = "Book A"
 
+book_store_qualifier = "bookstore"
+
 class TestSqlQueryResultConstraints(unittest.TestCase):
   mgd = None
   select = None
@@ -94,14 +96,14 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "title", storage = storage), 
       name = "bookname", 
-      qualifier = "b"
+      qualifier = book_qualifier
     )
     self.select.add_column(column)
 
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "id", storage = storage), 
       name = "book_id", 
-      qualifier = "b"
+      qualifier = book_qualifier
     )
     self.select.add_column(column)
     
@@ -283,12 +285,14 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.select.add_join(
       "INNER", 
       Midgard.SqlQueryColumn(
-        queryproperty = Midgard.QueryProperty(property = "book_id", storage = self.default_book_storage),
+        name = "book_id", 
+        queryproperty = Midgard.QueryProperty(property = "id", storage = self.default_book_storage),
         qualifier = book_qualifier
       ),
       Midgard.SqlQueryColumn(
-        queryproperty = Midgard.QueryProperty(property = "store_id", storage = self.default_book_storage),
-        qualifier = book_qualifier
+        name = "store_id", 
+        queryproperty = Midgard.QueryProperty(property = "id", storage = self.default_store_storage),
+        qualifier = book_store_qualifier
       )
     )
 
