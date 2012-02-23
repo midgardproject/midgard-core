@@ -96,9 +96,9 @@ midgard_query_executor_add_order (MidgardQueryExecutor *self, MidgardQueryProper
 
 gboolean
 midgard_query_executor_add_join (MidgardQueryExecutor *self, const gchar *join_type, 
-		MidgardQueryProperty *left_property, MidgardQueryProperty *right_property)
+		MidgardQueryHolder *left_holder, MidgardQueryHolder *right_holder)
 {
-	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->add_join (self, join_type, left_property, right_property);
+	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->add_join (self, join_type, left_holder, right_holder);
 }
 
 /**
