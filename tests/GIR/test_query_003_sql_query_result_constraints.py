@@ -209,7 +209,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     names = query_result.get_column_names()
     # There should be three columns
     self.assertEqual(len(columns), 3)
-    colnames = {"bookname", "sid", "storename"}
+    colnames = {"bookname", "book_id", "storename"}
     self.assertIn(names[0], colnames)
     self.assertIn(names[1], colnames)
     self.assertIn(names[2], colnames)
