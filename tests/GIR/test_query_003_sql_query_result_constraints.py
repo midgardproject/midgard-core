@@ -94,13 +94,13 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "title", storage = storage), 
       name = "bookname", 
-      qualifier = "s"
+      qualifier = "b"
     )
     self.select.add_column(column)
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "id", storage = storage), 
       name = "sid", 
-      qualifier = "s"
+      qualifier = "b"
     )
     self.select.add_column(column)
     store_storage = self.default_store_storage
@@ -147,7 +147,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
       Midgard.QueryConstraint(
         property = Midgard.QueryProperty(property = "name"),
         operator = "=",
-        holder = Midgard.QueryValue.create_with_value("B")
+        holder = Midgard.QueryValue.create_with_value("InvalidConstraint")
       )
     )
     try:
@@ -157,7 +157,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
       self.assertEqual(e.code, Midgard.ValidationError.TYPE_INVALID)
       self.assertEqual(e.message, "Invalid constraint type 'MidgardQueryConstraint'. Expected SqlQueryConstraint or SqlQueryConstraintGroup")
 
-  def testGetRowsWithNameB(self):
+  def testGetRowsWithABook(self):
     self.addColumns()
     self.select.set_constraint(
       Midgard.SqlQueryConstraint(
@@ -174,7 +174,6 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     except GObject.GError as e:
       print self.select.get_query_string()
       raise e
-    print self.select.get_query_string()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
     # There should be one snippet
