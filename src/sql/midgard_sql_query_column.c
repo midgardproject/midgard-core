@@ -241,8 +241,8 @@ __get_value (MidgardQueryHolder *self, GValue *value)
 	g_value_take_string (
 		value,
 		g_strjoin(
+			".", 
 			midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (self), NULL),
-			".",
 			midgard_query_column_get_name (MIDGARD_QUERY_COLUMN (self), NULL),
 			NULL
 		)
