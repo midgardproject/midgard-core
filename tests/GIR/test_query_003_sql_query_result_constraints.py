@@ -89,7 +89,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     )
     self.select.add_column(column)
 
-  def addSDirColumns(self):
+  def addStoreColumns(self):
     storage = self.default_book_storage
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "title", storage = storage), 
@@ -136,7 +136,17 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.select.execute()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
-    # There should be three snippets 
+    # There should be three books
+    self.assertEqual(len(rows), 1)
+
+  def testGetRowsOffset(self):
+    self.addColumns()
+    self.select.set_limit(1)
+    self.select.set_offset(1)
+    self.select.execute()
+    query_result = self.select.get_query_result()
+    rows = query_result.get_rows()
+    # There should be three books
     self.assertEqual(len(rows), 1)
 
   def testExecuteInvalidConstraint(self):
@@ -177,16 +187,30 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     print self.select.get_query_string()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
-    # There should be one snippet
+    # There should be one book
     self.assertEqual(len(rows), 1)
 
-  def testGetRowsSnippetsAndDir(self):
-    self.addSDirColumns()
+  def testGetRowsWithAllBooks(self):
+    self.addStoreColumns()
     self.select.execute()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
-    # There should be three snippets 
+    # There should be three books
     self.assertEqual(len(rows), 3)
+
+  def testGetColumnsWithAllBooks(self):
+    self.addStoreColumns()
+    self.select.execute()
+    query_result = self.select.get_query_result()
+    rows = query_result.get_rows()
+    columns = query_result.get_columns()
+    names = query_result.get_column_names()
+    # There should be three columns
+    self.assertEqual(len(columns), 3)
+    colnames = {"bookname", "sid", "storename"}
+    self.assertIn(names[0], colnames)
+    self.assertIn(names[1], colnames)
+    self.assertIn(names[2], colnames)
 
   def testGetColumns(self):
     self.addColumns()
