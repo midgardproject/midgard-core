@@ -202,30 +202,21 @@ typedef struct {
 
 gboolean
 _midgard_sql_query_select_data_add_join (MidgardQueryExecutor *self, const gchar *join_type, 
-		MidgardQueryProperty *left_property, MidgardQueryProperty *right_property)
+		MidgardQueryHolder *left_holder, MidgardQueryHolder *right_holder)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (join_type != NULL, FALSE);
-	g_return_val_if_fail (left_property != NULL, FALSE);
-	g_return_val_if_fail (right_property != NULL, FALSE);
+	g_return_val_if_fail (left_holder != NULL, FALSE);
+	g_return_val_if_fail (right_holder != NULL, FALSE);
 
 	/* validate join type */
 	GdaSqlSelectJoinType join_type_id;
 	if (!__query_join_type_is_valid (join_type, &join_type_id)) 
 		return FALSE;
 
-	/* MidgardQueryStorage *left_storage = left_property->priv->storage; */
-	MidgardQueryStorage *right_storage = right_property->priv->storage;
-
-	/* We can not join the same table adding new implicit table alias */
-	if (!right_storage) {
-		g_warning ("Can not add join. Right property storage is NULL. ");
-	       return FALSE;	
-	}
-
 	qsj *_sj = g_new (qsj, 1);
-	_sj->left_property = g_object_ref (left_property);
-	_sj->right_property = g_object_ref (right_property);
+	_sj->left_property = g_object_ref (left_holder);
+	_sj->right_property = g_object_ref (right_holder);
 
 	_sj->join_type = join_type_id;
 
@@ -401,7 +392,7 @@ __add_implicit_workspace_join (MidgardSqlQuerySelectData *self, GdaSqlOperation 
 
 gboolean __query_select_data_add_joins (MidgardSqlQuerySelectData *self, GdaSqlOperation *operation, GError **error)
 {
-	__add_implicit_workspace_join (self, operation);
+	//__add_implicit_workspace_join (self, operation);
 
 	if (!MIDGARD_QUERY_EXECUTOR (self)->priv->joins)
 		return TRUE;
@@ -424,6 +415,7 @@ gboolean __query_select_data_add_joins (MidgardSqlQuerySelectData *self, GdaSqlO
 		MidgardQueryStorage *left_storage = _sj->left_property->priv->storage;
 		MidgardQueryStorage *right_storage = _sj->right_property->priv->storage;
 
+		/*
 		GError *err = NULL;
 		GValue lval = {0, };
 		midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (_sj->left_property), &lval);
@@ -441,28 +433,38 @@ gboolean __query_select_data_add_joins (MidgardSqlQuerySelectData *self, GdaSqlO
 		if (err) {
 			g_propagate_error (error, err);
 			g_free (right_table_field);
-		}
+		}*/
+	       
+		GValue lval = {0, };
+		midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (_sj->left_property), &lval);
+		
+		GValue rval = {0, };
+                midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (_sj->right_property), &rval);
 
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (join));
 		expr->value = gda_value_new (G_TYPE_STRING);
-		g_value_take_string (expr->value, g_strdup_printf ("%s = %s", left_table_field, right_table_field));
+		g_value_take_string (expr->value, g_strdup_printf ("%s = %s", g_value_get_string (&lval), g_value_get_string (&rval)));
+
+		g_value_unset (&lval);
+		g_value_unset (&rval);
 
 		join->expr = expr;
 		join->position = ++executor->priv->joinid;
 
-		/* Add right storage to targets */
-		MQE_SET_TABLE_ALIAS (executor, right_storage);
+		const gchar *qualifier = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (_sj->right_property), NULL);
+
+		/* Add right qualifier to targets */	
 		gda_sql_select_from_take_new_join (from , join);
 		GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (from));
-		s_target->table_name = g_strdup (right_storage->priv->table);
-		s_target->as = g_strdup (right_storage->priv->table_alias);
+		s_target->table_name = g_strdup (qualifier);
+		//s_target->as = g_strdup (right_storage->priv->table_alias);
 		gda_sql_select_from_take_new_target (from, s_target);
 	
-		// Set target expression 
+		/* Set target expression */
 		GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
 		GValue *tval = g_new0 (GValue, 1);
 		g_value_init (tval, G_TYPE_STRING);
-		g_value_set_string (tval, right_storage->priv->table);
+		g_value_set_string (tval, qualifier);
 		texpr->value = tval;
 		s_target->expr = texpr;
 	}
@@ -748,11 +750,11 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 	GdaSqlExpr *where = sss->where_cond;
 	GdaSqlOperation *operation = where->cond;
 	/* Add joins, LEFT JOIN tbl2 ON... */
-	/*__query_select_data_add_joins (MIDGARD_SQL_QUERY_SELECT_DATA (self), operation, &err);
+	__query_select_data_add_joins (MIDGARD_SQL_QUERY_SELECT_DATA (self), operation, &err);
 	if (err) {
 	 	g_propagate_error (error, err);
 		goto return_false;
-	}*/
+	}
 
 	/* Add constraints' conditions (WHERE a=1, b=2...) */
 	if (MIDGARD_QUERY_EXECUTOR (self)->priv->constraint) {
