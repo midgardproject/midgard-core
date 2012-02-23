@@ -172,7 +172,6 @@ static void _midgard_connection_dispose(GObject *object)
 		midgard_core_connection_disconnect_error_callback(self);
 
 	if (gda_cnc != NULL) {
-
 		g_object_unref(gda_cnc);
 		g_signal_emit(self, MIDGARD_CONNECTION_GET_CLASS(self)->signal_id_disconnected, 0);
 	}
