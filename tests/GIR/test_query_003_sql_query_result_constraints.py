@@ -12,6 +12,7 @@ from gi.repository import GObject
 book_qualifier = "book_q"
 book_title = "btitle"
 book_a_title = "Book A"
+book_title_column = "booktitle"
 
 book_store_qualifier = "bookstore"
 
@@ -95,7 +96,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     storage = self.default_book_storage
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "title", storage = storage), 
-      name = "bookname", 
+      name = book_title_column, 
       qualifier = book_qualifier
     )
     self.select.add_column(column)
@@ -132,7 +133,8 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     except GObject.GError as e:
       self.assertEqual(e.domain, "midgard-execution-error-quark")
       self.assertEqual(e.code, Midgard.ValidationError.TYPE_INVALID)
-      self.assertEqual(e.message, "Execute error - no such column: book_q.title")
+      # Do not test error message. It's provider specific.
+      #self.assertEqual(e.message, "Execute error - no such column: book_q.title")
 
   def testGetRowsLimit(self):
     self.addColumns()
@@ -211,7 +213,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     names = query_result.get_column_names()
     # There should be three columns
     self.assertEqual(len(columns), 3)
-    colnames = {"bookname", "book_id", "storename"}
+    colnames = {"booktitle", "book_id", "storename"}
     self.assertIn(names[0], colnames)
     self.assertIn(names[1], colnames)
     self.assertIn(names[2], colnames)
@@ -263,6 +265,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
   def testAddJoin(self):
     self.addStoreColumns()
 
+    # Add book and store id required for join
     store_storage = self.default_store_storage
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "id", storage = store_storage), 
@@ -270,11 +273,19 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
       qualifier = "bookstore"
     )
     self.select.add_column(column)
-   
+  
+    column = Midgard.SqlQueryColumn(
+      queryproperty = Midgard.QueryProperty(property = "store", storage = self.default_book_storage), 
+      name = "book_store", 
+      qualifier = book_qualifier
+    )
+    self.select.add_column(column)
+
     self.select.set_constraint(
       Midgard.SqlQueryConstraint(
         column = Midgard.SqlQueryColumn(
           queryproperty = Midgard.QueryProperty(property = "title", storage = self.default_book_storage),
+          name = book_title_column,
           qualifier = book_qualifier
         ),
         operator = "=",
@@ -285,8 +296,8 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.select.add_join(
       "INNER", 
       Midgard.SqlQueryColumn(
-        name = "book_id", 
-        queryproperty = Midgard.QueryProperty(property = "id", storage = self.default_book_storage),
+        name = "book_store", 
+        queryproperty = Midgard.QueryProperty(property = "store", storage = self.default_book_storage),
         qualifier = book_qualifier
       ),
       Midgard.SqlQueryColumn(
