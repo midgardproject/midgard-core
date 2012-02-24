@@ -19,6 +19,7 @@
 #include "midgard_sql_query_column.h"
 #include "../midgard_query_column.h"
 #include "../midgard_query_holder.h"
+#include "midgard_core_object_class.h"
 
 /**
  * midgard_sql_query_column_new:
@@ -238,15 +239,44 @@ __get_value (MidgardQueryHolder *self, GValue *value)
 	if (!G_VALUE_HOLDS_STRING (value))
 		g_value_init (value, G_TYPE_STRING);
 
-	g_value_take_string (
-		value,
-		g_strjoin(
-			".", 
-			midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (self), NULL),
-			midgard_query_column_get_name (MIDGARD_QUERY_COLUMN (self), NULL),
-			NULL
-		)
-	);
+	MidgardDBObjectClass *dbklass = NULL;
+	gchar *classname = NULL;
+	gchar *pname = NULL;
+	MidgardQueryStorage *storage = NULL;
+
+	 /* Get property's dbclass if defined */
+	MidgardQueryProperty *qproperty = MIDGARD_SQL_QUERY_COLUMN (self)->query_property;
+	if (qproperty) {
+		g_object_get (qproperty, "storage", &storage, "property", &pname, NULL);
+		if (storage) {
+			g_object_get (storage, "dbclass", &classname, NULL);
+			g_object_unref (storage);
+		}
+	}
+
+	if (classname) {
+		GType dbtype = g_type_from_name (classname);	
+		dbklass = MIDGARD_DBOBJECT_CLASS (g_type_class_peek (dbtype));
+	}
+
+	 /* Get real fieldname */
+	const gchar *fieldname = (const gchar *)pname;
+	if (dbklass)
+		fieldname = midgard_core_class_get_property_colname (dbklass, pname);
+	
+	const gchar *qualifier = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (self), NULL);
+	if (*qualifier == '\0')
+		qualifier = NULL;
+	
+	gchar *table_alias_field = g_strdup_printf("%s%s%s",
+			qualifier ? qualifier : "",
+			qualifier ? "." : "",
+			fieldname);
+	
+	g_free (classname);
+	g_free (pname);
+
+	g_value_take_string (value, table_alias_field);
 }
 
 static gboolean
