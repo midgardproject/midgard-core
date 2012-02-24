@@ -79,6 +79,7 @@ MidgardDBColumn *midgard_core_dbcolumn_new(void)
 static void
 _update_gda_meta_store_table (GdaConnection *cnc, const gchar *tablename, GError **error)
 {
+	return;
 	GdaMetaContext mcontext = {"_tables", 1, NULL, NULL};
 	mcontext.column_names = g_new (gchar *, 1);
 	mcontext.column_names[0] = "table_name";
