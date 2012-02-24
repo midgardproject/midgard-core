@@ -254,6 +254,10 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.assertIn(names[0], colnames)
     self.assertIn(names[1], colnames)
 
+  @unittest.skip("To implement")
+  def testAddOrder(self):
+    pass
+
 #        VALUES
 #########################
 
