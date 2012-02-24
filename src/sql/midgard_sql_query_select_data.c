@@ -441,6 +441,22 @@ gboolean __query_select_data_add_joins (MidgardSqlQuerySelectData *self, GdaSqlO
 		GValue rval = {0, };
                 midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (_sj->right_property), &rval);
 
+		/* Set qualifier as default table and alias */
+		const gchar *qualifier = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (_sj->right_property), NULL);
+		MidgardQueryProperty *qproperty = midgard_query_column_get_query_property (MIDGARD_QUERY_COLUMN (_sj->right_property), NULL);
+		gchar *table_name = (gchar *) qualifier;
+
+		/* Set real storage table name if defined */
+		if (qproperty) {
+			MidgardQueryStorage *right_storage = NULL;
+			g_object_get (qproperty, "storage", &right_storage, NULL);
+			if (right_storage) {
+				MidgardDBObjectClass *dbklass = g_type_class_peek (g_type_from_name (right_storage->priv->classname));
+				table_name = midgard_core_class_get_table (dbklass);
+				g_object_unref (right_storage);
+			}
+		}
+
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (join));
 		expr->value = gda_value_new (G_TYPE_STRING);
 		g_value_take_string (expr->value, g_strdup_printf ("%s = %s", g_value_get_string (&lval), g_value_get_string (&rval)));
@@ -451,20 +467,18 @@ gboolean __query_select_data_add_joins (MidgardSqlQuerySelectData *self, GdaSqlO
 		join->expr = expr;
 		join->position = ++executor->priv->joinid;
 
-		const gchar *qualifier = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (_sj->right_property), NULL);
-
 		/* Add right qualifier to targets */	
 		gda_sql_select_from_take_new_join (from , join);
 		GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (from));
-		s_target->table_name = g_strdup (qualifier);
-		//s_target->as = g_strdup (right_storage->priv->table_alias);
-		gda_sql_select_from_take_new_target (from, s_target);
+		s_target->table_name = g_strdup (table_name);
+		s_target->as = g_strdup (qualifier);
+		//gda_sql_select_from_take_new_target (from, s_target);
 	
 		/* Set target expression */
 		GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
 		GValue *tval = g_new0 (GValue, 1);
 		g_value_init (tval, G_TYPE_STRING);
-		g_value_set_string (tval, qualifier);
+		g_value_set_string (tval, table_name);
 		texpr->value = tval;
 		s_target->expr = texpr;
 	}
