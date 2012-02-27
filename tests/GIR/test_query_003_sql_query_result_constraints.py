@@ -13,8 +13,10 @@ book_qualifier = "book_q"
 book_title = "btitle"
 book_a_title = "Book A"
 book_title_column = "booktitle"
+book_store_id = "book_store_id"
 
 book_store_qualifier = "bookstore"
+
 
 class TestSqlQueryResultConstraints(unittest.TestCase):
   mgd = None
@@ -254,19 +256,13 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.assertIn(names[0], colnames)
     self.assertIn(names[1], colnames)
 
-  @unittest.skip("To implement")
-  def testAddOrder(self):
-    pass
-
-#        VALUES
-#########################
-
-
-
 #        JOINS
 #########################
 
-  def testAddJoin(self):
+  def testAddJoinAddOrder(self):
+    pass
+
+  def prepareJoin(self):
     self.addStoreColumns()
 
     # Add book and store id required for join
@@ -280,7 +276,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
   
     column = Midgard.SqlQueryColumn(
       queryproperty = Midgard.QueryProperty(property = "store", storage = self.default_book_storage), 
-      name = "book_store", 
+      name = book_store_id, 
       qualifier = book_qualifier
     )
     self.select.add_column(column)
@@ -300,7 +296,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.select.add_join(
       "INNER", 
       Midgard.SqlQueryColumn(
-        name = "book_store", 
+        name = book_store_id, 
         queryproperty = Midgard.QueryProperty(property = "store", storage = self.default_book_storage),
         qualifier = book_qualifier
       ),
@@ -310,6 +306,9 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
         qualifier = book_store_qualifier
       )
     )
+
+  def testAddJoin(self):
+    self.prepareJoin()
 
     try:
       self.select.execute()
@@ -321,6 +320,45 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     rows = query_result.get_rows()
     # There should be one book
     self.assertEqual(len(rows), 1)
+    names = query_result.get_column_names()
+    self.assertEqual(len(names), 5)
+    colnames = {"booktitle", "book_id", "storename", "store_id", "book_store_id"}
+    self.assertIn(names[0], colnames)
+    self.assertEqual(rows[0].get_value(names[0]), "Book A")
+    self.assertIn(names[1], colnames)
+    # Ignore book_id, integer which depends on provider
+    self.assertIn(names[2], colnames)
+    self.assertEqual(rows[0].get_value(names[2]), "Bookstore")
+    self.assertIn(names[3], colnames)
+    # Ignore store_id, integer which depends on provider
+    self.assertIn(names[4], colnames)
+    # Ignore book_store_id, integer which depends on provider
+  
+    # store_id must match book_store_id
+    self.assertEqual(rows[0].get_value(names[3]), rows[0].get_value(names[4]))
+
+  def testRowGetValues(self):
+    self.prepareJoin()
+
+    try:
+      self.select.execute()
+    except GObject.GError as e:
+      print self.select.get_query_string()
+      raise e
+    query_result = self.select.get_query_result()
+    rows = query_result.get_rows()
+    # There should be one book
+    self.assertEqual(len(rows), 1)
+    values = rows[0].get_values()
+    self.assertEqual(values.n_values, 5)
+    self.assertEqual("Book A", values.get_nth(0))
+    self.assertNotEqual("", values.get_nth(1))
+    self.assertEqual("Bookstore", values.get_nth(2))
+    self.assertNotEqual(0, values.get_nth(3))
+    self.assertNotEqual(" ", values.get_nth(4))
+
+  def testAddJoinAddOrder(self):
+    self.prepareJoin()
 
   def testInheritance(self):
     self.addColumns()
