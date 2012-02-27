@@ -73,19 +73,28 @@ _midgard_sql_query_row_get_values (MidgardQueryRow *self, GError **error)
 	GdaDataModel *model = GDA_DATA_MODEL (MIDGARD_SQL_QUERY_ROW (self)->model);
 	g_return_val_if_fail (model != NULL, NULL);
 
-	GdaDataModelIter *iter = GDA_DATA_MODEL_ITER (model);
-	if (gda_data_model_iter_move_to_row (iter, 0)) {
-		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
-				"Can not reset model iterator");
+	gint n_columns = gda_data_model_get_n_columns (model);
+	GValueArray *varray = g_value_array_new (n_columns);
+
+	if (GDA_IS_DATA_MODEL_ITER (model)) {	
+		GdaDataModelIter *iter = GDA_DATA_MODEL_ITER (model);
+		if (gda_data_model_iter_move_to_row (iter, 0)) {
+			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_INTERNAL,
+					"Can not reset model iterator");
+		}
+
+		while (gda_data_model_iter_move_next (iter) == TRUE) {
+			gint row_id = gda_data_model_iter_get_row (iter);
+			g_value_array_append (varray, gda_data_model_iter_get_value_at (iter, row_id));
+		}
+		
+		return varray;
 	}
 
-	guint cols = gda_data_model_get_n_columns (model);
-	GValueArray *varray = g_value_array_new (cols);
-
-	while (gda_data_model_iter_move_next (iter) == TRUE) {
-		gint row_id = gda_data_model_iter_get_row (iter);
-		g_value_array_append (varray, gda_data_model_iter_get_value_at (iter, row_id));
-	}
+	gint i;
+	for (i = 0; i < n_columns; i++) {
+		g_value_array_append (varray, gda_data_model_get_value_at (model, i, MIDGARD_SQL_QUERY_ROW(self)->row, NULL));
+	}	
 
 	return varray;
 }
