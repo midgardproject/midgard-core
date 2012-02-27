@@ -94,15 +94,15 @@ typedef struct {
 } qso;
 
 gboolean
-_midgard_query_select_add_order (MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type)
+_midgard_query_select_add_order (MidgardQueryExecutor *self, MidgardQueryHolder *holder, const gchar *type)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
-	g_return_val_if_fail (property != NULL, FALSE);
+	g_return_val_if_fail (holder != NULL, FALSE);
 
 	qso *_qs = g_new (qso, 1);
 	_qs->order_type = g_strdup (type);
 	_qs->asc = FALSE;
-	_qs->property = g_object_ref (property);
+	_qs->property = g_object_ref (holder);
 
 	self->priv->orders = g_slist_append (self->priv->orders, _qs);
 

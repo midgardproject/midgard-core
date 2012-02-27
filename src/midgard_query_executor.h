@@ -47,7 +47,7 @@ struct _MidgardQueryExecutorClass {
 	gboolean	(*set_constraint)		(MidgardQueryExecutor *self, MidgardQueryConstraintSimple *constraint);
 	gboolean	(*set_limit)			(MidgardQueryExecutor *self, guint limit);
 	gboolean	(*set_offset)			(MidgardQueryExecutor *self, guint offset);
-	gboolean	(*add_order)			(MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type);
+	gboolean	(*add_order)			(MidgardQueryExecutor *self, MidgardQueryHolder *holder, const gchar *type);
 	gboolean        (*add_join)			(MidgardQueryExecutor *self, const gchar *join_type, 
 								MidgardQueryHolder *left_holder, MidgardQueryHolder *right_holder);
 	guint 		(*get_results_count)		(MidgardQueryExecutor *self);
@@ -73,7 +73,7 @@ MidgardQueryExecutor	*midgard_query_executor_new 		(MidgardConnection *mgd, Midg
 gboolean		midgard_query_executor_set_constraint	(MidgardQueryExecutor *self, MidgardQueryConstraintSimple *constraint);
 gboolean		midgard_query_executor_set_limit	(MidgardQueryExecutor *self, guint limit);
 gboolean 		midgard_query_executor_set_offset	(MidgardQueryExecutor *self, guint offset);
-gboolean		midgard_query_executor_add_order	(MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type);
+gboolean		midgard_query_executor_add_order	(MidgardQueryExecutor *self, MidgardQueryHolder *holder, const gchar *type);
 gboolean		midgard_query_executor_add_join		(MidgardQueryExecutor *self, const gchar *join_type, MidgardQueryHolder *left_holder, MidgardQueryHolder *right_holder);
 guint 			midgard_query_executor_get_results_count	(MidgardQueryExecutor *self);
 

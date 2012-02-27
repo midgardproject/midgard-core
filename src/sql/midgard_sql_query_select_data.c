@@ -143,15 +143,15 @@ typedef struct {
 } qso;
 
 gboolean
-_midgard_sql_query_select_data_add_order (MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type)
+_midgard_sql_query_select_data_add_order (MidgardQueryExecutor *self, MidgardQueryHolder *holder, const gchar *type)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
-	g_return_val_if_fail (property != NULL, FALSE);
+	g_return_val_if_fail (holder != NULL, FALSE);
 
 	qso *_qs = g_new (qso, 1);
 	_qs->order_type = g_strdup (type);
 	_qs->asc = FALSE;
-	_qs->property = g_object_ref (property);
+	_qs->property = g_object_ref (holder);
 
 	self->priv->orders = g_slist_append (self->priv->orders, _qs);
 
@@ -245,40 +245,14 @@ gboolean __query_select_data_add_orders (MidgardQueryExecutor *self, GError **er
 		/* Create new order */
 		order = gda_sql_select_order_new (GDA_SQL_ANY_PART (select));
 		order->asc = _so->asc;
-		MidgardQueryProperty *property = _so->property;
-		MidgardQueryStorage *storage = NULL;
-		
-		if (property->priv && property->priv->storage)
-			storage = property->priv->storage;
+		MidgardQueryHolder *holder = MIDGARD_QUERY_HOLDER (_so->property);
 
-		/* Compute table.colname for given property name */
-		GValue rval = {0, };
-		midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (property), &rval);
-		GError *err = NULL;
-		gchar *table_field = midgard_core_query_compute_constraint_property (executor, storage, g_value_get_string (&rval), &err);
-		if (err) {
-			g_propagate_error (error, err);
-			g_free (table_field);
-			gda_sql_select_order_free (order);
-			return FALSE;
-		}
-
-		if (!table_field) {
-			g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_LOCATION_INVALID,
-					"Can not find table and column name for given '%s' property name", g_value_get_string (&rval));
-			g_value_unset (&rval);
-			return FALSE;	
-		}
-
-		g_value_unset (&rval);
-
-		GValue *value = g_new0 (GValue, 1);
-		g_value_init (value, G_TYPE_STRING);
-		g_value_take_string (value, table_field);
+		GValue *rval = g_new0 (GValue, 1);
+		midgard_query_holder_get_value (holder, rval);
 
 		/* Set order's expression and add new one to statement orders list */
 		GdaSqlExpr *expr = gda_sql_expr_new (GDA_SQL_ANY_PART (order));
-		expr->value = value;
+		expr->value = rval;
 		order->expr = expr;
 		select->order_by = g_slist_append (select->order_by, order);
 	}
@@ -452,7 +426,7 @@ gboolean __query_select_data_add_joins (MidgardSqlQuerySelectData *self, GdaSqlO
 			g_object_get (qproperty, "storage", &right_storage, NULL);
 			if (right_storage) {
 				MidgardDBObjectClass *dbklass = g_type_class_peek (g_type_from_name (right_storage->priv->classname));
-				table_name = midgard_core_class_get_table (dbklass);
+				table_name = (gchar *) midgard_core_class_get_table (dbklass);
 				g_object_unref (right_storage);
 			}
 		}
