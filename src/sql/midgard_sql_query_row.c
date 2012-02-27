@@ -56,7 +56,14 @@ _midgard_sql_query_row_get_value (MidgardQueryRow *self, const gchar *column_nam
 		return NULL;
 	}
 
-	return gda_data_model_iter_get_value_for_field (GDA_DATA_MODEL_ITER (model), column_name);
+	if (GDA_IS_DATA_MODEL_ITER (model))
+		return gda_data_model_iter_get_value_for_field (GDA_DATA_MODEL_ITER (model), column_name);
+
+	return gda_data_model_get_value_at (GDA_DATA_MODEL (model), 
+		gda_data_model_get_column_index(model, column_name), 
+		MIDGARD_SQL_QUERY_ROW(self)->row, 
+		NULL
+	);
 }
 
 GValueArray *
