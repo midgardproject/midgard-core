@@ -35,16 +35,19 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     
     sA = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
     sA.set_property("title", book_a_title)
+    sA.set_property("edition", 1)
     sA.set_property("store", idA)
     self.assertTrue(sA.create())
     
     sB = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
     sB.set_property("title", "Book B")
+    sB.set_property("edition", 2)
     sB.set_property("store", idA)
     self.assertTrue(sB.create())
   
     sC = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
     sC.set_property("title", "Book C")
+    sC.set_property("edition", 3)
     sC.set_property("store", idA)
     self.assertTrue(sC.create())
 
@@ -191,7 +194,6 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     except GObject.GError as e:
       print self.select.get_query_string()
       raise e
-    print self.select.get_query_string()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
     # There should be one book
@@ -201,7 +203,6 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.addStoreColumns()
     self.select.execute()
     query_result = self.select.get_query_result()
-    print self.select.get_query_string()
     rows = query_result.get_rows()
     # There should be three books
     self.assertEqual(len(rows), 3)
@@ -281,18 +282,6 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     )
     self.select.add_column(column)
 
-    self.select.set_constraint(
-      Midgard.SqlQueryConstraint(
-        column = Midgard.SqlQueryColumn(
-          queryproperty = Midgard.QueryProperty(property = "title", storage = self.default_book_storage),
-          name = book_title_column,
-          qualifier = book_qualifier
-        ),
-        operator = "=",
-        holder = Midgard.QueryValue.create_with_value(book_a_title)
-      )
-    )
-
     self.select.add_join(
       "INNER", 
       Midgard.SqlQueryColumn(
@@ -307,15 +296,29 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
       )
     )
 
+  def addBookTitleConstraint(self):  
+    self.select.set_constraint(
+      Midgard.SqlQueryConstraint(
+        column = Midgard.SqlQueryColumn(
+          queryproperty = Midgard.QueryProperty(property = "title", storage = self.default_book_storage),
+          name = book_title_column,
+          qualifier = book_qualifier
+        ),
+        operator = "=",
+        holder = Midgard.QueryValue.create_with_value(book_a_title)
+      )
+    )
+
   def testAddJoin(self):
     self.prepareJoin()
+    self.addBookTitleConstraint()
 
     try:
       self.select.execute()
     except GObject.GError as e:
       print self.select.get_query_string()
       raise e
-    print self.select.get_query_string()
+    #print self.select.get_query_string()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
     # There should be one book
@@ -339,6 +342,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
 
   def testRowGetValues(self):
     self.prepareJoin()
+    self.addBookTitleConstraint()
 
     try:
       self.select.execute()
@@ -357,8 +361,79 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.assertNotEqual(0, values.get_nth(3))
     self.assertNotEqual(" ", values.get_nth(4))
 
-  def testAddJoinAddOrder(self):
+  def testAddJoinAddOrderASC(self):
     self.prepareJoin()
+    self.select.add_order(
+      Midgard.SqlQueryColumn(
+        queryproperty = Midgard.QueryProperty(property = "title", storage = self.default_book_storage),
+        name = book_title_column,
+        qualifier = book_qualifier
+      ),
+      "ASC"
+    )
+    try:
+      self.select.execute()
+    except GObject.GError as e:
+      print self.select.get_query_string()
+      raise e
+    #print self.select.get_query_string()
+    query_result = self.select.get_query_result()
+    rows = query_result.get_rows()
+    self.assertEqual(rows[0].get_value(book_title_column), "Book A");
+    self.assertEqual(rows[1].get_value(book_title_column), "Book B");
+    self.assertEqual(rows[2].get_value(book_title_column), "Book C");
+
+  def testAddJoinAddOrderDESC(self):
+    self.prepareJoin()
+    self.select.add_order(
+      Midgard.SqlQueryColumn(
+        queryproperty = Midgard.QueryProperty(property = "title", storage = self.default_book_storage),
+        name = book_title_column,
+        qualifier = book_qualifier
+      ),
+      "DESC"
+    )
+    try:
+      self.select.execute()
+    except GObject.GError as e:
+      print self.select.get_query_string()
+      raise e
+    #print self.select.get_query_string()
+    query_result = self.select.get_query_result()
+    rows = query_result.get_rows()
+    self.assertEqual(rows[0].get_value(book_title_column), "Book C");
+    self.assertEqual(rows[1].get_value(book_title_column), "Book B");
+    self.assertEqual(rows[2].get_value(book_title_column), "Book A");
+
+  def testAddJoinAddOrderASCDESC(self):
+    self.prepareJoin()
+    self.select.add_order(
+      Midgard.SqlQueryColumn(
+        queryproperty = Midgard.QueryProperty(property = "edition", storage = self.default_book_storage),
+        name = "edition",
+        qualifier = book_qualifier
+      ),
+      "DESC"
+    )
+    self.select.add_order(
+      Midgard.SqlQueryColumn(
+        queryproperty = Midgard.QueryProperty(property = "title", storage = self.default_book_storage),
+        name = book_title_column,
+        qualifier = book_qualifier
+      ),
+      "ASC"
+    )
+
+    try:
+      self.select.execute()
+    except GObject.GError as e:
+      print self.select.get_query_string()
+      raise e
+    query_result = self.select.get_query_result()
+    rows = query_result.get_rows()
+    self.assertEqual(rows[0].get_value(book_title_column), "Book C");
+    self.assertEqual(rows[1].get_value(book_title_column), "Book B");
+    self.assertEqual(rows[2].get_value(book_title_column), "Book A");
 
   def testInheritance(self):
     self.addColumns()
