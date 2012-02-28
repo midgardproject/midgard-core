@@ -38,6 +38,7 @@ MidgardObject attachments
 </para>
 
 @self: 
+@n_objects: 
 @Returns: 
 
 

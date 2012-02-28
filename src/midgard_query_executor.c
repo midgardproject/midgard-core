@@ -82,6 +82,7 @@ gboolean midgard_query_executor_set_offset (MidgardQueryExecutor *self, guint of
 /**
  * midgard_query_executor_add_order:
  * @self: #MidgardQueryExecutor instance
+ * @holder: #MidgardQueryHolder instance 
  * @type: execution order
  *
  * Returns: %TRUE on success, %FALSE otherwise
@@ -89,16 +90,16 @@ gboolean midgard_query_executor_set_offset (MidgardQueryExecutor *self, guint of
  * Since: 10.05
  */ 
 gboolean
-midgard_query_executor_add_order (MidgardQueryExecutor *self, MidgardQueryProperty *property, const gchar *type)
+midgard_query_executor_add_order (MidgardQueryExecutor *self, MidgardQueryHolder *holder, const gchar *type)
 {
-	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->add_order (self, property, type);
+	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->add_order (self, holder, type);
 }
 
 gboolean
 midgard_query_executor_add_join (MidgardQueryExecutor *self, const gchar *join_type, 
-		MidgardQueryProperty *left_property, MidgardQueryProperty *right_property)
+		MidgardQueryHolder *left_holder, MidgardQueryHolder *right_holder)
 {
-	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->add_join (self, join_type, left_property, right_property);
+	return MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->add_join (self, join_type, left_holder, right_holder);
 }
 
 /**

@@ -9,7 +9,7 @@ MidgardConfig
  #MidgardConfig class represents Midgard unified configuration file. 
  Underlying configuration file representation is limited to #GKeyFile. 
  There are few ways to read configuration data: midgard_config_read_file(), which 
- encapsulates real file location, midgard_config_read_file_path() if file location
+ encapsulates real file location, midgard_config_read_file_at_path() if file location
  is not common or very specific for application or midgard_config_read_data(), which 
  reads configuration from given buffer.  
 </para>

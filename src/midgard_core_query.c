@@ -636,7 +636,7 @@ midgard_core_query_get_dbobject_model (MidgardConnection *mgd, MidgardDBObjectCl
 	gfloat pfloat; 									\
 	MidgardTimestamp *mt;								\
 	gboolean pbool;									\
-	gchar *pname = pspecs[i]->name; 						\
+	const gchar *pname = pspecs[i]->name; 						\
 	switch (G_TYPE_FUNDAMENTAL (pspecs[i]->value_type)) { 				\
 		case G_TYPE_STRING:							\
 			g_object_get (object, pname, &pstr, NULL);			\

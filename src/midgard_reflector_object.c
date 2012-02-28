@@ -142,22 +142,24 @@ midgard_reflector_object_list_children (const gchar *classname, guint *n_childre
 	g_return_val_if_fail (classname != NULL, NULL);
 	g_return_val_if_fail (n_children != NULL, NULL);
 
-	*n_children = 0;
-
 	_GET_CLASS_BY_NAME (classname, NULL);
 	_GET_TYPE_ATTR (klass);
 
 	if (!type_attr->children)
 		return NULL;
 
-	 GSList *list;
-	 GSList *children = type_attr->children;
+	 GSList *list; 
 	 guint i = 0;
-	 guint length = g_slist_length (children);
+	 guint length = g_slist_length (type_attr->children);
+	 *n_children = length;
 
-	 gchar **children_class = g_new (gchar*, length);
+	 /* possible? */
+	 if (length == 0)
+		 return NULL;
 
-	 for (list = children; list != NULL; list = list->next, i++) 
+	 gchar **children_class = g_new (gchar*, length + 1);
+
+	 for (list = type_attr->children; list != NULL; list = list->next, i++) 
 		 children_class[i] = (gchar *) list->data;
 
 	 *n_children = length;

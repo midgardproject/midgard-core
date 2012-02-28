@@ -89,6 +89,15 @@ midgard_public_h = \
 	src/midgard_workspace_context.h \
 	src/midgard_workspace_manager.h \
 	src/midgard_workspace_storage.h \
+	src/midgard_query_row.h \
+	src/midgard_query_column.h \
+	src/midgard_query_selector.h \
+	src/midgard_query_result.h \
+	src/sql/midgard_sql_query_column.h \
+	src/sql/midgard_sql_query_row.h \
+	src/sql/midgard_sql_query_result.h \
+	src/sql/midgard_sql_query_select_data.h \
+	src/sql/midgard_sql_query_constraint.h \
 	$(NULL)
 
 man_MANS = man/midgard2-schema.1 \
@@ -193,6 +202,10 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_query_constraint_simple.c \
 	src/midgard_query_storage.c \
 	src/midgard_query_value.c \
+	src/midgard_query_row.c \
+	src/midgard_query_column.c \
+	src/midgard_query_selector.c \
+	src/midgard_query_result.c \
 	src/midgard_reflector_object.c \
 	src/midgard_reflector_property.c \
 	src/midgard_replicator.c \
@@ -215,6 +228,11 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_workspace_context.c \
 	src/midgard_workspace_manager.c \
 	src/midgard_workspace_storage.c \
+	src/sql/midgard_sql_query_column.c \
+	src/sql/midgard_sql_query_row.c \
+	src/sql/midgard_sql_query_result.c \
+	src/sql/midgard_sql_query_select_data.c \
+	src/sql/midgard_sql_query_constraint.c \
 	$(NULL)
 
 pkgdatadir = $(datadir)/midgard2
@@ -233,7 +251,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = midgard2.pc
 
 -include $(INTROSPECTION_MAKEFILE)
-INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir)
+INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir) --warn-all
 INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION

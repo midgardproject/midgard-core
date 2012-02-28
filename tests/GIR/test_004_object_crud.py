@@ -11,10 +11,21 @@ from gi.repository import GObject
 
 class TestObjectCrud(unittest.TestCase):
   mgd = None
+  bookstore = None
 
   def setUp(self):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
+    if self.bookstore is None:
+      self.bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
+      self.bookstore.set_property("name", "BookStore")
+      self.bookstore.create()
+
+  def tearDown(self):
+    if self.bookstore is not None:
+        self.bookstore.purge(False)
+    self.mgd.close()
+    self.mgd = None
 
   def createGuid(self):
     try:
@@ -40,6 +51,7 @@ class TestObjectCrud(unittest.TestCase):
     obj.set_property("edition", edition)
     obj.set_property("sold", sold)
     obj.set_property("description", description)
+    obj.set_property("store", self.bookstore.get_property("id"))
 
     return obj
 
@@ -61,7 +73,7 @@ class TestObjectCrud(unittest.TestCase):
     obj.set_property("edition", edition)
     obj.set_property("sold", sold)
     obj.set_property("description", description)
-
+ 
     self.assertTrue(obj.create())
     self.assertTrue(Midgard.is_guid(obj.get_property("guid")))
     new_obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", obj.get_property("guid"))

@@ -58,7 +58,7 @@ midgard_core_workspace_private_free (MidgardWorkspacePrivate *ws_priv)
 	ws_priv->up_id = 0;
 
 	if (ws_priv->manager && G_IS_OBJECT(ws_priv->manager))
-		g_object_unref (ws_priv->manager);
+		g_object_unref (G_OBJECT(ws_priv->manager));
 	ws_priv->manager = NULL;
 	
 	if (ws_priv->context)

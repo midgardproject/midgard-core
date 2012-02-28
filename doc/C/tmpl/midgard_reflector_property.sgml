@@ -170,7 +170,6 @@ properties of any class which extends Midgard Schema one may be also reflected w
 
 @self: 
 @property: 
-@value: 
 @Returns: 
 
 

@@ -388,7 +388,7 @@ midgard_reflector_property_get_default_value (MidgardReflectorProperty *self, co
 	if (!prop_attr->default_value)
 		return NULL;
 
-	GValue *value = g_new0 (GValue *, 1);
+	GValue *value = g_new0 (GValue, 1);
 	g_value_init (value, G_VALUE_TYPE (prop_attr->default_value));
 	g_value_copy (prop_attr->default_value, value);
 
