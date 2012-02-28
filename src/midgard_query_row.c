@@ -44,7 +44,7 @@ midgard_query_row_get_value (MidgardQueryRow *self, const gchar *column_name, GE
  * @self: #MidgardQueryRow instance
  * @error: a pointer to store error
  *
- * Returns array of values stored in a row or %NULL.
+ * Returns: (transfer container): array of values stored in a row or %NULL.
  *
  * Since: 10.05.6
  */ 
