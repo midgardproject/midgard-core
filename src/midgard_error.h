@@ -88,7 +88,7 @@ typedef enum
 	MIDGARD_GENERIC_ERROR_MISSED_DEPENDENCE = -25, /**< Missed dependence for object   <br /> */
 	MIDGARD_GENERIC_ERROR_TREE_IS_CIRCULAR = -26, /**< Circular reference found in object's tree <br />*/
 	MIDGARD_GENERIC_ERROR_OBJECT_IS_LOCKED = -27 /**< Object is locked */
-} MidgardGenericError;
+} MidgardErrorGeneric;
 
 GQuark 		midgard_error_generic		(void);
 const gchar 	*midgard_error_string		(GQuark domain, gint errcode);

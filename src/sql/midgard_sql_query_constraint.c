@@ -75,7 +75,7 @@ static gboolean __query_constraint_operator_is_valid(const gchar *op, GdaSqlOper
 
 /**
  * midgard_sql_query_constraint_new:
- * @column: #MidgardSqlQuerycolumn instance
+ * @column: #MidgardSqlQueryColumn instance
  * @op: constraint operator
  * @holder: #MidgardQueryHolder instance
  *

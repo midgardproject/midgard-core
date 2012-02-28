@@ -15,7 +15,7 @@ Files and binary data.
  Main #MidgardBlob approaches:
  <itemizedlist>
  <listitem><para>
- Binary data doesn't have to be stored together with database record ( #MgdObject ).
+ Binary data doesn't have to be stored together with database record ( #MidgardObject ).
  </para></listitem>
   <listitem><para>
  One object may have unlimited attachments.
@@ -49,7 +49,17 @@ Files and binary data.
 </para>
 
 
+<!-- ##### ARG MidgardBlob:attachment ##### -->
+<para>
+
+</para>
+
 <!-- ##### ARG MidgardBlob:content ##### -->
+<para>
+
+</para>
+
+<!-- ##### ARG MidgardBlob:encoding ##### -->
 <para>
 
 </para>
@@ -118,6 +128,7 @@ Files and binary data.
 
 @self: 
 @mode: 
+@error: 
 @Returns: 
 
 
@@ -145,6 +156,7 @@ Files and binary data.
 </para>
 
 @self: 
+@error: 
 @Returns: 
 
 

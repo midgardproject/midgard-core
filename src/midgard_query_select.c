@@ -37,7 +37,7 @@
  * #MidgardStorage @storage represents storage which is queried during execution
  *
  * By default, for performance reason, MidgardQuerySelect is instantiated in read only mode.
- * See: midgard_query_select_read_only().
+ * See: midgard_query_select_toggle_read_only().
  *
  * Returns: new #MidgardQuerySelect instance or %NULL on failure
  * Since: 10.05
