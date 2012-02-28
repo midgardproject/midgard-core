@@ -26,6 +26,8 @@ class TestBlob(unittest.TestCase):
       if self.blob.exists():
         self.blob.remove_file()
     self.attachment.purge(False)
+    self.mgd.close()
+    self.mgd = None
 
   def testBlobNew(self):
     self.assertIsNot(self.blob, None)

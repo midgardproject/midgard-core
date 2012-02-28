@@ -16,8 +16,10 @@ class TestConnection(Midgard.Connection):
   def openConnection():
     config = TestConfig()
     mgd = Midgard.Connection()
-    mgd.open_config(config)
-    return mgd
+    if mgd.open_config(config) is True:
+      return mgd
+    print mgd.get_error_string()
+    return None
 
 class TestMethods(unittest.TestCase):
   def testOpenConfig(self):

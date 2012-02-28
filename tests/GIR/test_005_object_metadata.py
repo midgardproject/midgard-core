@@ -11,15 +11,27 @@ from gi.repository import GObject
 
 class TestObjectMetadataCrud(unittest.TestCase):
   mgd = None
+  bookstore = None
 
   def setUp(self):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
+    if self.bookstore is None:
+      self.bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
+      self.bookstore.set_property("name", "BookStore")
+      self.bookstore.create()
+
+  def tearDown(self):
+    if self.bookstore is not None:
+      self.bookstore.purge(False)
+    self.mgd.close()
+    self.mgd = None
 
   def getNewBook(self):
     obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
     title = "The Metadata of a Holly Grail"
     obj.set_property("title", title)
+    obj.set_property("store", self.bookstore.get_property("id"))
     return obj
 
   def testMetadataCreate(self):

@@ -16,6 +16,10 @@ class TestQuerySelect(unittest.TestCase):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
 
+  def tearDown(self):
+    self.mgd.close()
+    self.mgd = None
+
   # Create three persons for *all* tests 
   @staticmethod
   def setUpClass():

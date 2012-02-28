@@ -1,7 +1,7 @@
-language: python
+language: php
 
-python:
-  - 2.7
+php:
+  - 5.3
 
 env:
   - MIDGARD_TEST_CONFIGURATION_FILE=test_SQLITE.conf

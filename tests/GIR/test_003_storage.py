@@ -13,14 +13,23 @@ from gi.repository import Midgard
 from gi.repository import GObject
 
 class TestStorage(unittest.TestCase):
+  mgd = None
+
+  def setUp(self):
+    if self.mgd is None:
+      self.mgd = TestConnection.openConnection()
+
+  def tearDown(self):
+    self.mgd.close()
+    self.mgd = None
+
   def testBaseStorage(self):
-    mgd = TestConnection.openConnection()
     types = []
     self.getDBObjectDerived("MidgardDBObject", types)
     for typename in types:
       nsname = "Midgard." + typename[7:]
-      self.assertEqual(Midgard.Storage.exists(mgd, typename), False, "Storage for " + nsname + " shouldn't exist")
-    self.assertTrue(Midgard.Storage.create_base_storage(mgd))
+      self.assertEqual(Midgard.Storage.exists(self.mgd, typename), False, "Storage for " + nsname + " shouldn't exist")
+    self.assertTrue(Midgard.Storage.create_base_storage(self.mgd))
 
   def getDBObjectDerived(self, typename, types):
     children = GObject.type_children(typename)
@@ -35,23 +44,21 @@ class TestStorage(unittest.TestCase):
       types.append(childname)
 
   def testCreateTypeStorage(self):
-    mgd = TestConnection.openConnection()
     types = []
     self.getDBObjectDerived("MidgardDBObject", types)
     for typename in types:
       nsname = "Midgard." + typename[7:]
-      self.assertEqual(Midgard.Storage.create(mgd, typename), True, "Failed to create " + nsname + " storage")
-      self.assertEqual(Midgard.Storage.exists(mgd, typename), True, "Storage for " + nsname + " doesn't exists. Previosuly created.")
+      self.assertEqual(Midgard.Storage.create(self.mgd, typename), True, "Failed to create " + nsname + " storage")
+      self.assertEqual(Midgard.Storage.exists(self.mgd, typename), True, "Storage for " + nsname + " doesn't exists. Previosuly created.")
 
   def testUpdateTypeStorage(self):
-    mgd = TestConnection.openConnection()
     types = []
     self.getDBObjectDerived("MidgardDBObject", types)
     for typename in types:
       nsname = "Midgard." + typename[7:]
-      self.assertEqual(Midgard.Storage.exists(mgd, typename), True, "Storage for " + nsname + " doesn't exists. Already created.")
-      self.assertEqual(Midgard.Storage.update(mgd, typename), True, "Failed to update " + nsname + " storage")
-      self.assertEqual(Midgard.Storage.exists(mgd, typename), True, "Storage for " + nsname + " doesn't exists. Previosuly updated.")
+      self.assertEqual(Midgard.Storage.exists(self.mgd, typename), True, "Storage for " + nsname + " doesn't exists. Already created.")
+      self.assertEqual(Midgard.Storage.update(self.mgd, typename), True, "Failed to update " + nsname + " storage")
+      self.assertEqual(Midgard.Storage.exists(self.mgd, typename), True, "Storage for " + nsname + " doesn't exists. Previosuly updated.")
 
 if __name__ == "__main__":
     unittest.main()

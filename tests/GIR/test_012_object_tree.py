@@ -16,6 +16,26 @@ class TestSchemaObjectTree(unittest.TestCase):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
 
+  def purgeSnippets(self):
+    tr = Midgard.Transaction(connection = self.mgd)
+    tr.begin()
+    st = Midgard.QueryStorage(dbclass = "midgard_snippet")
+    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
+    qs.execute()
+    for s in qs.list_objects():
+      s.purge(False)
+    st = Midgard.QueryStorage(dbclass = "midgard_snippetdir")
+    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
+    qs.execute()
+    for s in qs.list_objects():
+      s.purge(False)
+    tr.commit()
+
+  def tearDown(self):        
+    self.purgeSnippets()
+    self.mgd.close()
+    self.mgd = None
+
   def testObjectList(self):
     # Create object and two child ones
     sdirA = Midgard.Object.factory(self.mgd, "midgard_snippetdir", None)

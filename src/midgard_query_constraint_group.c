@@ -151,7 +151,7 @@ midgard_query_constraint_group_get_group_type (MidgardQueryConstraintGroup *self
 
 /**
  * midgard_query_constraint_group_set_group_type:
- * @self: #MidgardConstraintGroup instance
+ * @self: #MidgardQueryConstraintGroup instance
  * @type: group type to set ('OR' or 'AND')
  *
  * Returns: %TRUE if type is set, %FALSE otherwise

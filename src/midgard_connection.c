@@ -172,7 +172,6 @@ static void _midgard_connection_dispose(GObject *object)
 		midgard_core_connection_disconnect_error_callback(self);
 
 	if (gda_cnc != NULL) {
-
 		g_object_unref(gda_cnc);
 		g_signal_emit(self, MIDGARD_CONNECTION_GET_CLASS(self)->signal_id_disconnected, 0);
 	}
@@ -562,7 +561,7 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError *
 
 	GError *err = NULL;
 	GdaConnection *connection = gda_connection_open_from_string(
-			config->dbtype, tmpstr, auth, GDA_CONNECTION_OPTIONS_NONE, &err);
+			config->dbtype, tmpstr, auth, GDA_CONNECTION_OPTIONS_AUTO_META_DATA, &err);
 	g_free(auth);	
 
 	if(connection == NULL) {
