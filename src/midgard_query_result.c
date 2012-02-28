@@ -30,7 +30,7 @@ struct _MidgardQueryResult {
  *
  * Returns: (element-type GObject) (array length=n_objects) (transfer full): array of objects available in this result or %NULL
  *
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 GObject**
 midgard_query_result_get_objects (MidgardQueryResult *self, guint *n_objects, GError **error)
@@ -46,7 +46,7 @@ midgard_query_result_get_objects (MidgardQueryResult *self, guint *n_objects, GE
  *
  * Returns: (element-type MidgardQueryColumn) (array length=n_objects) (transfer full): array of #MidgardQueryColumn columns available in this result or %NULL
  *
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 MidgardQueryColumn**
 midgard_query_result_get_columns (MidgardQueryResult *self, guint *n_objects, GError **error)
@@ -62,7 +62,7 @@ midgard_query_result_get_columns (MidgardQueryResult *self, guint *n_objects, GE
  *
  * Returns: (element-type MidgardQueryRow) (array length=n_objects) (transfer full): array of #MidgardQueryRow rows available in this result or %NULL
  *
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 MidgardQueryRow**
 midgard_query_result_get_rows (MidgardQueryResult *self, guint *n_objects, GError **error)
@@ -78,7 +78,7 @@ midgard_query_result_get_rows (MidgardQueryResult *self, guint *n_objects, GErro
  *
  * Returns: (transfer container) (array length=n_names): array of column names available in this result or %NULL
  *
- * Since: 10.06
+ * Since: 10.05.6
  */ 
 gchar**
 midgard_query_result_get_column_names (MidgardQueryResult *self, guint *n_names, GError **error)
