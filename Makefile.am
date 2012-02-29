@@ -93,6 +93,9 @@ midgard_public_h = \
 	src/midgard_query_column.h \
 	src/midgard_query_selector.h \
 	src/midgard_query_result.h \
+	$(NULL)
+
+midgard_sql_public_h = \
 	src/sql/midgard_sql_query_column.h \
 	src/sql/midgard_sql_query_row.h \
 	src/sql/midgard_sql_query_result.h \
@@ -243,6 +246,9 @@ libmidgardinclude_HEADERS =  src/midgard2.h
 libsubmidgardincludedir = $(includedir)/midgard2/midgard
 libsubmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h 
 
+libmidgardsqlincludedir = $(includedir)/midgard2/midgard/sql
+libmidgardsqlinclude_HEADERS = $(midgard_sql_public_h)
+
 src_libmidgard2_la_SOURCES = $(src_libmidgard2_la_public_SOURCES) $(src_libmidgard2_la_core_SOURCES)
 
 mgdschemasdir = $(datadir)/midgard2/schema
@@ -256,7 +262,7 @@ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
-introspection_sources = $(src_libmidgard2_la_public_SOURCES) $(midgard_public_h)
+introspection_sources = $(src_libmidgard2_la_public_SOURCES) $(midgard_public_h) $(midgard_sql_public_h)
 Midgard-10.05.gir: $(lib_LTLIBRARIES)
 Midgard_10_05_gir_INCLUDES = GObject-2.0 libxml2-2.0 Gda-4.0 
 Midgard_10_05_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
