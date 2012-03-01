@@ -176,7 +176,7 @@ _midgard_sql_query_column_get_property (GObject *object, guint property_id, GVal
 		case PROPERTY_QUERY_PROP:
 		case PROPERTY_NAME:
 		case PROPERTY_QUALIFIER:
-			/* Read only */ 
+			/* Write only */ 
 			break;
 
 		default:
@@ -208,7 +208,7 @@ static void _midgard_sql_query_column_class_init(
 			"QueryProperty",
 			"Holds a reference to property name and it's storage",
 			MIDGARD_TYPE_QUERY_PROPERTY,
-			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_QUERY_PROP, pspec);	 
 
 	/* name */
@@ -217,7 +217,7 @@ static void _midgard_sql_query_column_class_init(
 			"SqlQueryColumn name",
 			"",
 			"",
-			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_NAME, pspec);
 
 	/* qualififer */
@@ -226,7 +226,7 @@ static void _midgard_sql_query_column_class_init(
 			"Qualifier of a column",
 			"",
 			"",
-			G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY);
+			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
 	g_object_class_install_property (gobject_class, PROPERTY_QUALIFIER, pspec);
 }
 
