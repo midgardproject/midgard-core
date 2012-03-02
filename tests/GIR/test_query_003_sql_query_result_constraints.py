@@ -147,7 +147,7 @@ class TestSqlQueryResultConstraints(unittest.TestCase):
     self.select.execute()
     query_result = self.select.get_query_result()
     rows = query_result.get_rows()
-    # There should be three books
+    # There should be one book
     self.assertEqual(len(rows), 1)
 
   def testGetRowsOffset(self):
