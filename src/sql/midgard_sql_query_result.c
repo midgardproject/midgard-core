@@ -188,7 +188,7 @@ _midgard_sql_query_result_get_rows (MidgardQueryResult *result, guint *n_objects
 
         /* Create new rows array, add new reference to returned rows, caller should free array and unref objects */
         guint i;
-        MidgardSqlQueryRow **rows = g_new (MidgardSqlQueryRow *, self->rows);
+        MidgardSqlQueryRow **rows = g_new (MidgardSqlQueryRow *, self->n_rows);
         for (i = 0; i < self->n_rows; i++) {
 		rows[i] = (MidgardSqlQueryRow *) g_object_ref (self->rows[i]);
 	}
