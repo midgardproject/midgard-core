@@ -561,7 +561,7 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError *
 
 	GError *err = NULL;
 	GdaConnection *connection = gda_connection_open_from_string(
-			config->dbtype, tmpstr, auth, GDA_CONNECTION_OPTIONS_AUTO_META_DATA, &err);
+			config->dbtype, tmpstr, auth, GDA_CONNECTION_OPTIONS_NONE, &err);
 	g_free(auth);	
 
 	if(connection == NULL) {
