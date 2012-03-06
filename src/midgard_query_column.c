@@ -33,7 +33,7 @@ struct _MidgardQueryColumn {
 MidgardQueryProperty*
 midgard_query_column_get_query_property (MidgardQueryColumn *self, GError **error)
 {
-	MIDGARD_QUERY_COLUMN_GET_INTERFACE (self)->get_query_property (self, error);
+	return MIDGARD_QUERY_COLUMN_GET_INTERFACE (self)->get_query_property (self, error);
 }
 
 /**

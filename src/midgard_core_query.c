@@ -2552,12 +2552,12 @@ midgard_core_query_get_objects (MidgardConnection *mgd, const gchar *classname, 
 {
 	if (mgd == NULL) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected MidgardConnection. Can not get object.");
-		return;
+		return NULL;
 	}
 
 	if (classname == NULL) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected class name. Can not get object.");
-		return;
+		return NULL;
 	}
 
 	GSList *arg_list = NULL;
@@ -2584,7 +2584,7 @@ midgard_core_query_get_objects (MidgardConnection *mgd, const gchar *classname, 
 
 	if (arg_list == NULL) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected at last one constraint to get object");
-		return;
+		return NULL;
 	}
 
 	/* We need either group or one constraint */
