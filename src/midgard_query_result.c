@@ -35,7 +35,7 @@ struct _MidgardQueryResult {
 GObject**
 midgard_query_result_get_objects (MidgardQueryResult *self, guint *n_objects, GError **error)
 {
-	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_objects (self, n_objects, error);
+	return MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_objects (self, n_objects, error);
 }
 
 /**
@@ -51,7 +51,7 @@ midgard_query_result_get_objects (MidgardQueryResult *self, guint *n_objects, GE
 MidgardQueryColumn**
 midgard_query_result_get_columns (MidgardQueryResult *self, guint *n_objects, GError **error)
 {
-	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_columns (self, n_objects, error);
+	return MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_columns (self, n_objects, error);
 }
 
 /**
@@ -67,7 +67,7 @@ midgard_query_result_get_columns (MidgardQueryResult *self, guint *n_objects, GE
 MidgardQueryRow**
 midgard_query_result_get_rows (MidgardQueryResult *self, guint *n_objects, GError **error)
 {
-	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_rows (self, n_objects, error);
+	return MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_rows (self, n_objects, error);
 }
 
 /**
@@ -83,7 +83,7 @@ midgard_query_result_get_rows (MidgardQueryResult *self, guint *n_objects, GErro
 gchar**
 midgard_query_result_get_column_names (MidgardQueryResult *self, guint *n_names, GError **error)
 {
-	MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_column_names (self, n_names, error);
+	return MIDGARD_QUERY_RESULT_GET_INTERFACE (self)->get_column_names (self, n_names, error);
 }
 
 /* GOBJECT ROUTINES */

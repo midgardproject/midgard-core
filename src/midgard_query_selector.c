@@ -34,7 +34,7 @@ struct _MidgardQuerySelector {
 MidgardQueryResult*
 midgard_query_selector_get_query_result (MidgardQuerySelector *self, GError **error)
 {
-	MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_query_result (self, error);
+	return MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_query_result (self, error);
 }
 
 /**
@@ -48,7 +48,7 @@ midgard_query_selector_get_query_result (MidgardQuerySelector *self, GError **er
 MidgardConnection*
 midgard_query_selector_get_connection (MidgardQuerySelector *self)
 {
-	MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_connection (self);
+	return MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_connection (self);
 }
 
 /**
@@ -65,7 +65,7 @@ midgard_query_selector_get_connection (MidgardQuerySelector *self)
 const gchar*
 midgard_query_selector_get_query_string (MidgardQuerySelector *self)
 {
-	MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_query_string (self);
+	return MIDGARD_QUERY_SELECTOR_GET_INTERFACE (self)->get_query_string (self);
 }
 
 

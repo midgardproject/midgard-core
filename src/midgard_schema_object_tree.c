@@ -611,7 +611,7 @@ midgard_schema_object_tree_list_children_objects (MidgardObject *object, const g
 
 	fprop = g_object_class_find_property(G_OBJECT_GET_CLASS(object),primary_prop);
 	if (fprop == NULL)
-		return;
+		return NULL;
 
 	GValue pval = {0,};
 	g_value_init(&pval,fprop->value_type);

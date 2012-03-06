@@ -36,7 +36,7 @@ struct _MidgardQueryRow {
 const GValue*
 midgard_query_row_get_value (MidgardQueryRow *self, const gchar *column_name, GError **error)
 {
-	MIDGARD_QUERY_ROW_GET_INTERFACE (self)->get_value (self, column_name, error);
+	return MIDGARD_QUERY_ROW_GET_INTERFACE (self)->get_value (self, column_name, error);
 }
 
 /**
@@ -51,7 +51,7 @@ midgard_query_row_get_value (MidgardQueryRow *self, const gchar *column_name, GE
 GValueArray*
 midgard_query_row_get_values (MidgardQueryRow *self, GError **error)
 {
-	MIDGARD_QUERY_ROW_GET_INTERFACE (self)->get_values (self, error);
+	return MIDGARD_QUERY_ROW_GET_INTERFACE (self)->get_values (self, error);
 }
 
 /**
@@ -68,7 +68,7 @@ midgard_query_row_get_values (MidgardQueryRow *self, GError **error)
 GObject*
 midgard_query_row_get_object (MidgardQueryRow *self, const gchar *column_name, GError **error)
 {
-	MIDGARD_QUERY_ROW_GET_INTERFACE (self)->get_object (self, column_name, error);
+	return MIDGARD_QUERY_ROW_GET_INTERFACE (self)->get_object (self, column_name, error);
 }
 
 
