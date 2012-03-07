@@ -685,18 +685,8 @@ __midgard_user_delete (MidgardUser *self)
       	g_debug ("%s", del_query->str);
 
 	GError *error = NULL;
-	GdaConnection *connection = mgd->priv->connection;
-
-#ifdef HAVE_LIBGDA_4
-	
+	GdaConnection *connection = mgd->priv->connection;	
 	gda_execute_non_select_command (connection, del_query->str, &error);
-
-#else 
-	GdaCommand *command = gda_command_new (del_query->str, GDA_COMMAND_TYPE_SQL, GDA_COMMAND_OPTION_STOP_ON_ERRORS);
-	gda_connection_execute_non_select_command (connection, command, NULL, &error);
-	gda_command_free (command);
-
-#endif /* HAVE_LIBGDA_4 */
 	
 	g_string_free (del_query, TRUE);
 
