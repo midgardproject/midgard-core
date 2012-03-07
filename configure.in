@@ -28,8 +28,11 @@ AC_LANG(C)
 dnl Checks for programs.
 AM_PROG_LIBTOOL
 
-dnl Checks for libraries.
+dnl Checks libgda
 gdamodule="libgda-4.0"
+AC_MSG_CHECKING([whether to use Libgda5 (libgda4 by default)])
+AC_ARG_WITH(libgda5, [  --with-libgda5], gdamodule="libgda-5.0", gdamodule="libgda-4.0")
+AC_MSG_RESULT($gdamodule)
 
 _MIDGARD_DBUS_SUPPORT=yes
 dbus_libs="dbus-1 dbus-glib-1"
@@ -44,7 +47,7 @@ if test "$_MIDGARD_DBUS_SUPPORT" == "no"; then
 	dbus_libs=""
 fi
 
-PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 libgda-4.0 $dbus_libs)
+PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 $gdamodule $dbus_libs)
 if test "$gdamodule" == "libgda-4.0"; then
     MIDGARD_CFLAGS="${MIDGARD_CFLAGS} -DHAVE_LIBGDA_4"
 fi
