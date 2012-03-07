@@ -405,8 +405,7 @@ __mysql_reconnect (MidgardConnection *mgd)
 
 		opened = gda_connection_open (mgd->priv->connection, NULL);
 	
-		if (opened) {
-		
+		if (opened) {	
 			g_signal_emit (mgd, MIDGARD_CONNECTION_GET_CLASS (mgd)->signal_id_connected, 0);
 			g_debug ("Successfully reopened connection");
 			return TRUE;
@@ -565,7 +564,6 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError *
 	g_free(auth);	
 
 	if(connection == NULL) {
-
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_NOT_CONNECTED, 
 				" Database [%s]. %s", tmpstr, err->message);
 		if (err) {
@@ -584,6 +582,12 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError *
 	if (!mgd->priv->parser)
 		mgd->priv->parser = gda_sql_parser_new();
 	g_assert (mgd->priv->parser != NULL);
+
+	/* Set the same database as meta store */
+	GdaMetaStore *store;
+	store = GDA_META_STORE (g_object_new (GDA_TYPE_META_STORE, "cnc", connection, NULL));
+	g_object_set (G_OBJECT (connection), "meta-store", store, NULL);
+	g_object_unref (store); 
 
 	mgd->priv->connection = connection;
 	midgard_core_connection_connect_error_callback (mgd);	
