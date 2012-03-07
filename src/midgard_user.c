@@ -686,7 +686,7 @@ __midgard_user_delete (MidgardUser *self)
 
 	GError *error = NULL;
 	GdaConnection *connection = mgd->priv->connection;	
-	gda_execute_non_select_command (connection, del_query->str, &error);
+	gda_connection_execute_non_select_command (connection, del_query->str, &error);
 	
 	g_string_free (del_query, TRUE);
 
