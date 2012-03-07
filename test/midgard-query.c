@@ -59,11 +59,7 @@ main (int argc, char **argv)
 		return(1);
 	}
 
-#ifdef HAVE_LIBGDA_4
 	gda_init();
-#else
-	gda_init(G_LOG_DOMAIN, midgard_version(), 0, NULL);
-#endif
 
 	g_log_set_always_fatal(G_LOG_LEVEL_ERROR);
 

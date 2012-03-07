@@ -134,11 +134,8 @@ midgard_init()
 	GType type;
 	/* g_type_init_with_debug_flags(G_TYPE_DEBUG_OBJECTS | G_TYPE_DEBUG_NONE); */
 
-#ifdef HAVE_LIBGDA_4
+
 	gda_init ();
-#else
-	gda_init ("midgard-core-gda", midgard_version(), 0, NULL);
-#endif
 
 	type = MIDGARD_TYPE_BLOB;
 	g_assert (type != 0);
