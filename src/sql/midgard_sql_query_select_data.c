@@ -32,6 +32,7 @@
 #include "../midgard_query_result.h"
 #include "midgard_sql_query_result.h"
 #include "midgard_sql_query_constraint.h"
+#include "../midgard_query_constraint_group.h"
 
 /**
  * midgard_sql_query_select_data_new:
@@ -492,6 +493,7 @@ _get_all_constraints (MidgardSqlQuerySelectData *self, MidgardQueryConstraintSim
 	if (!constr)
 		return;
 
+	*list = g_slist_prepend (*list, constr);
 	guint n_objects;
 	MidgardQueryConstraintSimple **constraints = midgard_query_constraint_simple_list_constraints (constr, &n_objects);
 	if (!constraints)
@@ -500,7 +502,6 @@ _get_all_constraints (MidgardSqlQuerySelectData *self, MidgardQueryConstraintSim
 	guint i;
 	for (i = 0; i < n_objects; i++) {
 		_get_all_constraints (NULL, constraints[i], list);
-		*list = g_slist_prepend (*list, constraints[i]);
 	}
 
 	g_free (constraints);
@@ -604,10 +605,8 @@ _midgard_sql_query_select_data_validable_iface_validate (MidgardValidable *iface
 
 	for (l = o_list; l != NULL; l = l->next) {
 
-		if (MIDGARD_IS_SQL_QUERY_CONSTRAINT (l->data)
-				/* || MIDGARD_IS_SQL_QUERY_CONSTRAINT_GROUP (l->data)) */
-				&& (!midgard_validable_is_valid (MIDGARD_VALIDABLE (l->data)))) {
-			//midgard_validable_validate (MIDGARD_VALIDABLE (l->data), &err);
+		if (MIDGARD_IS_SQL_QUERY_CONSTRAINT (l->data) || MIDGARD_IS_QUERY_CONSTRAINT_GROUP (l->data)) {
+			midgard_validable_validate (MIDGARD_VALIDABLE (l->data), &err);
 			if (err) {
 				g_propagate_error (error, err);
 				g_slist_free (o_list);
