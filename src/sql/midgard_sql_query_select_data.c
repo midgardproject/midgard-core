@@ -809,7 +809,7 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 	if (MGD_CNC_DEBUG (mgd)) 
 		g_debug ("QuerySelectData: %s", self->query_string);
 
-	g_print ("CORE QUERY : %s \n", self->query_string);
+	//g_print ("CORE QUERY : %s \n", self->query_string);
 
 	/* execute statement */
 	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
