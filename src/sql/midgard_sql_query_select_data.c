@@ -32,6 +32,7 @@
 #include "../midgard_query_result.h"
 #include "midgard_sql_query_result.h"
 #include "midgard_sql_query_constraint.h"
+#include "../midgard_query_constraint_group.h"
 
 /**
  * midgard_sql_query_select_data_new:
@@ -604,10 +605,8 @@ _midgard_sql_query_select_data_validable_iface_validate (MidgardValidable *iface
 
 	for (l = o_list; l != NULL; l = l->next) {
 
-		if (MIDGARD_IS_SQL_QUERY_CONSTRAINT (l->data)
-				/* || MIDGARD_IS_SQL_QUERY_CONSTRAINT_GROUP (l->data)) */
-				&& (!midgard_validable_is_valid (MIDGARD_VALIDABLE (l->data)))) {
-			//midgard_validable_validate (MIDGARD_VALIDABLE (l->data), &err);
+		if (MIDGARD_IS_SQL_QUERY_CONSTRAINT (l->data) || MIDGARD_IS_QUERY_CONSTRAINT_GROUP (l->data)) {
+			midgard_validable_validate (MIDGARD_VALIDABLE (l->data), &err);
 			if (err) {
 				g_propagate_error (error, err);
 				g_slist_free (o_list);
@@ -809,6 +808,8 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 	self->query_string = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 	if (MGD_CNC_DEBUG (mgd)) 
 		g_debug ("QuerySelectData: %s", self->query_string);
+
+	//g_print ("CORE QUERY : %s \n", self->query_string);
 
 	/* execute statement */
 	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
