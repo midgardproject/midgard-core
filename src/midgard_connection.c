@@ -583,12 +583,6 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError *
 		mgd->priv->parser = gda_sql_parser_new();
 	g_assert (mgd->priv->parser != NULL);
 
-	/* Set the same database as meta store */
-	GdaMetaStore *store;
-	store = GDA_META_STORE (g_object_new (GDA_TYPE_META_STORE, "cnc", connection, NULL));
-	g_object_set (G_OBJECT (connection), "meta-store", store, NULL);
-	g_object_unref (store); 
-
 	mgd->priv->connection = connection;
 	midgard_core_connection_connect_error_callback (mgd);	
 

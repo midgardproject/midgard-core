@@ -1069,6 +1069,8 @@ gboolean __table_exists(MidgardConnection *mgd, const gchar *tablename)
         g_value_set_string ((mcontext.column_values[0] = gda_value_new (G_TYPE_STRING)), tablename);
 	GError *error = NULL;
 
+	_update_gda_meta_store_table (mgd->priv->connection, tablename, NULL);
+
 	GdaDataModel *dm_schema =
 		gda_connection_get_meta_store_data (mgd->priv->connection,
 						    GDA_CONNECTION_META_TABLES, NULL, 1,
