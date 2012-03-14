@@ -492,7 +492,6 @@ _get_all_constraints (MidgardSqlQuerySelectData *self, MidgardQueryConstraintSim
 	if (!constr)
 		return;
 
-	*list = g_slist_prepend (*list, constr);
 	guint n_objects;
 	MidgardQueryConstraintSimple **constraints = midgard_query_constraint_simple_list_constraints (constr, &n_objects);
 	if (!constraints)
@@ -501,6 +500,7 @@ _get_all_constraints (MidgardSqlQuerySelectData *self, MidgardQueryConstraintSim
 	guint i;
 	for (i = 0; i < n_objects; i++) {
 		_get_all_constraints (NULL, constraints[i], list);
+		*list = g_slist_prepend (*list, constraints[i]);
 	}
 
 	g_free (constraints);
@@ -809,6 +809,8 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 	self->query_string = gda_connection_statement_to_sql (cnc, stmt, NULL, GDA_STATEMENT_SQL_PRETTY, NULL, NULL);
 	if (MGD_CNC_DEBUG (mgd)) 
 		g_debug ("QuerySelectData: %s", self->query_string);
+
+	g_print ("CORE QUERY : %s \n", self->query_string);
 
 	/* execute statement */
 	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
