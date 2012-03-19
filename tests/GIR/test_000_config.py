@@ -38,6 +38,16 @@ class TestProperties(unittest.TestCase):
     self.assertNotEqual(config.get_property("dbdir"), "/tmp/test")
     self.assertFalse(hasattr(config.props, "notexists"))
 
+  def testBooleanProperties(self):
+    config = Midgard.Config()
+    boolean_properties = { "tablecreate", "tableupdate", "gdathreads" }
+    for prop in boolean_properties:
+      self.assertTrue(hasattr(config.props, prop))
+      config.set_property(prop, True)
+      self.assertTrue(config.get_property(prop))
+      config.set_property(prop, False)
+      self.assertFalse(config.get_property(prop))
+
   def testReadFileAtPath(self):
     config = Midgard.Config()
     self.assertTrue(config.read_file_at_path("./test_SQLITE.conf"))
