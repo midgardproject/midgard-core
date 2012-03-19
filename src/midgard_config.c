@@ -62,7 +62,8 @@ enum {
 	MIDGARD_CONFIG_BLOBDIR,
 	MIDGARD_CONFIG_SHAREDIR,
 	MIDGARD_CONFIG_VARDIR,
-	MIDGARD_CONFIG_CACHEDIR
+	MIDGARD_CONFIG_CACHEDIR,
+	MIDGARD_CONFIG_GDATHREADS
 };
 
 static MidgardConfigPrivate *midgard_config_private_new(void)
@@ -1576,6 +1577,10 @@ _midgard_config_set_property (GObject *object, guint property_id,
 			self->cachedir = g_value_dup_string (value);
 			break;
 
+		case MIDGARD_CONFIG_GDATHREADS:
+			self->gdathreads = g_value_get_boolean(value);
+			break;
+
 		default:
 			G_OBJECT_WARN_INVALID_PROPERTY_ID(object,property_id,pspec);
 			break;
@@ -1669,6 +1674,10 @@ _midgard_config_get_property (GObject *object, guint property_id,
 
 		case MIDGARD_CONFIG_CACHEDIR:
 			g_value_set_string (value, self->cachedir);
+			break;
+
+		case MIDGARD_CONFIG_GDATHREADS:
+			g_value_set_boolean (value, self->gdathreads);
 			break;
 
 		default:
@@ -1837,6 +1846,14 @@ _midgard_config_class_init (gpointer g_class, gpointer g_class_data)
 	g_object_class_install_property (gobject_class,
 			MIDGARD_CONFIG_AUTHTYPE,
 			pspec);	
+
+	pspec = g_param_spec_boolean("gdathreads",
+			"GdaThreads",
+			"GDA connection thread safe flag",
+			FALSE, G_PARAM_READWRITE);
+	g_object_class_install_property (gobject_class,
+			MIDGARD_CONFIG_GDATHREADS,
+			pspec);
 
 	/* MidgardDir */	
 	pspec = g_param_spec_string ("blobdir",
