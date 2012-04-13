@@ -379,7 +379,7 @@ gboolean __query_select_data_add_joins (MidgardSqlQuerySelectData *self, GdaSqlO
 	GdaSqlStatementSelect *select = (GdaSqlStatementSelect *) sql_stm->contents;	
 	GdaSqlSelectFrom *from = select->from;
 	GdaSqlSelectJoin *join; 
-	
+
 	for (l = MIDGARD_QUERY_EXECUTOR (self)->priv->joins; l != NULL; l = l->next) {
 
 		qsj *_sj = (qsj*) l->data;
@@ -417,7 +417,8 @@ gboolean __query_select_data_add_joins (MidgardSqlQuerySelectData *self, GdaSqlO
                 midgard_query_holder_get_value (MIDGARD_QUERY_HOLDER (_sj->right_property), &rval);
 
 		/* Set qualifier as default table and alias */
-		const gchar *qualifier = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (_sj->right_property), NULL);
+		const gchar *qualifier= NULL;
+		qualifier = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN (_sj->right_property), NULL);
 		MidgardQueryProperty *qproperty = midgard_query_column_get_query_property (MIDGARD_QUERY_COLUMN (_sj->right_property), NULL);
 		gchar *table_name = (gchar *) qualifier;
 
@@ -440,22 +441,37 @@ gboolean __query_select_data_add_joins (MidgardSqlQuerySelectData *self, GdaSqlO
 		g_value_unset (&rval);
 
 		join->expr = expr;
-		join->position = ++executor->priv->joinid;
 
 		/* Add right qualifier to targets */	
 		gda_sql_select_from_take_new_join (from , join);
 		GdaSqlSelectTarget *s_target = gda_sql_select_target_new (GDA_SQL_ANY_PART (from));
 		s_target->table_name = g_strdup (table_name);
-		s_target->as = g_strdup (qualifier);
-		//gda_sql_select_from_take_new_target (from, s_target);
-	
-		/* Set target expression */
-		GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
-		GValue *tval = g_new0 (GValue, 1);
-		g_value_init (tval, G_TYPE_STRING);
-		g_value_set_string (tval, table_name);
-		texpr->value = tval;
-		s_target->expr = texpr;
+		s_target->as = g_strdup (qualifier);	
+
+		GSList *l = NULL;
+		guint i = 0;
+		gboolean duplicate = FALSE;
+		for (l = from->targets; l != NULL; l = l->next, i++) {
+			if (g_str_equal(((GdaSqlSelectTarget*)(l->data))->as, qualifier)) {
+				duplicate = TRUE;
+				break;
+			}
+		}
+
+		if (duplicate) {
+			join->position = i;
+		} else {
+			gda_sql_select_from_take_new_target (from, s_target);
+			join->position = g_slist_length(from->targets)-1;		
+
+			/* Set target expression, cause we set new target */
+			GdaSqlExpr *texpr = gda_sql_expr_new (GDA_SQL_ANY_PART (s_target));
+			GValue *tval = g_new0 (GValue, 1);
+			g_value_init (tval, G_TYPE_STRING);
+			g_value_set_string (tval, table_name);
+			texpr->value = tval;
+			s_target->expr = texpr;
+		}
 	}
 
 	return TRUE;
