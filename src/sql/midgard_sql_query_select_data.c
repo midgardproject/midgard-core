@@ -703,6 +703,12 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 		g_object_unref (qprop);
 		MidgardDBObjectClass *dbklass = storage->priv->klass;
 		const gchar *table_alias = midgard_query_column_get_qualifier (MIDGARD_QUERY_COLUMN(columns[i]), NULL);
+		if (!table_alias || (table_alias && *table_alias == '\0')) {
+			g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_COMMAND_INVALID_DATA,
+					"Expected non null qualifier for '%s'", 
+					midgard_query_column_get_name (MIDGARD_QUERY_COLUMN(columns[i]), NULL));
+			return; 
+		}
 		const gchar *property_table = midgard_core_class_get_table (dbklass);
 		const gchar *property_field = midgard_core_class_get_property_colname (dbklass, property);
 
