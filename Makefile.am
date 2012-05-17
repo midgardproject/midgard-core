@@ -192,7 +192,6 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_collector.c \
 	src/midgard_dbus.h \
 	src/midgard_dbus.c \
-	src/midgard_dbus_interface.h \
 	src/midgard_executable.c \
 	src/midgard_object_parameter.c \
 	src/midgard_object_attachment.c \
@@ -238,6 +237,12 @@ src_libmidgard2_la_public_SOURCES = \
 	src/sql/midgard_sql_query_constraint.c \
 	$(NULL)
 
+if MIDGARD_DBUS_SUPPORT
+src_libmidgard2_la_dbus_SOURCES = src/midgard_dbus_interface.h
+else
+src_libmidgard2_la_dbus_SOURCES =
+endif
+
 pkgdatadir = $(datadir)/midgard2
 pkglibdir = $(libdir)/midgard2
 libmidgardincludedir = $(includedir)/midgard2
@@ -249,7 +254,7 @@ libsubmidgardinclude_HEADERS = $(midgard_public_h) src/midgard.h
 libmidgardsqlincludedir = $(includedir)/midgard2/midgard/sql
 libmidgardsqlinclude_HEADERS = $(midgard_sql_public_h)
 
-src_libmidgard2_la_SOURCES = $(src_libmidgard2_la_public_SOURCES) $(src_libmidgard2_la_core_SOURCES)
+src_libmidgard2_la_SOURCES = $(src_libmidgard2_la_public_SOURCES) $(src_libmidgard2_la_core_SOURCES) $(src_libmidgard2_la_dbus_SOURCES)
 
 mgdschemasdir = $(datadir)/midgard2/schema
 
