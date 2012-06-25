@@ -119,7 +119,7 @@ midgard_sql_query_constraint_get_column (MidgardSqlQueryConstraint *self)
  * Since: 10.05.6
  */ 
 void 
-midgard_sql_query_constraint_set_storage (MidgardSqlQueryConstraint *self, MidgardSqlQueryColumn *column, GError **error)
+midgard_sql_query_constraint_set_column (MidgardSqlQueryConstraint *self, MidgardSqlQueryColumn *column, GError **error)
 {
 	g_return_if_fail (self != NULL);
 	g_return_if_fail (column != NULL);
@@ -138,7 +138,7 @@ midgard_sql_query_constraint_set_storage (MidgardSqlQueryConstraint *self, Midga
  * Since: 10.05.6
  */ 
 MidgardQueryHolder*
-midgard_sql_query_constraint_get_property (MidgardSqlQueryConstraint *self)
+midgard_sql_query_constraint_get_holder (MidgardSqlQueryConstraint *self)
 {
 	g_return_val_if_fail (self != NULL, NULL);
 
