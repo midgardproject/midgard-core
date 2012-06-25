@@ -30,9 +30,17 @@ AM_PROG_LIBTOOL
 
 dnl Checks libgda
 gdamodule="libgda-4.0"
+GDA_GIR_INCLUDE="Gda-4.0"
+GDA_GIR_PACKAGE="libgda-4.0"
 AC_MSG_CHECKING([whether to use Libgda5 (libgda4 by default)])
 AC_ARG_WITH(libgda5, [  --with-libgda5], gdamodule="libgda-5.0", gdamodule="libgda-4.0")
 AC_MSG_RESULT($gdamodule)
+
+if test "$gdamodule" == "libgda-5.0"; then
+	GDA_GIR_INCLUDE="Gda-5.0"
+	GDA_GIR_PACKAGE="libgda-5.0"
+fi
+
 
 _MIDGARD_DBUS_SUPPORT=yes
 dbus_libs="dbus-1 dbus-glib-1"
@@ -103,6 +111,8 @@ AC_SUBST(VERSION)
 AC_SUBST(VERSION_STRING)
 AC_SUBST(LFLAGS)
 AC_SUBST(MIDGARD_DBUS_SUPPORT)
+AC_SUBST(GDA_GIR_INCLUDE)
+AC_SUBST(GDA_GIR_PACKAGE)
 AC_SUBST(LIBGDA_VERSION, $gdamodule)
 AC_SUBST(MIDGARD_LIBS)
 AC_SUBST(MIDGARD_CFLAGS)
