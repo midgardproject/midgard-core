@@ -7,15 +7,14 @@ import shutil
 
 import unittest
 
+testLoader = unittest.TestLoader()
+
 names = []
 for filename in glob.iglob("test_*.py"):
   names.append(filename[:-3])
-
 names.sort()
 
-testLoader = unittest.TestLoader()
 testSuite = testLoader.loadTestsFromNames(names)
-
 runner = unittest.TextTestRunner(verbosity=2)
 result = runner.run(testSuite)
 
