@@ -214,7 +214,7 @@ _connect_cnc_callback (GdaConnection *cnc, GdaConnectionEvent *event, gpointer u
 			errcode,
 			gda_connection_event_get_source(event),
 			gda_connection_event_get_sqlstate (event));
-	
+
 	if (ud == NULL || !MIDGARD_IS_CONNECTION(ud))
 		return;
 
