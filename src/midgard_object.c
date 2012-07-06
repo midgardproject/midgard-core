@@ -2249,6 +2249,17 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 					G_TYPE_NONE,
 					0);
 
+		mklass->signal_action_load =
+			g_signal_new("action-load",
+					G_TYPE_FROM_CLASS(g_class),
+					G_SIGNAL_ACTION,
+					G_STRUCT_OFFSET (MidgardObjectClass, action_load),
+					NULL, /* accumulator */
+					NULL, /* accu_data */
+					g_cclosure_marshal_VOID__VOID,	
+					G_TYPE_NONE,
+					0);
+
 		mklass->signal_action_loaded =
 			g_signal_new("action-loaded",
 					G_TYPE_FROM_CLASS(g_class),

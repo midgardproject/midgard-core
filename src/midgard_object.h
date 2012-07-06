@@ -71,6 +71,7 @@ struct _MidgardObjectClass {
 	void (*action_export)		(MidgardObject *object);
 	void (*action_export_hook)   	(MidgardObject *object);
 	void (*action_exported) 	(MidgardObject *object);
+	void (*action_load)		(MidgardObject *object);
 	void (*action_loaded)		(MidgardObject *object);
 	void (*action_loaded_hook)   	(MidgardObject *object);
 	void (*action_approve)		(MidgardObject *object);
@@ -87,6 +88,7 @@ struct _MidgardObjectClass {
 	void (*action_unlocked)		(MidgardObject *object);
 
 	/* signals id */
+	guint signal_action_load;
 	guint signal_action_loaded;
 	guint signal_action_loaded_hook;
 	guint signal_action_update;
