@@ -61,6 +61,9 @@ midgard_public_h = \
 	src/midgard_connection.h \
 	src/midgard_error.h \
 	src/midgard_collector.h \
+	src/midgard_model.h \
+	src/midgard_model_reference.h \
+	src/midgard_object_reference.h \
 	src/midgard_object_parameter.h \
 	src/midgard_object_attachment.h \
 	src/midgard_query_constraint.h \
@@ -193,6 +196,9 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_dbus.h \
 	src/midgard_dbus.c \
 	src/midgard_executable.c \
+	src/midgard_model.c \
+	src/midgard_model_reference.c \
+	src/midgard_object_reference.c \
 	src/midgard_object_parameter.c \
 	src/midgard_object_attachment.c \
 	src/midgard_query_constraint.c \
