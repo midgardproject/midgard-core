@@ -83,6 +83,8 @@
 #include <midgard/model.h>
 #include <midgard/model_reference.h>
 #include <midgard/object_reference.h>
+#include <midgard/midgard_content_manager.h>
+#include <midgard/sql/midgard_sql_async_content_manager.h>
 
 #endif /* _MIDGARD_API_H_ */
 

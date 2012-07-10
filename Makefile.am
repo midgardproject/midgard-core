@@ -42,6 +42,7 @@ midgard_public_h = \
 	src/midgard_base_mixin.h \
 	src/midgard_config.h \
 	src/midgard_config_auto.h \
+	src/midgard_content_manager.h \
 	src/midgard_dbobject.h \
 	src/midgard_defs.h \
 	src/midgard_dbus.h \
@@ -104,6 +105,7 @@ midgard_sql_public_h = \
 	src/sql/midgard_sql_query_result.h \
 	src/sql/midgard_sql_query_select_data.h \
 	src/sql/midgard_sql_query_constraint.h \
+	src/sql/midgard_sql_async_content_manager.h \
 	$(NULL)
 
 man_MANS = man/midgard2-schema.1 \
@@ -176,6 +178,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_base_abstract.c \
 	src/midgard_base_interface.c \
 	src/midgard_base_mixin.c \
+	src/midgard_content_manager.c \
 	src/midgard_key_config.c \
 	src/midgard_key_config_context.c \
 	src/midgard_key_config_file.c \
@@ -241,6 +244,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/sql/midgard_sql_query_result.c \
 	src/sql/midgard_sql_query_select_data.c \
 	src/sql/midgard_sql_query_constraint.c \
+	src/sql/midgard_sql_async_content_manager.c \
 	$(NULL)
 
 if MIDGARD_DBUS_SUPPORT
