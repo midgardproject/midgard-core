@@ -18,6 +18,20 @@
 
 #include "midgard_content_manager.h"
 
+/**
+ * midgard_content_manager_error_quark: (skip)
+ * 
+ * Returns: MIDGARD_CONTENT_MANAGER_ERROR quark
+ */
+GQuark
+midgard_content_manager_error_quark (void)
+{
+	static GQuark q = 0;
+	if (q == 0)
+		q = g_quark_from_static_string ("midgard-content-manager-error-quark");
+	return q;
+}
+
 struct _MidgardContentManager {
 	GObject parent;
 };

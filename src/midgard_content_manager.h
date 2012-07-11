@@ -25,6 +25,14 @@
 
 G_BEGIN_DECLS
 
+typedef enum {
+	MIDGARD_CONTENT_MANAGER_ERROR_INVALID,
+	MIDGARD_CONTENT_MANAGER_ERROR_EXISTS,
+	MIDGARD_CONTENT_MANAGER_ERROR_DUPLICATED,
+	MIDGARD_CONTENT_MANAGER_ERROR_NOT_EXISTS
+} MidgardContentManagerError;
+#define MIDGARD_CONTENT_MANAGER_ERROR midgard_content_manager_error_quark ()
+
 /* convention macros */
 #define MIDGARD_TYPE_CONTENT_MANAGER (midgard_content_manager_get_type()) 
 #define MIDGARD_CONTENT_MANAGER(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_CONTENT_MANAGER, MidgardContentManager))
