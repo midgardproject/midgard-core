@@ -34,6 +34,23 @@ midgard_model_reference_get_id (MidgardModelReference *self, GError **error)
 	return MIDGARD_MODEL_REFERENCE_GET_INTERFACE (self)->get_id (self, error);
 }
 
+/**
+ * midgard_model_reference_get_id_value:
+ * @self: #MidgardModelReference instance
+ * @error: pointer to store returned error
+ *
+ * The purpose of this method is to return generic GValue which can hold either 
+ * string or integer id. 
+ *
+ * Returns: New GValue which holds id of the model, or NULL in case of error.
+ *
+ * Since: 10.05.8
+ */ 
+const gchar*
+midgard_model_reference_get_id_value (MidgardModelReference *self, GError **error)
+{
+	return MIDGARD_MODEL_REFERENCE_GET_INTERFACE (self)->get_id_value (self, error);
+}
 
 /* GOBJECT ROUTINES */
 

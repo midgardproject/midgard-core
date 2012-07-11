@@ -36,11 +36,13 @@ struct _MidgardModelReferenceIFace {
 	GTypeInterface parent;
 
 	const gchar*		(*get_id)		(MidgardModelReference *self, GError **error);
+	GValue*			(*get_id_value)		(MidgardModelReference *self, GError **error);
 
 };
 
 GType 			midgard_model_reference_get_type	(void);
 const gchar 		*midgard_model_reference_get_id		(MidgardModelReference *self, GError **error);
+GValue			*midgard_model_reference_get_id_value	(MidgardModelReference *self, GError **error);
 
 G_END_DECLS
 
