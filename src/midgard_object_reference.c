@@ -19,6 +19,7 @@
 #include "midgard_object_reference.h"
 #include "midgard_model.h"
 #include "midgard_model_reference.h"
+#include "midgard_validable.h"
 
 struct _MidgardObjectReferencePrivate {
 	const gchar *name;
@@ -68,6 +69,34 @@ _midgard_object_reference_get_id (MidgardModelReference *iface, GError **error)
 	return self->priv->id;
 }
 
+GValue*                
+_midgard_object_reference_get_id_value (MidgardModelReference *iface, GError **error)
+{
+	MidgardObjectReference *self = MIDGARD_OBJECT_REFERENCE(iface);
+
+	const gchar *id = self->priv->id;
+	GValue *id_value = g_new0(GValue, 1);
+
+	/* GUID */
+	if (midgard_is_guid(id)) {
+		g_value_init (id_value, G_TYPE_STRING);
+		g_value_set_string (id_value, id);
+	/* integer */
+	} else if (isdigit(id)) {
+		g_value_init (id_value, G_TYPE_UINT);
+		g_value_set_uint (id_value, atoi(id));
+	/* undefined TODO: UUID */	
+	} else {
+		g_free (id_value);
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID, 
+				"Invalid ID value type. Expected guid, uuid or integer id. Got '%s'.",
+				G_VALUE_TYPE_NAME (id_value));
+		return;
+	}	
+
+	return id_value;
+}
+
 /* GOBJECT ROUTINES */
 
 static GObjectClass *__parent_class= NULL;
@@ -90,6 +119,7 @@ static void
 _midgard_object_reference_model_reference_iface_init (MidgardModelReferenceIFace *iface)
 {
 	iface->get_id = _midgard_object_reference_get_id;
+	iface->get_id_value = _midgard_object_reference_get_id_value;
 	return;
 }
 
