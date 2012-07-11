@@ -46,7 +46,7 @@ midgard_model_reference_get_id (MidgardModelReference *self, GError **error)
  *
  * Since: 10.05.8
  */ 
-const gchar*
+GValue*
 midgard_model_reference_get_id_value (MidgardModelReference *self, GError **error)
 {
 	return MIDGARD_MODEL_REFERENCE_GET_INTERFACE (self)->get_id_value (self, error);
