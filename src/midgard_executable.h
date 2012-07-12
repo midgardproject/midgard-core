@@ -44,10 +44,12 @@ struct _MidgardExecutableIFace {
 	GTypeInterface	parent;
 
 	void			(*execute)		(MidgardExecutable *self, GError **error);
+	void			(*execute_async)	(MidgardExecutable *self, GError **error);
 };
 
 GType		midgard_executable_get_type		(void);
 void		midgard_executable_execute		(MidgardExecutable *self, GError **error);
+void		midgard_executable_execute_async	(MidgardExecutable *self, GError **error);
 GQuark		midgard_execution_error_quark 		(void);
 
 G_END_DECLS

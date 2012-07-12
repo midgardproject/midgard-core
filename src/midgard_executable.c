@@ -54,6 +54,28 @@ midgard_executable_execute (MidgardExecutable *self, GError **error)
 	MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute (self, error);
 }
 
+/**
+ * midgard_executable_execute_async:
+ * @self: #MidgardExecutable instance
+ * @error (error-domains MIDGARD_EXECUTION_ERROR): location to store error
+ *
+ * Execute asynchronous command or perform operation.
+ * Implementation shall check if given instance is valid.
+ * If it's not, shall invoke validation, if given instance is #MidgardValidable derived.
+ *
+ * Since: 10.05.8
+ */
+void
+midgard_executable_execute_async (MidgardExecutable *self, GError **error)
+{
+	if (MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute_async == NULL) {
+		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
+				"%s class doesn't implement execute_async() method", G_OBJECT_TYPE_NAME (self));
+	}
+
+	MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute_async (self, error);
+}
+
 GType
 midgard_executable_get_type (void)
 {
