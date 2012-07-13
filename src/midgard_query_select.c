@@ -603,11 +603,41 @@ _midgard_query_select_validable_iface_is_valid (MidgardValidable *self)
 }
 
 static void
-_midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError **error)
+_execute_async_callback (MidgardQueryExecutor *self)
+{
+	if (self->priv->is_pending == FALSE)
+		return;
+
+	MidgardConnection *mgd = self->priv->mgd;
+	GdaConnection *cnc = mgd->priv->connection;
+
+	while (self->priv->is_pending == TRUE) {
+		GdaDataModel *model = gda_connection_async_fetch_result (cnc, self->priv->async_task_id, NULL, NULL);
+		if (model) {
+			self->priv->results_count = gda_data_model_get_n_rows (model);
+			if (self->priv->resultset && G_IS_OBJECT (self->priv->resultset))
+				g_object_unref (G_OBJECT (self->priv->resultset));
+			self->priv->resultset = (gpointer) model;
+			self->priv->is_pending = FALSE;
+			g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
+			g_object_unref (self);
+		}
+	}
+}
+
+
+static void
+_midgard_query_select_execute (MidgardExecutable *iface, gboolean async, GError **error)
 {
 	g_return_if_fail (iface != NULL);
 	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (iface);
 	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
+
+	executor->priv->is_async = async;
+	executor->priv->is_pending = async;
+
+	/* Connect to execution-start callback so we can start to monitor async execution */
+	g_signal_connect (G_OBJECT(self), "execution-start", G_CALLBACK(_execute_async_callback), (gpointer) executor);
 
 	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_start, 0);
 
@@ -737,8 +767,24 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 	}
 
 	/* execute statement */
-	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
-	g_object_unref (stmt);
+	GdaDataModel *model = NULL;
+	if (async == TRUE) {
+		guint task_id = gda_connection_async_statement_execute (
+				cnc, stmt, NULL, GDA_STATEMENT_MODEL_RANDOM_ACCESS, NULL, FALSE, &err);
+		g_object_unref (stmt);
+		if (task_id == 0) {
+			executor->priv->is_pending = FALSE;
+			g_object_unref (self);
+			g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
+					"Async execute error - %s", err && err->message ? err->message : "Unknown reason" );
+			g_error_free (err);
+		}	
+		executor->priv->async_task_id = task_id;
+		return;
+	} else {
+		model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
+		g_object_unref (stmt);
+	}
 
 	if (!model && !err) {
 		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
@@ -768,6 +814,28 @@ return_false:
 
 	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
 	g_object_unref (self);
+	return;
+}
+
+static void
+_midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError **error)
+{
+	GError *err = NULL;
+	_midgard_query_select_execute (iface, FALSE, &err);
+	if (err)
+		g_propagate_error (error, err);
+
+	return;
+}
+
+static void
+_midgard_query_select_executable_iface_execute_async (MidgardExecutable *iface, GError **error)
+{
+	GError *err = NULL;
+	_midgard_query_select_execute (iface, TRUE, &err);
+	if (err)
+		g_propagate_error (error, err);
+
 	return;
 }
 
@@ -1062,6 +1130,7 @@ static void
 _midgard_query_select_executable_iface_init (MidgardExecutableIFace *iface)
 {
 	iface->execute = _midgard_query_select_executable_iface_execute;
+	iface->execute = _midgard_query_select_executable_iface_execute_async;
 }
 
 /* Validable iface */
