@@ -146,6 +146,7 @@ __midgard_query_executor_instance_init (GTypeInstance *instance, gpointer g_clas
 	MIDGARD_QUERY_EXECUTOR (object)->priv->bool_is_int = FALSE;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->is_async = FALSE;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->is_pending = FALSE;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->async_task_id = 0;
 }
 
 static GObject *
@@ -206,6 +207,7 @@ _midgard_query_executor_finalize (GObject *object)
 
 	self->priv->is_async = FALSE;
 	self->priv->is_pending = FALSE;
+	self->priv->async_task_id = 0;
 
 	g_free (self->priv);
 	self->priv = NULL;

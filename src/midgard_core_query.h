@@ -105,6 +105,7 @@ struct _MidgardQueryExecutorPrivate {
 	gboolean bool_is_int;
 	gboolean is_async;
 	gboolean is_pending;
+	guint async_task_id;
 };
 
 struct _MidgardQueryConstraintSimplePrivate {
