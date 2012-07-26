@@ -34,8 +34,10 @@ typedef struct _MidgardDBJoin MidgardDBJoin;
 struct _MidgardDBColumn {
 	const gchar *table_name;
 	const gchar *column_name;
+	gchar **columns;
 	const gchar *column_desc;
 	const gchar *dbtype;
+	gchar *index_name;
 	GType gtype;
 	gboolean index;
 	gboolean unique;
@@ -106,6 +108,7 @@ struct _MidgardQueryExecutorPrivate {
 	gboolean is_async;
 	gboolean is_pending;
 	guint async_task_id;
+	GMainLoop *loop;
 };
 
 struct _MidgardQueryConstraintSimplePrivate {
