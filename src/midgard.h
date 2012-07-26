@@ -80,9 +80,9 @@
 #include <midgard/sql/midgard_sql_query_row.h>
 #include <midgard/sql/midgard_sql_query_result.h>
 #include <midgard/sql/midgard_sql_query_select_data.h>
-#include <midgard/model.h>
-#include <midgard/model_reference.h>
-#include <midgard/object_reference.h>
+#include <midgard/midgard_model.h>
+#include <midgard/midgard_model_reference.h>
+#include <midgard/midgard_object_reference.h>
 #include <midgard/midgard_content_manager.h>
 #include <midgard/sql/midgard_sql_async_content_manager.h>
 
