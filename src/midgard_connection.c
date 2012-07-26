@@ -562,7 +562,7 @@ __midgard_connection_open(MidgardConnection *mgd, gboolean init_schema, GError *
 	GdaConnection *connection = gda_connection_open_from_string(
 			config->dbtype, 
 			tmpstr, auth, 
-			enable_threads ? GDA_CONNECTION_OPTIONS_THREAD_SAFE : GDA_CONNECTION_OPTIONS_NONE, 
+			enable_threads ? GDA_CONNECTION_OPTIONS_THREAD_ISOLATED : GDA_CONNECTION_OPTIONS_NONE, 
 			&err);
 	g_free(auth);	
 
