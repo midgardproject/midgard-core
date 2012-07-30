@@ -97,6 +97,8 @@ midgard_public_h = \
 	src/midgard_query_column.h \
 	src/midgard_query_selector.h \
 	src/midgard_query_result.h \
+	src/midgard_pool.h \
+	src/midgard_thread_pool.h \
 	$(NULL)
 
 midgard_sql_public_h = \
@@ -239,6 +241,8 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_workspace_context.c \
 	src/midgard_workspace_manager.c \
 	src/midgard_workspace_storage.c \
+	src/midgard_pool.c \
+	src/midgard_thread_pool.c \
 	src/sql/midgard_sql_query_column.c \
 	src/sql/midgard_sql_query_row.c \
 	src/sql/midgard_sql_query_result.c \
