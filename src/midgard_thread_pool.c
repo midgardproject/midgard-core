@@ -69,7 +69,10 @@ thread_pool_execute (gpointer data, gpointer user_data)
 {
 	MidgardExecutable *executable = (MidgardExecutable *) data;
 	GError *error = NULL;
+	/* Perform real operation and wait till it's finished */
 	midgard_executable_execute (executable, &error);
+	/* Operation is done, emit signal */
+	midgard_executable_execution_end (executable);
 	if (error) {
 		/* TODO, handle error */
 	}
