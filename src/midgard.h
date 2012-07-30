@@ -85,6 +85,8 @@
 #include <midgard/midgard_object_reference.h>
 #include <midgard/midgard_content_manager.h>
 #include <midgard/sql/midgard_sql_async_content_manager.h>
+#include <midgard_pool.h>
+#include <midgard_thread_pool.h>
 
 #endif /* _MIDGARD_API_H_ */
 
