@@ -658,7 +658,7 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 	MidgardSqlQuerySelectData *self = MIDGARD_SQL_QUERY_SELECT_DATA (iface);
 	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
 
-	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_start, 0);
+	midgard_executable_execution_start (iface);
 
 	GError *err = NULL;
 	midgard_validable_validate (MIDGARD_VALIDABLE (self), &err);
@@ -855,14 +855,14 @@ _midgard_sql_query_select_data_executable_iface_execute (MidgardExecutable *ifac
 		g_object_unref (G_OBJECT (executor->priv->resultset));
 	executor->priv->resultset = (gpointer) model;
 	g_object_unref (self);
-	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
+	midgard_executable_execution_end (iface);
 	return;
 
 return_false:
 	if (sql_stm)
 		gda_sql_statement_free (sql_stm);
 
-	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
+	midgard_executable_execution_end (iface);
 	g_object_unref (self);
 	return;
 }

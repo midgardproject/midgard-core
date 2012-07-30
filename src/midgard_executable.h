@@ -20,6 +20,7 @@
 #define MIDGARD_EXECUTABLE_H
 
 #include <glib-object.h>
+#include "midgard_pool.h"
 
 G_BEGIN_DECLS
 
@@ -44,12 +45,16 @@ struct _MidgardExecutableIFace {
 	GTypeInterface	parent;
 
 	void			(*execute)		(MidgardExecutable *self, GError **error);
-	void			(*execute_async)	(MidgardExecutable *self, GError **error);
+	void			(*execute_async)	(MidgardExecutable *self, MidgardPool *pool, GError **error);
+
+	/* signals */
+	void            (*execution_start)      (GObject *object);
+	void            (*execution_end)        (GObject *object);
 };
 
 GType		midgard_executable_get_type		(void);
 void		midgard_executable_execute		(MidgardExecutable *self, GError **error);
-void		midgard_executable_execute_async	(MidgardExecutable *self, GError **error);
+void		midgard_executable_execute_async	(MidgardExecutable *self, MidgardPool *pool, GError **error);
 GQuark		midgard_execution_error_quark 		(void);
 
 G_END_DECLS

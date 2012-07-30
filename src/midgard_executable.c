@@ -18,6 +18,9 @@
 
 #include "midgard_executable.h"
 
+static guint execution_start_signal = 0;
+static guint execution_end_signal = 0;
+
 /**
  * midgard_executable_error_quark: (skip)
  *
@@ -57,6 +60,7 @@ midgard_executable_execute (MidgardExecutable *self, GError **error)
 /**
  * midgard_executable_execute_async:
  * @self: #MidgardExecutable instance
+ * @pool: #MidgardPool 
  * @error (error-domains MIDGARD_EXECUTION_ERROR): location to store error
  *
  * Execute asynchronous command or perform operation.
@@ -66,14 +70,85 @@ midgard_executable_execute (MidgardExecutable *self, GError **error)
  * Since: 10.05.8
  */
 void
-midgard_executable_execute_async (MidgardExecutable *self, GError **error)
+midgard_executable_execute_async (MidgardExecutable *self, MidgardPool *pool, GError **error)
 {
 	if (MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute_async == NULL) {
 		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
 				"%s class doesn't implement execute_async() method", G_OBJECT_TYPE_NAME (self));
 	}
 
-	MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute_async (self, error);
+	MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute_async (self, pool, error);
+}
+
+/**
+ * midgard_executable_execution_start:
+ * @self: #MidgardExecutable instance
+ *
+ * Emits 'execution-start' signal on given executable.
+ *
+ * Since: 10.05.8
+ */
+void
+midgard_executable_execution_start (MidgardExecutable *self)
+{
+	g_return_if_fail (MIDGARD_IS_EXECUTABLE (self));
+	g_signal_emit (self, execution_start_signal, 0);
+}
+
+/**
+ * midgard_executable_execution_end:
+ * @self: #MidgardExecutable instance
+ *
+ * Emits 'execution-end' signal on given executable.
+ *
+ * Since: 10.05.8
+ */
+void
+midgard_executable_execution_end (MidgardExecutable *self)
+{
+	g_return_if_fail (MIDGARD_IS_EXECUTABLE (self));
+	g_signal_emit (self, execution_end_signal, 0);
+}
+
+static void
+midgard_executable_class_init (gpointer g_class)
+{
+	static gboolean initialized = FALSE;
+
+	if (initialized == TRUE)
+		return;
+	/**
+	 * MidgardExecutable::execution-start:
+	 * @executor: the #MidgardExecutable
+	 *
+	 * Gets emitted before @executor's operation is executed
+	 **/
+	execution_start_signal = g_signal_new("execution-start",
+			MIDGARD_TYPE_EXECUTABLE,
+			G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+			G_STRUCT_OFFSET (MidgardExecutableIFace, execution_start),
+			NULL, /* accumulator */
+			NULL, /* accu_data */
+			g_cclosure_marshal_VOID__VOID,
+			G_TYPE_NONE,
+			0);
+	/**
+	 * MidgardExecutable::execution-end:
+	 * @executor: the #MidgardExecutable
+	 *
+	 * Gets emitted after @executor's operation is executed
+	 **/
+	execution_end_signal = g_signal_new("execution-end",
+			MIDGARD_TYPE_EXECUTABLE,
+			G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+			G_STRUCT_OFFSET (MidgardExecutableIFace, execution_end),
+			NULL, /* accumulator */
+			NULL, /* accu_data */
+			g_cclosure_marshal_VOID__VOID,
+			G_TYPE_NONE,
+			0);
+
+	initialized = TRUE;
 }
 
 GType
@@ -83,7 +158,7 @@ midgard_executable_get_type (void)
 	if (type == 0) {
 		static const GTypeInfo info = {
 			sizeof (MidgardExecutableIFace),
-			NULL,   /* base_init */
+			(GBaseInitFunc) midgard_executable_class_init,
 			NULL,   /* base_finalize */
 			NULL,   /* class_init */
 			NULL,   /* class_finalize */
