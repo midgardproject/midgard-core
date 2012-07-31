@@ -268,6 +268,9 @@ typedef enum {
 	OBJECT_UPDATE_CREATE
 } _ObjectActionUpdate;
 
+struct _MidgardThreadPoolPrivate {
+	GThreadPool *gpool;
+};
 
 /* MidgardDBObject */
 GParamSpec **midgard_core_dbobject_class_list_properties (MidgardDBObjectClass *klass, guint *n_props); 
