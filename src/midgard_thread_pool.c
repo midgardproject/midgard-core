@@ -19,10 +19,7 @@
 #include "midgard_thread_pool.h"
 #include "midgard_executable.h"
 #include "midgard_validable.h"
-
-struct _MidgardThreadPoolPrivate {
-	GThreadPool *gpool;
-};
+#include "midgard_core_object.h"
 
 /**
  * midgard_thread_pool_new:
