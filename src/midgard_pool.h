@@ -38,12 +38,14 @@ struct _MidgardPoolIFace {
 	guint		(*get_max_n_resources)		(MidgardPool *self);
 	MidgardPool*	(*set_max_n_resources)		(MidgardPool *self, guint n_resources, GError **error);
 	guint		(*get_n_resources)		(MidgardPool *self);
+	MidgardPool*	(*push)				(MidgardPool *self, GObject *object, GError **error);
 };
 
 GType 		midgard_pool_get_type			(void);
 guint		midgard_pool_get_max_n_resources	(MidgardPool *self);
 MidgardPool*	midgard_pool_set_max_n_resources	(MidgardPool *self, guint n_resources, GError **error);
 guint		midgard_pool_get_n_resources		(MidgardPool *self);
+MidgardPool*	midgard_pool_push			(MidgardPool *self, GObject *object, GError **error);
 
 G_END_DECLS
 

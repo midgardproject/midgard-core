@@ -64,6 +64,24 @@ midgard_pool_set_max_n_resources (MidgardPool *self, guint n_resources, GError *
 	return MIDGARD_POOL_GET_INTERFACE (self)->set_max_n_resources (self, n_resources, error);
 }
 
+/**
+ * midgard_pool_push:
+ * @self: #MidgardPool instance
+ * @object: #GObject to add to pool
+ * @error: pointer to store returned error
+ *
+ * Adds an @object to pool
+ *
+ * Returns: (transfer none): #MidgardPool self reference 
+ *
+ * Since: 10.05.8
+ */ 
+MidgardPool*
+midgard_pool_push (MidgardPool *self, GObject *object, GError **error)
+{
+	return MIDGARD_POOL_GET_INTERFACE (self)->push (self, object, error);
+}
+
 /* GOBJECT ROUTINES */
 
 GType
