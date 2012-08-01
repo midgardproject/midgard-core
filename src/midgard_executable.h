@@ -44,8 +44,7 @@ typedef struct _MidgardExecutableIFace MidgardExecutableIFace;
 struct _MidgardExecutableIFace {
 	GTypeInterface	parent;
 
-	void			(*execute)		(MidgardExecutable *self, GError **error);
-	void			(*execute_async)	(MidgardExecutable *self, MidgardPool *pool, GError **error);
+	void		(*execute)		(MidgardExecutable *self, GError **error);
 
 	/* signals */
 	void            (*execution_start)      (GObject *object);
@@ -54,7 +53,6 @@ struct _MidgardExecutableIFace {
 
 GType		midgard_executable_get_type		(void);
 void		midgard_executable_execute		(MidgardExecutable *self, GError **error);
-void		midgard_executable_execute_async	(MidgardExecutable *self, MidgardPool *pool, GError **error);
 GQuark		midgard_execution_error_quark 		(void);
 
 G_END_DECLS

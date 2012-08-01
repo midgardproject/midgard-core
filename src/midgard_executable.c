@@ -58,29 +58,6 @@ midgard_executable_execute (MidgardExecutable *self, GError **error)
 }
 
 /**
- * midgard_executable_execute_async:
- * @self: #MidgardExecutable instance
- * @pool: #MidgardPool 
- * @error (error-domains MIDGARD_EXECUTION_ERROR): location to store error
- *
- * Execute asynchronous command or perform operation.
- * Implementation shall check if given instance is valid.
- * If it's not, shall invoke validation, if given instance is #MidgardValidable derived.
- *
- * Since: 10.05.8
- */
-void
-midgard_executable_execute_async (MidgardExecutable *self, MidgardPool *pool, GError **error)
-{
-	if (MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute_async == NULL) {
-		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
-				"%s class doesn't implement execute_async() method", G_OBJECT_TYPE_NAME (self));
-	}
-
-	MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute_async (self, pool, error);
-}
-
-/**
  * midgard_executable_execution_start:
  * @self: #MidgardExecutable instance
  *
@@ -115,8 +92,14 @@ midgard_executable_class_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
-	if (initialized == TRUE)
+	static GMutex mutex;
+	g_mutex_lock (&mutex);
+
+	if (initialized == TRUE) {
+		g_mutex_unlock (&mutex);
 		return;
+	}
+
 	/**
 	 * MidgardExecutable::execution-start:
 	 * @executor: the #MidgardExecutable
@@ -149,6 +132,8 @@ midgard_executable_class_init (gpointer g_class)
 			0);
 
 	initialized = TRUE;
+
+	g_mutex_unlock (&mutex);
 }
 
 GType
