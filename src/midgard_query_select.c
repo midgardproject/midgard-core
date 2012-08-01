@@ -28,7 +28,6 @@
 #include "midgard_core_workspace.h"
 #include "midgard_workspace_storage.h"
 #include "midgard_core_config.h"
-#include "midgard_thread_pool.h"
 
 /**
  * midgard_query_select_new:
