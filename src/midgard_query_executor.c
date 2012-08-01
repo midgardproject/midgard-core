@@ -282,7 +282,6 @@ static void
 _midgard_query_executor_executable_iface_init (MidgardExecutableIFace *iface)
 {
 	iface->execute = NULL;
-	iface->execute_async = NULL;
 }
 
 GType
