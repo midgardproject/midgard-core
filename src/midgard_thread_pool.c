@@ -61,15 +61,38 @@ _midgard_thread_pool_set_max_n_resources (MidgardPool *iface, guint n_max, GErro
 	return iface;
 }
 
+MidgardPool*
+_midgard_thread_pool_push (MidgardPool *iface, GObject *object, GError **error)
+{
+	g_return_if_fail (MIDGARD_IS_THREAD_POOL (iface));
+
+	MidgardThreadPool *self = MIDGARD_THREAD_POOL(iface);
+
+	if (!MIDGARD_IS_EXECUTABLE (object)) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
+				"Invalid type. Expected Executable, got '%s'", G_OBJECT_TYPE_NAME (object));
+	}
+
+	GError *err = NULL;
+	/* Add new reference to executor, pool will unref it after real execution is done */
+	g_thread_pool_push (self->priv->gpool, g_object_ref(object), &err);
+	if (err) {
+		g_propagate_error (error, err);
+	}
+	
+	return iface;
+}
+
 static void
 thread_pool_execute (gpointer data, gpointer user_data)
 {
+	GMainContext *context = (GMainContext*) user_data;
 	MidgardExecutable *executable = (MidgardExecutable *) data;
 	GError *error = NULL;
 	/* Perform real operation and wait till it's finished */
 	midgard_executable_execute (executable, &error);
-	/* Operation is done, emit signal */
-	midgard_executable_execution_end (executable);
+	/* New reference has been added when object has been added to pool, unref it */
+	g_object_unref (executable);
 	if (error) {
 		/* TODO, handle error */
 	}
@@ -90,6 +113,7 @@ _midgard_thread_pool_pool_iface_init (MidgardPoolIFace *iface)
 	iface->get_max_n_resources = _midgard_thread_pool_get_max_n_resources;
 	iface->get_n_resources =_midgard_thread_pool_get_n_resources;
 	iface->set_max_n_resources = _midgard_thread_pool_set_max_n_resources;
+	iface->push = _midgard_thread_pool_push;
 	return;
 }
 
@@ -98,7 +122,7 @@ _midgard_thread_pool_instance_init (GTypeInstance *instance, gpointer g_class)
 {
 	MidgardThreadPool *self = (MidgardThreadPool*) instance;
 	self->priv = g_new(MidgardThreadPoolPrivate, 1);
-	self->priv->gpool = g_thread_pool_new (thread_pool_execute, NULL, 1, TRUE, NULL);
+	self->priv->gpool = g_thread_pool_new (thread_pool_execute, g_main_context_default(), 1, TRUE, NULL);
 	return;
 }
 

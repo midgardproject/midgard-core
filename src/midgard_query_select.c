@@ -603,6 +603,14 @@ _midgard_query_select_validable_iface_is_valid (MidgardValidable *self)
 	return MIDGARD_QUERY_EXECUTOR (self)->priv->is_valid;
 }
 
+static gboolean
+execution_end_func (gpointer data)
+{
+	MidgardExecutable *executable = (MidgardExecutable *) data;
+	midgard_executable_execution_end (executable);
+	return FALSE;
+}
+
 static void
 _midgard_query_select_execute (MidgardExecutable *iface, gboolean async, GError **error)
 {
@@ -760,14 +768,14 @@ _midgard_query_select_execute (MidgardExecutable *iface, gboolean async, GError 
 	executor->priv->resultset = (gpointer) model;
 	g_object_unref (self);
 
-	midgard_executable_execution_end (MIDGARD_EXECUTABLE(self));
+	g_main_context_invoke (NULL, (GSourceFunc) execution_end_func, iface);
 	return;
 
 return_false:
 	if (sql_stm)
 		gda_sql_statement_free (sql_stm);
 
-	midgard_executable_execution_end (MIDGARD_EXECUTABLE(self));
+	g_main_context_invoke (NULL, (GSourceFunc) execution_end_func, iface);
 	g_object_unref (self);
 	return;
 }
@@ -779,37 +787,6 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 	_midgard_query_select_execute (iface, FALSE, &err);
 	if (err)
 		g_propagate_error (error, err);
-
-	return;
-}
-
-static void
-_execute_end_callback (MidgardQueryExecutor *executor)
-{
-	executor->priv->is_pending = FALSE;
-}
-
-static void
-_midgard_query_select_executable_iface_execute_async (MidgardExecutable *iface, MidgardPool *pool, GError **error)
-{
-	g_return_if_fail (MIDGARD_IS_THREAD_POOL (pool));
-
-	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (iface);
-	if (executor->priv->is_pending == TRUE) {
-		// TODO
-	}
-
-	midgard_executable_execution_start (iface);
-	executor->priv->is_pending = TRUE;
-	g_signal_connect (G_OBJECT(executor), "execution-end", G_CALLBACK(_execute_end_callback), (gpointer) executor);
-
-	GError *err = NULL;
-	MidgardThreadPool *thread_pool = MIDGARD_THREAD_POOL (pool);
-	g_thread_pool_push (thread_pool->priv->gpool, iface, &err);
-	if (err) {
-		executor->priv->is_pending = FALSE;
-		g_propagate_error (error, err);
-	}
 
 	return;
 }
@@ -1105,7 +1082,6 @@ static void
 _midgard_query_select_executable_iface_init (MidgardExecutableIFace *iface)
 {
 	iface->execute = _midgard_query_select_executable_iface_execute;
-	iface->execute_async = _midgard_query_select_executable_iface_execute_async;
 }
 
 /* Validable iface */
