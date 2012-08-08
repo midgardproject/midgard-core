@@ -18,6 +18,8 @@
 
 #include "midgard_sql_async_content_manager.h"
 #include "../midgard_content_manager.h"
+#include "../midgard_model_reference.h"
+#include "../midgard_object.h"
 
 struct _MidgardSqlAsyncContentManagerPrivate {
 	MidgardConnection *mgd;
@@ -42,49 +44,89 @@ midgard_sql_async_content_manager_new (MidgardConnection *mgd)
 
 GObject* 
 _midgard_sql_async_content_manager_get_by_id (MidgardContentManager *self, 
-		MidgardObjectReference *reference, MidgardModel *model, GError **error) {
+		MidgardObjectReference *reference, MidgardModel *model, GError **error) 
+{
 
 }
 
 static void
 _midgard_sql_async_content_manager_load (MidgardContentManager *self, 
-		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) {
+		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) 
+{
+	g_return_if_fail (self != NULL);
+	g_return_if_fail (object != NULL);
+	g_return_if_fail (reference != NULL);
+
+	/* Check if given object is MidgardObject */
+	if (!MIDGARD_IS_OBJECT(object)) {
+		g_set_error (error, MIDGARD_CONTENT_MANAGER_ERROR, MIDGARD_CONTENT_MANAGER_ERROR_INVALID,
+				"Invalid content object. Expected MidgardObject, '%s' given", 
+				G_OBJECT_TYPE_NAME (object));
+		return;
+	}
+
+	/* Check if given refrence has guid or uuid */
+	GError *err = NULL;
+	const gchar *id = midgard_model_reference_get_id(reference, &err);
+	if (err) {
+		g_propagate_error (error, err);
+		return;
+	}
+	
+	GValue id_val = {0, };
+	if (midgard_is_guid (id)) {
+		g_value_init (&id_val, G_TYPE_STRING);
+		g_value_set_string (&id_val, id);
+	} else {
+		/* Hack */
+		guint int_id = atol(id);
+	}
+
+
+	/* Check if we have valid model */
+	/* TODO */
 
 }
 
 static void
 _midgard_sql_async_content_manager_exists (MidgardContentManager *self, 
-		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) {
+		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) 
+{
 
 }
 
 static void
 _midgard_sql_async_content_manager_create (MidgardContentManager *self, 
-		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) {
+		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) 
+{
 
 }
 
 static void
 _midgard_sql_async_content_manager_update (MidgardContentManager *self, 
-		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) {
+		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) 
+{
 
 }
 
 static void
 _midgard_sql_async_content_manager_save (MidgardContentManager *self, 
-		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) {
+		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) 
+{
 
 }
 
 static void
 _midgard_sql_async_content_manager_remove (MidgardContentManager *self, 
-		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) {
+		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) 
+{
 
 }
 
 static void
 _midgard_sql_async_content_manager_purge (MidgardContentManager *self, 
-		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) {
+		GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error) 
+{
 
 }
 
