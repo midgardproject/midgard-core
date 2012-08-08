@@ -42,7 +42,10 @@ midgard_execution_error_quark (void)
  *
  * Execute command or perform operation.
  * Implementation shall check if given instance is valid.
- * If it's not, shall invoke validation, if given instance is #MidgardValidable derived.
+ * If it's not, shall invoke validation method, if given instance is #MidgardValidable derived.
+ *
+ * Before execution, implementation should emit 'execution-start' signal, and 'execution-end' when 
+ * execution operation is completed.
  *
  * Since: 10.05.5
  */
@@ -58,6 +61,30 @@ midgard_executable_execute (MidgardExecutable *self, GError **error)
 }
 
 /**
+ * midgard_executable_execute_async:
+ * @self: #MidgardExecutable instance
+ * @error (error-domains MIDGARD_EXECUTION_ERROR): location to store error
+ *
+ * Execute asynchronous command or perform operation.
+ * Implementation shall check if given instance is valid.
+ * If it's not, shall invoke validation method, if given instance is #MidgardValidable derived.
+ *
+ * Implementation shall not emit any signal inside asynchronous method. 
+ * Instead, signal emission should be added to GLib's default main loop(e.g. g_idle_add).
+ * 
+ * Since: 10.05.5
+ */
+void
+midgard_executable_execute_async (MidgardExecutable *self, GError **error)
+{
+	if (MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute_async == NULL) {
+		g_set_error (error, MIDGARD_EXECUTION_ERROR, MIDGARD_EXECUTION_ERROR_INTERNAL,
+				"%s class doesn't implement execute_async() method", G_OBJECT_TYPE_NAME (self));
+	}
+
+	MIDGARD_EXECUTABLE_GET_INTERFACE (self)->execute_async (self, error);
+}
+/**
  * midgard_executable_execution_start:
  * @self: #MidgardExecutable instance
  *
@@ -70,6 +97,14 @@ midgard_executable_execution_start (MidgardExecutable *self)
 {
 	g_return_if_fail (MIDGARD_IS_EXECUTABLE (self));
 	g_signal_emit (self, execution_start_signal, 0);
+}
+
+static gboolean
+execution_end_func (gpointer data)
+{
+	MidgardExecutable *executable = (MidgardExecutable *) data;
+	g_signal_emit (executable, execution_end_signal, 0);	
+	return FALSE;
 }
 
 /**
@@ -85,6 +120,7 @@ midgard_executable_execution_end (MidgardExecutable *self)
 {
 	g_return_if_fail (MIDGARD_IS_EXECUTABLE (self));
 	g_signal_emit (self, execution_end_signal, 0);
+	//g_idle_add ((GSourceFunc) execution_end_func, self);
 }
 
 static void
