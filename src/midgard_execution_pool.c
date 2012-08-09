@@ -100,6 +100,7 @@ execution_end_func (gpointer data)
 {
 	MidgardExecutable *executable = (MidgardExecutable *) data;
 	g_signal_emit_by_name (executable, "execution-end", 0);
+	g_object_unref (executable);
 	return FALSE;
 }
 
@@ -111,7 +112,7 @@ thread_pool_execute (gpointer data, gpointer user_data)
 	GError *error = NULL;
 	/* Perform real operation and wait till it's finished */
 	midgard_executable_execute_async (executable, &error);
-	g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) execution_end_func, executable, NULL);
+	g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) execution_end_func, g_object_ref (executable), NULL);
 	/* New reference has been added when object has been added to pool, unref it */
 	g_object_unref (executable);
 	if (error) {
