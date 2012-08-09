@@ -211,7 +211,10 @@ void midgard_set_error(
 
 	if(!domain) 
 		domain = MGD_GENERIC_ERROR;
-	
+
+	static GMutex mutex;
+	g_mutex_lock (&mutex);
+
 	if(mgd->errstr)
 		g_free(mgd->errstr);
 
@@ -240,6 +243,8 @@ void midgard_set_error(
 		mgd->errstr = g_strdup("");
 	else
 		mgd->errstr = g_strdup(mgd->err->message);	
+
+	g_mutex_unlock (&mutex);
 
 	return;		
 }
