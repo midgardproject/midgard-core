@@ -128,11 +128,11 @@ midgard_executable_class_init (gpointer g_class)
 {
 	static gboolean initialized = FALSE;
 
-	static GMutex mutex;
-	g_mutex_lock (&mutex);
+	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
+	g_static_mutex_lock (&mutex);
 
 	if (initialized == TRUE) {
-		g_mutex_unlock (&mutex);
+		g_static_mutex_unlock (&mutex);
 		return;
 	}
 
@@ -169,7 +169,7 @@ midgard_executable_class_init (gpointer g_class)
 
 	initialized = TRUE;
 
-	g_mutex_unlock (&mutex);
+	g_static_mutex_unlock (&mutex);
 }
 
 GType
