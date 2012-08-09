@@ -4,7 +4,6 @@ import sys
 import struct
 import unittest
 import inspect
-import gobject
 
 from test_000_config import TestConfig
 from test_001_connection import TestConnection
