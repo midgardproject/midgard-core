@@ -73,7 +73,6 @@ class TestQuerySelectAsync(unittest.TestCase):
 
   def testSelectAsyncAllPersons(self):
     st = Midgard.QueryStorage(dbclass = "midgard_person")
-    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     self.pool = Midgard.ExecutionPool(max_n_threads = 10)
     l = [] # Hold all executors in array to avoid implicit objects' destruction
     for i in range(0, 30):
