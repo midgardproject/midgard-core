@@ -59,7 +59,11 @@ _midgard_execution_pool_set_max_n_resources (MidgardPool *iface, guint n_max, GE
 {
 	MidgardExecutionPool *self = MIDGARD_EXECUTION_POOL(iface);
 	GError *err = NULL;
+#if GLIB_CHECK_VERSION(2,32,0)
 	gboolean is_set = g_thread_pool_set_max_threads (self->priv->gpool, (gint)n_max, &err);
+#else 
+	g_thread_pool_set_max_threads (self->priv->gpool, (gint)n_max, &err);
+#endif
 	if (err)
 		g_propagate_error (error, err);
 	return iface;
