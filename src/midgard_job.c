@@ -17,6 +17,7 @@
  */
 
 #include "midgard_job.h"
+#include "midgard_executable.h"
 
 /**
  * midgard_job_is_running:
