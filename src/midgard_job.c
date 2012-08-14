@@ -18,10 +18,6 @@
 
 #include "midgard_job.h"
 
-struct _MidgardJob {
-	GObject parent;
-};
-
 /**
  * midgard_job_is_running:
  * @self: #MidgardJob instance
@@ -30,7 +26,7 @@ struct _MidgardJob {
  *
  * Since: 10.05.8
  */ 
-GObject*
+gboolean
 midgard_job_is_running (MidgardJob *self)
 {
 	return MIDGARD_JOB_GET_INTERFACE (self)->is_running (self);
@@ -44,7 +40,7 @@ midgard_job_is_running (MidgardJob *self)
  *
  * Since: 10.05.8
  */ 
-GObject*
+gboolean
 midgard_job_is_executed (MidgardJob *self)
 {
 	return MIDGARD_JOB_GET_INTERFACE (self)->is_executed (self);
@@ -58,7 +54,7 @@ midgard_job_is_executed (MidgardJob *self)
  *
  * Since: 10.05.8
  */ 
-GObject*
+gboolean
 midgard_job_is_failed (MidgardJob *self)
 {
 	return MIDGARD_JOB_GET_INTERFACE (self)->is_failed (self);

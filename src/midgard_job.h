@@ -20,8 +20,6 @@
 #define MIDGARD_JOB_H
 
 #include <glib-object.h>
-#include "midgard_model.h"
-#include "midgard_object_reference.h"
 
 G_BEGIN_DECLS
 
