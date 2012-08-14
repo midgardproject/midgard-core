@@ -88,6 +88,7 @@
 #include <midgard/midgard_pool.h>
 #include <midgard/midgard_execution_pool.h>
 #include <midgard/midgard_job.h>
+#include <midgard/midgard_content_manager_job.h>
 
 #endif /* _MIDGARD_API_H_ */
 
