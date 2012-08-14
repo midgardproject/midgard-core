@@ -45,7 +45,7 @@ struct _MidgardContentManagerJobIFace {
 GType 			midgard_content_manager_job_get_type		(void);
 GObject* 		midgard_content_manager_job_get_content_object	(MidgardContentManagerJob *self, GError **error);
 MidgardObjectReference* midgard_content_manager_job_get_reference	(MidgardContentManagerJob *self, GError **error);
-MidgardModel* 		midgard_content_manager_job_get_reference	(MidgardContentManagerJob *self, GError **error);
+MidgardModel* 		midgard_content_manager_job_get_model		(MidgardContentManagerJob *self, GError **error);
 
 G_END_DECLS
 
