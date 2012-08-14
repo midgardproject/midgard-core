@@ -17,6 +17,8 @@
  */
 
 #include "midgard_content_manager_job.h"
+#include "midgard_job.h"
+#include "midgard_validable.h"
 
 /**
  * midgard_content_manager_job_get_content_object:
@@ -42,7 +44,7 @@ midgard_content_manager_job_get_content_object (MidgardContentManagerJob *self, 
  *
  * Since: 10.05.8
  */ 
-GObject*
+MidgardObjectReference*
 midgard_content_manager_job_get_reference (MidgardContentManagerJob *self, GError **error)
 {
 	return MIDGARD_CONTENT_MANAGER_JOB_GET_INTERFACE (self)->get_reference (self, error);
@@ -57,7 +59,7 @@ midgard_content_manager_job_get_reference (MidgardContentManagerJob *self, GErro
  *
  * Since: 10.05.8
  */ 
-GObject*
+MidgardModel*
 midgard_content_manager_job_get_model (MidgardContentManagerJob *self, GError **error)
 {
 	return MIDGARD_CONTENT_MANAGER_JOB_GET_INTERFACE (self)->get_model (self, error);
