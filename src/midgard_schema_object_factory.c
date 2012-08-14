@@ -75,7 +75,7 @@ midgard_schema_object_factory_get_object_by_guid (MidgardConnection *mgd, const 
 	GValue gval = {0, };
 	g_value_init (&gval, G_TYPE_STRING);
 	g_value_set_string (&gval, guid);
-	midgard_core_query_get_object (mgd, g_type_name (MIDGARD_TYPE_REPLIGARD), &repligard, &error, "reference", &gval, NULL);
+	midgard_core_query_get_object (mgd, g_type_name (MIDGARD_TYPE_REPLIGARD), &repligard, FALSE, &error, "reference", &gval, NULL);
 	g_value_unset (&gval);
 	
 	if (error) {
@@ -369,7 +369,7 @@ midgard_schema_object_factory_object_undelete (MidgardConnection *mgd, const gch
 	GValue gval = {0, };
 	g_value_init (&gval, G_TYPE_STRING);
 	g_value_set_string (&gval, guid);
-	midgard_core_query_get_object (mgd, g_type_name (MIDGARD_TYPE_REPLIGARD), &repligard, &error, "guid", &gval, NULL);
+	midgard_core_query_get_object (mgd, g_type_name (MIDGARD_TYPE_REPLIGARD), &repligard, FALSE, &error, "guid", &gval, NULL);
 	g_value_unset (&gval);
 	
 	if (error) {

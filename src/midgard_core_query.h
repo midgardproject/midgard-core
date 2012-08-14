@@ -296,7 +296,7 @@ gint			midgard_core_query_update_dbobject_record 	(MidgardDBObject *object, GErr
 gchar                   *midgard_core_query_binary_stringify            (GValue *src_value); 
 gchar 			*midgard_core_query_compute_constraint_property	(MidgardQueryExecutor *executor, MidgardQueryStorage *storage, const gchar *name, GError **error);
 gchar 			*midgard_core_query_unescape_string (MidgardConnection *mgd, const gchar *str);
-void			midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, GError **error, const gchar *property, ...);
+void			midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, gboolean async, GError **error, const gchar *property, ...);
 MidgardDBObject 	**midgard_core_query_get_objects (MidgardConnection *mgd, const gchar *classname, GError **error, const gchar *property, ...);
 
 #endif /* MIDGARD_CORE_QUERY_H */

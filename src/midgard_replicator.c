@@ -129,7 +129,7 @@ midgard_replicator_export_by_guid (MidgardConnection *mgd, const gchar *guid)
 	GValue gval = {0, };
 	g_value_init (&gval, G_TYPE_STRING);
 	g_value_set_string (&gval, guid);
-	midgard_core_query_get_object (mgd, g_type_name (MIDGARD_TYPE_REPLIGARD), &repligard, &error, "guid", &gval, NULL);
+	midgard_core_query_get_object (mgd, g_type_name (MIDGARD_TYPE_REPLIGARD), &repligard, FALSE, &error, "guid", &gval, NULL);
 	g_value_unset (&gval);
 
 	if (error) {

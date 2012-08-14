@@ -1352,7 +1352,7 @@ gboolean midgard_object_get_by_id(MidgardObject *object, guint id)
 	
 	/* Get object using 'id' constraint */
 	GError *err = NULL;
-	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, &err, "id", &pval, NULL);
+	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, FALSE, &err, "id", &pval, NULL);
 	g_value_unset (&pval);
 	if (err) {
 		MIDGARD_ERRNO_SET_STRING (MGD_OBJECT_CNC(object), MGD_ERR_NOT_EXISTS, "%s", 
@@ -2546,7 +2546,7 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 		}
 	
 		GError *err = NULL;
-		midgard_core_query_get_object (mgd, name, &self, &err, field, value, NULL);
+		midgard_core_query_get_object (mgd, name, &self, FALSE, &err, field, value, NULL);
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", 
 					err && err->message ? err->message : "Unknown reason");
@@ -2817,7 +2817,7 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 	g_value_set_string(&pval, guid);
 
 	GError *err = NULL;
-	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, &err, "guid", &pval, NULL);
+	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, FALSE, &err, "guid", &pval, NULL);
 	g_value_unset (&pval);
 
 	if (err) {

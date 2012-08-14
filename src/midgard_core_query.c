@@ -2440,7 +2440,7 @@ midgard_core_query_unescape_string (MidgardConnection *mgd, const gchar *string)
 }
 
 void
-midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, GError **error, const gchar *property, ...)
+midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, gboolean async, GError **error, const gchar *property, ...)
 {
 	if (mgd == NULL) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected MidgardConnection. Can not get object.");
@@ -2502,7 +2502,11 @@ midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, M
 	midgard_query_select_toggle_read_only (select, FALSE);
 
 	GError *err = NULL;
-	midgard_executable_execute (MIDGARD_EXECUTABLE (select), &err);
+	if (async) 
+		midgard_executable_execute_async (MIDGARD_EXECUTABLE (select), &err);
+	else 
+		midgard_executable_execute (MIDGARD_EXECUTABLE (select), &err);
+
 	if (err) {
 		g_propagate_error (error, err);
 		goto free_objects_and_return;
