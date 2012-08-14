@@ -99,6 +99,7 @@ midgard_public_h = \
 	src/midgard_query_result.h \
 	src/midgard_pool.h \
 	src/midgard_execution_pool.h \
+	src/midgard_job.h \
 	$(NULL)
 
 midgard_sql_public_h = \
@@ -249,6 +250,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/sql/midgard_sql_query_select_data.c \
 	src/sql/midgard_sql_query_constraint.c \
 	src/sql/midgard_sql_async_content_manager.c \
+	src/midgard_job.c \
 	$(NULL)
 
 if MIDGARD_DBUS_SUPPORT
