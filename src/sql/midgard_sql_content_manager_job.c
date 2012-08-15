@@ -375,8 +375,8 @@ midgard_sql_content_manager_job_get_type (void)
 		type = g_type_register_static (G_TYPE_OBJECT, "MidgardSqlContentManagerJob", &info, G_TYPE_FLAG_ABSTRACT);
 		g_type_add_interface_static (type, MIDGARD_TYPE_EXECUTABLE, &executable_info);
 		g_type_add_interface_static (type, MIDGARD_TYPE_JOB, &job_info);
-		g_type_add_interface_static (type, MIDGARD_TYPE_CONTENT_MANAGER_JOB, &content_manager_job_info);
 		g_type_add_interface_static (type, MIDGARD_TYPE_VALIDABLE, &validable_info);
+		g_type_add_interface_static (type, MIDGARD_TYPE_CONTENT_MANAGER_JOB, &content_manager_job_info);
 	}
 	return type;
 }
