@@ -31,6 +31,7 @@ struct _MidgardSqlContentManagerJobPrivate {
 	gboolean is_running;
 	gboolean is_executed;
 	gboolean is_failed;
+	gboolean is_valid;
 };
 
 /* MidgardSqlContentManagerJob properties */
@@ -58,6 +59,80 @@ midgard_sql_content_manager_job_get_connection (MidgardSqlContentManagerJob *sel
 	return MIDGARD_SQL_CONTENT_MANAGER_JOB_GET_CLASS (self)->get_connection (self, error);
 }
 
+
+static gboolean
+_midgard_sql_content_manager_job_job_iface_is_running (MidgardJob *iface)
+{
+	g_return_val_if_fail (iface != NULL, FALSE);
+	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	return job->priv->is_running;
+}
+
+static gboolean
+_midgard_sql_content_manager_job_job_iface_is_executed (MidgardJob *iface)
+{
+	g_return_val_if_fail (iface != NULL, FALSE);
+	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	return job->priv->is_executed;
+}
+
+static gboolean
+_midgard_sql_content_manager_job_job_iface_is_failed (MidgardJob *iface)
+{
+	g_return_val_if_fail (iface != NULL, FALSE);
+	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	return job->priv->is_failed;
+}
+
+static GObject*
+ _midgard_sql_content_manager_job_content_manager_job_iface_get_content_object (MidgardContentManagerJob *iface, GError **error)
+{
+	g_return_val_if_fail (iface != NULL, NULL);
+	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	if (job->priv->content_object == NULL) {
+		/* TODO, set error*/
+	}
+	return (GObject *) g_object_ref (job->priv->content_object);
+}
+
+static MidgardObjectReference*
+ _midgard_sql_content_manager_job_content_manager_job_iface_get_reference (MidgardContentManagerJob *iface, GError **error)
+{
+	g_return_val_if_fail (iface != NULL, NULL);
+	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	if (job->priv->content_object == NULL) {
+		/* TODO, set error*/
+	}
+	return (MidgardObjectReference *) g_object_ref (job->priv->reference);
+}
+
+static MidgardModel*
+ _midgard_sql_content_manager_job_content_manager_job_iface_get_model (MidgardContentManagerJob *iface, GError **error)
+{
+	g_return_val_if_fail (iface != NULL, NULL);
+	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	if (job->priv->content_object == NULL) {
+		/* TODO, set error*/
+	}
+	return (MidgardModel *) g_object_ref (job->priv->model);
+}
+
+static void 
+_midgard_sql_content_manager_job_validable_iface_validate (MidgardValidable *iface, GError **error)
+{
+	g_return_if_fail (iface != NULL);
+	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	/* TODO, validate */
+}
+
+static gboolean
+_midgard_sql_content_manager_job_validable_iface_is_valid (MidgardValidable *iface)
+{
+	g_return_if_fail (iface != NULL);
+	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	return job->priv->is_valid;
+}
+
 /* GOBJECT ROUTINES */
 
 static GObjectClass *parent_class= NULL;
@@ -75,6 +150,7 @@ _midgard_sql_content_manager_job_instance_init (GTypeInstance *instance, gpointe
 	MIDGARD_SQL_CONTENT_MANAGER_JOB (object)->priv->is_running = FALSE;
 	MIDGARD_SQL_CONTENT_MANAGER_JOB (object)->priv->is_executed = FALSE;
 	MIDGARD_SQL_CONTENT_MANAGER_JOB (object)->priv->is_failed = FALSE;
+	MIDGARD_SQL_CONTENT_MANAGER_JOB (object)->priv->is_valid = FALSE;
 }
 
 static GObject *
@@ -126,6 +202,7 @@ _midgard_sql_content_manager_job_finalize (GObject *object)
 	self->priv->is_running = FALSE;
 	self->priv->is_executed = FALSE;
 	self->priv->is_failed = FALSE;
+	self->priv->is_valid = FALSE;
 
 	g_free (self->priv);
 	self->priv = NULL;
@@ -225,32 +302,33 @@ static void
 _midgard_sql_content_manager_job_executable_iface_init (MidgardExecutableIFace *iface)
 {
 	iface->execute = NULL;
+	iface->execute_async = NULL;
 }
 
 /* Job iface */
 static void
 _midgard_sql_content_manager_job_job_iface_init (MidgardJobIFace *iface)
 {
-	iface->is_running = NULL;
-	iface->is_executed = NULL;
-	iface->is_failed = NULL;
+	iface->is_running = _midgard_sql_content_manager_job_job_iface_is_running;
+	iface->is_executed = _midgard_sql_content_manager_job_job_iface_is_executed;
+	iface->is_failed = _midgard_sql_content_manager_job_job_iface_is_failed;
 }
 
 /* ContentManagerJob iface */
 static void
 _midgard_sql_content_manager_job_content_manager_job_iface_init (MidgardContentManagerJobIFace *iface)
 {
-	iface->get_content_object = NULL;
-	iface->get_reference = NULL;
-	iface->get_model = NULL;
+	iface->get_content_object = _midgard_sql_content_manager_job_content_manager_job_iface_get_content_object;
+	iface->get_reference = _midgard_sql_content_manager_job_content_manager_job_iface_get_reference;
+	iface->get_model = _midgard_sql_content_manager_job_content_manager_job_iface_get_model;
 }
 
 /* Validable iface */
 static void
 _midgard_sql_content_manager_job_validable_iface_init (MidgardValidableIFace *iface)
 {
-	iface->validate = NULL;
-	iface->is_valid = NULL;
+	iface->validate = _midgard_sql_content_manager_job_validable_iface_validate;
+	iface->is_valid = _midgard_sql_content_manager_job_validable_iface_is_valid;
 }
 
 GType
