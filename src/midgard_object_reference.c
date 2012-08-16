@@ -55,6 +55,25 @@ midgard_object_reference_new (const gchar *id, const gchar *name, MidgardWorkspa
 	return self;
 }
 
+/**
+ * midgard_object_reference_get_workspace:
+ * @self: #MidgardObjectReference instance
+ * @error: pointer to store returned error
+ * 
+ * Returns: (transfer full): #MidgardWorkspace instance or %NULL
+ *
+ * Since: 10.05.8
+ */ 
+MidgardWorkspace *             
+midgard_object_reference_get_workspace (MidgardObjectReference *self, GError **error)
+{
+	g_return_val_if_fail (self != NULL, NULL);
+	/* TODO, handle error */
+	if (self->priv->workspace == NULL)
+		return NULL;
+	return g_object_ref (self->priv->workspace);
+}
+
 const gchar*                
 _midgard_object_reference_get_name (MidgardModel *iface, GError **error)
 {
