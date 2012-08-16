@@ -49,7 +49,7 @@ enum {
  *
  * Get job's connection. 
  *
- * Returns: #MidgardConnection instance or %NULL on failure
+ * Returns: (transfer full): #MidgardConnection instance or %NULL on failure
  *
  * Since: 10.05.08
  */ 
