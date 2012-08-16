@@ -45,7 +45,7 @@ struct _MidgardContentManager {
  *
  * From storage, get object which is identified by @reference.
  *
- * Returns: GObject derived instance or NULL
+ * Returns: (transfer full): GObject derived instance or NULL
  *
  * Since: 10.05.8
  */ 
