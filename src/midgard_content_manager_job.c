@@ -25,7 +25,7 @@
  * @self: #MidgardContentManagerJob instance
  * @error: pointer to store returned error
  *
- * Returns: #GObject derived instance which is volatile content data holder
+ * Returns: (transfer full): #GObject derived instance which is volatile content data holder
  *
  * Since: 10.05.8
  */ 
@@ -40,7 +40,7 @@ midgard_content_manager_job_get_content_object (MidgardContentManagerJob *self, 
  * @self: #MidgardContentManagerJob instance
  * @error: pointer to store returned error
  *
- * Returns: #MidgardObjectReference instance which identifies object in this job
+ * Returns: (transfer full): #MidgardObjectReference instance which identifies object in this job
  *
  * Since: 10.05.8
  */ 
@@ -55,7 +55,7 @@ midgard_content_manager_job_get_reference (MidgardContentManagerJob *self, GErro
  * @self: #MidgardContentManagerJob instance
  * @error: pointer to store returned error
  *
- * Returns: #MidgardModel instance which is a model for content object in this job or %NULL
+ * Returns: (transfer full): #MidgardModel instance which is a model for content object in this job or %NULL
  *
  * Since: 10.05.8
  */ 
