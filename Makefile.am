@@ -111,6 +111,7 @@ midgard_sql_public_h = \
 	src/sql/midgard_sql_query_constraint.h \
 	src/sql/midgard_sql_async_content_manager.h \
 	src/sql/midgard_sql_content_manager_job.h \
+	src/sql/midgard_sql_content_manager_job_create.h \
 	$(NULL)
 
 man_MANS = man/midgard2-schema.1 \
@@ -255,6 +256,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/sql/midgard_sql_query_constraint.c \
 	src/sql/midgard_sql_async_content_manager.c \
 	src/sql/midgard_sql_content_manager_job.c \
+	src/sql/midgard_sql_content_manager_job_create.c \
 	$(NULL)
 
 if MIDGARD_DBUS_SUPPORT
