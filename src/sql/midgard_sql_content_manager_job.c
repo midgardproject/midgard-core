@@ -125,8 +125,40 @@ static void
 _midgard_sql_content_manager_job_validable_iface_validate (MidgardValidable *iface, GError **error)
 {
 	g_return_if_fail (iface != NULL);
-	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
-	/* TODO, validate */
+
+	GError *err = NULL;
+	MidgardContentManagerJob *job = MIDGARD_CONTENT_MANAGER_JOB (iface);
+	MidgardSqlContentManagerJob *self = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	/* set invalid flag */
+	self->priv->is_valid = FALSE;
+
+	/* check connection */
+	if (self->priv->connection == NULL) {
+		g_set_error (error,
+				MIDGARD_VALIDATION_ERROR,
+				MIDGARD_VALIDATION_ERROR_INTERNAL,
+				"Missed connection object");
+		return;
+	}
+
+	/* check content object */
+	GObject *content_object = midgard_content_manager_job_get_content_object (job, &err);
+	if (!content_object) {
+		g_set_error (error,
+				MIDGARD_VALIDATION_ERROR,
+				MIDGARD_VALIDATION_ERROR_INTERNAL,
+				"Missed content object");
+		return;
+	}
+
+	/* check reference */
+	/* TODO */
+
+	/* check model */
+	/* TODO */
+
+	/* set valid flag */
+	self->priv->is_valid = TRUE;
 }
 
 static gboolean
