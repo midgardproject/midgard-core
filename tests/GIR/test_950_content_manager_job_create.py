@@ -17,6 +17,8 @@ class TestContentManagerJobCreate(unittest.TestCase):
   job_two = None
   reference_one = None
   reference_two = None
+  callback_msg_start = None 
+  callback_msg_end = None
 
   def setUp(self):
     if self.mgd == None:
@@ -41,6 +43,8 @@ class TestContentManagerJobCreate(unittest.TestCase):
           connection = self.mgd,
           contentobject = self.bookstore_two,
           reference = self.reference_two)
+    self.callback_msg_start = "TODO START"
+    self.callback_msg_end = "TODO END"
 
   def tearDown(self):
     if self.bookstore_one is not None:
@@ -99,6 +103,32 @@ class TestContentManagerJobCreate(unittest.TestCase):
   def testGetModel(self):
     self.assertEqual(self.job_one.get_model(), None)    
     self.assertEqual(self.job_two.get_model(), None)    
+
+  def executionStartCallback(self, obj, arg):
+    self.callback_msg_start = "DONE START"
+
+  def executionEndCallback(self, obj, arg):
+    self.callback_msg_end = "DONE END"
+
+  def testZExecute(self):
+    self.job_one.connect("execution-start", self.executionStartCallback, None)
+    self.job_one.connect("execution-end", self.executionEndCallback, None)
+    self.job_one.execute()
+    self.assertTrue(self.job_one.is_valid())
+    self.assertNotEqual(self.callback_msg_start, None)
+    self.assertEqual(self.callback_msg_start, "DONE START")
+    self.assertNotEqual(self.callback_msg_end, None)
+    self.assertEqual(self.callback_msg_end, "DONE END")
+    # job two
+    self.job_two.connect("execution-start", self.executionStartCallback, None)
+    self.job_two.connect("execution-end", self.executionEndCallback, None)
+    self.job_two.execute()
+    self.assertTrue(self.job_two.is_valid())
+    self.assertNotEqual(self.callback_msg_start, None)
+    self.assertEqual(self.callback_msg_start, "DONE START")
+    self.assertNotEqual(self.callback_msg_end, None)
+    self.assertEqual(self.callback_msg_end, "DONE END")
+
 
 if __name__ == "__main__":
     unittest.main()
