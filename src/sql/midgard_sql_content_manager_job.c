@@ -111,8 +111,9 @@ static MidgardModel*
 {
 	g_return_val_if_fail (iface != NULL, NULL);
 	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
-	if (job->priv->content_object == NULL) {
-		/* TODO, set error*/
+	if (job->priv->model == NULL) {
+		/* TODO, set error if required */
+		return NULL;
 	}
 	return (MidgardModel *) g_object_ref (job->priv->model);
 }
