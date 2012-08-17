@@ -56,7 +56,10 @@ enum {
 MidgardConnection*
 midgard_sql_content_manager_job_get_connection (MidgardSqlContentManagerJob *self, GError **error)
 {
-	return MIDGARD_SQL_CONTENT_MANAGER_JOB_GET_CLASS (self)->get_connection (self, error);
+	g_return_val_if_fail (self != NULL, NULL);
+	if (self->priv->connection == NULL)
+		return self->priv->connection;
+	return g_object_ref (self->priv->connection);
 }
 
 

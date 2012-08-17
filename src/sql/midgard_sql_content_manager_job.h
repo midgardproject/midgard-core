@@ -38,9 +38,6 @@ typedef struct _MidgardSqlContentManagerJobPrivate MidgardSqlContentManagerJobPr
 
 struct _MidgardSqlContentManagerJobClass {
 	GObjectClass parent;
-
-	/* virtual methods */
-	MidgardConnection*	(*get_connection)	(MidgardSqlContentManagerJob *self, GError **error);
 };
 
 struct _MidgardSqlContentManagerJob {
