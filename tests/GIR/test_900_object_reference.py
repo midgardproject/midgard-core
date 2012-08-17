@@ -8,7 +8,7 @@ import inspect
 
 from gi.repository import Midgard, GObject, GLib
 
-from test_100_connection import TestConnection
+from test_020_connection import TestConnection
 
 class TestObjectReference(unittest.TestCase):
   mgd = None
