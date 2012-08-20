@@ -113,6 +113,7 @@ midgard_sql_public_h = \
 	src/sql/midgard_sql_content_manager_job.h \
 	src/sql/midgard_sql_content_manager_job_create.h \
 	src/sql/midgard_sql_content_manager_job_update.h \
+	src/sql/midgard_sql_content_manager_job_delete.h \
 	$(NULL)
 
 man_MANS = man/midgard2-schema.1 \
@@ -259,6 +260,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/sql/midgard_sql_content_manager_job.c \
 	src/sql/midgard_sql_content_manager_job_create.c \
 	src/sql/midgard_sql_content_manager_job_update.c \
+	src/sql/midgard_sql_content_manager_job_delete.c \
 	$(NULL)
 
 if MIDGARD_DBUS_SUPPORT
