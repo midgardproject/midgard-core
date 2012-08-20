@@ -23,6 +23,7 @@
 #include "../midgard_executable.h"
 #include "../midgard_job.h"
 #include "../midgard_object.h"
+#include "../midgard_core_object.h"
 
 static void
 _midgard_sql_content_manager_job_create_executable_iface_execute (MidgardExecutable *iface, GError **error)
@@ -61,13 +62,43 @@ _midgard_sql_content_manager_job_create_executable_iface_execute (MidgardExecuta
 	midgard_executable_execution_end (iface);
 }
 
+static gboolean
+execution_end_func (gpointer data)
+{
+	MidgardExecutable *executable = (MidgardExecutable *) data;
+	g_signal_emit_by_name (executable, "execution-end", 0);
+	g_object_unref (executable);
+	return FALSE;
+}
+
 static void
 _midgard_sql_content_manager_job_create_executable_iface_execute_async (MidgardExecutable *iface, GError **error)
 {
-		g_set_error (error, 
-				MIDGARD_EXECUTION_ERROR, 
-				MIDGARD_EXECUTION_ERROR_INTERNAL, 
-				"NOT IMPLEMENTED");
+	GError *err = NULL;
+
+	/* Validate */
+	MidgardValidable *validable = MIDGARD_VALIDABLE (iface);
+	if (!midgard_validable_is_valid (validable)) {
+		midgard_validable_validate (validable, &err);
+		if (err) {
+			g_propagate_error (error, err);
+			return;
+		}
+	}
+
+	/* Get content object, it should be validated already */
+	MidgardContentManagerJob *job = MIDGARD_CONTENT_MANAGER_JOB (iface);
+	MidgardObject *content_object = (MidgardObject *) midgard_content_manager_job_get_content_object (job, &err);
+
+	/* Get connection, it should be validated already */
+	MidgardSqlContentManagerJob *job_sql = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	MidgardConnection *mgd = midgard_sql_content_manager_job_get_connection (job_sql, NULL);
+
+	/* Create object */
+	gboolean rv =  _midgard_object_create(content_object, NULL, OBJECT_UPDATE_NONE);
+
+	/* signal emission idle */
+	g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) execution_end_func, g_object_ref (iface), NULL);
 }
 
 /* GOBJECT ROUTINES */
