@@ -3113,6 +3113,22 @@ midgard_object_delete (MidgardObject *object, gboolean check_dependents)
  */ 
 gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 {
+	g_return_val_if_fail (object != NULL, FALSE);
+
+	g_signal_emit (object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purge, 0);
+	gboolean rv = _midgard_object_purge (object, check_dependents);
+
+	if (!rv) 
+		return FALSE;
+
+	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purged, 0);
+	__dbus_send(object, "purge");
+
+	return TRUE;
+}
+
+gboolean _midgard_object_purge(MidgardObject *object, gboolean check_dependents)
+{
 	gint rv = 0;
 	GString *dsql;
 	const gchar *guid, *table;
@@ -3120,7 +3136,6 @@ gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 	GError *err = NULL;
 	
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
-	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purge, 0);	
 
 	if (MIDGARD_DBOBJECT (object)->dbpriv->storage_data == NULL){
 		g_warning("No schema attributes for class %s", 
@@ -3196,9 +3211,6 @@ gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_INTERNAL);
 		return FALSE; 
 	}
-
-	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purged, 0);
-	__dbus_send(object, "purge");
 
 	return TRUE;  
 }

@@ -285,6 +285,8 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd, const gchar *xml,
 /* Object's routines */
 gboolean _midgard_object_update(MidgardObject *object, _ObjectActionUpdate replicate, GError **error);
 gboolean _midgard_object_create(MidgardObject *object, const gchar *create_guid, _ObjectActionUpdate replicate);
+gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependentents);
+gboolean _midgard_object_purge(MidgardObject *object, gboolean check_dependentents);
 void _object_copy_properties(GObject *src, GObject *dest);
 
 /* Links */
