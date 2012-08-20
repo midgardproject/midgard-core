@@ -3,6 +3,7 @@
 import sys
 import struct
 import unittest
+import time
 from test_000_config import TestConfig
 from test_020_connection import TestConnection
 
@@ -19,6 +20,7 @@ class TestContentManagerJobCreate(unittest.TestCase):
   reference_two = None
   callback_msg_start = None 
   callback_msg_end = None
+  async_callback_msg_end = None
 
   def setUp(self):
     if self.mgd == None:
@@ -45,6 +47,7 @@ class TestContentManagerJobCreate(unittest.TestCase):
           reference = self.reference_two)
     self.callback_msg_start = "TODO START"
     self.callback_msg_end = "TODO END"
+    self.async_callback_msg_end = "TODO ASYNC END"
 
   def tearDown(self):
     if self.bookstore_one is not None:
@@ -129,6 +132,18 @@ class TestContentManagerJobCreate(unittest.TestCase):
     self.assertNotEqual(self.callback_msg_end, None)
     self.assertEqual(self.callback_msg_end, "DONE END")
 
+  def executionEndCallbackAsync(self, obj, arg):
+    self.async_callback_msg_end = "DONE END ASYNC"
+
+  def testZExecuteAsync(self):
+    pool = Midgard.ExecutionPool(max_n_threads = 2)
+    self.job_one.connect("execution-end", self.executionEndCallbackAsync, None)
+    self.job_two.connect("execution-end", self.executionEndCallbackAsync, None)
+    pool.push(self.job_one)
+    pool.push(self.job_two)
+    time.sleep(1)
+    pool = None
+    self.assertEqual(self.async_callback_msg_end, "DONE END ASYNC")
 
 if __name__ == "__main__":
     unittest.main()
