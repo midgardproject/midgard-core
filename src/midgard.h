@@ -93,6 +93,7 @@
 #include <midgard/sql/midgard_sql_async_content_manager.h>
 #include <midgard/sql/midgard_sql_content_manager_job.h>
 #include <midgard/sql/midgard_sql_content_manager_job_create.h>
+#include <midgard/sql/midgard_sql_content_manager_job_update.h>
 
 #endif /* _MIDGARD_API_H_ */
 
