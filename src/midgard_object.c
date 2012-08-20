@@ -2839,7 +2839,6 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	g_assert(object);
 	
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
-	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_delete, 0);		
 		
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_GET_CLASS (MIDGARD_DBOBJECT (object));
@@ -3064,7 +3063,16 @@ midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 {
 	g_return_val_if_fail (object != NULL, FALSE);
 
-	return _midgard_object_delete (object, check_dependents);
+	g_signal_emit (object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_delete, 0);
+	gboolean rv = _midgard_object_delete (object, check_dependents);
+
+	if (!rv) 
+		return FALSE;
+
+	g_signal_emit (object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_deleted, 0);
+	__dbus_send (object, "delete");
+
+	return TRUE;
 }
 
 /**
