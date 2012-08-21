@@ -95,6 +95,7 @@
 #include <midgard/sql/midgard_sql_content_manager_job_create.h>
 #include <midgard/sql/midgard_sql_content_manager_job_update.h>
 #include <midgard/sql/midgard_sql_content_manager_job_delete.h>
+#include <midgard/sql/midgard_sql_content_manager_job_purge.h>
 
 #endif /* _MIDGARD_API_H_ */
 
