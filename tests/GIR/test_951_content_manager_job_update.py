@@ -4,6 +4,8 @@ import sys
 import struct
 import unittest
 import time
+
+from bookstorequery import BookStoreQuery
 from test_000_config import TestConfig
 from test_020_connection import TestConnection
 
@@ -14,6 +16,8 @@ class TestContentManagerJobUpdate(unittest.TestCase):
   mgd = None
   bookstore_one = None
   bookstore_two = None
+  bookstore_one_update_name = "BookStore One Update"
+  bookstore_two_update_name = "BookStore Two Update"
   job_one = None
   job_two = None
   reference_one = None
@@ -115,7 +119,8 @@ class TestContentManagerJobUpdate(unittest.TestCase):
   def executionEndCallback(self, obj, arg):
     self.callback_msg_end = "DONE END"
 
-  def testZExecute(self):
+  def ZExecute(self):
+    self.bookstore_one.set_property("name", self.bookstore_one_update_name)
     self.job_one.connect("execution-start", self.executionStartCallback, None)
     self.job_one.connect("execution-end", self.executionEndCallback, None)
     self.job_one.execute()
@@ -124,7 +129,10 @@ class TestContentManagerJobUpdate(unittest.TestCase):
     self.assertEqual(self.callback_msg_start, "DONE START")
     self.assertNotEqual(self.callback_msg_end, None)
     self.assertEqual(self.callback_msg_end, "DONE END")
+    bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_one_update_name)
+    self.assertEqual(len(bookstores), 1)
     # job two
+    self.bookstore_two.set_property("name", self.bookstore_two_update_name)
     self.job_two.connect("execution-start", self.executionStartCallback, None)
     self.job_two.connect("execution-end", self.executionEndCallback, None)
     self.job_two.execute()
@@ -133,11 +141,15 @@ class TestContentManagerJobUpdate(unittest.TestCase):
     self.assertEqual(self.callback_msg_start, "DONE START")
     self.assertNotEqual(self.callback_msg_end, None)
     self.assertEqual(self.callback_msg_end, "DONE END")
+    bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_two_update_name)
+    self.assertEqual(len(bookstores), 1)
 
   def executionEndCallbackAsync(self, obj, arg):
     self.async_callback_msg_end = "DONE END ASYNC"
 
   def testZExecuteAsync(self):
+    self.bookstore_one.set_property("name", self.bookstore_one_update_name)
+    self.bookstore_two.set_property("name", self.bookstore_two_update_name)
     pool = Midgard.ExecutionPool(max_n_threads = 2)
     self.job_one.connect("execution-end", self.executionEndCallbackAsync, None)
     self.job_two.connect("execution-end", self.executionEndCallbackAsync, None)
@@ -145,7 +157,12 @@ class TestContentManagerJobUpdate(unittest.TestCase):
     pool.push(self.job_two)
     time.sleep(1)
     pool = None
+    time.sleep(1)
     self.assertEqual(self.async_callback_msg_end, "DONE END ASYNC")
+    bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_one_update_name)
+    self.assertEqual(len(bookstores), 1)
+    bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_two_update_name)
+    self.assertEqual(len(bookstores), 1)
 
 if __name__ == "__main__":
     unittest.main()
