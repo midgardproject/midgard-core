@@ -133,6 +133,10 @@ class TestContentManagerJobDelete(unittest.TestCase):
     self.assertEqual(self.callback_msg_start, "DONE START")
     self.assertNotEqual(self.callback_msg_end, None)
     self.assertEqual(self.callback_msg_end, "DONE END")
+    deleted_one = self.bookstore_one.get_property("metadata").get_property("deleted")
+    self.assertTrue(deleted_one)
+    deleted_two = self.bookstore_two.get_property("metadata").get_property("deleted")
+    self.assertTrue(deleted_two)
 
   def executionEndCallbackAsync(self, obj, arg):
     self.async_callback_msg_end = "DONE END ASYNC"
@@ -146,6 +150,10 @@ class TestContentManagerJobDelete(unittest.TestCase):
     time.sleep(1)
     pool = None
     self.assertEqual(self.async_callback_msg_end, "DONE END ASYNC")
+    deleted_one = self.bookstore_one.get_property("metadata").get_property("deleted")
+    self.assertTrue(deleted_one)
+    deleted_two = self.bookstore_two.get_property("metadata").get_property("deleted")
+    self.assertTrue(deleted_two)
 
 if __name__ == "__main__":
     unittest.main()
