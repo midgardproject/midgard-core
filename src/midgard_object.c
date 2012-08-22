@@ -579,6 +579,9 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 	guint object_init_size = 0;
 	GError *err = NULL;
 
+	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
+	g_static_mutex_lock (&mutex);
+
 	g_debug ("UPDATE OBJECT WITH WS_OID (%i) ", MGD_OBJECT_WS_OID (self));
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
@@ -590,7 +593,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INVALID_PROPERTY_VALUE, 
 				"Can not update '%s'. Object's guid is NULL.", G_OBJECT_TYPE_NAME (G_OBJECT (self)));
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY_VALUE, "%s", (*error)->message);
-		return FALSE;
+		goto return_false;
 	}
 
 	/* Get object's size as it's needed for size' diff.
@@ -600,14 +603,14 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 		object_init_size = metadata->priv->size;		
 
 	if (!midgard_core_object_is_valid(self))
-		return FALSE;
+		goto return_false;
 
 	if (MIDGARD_DBOBJECT (self)->dbpriv->storage_data == NULL) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, 
 				"This is absolutely critical and internal error. No type metadata attributes for '%s' class.",
 				G_OBJECT_TYPE_NAME (G_OBJECT (self)));
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", (*error)->message);
-		return FALSE;
+		goto return_false;
 	}
 
 	table = midgard_core_class_get_table(dbklass);
@@ -616,18 +619,18 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 				"Can not update. No table configured for '%s' class.",
 				G_OBJECT_TYPE_NAME (G_OBJECT (self)));
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", (*error)->message);
-		return FALSE;
+		goto return_false;
 	}
 
 	/* Check duplicates and parent field */
 	if (_object_in_tree(self) == OBJECT_IN_TREE_DUPLICATE) 
-		return FALSE;
+		goto return_false;
 
 	if (metadata) {
 		guint object_size = metadata->priv->size;	
 		if (midgard_quota_size_is_reached(self, object_size)){
 			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_QUOTA);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -638,7 +641,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
 					"Failed to get parameters for prepared UPDATE statement (%s).",
 					G_OBJECT_CLASS_NAME (dbklass));
-			return FALSE;
+			goto return_false;
 		}
 		/* Workspace id */
 		gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_ID_FIELD, MGD_CNC_WORKSPACE_ID(mgd));
@@ -647,7 +650,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 					"Failed to set workspace id UPDATE parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 		/* Workspace object id */
 		g_debug ("UPDATE OBJECT, SET PARAM WS_OID (%i) ", MGD_OBJECT_WS_OID (self));
@@ -657,7 +660,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 					"Failed to set object's workspace id UPDATE parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -665,7 +668,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 
 	if (updated == 0) {
 		g_propagate_error (error, err);
-		return FALSE;
+		goto return_false;
 	}
 
 	if (updated < 0) {
@@ -673,7 +676,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 				"SQL query UPDATE failed: %s", err && err->message ? err->message : "Unknown reason");
 		if (err)
 			g_clear_error (&err);
-		return FALSE;
+		goto return_false;
 	}
 
 	midgard_quota_update(self, object_init_size);  
@@ -683,7 +686,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 		MidgardRepligard *repligard = midgard_repligard_new (mgd);
 		if (!repligard) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard object");
-			return FALSE;
+			goto return_false;
 		}
 		midgard_repligard_update_object_info (repligard, self, MGD_OBJECT_ACTION_UPDATE, &err);
 		g_object_unref (repligard);
@@ -693,7 +696,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 					G_OBJECT_TYPE_NAME (self),
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -717,7 +720,13 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 			break;
 	}
 
+        g_static_mutex_unlock (&mutex);
 	return TRUE;
+
+return_false:
+
+        g_static_mutex_unlock (&mutex);
+	return FALSE;
 }
 
 /**
