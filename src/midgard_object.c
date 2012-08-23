@@ -2853,7 +2853,10 @@ gboolean
 _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 {
 	g_assert(object);
-	
+
+	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
+	g_static_mutex_lock (&mutex);
+
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
 		
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
@@ -2865,7 +2868,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 				MGD_GENERIC_ERROR,
 				MGD_ERR_INVALID_PROPERTY_VALUE, 
 				"Object has neither metadata nor deleted property installed");
-		return FALSE;
+		goto return_false;
 	}
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
@@ -2874,7 +2877,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	if (!params) {
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
 				"Can not delete %s. Missed delete prepared statement or parameters", G_OBJECT_TYPE_NAME (object));
-		return FALSE;
+		goto return_false;
 	}	
 
 	const gchar *guid = MGD_OBJECT_GUID(object);
@@ -2882,12 +2885,12 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	if (!guid){
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY_VALUE, 
 				"Can not delete %s. Guid property is NULL.", G_OBJECT_TYPE_NAME (object));
-		return FALSE;
+		goto return_false;
 	}
 	
 	if (check_dependents && midgard_object_has_dependents(object)) {		
 		MIDGARD_ERRNO_SET (MGD_OBJECT_CNC(object), MGD_ERR_HAS_DEPENDANTS);
-		return FALSE;
+		goto return_false;
 	}
 	
 	GValue tval = {0, };
@@ -2907,7 +2910,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set revisor DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 		/* Revised */
 		gchar *timeupdated = NULL;
@@ -2918,7 +2921,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set revised DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 		g_free (timeupdated);
 		/* Revision */
@@ -2929,7 +2932,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set revision DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 		/* Deleted */
 		gda_set_set_holder_value (params, &err, "metadata_deleted", 1);
@@ -2938,7 +2941,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set deleted DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 
 	} else {
@@ -2950,7 +2953,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set deleted DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -2961,7 +2964,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 				"Failed to set guid DELETE(UPDATE) parameter: %s.",
 				err && err->message ? err->message : "Unknown reason");
 		g_clear_error (&err);
-		return FALSE;
+		goto return_false;
 	}
 
 	/* Workspace ID */
@@ -2973,7 +2976,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set workspace ID DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 	
@@ -2991,14 +2994,14 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 		if (metadata)
 			metadata->priv->revision--;
 
-		return FALSE;
+		goto return_false;
 	} 
 
 	if (MGD_CNC_REPLICATION (mgd)) {
 		MidgardRepligard *repligard = midgard_repligard_new (mgd);
 		if (!repligard) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard object");
-			return FALSE;
+			goto return_false;
 		}
 		midgard_repligard_update_object_info (repligard, object, MGD_OBJECT_ACTION_DELETE, &err);
 		g_object_unref (repligard);
@@ -3008,7 +3011,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					G_OBJECT_TYPE_NAME (object),
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -3029,7 +3032,13 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_deleted, 0);
 	__dbus_send(object, "delete");
 
+
+	g_static_mutex_unlock (&mutex);
 	return TRUE;
+
+return_false:
+	g_static_mutex_unlock (&mutex);
+	return FALSE;
 }
 
 
