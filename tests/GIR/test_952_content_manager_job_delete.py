@@ -4,6 +4,8 @@ import sys
 import struct
 import unittest
 import time
+
+from bookstorequery import BookStoreQuery
 from test_000_config import TestConfig
 from test_020_connection import TestConnection
 
@@ -14,6 +16,8 @@ class TestContentManagerJobDelete(unittest.TestCase):
   mgd = None
   bookstore_one = None
   bookstore_two = None
+  bookstore_one_name = "BookStore One"
+  bookstore_two_name = "BookStore Two"
   job_one = None
   job_two = None
   reference_one = None
@@ -27,11 +31,11 @@ class TestContentManagerJobDelete(unittest.TestCase):
       self.mgd = TestConnection.openConnection()
     if self.bookstore_one is None:
       self.bookstore_one = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
-      self.bookstore_one.set_property("name", "BookStore One")
+      self.bookstore_one.set_property("name", self.bookstore_one_name)
       self.bookstore_one.create()
     if self.bookstore_two is None:  
       self.bookstore_two = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
-      self.bookstore_two.set_property("name", "BookStore Two")
+      self.bookstore_two.set_property("name", self.bookstore_two_name)
       self.bookstore_two.create()
     if self.reference_one is None:
       self.reference_one = Midgard.ObjectReference(id = Midgard.Guid.new(self.mgd), name = "TestReferenceOne")
@@ -116,6 +120,7 @@ class TestContentManagerJobDelete(unittest.TestCase):
     self.callback_msg_end = "DONE END"
 
   def testZExecute(self):
+    # job one
     self.job_one.connect("execution-start", self.executionStartCallback, None)
     self.job_one.connect("execution-end", self.executionEndCallback, None)
     self.job_one.execute()
@@ -124,6 +129,9 @@ class TestContentManagerJobDelete(unittest.TestCase):
     self.assertEqual(self.callback_msg_start, "DONE START")
     self.assertNotEqual(self.callback_msg_end, None)
     self.assertEqual(self.callback_msg_end, "DONE END")
+    bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_one_name)
+    self.assertEqual(len(bookstores), 0)
+
     # job two
     self.job_two.connect("execution-start", self.executionStartCallback, None)
     self.job_two.connect("execution-end", self.executionEndCallback, None)
@@ -133,6 +141,9 @@ class TestContentManagerJobDelete(unittest.TestCase):
     self.assertEqual(self.callback_msg_start, "DONE START")
     self.assertNotEqual(self.callback_msg_end, None)
     self.assertEqual(self.callback_msg_end, "DONE END")
+    bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_two_name)
+    self.assertEqual(len(bookstores), 0)
+
     deleted_one = self.bookstore_one.get_property("metadata").get_property("deleted")
     self.assertTrue(deleted_one)
     deleted_two = self.bookstore_two.get_property("metadata").get_property("deleted")
@@ -154,6 +165,10 @@ class TestContentManagerJobDelete(unittest.TestCase):
     self.assertTrue(deleted_one)
     deleted_two = self.bookstore_two.get_property("metadata").get_property("deleted")
     self.assertTrue(deleted_two)
+    bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_one_name)
+    self.assertEqual(len(bookstores), 0)
+    bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_two_name)
+    self.assertEqual(len(bookstores), 0)
 
 if __name__ == "__main__":
     unittest.main()
