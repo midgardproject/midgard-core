@@ -24,7 +24,8 @@ class TestContentManagerJobDelete(unittest.TestCase):
   reference_two = None
   callback_msg_start = None 
   callback_msg_end = None
-  async_callback_msg_end = None
+  async_callback_msg_end_one = None
+  async_callback_msg_end_two = None
 
   def setUp(self):
     if self.mgd == None:
@@ -53,7 +54,8 @@ class TestContentManagerJobDelete(unittest.TestCase):
           reference = self.reference_two)
     self.callback_msg_start = "TODO START"
     self.callback_msg_end = "TODO END"
-    self.async_callback_msg_end = "TODO ASYNC END"
+    self.async_callback_msg_end_one = "TODO ASYNC ONE END"
+    self.async_callback_msg_end_two = "TODO ASYNC TWO END"
 
   def tearDown(self):
     if self.bookstore_one is not None:
@@ -149,22 +151,29 @@ class TestContentManagerJobDelete(unittest.TestCase):
     deleted_two = self.bookstore_two.get_property("metadata").get_property("deleted")
     self.assertTrue(deleted_two)
 
-  def executionEndCallbackAsync(self, obj, arg):
-    self.async_callback_msg_end = "DONE END ASYNC"
+  def executionEndCallbackAsyncOne(self, obj, arg):
+    self.async_callback_msg_end_one = "DONE END ASYNC ONE"
+
+  def executionEndCallbackAsyncTwo(self, obj, arg):
+    self.async_callback_msg_end_two = "DONE END ASYNC TWO"
 
   def testZExecuteAsync(self):
     pool = Midgard.ExecutionPool(max_n_threads = 2)
-    self.job_one.connect("execution-end", self.executionEndCallbackAsync, None)
-    self.job_two.connect("execution-end", self.executionEndCallbackAsync, None)
+    self.job_one.connect("execution-end", self.executionEndCallbackAsyncOne, None)
+    self.job_two.connect("execution-end", self.executionEndCallbackAsyncTwo, None)
     pool.push(self.job_one)
     pool.push(self.job_two)
     time.sleep(1)
     pool = None
-    self.assertEqual(self.async_callback_msg_end, "DONE END ASYNC")
+
+    self.assertEqual(self.async_callback_msg_end_one, "DONE END ASYNC ONE")
+    self.assertEqual(self.async_callback_msg_end_two, "DONE END ASYNC TWO")
+
     deleted_one = self.bookstore_one.get_property("metadata").get_property("deleted")
     self.assertTrue(deleted_one)
     deleted_two = self.bookstore_two.get_property("metadata").get_property("deleted")
     self.assertTrue(deleted_two)
+    
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_one_name)
     self.assertEqual(len(bookstores), 0)
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_two_name)
