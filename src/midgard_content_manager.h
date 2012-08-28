@@ -22,16 +22,16 @@
 #include <glib-object.h>
 #include "midgard_model.h"
 #include "midgard_object_reference.h"
+#include "midgard_content_manager_job.h"
 
 G_BEGIN_DECLS
 
 typedef enum {
-	MIDGARD_CONTENT_MANAGER_ERROR_INVALID,
-	MIDGARD_CONTENT_MANAGER_ERROR_EXISTS,
-	MIDGARD_CONTENT_MANAGER_ERROR_DUPLICATED,
-	MIDGARD_CONTENT_MANAGER_ERROR_NOT_EXISTS
-} MidgardContentManagerError;
-#define MIDGARD_CONTENT_MANAGER_ERROR midgard_content_manager_error_quark ()
+	MIDGARD_CONTENT_MANAGER_JOB_CREATE,
+	MIDGARD_CONTENT_MANAGER_JOB_UPDATE,
+	MIDGARD_CONTENT_MANAGER_JOB_DELETE,
+	MIDGARD_CONTENT_MANAGER_JOB_PURGE
+} MidgardContentManagerJobType;
 
 /* convention macros */
 #define MIDGARD_TYPE_CONTENT_MANAGER (midgard_content_manager_get_type()) 
@@ -45,26 +45,14 @@ typedef struct _MidgardContentManagerIFace MidgardContentManagerIFace;
 struct _MidgardContentManagerIFace {
 	GTypeInterface parent;
 
-	GObject*	(*get_by_id)	(MidgardContentManager *self, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-	void		(*load)		(MidgardContentManager *self, GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-	void		(*exists)		(MidgardContentManager *self, GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-	void		(*create)		(MidgardContentManager *self, GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-	void		(*update)		(MidgardContentManager *self, GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-	void		(*save)			(MidgardContentManager *self, GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-	void		(*remove)		(MidgardContentManager *self, GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-	void		(*purge)		(MidgardContentManager *self, GObject *object, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-
+	MidgardConnection*		(*get_connection)	(MidgardContentManager *self, GError **error);
+	MidgardContentManagerJob*	(*create_job)		(MidgardContentManager *self, 
+			MidgardContentManagerJobType type, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error);
 };
 
-GType 			midgard_content_manager_get_type		(void);
-GObject*		midgard_content_manager_get_by_id	(MidgardContentManager *self, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-void			midgard_content_manager_load		(MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-void			midgard_content_manager_exists		(MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-void			midgard_content_manager_create		(MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-void			midgard_content_manager_update		(MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-void			midgard_content_manager_save		(MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-void			midgard_content_manager_remove		(MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error);
-void			midgard_content_manager_purge		(MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error);
+GType 				midgard_content_manager_get_type		(void);
+MidgardConnection*		midgard_content_manager_get_connection		(MidgardContentManager *self, GError **error);
+MidgardContentManagerJob*	midgard_content_manager_create_job		(MidgardContentManager *self, MidgardContentManagerJobType type, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error);
 
 G_END_DECLS
 

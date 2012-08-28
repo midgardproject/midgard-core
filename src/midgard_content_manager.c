@@ -37,148 +37,37 @@ struct _MidgardContentManager {
 };
 
 /**
- * midgard_content_manager_get_by_id:
+ * midgard_content_manager_get_connection:
  * @self: #MidgardContentManager instance
- * @reference: #MidgardObjectReference instance
- * @model: #MidgardModel instance
  * @error: pointer to store returned error
  *
- * From storage, get object which is identified by @reference.
- *
- * Returns: (transfer full): GObject derived instance or NULL
+ * Returns: #MidgardConnection or %NULL 
  *
  * Since: 10.05.8
  */ 
-GObject*
-midgard_content_manager_get_by_id (MidgardContentManager *self, MidgardObjectReference *reference, MidgardModel *model, GError **error)
+MidgardConnection*
+midgard_content_manager_get_connection (MidgardContentManager *self, GError **error)
 {
-	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->get_by_id (self, reference, model, error);
+	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->get_connection (self, error);
 }
 
 /**
- * midgard_content_manager_load:
+ * midgard_content_manager_create_job:
  * @self: #MidgardContentManager instance
+ * @type: #MidgardContentManagerJobType
  * @content: #GObject object which holds content data
  * @reference: #MidgardObjectReference instance
  * @model: (allow-none): #MidgardModel instance
  * @error: pointer to store returned error
  *
- * From storage, load object's content identified by @reference.
+ * Returns: #MidgardContentManagerJob job or %NULL on failure 
  *
  * Since: 10.05.8
  */ 
-void
-midgard_content_manager_load (MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error)
+MidgardContentManagerJob*
+midgard_content_manager_create_job (MidgardContentManager *self, MidgardContentManagerJobType type, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error)
 {
-	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->load (self, content, reference, model, error);
-}
-
-/**
- * midgard_content_manager_exists:
- * @self: #MidgardContentManager instance
- * @content: #GObject object which holds content data
- * @reference: #MidgardObjectReference instance
- * @model: (allow-none): #MidgardModel instance
- * @error: pointer to store returned error
- *
- * Check if given object's content identified by @reference exists in storage.
- *
- * Since: 10.05.8
- */ 
-void
-midgard_content_manager_exists (MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error)
-{
-	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->exists (self, content, reference, model, error);
-}
-
-/**
- * midgard_content_manager_create:
- * @self: #MidgardContentManager instance
- * @content: #GObject object which holds content data
- * @reference: #MidgardObjectReference instance
- * @model: (allow-none): #MidgardModel instance
- * @error: pointer to store returned error
- *
- * Create object's content identified by @reference.
- *
- * Since: 10.05.8
- */ 
-void
-midgard_content_manager_create (MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error)
-{
-	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->create (self, content, reference, model, error);
-}
-
-/**
- * midgard_content_manager_update:
- * @self: #MidgardContentManager instance
- * @content: #GObject object which holds content data
- * @reference: #MidgardObjectReference instance
- * @model: (allow-none): #MidgardModel instance
- * @error: pointer to store returned error
- *
- * Update object's content identified by @reference.
- *
- * Since: 10.05.8
- */ 
-void
-midgard_content_manager_update (MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error)
-{
-	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->update (self, content, reference, model, error);
-}
-
-/**
- * midgard_content_manager_save:
- * @self: #MidgardContentManager instance
- * @content: #GObject object which holds content data
- * @reference: #MidgardObjectReference instance
- * @model: (allow-none): #MidgardModel instance
- * @error: pointer to store returned error
- *
- * Save object's content identified by @reference.
- *
- * Since: 10.05.8
- */ 
-void
-midgard_content_manager_save (MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error)
-{
-	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->save (self, content, reference, model, error);
-}
-
-/**
- * midgard_content_manager_remove:
- * @self: #MidgardContentManager instance
- * @content: #GObject object which holds content data
- * @reference: #MidgardObjectReference instance
- * @model: (allow-none): #MidgardModel instance
- * @error: pointer to store returned error
- *
- * From storage, remove object's content identified by @reference.
- *
- * Since: 10.05.8
- */ 
-void
-midgard_content_manager_remove (MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error)
-{
-	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->remove (self, content, reference, model, error);
-}
-
-/**
- * midgard_content_manager_purge:
- * @self: #MidgardContentManager instance
- * @content: #GObject object which holds content data
- * @reference: #MidgardObjectReference instance
- * @model: (allow-none): #MidgardModel instance
- * @error: pointer to store returned error
- *
- * From storage, purge object's content identified by @reference.
- *
- * Since: 10.05.8
- */ 
-void
-midgard_content_manager_purge (MidgardContentManager *self, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error)
-{
-	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->purge (self, content, reference, model, error);
+	return MIDGARD_CONTENT_MANAGER_GET_INTERFACE (self)->create_job (self, type, content, reference, model, error);
 }
 
 /* GOBJECT ROUTINES */
