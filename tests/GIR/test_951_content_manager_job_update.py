@@ -119,7 +119,7 @@ class TestContentManagerJobUpdate(unittest.TestCase):
   def executionEndCallback(self, obj, arg):
     self.callback_msg_end = "DONE END"
 
-  def ZExecute(self):
+  def testZExecute(self):
     self.bookstore_one.set_property("name", self.bookstore_one_update_name)
     self.job_one.connect("execution-start", self.executionStartCallback, None)
     self.job_one.connect("execution-end", self.executionEndCallback, None)
