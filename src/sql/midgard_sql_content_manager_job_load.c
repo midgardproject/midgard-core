@@ -26,15 +26,13 @@
 #include "../midgard_core_object.h"
 #include "../midgard_model_reference.h"
 
-static void
-_midgard_sql_content_manager_job_load_executable_iface_execute (MidgardExecutable *iface, GError **error)
+static void 
+_validate (MidgardContentManagerJob *job, GError **error)
 {
 	GError *err = NULL;
-	GValue *id_val;
-	MidgardContentManagerJob *job = MIDGARD_CONTENT_MANAGER_JOB (iface);
 
-	/* Validate */
-	MidgardValidable *validable = MIDGARD_VALIDABLE (iface);
+	/* Common validation */
+	MidgardValidable *validable = MIDGARD_VALIDABLE (job);
 	if (!midgard_validable_is_valid (validable)) {
 		midgard_validable_validate (validable, &err);
 		if (err) {
@@ -42,52 +40,42 @@ _midgard_sql_content_manager_job_load_executable_iface_execute (MidgardExecutabl
 			return;
 		}
 	}
+
+	/* To load object we must have valid reference, so check it */
 	MidgardObjectReference *ref = midgard_content_manager_job_get_reference (job, &err);
 	if (err) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_REFERENCE_INVALID,
 				"%s", err && err->message ? err->message : "Unknown reason");
 		g_clear_error (&err);
-		return;
+		goto free_objects;
 	}
 
-
-	midgard_executable_execution_start (iface);
-
-	/* Get content object, it should be validated already */
-	MidgardObject *content_object = (MidgardObject *) midgard_content_manager_job_get_content_object (job, &err);
-
-	/* Get connection, it should be validated already */
-	MidgardSqlContentManagerJob *job_sql = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
-	MidgardConnection *mgd = midgard_sql_content_manager_job_get_connection (job_sql, NULL);
-
-	/* Get guid or ID via reference */
-	id_val = midgard_model_reference_get_id_value (MIDGARD_MODEL_REFERENCE (iface), &err);
+	/* Check property name, we must select data with constraint */
+	const gchar *property = midgard_model_get_name (MIDGARD_MODEL (ref), &err);
 	if (err) {
-		g_set_error (error, MIDGARD_EXECUTION_ERROR,  MIDGARD_EXECUTION_ERROR_COMMAND_INVALID_DATA, 
-				"%s", err && err->message ? err->message : "No details for invalid command data");
-		g_clear_error (&err);
-		return;
-	}
-
-	/* Get the name of the property */
-	const gchar *property = midgard_model_get_name (MIDGARD_MODEL (iface), &err);
-	if (err) {
-		g_set_error (error, MIDGARD_EXECUTION_ERROR,  MIDGARD_EXECUTION_ERROR_COMMAND_INVALID_DATA, 
+		g_set_error (error, MIDGARD_VALIDATION_ERROR,  MIDGARD_VALIDATION_ERROR_NAME_INVALID, 
 				"%s", err && err->message ? err->message : "No details for invalid model name");
 		g_clear_error (&err);
-		return;
+		goto free_objects;
 	}
 
-	midgard_core_query_get_object (mgd, NULL, (MidgardDBObject **) &content_object, FALSE, &err, property, &id_val, NULL);
-	g_value_unset (id_val);
-	if (err) {
-		g_set_error (error, MIDGARD_EXECUTION_ERROR,  MIDGARD_EXECUTION_ERROR_COMMAND_INVALID, 
-				"%s", err && err->message ? err->message : "No details for invalid command");
-		g_clear_error (&err);
-		return;
+	/* Content object is already validated */
+	MidgardObject *content_object = (MidgardObject *) midgard_content_manager_job_get_content_object (job, &err);
+
+	/* Check if property is registered for the class */
+	GParamSpec *pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (content_object), property);
+	if (!pspec) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR,  MIDGARD_VALIDATION_ERROR_REFERENCE_INVALID, 
+				"Property %s not registered for %s", 
+				property, G_OBJECT_TYPE_NAME (content_object));
+		goto free_objects;
 	}
 
-	midgard_executable_execution_end (iface);
+free_objects:
+	if (content_object)
+		g_object_unref (content_object);
+	if (ref)
+		g_object_unref (ref);
 }
 
 static gboolean
@@ -100,55 +88,49 @@ execution_end_func (gpointer data)
 }
 
 static void
-_midgard_sql_content_manager_job_load_executable_iface_execute_async (MidgardExecutable *iface, GError **error)
+_midgard_sql_content_manager_job_load_execute (MidgardExecutable *iface, gboolean async, GError **error)
 {
 	GError *err = NULL;
 	GValue *id_val;
 	MidgardContentManagerJob *job = MIDGARD_CONTENT_MANAGER_JOB (iface);
+	MidgardObjectReference *ref = midgard_content_manager_job_get_reference (job, &err);
+	MidgardConnection *mgd = NULL;
+	MidgardObject *content_object = NULL;
+        
 
 	/* Validate */
-	MidgardValidable *validable = MIDGARD_VALIDABLE (iface);
-	if (!midgard_validable_is_valid (validable)) {
-		midgard_validable_validate (validable, &err);
-		if (err) {
-			g_propagate_error (error, err);
-			return;
-		}
-	}
-	MidgardObjectReference *ref = midgard_content_manager_job_get_reference (job, &err);
+	_validate (job, &err);
 	if (err) {
-		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_REFERENCE_INVALID,
-				"%s", err && err->message ? err->message : "Unknown reason");
-		g_clear_error (&err);
-		return;
+		g_propagate_error (error, err);
+		goto free_objects;
 	}
 
-
-	midgard_executable_execution_start (iface);
+	if (async == FALSE)
+		midgard_executable_execution_start (iface);
 
 	/* Get content object, it should be validated already */
-	MidgardObject *content_object = (MidgardObject *) midgard_content_manager_job_get_content_object (job, &err);
+	content_object = (MidgardObject *) midgard_content_manager_job_get_content_object (job, &err);
 
 	/* Get connection, it should be validated already */
 	MidgardSqlContentManagerJob *job_sql = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
-	MidgardConnection *mgd = midgard_sql_content_manager_job_get_connection (job_sql, NULL);
+	mgd = midgard_sql_content_manager_job_get_connection (job_sql, NULL);
 
 	/* Get guid or ID via reference */
-	id_val = midgard_model_reference_get_id_value (MIDGARD_MODEL_REFERENCE (iface), &err);
+	id_val = midgard_model_reference_get_id_value (MIDGARD_MODEL_REFERENCE (ref), &err);
 	if (err) {
 		g_set_error (error, MIDGARD_EXECUTION_ERROR,  MIDGARD_EXECUTION_ERROR_COMMAND_INVALID_DATA, 
 				"%s", err && err->message ? err->message : "No details for invalid command data");
 		g_clear_error (&err);
-		return;
+		goto free_objects;
 	}
 
 	/* Get the name of the property */
-	const gchar *property = midgard_model_get_name (MIDGARD_MODEL (iface), &err);
+	const gchar *property = midgard_model_get_name (MIDGARD_MODEL (ref), &err);
 	if (err) {
 		g_set_error (error, MIDGARD_EXECUTION_ERROR,  MIDGARD_EXECUTION_ERROR_COMMAND_INVALID_DATA, 
 				"%s", err && err->message ? err->message : "No details for invalid model name");
 		g_clear_error (&err);
-		return;
+		goto free_objects;
 	}
 
 	midgard_core_query_get_object (mgd, NULL, (MidgardDBObject **) &content_object, FALSE, &err, property, &id_val, NULL);
@@ -157,11 +139,36 @@ _midgard_sql_content_manager_job_load_executable_iface_execute_async (MidgardExe
 		g_set_error (error, MIDGARD_EXECUTION_ERROR,  MIDGARD_EXECUTION_ERROR_COMMAND_INVALID, 
 				"%s", err && err->message ? err->message : "No details for invalid command");
 		g_clear_error (&err);
-		return;
+		goto free_objects;
 	}
 
-	/* signal emission idle */
-	g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) execution_end_func, g_object_ref (iface), NULL);
+	if (async == FALSE) {
+		midgard_executable_execution_end (iface);
+	} else {
+		/* signal emission idle */
+		g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) execution_end_func, g_object_ref (iface), NULL);
+	}
+
+
+free_objects:
+	if (ref)
+		g_object_unref (ref);
+	if (content_object)
+		g_object_unref (content_object);
+	if (mgd)
+		g_object_unref (mgd);
+}
+
+static void
+_midgard_sql_content_manager_job_load_executable_iface_execute (MidgardExecutable *iface, GError **error)
+{
+	_midgard_sql_content_manager_job_load_execute (iface, FALSE, error);
+}
+
+static void
+_midgard_sql_content_manager_job_load_executable_iface_execute_async (MidgardExecutable *iface, GError **error)
+{
+	_midgard_sql_content_manager_job_load_execute (iface, TRUE, error);
 }
 
 /* GOBJECT ROUTINES */
