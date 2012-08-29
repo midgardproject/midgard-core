@@ -41,7 +41,7 @@ struct _MidgardContentManager {
  * @self: #MidgardContentManager instance
  * @error: pointer to store returned error
  *
- * Returns: #MidgardConnection or %NULL 
+ * Returns: (transfer full): #MidgardConnection or %NULL 
  *
  * Since: 10.05.8
  */ 
