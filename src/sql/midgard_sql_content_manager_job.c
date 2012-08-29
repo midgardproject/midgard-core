@@ -58,7 +58,7 @@ midgard_sql_content_manager_job_get_connection (MidgardSqlContentManagerJob *sel
 {
 	g_return_val_if_fail (self != NULL, NULL);
 	if (self->priv->connection == NULL)
-		return self->priv->connection;
+		return NULL;
 	return g_object_ref (self->priv->connection);
 }
 
@@ -94,6 +94,7 @@ static GObject*
 	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
 	if (job->priv->content_object == NULL) {
 		/* TODO, set error*/
+		return NULL;
 	}
 	return (GObject *) g_object_ref (job->priv->content_object);
 }
@@ -105,6 +106,7 @@ static MidgardObjectReference*
 	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
 	if (job->priv->content_object == NULL) {
 		/* TODO, set error*/
+		return NULL;
 	}
 	return (MidgardObjectReference *) g_object_ref (job->priv->reference);
 }
