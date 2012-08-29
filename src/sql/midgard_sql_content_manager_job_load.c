@@ -117,6 +117,11 @@ _midgard_sql_content_manager_job_load_execute (MidgardExecutable *iface, gboolea
 
 	/* Get guid or ID via reference */
 	id_val = midgard_model_reference_get_id_value (MIDGARD_MODEL_REFERENCE (ref), &err);
+	if (!G_IS_VALUE (id_val)) {
+		g_set_error (error, MIDGARD_VALIDATION_ERROR,  MIDGARD_VALIDATION_ERROR_VALUE_INVALID, 
+				"Invalid reference id value");
+		goto free_objects;
+	}
 	if (err) {
 		g_set_error (error, MIDGARD_EXECUTION_ERROR,  MIDGARD_EXECUTION_ERROR_COMMAND_INVALID_DATA, 
 				"%s", err && err->message ? err->message : "No details for invalid command data");
@@ -133,7 +138,7 @@ _midgard_sql_content_manager_job_load_execute (MidgardExecutable *iface, gboolea
 		goto free_objects;
 	}
 
-	midgard_core_query_get_object (mgd, NULL, (MidgardDBObject **) &content_object, FALSE, &err, property, &id_val, NULL);
+	midgard_core_query_get_object (mgd, NULL, (MidgardDBObject **) &content_object, FALSE, &err, property, id_val, NULL);
 	g_value_unset (id_val);
 	if (err) {
 		g_set_error (error, MIDGARD_EXECUTION_ERROR,  MIDGARD_EXECUTION_ERROR_COMMAND_INVALID, 
