@@ -71,6 +71,11 @@ MidgardConfig
 
 </para>
 
+<!-- ##### ARG MidgardConfig:gdathreads ##### -->
+<para>
+
+</para>
+
 <!-- ##### ARG MidgardConfig:host ##### -->
 <para>
 

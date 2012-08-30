@@ -139,6 +139,13 @@ MidgardObject
 
 @midgardobject: the object which received the signal.
 
+<!-- ##### SIGNAL MidgardObject::action-load ##### -->
+<para>
+
+</para>
+
+@midgardobject: the object which received the signal.
+
 <!-- ##### SIGNAL MidgardObject::action-loaded ##### -->
 <para>
 

@@ -243,6 +243,20 @@ midgard_tree
 @MIDGARD_GENERIC_ERROR_TREE_IS_CIRCULAR: 
 @MIDGARD_GENERIC_ERROR_OBJECT_IS_LOCKED: 
 
+<!-- ##### SIGNAL MidgardQueryExecutor::execution-end ##### -->
+<para>
+
+</para>
+
+@midgardqueryexecutor: the object which received the signal.
+
+<!-- ##### SIGNAL MidgardQueryExecutor::execution-start ##### -->
+<para>
+
+</para>
+
+@midgardqueryexecutor: the object which received the signal.
+
 <!-- ##### ARG MidgardRepligard:workspacepoid ##### -->
 <para>
 
