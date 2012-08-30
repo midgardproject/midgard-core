@@ -72,7 +72,7 @@ midgard_executable_execute (MidgardExecutable *self, GError **error)
  * Implementation shall not emit any signal inside asynchronous method. 
  * Instead, signal emission should be added to GLib's default main loop(e.g. g_idle_add).
  * 
- * Since: 10.05.5
+ * Since: 10.05.8
  */
 void
 midgard_executable_execute_async (MidgardExecutable *self, GError **error)
