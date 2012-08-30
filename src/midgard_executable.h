@@ -55,6 +55,8 @@ struct _MidgardExecutableIFace {
 GType		midgard_executable_get_type		(void);
 void		midgard_executable_execute		(MidgardExecutable *self, GError **error);
 void		midgard_executable_execute_async	(MidgardExecutable *self, GError **error);
+void		midgard_executable_execution_start 	(MidgardExecutable *self);
+void            midgard_executable_execution_end	(MidgardExecutable *self);
 GQuark		midgard_execution_error_quark 		(void);
 
 G_END_DECLS
