@@ -446,7 +446,9 @@ _midgard_workspace_manager_class_init (MidgardWorkspaceManagerClass *klass, gpoi
 			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
 	/**
 	 * MidgardWorkspaceManager:connection:
-	 * Pointer to a connection, #MidgardWorkspaceManager has been initialized for
+	 * @manager: #MidgardWorkspaceManager instance
+	 *
+	 * Pointer to a connection, @manager has been initialized for
 	 */
 	g_object_class_install_property (object_class, PROPERTY_CONNECTION, pspec);
 }
