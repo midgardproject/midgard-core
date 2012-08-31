@@ -121,7 +121,7 @@ __modify_path(MidgardConnection *mgd, const gchar *path)
 
 #ifdef MGD_HAVE_DBUS
 /* This is invoked for an object which is connected to D-Bus signal.
-   Then we emit MidgardDBusClass notified signal to trigger user's callback invokation */
+   Then we emit MidgardDbusClass notified signal to trigger user's callback invokation */
 static void
 notified_signal_handler (DBusGProxy *proxy, const char *msg, gpointer user_data)
 {
@@ -359,7 +359,7 @@ midgard_core_dbus_send_serialized_object(MidgardObject *object, const gchar *pat
 
 /**
  * midgard_dbus_get_message:
- * @self: #MidgardDBus instance
+ * @self: #MidgardDbus instance
  *
  * Get message associated with givven instance.
  * 
