@@ -26,7 +26,15 @@
 
 G_BEGIN_DECLS
 
+/**
+ * MidgardContentManagerJobType:
+ *
+ * Enum values to define job type.
+ * Since: 10.05.8
+ */ 
+
 typedef enum {
+	MIDGARD_CONTENT_MANAGER_JOB_LOAD,
 	MIDGARD_CONTENT_MANAGER_JOB_CREATE,
 	MIDGARD_CONTENT_MANAGER_JOB_UPDATE,
 	MIDGARD_CONTENT_MANAGER_JOB_DELETE,
