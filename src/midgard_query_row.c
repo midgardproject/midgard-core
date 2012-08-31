@@ -28,8 +28,9 @@ struct _MidgardQueryRow {
  * @column_name: (allow-none): Column name which holds value
  * @error: pointer to store error
  *
- * Returns value for specified column.
  * @column_name can be ommited if column name is uniqe in the #MidgardQueryResult
+ *
+ * Returns: value for specified column.
  *
  * Since: 10.05.6
  */ 
