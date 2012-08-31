@@ -433,14 +433,6 @@ __mysql_reconnect (MidgardConnection *mgd)
 	}\
 }
 
-/**
- * Adds a named parameter to the given libgda connection string.
- 
- @param cnc libgda connection string
- @param name parameter name
- @param value parameter value
- @param def default value (used if given value is NULL)
-*/
 static void cnc_add_part(
 		GString *cnc,
 		const gchar *name, const gchar *value, const gchar *def) 
