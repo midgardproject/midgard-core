@@ -1056,7 +1056,6 @@ MidgardJob
 midgard_job_is_running
 midgard_job_is_executed
 midgard_job_is_failed
-midgard_job_push
 <SUBSECTION Standard>
 MIDGARD_JOB
 MIDGARD_IS_JOB
