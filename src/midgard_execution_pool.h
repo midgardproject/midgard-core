@@ -48,7 +48,7 @@ struct _MidgardExecutionPoolClass {
 };
 
 GType 			midgard_execution_pool_get_type	(void);
-MidgardExecutionPool*	midgard_execution_pool_new 	(guint max_threads);
+MidgardExecutionPool*	midgard_execution_pool_new 	(guint max_n_threads);
 
 G_END_DECLS
 
