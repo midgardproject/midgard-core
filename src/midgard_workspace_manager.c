@@ -234,6 +234,7 @@ midgard_workspace_manager_get_workspace_by_path (const MidgardWorkspaceManager *
  * @self: #MidgardWorkspaceManager instance
  * @type: the type name
  * @ws: #MidgardWorkspace instance
+ * @error: pointer to store returned error
  *
  * From given @ws workspace, removes entire content of given @type name.
  * There's no undelete available for this operation.
@@ -286,6 +287,7 @@ midgard_workspace_manager_purge_content (const MidgardWorkspaceManager *self, co
  * @type: the type name
  * @src: source #MidgardWorkspace 
  * @dest: destination #MidgardWorkspace
+ * @error: pointer to store returned error
  *
  * Moves the content of given #type name from @src, source #MidgardWorkspace to 
  * @dest, destination one.
