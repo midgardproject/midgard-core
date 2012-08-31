@@ -440,7 +440,7 @@ midgard_quota_size_is_reached
 <INCLUDE>midgard/midgard.h</INCLUDE>
 <FILE>midgard_error</FILE>
 MIDGARD_GENERIC_ERROR
-MidgardErrorGeneric
+MidgardGenericError
 midgard_error_generic
 midgard_error_string
 midgard_set_error
