@@ -29,11 +29,6 @@
 #include "midgard_core_workspace.h"
 #include "midgard_user.h"
 
-/**
- * SECTION: MidgardConnection
- * @short_descritpion: MidgardConnection description
- */ 
-
 #ifdef HAVE_LIBGDA_4
 #include <sql-parser/gda-sql-parser.h>
 #endif
