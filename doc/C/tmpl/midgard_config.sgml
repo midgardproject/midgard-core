@@ -25,7 +25,7 @@ MidgardConfig
 <!-- ##### SECTION Image ##### -->
 
 
-<!-- ##### TYPEDEF MidgardConfig ##### -->
+<!-- ##### STRUCT MidgardConfig ##### -->
 <para>
 
 </para>
@@ -136,11 +136,12 @@ MidgardConfig
 
 </para>
 
-<!-- ##### TYPEDEF MidgardConfigClass ##### -->
+<!-- ##### STRUCT MidgardConfigClass ##### -->
 <para>
 
 </para>
 
+@parent: 
 
 <!-- ##### STRUCT MidgardConfigPrivate ##### -->
 <para>

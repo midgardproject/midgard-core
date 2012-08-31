@@ -191,6 +191,12 @@ midgard_tree
 
 @types: 
 
+<!-- ##### STRUCT MidgardBlobPrivate ##### -->
+<para>
+
+</para>
+
+
 <!-- ##### STRUCT MidgardCollectorPrivate ##### -->
 <para>
 

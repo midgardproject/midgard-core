@@ -213,7 +213,6 @@ MIDGARD_COLLECTOR_GET_CLASS
 <FILE>midgard_blob</FILE>
 MidgardBlob
 MidgardBlobClass
-MidgardBlobPrivate
 midgard_blob_new
 midgard_blob_create_blob
 midgard_blob_read_content
