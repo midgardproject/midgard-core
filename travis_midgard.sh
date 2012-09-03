@@ -8,4 +8,5 @@ make
 sudo make install
 
 sudo mysql -e 'create database test_gir;'
+sudo mysql -e 'SET GLOBAL sql_mode="";'
 psql -c 'create database test_gir;' -U postgres
