@@ -1312,16 +1312,12 @@ gboolean midgard_core_query_add_column(MidgardConnection *mgd,
 
 	/* Default value. 
 	 * Default value not implemented in PostgreSQL 8.1 ( 28.02.2007 ) */
-	if(!mdc->autoinc && 
-			mgd->priv->config->priv->dbtype != MIDGARD_DB_TYPE_POSTGRES) 
-		gda_server_operation_set_value_at(op, dval,
-				NULL, "/COLUMN_DEF_P/COLUMN_DEFAULT");
-
 	/* Default value invalid for BLOB/TEXT columns in MySQL (prior 5.0.2) */
 	if (mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_MYSQL
 			&& g_str_equal (mdc->dbtype, "text")) {
 		/* Do nothing */
-	} else {
+	} else if (!mdc->autoinc &&
+			mgd->priv->config->priv->dbtype != MIDGARD_DB_TYPE_POSTGRES) {
 		gda_server_operation_set_value_at(op, dval,
 				NULL, "/COLUMN_DEF_P/COLUMN_DEFAULT");
 	}
