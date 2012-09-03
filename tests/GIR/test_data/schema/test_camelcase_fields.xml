@@ -1,0 +1,20 @@
+<Schema xmlns="http://www.midgard-project.org/repligard/1.4">
+
+	<!-- Test https://github.com/midgardproject/midgard-core/issues/170 -->
+	<type name="test_camelcase_fields" table="test_camelcase_fields">
+		<property name="id" type="unsigned integer" primaryfield="id" />
+		<property name="author" type="unsigned integer"/>
+		<property name="topic" type="unsigned integer" parentfield="topic"/>
+		<property name="nextVersion" upfield="nextVersion" type="unsigned integer"/>
+		<property name="title" type="string"/>
+		<property name="abstract" type="text"/>
+		<property name="keywords" type="text"/>
+		<property name="docStatus" type="integer"/>
+		<property name="content" type="text"/>
+		<property name="orgOpenpsaAccesstype" type="integer" />
+		<property name="orgOpenpsaObtype" type="integer"/>
+		<property name="orgOpenpsaWgtype" type="integer"/>
+		<property name="orgOpenpsaOwnerWg" type="string"/>
+	</type>
+
+</Schema>
