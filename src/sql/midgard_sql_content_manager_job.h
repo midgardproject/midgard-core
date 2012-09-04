@@ -20,7 +20,7 @@
 #define MIDGARD_SQL_CONTENT_MANAGER_JOB_H
 
 #include <glib-object.h>
-#include "midgard_connection.h"
+#include "../midgard_connection.h"
 
 G_BEGIN_DECLS
 
