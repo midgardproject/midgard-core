@@ -60,7 +60,7 @@ midgard_content_manager_get_connection (MidgardContentManager *self, GError **er
  * @model: (allow-none): #MidgardModel instance
  * @error: pointer to store returned error
  *
- * Returns: #MidgardContentManagerJob job or %NULL on failure 
+ * Returns: (transfer full): #MidgardContentManagerJob job or %NULL on failure 
  *
  * Since: 10.05.8
  */ 
