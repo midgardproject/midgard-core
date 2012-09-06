@@ -109,6 +109,7 @@ midgard_sql_public_h = \
 	src/sql/midgard_sql_query_result.h \
 	src/sql/midgard_sql_query_select_data.h \
 	src/sql/midgard_sql_query_constraint.h \
+	src/sql/midgard_sql_content_manager.h \
 	src/sql/midgard_sql_content_manager_job.h \
 	src/sql/midgard_sql_content_manager_job_create.h \
 	src/sql/midgard_sql_content_manager_job_update.h \
@@ -257,6 +258,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/sql/midgard_sql_query_result.c \
 	src/sql/midgard_sql_query_select_data.c \
 	src/sql/midgard_sql_query_constraint.c \
+	src/sql/midgard_sql_content_manager.c \
 	src/sql/midgard_sql_content_manager_job.c \
 	src/sql/midgard_sql_content_manager_job_create.c \
 	src/sql/midgard_sql_content_manager_job_update.c \
