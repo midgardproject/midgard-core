@@ -153,12 +153,17 @@ typedef struct {
 
 gboolean
 _midgard_query_select_add_join (MidgardQueryExecutor *self, const gchar *join_type, 
-		MidgardQueryProperty *left_property, MidgardQueryProperty *right_property)
+		MidgardQueryHolder *left_holder, MidgardQueryHolder *right_holder)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (join_type != NULL, FALSE);
-	g_return_val_if_fail (left_property != NULL, FALSE);
-	g_return_val_if_fail (right_property != NULL, FALSE);
+	g_return_val_if_fail (left_holder != NULL, FALSE);
+	g_return_val_if_fail (right_holder != NULL, FALSE);
+
+	MidgardQueryProperty *left_property = MIDGARD_QUERY_PROPERTY (left_holder);
+	g_return_val_if_fail (MIDGARD_IS_QUERY_PROPERTY (left_property), FALSE);
+	MidgardQueryProperty *right_property = MIDGARD_QUERY_PROPERTY (right_holder);
+	g_return_val_if_fail (MIDGARD_IS_QUERY_PROPERTY (right_property), FALSE);
 
 	/* validate join type */
 	GdaSqlSelectJoinType join_type_id;
