@@ -60,6 +60,9 @@ _midgard_sql_content_manager_job_create_executable_iface_execute (MidgardExecuta
 	}
 
 	midgard_executable_execution_end (iface);
+
+	g_object_unref (content_object);
+	g_object_unref (mgd);
 }
 
 static gboolean
@@ -99,6 +102,9 @@ _midgard_sql_content_manager_job_create_executable_iface_execute_async (MidgardE
 
 	/* signal emission idle */
 	g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) execution_end_func, g_object_ref (iface), NULL);
+
+	g_object_unref (content_object);
+	g_object_unref (mgd);
 }
 
 /* GOBJECT ROUTINES */
