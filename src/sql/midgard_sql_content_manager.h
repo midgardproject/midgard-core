@@ -24,7 +24,7 @@
 G_BEGIN_DECLS
 
 /* convention macros */
-#define MIDGARD_TYPE_SQL_CONTENT_MANAGER (midgard_sql_content_manager_job_get_type()) 
+#define MIDGARD_TYPE_SQL_CONTENT_MANAGER (midgard_sql_content_manager_get_type()) 
 #define MIDGARD_SQL_CONTENT_MANAGER(object)  (G_TYPE_CHECK_INSTANCE_CAST ((object),MIDGARD_TYPE_SQL_CONTENT_MANAGER, MidgardSqlContentManager))
 #define MIDGARD_SQL_CONTENT_MANAGER_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST ((klass), MIDGARD_TYPE_SQL_CONTENT_MANAGER, MidgardSqlContentManagerClass))
 #define MIDGARD_IS_SQL_CONTENT_MANAGER(object) (G_TYPE_CHECK_INSTANCE_TYPE ((object), MIDGARD_TYPE_SQL_CONTENT_MANAGER))
