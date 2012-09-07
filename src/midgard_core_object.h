@@ -233,6 +233,8 @@ struct _MidgardConnectionPrivate {
 	gpointer workspace;
 	GdaDataModel *workspace_model;
 	MidgardWorkspaceManager *workspace_manager;
+
+	MidgardContentManager *content_manager;
 };
 
 #define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL

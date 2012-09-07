@@ -28,6 +28,7 @@
 #include "midgard_core_query_builder.h"
 #include "midgard_core_workspace.h"
 #include "midgard_user.h"
+#include "sql/midgard_sql_content_manager.h"
 
 #ifdef HAVE_LIBGDA_4
 #include <sql-parser/gda-sql-parser.h>
@@ -81,6 +82,9 @@ midgard_connection_private_new (void)
 	cnc_private->workspace_model = NULL;
 	cnc_private->workspace = NULL;
 	cnc_private->workspace_manager = NULL;
+
+	/* content_manager */
+	cnc_private->content_manager = NULL;
 
 	return cnc_private;
 }
@@ -161,6 +165,10 @@ static void _midgard_connection_dispose(GObject *object)
   	if (self->priv->workspace)
 		g_object_unref (self->priv->workspace);
 	self->priv->workspace = NULL;
+
+	if (self->priv->content_manager)
+		g_object_unref (self->priv->content_manager);
+	self->priv->content_manager = NULL;
 
 	/* Disconnect and do not invoke error callbacks */
 	if (self->priv->error_clbk_connected)
@@ -1445,3 +1453,22 @@ midgard_connection_get_workspace_manager (MidgardConnection *self)
 
 	return self->priv->workspace_manager;
 }
+
+/**
+ * midgard_connection_get_content_manager:
+ * @self: #MidgardConnection instance
+ * @error: a pointer to store returned error
+ *
+ * Returns: (transfer full): #MidgardContentManager
+ * Since: 12.09
+ */ 
+MidgardContentManager*
+midgard_connection_get_content_manager (MidgardConnection *self, GError **error)
+{
+	g_return_val_if_fail (self != NULL, NULL);
+	/* TODO, handle error */
+	if (!self->priv->content_manager)
+		self->priv->content_manager = (MidgardContentManager*) g_object_new (MIDGARD_TYPE_SQL_CONTENT_MANAGER, "connection", self, NULL);
+	return (MidgardContentManager *) g_object_ref (self->priv->content_manager);
+}
+
