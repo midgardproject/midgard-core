@@ -46,21 +46,51 @@ class TestContentManagerJobCreate(unittest.TestCase):
     job = self.manager.create_job(Midgard.ContentManagerJobType.LOAD, self.bookstore, self.reference, None)
     self.assertIsInstance(job, Midgard.SqlContentManagerJobLoad)
 
+  def testJobLoadObjects(self):
+    job = self.manager.create_job(Midgard.ContentManagerJobType.LOAD, self.bookstore, self.reference, None)
+    self.assertEqual(job.get_content_object(), self.bookstore)
+    self.assertEqual(job.get_model(), None)
+    self.assertEqual(job.get_reference(), self.reference)
+
   def testCreateCreateJob(self):
     job = self.manager.create_job(Midgard.ContentManagerJobType.CREATE, self.bookstore, self.reference, None)
     self.assertIsInstance(job, Midgard.SqlContentManagerJobCreate)
+
+  def testJobCreateObjects(self):
+    job = self.manager.create_job(Midgard.ContentManagerJobType.LOAD, self.bookstore, self.reference, None)
+    self.assertEqual(job.get_content_object(), self.bookstore)
+    self.assertEqual(job.get_model(), None)
+    self.assertEqual(job.get_reference(), self.reference)
 
   def testCreateUpdateJob(self):
     job = self.manager.create_job(Midgard.ContentManagerJobType.UPDATE, self.bookstore, self.reference, None)
     self.assertIsInstance(job, Midgard.SqlContentManagerJobUpdate)
 
+  def testJobUpdateObjects(self):
+    job = self.manager.create_job(Midgard.ContentManagerJobType.LOAD, self.bookstore, self.reference, None)
+    self.assertEqual(job.get_content_object(), self.bookstore)
+    self.assertEqual(job.get_model(), None)
+    self.assertEqual(job.get_reference(), self.reference)
+
   def testCreateDeleteJob(self):
     job = self.manager.create_job(Midgard.ContentManagerJobType.DELETE, self.bookstore, self.reference, None)
     self.assertIsInstance(job, Midgard.SqlContentManagerJobDelete)
 
+  def testJobDeleteObjects(self):
+    job = self.manager.create_job(Midgard.ContentManagerJobType.LOAD, self.bookstore, self.reference, None)
+    self.assertEqual(job.get_content_object(), self.bookstore)
+    self.assertEqual(job.get_model(), None)
+    self.assertEqual(job.get_reference(), self.reference)
+
   def testCreatePurgeJob(self):
     job = self.manager.create_job(Midgard.ContentManagerJobType.PURGE, self.bookstore, self.reference, None)
     self.assertIsInstance(job, Midgard.SqlContentManagerJobPurge)
+
+  def testJobPurgeObjects(self):
+    job = self.manager.create_job(Midgard.ContentManagerJobType.LOAD, self.bookstore, self.reference, None)
+    self.assertEqual(job.get_content_object(), self.bookstore)
+    self.assertEqual(job.get_model(), None)
+    self.assertEqual(job.get_reference(), self.reference)
 
 if __name__ == "__main__":
     unittest.main()
