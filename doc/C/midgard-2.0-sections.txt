@@ -54,6 +54,7 @@ midgard_connection_is_enabled_dbus
 midgard_connection_is_enabled_workspace
 midgard_connection_get_workspace
 midgard_connection_set_workspace
+midgard_connection_get_content_manager
 <SUBSECTION Standard>
 MIDGARD_CONNECTION
 MIDGARD_IS_CONNECTION
