@@ -25,7 +25,7 @@
  *
  * Returns: name of the model, or NULL in case of error
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 const gchar*
 midgard_model_get_name (MidgardModel *self, GError **error)

@@ -27,7 +27,7 @@
  *
  * Returns: (transfer full): #GObject derived instance which is volatile content data holder
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 GObject*
 midgard_content_manager_job_get_content_object (MidgardContentManagerJob *self, GError **error)
@@ -42,7 +42,7 @@ midgard_content_manager_job_get_content_object (MidgardContentManagerJob *self, 
  *
  * Returns: (transfer full): #MidgardObjectReference instance which identifies object in this job
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 MidgardObjectReference*
 midgard_content_manager_job_get_reference (MidgardContentManagerJob *self, GError **error)
@@ -57,7 +57,7 @@ midgard_content_manager_job_get_reference (MidgardContentManagerJob *self, GErro
  *
  * Returns: (transfer full): #MidgardModel instance which is a model for content object in this job or %NULL
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 MidgardModel*
 midgard_content_manager_job_get_model (MidgardContentManagerJob *self, GError **error)

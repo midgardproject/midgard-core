@@ -26,7 +26,7 @@
  *
  * Returns: Unique id of the model, or NULL in case of error
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 const gchar*
 midgard_model_reference_get_id (MidgardModelReference *self, GError **error)
@@ -44,7 +44,7 @@ midgard_model_reference_get_id (MidgardModelReference *self, GError **error)
  *
  * Returns: New GValue which holds id of the model, or NULL in case of error.
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 GValue*
 midgard_model_reference_get_id_value (MidgardModelReference *self, GError **error)

@@ -31,7 +31,7 @@ struct _MidgardExecutionPoolPrivate {
  * 
  * Returns: new #MidgardExecutionPool
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 MidgardExecutionPool *             
 midgard_execution_pool_new (guint max_n_threads)

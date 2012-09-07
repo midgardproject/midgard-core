@@ -24,7 +24,7 @@
  *
  * Returns: number of resources available in pool
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 guint
 midgard_pool_get_n_resources (MidgardPool *self)
@@ -38,7 +38,7 @@ midgard_pool_get_n_resources (MidgardPool *self)
  *
  * Returns: maximum number of resources which can be available in the pool
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 guint
 midgard_pool_get_max_n_resources (MidgardPool *self)
@@ -56,7 +56,7 @@ midgard_pool_get_max_n_resources (MidgardPool *self)
  *
  * Returns: (transfer none): #MidgardPool self reference 
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 MidgardPool*
 midgard_pool_set_max_n_resources (MidgardPool *self, guint n_resources, GError **error)
@@ -74,7 +74,7 @@ midgard_pool_set_max_n_resources (MidgardPool *self, guint n_resources, GError *
  *
  * Returns: (transfer none): #MidgardPool self reference 
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 MidgardPool*
 midgard_pool_push (MidgardPool *self, GObject *object, GError **error)

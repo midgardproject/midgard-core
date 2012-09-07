@@ -25,7 +25,7 @@
  *
  * Returns: %TRUE if job is running, %FALSE otherwise
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 gboolean
 midgard_job_is_running (MidgardJob *self)
@@ -39,7 +39,7 @@ midgard_job_is_running (MidgardJob *self)
  *
  * Returns: %TRUE if job is executed, %FALSE otherwise
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 gboolean
 midgard_job_is_executed (MidgardJob *self)
@@ -53,7 +53,7 @@ midgard_job_is_executed (MidgardJob *self)
  *
  * Returns: %TRUE if job failed, %FALSE otherwise
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 gboolean
 midgard_job_is_failed (MidgardJob *self)

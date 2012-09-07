@@ -43,7 +43,7 @@ struct _MidgardContentManager {
  *
  * Returns: (transfer full): #MidgardConnection or %NULL 
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 MidgardConnection*
 midgard_content_manager_get_connection (MidgardContentManager *self, GError **error)
@@ -62,7 +62,7 @@ midgard_content_manager_get_connection (MidgardContentManager *self, GError **er
  *
  * Returns: (transfer full): #MidgardContentManagerJob job or %NULL on failure 
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 MidgardContentManagerJob*
 midgard_content_manager_create_job (MidgardContentManager *self, MidgardContentManagerJobType type, GObject *content, MidgardObjectReference *reference, MidgardModel *model, GError **error)

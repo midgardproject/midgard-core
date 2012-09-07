@@ -35,7 +35,7 @@ struct _MidgardObjectReferencePrivate {
  * 
  * Returns: new #MidgardObjectReference
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 MidgardObjectReference *             
 midgard_object_reference_new (const gchar *id, const gchar *name, MidgardWorkspace *workspace)
@@ -62,7 +62,7 @@ midgard_object_reference_new (const gchar *id, const gchar *name, MidgardWorkspa
  * 
  * Returns: (transfer full): #MidgardWorkspace instance or %NULL
  *
- * Since: 10.05.8
+ * Since: 12.09
  */ 
 MidgardWorkspace *             
 midgard_object_reference_get_workspace (MidgardObjectReference *self, GError **error)
