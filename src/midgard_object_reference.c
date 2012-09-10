@@ -88,6 +88,16 @@ _midgard_object_reference_get_id (MidgardModelReference *iface, GError **error)
 	return self->priv->id;
 }
 
+static gboolean _is_int(const gchar *id)
+{
+	while (*id != '\0') {
+		if (!isdigit(*id))
+			return FALSE;
+		id++;
+	}
+	return TRUE;
+}
+
 GValue*                
 _midgard_object_reference_get_id_value (MidgardModelReference *iface, GError **error)
 {
@@ -101,7 +111,7 @@ _midgard_object_reference_get_id_value (MidgardModelReference *iface, GError **e
 		g_value_init (id_value, G_TYPE_STRING);
 		g_value_set_string (id_value, id);
 	/* integer */
-	} else if (isdigit(id)) {
+	} else if (_is_int(id)) {
 		g_value_init (id_value, G_TYPE_UINT);
 		g_value_set_uint (id_value, atoi(id));
 	/* undefined TODO: UUID */	
