@@ -47,7 +47,7 @@ class TestObjectReference(unittest.TestCase):
   def testGetIDValueInteger(self):
     reference = Midgard.ObjectReference(id = 123, name = "abc")
     self.assertNotEqual(reference.get_id_value(), None)
-    self.assertEqual(self.reference.get_id_value(), 123)
+    self.assertEqual(reference.get_id_value(), 123)
 
   def testGetWorkspace(self):
     self.assertEqual(self.reference.get_workspace(), None)
