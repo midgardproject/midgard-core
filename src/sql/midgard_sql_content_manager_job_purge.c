@@ -30,12 +30,17 @@ _midgard_sql_content_manager_job_purge_executable_iface_execute (MidgardExecutab
 {
 	GError *err = NULL;
 
+	MidgardSqlContentManagerJob *job_sql = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	midgard_core_sql_content_manager_job_running (job_sql);
+	gboolean failed = FALSE;
+
 	/* Validate */
 	MidgardValidable *validable = MIDGARD_VALIDABLE (iface);
 	if (!midgard_validable_is_valid (validable)) {
 		midgard_validable_validate (validable, &err);
 		if (err) {
 			g_propagate_error (error, err);
+			midgard_core_sql_content_manager_job_failed (job_sql);
 			return;
 		}
 	}
@@ -47,7 +52,6 @@ _midgard_sql_content_manager_job_purge_executable_iface_execute (MidgardExecutab
 	MidgardObject *content_object = (MidgardObject *) midgard_content_manager_job_get_content_object (job, &err);
 
 	/* Get connection, it should be validated already */
-	MidgardSqlContentManagerJob *job_sql = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
 	MidgardConnection *mgd = midgard_sql_content_manager_job_get_connection (job_sql, NULL);
 
 	/* purge object */
@@ -57,9 +61,15 @@ _midgard_sql_content_manager_job_purge_executable_iface_execute (MidgardExecutab
 				MIDGARD_EXECUTION_ERROR_INTERNAL, 
 				"%s",
 				midgard_connection_get_error_string (mgd), NULL);
+				failed = TRUE;
 	}
 
 	midgard_executable_execution_end (iface);
+
+	if (failed == TRUE)
+		midgard_core_sql_content_manager_job_failed (job_sql);
+	else	
+		midgard_core_sql_content_manager_job_succeed (job_sql);
 
 	g_object_unref (content_object);
 	g_object_unref (mgd);
@@ -79,12 +89,16 @@ _midgard_sql_content_manager_job_purge_executable_iface_execute_async (MidgardEx
 {
 	GError *err = NULL;
 
+	MidgardSqlContentManagerJob *job_sql = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
+	midgard_core_sql_content_manager_job_running (job_sql);
+
 	/* Validate */
 	MidgardValidable *validable = MIDGARD_VALIDABLE (iface);
 	if (!midgard_validable_is_valid (validable)) {
 		midgard_validable_validate (validable, &err);
 		if (err) {
 			g_propagate_error (error, err);
+			midgard_core_sql_content_manager_job_failed (job_sql);
 			return;
 		}
 	}
@@ -94,7 +108,6 @@ _midgard_sql_content_manager_job_purge_executable_iface_execute_async (MidgardEx
 	MidgardObject *content_object = (MidgardObject *) midgard_content_manager_job_get_content_object (job, &err);
 
 	/* Get connection, it should be validated already */
-	MidgardSqlContentManagerJob *job_sql = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
 	MidgardConnection *mgd = midgard_sql_content_manager_job_get_connection (job_sql, NULL);
 
 	/* purge object */
@@ -103,6 +116,11 @@ _midgard_sql_content_manager_job_purge_executable_iface_execute_async (MidgardEx
 
 	/* signal emission idle */
 	g_idle_add_full (G_PRIORITY_HIGH_IDLE, (GSourceFunc) execution_end_func, g_object_ref (iface), NULL);
+
+	if (rv)
+		midgard_core_sql_content_manager_job_succeed (job_sql);
+	else
+		midgard_core_sql_content_manager_job_failed (job_sql);
 
 	g_object_unref (content_object);
 	g_object_unref (mgd);

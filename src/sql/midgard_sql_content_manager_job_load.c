@@ -93,10 +93,13 @@ _midgard_sql_content_manager_job_load_execute (MidgardExecutable *iface, gboolea
 	GError *err = NULL;
 	GValue *id_val;
 	MidgardContentManagerJob *job = MIDGARD_CONTENT_MANAGER_JOB (iface);
+	MidgardSqlContentManagerJob *job_sql = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
 	MidgardObjectReference *ref = midgard_content_manager_job_get_reference (job, &err);
 	MidgardConnection *mgd = NULL;
 	MidgardObject *content_object = NULL;
-        
+	gboolean failed = TRUE;
+       
+	midgard_core_sql_content_manager_job_running (job_sql);
 
 	/* Validate */
 	_validate (job, &err);
@@ -112,7 +115,6 @@ _midgard_sql_content_manager_job_load_execute (MidgardExecutable *iface, gboolea
 	content_object = (MidgardObject *) midgard_content_manager_job_get_content_object (job, &err);
 
 	/* Get connection, it should be validated already */
-	MidgardSqlContentManagerJob *job_sql = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
 	mgd = midgard_sql_content_manager_job_get_connection (job_sql, NULL);
 
 	/* Get guid or ID via reference */
@@ -138,12 +140,14 @@ _midgard_sql_content_manager_job_load_execute (MidgardExecutable *iface, gboolea
 		goto free_objects;
 	}
 
+	failed = FALSE;
 	midgard_core_query_get_object (mgd, NULL, (MidgardDBObject **) &content_object, FALSE, &err, property, id_val, NULL);
 	g_value_unset (id_val);
 	if (err) {
 		g_set_error (error, MIDGARD_EXECUTION_ERROR,  MIDGARD_EXECUTION_ERROR_COMMAND_INVALID, 
 				"%s", err && err->message ? err->message : "No details for invalid command");
 		g_clear_error (&err);
+		failed = TRUE;
 		goto free_objects;
 	}
 
@@ -162,6 +166,10 @@ free_objects:
 		g_object_unref (content_object);
 	if (mgd)
 		g_object_unref (mgd);
+	if (failed)
+		midgard_core_sql_content_manager_job_failed (job_sql);
+	else 
+		midgard_core_sql_content_manager_job_succeed (job_sql);
 }
 
 static void
