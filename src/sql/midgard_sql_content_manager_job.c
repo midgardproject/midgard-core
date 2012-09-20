@@ -22,17 +22,7 @@
 #include "midgard_executable.h"
 #include "midgard_job.h"
 #include "midgard_content_manager_job.h"
-
-struct _MidgardSqlContentManagerJobPrivate {
-	GObject *content_object;
-	MidgardObjectReference *reference;
-	MidgardModel *model;
-	MidgardConnection *connection;
-	gboolean is_running;
-	gboolean is_executed;
-	gboolean is_failed;
-	gboolean is_valid;
-};
+#include "midgard_core_sql_helper.h"
 
 /* MidgardSqlContentManagerJob properties */
 enum {
