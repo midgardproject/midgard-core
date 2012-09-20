@@ -79,6 +79,7 @@ _midgard_execution_pool_push (MidgardPool *iface, GObject *object, GError **erro
 	if (!MIDGARD_IS_EXECUTABLE (object)) {
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID,
 				"Invalid type. Expected Executable, got '%s'", G_OBJECT_TYPE_NAME (object));
+		return iface;
 	}
 
 	GError *err = NULL;
