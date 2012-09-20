@@ -125,6 +125,9 @@ class TestContentManagerJobCreate(unittest.TestCase):
     self.assertNotEqual(self.bookstore_one.get_property("guid"), None)
     self.assertNotEqual(self.bookstore_one.get_property("id"), None)
     self.assertNotEqual(self.bookstore_one.get_property("id"), 0)
+    self.assertEqual(self.job_one.is_running(), False)
+    self.assertEqual(self.job_one.is_failed(), False)
+    self.assertEqual(self.job_one.is_executed(), True)
     # job two
     self.job_two.connect("execution-start", self.executionStartCallback, None)
     self.job_two.connect("execution-end", self.executionEndCallback, None)
@@ -137,6 +140,9 @@ class TestContentManagerJobCreate(unittest.TestCase):
     self.assertNotEqual(self.bookstore_two.get_property("guid"), None)
     self.assertNotEqual(self.bookstore_two.get_property("id"), None)
     self.assertNotEqual(self.bookstore_two.get_property("id"), 0)
+    self.assertEqual(self.job_two.is_running(), False)
+    self.assertEqual(self.job_two.is_failed(), False)
+    self.assertEqual(self.job_two.is_executed(), True)
 
   def executionEndCallbackAsync(self, obj, arg):
     self.async_callback_msg_end = "DONE END ASYNC"
@@ -156,6 +162,12 @@ class TestContentManagerJobCreate(unittest.TestCase):
     self.assertNotEqual(self.bookstore_one.get_property("id"), 0)
     self.assertNotEqual(self.bookstore_two.get_property("id"), None)
     self.assertNotEqual(self.bookstore_two.get_property("id"), 0)
+    self.assertEqual(self.job_one.is_running(), False)
+    self.assertEqual(self.job_one.is_failed(), False)
+    self.assertEqual(self.job_one.is_executed(), True)
+    self.assertEqual(self.job_two.is_running(), False)
+    self.assertEqual(self.job_two.is_failed(), False)
+    self.assertEqual(self.job_two.is_executed(), True)
 
 if __name__ == "__main__":
     unittest.main()

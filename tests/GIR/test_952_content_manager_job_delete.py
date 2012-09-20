@@ -133,6 +133,9 @@ class TestContentManagerJobDelete(unittest.TestCase):
     self.assertEqual(self.callback_msg_end, "DONE END")
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_one_name)
     self.assertEqual(len(bookstores), 0)
+    self.assertEqual(self.job_one.is_running(), False)
+    self.assertEqual(self.job_one.is_failed(), False)
+    self.assertEqual(self.job_one.is_executed(), True)
 
     # job two
     self.job_two.connect("execution-start", self.executionStartCallback, None)
@@ -145,6 +148,9 @@ class TestContentManagerJobDelete(unittest.TestCase):
     self.assertEqual(self.callback_msg_end, "DONE END")
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_two_name)
     self.assertEqual(len(bookstores), 0)
+    self.assertEqual(self.job_two.is_running(), False)
+    self.assertEqual(self.job_two.is_failed(), False)
+    self.assertEqual(self.job_two.is_executed(), True)
 
     deleted_one = self.bookstore_one.get_property("metadata").get_property("deleted")
     self.assertTrue(deleted_one)
@@ -178,6 +184,13 @@ class TestContentManagerJobDelete(unittest.TestCase):
     self.assertEqual(len(bookstores), 0)
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_two_name)
     self.assertEqual(len(bookstores), 0)
+
+    self.assertEqual(self.job_one.is_running(), False)
+    self.assertEqual(self.job_one.is_failed(), False)
+    self.assertEqual(self.job_one.is_executed(), True)
+    self.assertEqual(self.job_two.is_running(), False)
+    self.assertEqual(self.job_two.is_failed(), False)
+    self.assertEqual(self.job_two.is_executed(), True)
 
 if __name__ == "__main__":
     unittest.main()

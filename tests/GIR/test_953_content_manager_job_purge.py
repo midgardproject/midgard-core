@@ -131,6 +131,9 @@ class TestContentManagerJobPurge(unittest.TestCase):
     self.assertEqual(self.callback_msg_end, "DONE END")
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_one_name)
     self.assertEqual(len(bookstores), 0)
+    self.assertEqual(self.job_one.is_running(), False)
+    self.assertEqual(self.job_one.is_failed(), False)
+    self.assertEqual(self.job_one.is_executed(), True)
 
     # job two
     self.job_two.connect("execution-start", self.executionStartCallback, None)
@@ -143,6 +146,9 @@ class TestContentManagerJobPurge(unittest.TestCase):
     self.assertEqual(self.callback_msg_end, "DONE END")
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstore_two_name)
     self.assertEqual(len(bookstores), 0)
+    self.assertEqual(self.job_two.is_running(), False)
+    self.assertEqual(self.job_two.is_failed(), False)
+    self.assertEqual(self.job_two.is_executed(), True)
 
     self.bookstore_one = None
     self.bookstore_two = None
@@ -168,6 +174,13 @@ class TestContentManagerJobPurge(unittest.TestCase):
 
     self.bookstore_one = None
     self.bookstore_two = None
+    
+    self.assertEqual(self.job_one.is_running(), False)
+    self.assertEqual(self.job_one.is_failed(), False)
+    self.assertEqual(self.job_one.is_executed(), True)
+    self.assertEqual(self.job_two.is_running(), False)
+    self.assertEqual(self.job_two.is_failed(), False)
+    self.assertEqual(self.job_two.is_executed(), True)
 
 if __name__ == "__main__":
     unittest.main()
