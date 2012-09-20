@@ -181,6 +181,8 @@ src_libmidgard2_la_core_SOURCES = \
 	src/midgard_core_xml.c \
 	src/midgard_core_workspace.h \
 	src/midgard_core_workspace.c \
+	src/sql/midgard_core_sql_helper.h \
+	src/sql/midgard_core_sql_helper.c \
 	$(NULL)
 
 src_libmidgard2_la_public_SOURCES = \
