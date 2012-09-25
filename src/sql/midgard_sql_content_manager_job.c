@@ -156,7 +156,7 @@ _midgard_sql_content_manager_job_validable_iface_validate (MidgardValidable *ifa
 static gboolean
 _midgard_sql_content_manager_job_validable_iface_is_valid (MidgardValidable *iface)
 {
-	g_return_if_fail (iface != NULL);
+	g_return_val_if_fail (iface != NULL, FALSE);
 	MidgardSqlContentManagerJob *job = MIDGARD_SQL_CONTENT_MANAGER_JOB (iface);
 	return job->priv->is_valid;
 }

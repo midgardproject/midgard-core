@@ -24,6 +24,7 @@
 #include "../midgard_job.h"
 #include "../midgard_object.h"
 #include "../midgard_core_object.h"
+#include "midgard_core_sql_helper.h"
 
 static void
 _midgard_sql_content_manager_job_delete_executable_iface_execute (MidgardExecutable *iface, GError **error)
@@ -60,7 +61,7 @@ _midgard_sql_content_manager_job_delete_executable_iface_execute (MidgardExecuta
 				MIDGARD_EXECUTION_ERROR, 
 				MIDGARD_EXECUTION_ERROR_INTERNAL, 
 				"%s",
-				midgard_connection_get_error_string (mgd), NULL);
+				midgard_connection_get_error_string (mgd));
 				failed = FALSE;	
 	}
 

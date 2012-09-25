@@ -25,6 +25,7 @@
 #include "../midgard_object.h"
 #include "../midgard_core_object.h"
 #include "../midgard_model_reference.h"
+#include "midgard_core_sql_helper.h"
 
 static void 
 _validate (MidgardContentManagerJob *job, GError **error)

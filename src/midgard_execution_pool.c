@@ -72,7 +72,7 @@ _midgard_execution_pool_set_max_n_resources (MidgardPool *iface, guint n_max, GE
 MidgardPool*
 _midgard_execution_pool_push (MidgardPool *iface, GObject *object, GError **error)
 {
-	g_return_if_fail (MIDGARD_IS_EXECUTION_POOL (iface));
+	g_return_val_if_fail (MIDGARD_IS_EXECUTION_POOL (iface), NULL);
 
 	MidgardExecutionPool *self = MIDGARD_EXECUTION_POOL(iface);
 
