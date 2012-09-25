@@ -20,6 +20,9 @@
 #include "midgard_model.h"
 #include "midgard_model_reference.h"
 #include "midgard_validable.h"
+#include "guid.h"
+#include <stdlib.h>
+#include <ctype.h>
 
 struct _MidgardObjectReferencePrivate {
 	const gchar *name;
@@ -120,7 +123,7 @@ _midgard_object_reference_get_id_value (MidgardModelReference *iface, GError **e
 		g_set_error (error, MIDGARD_VALIDATION_ERROR, MIDGARD_VALIDATION_ERROR_TYPE_INVALID, 
 				"Invalid ID value type. Expected guid, uuid or integer id. Got '%s'.",
 				G_VALUE_TYPE_NAME (id_value));
-		return;
+		return NULL;
 	}	
 
 	return id_value;
