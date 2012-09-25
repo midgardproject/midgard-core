@@ -76,7 +76,7 @@ midgard_reflection_property_get_type (void)
  *
  * Returns: newly initialized #MidgardReflectionProperty instance or %NULL on failure.
  *
- * Deprecated:10.05
+ * Deprecated:10.05: Use midgard_reflector_property_new() instead.
  */ 
 MidgardReflectionProperty *
 midgard_reflection_property_new (MidgardDBObjectClass *klass)
@@ -94,7 +94,7 @@ midgard_reflection_property_new (MidgardDBObjectClass *klass)
  * @propname: property name which is registered for #MidgardDBObjectClass
  *
  * Returns: type (#GType) of the property or %NULL if property is not registered for given class.
- * Deprecated:10.05
+ * Deprecated:10.05: Use midgard_reflector_property_get_midgard_type() instead.
  */ 
 GType 
 midgard_reflection_property_get_midgard_type (MidgardReflectionProperty *self, const gchar *propname)
@@ -119,7 +119,7 @@ midgard_reflection_property_get_midgard_type (MidgardReflectionProperty *self, c
  * Checks whether property is a link.
  *
  * Returns: %TRUE if property is registered as link, %FALSE otherwise (or in case if property is not registered for given class.
- * Deprecated:10.05
+ * Deprecated:10.05: Use midgard_reflector_property_is_link() instead.
  */ 
 gboolean 
 midgard_reflection_property_is_link (MidgardReflectionProperty *self, const gchar *propname)

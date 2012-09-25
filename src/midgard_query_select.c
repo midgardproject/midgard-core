@@ -153,12 +153,17 @@ typedef struct {
 
 gboolean
 _midgard_query_select_add_join (MidgardQueryExecutor *self, const gchar *join_type, 
-		MidgardQueryProperty *left_property, MidgardQueryProperty *right_property)
+		MidgardQueryHolder *left_holder, MidgardQueryHolder *right_holder)
 {
 	g_return_val_if_fail (self != NULL, FALSE);
 	g_return_val_if_fail (join_type != NULL, FALSE);
-	g_return_val_if_fail (left_property != NULL, FALSE);
-	g_return_val_if_fail (right_property != NULL, FALSE);
+	g_return_val_if_fail (left_holder != NULL, FALSE);
+	g_return_val_if_fail (right_holder != NULL, FALSE);
+
+	MidgardQueryProperty *left_property = MIDGARD_QUERY_PROPERTY (left_holder);
+	g_return_val_if_fail (MIDGARD_IS_QUERY_PROPERTY (left_property), FALSE);
+	MidgardQueryProperty *right_property = MIDGARD_QUERY_PROPERTY (right_holder);
+	g_return_val_if_fail (MIDGARD_IS_QUERY_PROPERTY (right_property), FALSE);
 
 	/* validate join type */
 	GdaSqlSelectJoinType join_type_id;
@@ -602,14 +607,13 @@ _midgard_query_select_validable_iface_is_valid (MidgardValidable *self)
 	return MIDGARD_QUERY_EXECUTOR (self)->priv->is_valid;
 }
 
+
 static void
-_midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError **error)
+_midgard_query_select_execute (MidgardExecutable *iface, gboolean async, GError **error)
 {
 	g_return_if_fail (iface != NULL);
 	MidgardQuerySelect *self = MIDGARD_QUERY_SELECT (iface);
 	MidgardQueryExecutor *executor = MIDGARD_QUERY_EXECUTOR (self);
-
-	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_start, 0);
 
 	GError *err = NULL;
 	midgard_validable_validate (MIDGARD_VALIDABLE (self), &err);
@@ -617,8 +621,6 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 		g_propagate_error (error, err);
 		return;
 	}
-
-	g_object_ref (self);
 
 	MidgardDBObjectClass *klass = executor->priv->storage->priv->klass;
 	MidgardConnection *mgd = executor->priv->mgd;
@@ -737,7 +739,9 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 	}
 
 	/* execute statement */
-	GdaDataModel *model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
+	GdaDataModel *model = NULL;
+	midgard_executable_execution_start (MIDGARD_EXECUTABLE(self));
+	model = gda_connection_statement_execute_select (cnc, stmt, NULL, &err);
 	g_object_unref (stmt);
 
 	if (!model && !err) {
@@ -757,17 +761,41 @@ _midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError
 	if (executor->priv->resultset && G_IS_OBJECT (executor->priv->resultset))
 		g_object_unref (G_OBJECT (executor->priv->resultset));
 	executor->priv->resultset = (gpointer) model;
-	g_object_unref (self);
-	
-	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
+
 	return;
 
 return_false:
 	if (sql_stm)
 		gda_sql_statement_free (sql_stm);
 
-	g_signal_emit (self, MIDGARD_QUERY_EXECUTOR_GET_CLASS (self)->signal_id_execution_end, 0);
-	g_object_unref (self);
+	return;
+}
+
+static void
+_midgard_query_select_executable_iface_execute (MidgardExecutable *iface, GError **error)
+{
+	GError *err = NULL;
+
+	g_object_ref (iface);
+	midgard_executable_execution_start (iface);
+	_midgard_query_select_execute (iface, FALSE, &err);
+	if (err) 
+		g_propagate_error (error, err);
+	midgard_executable_execution_end (iface);
+	g_object_unref (iface);
+	return;
+}
+
+static void
+_midgard_query_select_executable_iface_execute_async (MidgardExecutable *iface, GError **error)
+{
+	GError *err = NULL;
+
+	g_object_ref (iface);
+	_midgard_query_select_execute (iface, FALSE, &err);
+	if (err) 
+		g_propagate_error (error, err);
+	g_object_unref (iface);
 	return;
 }
 
@@ -1062,6 +1090,7 @@ static void
 _midgard_query_select_executable_iface_init (MidgardExecutableIFace *iface)
 {
 	iface->execute = _midgard_query_select_executable_iface_execute;
+	iface->execute_async = _midgard_query_select_executable_iface_execute_async;
 }
 
 /* Validable iface */

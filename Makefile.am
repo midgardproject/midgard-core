@@ -42,6 +42,7 @@ midgard_public_h = \
 	src/midgard_base_mixin.h \
 	src/midgard_config.h \
 	src/midgard_config_auto.h \
+	src/midgard_content_manager.h \
 	src/midgard_dbobject.h \
 	src/midgard_defs.h \
 	src/midgard_dbus.h \
@@ -61,6 +62,9 @@ midgard_public_h = \
 	src/midgard_connection.h \
 	src/midgard_error.h \
 	src/midgard_collector.h \
+	src/midgard_model.h \
+	src/midgard_model_reference.h \
+	src/midgard_object_reference.h \
 	src/midgard_object_parameter.h \
 	src/midgard_object_attachment.h \
 	src/midgard_query_constraint.h \
@@ -93,6 +97,10 @@ midgard_public_h = \
 	src/midgard_query_column.h \
 	src/midgard_query_selector.h \
 	src/midgard_query_result.h \
+	src/midgard_pool.h \
+	src/midgard_execution_pool.h \
+	src/midgard_job.h \
+	src/midgard_content_manager_job.h \
 	$(NULL)
 
 midgard_sql_public_h = \
@@ -101,6 +109,13 @@ midgard_sql_public_h = \
 	src/sql/midgard_sql_query_result.h \
 	src/sql/midgard_sql_query_select_data.h \
 	src/sql/midgard_sql_query_constraint.h \
+	src/sql/midgard_sql_content_manager.h \
+	src/sql/midgard_sql_content_manager_job.h \
+	src/sql/midgard_sql_content_manager_job_create.h \
+	src/sql/midgard_sql_content_manager_job_update.h \
+	src/sql/midgard_sql_content_manager_job_delete.h \
+	src/sql/midgard_sql_content_manager_job_purge.h \
+	src/sql/midgard_sql_content_manager_job_load.h \
 	$(NULL)
 
 man_MANS = man/midgard2-schema.1 \
@@ -127,7 +142,7 @@ src_libmidgard2_la_CPPFLAGS = \
 AM_CFLAGS = -I$(top_srcdir)/src @MIDGARD_CFLAGS@
 AM_LDFLAGS = @MIDGARD_LIBS@ 
 
-src_libmidgard2_la_LDFLAGS = -version-info 2015:0:5 $(no_undefined)
+src_libmidgard2_la_LDFLAGS = -version-info 21:0:9 $(no_undefined)
 
 test_midgard_schema_CPPFLAGS = \
 	 -DG_LOG_DOMAIN=\"midgard-core\"
@@ -166,6 +181,8 @@ src_libmidgard2_la_core_SOURCES = \
 	src/midgard_core_xml.c \
 	src/midgard_core_workspace.h \
 	src/midgard_core_workspace.c \
+	src/sql/midgard_core_sql_helper.h \
+	src/sql/midgard_core_sql_helper.c \
 	$(NULL)
 
 src_libmidgard2_la_public_SOURCES = \
@@ -173,6 +190,7 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_base_abstract.c \
 	src/midgard_base_interface.c \
 	src/midgard_base_mixin.c \
+	src/midgard_content_manager.c \
 	src/midgard_key_config.c \
 	src/midgard_key_config_context.c \
 	src/midgard_key_config_file.c \
@@ -193,6 +211,9 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_dbus.h \
 	src/midgard_dbus.c \
 	src/midgard_executable.c \
+	src/midgard_model.c \
+	src/midgard_model_reference.c \
+	src/midgard_object_reference.c \
 	src/midgard_object_parameter.c \
 	src/midgard_object_attachment.c \
 	src/midgard_query_constraint.c \
@@ -230,11 +251,22 @@ src_libmidgard2_la_public_SOURCES = \
 	src/midgard_workspace_context.c \
 	src/midgard_workspace_manager.c \
 	src/midgard_workspace_storage.c \
+	src/midgard_pool.c \
+	src/midgard_execution_pool.c \
+	src/midgard_job.c \
+	src/midgard_content_manager_job.c \
 	src/sql/midgard_sql_query_column.c \
 	src/sql/midgard_sql_query_row.c \
 	src/sql/midgard_sql_query_result.c \
 	src/sql/midgard_sql_query_select_data.c \
 	src/sql/midgard_sql_query_constraint.c \
+	src/sql/midgard_sql_content_manager.c \
+	src/sql/midgard_sql_content_manager_job.c \
+	src/sql/midgard_sql_content_manager_job_create.c \
+	src/sql/midgard_sql_content_manager_job_update.c \
+	src/sql/midgard_sql_content_manager_job_delete.c \
+	src/sql/midgard_sql_content_manager_job_purge.c \
+	src/sql/midgard_sql_content_manager_job_load.c \
 	$(NULL)
 
 if MIDGARD_DBUS_SUPPORT
@@ -268,13 +300,13 @@ INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 if HAVE_INTROSPECTION
 INTROSPECTION_CFLAGS += $(AM_CFLAGS)
 introspection_sources = $(src_libmidgard2_la_public_SOURCES) $(midgard_public_h) $(midgard_sql_public_h)
-Midgard-10.05.gir: $(lib_LTLIBRARIES)
-Midgard_10_05_gir_INCLUDES = GObject-2.0 libxml2-2.0 $(GDA_GIR_INCLUDE)
-Midgard_10_05_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
-Midgard_10_05_gir_LIBS = $(lib_LTLIBRARIES) 
-Midgard_10_05_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
-Midgard_10_05_gir_PACKAGES = gobject-2.0 libxml-2.0 $(GDA_GIR_PACKAGE)
-INTROSPECTION_GIRS = Midgard-10.05.gir
+Midgard-12.09.gir: $(lib_LTLIBRARIES)
+Midgard_12_09_gir_INCLUDES = GObject-2.0 libxml2-2.0 $(GDA_GIR_INCLUDE)
+Midgard_12_09_gir_CFLAGS = $(AM_CFLAGS) `pkg-config --cflags libxml-2.0`
+Midgard_12_09_gir_LIBS = $(lib_LTLIBRARIES) 
+Midgard_12_09_gir_FILES = $(addprefix $(srcdir)/,$(introspection_sources))
+Midgard_12_09_gir_PACKAGES = gobject-2.0 libxml-2.0 $(GDA_GIR_PACKAGE)
+INTROSPECTION_GIRS = Midgard-12.09.gir
 INTROSPECTION_LIBS += -lxml2
 girdir = $(datadir)/gir-1.0
 gir_DATA = $(INTROSPECTION_GIRS)

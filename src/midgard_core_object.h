@@ -233,6 +233,8 @@ struct _MidgardConnectionPrivate {
 	gpointer workspace;
 	GdaDataModel *workspace_model;
 	MidgardWorkspaceManager *workspace_manager;
+
+	MidgardContentManager *content_manager;
 };
 
 #define MGD_CNC_PERSON(_cnc) _cnc->priv->user ? midgard_user_get_person (_cnc->priv->user) : NULL
@@ -268,7 +270,6 @@ typedef enum {
 	OBJECT_UPDATE_CREATE
 } _ObjectActionUpdate;
 
-
 /* MidgardDBObject */
 GParamSpec **midgard_core_dbobject_class_list_properties (MidgardDBObjectClass *klass, guint *n_props); 
 
@@ -286,6 +287,8 @@ GObject **midgard_core_object_from_xml(MidgardConnection *mgd, const gchar *xml,
 /* Object's routines */
 gboolean _midgard_object_update(MidgardObject *object, _ObjectActionUpdate replicate, GError **error);
 gboolean _midgard_object_create(MidgardObject *object, const gchar *create_guid, _ObjectActionUpdate replicate);
+gboolean _midgard_object_delete(MidgardObject *object, gboolean check_dependentents);
+gboolean _midgard_object_purge(MidgardObject *object, gboolean check_dependentents);
 void _object_copy_properties(GObject *src, GObject *dest);
 
 /* Links */

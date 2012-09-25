@@ -320,3 +320,13 @@ MidgardConnection
 @Returns: 
 
 
+<!-- ##### FUNCTION midgard_connection_get_content_manager ##### -->
+<para>
+
+</para>
+
+@self: 
+@error: 
+@Returns: 
+
+

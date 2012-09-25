@@ -37,11 +37,11 @@ G_BEGIN_DECLS
 #define MIDGARD_BLOB_GET_CLASS(obj) \
 	(G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_BLOB, MidgardBlobClass))
 
-typedef struct MidgardBlob MidgardBlob;
-typedef struct MidgardBlobClass MidgardBlobClass;
+typedef struct _MidgardBlob MidgardBlob;
+typedef struct _MidgardBlobClass MidgardBlobClass;
 typedef struct _MidgardBlobPrivate MidgardBlobPrivate;
 
-struct MidgardBlobClass {
+struct _MidgardBlobClass {
 	GObjectClass parent;
 
 	gchar *(*read_content) (MidgardBlob *self, gsize *bytes_read);
@@ -52,7 +52,7 @@ struct MidgardBlobClass {
 	GIOChannel *(*get_handler) (MidgardBlob *self, const gchar *mode, GError **error);
 };
 
-struct MidgardBlob {
+struct _MidgardBlob {
 	GObject parent;
 
 	MidgardBlobPrivate *priv;

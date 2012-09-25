@@ -64,6 +64,8 @@ MidgardDBColumn *midgard_core_dbcolumn_new(void)
 	mdc->table_name = NULL;
 	mdc->column_name = NULL;
 	mdc->column_desc = NULL;
+	mdc->index_name = NULL;
+	mdc->columns = NULL;
 	mdc->dbtype = NULL;
 	mdc->gtype = 0;
 	mdc->index = FALSE;
@@ -74,6 +76,15 @@ MidgardDBColumn *midgard_core_dbcolumn_new(void)
 	mdc->autoinc = FALSE;
 
 	return mdc;
+}
+
+static void 
+midgard_core_dbcolumn_free (MidgardDBColumn *mdc)
+{
+	g_free (mdc->index_name);
+	g_strfreev(mdc->columns);
+	g_free (mdc);
+	mdc = NULL;
 }
 
 static void
@@ -1299,11 +1310,17 @@ gboolean midgard_core_query_add_column(MidgardConnection *mgd,
 		dval = g_strdup("\'\'");
 	}
 
-	/* Default value. Default value not implemented in PostgreSQL 8.1 ( 28.02.2007 ) */
-	if(!mdc->autoinc && 
-			mgd->priv->config->priv->dbtype != MIDGARD_DB_TYPE_POSTGRES) 
+	/* Default value. 
+	 * Default value not implemented in PostgreSQL 8.1 ( 28.02.2007 ) */
+	/* Default value invalid for BLOB/TEXT columns in MySQL (prior 5.0.2) */
+	if (mgd->priv->config->priv->dbtype == MIDGARD_DB_TYPE_MYSQL
+			&& g_str_equal (mdc->dbtype, "text")) {
+		/* Do nothing */
+	} else if (!mdc->autoinc &&
+			mgd->priv->config->priv->dbtype != MIDGARD_DB_TYPE_POSTGRES) {
 		gda_server_operation_set_value_at(op, dval,
 				NULL, "/COLUMN_DEF_P/COLUMN_DEFAULT");
+	}
 
 	g_free(dval);
 
@@ -1422,14 +1439,12 @@ gboolean midgard_core_query_add_index(MidgardConnection *mgd,
 		return TRUE;
 	}
 
-	gchar *index_name = g_strconcat(mdc->table_name, "_", mdc->column_name, "_idx", NULL);
-	if (__index_exists(mgd, mdc, (const gchar *)index_name)) {
+	if (mdc->index_name == NULL)
+		mdc->index_name = g_strconcat(mdc->table_name, "_", mdc->column_name, "_idx", NULL);
 
-		g_free(index_name);
+	if (__index_exists(mgd, mdc, (const gchar *)mdc->index_name)) {
 		return TRUE;
 	}
-
-	g_free(index_name);
 
 	if(!mdc->column_desc)
 		mdc->column_desc = mdc->column_name;
@@ -1456,12 +1471,9 @@ gboolean midgard_core_query_add_index(MidgardConnection *mgd,
 	}
 
 	if(mdc->index) {
-		
-		index_name = g_strconcat(mdc->table_name, "_", mdc->column_name, "_idx", NULL);
 
-		gda_server_operation_set_value_at(op, index_name,
+		gda_server_operation_set_value_at(op, mdc->index_name,
 				NULL, "/INDEX_DEF_P/INDEX_NAME");
-		g_free(index_name);
 
 		gda_server_operation_set_value_at(op, table_name,
 			NULL, "/INDEX_DEF_P/INDEX_ON_TABLE");
@@ -1489,15 +1501,16 @@ gboolean midgard_core_query_add_index(MidgardConnection *mgd,
 		if(!created) {
 			
 			g_debug("Can not create index on %s.%s ( %s )",
-					column_name, table_name, error->message); 
+					column_name, table_name, error && error->message ? error->message : "Unknown reason"); 
 			g_clear_error(&error);
 			g_object_unref(op);
 			return FALSE;
 		}
 
 		g_debug("Added index on %s.%s", table_name, column_name);
-
-		g_clear_error(&error);
+		
+		if (error)
+			g_clear_error(&error);
 		g_object_unref(op);
 		
 		return TRUE;
@@ -1741,19 +1754,18 @@ void __check_property_index(MidgardDBObjectClass *klass, MidgardReflectionProper
 	const gchar *parent = NULL;
 	const gchar *up = NULL;
 	const gchar *classname = G_OBJECT_CLASS_NAME (klass);
+	const gchar *unique_name = midgard_reflector_object_get_property_unique (classname);
 	if (MIDGARD_IS_OBJECT_CLASS (klass)) {
 		parent = midgard_reflector_object_get_property_parent (classname);
 		up = midgard_reflector_object_get_property_up (classname);	
 	}
 
 	if (parent && g_str_equal(parent, property)) {
-
 		mdc->index = TRUE;
 		return;
 	}
 	
-	if(up && g_str_equal(up, property)) {
-
+	if (up && g_str_equal(up, property)) {
 		mdc->index = TRUE;
 		return;
 	}
@@ -1762,7 +1774,6 @@ void __check_property_index(MidgardDBObjectClass *klass, MidgardReflectionProper
 	prop_attr = g_hash_table_lookup(klass->dbpriv->storage_data->prophash, property);
 	
 	if (prop_attr != NULL && prop_attr->dbindex == TRUE) {
-
 		mdc->index = TRUE;
 		return;
 	}
@@ -1882,7 +1893,7 @@ gboolean midgard_core_query_update_class_storage(MidgardConnection *mgd, Midgard
 		__check_property_index(klass, mrp, pspecs[i]->name, mdc);
 		midgard_core_query_add_index(mgd, mdc);
 
-		g_free(mdc);
+		midgard_core_dbcolumn_free(mdc);
 		g_strfreev(spltd);
 		g_value_unset(&pval);		
 	}
@@ -2088,7 +2099,7 @@ midgard_core_query_create_class_storage (MidgardConnection *mgd, MidgardDBObject
 		__check_property_index(klass, mrp, pspecs[i]->name, mdc);
 		midgard_core_query_add_index(mgd, mdc);
 
-		g_free(mdc);
+		midgard_core_dbcolumn_free(mdc);
 		g_strfreev(spltd);
 		g_value_unset(&pval);		
 	}
@@ -2435,7 +2446,7 @@ midgard_core_query_unescape_string (MidgardConnection *mgd, const gchar *string)
 }
 
 void
-midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, GError **error, const gchar *property, ...)
+midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, gboolean async, GError **error, const gchar *property, ...)
 {
 	if (mgd == NULL) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, "Expected MidgardConnection. Can not get object.");
@@ -2497,7 +2508,11 @@ midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, M
 	midgard_query_select_toggle_read_only (select, FALSE);
 
 	GError *err = NULL;
-	midgard_executable_execute (MIDGARD_EXECUTABLE (select), &err);
+	if (async) 
+		midgard_executable_execute_async (MIDGARD_EXECUTABLE (select), &err);
+	else 
+		midgard_executable_execute (MIDGARD_EXECUTABLE (select), &err);
+
 	if (err) {
 		g_propagate_error (error, err);
 		goto free_objects_and_return;

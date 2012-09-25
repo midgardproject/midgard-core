@@ -234,6 +234,7 @@ midgard_workspace_manager_get_workspace_by_path (const MidgardWorkspaceManager *
  * @self: #MidgardWorkspaceManager instance
  * @type: the type name
  * @ws: #MidgardWorkspace instance
+ * @error: pointer to store returned error
  *
  * From given @ws workspace, removes entire content of given @type name.
  * There's no undelete available for this operation.
@@ -286,6 +287,7 @@ midgard_workspace_manager_purge_content (const MidgardWorkspaceManager *self, co
  * @type: the type name
  * @src: source #MidgardWorkspace 
  * @dest: destination #MidgardWorkspace
+ * @error: pointer to store returned error
  *
  * Moves the content of given #type name from @src, source #MidgardWorkspace to 
  * @dest, destination one.
@@ -444,7 +446,9 @@ _midgard_workspace_manager_class_init (MidgardWorkspaceManagerClass *klass, gpoi
 			G_PARAM_WRITABLE | G_PARAM_CONSTRUCT_ONLY);
 	/**
 	 * MidgardWorkspaceManager:connection:
-	 * Pointer to a connection, #MidgardWorkspaceManager has been initialized for
+	 * @manager: #MidgardWorkspaceManager instance
+	 *
+	 * Pointer to a connection, @manager has been initialized for
 	 */
 	g_object_class_install_property (object_class, PROPERTY_CONNECTION, pspec);
 }

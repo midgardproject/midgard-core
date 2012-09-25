@@ -51,14 +51,6 @@ struct _MidgardQueryExecutorClass {
 	gboolean        (*add_join)			(MidgardQueryExecutor *self, const gchar *join_type, 
 								MidgardQueryHolder *left_holder, MidgardQueryHolder *right_holder);
 	guint 		(*get_results_count)		(MidgardQueryExecutor *self);
-
-	/* signals */
-	void            (*execution_start)      (GObject *object);
-	void            (*execution_end)        (GObject *object);
-
-	/* signals IDs */
-	guint           signal_id_execution_start;
-	guint           signal_id_execution_end;
 };
 
 struct _MidgardQueryExecutor {

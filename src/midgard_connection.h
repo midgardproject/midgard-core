@@ -27,6 +27,7 @@
 #include "midgard_config.h"
 #include "midgard_workspace_storage.h"
 #include "midgard_workspace_manager.h"
+#include "midgard_content_manager.h"
 
 /* convention macros */
 #define MIDGARD_TYPE_CONNECTION (midgard_connection_get_type())
@@ -99,5 +100,6 @@ void			midgard_connection_close			(MidgardConnection *self);
 gboolean                midgard_connection_set_workspace                (MidgardConnection *self, MidgardWorkspaceStorage *workspace);
 const MidgardWorkspaceStorage   *midgard_connection_get_workspace       (MidgardConnection *self);
 const MidgardWorkspaceManager	*midgard_connection_get_workspace_manager (MidgardConnection *self);
+MidgardContentManager	*midgard_connection_get_content_manager		(MidgardConnection *self, GError **error);
 
 #endif /* MIDGARD_CONNNECTION_H */

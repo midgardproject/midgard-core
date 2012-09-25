@@ -4,10 +4,9 @@ import sys
 import struct
 import unittest
 import inspect
-import gobject
 
 from test_000_config import TestConfig
-from test_001_connection import TestConnection
+from test_020_connection import TestConnection
 
 from gi.repository import Midgard
 from gi.repository import GObject

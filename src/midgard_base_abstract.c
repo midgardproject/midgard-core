@@ -18,6 +18,7 @@
 
 #include "midgard_base_abstract.h"
 #include "schema.h"
+#include "midgard_core_object.h"
 
 static void
 __midgard_base_abstract_derived_class_set_property (GObject *object, guint prop_id,

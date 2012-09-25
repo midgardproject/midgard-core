@@ -34,8 +34,10 @@ typedef struct _MidgardDBJoin MidgardDBJoin;
 struct _MidgardDBColumn {
 	const gchar *table_name;
 	const gchar *column_name;
+	gchar **columns;
 	const gchar *column_desc;
 	const gchar *dbtype;
+	gchar *index_name;
 	GType gtype;
 	gboolean index;
 	gboolean unique;
@@ -103,6 +105,7 @@ struct _MidgardQueryExecutorPrivate {
 	gboolean include_deleted;
 	gboolean is_valid;
 	gboolean bool_is_int;
+	gboolean is_pending;
 };
 
 struct _MidgardQueryConstraintSimplePrivate {
@@ -122,13 +125,11 @@ struct _MidgardQueryConstraintSimplePrivate {
 MidgardDBJoin	*midgard_core_dbjoin_new	(void);
 void		midgard_core_dbjoin_free	(MidgardDBJoin *mdbj);
 
-
-#warning remove data_model macros
 #define midgard_data_model_get_value_at(__model,__col,__row) \
 	gda_data_model_get_value_at((__model), (__col), (__row), NULL)
 
 #define midgard_data_model_get_value_at_col_name(__model,__col,__row) \
-	midgard_data_model_get_value_at (__model, gda_data_model_get_column_index (__model, __col), __row);
+	gda_data_model_get_value_at (__model, gda_data_model_get_column_index (__model, __col), __row, NULL);
 
 #define MIDGARD_GET_UINT_FROM_VALUE(__prop, __value) \
 	if(G_VALUE_HOLDS_UINT(__value)) { \
@@ -295,7 +296,7 @@ gint			midgard_core_query_update_dbobject_record 	(MidgardDBObject *object, GErr
 gchar                   *midgard_core_query_binary_stringify            (GValue *src_value); 
 gchar 			*midgard_core_query_compute_constraint_property	(MidgardQueryExecutor *executor, MidgardQueryStorage *storage, const gchar *name, GError **error);
 gchar 			*midgard_core_query_unescape_string (MidgardConnection *mgd, const gchar *str);
-void			midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, GError **error, const gchar *property, ...);
+void			midgard_core_query_get_object (MidgardConnection *mgd, const gchar *classname, MidgardDBObject **object, gboolean async, GError **error, const gchar *property, ...);
 MidgardDBObject 	**midgard_core_query_get_objects (MidgardConnection *mgd, const gchar *classname, GError **error, const gchar *property, ...);
 
 #endif /* MIDGARD_CORE_QUERY_H */
