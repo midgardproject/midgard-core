@@ -39,6 +39,10 @@
 #include "midgard_base_mixin.h"
 #include "midgard_query_executor.h"
 #include "midgard_query_select.h"
+#include "midgard_job.h"
+#include "midgard_model.h"
+#include "midgard_model_reference.h"
+#include "sql/midgard_sql_content_manager_job.h"
 
 #include <locale.h>
 
@@ -209,6 +213,17 @@ midgard_init()
 	type = MIDGARD_TYPE_BASE_MIXIN;
 	g_assert (type != 0);
 
+	type = MIDGARD_TYPE_JOB;
+	g_assert (type != 0);
+
+	type = MIDGARD_TYPE_OBJECT_REFERENCE;
+	g_assert (type != 0);
+	g_type_class_ref (type);
+
+	type = MIDGARD_TYPE_SQL_CONTENT_MANAGER_JOB;
+	g_assert (type != 0);
+	g_type_class_ref (type);
+
 	/* Register transform function explicitly, we need own routine */
 	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_FLOAT, __transform_string_to_float);
   	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_BOOLEAN, __transform_string_to_boolean);
@@ -278,4 +293,13 @@ midgard_close(void)
 	klass = g_type_class_peek (MIDGARD_TYPE_QUERY_SELECT);
 	if (klass)
 		g_type_class_unref (klass);
+
+	klass = g_type_class_peek (MIDGARD_TYPE_OBJECT_REFERENCE);
+	if (klass)
+		g_type_class_unref (klass);
+
+	klass = g_type_class_peek (MIDGARD_TYPE_SQL_CONTENT_MANAGER_JOB);
+	if (klass)
+		g_type_class_unref (klass);
+
 }

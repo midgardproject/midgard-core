@@ -43,7 +43,7 @@ Files and binary data.
 <!-- ##### SECTION Image ##### -->
 
 
-<!-- ##### TYPEDEF MidgardBlob ##### -->
+<!-- ##### STRUCT MidgardBlob ##### -->
 <para>
 
 </para>
@@ -69,17 +69,18 @@ Files and binary data.
 
 </para>
 
-<!-- ##### TYPEDEF MidgardBlobClass ##### -->
+<!-- ##### STRUCT MidgardBlobClass ##### -->
 <para>
 
 </para>
 
-
-<!-- ##### STRUCT MidgardBlobPrivate ##### -->
-<para>
-
-</para>
-
+@parent: 
+@read_content: 
+@write_content: 
+@remove_file: 
+@exists: 
+@get_path: 
+@get_handler: 
 
 <!-- ##### FUNCTION midgard_blob_new ##### -->
 <para>

@@ -11,7 +11,7 @@ DOC_MODULE=midgard-2.0
 DOC_MAIN_SGML_FILE=$(DOC_MODULE)-docs.sgml
 
 # Extra options to supply to gtkdoc-scan
-SCAN_OPTIONS=--deprecated-guards
+SCAN_OPTIONS=--deprecated-guards="G_DISABLE_DEPRECATED"
 
 # Extra options to pass to gtkdoc-scangobj
 #SCANGOBJ_OPTIONS=--module=midgard --types=midgard.types
@@ -21,11 +21,11 @@ SCAN_OPTIONS=--deprecated-guards
 MKDB_OPTIONS=--sgml-mode --output-format=xml --name-space=midgard --ignore-files="midgard_core_object.c simple_constraint.c" 
 
 # The directory containing the source code. Relative to $(srcdir)
-DOC_SOURCE_DIR=  ../../src
+DOC_SOURCE_DIR = ../../src ../../src/sql
 
 # Used for dependencies.
-HFILE_GLOB=../../src/*.h
-CFILE_GLOB=../../src/*.c
+HFILE_GLOB = ../../src/*.h ../../src/sql/*.h
+CFILE_GLOB = ../../src/*.c ../../src/sql/*.c
 
 # Header files to ignore when scanning
 IGNORE_HFILES=config.h midgard_core_object.h simple_constraint.h
@@ -36,7 +36,9 @@ GTKDOC_CFLAGS = -I$(top_srcdir) \
         -I$(top_builddir) \
 	-I /usr/include/glib-2.0 \
         -I $(MIDGARD_CFLAGS) \
-	-I ../../
+	-I ../../ \
+	-I$(top_srcdir)/sql
+
 GTKDOC_LIBS =  $(top_builddir)/../src/libmidgard2.la $(MIDGARD_LIBS)
 #GTKDOC_LIBS =  -lmidgard $(MIDGARD_LIBS)
 

@@ -75,11 +75,28 @@
 #include <midgard/midgard_query_column.h>
 #include <midgard/midgard_query_selector.h>
 #include <midgard/midgard_query_result.h>
+#include <midgard/midgard_model.h>
+#include <midgard/midgard_model_reference.h>
+#include <midgard/midgard_object_reference.h>
+#include <midgard/midgard_content_manager.h>
+#include <midgard/midgard_pool.h>
+#include <midgard/midgard_execution_pool.h>
+#include <midgard/midgard_job.h>
+#include <midgard/midgard_content_manager_job.h>
+
+/* SQL implementations */
 #include <midgard/sql/midgard_sql_query_column.h> 
 #include <midgard/sql/midgard_sql_query_constraint.h>
 #include <midgard/sql/midgard_sql_query_row.h>
 #include <midgard/sql/midgard_sql_query_result.h>
 #include <midgard/sql/midgard_sql_query_select_data.h>
+#include <midgard/sql/midgard_sql_content_manager.h>
+#include <midgard/sql/midgard_sql_content_manager_job.h>
+#include <midgard/sql/midgard_sql_content_manager_job_create.h>
+#include <midgard/sql/midgard_sql_content_manager_job_update.h>
+#include <midgard/sql/midgard_sql_content_manager_job_delete.h>
+#include <midgard/sql/midgard_sql_content_manager_job_purge.h>
+#include <midgard/sql/midgard_sql_content_manager_job_load.h>
 
 #endif /* _MIDGARD_API_H_ */
 

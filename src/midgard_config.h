@@ -35,11 +35,11 @@
 #define MIDGARD_CONFIG_GET_CLASS(obj) \
 	(G_TYPE_INSTANCE_GET_CLASS ((obj), MIDGARD_TYPE_CONFIG, MidgardConfigClass))
 
-typedef struct MidgardConfig MidgardConfig;
-typedef struct MidgardConfigClass MidgardConfigClass;
+typedef struct _MidgardConfig MidgardConfig;
+typedef struct _MidgardConfigClass MidgardConfigClass;
 typedef struct _MidgardConfigPrivate MidgardConfigPrivate;
 
-struct MidgardConfig{
+struct _MidgardConfig{
 	GObject parent;
 	
 	/* MidgardDatabase */
@@ -77,9 +77,8 @@ struct MidgardConfig{
 	MidgardConfigPrivate *priv;
 };
 
-struct MidgardConfigClass{
+struct _MidgardConfigClass{
 	GObjectClass parent;
-	
 };
 
 GType midgard_config_get_type(void);

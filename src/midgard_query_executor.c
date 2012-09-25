@@ -144,6 +144,7 @@ __midgard_query_executor_instance_init (GTypeInstance *instance, gpointer g_clas
 	MIDGARD_QUERY_EXECUTOR (object)->priv->include_deleted = FALSE;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->is_valid = FALSE;
 	MIDGARD_QUERY_EXECUTOR (object)->priv->bool_is_int = FALSE;
+	MIDGARD_QUERY_EXECUTOR (object)->priv->is_pending = FALSE;
 }
 
 static GObject *
@@ -202,6 +203,8 @@ _midgard_query_executor_finalize (GObject *object)
 	g_free (self->priv->table_alias);
 	self->priv->table_alias = NULL;
 
+	self->priv->is_pending = FALSE;
+
 	g_free (self->priv);
 	self->priv = NULL;
 
@@ -240,29 +243,6 @@ _midgard_query_executor_class_init (MidgardQueryExecutorClass *klass, gpointer c
 	object_class->dispose = _midgard_query_executor_dispose;
 	object_class->finalize = _midgard_query_executor_finalize;
 	object_class->get_property = _midgard_query_executor_get_property;
-
-	/* SIGNALS */
-    	klass->signal_id_execution_start =
-		g_signal_new("execution-start",
-				G_TYPE_FROM_CLASS(klass),
-				G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-				G_STRUCT_OFFSET (MidgardQueryExecutorClass, execution_start),
-				NULL, /* accumulator */
-				NULL, /* accu_data */
-				g_cclosure_marshal_VOID__VOID,
-				G_TYPE_NONE,
-				0);
-
-	klass->signal_id_execution_end =
-		g_signal_new("execution-end",
-				G_TYPE_FROM_CLASS(klass),
-				G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-				G_STRUCT_OFFSET (MidgardQueryExecutorClass, execution_end),
-				NULL, /* accumulator */
-				NULL, /* accu_data */
-				g_cclosure_marshal_VOID__VOID,
-				G_TYPE_NONE,
-				0);
 
 	/* PROPERTIES */
 	GParamSpec *pspec = g_param_spec_uint ("resultscount",

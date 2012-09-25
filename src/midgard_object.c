@@ -579,6 +579,9 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 	guint object_init_size = 0;
 	GError *err = NULL;
 
+	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
+	g_static_mutex_lock (&mutex);
+
 	g_debug ("UPDATE OBJECT WITH WS_OID (%i) ", MGD_OBJECT_WS_OID (self));
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
@@ -590,7 +593,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INVALID_PROPERTY_VALUE, 
 				"Can not update '%s'. Object's guid is NULL.", G_OBJECT_TYPE_NAME (G_OBJECT (self)));
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY_VALUE, "%s", (*error)->message);
-		return FALSE;
+		goto return_false;
 	}
 
 	/* Get object's size as it's needed for size' diff.
@@ -600,14 +603,14 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 		object_init_size = metadata->priv->size;		
 
 	if (!midgard_core_object_is_valid(self))
-		return FALSE;
+		goto return_false;
 
 	if (MIDGARD_DBOBJECT (self)->dbpriv->storage_data == NULL) {
 		g_set_error (error, MIDGARD_GENERIC_ERROR, MGD_ERR_INTERNAL, 
 				"This is absolutely critical and internal error. No type metadata attributes for '%s' class.",
 				G_OBJECT_TYPE_NAME (G_OBJECT (self)));
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", (*error)->message);
-		return FALSE;
+		goto return_false;
 	}
 
 	table = midgard_core_class_get_table(dbklass);
@@ -616,18 +619,18 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 				"Can not update. No table configured for '%s' class.",
 				G_OBJECT_TYPE_NAME (G_OBJECT (self)));
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", (*error)->message);
-		return FALSE;
+		goto return_false;
 	}
 
 	/* Check duplicates and parent field */
 	if (_object_in_tree(self) == OBJECT_IN_TREE_DUPLICATE) 
-		return FALSE;
+		goto return_false;
 
 	if (metadata) {
 		guint object_size = metadata->priv->size;	
 		if (midgard_quota_size_is_reached(self, object_size)){
 			MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (self), MGD_ERR_QUOTA);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -638,7 +641,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
 					"Failed to get parameters for prepared UPDATE statement (%s).",
 					G_OBJECT_CLASS_NAME (dbklass));
-			return FALSE;
+			goto return_false;
 		}
 		/* Workspace id */
 		gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_ID_FIELD, MGD_CNC_WORKSPACE_ID(mgd));
@@ -647,7 +650,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 					"Failed to set workspace id UPDATE parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 		/* Workspace object id */
 		g_debug ("UPDATE OBJECT, SET PARAM WS_OID (%i) ", MGD_OBJECT_WS_OID (self));
@@ -657,7 +660,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 					"Failed to set object's workspace id UPDATE parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -665,7 +668,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 
 	if (updated == 0) {
 		g_propagate_error (error, err);
-		return FALSE;
+		goto return_false;
 	}
 
 	if (updated < 0) {
@@ -673,7 +676,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 				"SQL query UPDATE failed: %s", err && err->message ? err->message : "Unknown reason");
 		if (err)
 			g_clear_error (&err);
-		return FALSE;
+		goto return_false;
 	}
 
 	midgard_quota_update(self, object_init_size);  
@@ -683,7 +686,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 		MidgardRepligard *repligard = midgard_repligard_new (mgd);
 		if (!repligard) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard object");
-			return FALSE;
+			goto return_false;
 		}
 		midgard_repligard_update_object_info (repligard, self, MGD_OBJECT_ACTION_UPDATE, &err);
 		g_object_unref (repligard);
@@ -693,7 +696,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 					G_OBJECT_TYPE_NAME (self),
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -717,7 +720,13 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 			break;
 	}
 
+        g_static_mutex_unlock (&mutex);
 	return TRUE;
+
+return_false:
+
+        g_static_mutex_unlock (&mutex);
+	return FALSE;
 }
 
 /**
@@ -981,8 +990,11 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);	
 	GError *err = NULL;
 
+	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
+	g_static_mutex_lock (&mutex);
+
 	if (MIDGARD_DBOBJECT (object)->dbpriv->storage_data == NULL)
-		return FALSE;
+		goto return_false;
 
 	/* Handle pure create call. If replicate is OBJECT_UPDATE_IMPORTED, then, 
 	 * object has guid already set, which is valid for unserialized object */
@@ -993,7 +1005,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 				MGD_GENERIC_ERROR,
 				MGD_ERR_DUPLICATE,
 				"Object already created.");
-		return FALSE;
+		goto return_false;
 	}
 
 	/* Create object's guid, only if it's not already set */
@@ -1011,7 +1023,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	/* check if object is valid */
 	if (!midgard_core_object_is_valid(object)) {
 		_CLEAR_OBJECT_GUID (object);
-		return FALSE;
+		goto return_false;
 	}
 	
 	MIDGARD_ERRNO_SET (MGD_OBJECT_CNC (object), MGD_ERR_OK);	
@@ -1033,7 +1045,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		g_warning ("Object '%s' has no table or storage defined!",
 				G_OBJECT_TYPE_NAME(object));    
 		MIDGARD_ERRNO_SET (MGD_OBJECT_CNC (object), MGD_ERR_NOT_EXISTS);    
-		return FALSE;  
+		goto return_false;  
 	}
 
 	/* If Object has upfield set , check if property which points to up is set and has some value. 
@@ -1045,12 +1057,12 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	if (is_dup == OBJECT_IN_TREE_DUPLICATE) {
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_DUPLICATE);
 		_CLEAR_OBJECT_GUID (object);
-		return FALSE;
+		goto return_false;
 	}
 		
 	if (!midgard_quota_create(object)) {
 		_CLEAR_OBJECT_GUID (object);
-		return FALSE;
+		goto return_false;
 	}	
 
 	if (MGD_CNC_USES_WORKSPACE (mgd)) {
@@ -1060,7 +1072,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
 					"Failed to get parameters for prepared INSERT statement (%s).",  
 					G_OBJECT_CLASS_NAME (dbklass));
-			return FALSE;
+			goto return_false;
 		}
 		/* Workspace id */
 		gda_set_set_holder_value (params, &err, MGD_WORKSPACE_ID_FIELD, MGD_CNC_WORKSPACE_ID(mgd));
@@ -1069,7 +1081,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 					"Failed to set workspace id parameter: %s.", 
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 		/* Workspace object id */
 		gda_set_set_holder_value (params, &err, MGD_WORKSPACE_OID_FIELD, MGD_OBJECT_WS_OID (object));
@@ -1078,7 +1090,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 					"Failed to set object's workspace id parameter: %s.", 
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -1087,7 +1099,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	if (inserted == -1) {
 		_CLEAR_OBJECT_GUID (object);
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);
-		return FALSE;
+		goto return_false;
 	}
 
 	/* Always! get ID of newly created object */
@@ -1108,7 +1120,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 					G_OBJECT_TYPE_NAME(G_OBJECT(object)),
 					MGD_OBJECT_GUID (object));
 			MIDGARD_ERRNO_SET (MGD_OBJECT_CNC (object), MGD_ERR_INTERNAL);    
-			return FALSE;
+			goto return_false;
 		} else {
 
 			g_object_set(G_OBJECT(object), "id", new_id, NULL);
@@ -1137,7 +1149,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		MidgardRepligard *repligard = midgard_repligard_new (mgd);
 		if (!repligard) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard object");
-			return FALSE;
+			goto return_false;
 		}
 		midgard_repligard_create_object_info (repligard, object, &err);
 		g_object_unref (repligard);
@@ -1147,7 +1159,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 					G_OBJECT_TYPE_NAME (object), 					
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -1168,8 +1180,12 @@ gboolean _midgard_object_create (	MidgardObject *object,
 	}
 
 	MGD_OBJECT_IN_STORAGE (object) = TRUE;
-
+	g_static_mutex_unlock (&mutex);
 	return TRUE;
+
+return_false:
+	g_static_mutex_unlock (&mutex);
+	return FALSE;
 }
 
 /**
@@ -1352,7 +1368,7 @@ gboolean midgard_object_get_by_id(MidgardObject *object, guint id)
 	
 	/* Get object using 'id' constraint */
 	GError *err = NULL;
-	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, &err, "id", &pval, NULL);
+	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, FALSE, &err, "id", &pval, NULL);
 	g_value_unset (&pval);
 	if (err) {
 		MIDGARD_ERRNO_SET_STRING (MGD_OBJECT_CNC(object), MGD_ERR_NOT_EXISTS, "%s", 
@@ -2249,6 +2265,17 @@ __midgard_object_class_init (MidgardObjectClass *klass, gpointer g_class_data)
 					G_TYPE_NONE,
 					0);
 
+		mklass->signal_action_load =
+			g_signal_new("action-load",
+					G_TYPE_FROM_CLASS(g_class),
+					G_SIGNAL_ACTION,
+					G_STRUCT_OFFSET (MidgardObjectClass, action_load),
+					NULL, /* accumulator */
+					NULL, /* accu_data */
+					g_cclosure_marshal_VOID__VOID,	
+					G_TYPE_NONE,
+					0);
+
 		mklass->signal_action_loaded =
 			g_signal_new("action-loaded",
 					G_TYPE_FROM_CLASS(g_class),
@@ -2535,7 +2562,7 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 		}
 	
 		GError *err = NULL;
-		midgard_core_query_get_object (mgd, name, &self, &err, field, value, NULL);
+		midgard_core_query_get_object (mgd, name, &self, FALSE, &err, field, value, NULL);
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", 
 					err && err->message ? err->message : "Unknown reason");
@@ -2806,7 +2833,7 @@ gboolean midgard_object_get_by_guid(MidgardObject *object, const gchar *guid)
 	g_value_set_string(&pval, guid);
 
 	GError *err = NULL;
-	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, &err, "guid", &pval, NULL);
+	midgard_core_query_get_object (MGD_OBJECT_CNC (object), NULL, (MidgardDBObject **) &object, FALSE, &err, "guid", &pval, NULL);
 	g_value_unset (&pval);
 
 	if (err) {
@@ -2826,9 +2853,11 @@ gboolean
 _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 {
 	g_assert(object);
-	
+
+	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
+	g_static_mutex_lock (&mutex);
+
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
-	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_delete, 0);		
 		
 	MidgardMetadata *metadata = MGD_DBOBJECT_METADATA (object);
 	MidgardDBObjectClass *klass = MIDGARD_DBOBJECT_GET_CLASS (MIDGARD_DBOBJECT (object));
@@ -2839,7 +2868,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 				MGD_GENERIC_ERROR,
 				MGD_ERR_INVALID_PROPERTY_VALUE, 
 				"Object has neither metadata nor deleted property installed");
-		return FALSE;
+		goto return_false;
 	}
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
@@ -2848,7 +2877,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	if (!params) {
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
 				"Can not delete %s. Missed delete prepared statement or parameters", G_OBJECT_TYPE_NAME (object));
-		return FALSE;
+		goto return_false;
 	}	
 
 	const gchar *guid = MGD_OBJECT_GUID(object);
@@ -2856,12 +2885,12 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	if (!guid){
 		MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INVALID_PROPERTY_VALUE, 
 				"Can not delete %s. Guid property is NULL.", G_OBJECT_TYPE_NAME (object));
-		return FALSE;
+		goto return_false;
 	}
 	
 	if (check_dependents && midgard_object_has_dependents(object)) {		
 		MIDGARD_ERRNO_SET (MGD_OBJECT_CNC(object), MGD_ERR_HAS_DEPENDANTS);
-		return FALSE;
+		goto return_false;
 	}
 	
 	GValue tval = {0, };
@@ -2881,7 +2910,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set revisor DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 		/* Revised */
 		gchar *timeupdated = NULL;
@@ -2892,7 +2921,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set revised DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 		g_free (timeupdated);
 		/* Revision */
@@ -2903,7 +2932,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set revision DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 		/* Deleted */
 		gda_set_set_holder_value (params, &err, "metadata_deleted", 1);
@@ -2912,7 +2941,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set deleted DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 
 	} else {
@@ -2924,7 +2953,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set deleted DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -2935,7 +2964,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 				"Failed to set guid DELETE(UPDATE) parameter: %s.",
 				err && err->message ? err->message : "Unknown reason");
 		g_clear_error (&err);
-		return FALSE;
+		goto return_false;
 	}
 
 	/* Workspace ID */
@@ -2947,7 +2976,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					"Failed to set workspace ID DELETE(UPDATE) parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 	
@@ -2965,14 +2994,14 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 		if (metadata)
 			metadata->priv->revision--;
 
-		return FALSE;
+		goto return_false;
 	} 
 
 	if (MGD_CNC_REPLICATION (mgd)) {
 		MidgardRepligard *repligard = midgard_repligard_new (mgd);
 		if (!repligard) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "Can not initialize repligard object");
-			return FALSE;
+			goto return_false;
 		}
 		midgard_repligard_update_object_info (repligard, object, MGD_OBJECT_ACTION_DELETE, &err);
 		g_object_unref (repligard);
@@ -2982,7 +3011,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 					G_OBJECT_TYPE_NAME (object),
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
-			return FALSE;
+			goto return_false;
 		}
 	}
 
@@ -3003,7 +3032,13 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_deleted, 0);
 	__dbus_send(object, "delete");
 
+
+	g_static_mutex_unlock (&mutex);
 	return TRUE;
+
+return_false:
+	g_static_mutex_unlock (&mutex);
+	return FALSE;
 }
 
 
@@ -3053,7 +3088,16 @@ midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 {
 	g_return_val_if_fail (object != NULL, FALSE);
 
-	return _midgard_object_delete (object, check_dependents);
+	g_signal_emit (object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_delete, 0);
+	gboolean rv = _midgard_object_delete (object, check_dependents);
+
+	if (!rv) 
+		return FALSE;
+
+	g_signal_emit (object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_deleted, 0);
+	__dbus_send (object, "delete");
+
+	return TRUE;
 }
 
 /**
@@ -3094,6 +3138,22 @@ midgard_object_delete (MidgardObject *object, gboolean check_dependents)
  */ 
 gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 {
+	g_return_val_if_fail (object != NULL, FALSE);
+
+	g_signal_emit (object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purge, 0);
+	gboolean rv = _midgard_object_purge (object, check_dependents);
+
+	if (!rv) 
+		return FALSE;
+
+	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purged, 0);
+	__dbus_send(object, "purge");
+
+	return TRUE;
+}
+
+gboolean _midgard_object_purge(MidgardObject *object, gboolean check_dependents)
+{
 	gint rv = 0;
 	GString *dsql;
 	const gchar *guid, *table;
@@ -3101,7 +3161,6 @@ gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 	GError *err = NULL;
 	
 	MIDGARD_ERRNO_SET(MGD_OBJECT_CNC (object), MGD_ERR_OK);
-	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purge, 0);	
 
 	if (MIDGARD_DBOBJECT (object)->dbpriv->storage_data == NULL){
 		g_warning("No schema attributes for class %s", 
@@ -3177,9 +3236,6 @@ gboolean midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 		MIDGARD_ERRNO_SET(MGD_OBJECT_CNC(object), MGD_ERR_INTERNAL);
 		return FALSE; 
 	}
-
-	g_signal_emit(object, MIDGARD_OBJECT_GET_CLASS(object)->signal_action_purged, 0);
-	__dbus_send(object, "purge");
 
 	return TRUE;  
 }

@@ -29,6 +29,15 @@ class TestMethods(unittest.TestCase):
     self.assertTrue(mgd.open_config(config))
     self.assertEqual(mgd.get_error_string(), "MGD_ERR_OK")
 
+  def testContentManager(self):
+    mgd = TestConnection()
+    manager = mgd.get_content_manager()
+    self.assertNotEqual(manager, None)
+    self.assertIsInstance(manager, Midgard.SqlContentManager)
+    manager2 = mgd.get_content_manager()
+    self.assertNotEqual(manager2, None)
+    self.assertEqual(manager, manager2)
+
   def testInheritance(self):
     mgd = TestConnection()
     self.assertIsInstance(mgd, GObject.GObject)
