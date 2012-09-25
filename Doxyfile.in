@@ -1,7 +1,0 @@
-PROJECT_NAME           = @PACKAGE@
-PROJECT_NUMBER         = @VERSION@
-INPUT                  = @srcdir@
-RECURSIVE              = YES
-OUTPUT_DIRECTORY       = doc
-OPTIMIZE_OUTPUT_FOR_C  = YES
-SOURCE_BROWSER         = NO
