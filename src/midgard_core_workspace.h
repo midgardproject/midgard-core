@@ -74,6 +74,7 @@ GSList 		*midgard_core_workspace_get_parent_names	(MidgardConnection *mgd, guint
 const GValue 	*midgard_core_workspace_get_value_by_id 	(MidgardConnection *mgd, guint field_id, guint id, guint *row_id);
 gint		midgard_core_workspace_get_col_id_by_name 	(MidgardConnection *mgd, const gchar *name, gint col_idx, gint up_id_check, guint *row_id);
 GSList 		*midgard_core_workspace_get_context_ids 	(MidgardConnection *mgd, guint id);
+GSList 		*midgard_core_workspace_get_children_ids 	(MidgardConnection *mgd, guint id);
 gint		midgard_core_workspace_get_id_by_path		(MidgardConnection *mgd, const gchar *path, guint *row_id, GError **error);
 
 G_END_DECLS
