@@ -291,6 +291,46 @@ midgard_core_workspace_get_context_ids (MidgardConnection *mgd, guint id)
 }
 
 GSList *
+midgard_core_workspace_get_children_ids (MidgardConnection *mgd, guint id)
+{
+	g_return_val_if_fail (mgd != NULL, NULL);
+	g_return_val_if_fail (id != 0, NULL);
+
+	guint row;
+	GdaDataModel *model = mgd->priv->workspace_model;
+	/* model is not initialized, which means there's no workspace created yet */
+	if (!model)
+		return NULL;
+
+	g_object_ref (model);
+
+	GSList *list = NULL;
+	guint ret_rows = gda_data_model_get_n_rows (model);
+	if (ret_rows == 0)
+		goto return_list;
+
+	for (row = 0; row < ret_rows; row++) {
+		
+		const GValue *upval = gda_data_model_get_value_at (model, MGD_WORKSPACE_FIELD_IDX_UP, row, NULL);
+		guint up_id;
+		if (G_VALUE_HOLDS_UINT (upval))
+			up_id = g_value_get_uint (upval);
+		else
+			up_id = g_value_get_int (upval);
+		
+		if (up_id != id)
+			continue;
+
+		const GValue *idval = gda_data_model_get_value_at (model, MGD_WORKSPACE_FIELD_IDX_ID, row, NULL);
+		list = g_slist_append(list, (gpointer) idval);
+	}
+
+return_list:
+	g_object_unref (model);
+	return list;
+}
+
+GSList *
 midgard_core_workspace_get_parent_names (MidgardConnection *mgd, guint up)
 {
 	g_return_val_if_fail (mgd != NULL, NULL);
