@@ -367,35 +367,30 @@ _midgard_workspace_list_workspace_names (MidgardWorkspaceStorage *wss, guint *el
 		*elements = 0;
 
 	MidgardWorkspace *self = MIDGARD_WORKSPACE (wss);
-	const gchar *path = midgard_workspace_storage_get_path (wss);
-	if (path == NULL)
+
+	const MidgardWorkspaceManager *manager = self->priv->manager;
+	MidgardConnection *mgd = manager->priv->mgd;
+	guint id = self->priv->id;
+	GSList *sl = NULL;
+
+	GSList *list = midgard_core_workspace_get_children_ids (mgd, id);
+	if (list == NULL)
 		return NULL;
 
-	gchar **tokens = g_strsplit (path, "/", 0);
-	guint i = 0;
-
-	GSList *slist = NULL;
-
-	/* compute number of elements, ignore empty element and self's name */       
-	while (tokens[i] != NULL) {
-		if (*tokens[i] != '\0' && !g_str_equal (self->priv->name, tokens[i]))
-			slist = g_slist_prepend (slist, tokens[i]);
-		i++;
+	*elements = g_slist_length (list);
+	gchar **names = g_new (gchar *, *elements);
+	guint n = 0;
+		
+	for (sl = list; sl != NULL; sl = sl->next, n++) {
+		GValue* id_val = (GValue *) sl->data;
+		guint child_id = G_VALUE_HOLDS_UINT (id_val) ? g_value_get_uint (id_val) : (guint) g_value_get_int(id_val);
+		guint row_id;
+		const GValue *name_value = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_NAME, child_id, &row_id);
+		/* Full transfer is only for container so do not duplicate strings */
+		names[n] = (gchar *) g_value_get_string (name_value);
 	}
 
-	if (slist == NULL)
-		return NULL;
-
-	gchar **names = g_new (gchar*, g_slist_length (slist));
-	slist = g_slist_reverse (slist);
-	GSList *l;
-	for (l = slist, i = 0; l != NULL; l = l->next, i++) {
-		names[i] = (gchar*) l->data;
-	}
-
-	if (elements)
-		*elements = g_slist_length (slist);
-	g_slist_free (slist);
+	g_slist_free (list);
 
 	return names;
 }
