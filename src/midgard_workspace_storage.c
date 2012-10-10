@@ -47,7 +47,7 @@ midgard_workspace_storage_get_path (MidgardWorkspaceStorage *self)
  * @self: #MidgardWorkspaceStorage instance
  * @name: a name of #MidgardWorkspaceStorage object to find
  *
- * Returns: (transfer full): (transfer full): (transfer full): (transfer full): (transfer full): (transfer full): (transfer full): (transfer full): (transfer full): newly allocated #MidgardWorkspaceStorage object if found, %NULL otherwise
+ * Returns: (transfer full): newly allocated #MidgardWorkspaceStorage object if found, %NULL otherwise
  * Since: 10.05.5
  */ 
 MidgardWorkspaceStorage *
