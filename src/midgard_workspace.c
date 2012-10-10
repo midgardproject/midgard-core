@@ -437,10 +437,18 @@ _midgard_workspace_list_children (MidgardWorkspaceStorage *wss, guint *n_objects
 	if (names == NULL) 
 		return NULL;
 
+	const gchar *path = midgard_workspace_storage_get_path (wss);
+	if (path == NULL)
+		return NULL;
+
 	guint i;
+	const MidgardWorkspaceManager *manager = MIDGARD_WORKSPACE(wss)->priv->manager;
 	MidgardWorkspaceStorage **children = g_new (MidgardWorkspaceStorage*, n_names);
 	for (i = 0; i < n_names; i++) {
-		children[i] = midgard_workspace_storage_get_workspace_by_name (wss, names[i]);
+		gchar *child_path = g_strconcat (path, "/", names[i], NULL);
+		children[i] = (MidgardWorkspaceStorage *) midgard_workspace_new ();
+		midgard_workspace_manager_get_workspace_by_path (manager, children[i], child_path, NULL);
+		g_free (child_path);
 	}
 
 	if (n_objects)
