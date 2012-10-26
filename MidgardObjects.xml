@@ -449,7 +449,7 @@
     </type>
 
     <!-- nt:hierarchyNode -->
-    <type name="nt_hierarchyNode" metadata="false" extends="nt_base, mix_created">
+    <type name="nt_hierarchyNode" metadata="false" abstract="interface" extends="nt_base, mix_created">
         <!-- Node and NodeType definitions -->
         <user_values>
             <Supertypes>mix:created</Supertypes>
