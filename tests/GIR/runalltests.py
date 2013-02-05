@@ -7,6 +7,9 @@ import shutil
 
 import unittest
 
+if os.path.isfile("./test_data/test_gir.db"):
+  os.remove("./test_data/test_gir.db")
+
 testLoader = unittest.TestLoader()
 
 names = []
@@ -23,9 +26,6 @@ try:
   shutil.rmtree("./test_data/blobs")
 except OSError:
   pass
-
-if os.path.isfile("./test_data/test_gir.db"):
-  os.remove("./test_data/test_gir.db")
 
 if not result.wasSuccessful():
 	sys.exit(1) 
