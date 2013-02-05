@@ -3198,7 +3198,11 @@ gboolean _midgard_object_purge(MidgardObject *object, gboolean check_dependents)
 
 	dsql = g_string_new("DELETE ");
 	g_string_append_printf(dsql, "FROM %s WHERE guid='%s' ", table, guid);
-	
+
+	if (MGD_CNC_USES_WORKSPACE (mgd)) {
+		g_string_append_printf(dsql, " AND midgard_ws_id=%d", MGD_CNC_WORKSPACE_ID(mgd));
+	}
+
 	guint size = midgard_quota_get_object_size(object);
 	
 	/* TODO , libgda, libgda */
