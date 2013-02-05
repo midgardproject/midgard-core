@@ -17,6 +17,7 @@ class TestStorage(unittest.TestCase):
   def setUp(self):
     if self.mgd is None:
       self.mgd = TestConnection.openConnection()
+      self.mgd.enable_workspace(True)
 
   def tearDown(self):
     self.mgd.close()
