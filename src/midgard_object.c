@@ -1076,6 +1076,7 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		}
 		/* Workspace id */
 		gda_set_set_holder_value (params, &err, MGD_WORKSPACE_ID_FIELD, MGD_CNC_WORKSPACE_ID(mgd));
+		MGD_OBJECT_WS_ID (object) = MGD_CNC_WORKSPACE_ID(mgd);
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
 					"Failed to set workspace id parameter: %s.", 
