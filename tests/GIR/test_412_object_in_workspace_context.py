@@ -46,6 +46,8 @@ class TestObjectInWorkspaceContext(unittest.TestCase):
     self.manager.get_workspace_by_path(context, "/Foo/Bar")
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstoreName)
     self.assertEqual(len(bookstores), 1)
+    # test workspace object
+    self.assertEqual(bookstores[0].get_workspace(), context)
    
   def testCreate_02_ObjectInWorkspaceContext_FooBar(self):
     # set new context so we can query object from there
