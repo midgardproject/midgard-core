@@ -818,6 +818,11 @@ midgard_object_save (MidgardObject *self)
 
 	g_signal_emit(self, MIDGARD_OBJECT_GET_CLASS(self)->signal_action_update, 0);
 
+	/* Create object's guid, only if it's not already set */
+	if (MGD_OBJECT_GUID (self) == NULL) {
+		MGD_OBJECT_GUID (self) = midgard_guid_new (MGD_OBJECT_CNC (self));
+	}
+
 	GError *error = NULL;
 	gboolean rv =  _midgard_object_update(self, OBJECT_UPDATE_NONE, &error);
 	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
