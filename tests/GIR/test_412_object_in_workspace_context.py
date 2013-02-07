@@ -40,14 +40,13 @@ class TestObjectInWorkspaceContext(unittest.TestCase):
     bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
     bookstore.set_property("name", self.bookstoreName)
     bookstore.set_property("extra", self.extraFoo)
-    self.assertTrue(bookstore.create())
+    self.assertTrue(bookstore.save())
     # set new context so we can query object from there
     context = Midgard.WorkspaceContext()
     self.manager.get_workspace_by_path(context, "/Foo/Bar")
+    self.mgd.set_workspace(context)
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstoreName)
     self.assertEqual(len(bookstores), 1)
-    # test workspace object
-    self.assertEqual(bookstores[0].get_workspace(), context)
    
   def testCreate_02_ObjectInWorkspaceContext_FooBar(self):
     # set new context so we can query object from there
@@ -58,7 +57,7 @@ class TestObjectInWorkspaceContext(unittest.TestCase):
     self.assertEqual(len(bookstores), 1)
     bookstore = bookstores[0]
     bookstore.set_property("extra", self.extraFooBar)
-    self.assertTrue(bookstore.update())
+    self.assertTrue(bookstore.save())
     # test updated object
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstoreName)
     self.assertEqual(len(bookstores), 1)
@@ -82,7 +81,7 @@ class TestObjectInWorkspaceContext(unittest.TestCase):
     self.assertEqual(len(bookstores), 1)
     bookstore = bookstores[0]
     bookstore.set_property("extra", self.extraFooBarFooBar)
-    self.assertTrue(bookstore.update())
+    self.assertTrue(bookstore.save())
     # test updated object
     bookstores = BookStoreQuery.findByName(self.mgd, self.bookstoreName)
     self.assertEqual(len(bookstores), 1)
@@ -113,7 +112,7 @@ class TestObjectInWorkspaceContext(unittest.TestCase):
     self.assertEqual(bookstore.get_property("extra"), self.extraFooBar)
 
   def testDelete_05_ObjectInWorkspaceContext_FooBar(self):
-    # set /Foo/Bar/FooBar context and get object
+    # set /Foo/Bar context and get object
     context = Midgard.WorkspaceContext()
     self.manager.get_workspace_by_path(context, "/Foo/Bar")
     self.mgd.set_workspace(context)
@@ -128,7 +127,7 @@ class TestObjectInWorkspaceContext(unittest.TestCase):
     self.assertEqual(bookstore.get_property("extra"), self.extraFoo)
 
   def testDelete_06_ObjectInWorkspaceContext_FooBarFooBar(self):
-    # set /Foo/Bar/FooBar context and get object
+    # set /Foo context and get object
     context = Midgard.WorkspaceContext()
     self.manager.get_workspace_by_path(context, "/Foo")
     self.mgd.set_workspace(context)
