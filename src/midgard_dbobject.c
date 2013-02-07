@@ -367,8 +367,7 @@ __initialize_statement_insert_query_string (MidgardDBObjectClass *klass, gboolea
 
 	/* Add workspace context columns */
 	if (add_workspace) {
-		g_string_append_printf (colnames, ", %s, %s", MGD_WORKSPACE_OID_FIELD, MGD_WORKSPACE_ID_FIELD);
-		g_string_append_printf (values, ", ##%s::guint", MGD_WORKSPACE_OID_FIELD);
+		g_string_append_printf (colnames, ", %s", MGD_WORKSPACE_ID_FIELD);
 		g_string_append_printf (values, ", ##%s::guint", MGD_WORKSPACE_ID_FIELD);
 	}
 
@@ -515,8 +514,7 @@ __initialize_statement_update_query_string (MidgardDBObjectClass *klass, gboolea
 
 	if (add_workspace) {
       		/* Add workspace context columns */
-		g_string_append_printf (sql, ",%s=##%s::guint, %s=##%s::guint", 
-				MGD_WORKSPACE_OID_FIELD, MGD_WORKSPACE_OID_FIELD,
+		g_string_append_printf (sql, ",%s=##%s::guint", 
 				MGD_WORKSPACE_ID_FIELD, MGD_WORKSPACE_ID_FIELD);
 	}
 

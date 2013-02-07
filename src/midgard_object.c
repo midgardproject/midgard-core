@@ -580,9 +580,7 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 	GError *err = NULL;
 
 	static GStaticMutex mutex = G_STATIC_MUTEX_INIT;
-	g_static_mutex_lock (&mutex);
-
-	g_debug ("UPDATE OBJECT WITH WS_OID (%i) ", MGD_OBJECT_WS_OID (self));
+	g_static_mutex_lock (&mutex);	
 
 	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
 	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (self);
@@ -648,16 +646,6 @@ _midgard_object_update (MidgardObject *self, _ObjectActionUpdate replicate, GErr
 		if (err) {
 			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
 					"Failed to set workspace id UPDATE parameter: %s.",
-					err && err->message ? err->message : "Unknown reason");
-			g_clear_error (&err);
-			goto return_false;
-		}
-		/* Workspace object id */
-		g_debug ("UPDATE OBJECT, SET PARAM WS_OID (%i) ", MGD_OBJECT_WS_OID (self));
-		gda_set_set_holder_value (params, NULL, MGD_WORKSPACE_OID_FIELD, MGD_OBJECT_WS_OID (self));
-		if (err) {
-			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL,
-					"Failed to set object's workspace id UPDATE parameter: %s.",
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
 			goto return_false;
@@ -1089,15 +1077,6 @@ gboolean _midgard_object_create (	MidgardObject *object,
 			g_clear_error (&err);
 			goto return_false;
 		}
-		/* Workspace object id */
-		gda_set_set_holder_value (params, &err, MGD_WORKSPACE_OID_FIELD, MGD_OBJECT_WS_OID (object));
-		if (err) {
-			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, 
-					"Failed to set object's workspace id parameter: %s.", 
-					err && err->message ? err->message : "Unknown reason");
-			g_clear_error (&err);
-			goto return_false;
-		}
 	}
 
 	gint inserted = midgard_core_query_create_dbobject_record (MIDGARD_DBOBJECT (object));
@@ -1130,23 +1109,6 @@ gboolean _midgard_object_create (	MidgardObject *object,
 		} else {
 
 			g_object_set(G_OBJECT(object), "id", new_id, NULL);
-		}
-	}
-
-	/* UPDATE object's workspace data */
-	/* If workspace object id is 0 we do fallback to self id, to keep unique
-	 * oid reference. This is typical create without workspace context */
-	if (MGD_CNC_USES_WORKSPACE (mgd)) {
-		MGD_OBJECT_WS_ID (object) = MGD_CNC_WORKSPACE_ID (mgd);
-		guint oid = MGD_OBJECT_WS_OID (object);
-		if (oid == 0) {
-			MGD_OBJECT_WS_OID (object) = new_id;
-			/* UPDATE WS object id field using newly created id value */
-			query = g_string_new ("UPDATE ");
-			g_string_append_printf (query, " %s SET %s=%d WHERE id=%d",
-					tablename, MGD_WORKSPACE_OID_FIELD, new_id, new_id);
-			midgard_core_query_execute(MGD_OBJECT_CNC (object), query->str, FALSE);
-			g_string_free(query, TRUE);
 		}
 	}
 
@@ -1407,21 +1369,6 @@ __add_workspace_columns (MidgardConnection *mgd, MidgardDBObjectClass *klass)
 	if (!rv)
 		return FALSE;
 
-	/* Workspace object id */
-	mdc = midgard_core_dbcolumn_new ();
-	mdc->table_name = table;
-	mdc->column_name = MGD_WORKSPACE_OID_FIELD;
-	mdc->index = TRUE;
-	mdc->dbtype = "int";
-	mdc->gtype = MGD_TYPE_INT;
-	mdc->unique = FALSE;
-	mdc->dvalue = "0";
-	
-	rv = midgard_core_query_add_column (mgd, mdc);
-	g_free (mdc);
-	if (!rv)
-		return FALSE;
-
 	return TRUE;
 }
 
@@ -1552,7 +1499,7 @@ __add_fields_to_select_statement (MidgardDBObjectClass *klass, MidgardConnection
 	/* Add workspace identifiers */
 
 	/* Root workspace ideintifier */
-	select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
+	/* select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
 	select_field->as = g_strdup_printf (MGD_WORKSPACE_OID_FIELD);
 	select->expr_list = g_slist_append (select->expr_list, select_field);
 	expr = gda_sql_expr_new (GDA_SQL_ANY_PART (select_field));
@@ -1562,7 +1509,7 @@ __add_fields_to_select_statement (MidgardDBObjectClass *klass, MidgardConnection
 	g_value_set_string (val, table_field);
 	g_free (table_field);
 	expr->value = val;
-	select_field->expr = expr;
+	select_field->expr = expr; */
 
 	/* Current workspace id */
 	select_field = gda_sql_select_field_new (GDA_SQL_ANY_PART (select));
@@ -1610,25 +1557,8 @@ __set_from_data_model (MidgardDBObject *self, GdaDataModel *model, gint row, gui
 
 	guint id;
 
-	/* object ws id */
-	gint ws_idx = gda_data_model_get_column_index (model, MGD_WORKSPACE_OID_FIELD);
-	value = gda_data_model_get_value_at (model, ws_idx, row, &error);
-	if (!value) {
-		g_warning ("Failed to get ws_root_id: %s", error && error->message ? error->message : "Unknown reason");
-		if (error)
-			g_clear_error (&error);
-	} else {
-		if (G_VALUE_HOLDS_UINT (value))
-			id = g_value_get_uint (value);
-		else 
-			id = (guint) g_value_get_int (value);
-
-		MGD_OBJECT_WS_OID (self) = id;
-	}
-	if (error) g_clear_error (&error);
-
 	/* ws id */
-	ws_idx = gda_data_model_get_column_index (model, MGD_WORKSPACE_ID_FIELD);
+	guint ws_idx = gda_data_model_get_column_index (model, MGD_WORKSPACE_ID_FIELD);
 	value = gda_data_model_get_value_at (model, ws_idx, row, &error);
 	if (!value) {
 		g_warning ("Failed to get ws_id: %s", error && error->message ? error->message : "Unknown reason");
