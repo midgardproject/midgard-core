@@ -3934,25 +3934,9 @@ MidgardWorkspace*
 midgard_object_get_workspace (MidgardObject *self)
 {
 	g_return_val_if_fail (self != NULL, NULL);
-
-	guint ws_id = MGD_OBJECT_WS_ID (self);
-	if (ws_id == 0)
-		return NULL;
-
-	guint row_id;
-	MidgardConnection *mgd = MGD_OBJECT_CNC (self);
-	const GValue *val = midgard_core_workspace_get_value_by_id (MGD_OBJECT_CNC (self), MGD_WORKSPACE_FIELD_IDX_ID, ws_id, &row_id);
-	if (!val) {
-		/* FIXME critical error */
-		return NULL;
-	}
-
-#warning "Get workspace via WorkspaceManager"	
-	MidgardWorkspace *ws = midgard_workspace_new (mgd, NULL);
-	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (ws);
-	dbklass->dbpriv->set_from_data_model (MIDGARD_DBOBJECT (ws), mgd->priv->workspace_model, row_id, 0);
-
-	return ws;
+	
+	g_warning("Call workspace manager get_object_workspace method");
+	return NULL;
 }
 
 /* C# helpers */
