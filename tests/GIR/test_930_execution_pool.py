@@ -23,6 +23,7 @@ class TestExecutionPool(unittest.TestCase):
   def setUp(self):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()  
     if self.bookstore is None:
       self.bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
       self.bookstore.set_property("name", "BookStore One")
@@ -43,6 +44,7 @@ class TestExecutionPool(unittest.TestCase):
     self.reference = None
     self.job = None
     self.pool = None
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 

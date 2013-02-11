@@ -17,6 +17,7 @@ from bookstorequery import BookStoreQuery
 class TestObjectInWorkspaceContext(unittest.TestCase):
   mgd = None
   manager = None
+  transaction = None
   bookstoreName = "BookStore In Foo"
   extraFoo = "extra Foo"
   extraFooBar = "extra FooBar"
@@ -25,14 +26,16 @@ class TestObjectInWorkspaceContext(unittest.TestCase):
   def setUp(self):
     if self.mgd is None:
       self.mgd = TestConnection.openConnection()
-      self.mgd.enable_workspace(True)
+    self.mgd.enable_workspace(True)
+    self.mgd.beginTransaction()
     if self.manager is None:
       self.manager = Midgard.WorkspaceManager(connection = self.mgd)
     ws = Midgard.Workspace()
     self.manager.get_workspace_by_path(ws, "/Foo")
     self.mgd.set_workspace(ws)
 
-  def tearDown(self):        
+  def tearDown(self):       
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 

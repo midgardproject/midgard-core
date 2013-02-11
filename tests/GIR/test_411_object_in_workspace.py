@@ -17,6 +17,7 @@ from bookstorequery import BookStoreQuery
 class TestObjectInWorkspaceContext(unittest.TestCase):
   mgd = None
   manager = None
+  transaction = None
   bookstoreName = "BookStore In Foo"
   extraFoo = "extra Foo"
   extraFooBar = "extra FooBar"
@@ -31,8 +32,10 @@ class TestObjectInWorkspaceContext(unittest.TestCase):
     ws = Midgard.Workspace()
     self.manager.get_workspace_by_path(ws, "/Foo")
     self.mgd.set_workspace(ws)
+    self.mgd.beginTransaction() 
 
   def tearDown(self):        
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 

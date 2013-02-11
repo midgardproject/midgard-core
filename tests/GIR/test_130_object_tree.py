@@ -15,10 +15,9 @@ class TestSchemaObjectTree(unittest.TestCase):
   def setUp(self):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()
 
   def purgeSnippets(self):
-    tr = Midgard.Transaction(connection = self.mgd)
-    tr.begin()
     st = Midgard.QueryStorage(dbclass = "midgard_snippet")
     qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
     qs.execute()
@@ -29,10 +28,10 @@ class TestSchemaObjectTree(unittest.TestCase):
     qs.execute()
     for s in qs.list_objects():
       s.purge(False)
-    tr.commit()
 
   def tearDown(self):        
     self.purgeSnippets()
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 

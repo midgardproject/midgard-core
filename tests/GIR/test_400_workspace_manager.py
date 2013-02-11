@@ -16,10 +16,12 @@ class TestWorkspaceManager(unittest.TestCase):
   def setUp(self):
     if self.mgd is None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()
     if self.manager is None:
       self.manager = Midgard.WorkspaceManager(connection = self.mgd)
 
   def tearDown(self):        
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 
