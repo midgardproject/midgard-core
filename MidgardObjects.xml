@@ -76,7 +76,7 @@
         <property name="name" type="string" index="yes" unique="yes">
             <description>Path name of the snippet</description>
         </property>
-        <property name="snippetdir" type="unsigned integer" link="midgard_snippetdir:id" parentfield="up">
+        <property name="snippetdir" type="unsigned integer" link="midgard_snippetdir:id" parentfield="snippetdir">
             <description>Snippetdir the snippet is under</description>
         </property>
         <property name="code" type="text">
