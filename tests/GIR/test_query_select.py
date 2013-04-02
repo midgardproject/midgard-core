@@ -238,6 +238,31 @@ class TestQuerySelect(unittest.TestCase):
     query_value.set_value(some_float)
     self.assertEqual(query_value.get_value(), some_float)
 
+  def testVeryLongStringConstraintWithIndexedColumn(self):
+    # https://github.com/midgardproject/midgard-core/issues/198
+    long_firstname = "thisisareallyreallylongstringtomakesurewerelongerthantheindex@unitteststheproblemshowedupwith86chrs.fx"
+    person = Midgard.Object.factory(self.mgd, "midgard_person", None)
+    person.set_property("firstname", long_firstname)
+    self.assertTrue(person.create())
+    
+    st = Midgard.QueryStorage(dbclass = "midgard_person")
+    qs = Midgard.QuerySelect(connection = self.mgd, storage = st)
+    qs.set_constraint(
+        Midgard.QueryConstraint(
+          property = Midgard.QueryProperty(property = "firstname"),
+          operator = "=",
+          holder = Midgard.QueryValue.create_with_value(long_firstname)
+          )
+        )
+    
+    qs.execute()
+    objects = qs.list_objects()
+    self.assertEqual(len(objects), 1)
+    p = objects[0]
+    self.assertEqual(p.get_property("firstname"), long_firstname)
+    
+    person.purge(False)
+
   def testInheritance(self):
     qs = Midgard.QuerySelect(connection = self.mgd)
     self.assertIsInstance(qs, Midgard.QueryExecutor)
