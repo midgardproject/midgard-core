@@ -2500,7 +2500,7 @@ midgard_object_new (MidgardConnection *mgd, const gchar *name, GValue *value)
 		GError *err = NULL;
 		midgard_core_query_get_object (mgd, name, &self, FALSE, &err, field, value, NULL);
 		if (err) {
-			MIDGARD_ERRNO_SET_STRING (mgd, MGD_ERR_INTERNAL, "%s", 
+			MIDGARD_ERRNO_SET_STRING (mgd, err->code, "%s", 
 					err && err->message ? err->message : "Unknown reason");
 			g_clear_error (&err);
 			return NULL;
