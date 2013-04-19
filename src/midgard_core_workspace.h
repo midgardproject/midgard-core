@@ -29,7 +29,7 @@ G_BEGIN_DECLS
 
 #define MGD_WORKSPACE_TABLE "midgard_workspace"
 
-#define MGD_WORKSPACE_OID_FIELD "midgard_ws_oid_id"
+#define MGD_WORKSPACE_OID_FIELD "guid"
 #define MGD_WORKSPACE_ID_FIELD "midgard_ws_id"
 
 #define MGD_WORKSPACE_FIELD_ID          "id"

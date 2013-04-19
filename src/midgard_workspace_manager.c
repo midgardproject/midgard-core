@@ -335,6 +335,51 @@ midgard_workspace_manager_move_content (const MidgardWorkspaceManager *self, con
 	return TRUE;
 }
 
+/**
+ * midgard_workspace_manager_get_object_workspace:
+ * @self: #MidgardWorkspaceManager instance
+ * @object: #GObject instance
+ * @error: pointer to store returned error
+ *
+ * Get the workspace associated with given object. Valid #MidgardObject or #MidgardDBObject is recommended.
+ * In other case, object instance is ignored and %NULL is returned unconditionaly.
+ *
+ * Returns: (transfer full): #MidgardWorkspace or %NULL
+ *
+ * Since: 12.09.2
+ */ 
+MidgardWorkspace*
+midgard_workspace_manager_get_object_workspace (const MidgardWorkspaceManager *self, GObject *object, GError **error)
+{
+	g_return_val_if_fail (self != NULL, NULL);
+	g_return_val_if_fail (object != NULL, NULL);
+
+	if (!MIDGARD_IS_OBJECT(object))
+		return;
+	if (!MIDGARD_IS_DBOBJECT(object))
+		return;
+
+	guint ws_id = MGD_OBJECT_WS_ID (object);
+	if (ws_id == 0)
+		return NULL;
+
+	guint row_id;
+	MidgardConnection *mgd = MGD_OBJECT_CNC (object);
+	const GValue *val = midgard_core_workspace_get_value_by_id (mgd, MGD_WORKSPACE_FIELD_IDX_ID, ws_id, &row_id);
+	if (!val) {
+		g_set_error (error, MIDGARD_WORKSPACE_STORAGE_ERROR,
+				MIDGARD_WORKSPACE_STORAGE_ERROR_INVALID_VALUE,
+				"Can not find workspace with invalid identifier");
+		return NULL;
+	}
+	
+	MidgardWorkspace *ws = midgard_workspace_new ();
+	MidgardDBObjectClass *dbklass = MIDGARD_DBOBJECT_GET_CLASS (ws);
+	dbklass->dbpriv->set_from_data_model (MIDGARD_DBOBJECT (ws), mgd->priv->workspace_model, row_id, 0);
+	
+	return ws;
+}
+
 /* GOBJECT ROUTINES */
 
 static GObjectClass *parent_class = NULL;

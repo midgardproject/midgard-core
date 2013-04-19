@@ -16,6 +16,7 @@ class TestAttachment(unittest.TestCase):
   def setUp(self):
     if self.mgd is None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()  
     if self.bookstore is None:
       self.bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
       self.bookstore.set_property("name", "BookStore")
@@ -29,6 +30,7 @@ class TestAttachment(unittest.TestCase):
   def tearDown(self):        
     if self.bookstore is not None:
       self.bookstore.purge(False)
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 

@@ -77,7 +77,7 @@ midgard_transaction_begin (MidgardTransaction *self)
 	g_debug("Begin named transaction '%s'", self->priv->name);
 
 	rv = gda_connection_begin_transaction(cnc, self->priv->name, 
-			GDA_TRANSACTION_ISOLATION_UNKNOWN, &error);
+			GDA_TRANSACTION_ISOLATION_READ_COMMITTED, &error);
 
 	if (!error && rv)
 		return TRUE;

@@ -15,8 +15,10 @@ class TestUser(unittest.TestCase):
   def setUp(self):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()
 
   def tearDown(self):        
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 

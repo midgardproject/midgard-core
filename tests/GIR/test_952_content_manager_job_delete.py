@@ -30,6 +30,7 @@ class TestContentManagerJobDelete(unittest.TestCase):
   def setUp(self):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()  
     if self.bookstore_one is None:
       self.bookstore_one = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
       self.bookstore_one.set_property("name", self.bookstore_one_name)
@@ -66,6 +67,7 @@ class TestContentManagerJobDelete(unittest.TestCase):
     self.reference_two = None
     self.job_one = None
     self.job_two = None
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 
