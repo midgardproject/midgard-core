@@ -158,6 +158,19 @@ class TestObjectCrud(unittest.TestCase):
     new_obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", obj.get_property("guid"))
     self.assertIsNone(new_obj)
 
+  def testLoadDeleted(self):
+    # https://github.com/midgardproject/midgard-core/issues/199
+    obj = self.getNewBook()    
+    obj.set_property("title", "The book to delete and load")
+
+    self.assertTrue(obj.create())
+    deleted_id = obj.get_property("id")
+    self.assertTrue(obj.delete(False))
+
+    new_obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", obj.get_property("guid"))
+    self.assertEqual(self.mgd.get_error(), Midgard.GenericError.NOT_EXISTS)
+
+    self.assertTrue(obj.purge(False))
 
   def testInheritance(self):
     obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)
