@@ -8,6 +8,9 @@ from test_000_config import TestConfig
 from gi.repository import Midgard, GObject
 
 class TestConnection(Midgard.Connection):
+  
+  transaction = None
+
   def __init__(self):
     Midgard.init()
     Midgard.Connection.__init__(self)
@@ -15,11 +18,18 @@ class TestConnection(Midgard.Connection):
   @staticmethod
   def openConnection():
     config = TestConfig()
-    mgd = Midgard.Connection()
+    mgd = TestConnection()
     if mgd.open_config(config) is True:
       return mgd
     print mgd.get_error_string()
     return None
+
+  def beginTransaction(self):
+    self.transaction = Midgard.Transaction(connection = self)
+    self.transaction.begin()
+
+  def commitTransaction(self):
+    self.transaction.commit()
 
 class TestMethods(unittest.TestCase):
   def testOpenConfig(self):

@@ -59,6 +59,7 @@ gboolean		midgard_workspace_manager_get_workspace_by_path (const MidgardWorkspac
 
 gboolean 		midgard_workspace_manager_purge_content		(const MidgardWorkspaceManager *self, const gchar *type, MidgardWorkspace *ws, GError **error);
 gboolean 		midgard_workspace_manager_move_content		(const MidgardWorkspaceManager *self, const gchar *type, MidgardWorkspace *src, MidgardWorkspace *dest, GError **error);
+MidgardWorkspace	*midgard_workspace_manager_get_object_workspace	(const MidgardWorkspaceManager *self, GObject *object, GError **error);
 
 G_END_DECLS
 

@@ -19,6 +19,7 @@ class TestContentManagerJobCreate(unittest.TestCase):
   def setUp(self):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()
     if self.bookstore is None:
       self.bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
     if self.reference is None:
@@ -31,6 +32,7 @@ class TestContentManagerJobCreate(unittest.TestCase):
     self.reference = None
     self.job = None
     self.manager = None
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 

@@ -16,10 +16,12 @@ class TestWorkspaceManager(unittest.TestCase):
   def setUp(self):
     if self.mgd is None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()
     if self.manager is None:
       self.manager = Midgard.WorkspaceManager(connection = self.mgd)
 
   def tearDown(self):        
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 
@@ -53,6 +55,30 @@ class TestWorkspaceManager(unittest.TestCase):
 
     wb = Midgard.Workspace(name = "stable")
     self.assertTrue(self.manager.create_workspace(wb, "/devel/testing"))
+
+  def testGetObjectWorkspaceInvalid(self):
+    workspace =self.manager.get_object_workspace(self.manager)
+    self.assertEqual(workspace, None)
+
+  def testGetObjectWorkspaceWithoutWorkspace(self):
+    bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
+    workspace = self.manager.get_object_workspace(bookstore)
+    self.assertEqual(workspace, None)
+
+  def testGetObjectWorkspace(self):
+    #bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
+    context = Midgard.WorkspaceContext()
+    self.manager.get_workspace_by_path(context, "/devel/testing")
+    self.mgd.enable_workspace(True)
+    self.mgd.set_workspace(context)
+    bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
+    bookstore.create()
+    workspace = self.manager.get_object_workspace(bookstore)
+    ws = Midgard.Workspace()
+    self.manager.get_workspace_by_path(ws, "/devel/testing")
+    self.assertEqual(workspace.get_property("name"), ws.get_property("name"))
+    self.assertEqual(workspace.get_property("guid"), ws.get_property("guid"))
+    bookstore.purge(False)
 
   def testGetWorkspaceByPathInvalid(self):
     wa = Midgard.Workspace()

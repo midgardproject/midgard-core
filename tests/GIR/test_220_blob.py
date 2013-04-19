@@ -15,6 +15,7 @@ class TestBlob(unittest.TestCase):
   def setUp(self):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()
     self.attachment = Midgard.Object.factory(self.mgd, "midgard_attachment", None)
     self.attachment.set_property("title", "TestTitle")
     self.attachment.set_property("name", "TestName")
@@ -26,6 +27,7 @@ class TestBlob(unittest.TestCase):
       if self.blob.exists():
         self.blob.remove_file()
     self.attachment.purge(False)
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 

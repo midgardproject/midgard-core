@@ -16,6 +16,7 @@ class TestObjectCrud(unittest.TestCase):
   def setUp(self):
     if self.mgd == None:
       self.mgd = TestConnection.openConnection()
+    self.mgd.beginTransaction()
     if self.bookstore is None:
       self.bookstore = Midgard.Object.factory(self.mgd, "gir_test_book_store", None)
       self.bookstore.set_property("name", "BookStore")
@@ -24,6 +25,7 @@ class TestObjectCrud(unittest.TestCase):
   def tearDown(self):
     if self.bookstore is not None:
         self.bookstore.purge(False)
+    self.mgd.commitTransaction()
     self.mgd.close()
     self.mgd = None
 
@@ -158,6 +160,18 @@ class TestObjectCrud(unittest.TestCase):
     new_obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", obj.get_property("guid"))
     self.assertIsNone(new_obj)
 
+  def testLoadDeleted(self):
+    # https://github.com/midgardproject/midgard-core/issues/199
+    obj = self.getNewBook()    
+    obj.set_property("title", "The book to delete and load")
+    
+    self.assertTrue(obj.create())
+    deleted_id = obj.get_property("id")
+    self.assertTrue(obj.delete(False))
+    
+    new_obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", obj.get_property("guid"))
+    self.assertEqual(self.mgd.get_error(), Midgard.GenericError.NOT_EXISTS)
+    self.assertTrue(obj.purge(False)) 
 
   def testInheritance(self):
     obj = Midgard.Object.factory(self.mgd, "gir_test_book_crud", None)

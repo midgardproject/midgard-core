@@ -3,6 +3,7 @@
 	<type name="gir_test_book_store" table="gir_test_book_store">
 		<property name="id" type="unsigned integer" primaryfield="id"/>
 		<property name="name" type="string" field="name_field"/>
+		<property name="extra" type="string" field="extra_field"/>
 	</type>
 	<type name="gir_test_book_author" table="gir_test_book_author">
 		<property name="id" type="unsigned integer" primaryfield="id"/>
