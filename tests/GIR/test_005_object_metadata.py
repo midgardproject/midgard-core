@@ -57,7 +57,7 @@ class TestObjectMetadataCrud(unittest.TestCase):
     # Read only properties 
     self.assertIsNot(new_metadata.get_property("created"), None)
     self.assertIsNot(new_metadata.get_property("revised"), None)
-    self.assertIsNot(new_metadata.get_property("revision"), 0)
+    self.assertEqual(new_metadata.get_property("revision"), 0)
 
     # Cleanup 
     obj.purge(False)
@@ -90,7 +90,7 @@ class TestObjectMetadataCrud(unittest.TestCase):
     # Read only properties 
     self.assertIsNot(metadata.get_property("created"), None)
     self.assertIsNot(metadata.get_property("revised"), None)
-    self.assertIsNot(metadata.get_property("revision"), 1)
+    self.assertEqual(metadata.get_property("revision"), 1)
 
     # Cleanup 
     obj.purge(False)
