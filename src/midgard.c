@@ -212,6 +212,14 @@ midgard_init()
 	/* Register transform function explicitly, we need own routine */
 	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_FLOAT, __transform_string_to_float);
   	g_value_register_transform_func (G_TYPE_STRING, G_TYPE_BOOLEAN, __transform_string_to_boolean);
+
+	/*
+	g_log_set_always_fatal(G_LOG_LEVEL_WARNING);
+	g_log_set_fatal_mask("GLib-GObject", G_LOG_LEVEL_WARNING);
+	g_log_set_fatal_mask("GLib", G_LOG_LEVEL_WARNING);
+	g_log_set_fatal_mask("GLib-GObject", G_LOG_LEVEL_CRITICAL);
+	g_log_set_fatal_mask("GLib", G_LOG_LEVEL_CRITICAL); 
+	*/
 }
 
 void 
