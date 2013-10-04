@@ -2865,8 +2865,7 @@ _midgard_object_delete (MidgardObject *object, gboolean check_dependents)
 	}
 	
 	GValue tval = {0, };
-	g_value_init (&tval, MGD_TYPE_TIMESTAMP);
-	midgard_timestamp_set_current_time(&tval);
+	midgard_timestamp_new_current (&tval);
 	GError *err = NULL;	
 	gchar *person_guid = "";
 	MidgardObject *person = MGD_CNC_PERSON (mgd);
