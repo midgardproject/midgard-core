@@ -29,10 +29,7 @@
 #include "midgard_core_workspace.h"
 #include "midgard_user.h"
 #include "sql/midgard_sql_content_manager.h"
-
-#ifdef HAVE_LIBGDA_4
 #include <sql-parser/gda-sql-parser.h>
-#endif
 
 #define MGD_MYSQL_HOST "127.0.0.1"
 #define MGD_MYSQL_DATABASE "midgard"
