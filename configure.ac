@@ -18,10 +18,11 @@ AC_CONFIG_SRCDIR(src/midgard.c)
 
 dnl Automake is needed for the build system.
 dnl
-AM_INIT_AUTOMAKE([-Wno-portability -Wall])
+AM_PROG_AR
+AM_INIT_AUTOMAKE([-Wno-portability -Wall subdir-objects])
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 AM_MAINTAINER_MODE
-GOBJECT_INTROSPECTION_CHECK([0.6.5])
+GOBJECT_INTROSPECTION_CHECK([1.66])
 
 AC_PROG_CC(gcc cc)
 AC_LANG(C)
@@ -30,18 +31,10 @@ dnl Checks for programs.
 AM_PROG_LIBTOOL
 
 dnl Checks libgda
-gdamodule="libgda-4.0"
-GDA_GIR_INCLUDE="Gda-4.0"
-GDA_GIR_PACKAGE="libgda-4.0"
-AC_MSG_CHECKING([whether to use Libgda5 (libgda4 by default)])
-AC_ARG_WITH(libgda5, [  --with-libgda5], gdamodule="libgda-5.0", gdamodule="libgda-4.0")
-AC_MSG_RESULT($gdamodule)
 
-if test "$gdamodule" == "libgda-5.0"; then
-	GDA_GIR_INCLUDE="Gda-5.0"
-	GDA_GIR_PACKAGE="libgda-5.0"
-fi
-
+GDA_GIR_INCLUDE="Gda-5.0"
+GDA_GIR_PACKAGE="libgda-5.0"
+gdamodule="libgda-5.0"
 
 _MIDGARD_DBUS_SUPPORT=yes
 dbus_libs="dbus-1 dbus-glib-1"
@@ -57,9 +50,6 @@ if test "$_MIDGARD_DBUS_SUPPORT" == "no"; then
 fi
 
 PKG_CHECK_MODULES(MIDGARD, glib-2.0 gobject-2.0 libxml-2.0 $gdamodule $dbus_libs)
-if test "$gdamodule" == "libgda-4.0"; then
-    MIDGARD_CFLAGS="${MIDGARD_CFLAGS} -DHAVE_LIBGDA_4"
-fi
 
 DBUS_CONF_DIR="/etc"
 if test "$_MIDGARD_DBUS_SUPPORT" == "yes"; then
