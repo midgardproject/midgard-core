@@ -294,7 +294,7 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = midgard2.pc
 
 -include $(INTROSPECTION_MAKEFILE)
-INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir) 
+INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir) --pkg-export=midgard2
 INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
 
 if HAVE_INTROSPECTION
